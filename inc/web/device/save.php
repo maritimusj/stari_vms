@@ -3,7 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
- 
+
 namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
@@ -12,8 +12,8 @@ use RuntimeException;
 use zovye\model\packageModelObj;
 
 $id = Request::int('id');
-
 $device = null;
+
 $result = Util::transactionDo(function () use ($id, &$device) {
     $data = [
         'agent_id' => 0,
@@ -24,7 +24,6 @@ $result = Util::transactionDo(function () use ($id, &$device) {
         'remain' => max(0, Request::int('remain')),
     ];
 
-    $tags = Request::trim('tags');
     $extra = [
         'pushAccountMsg' => Request::trim('pushAccountMsg'),
         'isDown' => Request::bool('isDown') ? Device::STATUS_MAINTENANCE : Device::STATUS_NORMAL,
@@ -93,7 +92,9 @@ $result = Util::transactionDo(function () use ($id, &$device) {
 
     $data['device_type'] = $type_id;
 
-    if (App::isBluetoothDeviceSupported() && Request::str('device_model') == Device::BLUETOOTH_DEVICE) {
+    $device_model = Request::str('device_model');
+
+    if (App::isBluetoothDeviceSupported() && $device_model == Device::BLUETOOTH_DEVICE) {
         $extra['bluetooth'] = [
             'protocol' => Request::str('blueToothProtocol'),
             'uid' => Request::trim('BUID'),
@@ -105,7 +106,7 @@ $result = Util::transactionDo(function () use ($id, &$device) {
         ];
     }
 
-    if (App::isFuelingDeviceEnabled() && Request::str('device_model') == Device::FUELING_DEVICE) {
+    if (App::isFuelingDeviceEnabled() && $device_model == Device::FUELING_DEVICE) {
         $extra['pulse'] = Request::int('pulse');
         $extra['timeout'] = Request::int('timeout');
         $extra['solo'] = Request::bool('solo') ? 1 : 0;
@@ -122,13 +123,14 @@ $result = Util::transactionDo(function () use ($id, &$device) {
         $data['agent_id'] = $agent->getId();
     }
 
-    $now = time();
-
-    if ($id) {
+    //更新设备
+    if ($id > 0) {
         $device = Device::get($id);
         if (empty($device)) {
             throw new RuntimeException('设备不存在！');
         }
+
+        $device->setDeviceModel($device_model);
 
         if ($data['shadow_id']) {
             $device->setShadowId($data['shadow_id']);
@@ -150,7 +152,7 @@ $result = Util::transactionDo(function () use ($id, &$device) {
         }
 
         if ($data['device_type'] != $device->getDeviceType()) {
-            $res = $device->resetPayload(['*' => '@0'], '管理员改变型号', $now);
+            $res = $device->resetPayload(['*' => '@0'], '管理员改变型号', TIMESTAMP);
             if (is_error($res)) {
                 throw new RuntimeException('保存库存失败！');
             }
@@ -167,15 +169,15 @@ $result = Util::transactionDo(function () use ($id, &$device) {
                 $extra['volume'] = $vol;
             }
         }
+
     } else {
+        //创建新设备
         $device = Device::create($data);
         if (empty($device)) {
             throw new RuntimeException('创建失败！');
         }
 
-        $model = Request::str('device_model');
-
-        $device->setDeviceModel($model);
+        $device->setDeviceModel($device_model);
 
         if ($device->isNormalDevice() || $device->isChargingDevice() || $device->isFuelingDevice()) {
             $activeRes = Util::activeDevice($device->getImei());
@@ -194,6 +196,7 @@ $result = Util::transactionDo(function () use ($id, &$device) {
         $device->updateAppId();
     }
 
+    //充电设备处理
     if ($device->isChargingDevice()) {
         $device->setDeviceType(0);
 
@@ -226,7 +229,7 @@ $result = Util::transactionDo(function () use ($id, &$device) {
 
             $cargo_lanes = [];
             $capacities = Request::array('capacities');
-            $is_fueling =  $device->isFuelingDevice();
+            $is_fueling = $device->isFuelingDevice();
 
             foreach (Request::array('goods') as $index => $goods_id) {
                 $cargo_lanes[] = [
@@ -234,13 +237,17 @@ $result = Util::transactionDo(function () use ($id, &$device) {
                     'capacity' => $is_fueling ? intval(round($capacities[$index] * 100)) : intval($capacities[$index]),
                 ];
                 if ($old[$index] && $old[$index]['goods'] != intval($goods_id)) {
-                    $device->resetPayload([$index => '@0'], $is_fueling ? '管理员更改加注枪商品' : '管理员更改货道商品', $now);
+                    $device->resetPayload([$index => '@0'],
+                        $is_fueling ? '管理员更改加注枪商品' : '管理员更改货道商品',
+                        TIMESTAMP);
                 }
                 unset($old[$index]);
             }
 
             foreach ($old as $index => $lane) {
-                $device->resetPayload([$index => '@0'], $is_fueling ? '管理员删除加注枪' : '管理员删除货道', $now);
+                $device->resetPayload([$index => '@0'],
+                    $is_fueling ? '管理员删除加注枪' : '管理员删除货道',
+                    TIMESTAMP);
             }
 
             $device_type->setExtraData('cargo_lanes', $cargo_lanes);
@@ -252,13 +259,13 @@ $result = Util::transactionDo(function () use ($id, &$device) {
         throw new RuntimeException('获取型号失败！');
     }
 
-    $is_fueling =  $device->isFuelingDevice();
+    $is_fueling = $device->isFuelingDevice();
 
     //货道商品数量和价格
     $type_data = DeviceTypes::format($device_type);
     $cargo_lanes = [];
     foreach ($type_data['cargo_lanes'] as $index => $lane) {
-        if ( $is_fueling) {
+        if ($is_fueling) {
             $num = intval(Request::float("lane{$index}_num", 0, 2) * 100);
         } else {
             $num = Request::int("lane{$index}_num");
@@ -271,7 +278,7 @@ $result = Util::transactionDo(function () use ($id, &$device) {
         }
     }
 
-    $res = $device->resetPayload($cargo_lanes, '管理员编辑设备', $now);
+    $res = $device->resetPayload($cargo_lanes, '管理员编辑设备', TIMESTAMP);
     if (is_error($res)) {
         throw new RuntimeException('保存设备库存数据失败！');
     }
@@ -281,10 +288,8 @@ $result = Util::transactionDo(function () use ($id, &$device) {
     $extra['location']['baidu']['lng'] = $location['lng'];
 
     $saved_baidu_loc = $device->settings('extra.location.baidu', []);
-    if (
-        strval($saved_baidu_loc['lng']) != strval($location['lng'])
-        || strval($saved_baidu_loc['lat']) != strval($location['lat'])
-    ) {
+    if (strval($saved_baidu_loc['lng']) != strval($location['lng'])
+        || strval($saved_baidu_loc['lat']) != strval($location['lat'])) {
         $address = Util::getLocation($location['lng'], $location['lat']);
         if ($address) {
             $extra['location']['baidu']['area'] = [
@@ -326,8 +331,9 @@ $result = Util::transactionDo(function () use ($id, &$device) {
         throw new RuntimeException('保存扩展数据失败！');
     }
 
+    $tags = Request::trim('tags');
     $device->setTagsFromText($tags);
-    $device->setDeviceModel(request('device_model'));
+
     if (!$device->save()) {
         throw new RuntimeException('保存数据失败！');
     }
@@ -343,8 +349,6 @@ $result = Util::transactionDo(function () use ($id, &$device) {
                 $error = true;
             }
         }
-    } elseif ($device->isChargingDevice()) {
-        //todo 暂无操作
     } else {
         if (App::isZJBaoEnabled()) {
             $device->updateSettings('zjbao.scene', Request::trim('ZJBao_Scene'));
@@ -352,11 +356,8 @@ $result = Util::transactionDo(function () use ($id, &$device) {
 
         //更新公众号缓存
         $device->updateAccountData();
-
         $device->updateScreenAdvsData();
-
         $device->updateAppVolume();
-
         $device->updateAppRemain();
     }
 
@@ -379,11 +380,10 @@ if (is_error($result)) {
     Util::itoast($result['message'], $id ? We7::referer() : $this->createWebUrl('device'), 'error');
 }
 
-Util::itoast(
-    $result['message'],
-    $this->createWebUrl(
-        'device',
-        ['op' => 'edit', 'id' => $device ? $device->getId() : $id, 'from' => Request::str('from')]
-    ),
-    $result['error'] ? 'warning' : 'success'
-);
+$redirect_url = $this->createWebUrl('device', [
+    'op' => 'edit',
+    'id' => $device ? $device->getId() : $id,
+    'from' => Request::str('from'),
+]);
+
+Util::itoast($result['message'], $redirect_url, $result['error'] ? 'warning' : 'success');

@@ -26,7 +26,7 @@ $content = app()->fetchTemplate(
     [
         'chartid' => Util::random(10),
         'title' => $title,
-        'chart' => Stats::chartOfchargingGroup($group, $title),
+        'chart' => Stats::chartOfChargingGroup($group, $title),
     ]
 );
 

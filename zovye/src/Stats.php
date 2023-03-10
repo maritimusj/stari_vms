@@ -190,6 +190,7 @@ class Stats
      * @param modelObj $obj
      * @param mixed $day
      * @param string $title
+     * @param callable|null $fn
      * @return array
      */
     public static function chartDataOfDay(modelObj $obj, DateTimeInterface $day, string $title = '', callable $fn = null): array
@@ -240,6 +241,7 @@ class Stats
      * @param modelObj $obj
      * @param DateTimeInterface $month
      * @param string $title
+     * @param callable|null $fn
      * @return array
      */
     public static function chartDataOfMonth(modelObj $obj, DateTimeInterface $month, string $title = '', callable $fn = null): array
@@ -319,12 +321,11 @@ class Stats
 
     /**
      * 返回指定月份的月统计数据
-     * @param modelObj $obj
-     * @param DateTimeInterface $month
+     * @param device_groupsModelObj $group
      * @param string $title
      * @return array
      */
-    public static function chartOfchargingGroup(device_groupsModelObj $group, string $title = ''): array
+    public static function chartOfChargingGroup(device_groupsModelObj $group, string $title = ''): array
     {
         $chart = self::getChargingChartInitData($title);
 
@@ -350,7 +351,7 @@ class Stats
             $result = $query->get();
             $total = $result[0] ?? 0;
 
-            return $total / 100;;
+            return $total / 100;
         };
         
         $begin = new DateTime();

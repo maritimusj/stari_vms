@@ -35,9 +35,9 @@ class Charging
         return false;
     }
 
-    public static function start(string $serial, ICard $card, deviceModelObj $device, $chargerID)
+    public static function start(string $serial, ICard $card, deviceModelObj $device, $chargerID, $extra = [])
     {
-        return Util::transactionDo(function () use ($card, $device, $chargerID, $serial) {
+        return Util::transactionDo(function () use ($card, $device, $chargerID, $serial, $extra) {
             if (!$device->isChargingDevice()) {
                 return err('设备类型不正确！');
             }
@@ -103,7 +103,7 @@ class Charging
                 'num' => 1,
                 'price' => 0,
                 'account' => empty($acc) ? '' : $acc->name(),
-                'ip' => Util::getClientIp(),
+                'ip' => $extra['ip'] ?? Util::getClientIp(),
                 'extra' => [
                     'group' => $group->profile(),
                     'device' => [
@@ -119,6 +119,10 @@ class Charging
                     ]
                 ],
             ];
+
+            if ($extra['pay_name']) {
+                $order_data['extra']['card']['pay_name'] = $extra['pay_name'];
+            }
 
             $agent = $device->getAgent();
             if ($agent) {
@@ -548,7 +552,10 @@ class Charging
 
         $chargerID = $pay_log->getChargerID();
 
-        $res = self::start($pay_log->getOrderNO(), $pay_log, $device, $chargerID);
+        $res = self::start($pay_log->getOrderNO(), $pay_log, $device, $chargerID, [
+            'ip' => $pay_log->getData('ip', ''),
+            'pay_name' => $pay_log->getPayName(),
+        ]);
         if (is_error($res)) {
             return $res;
         }

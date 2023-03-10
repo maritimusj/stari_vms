@@ -750,6 +750,7 @@ class Order extends State
                         }
                     }
                 }
+                $data['pay'] = (array)$order->getExtraData('card', []);
             } elseif ($order->isFuelingOrder()) {
                 $data['num'] = number_format($data['num'] / 100, 2, '.', '');
                 $goods = $order->getExtraData('goods');

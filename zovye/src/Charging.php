@@ -311,19 +311,19 @@ class Charging
         $result = $order->getChargingResult();
         if ($result && $result['re'] != 3) {
             if ($result['re'] == 112) {
-                return err("启动失败：正在充电中");
+                return err('启动失败：正在充电中');
             } elseif ($result['re'] == 113) {
-                return err("启动失败：设备故障");
+                return err('启动失败：设备故障');
             } elseif ($result['re'] == 114) {
-                return err("启动失败：设备离线");
+                return err('启动失败：设备离线');
             } elseif ($result['re'] == 115) {
-                return err("启动失败：充电枪没有插入");
+                return err('启动失败：充电枪没有插入');
             } elseif ($result['re'] == 121) {
-                return err("启动失败：设备通讯失败");
+                return err('启动失败：设备通讯失败');
             } elseif ($result['re'] == 122) {
-                return err("启动失败：设备响应超时");
+                return err('启动失败：设备响应超时');
             }
-            return err("启动失败：设备故障".($result['re'] - 110));
+            return err('启动失败：设备故障'.($result['re'] - 110));
         }
 
         $device = $order->getDevice();

@@ -328,13 +328,17 @@ class Stats
     {
         $chart = self::getChargingChartInitData($title);
 
-        $queryFN = function($begin, $end) use($group) {
+        $queryFN = function($begin) use($group) {
             $query = We7::load()->object('query');
         
             $query->from(m('order')->getTableName(), 'o')
             ->leftJoin(m('device')->getTableName(), 'd')
             ->on('o.device_id', 'd.id');
         
+            $end = new DateTime();
+            $end->setTimestamp($begin->getTimestamp());
+            $end->modify('first day of next month');
+            
             $query->where([
                 'd.group_id' => $group->getId(),
                 'o.createtime >=' => $begin->getTimestamp(),
@@ -345,16 +349,18 @@ class Stats
         
             $result = $query->get();
             $total = $result[0] ?? 0;
+
             return $total / 100;;
         };
         
         $begin = new DateTime();
         $begin->modify('-1 year');
-
+        $begin->modify('first day of this month 00:00');
+        
         $end = new DateTime();
 
         while ($begin < $end) {
-            $chart['series'][0]['data'][] = $queryFN($begin, $end);
+            $chart['series'][0]['data'][] = $queryFN($begin);
             $chart['xAxis']['data'][] = $begin->format('Y年m月');
             $begin->modify('+1 month');
         }

@@ -232,9 +232,9 @@ class Charging
 
     public static function stopCharging(deviceModelObj $device, $chargerID, $serial) {
         if (!$device->mcbNotify('config', '', [
-            "req" => "stop",
-            "ch" => $chargerID,
-            "ser" => $serial,
+            'req' => 'stop',
+            'ch' => $chargerID,
+            'ser' => $serial,
         ])) {
             return err('设备通信失败，请重试！');
         }

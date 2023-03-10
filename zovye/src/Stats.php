@@ -522,6 +522,7 @@ class Stats
             } else {
                 $begin = new DateTime();
                 $begin->setTimestamp($first_order['createtime']);
+                $begin->modify('first day of Jan this year 00:00');
                 $end = new DateTime();
 
                 while ($begin < $end) {

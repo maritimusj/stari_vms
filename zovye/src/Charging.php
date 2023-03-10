@@ -590,10 +590,20 @@ class Charging
                     $order->setExtraData('charging.status', $extra['status']);
                     $order->save();
 
-                    //检查用户余额
-                    $user = $order->getUser();
-                    if (empty($user) || $user->getCommissionBalanceCard()->total() < round($extra['status']['priceTotal'] * 100)) {
-                        Charging::stopCharging($device, $chargerID, $serial);
+                    //检查充电金额是否已经多于付款金额或帐户余额
+                    $totalPrice = round($extra['status']['priceTotal'] * 100);
+
+                    $pay_log = Pay::getPayLog($serial);
+                    if ($pay_log) {
+                        if ($totalPrice > $pay_log->total()) {
+                            Charging::stopCharging($device, $chargerID, $serial);
+                        }
+                    } else {
+                        //检查用户余额
+                        $user = $order->getUser();
+                        if (empty($user) || $totalPrice > $user->getCommissionBalanceCard()->total()) {
+                            Charging::stopCharging($device, $chargerID, $serial);
+                        }
                     }
                 }
             } else {

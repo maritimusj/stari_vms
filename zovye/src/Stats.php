@@ -15,6 +15,7 @@ use zovye\Contract\ISettings;
 use zovye\model\accountModelObj;
 use zovye\model\agentModelObj;
 use zovye\model\commission_balanceModelObj;
+use zovye\model\device_groupsModelObj;
 use zovye\model\orderModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
@@ -288,6 +289,74 @@ class Stats
             }
 
         } catch (Exception $e) {
+        }
+
+        return $chart;
+    }
+
+    public static function getChargingChartInitData(string $title): array
+    {
+        $chart = [
+            'tooltip' => ['trigger' => 'axis'], 
+            'xAxis' => ['type' => 'category'],
+            'yAxis' => ['type' => 'value', 'axisLabel' => ['formatter' => '{value}'], 'minInterval' => 1],
+            'series' => [
+                [
+                    'type' => 'line',
+                    'color' => '#FF3300',
+                    'name' => '收入',
+                    'data' => [],
+                ],
+            ],
+        ];
+
+        if ($title) {
+            $chart['title'] = ['text' => $title];
+        }
+
+        return $chart;
+    }
+
+    /**
+     * 返回指定月份的月统计数据
+     * @param modelObj $obj
+     * @param DateTimeInterface $month
+     * @param string $title
+     * @return array
+     */
+    public static function chartOfchargingGroup(device_groupsModelObj $group, string $title = ''): array
+    {
+        $chart = self::getChargingChartInitData($title);
+
+        $queryFN = function($begin, $end) use($group) {
+            $query = We7::load()->object('query');
+        
+            $query->from(m('order')->getTableName(), 'o')
+            ->leftJoin(m('device')->getTableName(), 'd')
+            ->on('o.device_id', 'd.id');
+        
+            $query->where([
+                'd.group_id' => $group->getId(),
+                'o.createtime >=' => $begin->getTimestamp(),
+                'o.createtime <' => $end->getTimestamp(),
+            ]);
+        
+            $query->select('sum(price)');
+        
+            $result = $query->get();
+            $total = $result[0] ?? 0;
+            return $total / 100;;
+        };
+        
+        $begin = new DateTime();
+        $begin->modify('-1 year');
+
+        $end = new DateTime();
+
+        while ($begin < $end) {
+            $chart['series'][0]['data'][] = $queryFN($begin, $end);
+            $chart['xAxis']['data'][] = $begin->format('Y年m月');
+            $begin->modify('+1 month');
         }
 
         return $chart;

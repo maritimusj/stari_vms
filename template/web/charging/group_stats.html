@@ -1,0 +1,27 @@
+{if $chart}
+<div style="min-width:700px;height:300px;" id="{$chartid}" data-chart="{$chartid}">
+</div>
+<script type="text/javascript">
+   require(["{php \zovye\url(false, JS_ECHARTS_URL);}"], function(echarts){
+        const myChart = echarts.init(document.getElementById("{$chartid}"));
+        const option = JSON.parse('{php echo json_encode($chart);}');
+        option['grid'] = {
+            top: '40px',
+            left: '30px',
+            right: '10px',
+            bottom: '40px',
+        }
+        myChart.setOption(option);
+        window.addEventListener("resize", function () {
+            myChart.resize();
+        });
+        $('body').on('shown.bs.modal', function () {
+            myChart.resize();
+        })
+    });
+</script>
+{else}
+<div class="text-center text-muted">
+    <i class="fa fa-question-circle"></i> 暂时没有统计数据！
+</div> 
+{/if}

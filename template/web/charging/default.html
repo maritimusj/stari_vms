@@ -62,12 +62,13 @@
                     {$item['createtime']}
                 </td>
                 <td class="operate"  data-id="{$item['id']}">
-                        <i class="fa fa-refresh {if $item['version'] != $item['remote_version']}active{/if}" data-op="refresh"></i>
+                    <i class="fa fa fa-area-chart fa-fw" data-op="stats" title="查看统计"></i>
+                    <i class="fa fa-refresh {if $item['version'] != $item['remote_version']}active{/if} fa-fw" data-op="refresh"></i>
                     <a href="{php echo $this->createWebUrl('charging',array('id'=>$item['id'],'op'=>'edit'));}">
-                        <i class="fa fa-edit" title="编辑"></i>
+                        <i class="fa fa-edit fa-fw" title="编辑"></i>
                     </a>
                     <a href="{php echo $this->createWebUrl('charging',array('id'=>$item['id'],'op'=>'remove'));}" onclick="if(!confirm('确定要删除这个分组吗？')){return false;}">
-                        <i class="fa fa-trash-o" title="删除这个分组？"></i>
+                        <i class="fa fa-trash-o fa-fw" title="删除这个分组？"></i>
                     </a> 
                 </td>
             </tr>

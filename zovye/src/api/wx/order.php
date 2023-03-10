@@ -263,6 +263,11 @@ class order
 
             if ($entry->isChargingOrder()) {
                 $data['type'] = 'charging';
+                $data['pay'] = $entry->getExtraData('card', []);
+                $refund = $entry->getExtraData('charging.refund', []);
+                if ($refund) {
+                    $data['pay']['refund'] = $refund;
+                }
             } elseif ($entry->isFuelingOrder()) {
                 $data['type'] = 'fueling';
                 $data['pay'] = $entry->getExtraData('card', []);

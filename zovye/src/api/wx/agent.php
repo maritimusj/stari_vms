@@ -1218,6 +1218,11 @@ class agent
 
             if ($order->isChargingOrder()) {
                 $data['type'] = 'charging';
+                $data['pay'] = $order->getExtraData('card', []);
+                $refund = $order->getExtraData('charging.refund', []);
+                if ($refund) {
+                    $data['pay']['refund'] = $refund;
+                }
             } elseif ($order->isFuelingOrder()) {
                 $data['type'] = 'fueling';
                 $data['pay'] = $order->getExtraData('card', []);

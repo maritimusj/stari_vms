@@ -443,6 +443,12 @@ class Charging
                 if ($remain > 0) {
                     Job::refund($serial, '充电订单结算退款');
                 }
+                //事件：订单已经创建
+                EventBus::on('device.orderCreated', [
+                    'device' => $device,
+                    'user' => $user,
+                    'order' => $order,
+                ]);
             } else {
                 //扣除用户账户金额
                 if ($totalPrice > 0) {

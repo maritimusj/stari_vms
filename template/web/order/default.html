@@ -470,7 +470,7 @@
                             <div class="detail">
                                 {if $order['type'] == 'charging'}
                                     {if $order['price'] > 0}
-                                        总价：<span class="price" data-op="priceDetail"> {$order['price']}</span>
+                                        {if $order['src'] == 31}费用：{else}总价：{/if}<span class="price" data-op="priceDetail"> {$order['price']}</span>
                                     {else}
                                     {/if}
                                 {else}

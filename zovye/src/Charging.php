@@ -606,11 +606,12 @@ class Charging
             if ($serial) {
                 $order = Order::get($serial, true);
                 if ($order) {
-                    $order->setExtraData('charging.status', $extra['status']);
-                    $order->save();
-
                     //检查充电金额是否已经多于付款金额或帐户余额
                     $totalPrice = round($extra['status']['priceTotal'] * 100);
+
+                    $order->setExtraData('charging.status', $extra['status']);
+                    $order->setPrice($totalPrice);
+                    $order->save();
 
                     $pay_log = Pay::getPayLog($serial);
                     if ($pay_log) {

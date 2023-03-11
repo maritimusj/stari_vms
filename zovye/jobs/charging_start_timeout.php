@@ -46,6 +46,11 @@ if ($op == 'charging_start_timeout' && CtrlServ::checkJobSign($params)) {
                     'at' => time(),
                     'reason' => '充电桩无响应，请稍后再试！',
                 ]);
+                //如果即时支付，尝试退款
+                $pay_log = Pay::getPayLog($order->getOrderNO());
+                if ($pay_log) {
+                    Job::refund($order->getOrderNO(), '充电订单超时退款');
+                }
             });
 
             $params['error'] = [

@@ -592,8 +592,8 @@
                             <i class="fa fa-tag"></i>
                             {/if}
                             已支付{php echo number_format($order['pay']['balance'] / 100, 2, '.', '')}元
-                            {if $order['fueling']&&$order['fueling']['refund']}, {if $order['fueling']['refund']['total']>0}{php echo number_format($order['fueling']['refund']['total'] / 100, 2, '.', '')}元已退回{else}已全额退款{/if}{/if}
-                            {if $order['charging']&&$order['charging']['refund']}, {if $order['charging']['refund']['total']>0}{php echo number_format($order['charging']['refund']['total'] / 100, 2, '.', '')}元已退回{else}已全额退款{/if}{/if}
+                            {if $order['fueling']&&$order['fueling']['refund']}, {if $order['fueling']['refund']['total']>0}已退回{php echo number_format($order['fueling']['refund']['total'] / 100, 2, '.', '')}元{else}已全额退款{/if}{/if}
+                            {if $order['charging']&&$order['charging']['refund']}, {if $order['charging']['refund']['total']>0}已退回{php echo number_format($order['charging']['refund']['total'] / 100, 2, '.', '')}元{else}已全额退款{/if}{/if}
                         </div>
                         {/if}
                 </td>

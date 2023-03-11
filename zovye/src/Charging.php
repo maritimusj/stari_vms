@@ -393,9 +393,15 @@ class Charging
     public static function setResult(string $serial, int $chargerID, array $result)
     {
         if ($result['re'] != 3) {
-            return self::end($serial, $chargerID, function (orderModelObj $order) use ($result) {
+            return self::end($serial, $chargerID, function (orderModelObj $order) use ($result, $serial) {
                 $order->setChargingResult($result);
                 $order->setResultCode($result['re']);
+
+                //如果是即时支付，则尝试退款
+                $pay_log = Pay::getPayLog($serial);
+                if ($pay_log) {
+                    Job::refund($serial, '充电订单失败退款');
+                }
             });
         }
 

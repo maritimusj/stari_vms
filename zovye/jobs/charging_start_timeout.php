@@ -10,9 +10,12 @@ namespace zovye\job\chargingTimeout;
 use zovye\Charging;
 use zovye\CtrlServ;
 use zovye\Device;
+use zovye\Job;
 use zovye\Log;
 
+use zovye\model\orderModelObj;
 use zovye\Order;
+use zovye\Pay;
 use zovye\Request;
 
 $uid = Request::str('uid');
@@ -33,6 +36,7 @@ $params = [
 
 $op = Request::op('default');
 if ($op == 'charging_start_timeout' && CtrlServ::checkJobSign($params)) {
+    /** @var orderModelObj $order */
     $order = Order::get($uid, true);
     if ($order) {
         $result = $order->getChargingResult();
@@ -62,6 +66,11 @@ if ($op == 'charging_start_timeout' && CtrlServ::checkJobSign($params)) {
                     'at' => time(),
                     'reason' => '充电桩失去响应，请重试！',
                 ]);
+                //如果即时支付，尝试退款
+                $pay_log = Pay::getPayLog($order->getOrderNO());
+                if ($pay_log) {
+                    Job::refund($order->getOrderNO(), '充电订单超时退款');
+                }
             });
             $params['error'] = [
                 'at' => time(),

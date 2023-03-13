@@ -84,4 +84,4 @@ $tpl_data['open_id'] = $agent_openid;
 $tpl_data['data'] = $data;
 $tpl_data['total'] = $total;
 
-app()->showTemplate('web/withdraw/stat', $tpl_data);
+app()->showTemplate('web/withdraw/stats', $tpl_data);

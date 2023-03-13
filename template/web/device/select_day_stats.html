@@ -1,0 +1,41 @@
+<form class="form-horizontal" id="selectStatsDayForm" data-id="{$id}">
+    <div class="form-group">
+        <label class="col-md-2 control-label">请选择时间范围</label>
+        <div class="col-md-10">
+            <input name="datelimit[start]" type="hidden" value="{php echo $s_date}"/>
+            <input name="datelimit[end]" type="hidden" value="{php echo $e_date}"/>
+            <button class="btn btn-default daterange daterange-date" type="button">
+            <span class="date-title">
+                {if empty($s_date) && empty($e_date)}
+                不限时间
+                {else}
+                {$s_date} 至{$e_date}
+                {/if}
+            </span> <i class="fa fa-calendar"></i>
+            </button>
+            <button class="btn btn-primary" type="button" data-op="dayStatsData"><i class="fa fa-search"></i>&nbsp;查询</button>
+        </div>
+    </div>
+</form>
+<script>
+    require(["daterangepicker"], function () {
+        $(function () {
+            $(".daterange.daterange-date").each(function () {
+                var elm = this;
+                $(this).daterangepicker({
+                    startDate: $(elm).prev().prev().val() || moment("不限", "Y"),
+                    endDate: $(elm).prev().val() || moment("不限", "Y"),
+                    format: "YYYY-MM-DD",
+                    clear: 1
+                }, function (start, end) {
+                    start = start.toDateStr().indexOf("0000-01-01") != -1 ? "" : start.toDateStr();
+                    end = end.toDateStr().indexOf("0000-01-01") != -1 ? "" : end.toDateStr();
+                    var html = (start == "" ? "不限时间" : start) + (start == "" && end === "" ? "" : (" 至" + end))
+                    $(elm).find(".date-title").html(html);
+                    $(elm).prev().prev().val(start);
+                    $(elm).prev().val(end);
+                })
+            })
+        })
+    })
+</script>

@@ -320,12 +320,67 @@ class Stats
     }
 
     /**
+     * 返回指定时间的日统计数据
+     * @param device_groupsModelObj $group
+     * @param string $title
+     * @return array
+     */
+    public static function dayChartOfChargingGroup(device_groupsModelObj $group, $s_date, $e_date, string $title = ''): array
+    {
+        $chart = self::getChargingChartInitData('');
+
+        $queryFN = function($begin) use($group) {
+            $query = We7::load()->object('query');
+        
+            $query->from(m('order')->getTableName(), 'o')
+            ->leftJoin(m('device')->getTableName(), 'd')
+            ->on('o.device_id', 'd.id');
+        
+            $end = new DateTime();
+            $end->setTimestamp($begin->getTimestamp());
+            $end->modify('next day 00:00');
+            
+            $query->where([
+                'd.group_id' => $group->getId(),
+                'o.createtime >=' => $begin->getTimestamp(),
+                'o.createtime <' => $end->getTimestamp(),
+            ]);
+        
+            $query->select('sum(price)');
+        
+            $result = $query->get();
+
+            return $result[0] ?? 0;
+        };
+        
+        $begin = new DateTime($s_date);
+        $begin->modify('00:00');
+        
+        $end = new DateTime($e_date);
+        $end->modify('next day 00:00');
+
+        $total = 0;
+        while ($begin < $end) {
+            $n = $queryFN($begin);
+            $total += $n;
+            $chart['series'][0]['data'][] = $n / 100;
+            $chart['xAxis']['data'][] = $begin->format('m月d日');
+            $begin->modify('+1 day');
+        }
+
+        $total = number_format($total /100, 2);
+        $chart['title']['text'] = "{$title}[ 总计{$total}元 ]";
+
+        return $chart;
+    }
+
+    /**
      * 返回指定月份的月统计数据
      * @param device_groupsModelObj $group
      * @param string $title
      * @return array
      */
-    public static function chartOfChargingGroup(device_groupsModelObj $group, string $title = ''): array
+    public static function monthChartOfChargingGroup(device_groupsModelObj $group, string $title = ''): array
     {
         $chart = self::getChargingChartInitData($title);
 

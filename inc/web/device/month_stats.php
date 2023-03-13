@@ -26,7 +26,7 @@ try {
 $title = $month->format('Y年n月');
 
 $content = app()->fetchTemplate(
-    'web/device/stats',
+    'web/common/stats',
     [
         'chartid' => Util::random(10),
         'title' => $title,

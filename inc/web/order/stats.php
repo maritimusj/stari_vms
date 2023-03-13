@@ -62,7 +62,7 @@ $tpl_data['device_id'] = $device_id;
 $tpl_data['data'] = array_reverse($data);
 $tpl_data['total'] = $total;
 
-app()->showTemplate('web/order/stat', $tpl_data);
+app()->showTemplate('web/order/stats', $tpl_data);
 
 function calc_stats($agent_openid, $device_id, $start, $end): array
 {

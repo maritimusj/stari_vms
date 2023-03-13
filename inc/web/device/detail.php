@@ -96,7 +96,7 @@ $tpl_data['first_msg_statistic'] = $device->settings('firstMsgStatistic');
 $tpl_data['first_total'] = intval($tpl_data['firstMsgStatistic'][date('Ym')][date('d')]['total']);
 
 $tpl_data['day_stats'] = app()->fetchTemplate(
-    'web/device/stats',
+    'web/common/stats',
     [
         'chartid' => Util::random(10),
         'chart' => Util::cachedCall(30, function () use ($device) {
@@ -106,7 +106,7 @@ $tpl_data['day_stats'] = app()->fetchTemplate(
 );
 
 $tpl_data['month_stats'] = app()->fetchTemplate(
-    'web/device/stats',
+    'web/common/stats',
     [
         'chartid' => Util::random(10),
         'chart' => Util::cachedCall(30, function () use ($device) {

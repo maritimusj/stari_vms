@@ -62,7 +62,8 @@
                     {$item['createtime']}
                 </td>
                 <td class="operate"  data-id="{$item['id']}">
-                    <i class="fa fa fa-area-chart fa-fw" data-op="stats" title="查看统计"></i>
+                    <i class="fa fa-area-chart fa-fw" data-op="monthStats" title="查看月统计"></i>
+                    <i class="fa fa-line-chart fa-fw" data-op="dayStats" title="查看日统计"></i>
                     <i class="fa fa-refresh {if $item['version'] != $item['remote_version']}active{/if} fa-fw" data-op="refresh" title="同步设置"></i>
                     <a href="{php echo $this->createWebUrl('charging',array('id'=>$item['id'],'op'=>'edit'));}">
                         <i class="fa fa-edit fa-fw" title="编辑"></i>
@@ -89,6 +90,13 @@
     require(["{php \zovye\url(false, 'static/js/zovye.min.js?v=20210716')}"], function (zovye) {
         zovye.enableOp();
         zovye.setApiUrl("{php echo $this->createWebUrl('charging');}");
+        zovye.op('dayStatsData', function(self, next) {
+            const form = $('#selectStatsDayForm');
+            const id = form.data('id');
+            const begin = form.find("input[name='datelimit[start]']").val();
+            const end = form.find("input[name='datelimit[end]']").val();
+            next({id, begin, end})
+        })
     });
 </script>
 {template 'common/footer'}

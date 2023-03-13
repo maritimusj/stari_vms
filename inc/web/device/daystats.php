@@ -17,7 +17,7 @@ if (empty($device)) {
 
 $title = date('n月d日');
 $content = app()->fetchTemplate(
-    'web/device/stats',
+    'web/common/stats',
     [
         'chartid' => Util::random(10),
         'title' => $title,

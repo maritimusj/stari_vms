@@ -8,7 +8,6 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-
 $group_id = request::int('id');
 if (!$group_id) {
     JSON::fail('分组不存在！');
@@ -22,11 +21,11 @@ if (!$group) {
 $title = $group->getTitle();
 
 $content = app()->fetchTemplate(
-    'web/device/stats',
+    'web/common/stats',
     [
         'chartid' => Util::random(10),
         'title' => $title,
-        'chart' => Stats::chartOfChargingGroup($group, $title),
+        'chart' => Stats::monthChartOfChargingGroup($group, $title),
     ]
 );
 

@@ -15,8 +15,12 @@ if (empty($user) || $user->isBanned()) {
     JSON::fail('找不到用户或者用户无法领取');
 }
 
-$getDeviceFN = function () {
-    return Device::get(Request::str('device'), true);
+$getDeviceFN = function () use($user) {
+    if (Request::has('device')) {
+        return Device::get(Request::str('device'), true);
+    } else {
+        return $user->getLastActiveDevice();
+    }
 };
 
 $fn = Request::trim('fn');

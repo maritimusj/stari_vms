@@ -26,8 +26,7 @@ $tpl_data = Util::getTplData([
 
 $api_url = Util::murl('account', [
     'op' => 'gift', 
-    'fn' => 'save', 
-    'device' => $device->getImei(), 
+    'fn' => 'save',
     'uid' => $gift['uid'],
 ]);
 

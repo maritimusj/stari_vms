@@ -105,7 +105,7 @@ class Fueling
 
             $total = $card->total();
             if ($total < 1) {
-                return err('用户卡余额不足1.00元，请先充值后再试！');
+                return err('用户卡余额不足，请先充值后再试！');
             }
 
             if (empty($serial)) {

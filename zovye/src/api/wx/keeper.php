@@ -50,7 +50,7 @@ class keeper
         }
 
         $user = common::getUser();
-        if (!$user->isKeeper()) {
+        if (!\zovye\Keeper::exists($user)) {
             JSON::fail(['msg' => '不是运营人员！']);
         }
 

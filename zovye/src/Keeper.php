@@ -43,7 +43,7 @@ class Keeper
         }
 
         return m('keeper')->exists(We7::uniacid([
-            'mobile' => $user->getMobile(),
+            'mobile' => $mobile,
         ]));
     }
 

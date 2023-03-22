@@ -10,6 +10,7 @@ use zovye\base\modelObjFinder;
 use zovye\model\deviceModelObj;
 use zovye\model\keeperModelObj;
 use zovye\model\replenishModelObj;
+use zovye\model\userModelObj;
 
 class Keeper
 {
@@ -28,6 +29,22 @@ class Keeper
     public static function query($cond = []): modelObjFinder
     {
         return m('keeper')->query(We7::uniacid([]))->where($cond);
+    }
+
+    public static function exists(userModelObj $user): bool
+    {
+        if (!$user->isWxUser()) {
+            return false;
+        }
+
+        $mobile = $user->getMobile();
+        if (empty($mobile)) {
+            return false;
+        }
+
+        return m('keeper')->exists(We7::uniacid([
+            'mobile' => $user->getMobile(),
+        ]));
     }
 
     public static function cache($keeper)

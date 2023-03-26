@@ -305,7 +305,7 @@ class device
         }
 
         if ($device->getAgentId() > 0) {
-            if ($owner && !$owner->settings('agentData.misc.power')) {
+            if ($owner && !$owner->hasFactoryPermission()) {
                 $agent = $owner->isPartner() ? $owner->getPartnerAgent() : $owner;
                 if (!\zovye\Device::isOwner($device, $agent)) {
                     return err('没有权限管理这个设备！');

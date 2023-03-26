@@ -1096,4 +1096,9 @@ class userModelObj extends modelObj
     {
         return $this->remove('fuelingNOW');
     }
+
+    public function hasFactoryPermission(): bool
+    {
+        return !empty($this->settings('agentData.misc.power'));
+    }
 }

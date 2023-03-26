@@ -848,7 +848,7 @@ class agent
                 return err('只能绑定到代理商帐号！');
             }
         } else {
-            if (!$user->settings('agentData.misc.power')) {
+            if (!$user->hasFactoryPermission()) {
                 if ($device->getAgentId() != $user->getAgentId()) {
                     return err('没有权限管理这个设备！');
                 }
@@ -1376,7 +1376,7 @@ class agent
             'total' => $total,
             'sup_guid' => "$superior_guid",
             'list' => [],
-            'remove' => (bool)$user->settings('agentData.misc.power'),
+            'remove' => $user->hasFactoryPermission(),
         ];
 
         if ($total > 0) {
@@ -1560,7 +1560,7 @@ class agent
         $op_user = common::getAgentOrPartner();
 
         if ($op_user->isAgent() || $op_user->isPartner()) {
-            if ($op_user->settings('agentData.misc.power')) {
+            if ($op_user->hasFactoryPermission()) {
                 $user_id = request('agent');
 
                 if ($user_id) {
@@ -1611,7 +1611,7 @@ class agent
                 $result = [
                     'total' => $total,
                     'list' => [],
-                    'remove' => (bool)$agent->settings('agentData.misc.power'),
+                    'remove' => $agent->hasFactoryPermission(),
                 ];
 
                 if ($total > 0) {

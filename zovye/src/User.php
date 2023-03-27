@@ -147,7 +147,6 @@ class User
         }
 
         $user = User::get($obj, is_string($obj));
-
         return $user && $user->isAliUser();
     }
 
@@ -156,8 +155,8 @@ class User
         if ($obj instanceof userModelObj) {
             return $obj->isWxUser();
         }
-        $user = User::get($obj, is_string($obj));
 
+        $user = User::get($obj, is_string($obj));
         return $user && $user->isWxUser();
     }
 
@@ -166,8 +165,8 @@ class User
         if ($obj instanceof userModelObj) {
             return $obj->isWXAppUser();
         }
-        $user = User::get($obj, is_string($obj));
 
+        $user = User::get($obj, is_string($obj));
         return $user && $user->isWXAppUser();
     }
 
@@ -196,8 +195,8 @@ class User
         if ($obj instanceof userModelObj) {
             return $obj->isPromoUser();
         }
-        $user = User::get($obj, is_string($obj));
 
+        $user = User::get($obj, is_string($obj));
         return $user && $user->isPromoUser();
     }
 
@@ -206,8 +205,8 @@ class User
         if ($obj instanceof userModelObj) {
             return $obj->isPseudoUser();
         }
-        $user = User::get($obj, is_string($obj));
 
+        $user = User::get($obj, is_string($obj));
         return $user && $user->isPseudoUser();
     }
 
@@ -216,9 +215,17 @@ class User
         if ($obj instanceof userModelObj) {
             return $obj->isDouYinUser();
         }
-        $user = User::get($obj, is_string($obj));
 
+        $user = User::get($obj, is_string($obj));
         return $user && $user->isDouYinUser();
+    }
+
+    public static function getPseudoUser($openid = null): ?userModelObj
+    {
+        return User::getOrCreate($openid ?? App::uid(16), User::PSEUDO, [
+            'nickname' => '虚拟用户',
+            'avatar' => MODULE_URL . 'static/img/unknown.svg',
+        ]);
     }
 
     /**

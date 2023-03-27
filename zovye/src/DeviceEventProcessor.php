@@ -302,7 +302,7 @@ class DeviceEventProcessor
             $e = self::$events[$event];
             if (isset($e)) {
                 self::log($e, $data);
-                
+
                 $fn = $e['handler'];
                 if (!empty($fn)) {
                     if (is_callable($fn)) {
@@ -702,7 +702,7 @@ class DeviceEventProcessor
         if (empty($device)) {
             return err('找不到这个设备！');
         }
-    
+
         $device->setLastPing(time());
         $device->setMcbOnline(Device::ONLINE);
         $device->setLastOnline(TIMESTAMP);
@@ -766,15 +766,17 @@ class DeviceEventProcessor
 
         if ($device->isNormalDevice()) {
             $device->updateMcbStatus($extra);
-        } else {
-            if ($device->isChargingDevice()) {
-                Charging::onEventReport($device, $extra);
-            } elseif ($device->isFuelingDevice()) {
-                Fueling::onEventReport($device, $extra);
+            //用户扫码购买
+            if (isset($extra['payment'])) {
+                Helper::createQrcodeOrder($device, (array)$extra['payment']);
             }
+        } elseif ($device->isChargingDevice()) {
+            Charging::onEventReport($device, $extra);
+        } elseif ($device->isFuelingDevice()) {
+            Fueling::onEventReport($device, $extra);
         }
 
-        $device->save();     
+        $device->save();
     }
 
     /**

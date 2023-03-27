@@ -7,6 +7,7 @@
 
 namespace zovye;
 
+use RuntimeException;
 use zovye\model\device_logsModelObj;
 use zovye\model\orderModelObj;
 use zovye\model\deviceModelObj;
@@ -471,6 +472,7 @@ class Helper
         }
 
         $data['orderNO'] = $order_no;
+
         return $data;
     }
 
@@ -649,5 +651,48 @@ class Helper
         $user->setLastActiveData('location.validated', true);
 
         return true;
+    }
+
+    public static function createQrcodeOrder(deviceModelObj $device, $params = [])
+    {
+        try {
+            $code = $params['code'] ?? '';
+            if (empty($code)) {
+                throw new RuntimeException('无效的付款码，请重新扫码！');
+            }
+
+            $goods_id = intval($params['goods'] ?? 0);
+            if ($goods_id > 0) {
+                $goods = $device->getGoods($goods_id);
+            } else {
+                $lane_id = intval($params['lane'] ?? 0);
+                $goods = $device->getGoodsByLane($lane_id);
+            }
+
+            if (empty($goods) || empty($goods[Goods::AllowPay]) || $goods['price'] < 1 || $goods['num'] < 1) {
+                throw new RuntimeException('对不起，暂时无法购买这个商品！');
+            }
+
+            list($order_no, $data) = Pay::createQrcodePay($device, $code, $goods, [
+                'level' => LOG_GOODS_PAY,
+                'total' => 1,
+            ]);
+
+            if (is_error($data)) {
+                throw new RuntimeException('创建支付失败: '.$data['message']);
+            }
+
+            //加入一个支付结果检查
+            Job::orderPayResult($order_no);
+
+            //加入一个支付超时任务
+            $res = Job::orderTimeout($order_no);
+            if (empty($res) || is_error($res)) {
+                throw new RuntimeException('创建支付任务失败！');
+            }
+
+        } catch (RuntimeException $e) {
+            $device->appShowMessage($e->getMessage());
+        }
     }
 }

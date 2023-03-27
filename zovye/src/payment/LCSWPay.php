@@ -42,6 +42,20 @@ class LCSWPay implements IPay
         ]);
     }
 
+    protected function getNotifyUrl(): string
+    {
+        $url = _W('siteroot');
+        $path = 'addons/'.APP_NAME.'/';
+
+        if (mb_strpos($url, $path) === false) {
+            $url .= $path;
+        }
+
+        $url .= 'payment/lcsw.php';
+
+        return $url;
+    }
+
     protected function createPay(
         callable $fn,
         string $user_uid,
@@ -52,22 +66,13 @@ class LCSWPay implements IPay
     ): array {
         $lcsw = $this->getLCSW();
 
-        $notify_url = _W('siteroot');
-        $path = 'addons/'.APP_NAME.'/';
-
-        if (mb_strpos($notify_url, $path) === false) {
-            $notify_url .= $path;
-        }
-
-        $notify_url .= 'payment/lcsw.php';
-
         $params = [
             'userUID' => $user_uid,
             'deviceUID' => $device_uid,
             'orderNO' => $order_no,
             'price' => $price,
             'body' => $body,
-            'notify_url' => $notify_url,
+            'notify_url' => $this->getNotifyUrl(),
         ];
 
         $res = $fn($lcsw, $params);
@@ -97,6 +102,26 @@ class LCSWPay implements IPay
             'signType' => $res['signType'],
             'paySign' => $res['paySign'],
         ];
+    }
+
+    public function createQrcodePay(string $code,
+        string $device_uid,
+        string $order_no,
+        int $price,
+        string $body = '')
+    {
+        $lcsw = $this->getLCSW();
+
+        $params = [
+            'code' => $code,
+            'deviceUID' => $device_uid,
+            'orderNO' => $order_no,
+            'price' => $price,
+            'body' => $body,
+            'notify_url' => $this->getNotifyUrl(),
+        ];
+
+        return $lcsw->qrpay($params);
     }
 
     /**

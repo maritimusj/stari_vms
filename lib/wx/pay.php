@@ -134,6 +134,38 @@ class pay
         return $result['short_url'];
     }
 
+    public function buildQrcodePay($params)
+    {
+        //检测必填参数
+        if (empty($params['out_trade_no'])) {
+            return err('缺少必填参数out_trade_no:商户订单号');
+        }
+        if (empty($params['body'])) {
+            return err('缺少必填参数body:商品描述');
+        }
+        if (empty($params['total_fee'])) {
+            return err('缺少必填参数total_fee:总金额');
+        }
+        if (empty($params['trade_type'])) {
+            return err('缺少必填参数trade_type:交易类型');
+        }
+        if (empty($params['auth_code'])) {
+            return err('缺少必填参数auth_code:付款码');
+        }
+
+        if (empty($params['notify_url'])) {
+            $params['notify_url'] = $this->config['notify_url'];
+        }
+
+        $params['appid'] = $this->config['appid'];
+        $params['mch_id'] = $this->config['mch_id'];
+        $params['spbill_create_ip'] = CLIENT_IP;
+        $params['nonce_str'] = Util::random(32);
+        $params['sign'] = $this->bulidSign($params);
+
+        return $this->requestApi('https://api.mch.weixin.qq.com/pay/micropay', $params);
+    }
+
     /*
      * 扫码模式一生成支付url
      * */

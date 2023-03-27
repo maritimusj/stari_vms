@@ -90,6 +90,31 @@ fwIDAQAB
         ]);
     }
 
+    public function qrPay($code, $order_no, $amount, $device_uid, $desc = '', $notify_url = '')
+    {
+        $params = [];
+        $params['terminal_sn'] = $this->config['sn'];       //收钱吧终端ID
+        $params['client_sn'] = $order_no;                    //商户系统订单号,必须在商户系统内唯一；且长度不超过64字节
+        $params['total_amount'] = "$amount";              //以分为单位,不超过10位纯数字字符串,超过1亿元的收款请使用银行转账
+
+        if (App::isAliUser()) {
+            $params['payway'] = '1';
+        } else{
+            $params['payway'] = '3';
+        }
+
+        $params['dynamic_id'] = $code; //付款码
+        $params['subject'] = $desc;
+        $params['operator'] = $device_uid;
+
+        if (!empty($notify_url)) {
+            $params['notify_url'] = $notify_url;
+        }
+
+        $path = '/upay/v2/pay';
+        return $this->requestApi("$this->api$path", $params);
+    }
+
     public function xAppPay($user_uid, $order_no, $amount, $device_uid, $desc = '', $notify_url = '')
     {
         $params = [];

@@ -217,6 +217,15 @@ class Pay
         return self::createPay('createJsPay', $device, $user, $goods, $pay_data);
     }
 
+    public static function createQrcodePay(
+        deviceModelObj $device,
+        string $code,
+        array $goods,
+        array $pay_data = []
+    ): array {
+        return self::createPay('createQrcodePay', $device, User::getPseudoUser($code), $goods, $pay_data);
+    }
+
     /**
      * 处理支付的通知数据
      * @param string $name 支付类型名称

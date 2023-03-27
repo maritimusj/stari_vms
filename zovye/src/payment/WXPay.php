@@ -40,6 +40,48 @@ class WXPay implements IPay
         ]);
     }
 
+    protected function getNotifyUrl(): string
+    {
+        $notify_url = _W('siteroot');
+        $path = 'addons/'.APP_NAME.'/';
+
+        if (mb_strpos($notify_url, $path) === false) {
+            $notify_url .= $path;
+        }
+
+        $notify_url .= 'payment/wx.php';
+
+        return $notify_url;
+    }
+
+    public function createQrcodePay(string $code,
+        string $device_uid,
+        string $order_no,
+        int $price,
+        string $body = '')
+    {
+        $wx = $this->getWx();
+
+        $params = [
+            'device_info' => $device_uid,
+            'out_trade_no' => $order_no,
+            'trade_type' => 'JSAPI',
+            'auth_code' => $code,
+            'body' => $body,
+            'total_fee' => $price,
+            'notify_url' => $this->getNotifyUrl(),
+        ];
+
+        $res = $wx->buildQrcodePay($params);
+
+        Log::debug('qr_pay', [
+            'params' => $params,
+            'res' => $res,
+        ]);
+
+        return $res;
+    }
+
     public function createXAppPay(
         string $user_uid,
         string $device_uid,
@@ -71,15 +113,6 @@ class WXPay implements IPay
     ): array {
         $wx = $this->getWx();
 
-        $notify_url = _W('siteroot');
-        $path = 'addons/'.APP_NAME.'/';
-
-        if (mb_strpos($notify_url, $path) === false) {
-            $notify_url .= $path;
-        }
-
-        $notify_url .= 'payment/wx.php';
-
         $params = [
             'device_info' => $device_uid,
             'out_trade_no' => $order_no,
@@ -87,7 +120,7 @@ class WXPay implements IPay
             'openid' => $user_uid,
             'body' => $body,
             'total_fee' => $price,
-            'notify_url' => $notify_url,
+            'notify_url' => $this->getNotifyUrl(),
         ];
 
         $res = $wx->buildUnifiedOrder($params);

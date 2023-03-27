@@ -41,7 +41,7 @@ class pay
         }
 
         $arr = [];
-        foreach ($params as $key => $val) {  
+        foreach ($params as $key => $val) {
             if ($key == 'key_sign') {
                 continue;
             }
@@ -49,10 +49,12 @@ class pay
         }
 
         $arr[] = "access_token={$this->config['access_token']}";
+
         return md5(implode('&', $arr));
     }
 
-    public function requestApi($url, $params) {
+    public function requestApi($url, $params)
+    {
         $res = ihttp::request($url, json_encode($params), ['Content-Type' => 'application/json']);
         if (is_error($res)) {
             return $res;
@@ -62,7 +64,7 @@ class pay
         if (empty($content)) {
             return err('请求失败！');
         }
-        
+
         if ($content['success'] === 'error') {
             return err($content['msg']);
         }
@@ -86,6 +88,7 @@ class pay
             'terminal_trace' => $params['orderNO'],
             'terminal_time' => date('YmdHis'),
             'total_fee' => $params['price'],
+            'auth_no' => $params['code'],
         ];
 
         if (!empty($params['notify_url'])) {
@@ -125,7 +128,7 @@ class pay
         $data['attach'] = $params['deviceUID'];
         $data['order_body'] = $params['body'];
         $data['terminal_ip'] = Util::getClientIp();
-                
+
         return $this->requestApi("$this->api$path", $data);
     }
 
@@ -154,9 +157,9 @@ class pay
         $data['attach'] = $params['deviceUID'];
         $data['order_body'] = $params['body'];
         $data['terminal_ip'] = Util::getClientIp();
-       
+
         return $this->requestApi("$this->api$path", $data);
-    }   
+    }
 
     public function queryOrder($uid)
     {
@@ -167,7 +170,7 @@ class pay
             'service_id' => '020',
             'merchant_no' => $this->config['merchant_no'],
             'terminal_id' => $this->config['terminal_id'],
-            'terminal_trace' => 'Q' . microtime(true),
+            'terminal_trace' => 'Q'.microtime(true),
             'terminal_time' => date('YmdHis'),
             'out_trade_no' => $uid,
         ];
@@ -187,7 +190,7 @@ class pay
             'service_id' => '030',
             'merchant_no' => $this->config['merchant_no'],
             'terminal_id' => $this->config['terminal_id'],
-            'terminal_trace' => empty($serial) ? 'R' . time() : $serial,
+            'terminal_trace' => empty($serial) ? 'R'.time() : $serial,
             'terminal_time' => date('YmdHis'),
             'refund_fee' => $total_fee,
             'out_trade_no' => $out_trade_no,

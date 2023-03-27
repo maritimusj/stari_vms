@@ -51,7 +51,7 @@ if ($s_principal) {
 }
 
 if (empty($query)) {
-    $query = User::query();
+    $query = User::query(['app <>' => User::PSEUDO]);
 }
 
 //搜索用户名

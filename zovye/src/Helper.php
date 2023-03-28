@@ -661,6 +661,11 @@ class Helper
                 throw new RuntimeException('无效的付款码，请重新扫码！');
             }
 
+            $order_no = "P$code";
+            if (Order::exists($order_no)) {
+                throw new RuntimeException('订单已存在！');
+            }
+
             $goods_id = intval($params['goods'] ?? 0);
             if ($goods_id > 0) {
                 $goods = $device->getGoods($goods_id);
@@ -674,6 +679,7 @@ class Helper
             }
 
             list($order_no, $data) = Pay::createQrcodePay($device, $code, $goods, [
+                'order_no' => $order_no,
                 'level' => LOG_GOODS_PAY,
                 'total' => 1,
             ]);

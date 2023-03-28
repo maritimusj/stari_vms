@@ -17,8 +17,6 @@ class goods
     {
         $user = common::getAgentOrPartner();
 
-        common::checkCurrentUserPrivileges('F_sp');
-
         $params = [
             'page' => Request::int('page'),
             'pagesize' => Request::int('pagesize', DEFAULT_PAGE_SIZE),
@@ -46,8 +44,6 @@ class goods
     public static function detail(): array
     {
         $user = common::getAgentOrPartner();
-
-        common::checkCurrentUserPrivileges('F_sp');
 
         $goods_id = Request::int('id');
 

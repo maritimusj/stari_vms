@@ -1021,14 +1021,14 @@ class agent
     public
     static function deviceLowRemain(): array
     {
-        $user = common::getAgentOrPartner();
+        $agent = common::getAgent();
 
         common::checkCurrentUserPrivileges('F_qz');
 
         if (Request::has('remain')) {
             $remain_warning = max(1, Request::int('remain'));
         } else {
-            $remain_warning = settings('device.remainWarning', 0);
+            $remain_warning = App::getRemainWarningNum($agent);
         }
 
         $page = max(1, Request::int('page'));
@@ -1036,7 +1036,7 @@ class agent
 
         $query = Device::query([
             'remain <' => $remain_warning,
-            'agent_id' => $user->getAgentId(),
+            'agent_id' => $agent->getAgentId(),
         ]);
 
         $total = $query->count();

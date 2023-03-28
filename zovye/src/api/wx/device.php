@@ -597,10 +597,8 @@ class device
             $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
 
             //首页
-            $remainWarning = App::getRemainWarningNum($agent);
-
             $low_query = \zovye\Device::query([
-                'remain <' => $remainWarning,
+                'remain <' => App::getRemainWarningNum($agent),
                 'agent_id' => $agent->getId(),
             ]);
             $error_query = \zovye\Device::query([

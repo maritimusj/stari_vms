@@ -710,8 +710,9 @@ class Helper
                 throw new RuntimeException('创建支付失败: '.$data['message']);
             }
 
-            if ($data['openid']) {
-                $user = User::get($data['openid'], true);
+            $user_id = $data['openid'] ?? ($data['payer_uid'] ?? $data['user_id']);
+            if ($user_id) {
+                $user = User::get($user_id, true);
                 if ($user) {
                     $pay_log = Pay::getPayLog($order_no);
                     if ($pay_log) {

@@ -82,7 +82,7 @@ class SQBPay implements IPay
             return $res;
         }
 
-        if ($res['result_code'] !== 'PAY_SUCCESS') {
+        if ($res['result_code'] !== 'PAY_SUCCESS' && $res['result_code'] !== 'PAY_IN_PROGRESS') {
             return err($res['error_message']);
         }
 

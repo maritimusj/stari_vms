@@ -699,6 +699,17 @@ class Helper
                 throw new RuntimeException('创建支付失败: '.$data['message']);
             }
 
+            if ($data['openid']) {
+                $user = User::get($data['openid'], true);
+                if ($user) {
+                    $pay_log = Pay::getPayLog($order_no);
+                    if ($pay_log) {
+                        $pay_log->setData('user', $user->getOpenid());
+                        $pay_log->save();
+                    }
+                }
+            }
+
             //加入一个支付结果检查
             Job::orderPayResult($order_no);
 

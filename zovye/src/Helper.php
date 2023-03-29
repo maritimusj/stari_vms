@@ -655,6 +655,11 @@ class Helper
 
     public static function createQrcodeOrder(deviceModelObj $device, $params = [])
     {
+        Log::debug('payment', [
+            'device' => $device->profile(),
+            'data' => $params,
+        ]);
+
         try {
             $code = $params['code'] ?? '';
             if (empty($code)) {

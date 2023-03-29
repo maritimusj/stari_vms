@@ -687,6 +687,7 @@ class Helper
                 'order_no' => $order_no,
                 'level' => LOG_GOODS_PAY,
                 'total' => 1,
+                'qrcode' => $params,
             ]);
 
             if (is_error($data)) {
@@ -703,7 +704,7 @@ class Helper
             }
 
         } catch (RuntimeException $e) {
-            $device->appShowMessage($e->getMessage());
+            $device->appShowMessage($e->getMessage(), 'error');
         }
     }
 }

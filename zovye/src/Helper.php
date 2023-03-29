@@ -659,7 +659,7 @@ class Helper
             'device' => $device->profile(),
             'data' => $params,
         ]);
-
+        
         try {
             $code = $params['code'] ?? '';
             if (empty($code)) {
@@ -670,8 +670,8 @@ class Helper
             if (empty($user)) {
                 throw new RuntimeException('创建用户失败，请重试！');
             }
-            
-            $order_no = "U{$user->getId()}P$code";
+
+            $order_no = substr("U{$user->getId()}P$code", 0, 32);
             if (Order::exists($order_no)) {
                 throw new RuntimeException('订单已存在！');
             }

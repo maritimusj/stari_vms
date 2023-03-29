@@ -284,7 +284,7 @@
                         {elseif $order['balance'] > 0}
                         <div class="orderSrc">
                             积分兑换：<span class="balance">{$order['balance']}</span>
-                            <img src="{MODULE_URL}static/img/coin.svg" class="balance">                            
+                            <img src="{MODULE_URL}static/img/coin.svg" class="balance">              
                         </div>
                         {elseif $order['reward']}
                         <div class="orderSrc">
@@ -319,6 +319,9 @@
                         </div>
                         {/if}
                         <div class="orderId">
+                            {if $order['qrcode']}
+                            <img src="{MODULE_URL}static/img/scanner.svg" class="balance" title="付款码">        
+                            {/if}
                             {$order['orderId']}
                         </div>
                         {/if}

@@ -239,6 +239,10 @@ foreach ($query->findAll() as $entry) {
         $data['pull_logs'] = $device->isVDevice() || $device->isNormalDevice();
     }
 
+    if ($entry->getExtraData('qrcode')) {
+        $data['qrcode'] = true;
+    }
+
     $orders[] = $data;
 }
 

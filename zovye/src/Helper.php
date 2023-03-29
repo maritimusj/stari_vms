@@ -666,7 +666,12 @@ class Helper
                 throw new RuntimeException('无效的付款码，请重新扫码！');
             }
 
-            $order_no = "P$code";
+            $user = User::getPseudoUser($code);
+            if (empty($user)) {
+                throw new RuntimeException('创建用户失败，请重试！');
+            }
+            
+            $order_no = "U{$user->getId()}P$code";
             if (Order::exists($order_no)) {
                 throw new RuntimeException('订单已存在！');
             }

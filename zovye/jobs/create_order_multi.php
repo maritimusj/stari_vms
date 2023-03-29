@@ -259,6 +259,11 @@ function createOrder(
         'result_code' => 0,
     ];
 
+    $qrcode = $pay_log->getData('qrcode.code', '');
+    if ($qrcode) {
+        $order_data['extra']['qrcode'] = $qrcode;
+    }
+
     //定制功能：零佣金
     if (Helper::isZeroBonus($device, Order::PAY_STR)) {
         $order_data['agent_id'] = 0;

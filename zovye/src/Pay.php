@@ -672,4 +672,10 @@ class Pay
 
         return $pay;
     }
+
+    public static function isWxPayQrcode($code): bool
+    {
+        $str = substr($code, 0, 2);
+        return in_array($str, ['10', '11', '12','13', '14', '15']);
+    }
 }

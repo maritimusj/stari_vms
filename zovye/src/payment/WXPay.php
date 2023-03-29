@@ -65,11 +65,9 @@ class WXPay implements IPay
         $params = [
             'device_info' => $device_uid,
             'out_trade_no' => $order_no,
-            'trade_type' => 'JSAPI',
             'auth_code' => $code,
             'body' => $body,
             'total_fee' => $price,
-            'notify_url' => $this->getNotifyUrl(),
         ];
 
         $res = $wx->buildQrcodePay($params);

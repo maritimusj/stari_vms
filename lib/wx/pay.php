@@ -146,15 +146,8 @@ class pay
         if (empty($params['total_fee'])) {
             return err('缺少必填参数total_fee:总金额');
         }
-        if (empty($params['trade_type'])) {
-            return err('缺少必填参数trade_type:交易类型');
-        }
         if (empty($params['auth_code'])) {
             return err('缺少必填参数auth_code:付款码');
-        }
-
-        if (empty($params['notify_url'])) {
-            $params['notify_url'] = $this->config['notify_url'];
         }
 
         $params['appid'] = $this->config['appid'];

@@ -666,6 +666,13 @@ class Helper
                 throw new RuntimeException('无效的付款码，请重新扫码！');
             }
 
+            //根据付款码设置环境
+            if (Pay::isWxPayQrcode($code)) {
+                $_SESSION['ali_user_id'] = $code;
+            } else {
+                $_SESSION['wx_user_id'] = $code;
+            }
+
             $user = User::getPseudoUser($code, '匿名用户');
             if (empty($user)) {
                 throw new RuntimeException('创建用户失败，请重试！');
@@ -696,6 +703,10 @@ class Helper
             ]);
 
             if (is_error($data)) {
+                Log::error('qr_pay', [
+                    'order_no' => $order_no,
+                    'data' => $data,
+                ]);
                 throw new RuntimeException('创建支付失败: '.$data['message']);
             }
 

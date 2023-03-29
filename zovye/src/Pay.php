@@ -163,6 +163,17 @@ class Pay
 
         if (is_callable([$pay, $fn])) {
             $res = $pay->$fn($user->getOpenid(), $device->getImei(), $order_no, $price, $title);
+
+            Log::debug('pay', [
+                'prepareData' => $result,
+                'pay' => $pay,
+                'fn' => $fn,
+                'goods' => $goods,
+                'data' => $pay_data,
+                'user' => $user->profile(),
+                'res' => $res,
+            ]);
+            
         } else {
             Log::debug('pay', [
                 'result' => $result,

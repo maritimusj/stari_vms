@@ -8,7 +8,6 @@ namespace lcsw;
 
 use we7\ihttp;
 use zovye\App;
-
 use zovye\Util;
 use function zovye\err;
 use function zovye\is_error;
@@ -69,7 +68,7 @@ class pay
             return err($content['msg']);
         }
 
-        if ($content['return_code'] !== '01' || $content['result_code'] !== '01') {
+        if ($content['return_code'] !== '01') {
             return err($content['return_msg']);
         }
 
@@ -78,30 +77,41 @@ class pay
 
     public function qrpay($params = [])
     {
-        $path = '/pay/110/qrpay';
+        $path = '/pay/100/barcodepay';
         $data = [
-            'pay_ver' => '110',
-            'pay_type' => '000',//$this->pay_type,
-            'service_id' => '016',
+            'pay_ver' => '100',
+            'pay_type' => '000',
+            'service_id' => '010',
             'merchant_no' => $this->config['merchant_no'],
             'terminal_id' => $this->config['terminal_id'],
             'terminal_trace' => $params['orderNO'],
             'terminal_time' => date('YmdHis'),
-            'total_fee' => $params['price'],
             'auth_no' => $params['code'],
+            'total_fee' => "{$params['price']}",
         ];
+
+        $data['key_sign'] = $this->sign($data);
 
         if (!empty($params['notify_url'])) {
             $data['notify_url'] = $params['notify_url'];
         }
 
+        $data['terminal_ip'] = Util::getClientIp();
+
         $data['attach'] = $params['deviceUID'];
         $data['order_body'] = $params['body'];
 
-        $data['key_sign'] = $this->sign($data, true);
-        $data['terminal_ip'] = Util::getClientIp();
+        $res = $this->requestApi("$this->api$path", $data);
 
-        return $this->requestApi("$this->api$path", $data);
+        if (is_error($res)) {
+            return $res;
+        }
+
+        if ($res['result_code'] !== '01' && $res['result_code'] !== '03') {
+            return err($res['return_msg'] ?? '订单付款失败！');
+        }
+
+        return $res;
     }
 
     public function xAppPay($params = [])
@@ -129,7 +139,17 @@ class pay
         $data['order_body'] = $params['body'];
         $data['terminal_ip'] = Util::getClientIp();
 
-        return $this->requestApi("$this->api$path", $data);
+        $res = $this->requestApi("$this->api$path", $data);
+
+        if (is_error($res)) {
+            return $res;
+        }
+
+        if ($res['result_code'] !== '01') {
+            return err('支付失败！');
+        }
+
+        return $res;
     }
 
 
@@ -158,7 +178,17 @@ class pay
         $data['order_body'] = $params['body'];
         $data['terminal_ip'] = Util::getClientIp();
 
-        return $this->requestApi("$this->api$path", $data);
+        $res = $this->requestApi("$this->api$path", $data);
+
+        if (is_error($res)) {
+            return $res;
+        }
+
+        if ($res['result_code'] !== '01') {
+            return err('创建支付失败！');
+        }
+
+        return $res;
     }
 
     public function queryOrder($uid)
@@ -177,7 +207,17 @@ class pay
 
         $params['key_sign'] = $this->sign($params);
 
-        return $this->requestApi("$this->api$path", $params);
+        $res = $this->requestApi("$this->api$path", $params);
+
+        if (is_error($res)) {
+            return $res;
+        }
+
+        if ($res['result_code'] !== '01') {
+            return err('查询订单失败！');
+        }
+
+        return $res;
     }
 
     public function doRefund($out_trade_no, $total_fee, $pay_type, $serial = '')
@@ -198,6 +238,16 @@ class pay
 
         $params['key_sign'] = $this->sign($params);
 
-        return $this->requestApi("$this->api$path", $params);
+        $res = $this->requestApi("$this->api$path", $params);
+
+        if (is_error($res)) {
+            return $res;
+        }
+
+        if ($res['result_code'] !== '01') {
+            return err('退款失败！');
+        }
+
+        return $res;
     }
 }

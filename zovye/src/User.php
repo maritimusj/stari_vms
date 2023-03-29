@@ -220,10 +220,10 @@ class User
         return $user && $user->isDouYinUser();
     }
 
-    public static function getPseudoUser($openid = null): ?userModelObj
+    public static function getPseudoUser($openid = null, $nickname = '虚拟用户'): ?userModelObj
     {
         return User::getOrCreate($openid ?? App::uid(16), User::PSEUDO, [
-            'nickname' => '虚拟用户',
+            'nickname' => $nickname,
             'avatar' => MODULE_URL . 'static/img/unknown.svg',
         ]);
     }

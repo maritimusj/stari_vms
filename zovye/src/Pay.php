@@ -223,7 +223,7 @@ class Pay
         array $goods,
         array $pay_data = []
     ): array {
-        return self::createPay('createQrcodePay', $device, User::getPseudoUser($code), $goods, $pay_data);
+        return self::createPay('createQrcodePay', $device, User::getPseudoUser($code, '匿名用户'), $goods, $pay_data);
     }
 
     /**

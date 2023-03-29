@@ -666,7 +666,7 @@ class Helper
                 throw new RuntimeException('无效的付款码，请重新扫码！');
             }
 
-            $user = User::getPseudoUser($code);
+            $user = User::getPseudoUser($code, '匿名用户');
             if (empty($user)) {
                 throw new RuntimeException('创建用户失败，请重试！');
             }

@@ -662,7 +662,7 @@ class Helper
 
         try {
             $code = $params['code'] ?? '';
-            if (empty($code)) {
+            if (empty($code) || !is_numeric($code)) {
                 throw new RuntimeException('无效的付款码，请重新扫码！');
             }
 

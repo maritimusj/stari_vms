@@ -659,7 +659,7 @@ class Helper
             'device' => $device->profile(),
             'data' => $params,
         ]);
-        
+
         try {
             $code = $params['code'] ?? '';
             if (empty($code)) {
@@ -675,7 +675,7 @@ class Helper
 
             $user = User::getPseudoUser($code, '匿名用户');
             if (empty($user)) {
-                throw new RuntimeException('创建用户失败，请重试！');
+                throw new RuntimeException('系统错误，创建用户失败！');
             }
 
             $order_no = substr("U{$user->getId()}P$code", 0, MAX_ORDER_NO_LEN);
@@ -691,8 +691,16 @@ class Helper
                 $goods = $device->getGoodsByLane($lane_id);
             }
 
-            if (empty($goods) || empty($goods[Goods::AllowPay]) || $goods['price'] < 1 || $goods['num'] < 1) {
+            if (empty($goods)) {
+                throw new RuntimeException('系统错误，没有可用商品！');
+            }
+
+            if (empty($goods[Goods::AllowPay]) || $goods['price'] < 1) {
                 throw new RuntimeException('对不起，暂时无法购买这个商品！');
+            }
+
+            if ($goods['num'] < 1) {
+                throw new RuntimeException('对不起，商品库存不足！');
             }
 
             list($order_no, $data) = Pay::createQrcodePay($device, $code, $goods, [
@@ -725,13 +733,13 @@ class Helper
             //加入一个支付结果检查
             $res = Job::orderPayResult($order_no);
             if (empty($res) || is_error($res)) {
-                throw new RuntimeException('创建支付任务失败！');
+                throw new RuntimeException('系统错误，创建支付任务失败！');
             }
 
             //加入一个支付超时任务
             $res = Job::orderTimeout($order_no);
             if (empty($res) || is_error($res)) {
-                throw new RuntimeException('创建支付任务失败！');
+                throw new RuntimeException('系统错误，创建支付任务失败！');
             }
 
         } catch (RuntimeException $e) {

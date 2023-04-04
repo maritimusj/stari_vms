@@ -102,12 +102,12 @@ if ($order_no) {
         'extra REGEXP' => "\"transaction_id\":\"[0-9]*{$order_no}[0-9]*\"",
     ]);
     $tpl_data['s_order'] = $order_no;
-}
-
-$order_no = Request::str('orderNO');
-if ($order_no) {
-    $query->where(['order_id' => $order_no]);
-    $tpl_data['s_order'] = $order_no;
+} else {
+    $order_no = Request::str('orderNO');
+    if ($order_no) {
+        $query->where(['order_id' => $order_no]);
+        $tpl_data['s_order'] = $order_no;
+    }
 }
 
 $limit = Request::array('datelimit');

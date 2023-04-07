@@ -2568,13 +2568,13 @@ class deviceModelObj extends modelObj
     {
         $delay = 0;
 
-        $advs = $this->getAds(Advertising::REDIRECT_URL);
-        if ($advs) {
-            foreach ($advs as $adv) {
+        $ads = $this->getAds(Advertising::REDIRECT_URL);
+        if ($ads) {
+            foreach ($ads as $ad) {
 
-                if ($adv['extra']['when'][$when]) {
-                    $url = $adv['extra']['url'];
-                    $delay = $adv['extra']['delay'];
+                if ($ad['extra']['when'][$when]) {
+                    $url = $ad['extra']['url'];
+                    $delay = $ad['extra']['delay'];
 
                     if ($url) {
                         break;

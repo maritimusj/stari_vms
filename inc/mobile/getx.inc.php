@@ -155,8 +155,18 @@ try {
         'msg' => $result['message'],
     ];
 
-    //成功转跳
-    $url = $device->getRedirectUrl()['url'];
+    if (App::isFlashEggEnabled() && $device->isFuelingDevice()) {
+        $goods = Goods::get($goods_id);
+        if ($goods) {
+            $url = $goods->getExtraData('redirect_url');
+        }
+    }
+
+    if (empty($url)) {
+        //成功转跳
+        $url = $device->getRedirectUrl()['url'];
+    }
+
     if (!empty($url)) {
         $response['url'] = $url;
     }

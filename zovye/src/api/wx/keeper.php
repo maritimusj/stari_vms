@@ -387,7 +387,7 @@ class keeper
                 }
 
                 if (Request::has('commission')) {
-                    $commission = Request::str('commission');
+                    $commission = Request::str('commission', '', true);
 
                     //%结尾表示百分比，*表示固定金额
                     if (substr($commission, -1) == '%') {
@@ -395,6 +395,7 @@ class keeper
                         $percent = max(0, min(100, intval($commission)));
                         $set_commission = function (&$data) use ($percent) {
                             $data['percent'] = $percent;
+                            unset($data['fixed']);
                             return $data;
                         };
                     } else {
@@ -402,6 +403,7 @@ class keeper
                         $fixed = max(0, intval($commission));
                         $set_commission = function (&$data) use ($fixed) {
                             $data['fixed'] = $fixed;
+                            unset($data['percent']);
                             return $data;
                         };
                     }

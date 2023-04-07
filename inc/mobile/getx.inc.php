@@ -155,7 +155,7 @@ try {
         'msg' => $result['message'],
     ];
 
-    if (App::isFlashEggEnabled() && $device->isFuelingDevice()) {
+    if (App::isFlashEggEnabled()) {
         $goods = Goods::get($goods_id);
         if ($goods) {
             $url = $goods->getExtraData('redirect_url');

@@ -144,9 +144,9 @@ class Util
                     if (empty($user) && !empty($params['create'])) {
                         $data = [
                             'app' => User::WX,
-                            'nickname' => $fans['nickname'],
-                            'avatar' => $fans['headimgurl'],
-                            'openid' => $fans['openid'],
+                            'nickname' => strval($fans['nickname'] ?? '匿名用户'),
+                            'avatar' => strval($fans['headimgurl']),
+                            'openid' => strval($fans['openid']),
                         ];
 
                         $user = User::create($data);

@@ -193,11 +193,16 @@ if (isset($params['goodsId'])) {
     $goods = Goods::create($data);
 }
 
-if (!empty($goods) && $goods->save()) {
-    if ($params['syncAll']) {
-        Job::goodsClone($goods->getId());
+if (!empty($goods)) {
+    if ($goods->isFlashEgg()) {
+        $goods->setExtraData('redirect_url', request::trim('redirectUrl'));
     }
-    Util::itoast('商品保存成功！', '', 'success');
+    if ($goods->save()) {
+        if ($params['syncAll']) {
+            Job::goodsClone($goods->getId());
+        }
+        Util::itoast('商品保存成功！', '', 'success');
+    }
 }
 
 Util::itoast('商品保存失败！', '', 'error');

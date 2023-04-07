@@ -180,6 +180,7 @@ class Goods
 
         if ($entry->isFlashEgg()) {
             $data['type'] = 'flash_egg';
+            $data['redirect_url'] = $entry->getExtraData('redirect_url', '');
         }
 
         $cost_price = $entry->getCostPrice();

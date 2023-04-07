@@ -54,6 +54,13 @@
                         <span class="help-block">* 用户使用微信支付购买时的价格</span>
                     </div>
                 </div>
+                <div class="form-group">
+                    <label for="redirectUrl" class="col-md-2 control-label">链接</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" id="redirectUrl" name="redirectUrl" value="{php echo $goods? $goods['redirect_url'] : ''}">
+                        <span class="help-block">* 用户购买或者领取成功后，转跳到指定链接</span>
+                    </div>
+                </div>                
             </div>
         </div>
     </div>

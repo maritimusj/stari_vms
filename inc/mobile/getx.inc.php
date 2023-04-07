@@ -157,7 +157,7 @@ try {
 
     if (App::isFlashEggEnabled()) {
         $goods = Goods::get($goods_id);
-        if ($goods) {
+        if ($goods && $goods->isFlashEgg()) {
             $url = $goods->getExtraData('redirect_url');
         }
     }

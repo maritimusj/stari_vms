@@ -81,15 +81,15 @@ class keeper
                 JSON::fail(['msg' => '您还没有绑定手机号码，请立即绑定！', 'url' => $url]);
             }
 
-            $keepers = \zovye\Keeper::query(['mobile' => $mobile]);
-            if (empty($keepers)) {
+            $query = \zovye\Keeper::query(['mobile' => $mobile]);
+            if (empty($query->count())) {
                 return err('找不到相应的运营人员信息！');
             }
 
             $keeper_data = [];
 
             /** @var keeperModelObj $keeper */
-            foreach ($keepers->findAll() as $keeper) {
+            foreach ($query->findAll() as $keeper) {
                 //清除原来的登录信息
                 foreach (LoginData::keeper(['user_id' => $keeper->getId()])->findAll() as $entry) {
                     $entry->destroy();

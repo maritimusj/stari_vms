@@ -61,7 +61,7 @@ class api
 
         return common::doUserLogin(
             $res,
-            Request::array('userInfo', []),
+            Request::array('userInfo'),
             $h5_openid,
             Request::str('device'),
             Request::str('from')

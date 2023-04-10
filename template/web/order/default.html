@@ -457,7 +457,9 @@
                                 <small>单价：<span class="fee">{$order['group']['tips']}</span></small>
                                 {/if}                                
                             </span>
-                            <span {if $order['pull_logs'] === true}  class="num" data-op="{if $order['charging'] || $order['fueling']}priceDetail{else}pullsDetail{/if}" title="查看出货记录..."{else} class="num" title="{$order['pull_logs']}"{/if}> 
+                            <span   {if $order['pull_logs'] === true}  class="num" data-op="pullsDetail" title="查看出货记录..."
+                                    {else}  class="num" title="{$order['pull_logs']}" {if $order['charging'] || $order['fueling']}data-op="priceDetail"{/if}
+                                    {/if}> 
                                 {$order['num']}
                                 <span style="font-size: small;">{$order['goods']['unit_title']}</span>
                                 {if $order['src'] ==  \zovye\Order::FUELING_UNPAID}

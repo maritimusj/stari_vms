@@ -21,24 +21,13 @@ if (!$order) {
 
 if ($order->isFuelingOrder()) {
     $data = $order->getFuelingRecord();
-    if ($data['time_total'] > 0) {
-        try {
-            $interval = new DateInterval('PT'.$data['time_total'].'S');
-            $time = new DateTime('00:00:00');
-            $time->add($interval);
-
-            if ($data['time_total'] < 60) {
-                $format_str = 's';
-            } elseif ($data['time_total'] < 60 * 60) {
-                $format_str = 'i:s';
-            } else {
-                $format_str = 'H:i:s';
-            }
-            $data['time_total_formatted'] = $time->format($format_str);
-        } catch (Exception $e) {
-        }
+    try {
+        $interval = new DateInterval('PT'.intval($data['time_total']).'S');
+        $time = new DateTime('00:00:00');
+        $time->add($interval);
+        $data['time_total_formatted'] = $time->format('H:i:s');
+    } catch (Exception $e) {
     }
-
     $content = app()->fetchTemplate(
         'web/fueling/detail',
         [

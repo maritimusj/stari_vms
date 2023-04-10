@@ -258,13 +258,8 @@ if ($page == 'device') {
         $tpl_data['version'] = $data['version'] ?: 'n/a';
         $tpl_data['build'] = $data['build'] ?: 'n/a';
 
-        if ($data['start']) {
-            $tpl_data['formatted_duration'] = Util::getFormattedPeriod($data['start']);
-        } else {
-            if ($data['startTime']) {
-                $tpl_data['formatted_duration'] = Util::getFormattedPeriod($data['startTime']);
-            }
-        }
+  
+        $tpl_data['formatted_duration'] = Util::getFormattedPeriod($data['start'] ?? $data['startTime']);
 
         if ($data['now']) {
             $tpl_data['formatted_now'] = (new DateTime())->setTimestamp($data['now'])->format("Y-m-d H:i:s");

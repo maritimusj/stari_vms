@@ -433,7 +433,7 @@ class Fueling
                         return err('设备正忙，请重试！');
                     }
 
-                    $res = $device->resetPayload([$chargerID => -$order->getNum()], "订单：$serial");
+                    $res = $device->resetPayload([$chargerID => -$num], "订单：$serial");
                     if (is_error($res)) {
                         return err('保存库存变动失败！');
                     }

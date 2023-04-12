@@ -424,18 +424,22 @@ class Fueling
 
                 $user = $order->getUser();
 
-                //减少库存
-                $locker = $device->payloadLockAcquire(3);
-                if (empty($locker)) {
-                    return err('设备正忙，请重试！');
-                }
+                $num = $order->getNum();
 
-                $res = $device->resetPayload([$chargerID => -$order->getNum()], "订单：$serial");
-                if (is_error($res)) {
-                    return err('保存库存变动失败！');
-                }
+                if ($num > 0) {
+                    //减少库存
+                    $locker = $device->payloadLockAcquire(3);
+                    if (empty($locker)) {
+                        return err('设备正忙，请重试！');
+                    }
 
-                $locker->unlock();
+                    $res = $device->resetPayload([$chargerID => -$order->getNum()], "订单：$serial");
+                    if (is_error($res)) {
+                        return err('保存库存变动失败！');
+                    }
+
+                    $locker->unlock();
+                }
 
                 $card_type = $order->getExtraData('card.type', '');
 

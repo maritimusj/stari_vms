@@ -191,14 +191,14 @@
 <ul class="nav nav-tabs" id="navbar">
     <li role="presentation"><a href="{php echo $this->createWebUrl('homepage', array('op'=>'default'));}">首页</a></li>
     <li role="presentation" class="active"><a href="#">营收统计</a></li>
-    <li role="presentation" ><a href="{php echo $this->createWebUrl('withdraw', array('op'=>'stat'));}">提现统计</a></li>
+    <li role="presentation" ><a href="{php echo $this->createWebUrl('withdraw', array('op'=>'stats'));}">提现统计</a></li>
     <li role="presentation" ><a href="{php echo $this->createWebUrl('order', array('op'=>'export'));}">订单导出</a></li>
     <li role="presentation" ><a href="{php echo $this->createWebUrl('agent', array('op'=>'commission_export'));}">佣金明细</a></li>
     <li role="presentation" ><a href="{php echo $this->createWebUrl('account', array('op'=>'platformStats'));}">平台分成</a></li>
 </ul>
 <div class="panel panel-default nav-tab-item">
     <div class="panel-body">
-    <form action="{php echo $this->createWebUrl('order', array('op'=>'stat'));}" method="post">
+    <form action="{php echo $this->createWebUrl('order', array('op'=>'stats'));}" method="post">
         <div class="form-group">
             <label for="select_agent" class="col-md-2 control-label">所属代理商</label>
             <div class="col-md-5">

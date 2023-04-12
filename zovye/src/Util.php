@@ -3281,10 +3281,6 @@ HTML_CONTENT;
             unset($navs['balance']);
         }
 
-        if (!settings('agent.wx.app.enabled') && !App::isBalanceEnabled()) {
-            unset($navs['wxapp']);
-        }
-
         return $navs;
     }
 

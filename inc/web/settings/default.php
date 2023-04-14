@@ -173,7 +173,7 @@ if ($page == 'device') {
 
         $tpl_data['config'] = $config;
     }
-} elseif ($page == 'data_view') {
+} elseif ($page == 'data_vw') {
 
     $goods = [
         'g1' => '商品一',
@@ -222,7 +222,7 @@ if ($page == 'device') {
     $values = [];
     $diff = [];
 
-    $res = m('data_view')->findAll();
+    $res = m('data_vw')->findAll();
 
     foreach ($res as $item) {
         if (in_array($item->getK(), $keys)) {
@@ -239,7 +239,7 @@ if ($page == 'device') {
 
     $tpl_data = array_merge($tpl_data, $values);
 
-    $dm = Util::murl('app', ['op' => 'data_view']);
+    $dm = Util::murl('app', ['op' => 'data_vw']);
 
     $tpl_data['dm'] = $dm;
 

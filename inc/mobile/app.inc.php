@@ -101,12 +101,12 @@ if ($op == 'default') {
         exit(json_encode(['status' => false, 'msg' => $result['message']]));
     }
 
-} elseif ($op == 'data_view') {
+} elseif ($op == 'data_vw') {
 
     $type = Request::str('type');
     //title
     if ($type == 'title') {
-        $query = m('data_view');
+        $query = m('data_vw');
         $title = $query->where(['k' => 'title'])->findOne();
         $value = '';
         if ($title) {
@@ -153,7 +153,7 @@ if ($op == 'default') {
     }
     //商品
     if ($type == 'goods') {
-        $query = m('data_view');
+        $query = m('data_vw');
         $arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         $arr_assoc = [
             1 => '第一名',
@@ -240,7 +240,7 @@ if ($op == 'default') {
 
     //省份
     if ($type == 'provinces') {
-        $query = m('data_view');
+        $query = m('data_vw');
 
         $res = $query->where(['k' => array_keys($arr_assoc)])->findAll();
 
@@ -275,7 +275,7 @@ if ($op == 'default') {
 
     if ($type == 'device_total') {
 
-        $query = m('data_view');
+        $query = m('data_vw');
         $res = $query->where(['k' => array_keys($arr_assoc)])->findAll();
 
         $total_amount = 0;
@@ -290,7 +290,7 @@ if ($op == 'default') {
     }
 
     if ($type == 'device_map') {
-        $query = m('data_view');
+        $query = m('data_vw');
         $res = $query->where(['k' => array_keys($arr_assoc)])->findAll();
 
         $res_arr = [];
@@ -307,7 +307,7 @@ if ($op == 'default') {
 
 function handlePCT($x, $y, $xx, $yy): array
 {
-    $query = m('data_view');
+    $query = m('data_vw');
 
     $res = $query->where(['k' => [$x, $y]])->findAll();
 
@@ -336,7 +336,7 @@ function handlePCT($x, $y, $xx, $yy): array
 
 function handleFreq($k_init, $k_freq, $k_s1, $k_s2): int
 {
-    $query = m('data_view');
+    $query = m('data_vw');
     $res = $query->where(['k' => [$k_init, $k_freq, $k_s1, $k_s2]])->findAll();
     $dt = time();
     $arr = [];

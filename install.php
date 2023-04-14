@@ -210,7 +210,7 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_coupon` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
-CREATE TABLE IF NOT EXISTS `ims_zovye_vms_data_view` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_data_vw` (
   `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `k` varchar(60) NOT NULL,
   `v` varchar(120) NOT NULL,
@@ -778,7 +778,7 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_wx_app` (
   UNIQUE KEY `key` (`key`,`uniacid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zovye_vms_data_view` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_data_vw` (
 `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `k` varchar(60) NOT NULL,
   `v` varchar(120) NOT NULL,

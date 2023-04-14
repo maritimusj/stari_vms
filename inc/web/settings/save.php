@@ -755,9 +755,9 @@ if ($page == 'device') {
         ]);
     }
 
-} elseif ($page == 'data_view') {
+} elseif ($page == 'data_vw') {
     $db_arr = [];
-    $res = m('data_view')->findAll();
+    $res = m('data_vw')->findAll();
     foreach ($res as $item) {
         $db_arr[$item->getK()] = $item->getV();
     }
@@ -847,7 +847,7 @@ if ($page == 'device') {
         }
     }
 
-    $query = m('data_view');
+    $query = m('data_vw');
     foreach ($need_inserted_arr as $key => $val) {
         $query->create(['k' => $key, 'v' => $val, 'createtime' => time()]);
     }

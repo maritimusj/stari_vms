@@ -236,9 +236,9 @@ SQL;
     Migrate::execSQL($sql);
 }
 
-if (!We7::pdo_tableexists($tb_name.'_data_view')) {
+if (!We7::pdo_tableexists($tb_name.'_data_vw')) {
     $sql = <<<SQL
-CREATE TABLE IF NOT EXISTS `ims_zovye_vms_data_view` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_data_vw` (
 `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `k` varchar(60) NOT NULL,
   `v` varchar(120) NOT NULL,

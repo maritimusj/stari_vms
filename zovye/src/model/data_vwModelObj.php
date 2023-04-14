@@ -10,11 +10,11 @@ use zovye\base\modelObj;
 
 use function zovye\tb;
 
-class data_viewModelObj extends modelObj
+class data_vwModelObj extends modelObj
 {
     public static function getTableName($readOrWrite): string
     {
-        return tb('data_view');
+        return tb('data_vw');
     }
 
     /** @var int */

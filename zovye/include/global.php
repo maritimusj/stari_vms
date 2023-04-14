@@ -40,7 +40,8 @@ try {
 
     Log::error("app", [
         'error' => $e->getMessage(),
-        'trace' => $e->getTraceAsString(),
+        'file' => $e->getFile(),
+        'line' => $e->getLine(),
     ]);
 
 }

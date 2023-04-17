@@ -118,6 +118,7 @@ JSCODE;
 
         if ($user->save() && $user->setPrincipal(Principal::Promoter, [
                 'keeper' => $keeper->getId(),
+                'time' => time(),
             ])) {
             return true;
         }
@@ -141,19 +142,7 @@ JSCODE;
 
 } elseif ($op == 'log') {
 
-    $page = max(1, Request::int('page'));
-    $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
-
-    $query = $user->getCommissionBalance()->log();
-    $query->page($page, $page_size);
-
-    $query->orderBy('createtime DESC');
-
-    $result = [];
-    foreach ($query->findAll() as $log) {
-        $result[] = CommissionBalance::format($log);
-    }
-
+    $result = Helper::getUserCommissionLogs($user);
     JSON::success($result);
 
 } elseif ($op == 'pre_withdraw') {

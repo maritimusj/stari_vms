@@ -78,6 +78,12 @@ router::exec($op, [
     'DeviceOpenDoor' => '\zovye\api\wx\device::openDoor',
     'DeviceKeepers' => '\zovye\api\wx\device::deviceKeepers',
 
+    'UpdatePromoterConfig' => '\zovye\api\wx\promoter::updatePromoterConfig',
+    'GetPromoterConfig' => '\zovye\api\wx\promoter::getPromoterConfig',
+    'GetPromoterList' => '\zovye\api\wx\promoter::getPromoterList',
+    'GetPromoterLogs' => '\zovye\api\wx\promoter::getPromoterLogs',
+    'KeeperGetPromoterLogs' => '\zovye\api\wx\promoter::keeperGetPromoterLogs',
+
     'SetKeeper' => '@\zovye\api\wx\keeper::setKeeper',
     'KeeperLogin' => '\zovye\api\wx\keeper::keeperLogin',
     'DeleteKeeper' => '\zovye\api\wx\keeper::deleteKeeper',

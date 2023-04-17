@@ -746,4 +746,22 @@ class Helper
             $device->appShowMessage($e->getMessage(), 'error');
         }
     }
+
+    public static function getUserCommissionLogs(userModelObj $user): array
+    {
+        $page = max(1, Request::int('page'));
+        $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
+
+        $query = $user->getCommissionBalance()->log();
+        $query->page($page, $page_size);
+
+        $query->orderBy('createtime DESC');
+
+        $result = [];
+        foreach ($query->findAll() as $log) {
+            $result[] = CommissionBalance::format($log);
+        }
+
+        return $result;
+    }
 }

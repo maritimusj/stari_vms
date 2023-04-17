@@ -113,7 +113,7 @@ class keeper
             }
 
             if ($keeper_data) {
-                $token = sha1(time() . "$mobile$session_key");
+                $token = sha1(time()."$mobile$session_key");
                 $data = [
                     'src' => LoginData::KEEPER,
                     'user_id' => 0,
@@ -396,6 +396,7 @@ class keeper
                         $set_commission = function (&$data) use ($percent) {
                             $data['percent'] = $percent;
                             unset($data['fixed']);
+
                             return $data;
                         };
                     } else {
@@ -404,11 +405,12 @@ class keeper
                         $set_commission = function (&$data) use ($fixed) {
                             $data['fixed'] = $fixed;
                             unset($data['percent']);
+
                             return $data;
                         };
                     }
                 } else {
-                    $set_commission = function($data) {
+                    $set_commission = function ($data) {
                         return $data;
                     };
                 }
@@ -434,7 +436,7 @@ class keeper
                     if ($way != -1) {
                         $keeper_data['way'] = $way;
                     }
-                    if($kind != -1) {
+                    if ($kind != -1) {
                         $keeper_data['kind'] = $kind;
                     }
                     $entry->setKeeper($keeper, $set_commission($keeper_data));
@@ -479,7 +481,7 @@ class keeper
                 return err('提现申请被拒绝，请联系代理商！');
             }
 
-            $total =  round(Request::float('amount', 0, 2) * 100);
+            $total = round(Request::float('amount', 0, 2) * 100);
 
             return balance::balanceWithdraw($user, $total);
         }
@@ -570,7 +572,7 @@ class keeper
         $user = $keeper->getUser();
         if ($user) {
             $result['balance_formatted'] = number_format($user->getCommissionBalance()->total() / 100, 2, '.', '');
-    
+
             if (App::isPromoterEnabled()) {
                 $referral = $user->getReferral();
                 if ($referral) {
@@ -835,7 +837,7 @@ class keeper
             return err('找不到这个设备！');
         }
 
-        if ($device->getAgentId() != $keeper->getAgentId() ||!$device->hasKeeper($keeper)) {
+        if ($device->getAgentId() != $keeper->getAgentId() || !$device->hasKeeper($keeper)) {
             return err('没有权限执行这个操作！');
         }
 
@@ -849,7 +851,7 @@ class keeper
             ],
             'keeper' => [
                 'kind' => $device->getKeeperKind($keeper),
-            ]
+            ],
         ];
 
         //电量
@@ -1016,7 +1018,7 @@ class keeper
             }
 
             $data = [
-                $lane => $num != 0 ? '@' . $num : 0,
+                $lane => $num != 0 ? '@'.$num : 0,
             ];
         } else {
             $data = [];
@@ -1062,7 +1064,7 @@ class keeper
             $err = $create_commission_fn($total);
             if (is_error($err)) {
                 Log::error('keeper', [
-                    'error' => '创建运营人员补货佣金失败:' . $err['message'],
+                    'error' => '创建运营人员补货佣金失败:'.$err['message'],
                     'total' => $total,
                 ]);
 
@@ -1277,7 +1279,7 @@ class keeper
 
         $keeper = keeper::getKeeper();
 
-        $order_id =  Request::int('orderid');
+        $order_id = Request::int('orderid');
 
         $agent = $keeper->getAgent();
         $order = Order::get($order_id);
@@ -1296,7 +1298,7 @@ class keeper
 
         $num = Request::int('num');
 
-        $res = Order::refund($order->getOrderNO(), $num, ['msg' => '运营人员：' . $keeper->getName()]);
+        $res = Order::refund($order->getOrderNO(), $num, ['msg' => '运营人员：'.$keeper->getName()]);
         if (is_error($res)) {
             return err($res['message']);
         }

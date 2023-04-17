@@ -10,6 +10,10 @@ use zovye\base\modelObj;
 use zovye\traits\ExtraDataGettersAndSetters;
 use function zovye\tb;
 
+/**
+ * @method setName($getName)
+ * @method setEnabled(true $true)
+ */
 class principalModelObj extends modelObj
 {
     public static function getTableName($readOrWrite): string
@@ -27,7 +31,7 @@ class principalModelObj extends modelObj
     protected $principal_id;
 
     /** @var bool */
-    protected $enable;
+    protected $enabled;
 
     /** @var string */
     protected $name;

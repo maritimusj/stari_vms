@@ -14,10 +14,10 @@ use zovye\model\userModelObj;
 
 $s_user_list = [];
 
-$query = Principal::gspsor();
+$query = Principal::gspor();
 $s_keyword = Request::trim('keyword', '', true);
 if ($s_keyword != '') {
-    $query = $query->whereOr([
+    $query->whereOr([
         'name REGEXP' => $s_keyword,
         'nickname REGEXP' => $s_keyword,
         'mobile REGEXP' => $s_keyword,

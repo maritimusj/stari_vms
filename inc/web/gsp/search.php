@@ -10,7 +10,7 @@ defined('IN_IA') or exit('Access Denied');
 
 use zovye\model\userModelObj;
 
-$query = Principal::gspsor();
+$query = Principal::gspor();
 
 $s_keyword = Request::trim('keyword');
 if ($s_keyword) {

@@ -55,7 +55,6 @@ use function zovye\is_error;
  * @method getMobile()
  * @method setMobile($mobile)
  * @method getSuperiorId()
- * @method setPassport(string $passport)
  * @method setState(int $param)
  * @method setSuperiorId(int $getId)
  * @method getAgentId()
@@ -63,6 +62,7 @@ use function zovye\is_error;
  * @method setLockedUid(string $UNLOCKED)
  * @method setOpenid($getOpenid)
  * @method getApp()
+ * @method setS1(string $s1)
  *
  * @property login_dataModelObj $loginData
  */
@@ -94,9 +94,6 @@ class userModelObj extends modelObj
 
     /** @var string */
     protected $s1;
-
-    /** @var string */
-    protected $passport;
 
     /** @var int */
     protected $superior_id;
@@ -222,7 +219,7 @@ class userModelObj extends modelObj
      */
     public function isAgent(): bool
     {
-        return $this->is(User::AGENT);
+        return Principal::is($this, Principal::Agent);
     }
 
     /**
@@ -240,35 +237,13 @@ class userModelObj extends modelObj
     }
 
     /**
-     * 是否是指定身份.
-     *
-     * @param $principal
-     *
-     * @return bool
-     */
-    public function is($principal): bool
-    {
-        $names = is_array($principal) ? $principal : explode(',', $principal);
-
-        return array_intersect($names, $this->getPrincipals()) === $names;
-    }
-
-    /**
-     * @return array
-     */
-    public function getPrincipals(): array
-    {
-        return $this->passport ? explode(',', $this->passport) : [];
-    }
-
-    /**
      * 用户是否是合伙人.
      *
      * @return bool
      */
     public function isPartner(): bool
     {
-        return $this->is(User::PARTNER);
+        return Principal::is($this, Principal::Partner);
     }
 
     public function isIDCardVerified(): bool
@@ -367,57 +342,70 @@ class userModelObj extends modelObj
 
     public function isKeeper(): bool
     {
-        return $this->is(User::KEEPER);
+        return Principal::is($this, Principal::Keeper);
     }
 
     public function setKeeper($beKeeper = true): bool
     {
-        return $beKeeper ? $this->setPrincipal(User::KEEPER) : $this->removePrincipal(User::KEEPER);
+        return $beKeeper ? $this->setPrincipal(Principal::Keeper)
+            : $this->removePrincipal(Principal::Keeper);
     }
 
     public function isTester(): bool
     {
-        return $this->is(User::TESTER);
+        return Principal::is($this, Principal::Tester);
     }
 
     public function setTester($beTester = true): bool
     {
-        return $beTester ? $this->setPrincipal(User::TESTER) : $this->removePrincipal(User::TESTER);
+        return $beTester ? $this->setPrincipal(Principal::Tester)
+            : $this->removePrincipal(Principal::Tester);
     }
 
     /**
-     * @param $name
-     *
+     * @param $principal_id
+     * @param array $extra
      * @return bool
      */
-    public function setPrincipal($name): bool
+    public function setPrincipal($principal_id, array $extra = []): bool
     {
-        if ($name) {
-            $names = is_array($name) ? $name : explode(',', $name);
-            $arr = array_merge($this->getPrincipals(), $names);
+        if ($principal_id) {
+            $principal = Principal::findOne([
+                'user_id' => $this->getId(),
+                'principal_id' => $principal_id,
+            ]);
 
-            $this->setPassport(implode(',', array_unique($arr)));
+            if ($principal) {
+                $principal->setEnabled(true);
+                $principal->setName($this->getName());
+                $principal->setExtraData($extra);
 
-            return $this->save() && Principal::update($this);
+                return $principal->save();
+            }
+
+            return (bool)Principal::create([
+                'user_id' => $this->getId(),
+                'principal_id' => $principal_id,
+                'name' => $this->getName(),
+                'enable' => true,
+                'extra' => $extra,
+            ]);
         }
 
         return false;
     }
 
     /**
-     * @param $name
-     *
+     * @param $principal_id
      * @return bool
      */
-    public function removePrincipal($name): bool
+    public function removePrincipal($principal_id): bool
     {
-        if ($name) {
-            $names = is_array($name) ? $name : explode(',', $name);
-            $arr = array_diff($this->getPrincipals(), $names);
-
-            $this->setPassport(implode(',', $arr));
-
-            return $this->save() && Principal::update($this);
+        if ($principal_id) {
+            return Principal::delete([
+                'user_id' => $this->getId(),
+                'principal_id' => $principal_id,
+            ]);
         }
 
         return false;
@@ -438,7 +426,7 @@ class userModelObj extends modelObj
      */
     public function isGSPor(): bool
     {
-        return $this->is(User::GSPOR);
+        return Principal::is($this, Principal::Gspor);
     }
 
     /**
@@ -454,18 +442,17 @@ class userModelObj extends modelObj
         if ($level) {
             if (array_key_exists($level, $levels)) {
                 if ($this->isAgent()) {
-                    $this->removePrincipal(User::AGENT);
-                    $this->removePrincipal(array_keys($levels));
+                    $this->removePrincipal(Principal::Agent);
                 }
 
-                if ($this->setPrincipal([User::AGENT, $level])) {
+                if ($this->setPrincipal(Principal::Agent, ['agent.level' => $level])) {
                     return true;
                 }
             }
         } else {
             $res = We7::pdo_update(User::getTableName(), ['superior_id' => 0], ['superior_id' => $this->getId()]);
             if ($res !== false) {
-                return $this->removePrincipal(User::AGENT) && $this->removePrincipal(array_keys($levels));
+                return $this->removePrincipal(Principal::agent());
             }
         }
 
@@ -517,7 +504,7 @@ class userModelObj extends modelObj
 
         $r = $balance->change($price, $src, $extra);
         if ($r) {
-            $this->setPrincipal(User::GSPOR);
+            $this->setPrincipal(Principal::Gspor);
 
             return $r;
         }
@@ -737,11 +724,12 @@ class userModelObj extends modelObj
             $config['appid'] = $params['appid'];
             $config['mch_id'] = $params['mch_id'];
 
-            $mch_pay =  new WxMCHPayV3($config);
+            $mch_pay = new WxMCHPayV3($config);
+
             return $mch_pay->transferInfo($transaction, $trade_no);
-        } 
-        
-        $mch_pay =  new WxMCHPay($params);
+        }
+
+        $mch_pay = new WxMCHPay($params);
         $file = Pay::getPEMFile($params['pem']);
         if (is_error($file)) {
             return $file;
@@ -774,7 +762,7 @@ class userModelObj extends modelObj
                 $config = $params['v3'];
 
                 if ($this->isWxUser()) {
-                    $config['appid'] =  $params['appid'];
+                    $config['appid'] = $params['appid'];
                 } elseif ($this->isWXAppUser()) {
                     $config['appid'] = $params['wxappid'];
                 } else {
@@ -782,20 +770,20 @@ class userModelObj extends modelObj
                 }
 
                 $config['mch_id'] = $params['mch_id'];
-                
-                $mch_pay =  new WxMCHPayV3($config);
+
+                $mch_pay = new WxMCHPayV3($config);
             } else {
                 $file = Pay::getPEMFile($params['pem']);
                 if (is_error($file)) {
                     return $file;
                 }
-    
+
                 $params['pem']['cert'] = $file['cert_filename'];
                 $params['pem']['key'] = $file['key_filename'];
 
-                $mch_pay =  new WxMCHPay($params);
+                $mch_pay = new WxMCHPay($params);
             }
-            
+
             $res = $mch_pay->transferTo($this->openid, $trade_no, $n, $desc);
             if (is_error($res)) {
                 return $res;
@@ -805,14 +793,15 @@ class userModelObj extends modelObj
                 if ($res['batch_id']) {
                     $info = $mch_pay->transferInfo($res['batch_id'], $trade_no);
                     if ($info && $info['detail_status'] == 'SUCCESS') {
-                         return $info;
+                        return $info;
                     }
-                   return $res;
+
+                    return $res;
                 }
                 if ($res['partner_trade_no'] == $trade_no && isset($res['payment_no'])) {
                     return $res;
                 }
-            } 
+            }
 
             return err('打款失败！');
         }
@@ -982,22 +971,22 @@ class userModelObj extends modelObj
 
     public function getAgentLevel(): array
     {
-        if (!$this->isAgent()) {
-            return [];
-        }
+        $principal = Principal::findOne([
+            'user_id' => $this->getId(),
+            'principal_id' => Principal::Agent,
+        ]);
 
-        $levels = settings('agent.levels');
-        $res = array_intersect(array_keys($levels), $this->getPrincipals());
-        if ($res) {
-            $res = array_values($res);
-            $data = $levels[$res[0]];
-            $data['level'] = $res[0];
+        if ($principal) {
+            $level = $principal->getExtraData('agent.level', '');
+            if ($level) {
+                $data = settings("agent.levels.$level", []);
+                $data['level'] = $level;
 
-            return $data;
+                return $data;
+            }
         }
 
         return [];
-
     }
 
     /**
@@ -1026,11 +1015,13 @@ class userModelObj extends modelObj
         return null;
     }
 
-    public function getCredit(): int {
+    public function getCredit(): int
+    {
         return $this->settings('credit.val', 0);
     }
 
-    public function setCredit(int $val): bool {
+    public function setCredit(int $val): bool
+    {
         return $this->updateSettings('credit.val', $val);
     }
 
@@ -1070,6 +1061,7 @@ class userModelObj extends modelObj
         if ($key) {
             $path .= ".$key";
         }
+
         return $this->settings($path, $default);
     }
 
@@ -1089,6 +1081,7 @@ class userModelObj extends modelObj
         if ($key) {
             $path .= ".$key";
         }
+
         return $this->settings($path, $default);
     }
 

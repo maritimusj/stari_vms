@@ -10,6 +10,7 @@ use zovye\CtrlServ;
 use zovye\Job;
 use zovye\Log;
 use zovye\model\userModelObj;
+use zovye\Principal;
 use zovye\Request;
 use zovye\User;
 use zovye\Wx;
@@ -39,13 +40,11 @@ if ($op == 'withdraw' && CtrlServ::checkJobSign($data)) {
                 'keyword2' => ['value' => date('Y-m-d H:i:s')],
                 'keyword3' => ['value' => ($data['amount'] / 100).'元'],
             ];
-
-            $query = User::query();
-
-            if (settings('notice.withdrawAdminUserId')) {
-                $query->where(['id' => settings('notice.withdrawAdminUserId')]);
+            $admin_id = intval(settings('notice.withdrawAdminUserId'));
+            if ($admin_id) {
+                $query = User::query(['id' => $admin_id]);
             } else {
-                $query->where("LOCATE('admin',passport)>0");
+                $query = Principal::admin();
             }
 
             /** @var userModelObj $user */

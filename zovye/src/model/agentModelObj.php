@@ -7,6 +7,7 @@
 namespace zovye\model;
 
 use zovye\GSP;
+use zovye\Principal;
 use zovye\User;
 use zovye\Util;
 use zovye\Device;
@@ -184,7 +185,7 @@ class agentModelObj extends userModelObj
 
             if ($this->updateSettings('agentData', $agent_data)) {
                 if ($partner && $partner->isPartner()) {
-                    return $partner->removePrincipal(User::PARTNER) && $partner->remove('partnerData');
+                    return $partner->removePrincipal(Principal::Partner) && $partner->remove('partnerData');
                 }
 
                 return true;
@@ -217,7 +218,7 @@ class agentModelObj extends userModelObj
         }
 
         $result = Util::transactionDo(function () use ($user, $name, $mobile, $notice) {
-            if (!$user->setPrincipal(User::PARTNER)) {
+            if (!$user->setPrincipal(Principal::Partner)) {
                 return err('设置身份失败！');
             }
 

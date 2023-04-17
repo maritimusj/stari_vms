@@ -32,20 +32,20 @@ $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 $s_principal = Request::trim('s_principal');
 if ($s_principal) {
     switch ($s_principal) {
-        case User::AGENT:
+        case 'agent':
             $query = Principal::agent();
             break;
-        case User::PARTNER:
+        case 'partner':
             $query = Principal::partner();
             break;
-        case User::KEEPER:
+        case 'keeper':
             $query = Principal::keeper();
             break;
-        case User::TESTER:
+        case 'tester':
             $query = Principal::tester();
             break;
-        case User::GSPOR:
-            $query = Principal::gspsor();
+        case 'gspor':
+            $query = Principal::gspor();
             break;
     }
 }
@@ -57,7 +57,7 @@ if (empty($query)) {
 //搜索用户名
 $s_keywords = urldecode(Request::trim('s_keywords'));
 if ($s_keywords) {
-    if (in_array($s_principal, [User::AGENT, User::PARTNER, User::KEEPER, User::TESTER, User::GSPOR])) {
+    if (in_array($s_principal, ['agent', 'partner', 'keeper', 'tester', 'gspor'])) {
         $query->whereOr([
             'name LIKE' => "%$s_keywords%",
             'nickname LIKE' => "%$s_keywords%",

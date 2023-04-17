@@ -148,7 +148,7 @@ $result = Util::transactionDo(function() use ($id) {
             if ($enabled) {
                 $user->updateSettings('agentData.commission.fee_type', Request::bool('feeType') ? 1 : 0);
                 $user->updateSettings('agentData.commission.fee', Request::float('commission_fee', 0, 2) * 100);
-                $user->setPrincipal(User::GSPOR);
+                $user->setPrincipal(Principal::Gspor);
             }
 
             //佣金分享

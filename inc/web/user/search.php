@@ -13,7 +13,21 @@ use zovye\model\userModelObj;
 $page = max(1, Request::int('page'));
 $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
-$query = User::query();
+$principal = Request::trim('principal');
+
+if ($principal == 'agent') {
+    $query = Principal::agent();
+} elseif ($principal == 'keeper') {
+    $query = Principal::keeper();
+} elseif ($principal == 'partner') {
+    $query = Principal::partner();
+} elseif ($principal == 'tester') {
+    $query = Principal::tester();
+} elseif ($principal == 'gspor') {
+    $query = Principal::gspor();
+} else {
+    $query = User::query();
+}
 
 $keywords = Request::trim('keywords');
 if (!empty($keywords)) {
@@ -21,15 +35,6 @@ if (!empty($keywords)) {
         [
             'nickname LIKE' => "%$keywords%",
             'mobile LIKE' => "%$keywords%",
-        ]
-    );
-}
-
-$passport = Request::trim('passport');
-if (!empty($passport)) {
-    $query->where(
-        [
-            'passport LIKE' => "%$passport%",
         ]
     );
 }

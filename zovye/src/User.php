@@ -29,12 +29,6 @@ class User
     const MALE = 1;
     const FEMALE = 2;
 
-    const AGENT = 'agent';
-    const PARTNER = 'partner';
-    const KEEPER = 'keeper';
-    const GSPOR = 'gspor';
-    const TESTER = 'tester';
-
     const ORDER_ACCOUNT_LOCKER = 'account::order';
     const ORDER_LOCKER = 'order';
     const COMMISSION_BALANCE_LOCKER = 'commission::balance';

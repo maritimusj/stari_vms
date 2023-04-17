@@ -25,6 +25,7 @@ use zovye\model\device_groupsModelObj;
 use zovye\model\deviceModelObj;
 use zovye\DeviceTypes;
 use zovye\model\settings_userModelObj;
+use zovye\Principal;
 use zovye\Request;
 use zovye\Job;
 use zovye\JSON;
@@ -1337,7 +1338,7 @@ class agent
         $page = max(1, Request::int('page'));
         $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
 
-        $query = User::query("LOCATE('agent',passport)>0");
+        $query = Principal::agent();
 
         $keyword = Request::trim('keyword');
         if ($keyword) {

@@ -153,16 +153,16 @@
         },
         doSearch: function (page) {
             $("#userDialog .searchUserResult").html("");
-            const seachType = 'search_' + searchDlg.usertype;
-            if(searchDlg[seachType]) {
-                (searchDlg[seachType])(page);
+            const searchType = 'search_' + searchDlg.usertype;
+            if(searchDlg[searchType]) {
+                (searchDlg[searchType])(page);
             }
         },
-        apiQuery: function(type, page) {
+        apiQuery: function(principal, page) {
             const keywords = $("#userDialog input[id=search_user_keywords]").val();
             $.getJSON("{url 'site/entry/user' array('m' => APP_NAME)}", 
                 {   op: 'search', 
-                    passport: type, 
+                    principal: principal,
                     keywords:keywords,
                     page: page || 1,
                     

@@ -27,7 +27,7 @@ $logs = [];
 if ($total > 0) {
     //检查有佣金记录的用户的佣金用户身份是否存在
     if (!$user->isGSPor()) {
-        $user->setPrincipal(User::GSPOR);
+        $user->setPrincipal(Principal::Gspor);
         $user->save();
     }
 

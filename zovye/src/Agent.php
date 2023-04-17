@@ -137,7 +137,7 @@ class Agent
             foreach ($keepers->findAll() as $keeper) {
                 $keeper_user = $keeper->getUser();
                 if ($keeper_user) {
-                    $keeper_user->removePrincipal(User::KEEPER);
+                    $keeper_user->removePrincipal(Principal::Keeper);
                 }
                 $keeper->destroy();
             }

@@ -169,6 +169,7 @@ class userModelObj extends modelObj
             'name' => $this->getName(),
             'nickname' => $this->getNickname(),
             'headimgurl' => $this->getAvatar(),
+            'mobile' => $this->getMobile(),
         ];
 
         if ($detail) {
@@ -191,7 +192,6 @@ class userModelObj extends modelObj
                     }
                 }
             }
-            $data['mobile'] = $this->getMobile();
         }
 
         return $data;
@@ -979,6 +979,7 @@ class userModelObj extends modelObj
 
             return $data;
         }
+
         return [];
     }
 
@@ -1104,5 +1105,15 @@ class userModelObj extends modelObj
         }
 
         return $referral;
+    }
+
+    /**
+     * 是否是推广员.
+     *
+     * @return bool
+     */
+    public function isPromoter(): bool
+    {
+        return Principal::is($this, Principal::Promoter);
     }
 }

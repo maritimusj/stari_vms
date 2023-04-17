@@ -21,7 +21,7 @@ class Referral
         return self::query(['id' => $id])->findOne();
     }
 
-    public static function from($code)
+    public static function from($code): ?referralModelObj
     {
         return self::findOne([
             'code' => $code,

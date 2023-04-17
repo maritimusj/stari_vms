@@ -14,7 +14,7 @@ use zovye\base\modelObj;
 /**
  * Class referralModelObj
  * @package zovye
- * @method getAgent_id()
+ * @method getUserId()
  * @method getCode()
  * @method getCreatetime()
  */
@@ -26,7 +26,7 @@ class referralModelObj extends modelObj
     protected $uniacid;
 
     /** @var int */
-    protected $agent_id;
+    protected $user_id;
 
     /** @var string */
     protected $code;
@@ -41,6 +41,6 @@ class referralModelObj extends modelObj
 
     public function getAgent(): ?agentModelObj
     {
-        return Agent::get($this->agent_id);
+        return Agent::get($this->user_id);
     }
 }

@@ -53,13 +53,13 @@ class agentModelObj extends userModelObj
     public function getReferral(): ?referralModelObj
     {
         /** @var referralModelObj $referral */
-        $referral = Referral::findOne(['agent_id' => $this->getId()]);
+        $referral = Referral::findOne(['user_id' => $this->getId()]);
         if (empty($referral)) {
             do {
                 $code = Util::random(6, true);
             } while (Referral::exists(['code' => $code]));
 
-            $referral = Referral::create(['agent_id' => $this->getId(), 'code' => $code]);
+            $referral = Referral::create(['user_id' => $this->getId(), 'code' => $code]);
         }
 
         return $referral;

@@ -15,6 +15,7 @@ use function zovye\tb;
  * @method getMobile();
  * @method setMobile(string $mobile);
  * @method setName(string $name);
+ * @method getUserId();
  * @method getName();
  * @method getRemark();
  * @method setRemark(string $remark);

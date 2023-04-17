@@ -6,6 +6,7 @@
 
 namespace zovye;
 
+use RuntimeException;
 use zovye\api\wx\balance;
 
 if (!App::isPromoterEnabled()) {
@@ -88,39 +89,47 @@ JSCODE;
 
 } elseif ($op == 'reg') {
 
-    $code = Request::trim('code');
-    if (empty($code)) {
-        JSON::fail('输入的邀请码无效，请重新输入！');
+    $result = Util::transactionDo(function () {
+        $code = Request::trim('code');
+        if (empty($code)) {
+            throw new RuntimeException('输入的邀请码无效，请重新输入！');
+        }
+
+        $ref = Referral::from($code);
+        if (empty($ref)) {
+            throw new RuntimeException('输入的邀请码无效，请重新输入！');
+        }
+
+        $keeper_user = $ref->getUser();
+        if (empty($keeper_user) || $keeper_user->isBanned()) {
+            throw new RuntimeException('找不到邀请码对应的运营人员！');
+        }
+
+        if ($keeper_user->getId() == $user->getId()) {
+            throw new RuntimeException('不能邀请自己，谢谢！');
+        }
+
+        $keeper = $keeper_user->getKeeper();
+        if (empty($keeper)) {
+            throw new RuntimeException('找不到推荐码对应的运营人员！');
+        }
+
+        $user->setSuperiorId($keeper->getId());
+
+        if ($user->save() && $user->setPrincipal(Principal::Promoter, [
+            'keeper' => $keeper->getId(),
+        ])) {
+            return true;
+        }
+
+        throw new RuntimeException('加入失败，请联系管理员！');
+    });
+
+    if (is_error($result)) {
+        JSON::fail($result);
     }
-
-    $ref = Referral::from($code);
-    if (empty($ref)) {
-        JSON::fail('输入的邀请码无效，请重新输入！');
-    }
-
-    $keeper_user = $ref->getUser();
-    if (empty($keeper_user) || $keeper_user->isBanned()) {
-        JSON::fail('找不到邀请码对应的运营人员！');
-    }
-
-    if ($keeper_user->getId() == $user->getId()) {
-        JSON::fail('不能邀请自己，谢谢！');
-    }
-
-    $keeper = $keeper_user->getKeeper();
-    if (empty($keeper)) {
-        JSON::fail('找不到推荐码对应的运营人员！');
-    }
-
-    $user->setSuperiorId($keeper->getId());
-
-    if ($user->setPrincipal(Principal::Promoter, [
-        'keeper' => $keeper->getId(),
-    ])) {
-        JSON::success('恭喜您成为推广员！');
-    }
-
-    JSON::fail('加入失败，请联系管理员！');
+    
+    JSON::success('恭喜您成为推广员！');
 
 } elseif ($op == 'brief') {
 

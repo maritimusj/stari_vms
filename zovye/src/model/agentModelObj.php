@@ -48,24 +48,6 @@ class agentModelObj extends userModelObj
     }
 
     /**
-     * @return referralModelObj
-     */
-    public function getReferral(): ?referralModelObj
-    {
-        /** @var referralModelObj $referral */
-        $referral = Referral::findOne(['user_id' => $this->getId()]);
-        if (empty($referral)) {
-            do {
-                $code = Util::random(6, true);
-            } while (Referral::exists(['code' => $code]));
-
-            $referral = Referral::create(['user_id' => $this->getId(), 'code' => $code]);
-        }
-
-        return $referral;
-    }
-
-    /**
      * 设备数量
      * @return int
      */

@@ -17,6 +17,7 @@ use zovye\Contract\ICard;
 use zovye\Fueling;
 use zovye\Locker;
 use zovye\Pay;
+use zovye\Referral;
 use zovye\UserCommissionBalanceCard;
 use zovye\VIP;
 use zovye\VIPCard;
@@ -1085,5 +1086,23 @@ class userModelObj extends modelObj
     public function hasFactoryPermission(): bool
     {
         return !empty($this->settings('agentData.misc.power'));
+    }
+
+    /**
+     * @return referralModelObj
+     */
+    public function getReferral(): ?referralModelObj
+    {
+        /** @var referralModelObj $referral */
+        $referral = Referral::findOne(['user_id' => $this->getId()]);
+        if (empty($referral)) {
+            do {
+                $code = Util::random(6, true);
+            } while (Referral::exists(['code' => $code]));
+
+            $referral = Referral::create(['user_id' => $this->getId(), 'code' => $code]);
+        }
+
+        return $referral;
     }
 }

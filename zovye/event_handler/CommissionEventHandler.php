@@ -136,7 +136,7 @@ class CommissionEventHandler
     protected static function reward(deviceModelObj $device, orderModelObj $order): bool
     {
         $commission = intval(Config::app('wxapp.advs.reward.freeCommission', 0));
-        $commission_price =  $commission * $order->getNum();
+        $commission_price = $commission * $order->getNum();
 
         return self::processCommissions($device, $order, $commission_price);
     }
@@ -333,13 +333,14 @@ class CommissionEventHandler
         $available_price = $commission_price;
 
         $keepers = $device->getKeepers();
+
         $log = [];
 
         foreach ($keepers as $keeper) {
             $user = $keeper->getUser();
             if (empty($user)) {
                 Log::error('keeper', [
-                    'err' => 'keeper user not exists!',
+                    'err' => '营运人员对应的用户不存在！',
                     'keeper' => [
                         'name' => $keeper->getName(),
                         'mobile' => $keeper->getMobile(),
@@ -348,6 +349,52 @@ class CommissionEventHandler
                 continue;
             }
 
+            //开始处理推广员佣金
+            if (App::isPromoterEnabled()) {
+                $config = $keeper->settings('promoter.commission', []);
+                if (!isEmptyArray($config)) {
+                    $query = Principal::promoter(['superior_id' => $keeper->getId()]);
+                    /** @var userModelObj $promoter */
+                    foreach ($query->findAll() as $promoter) {
+                        if ($promoter->isBanned()) {
+                            continue;
+                        }
+                        if ($config['percent']) {
+                            $price = intval(round($commission_price * intval($config['percent']) / 100));
+                        } elseif ($config['fixed']) {
+                            $price = intval($config['fixed'] * $order->getNum());
+                        } else {
+                            $price = 0;
+                        }
+
+                        if ($price > $available_price) {
+                            $price = $available_price;
+                        }
+
+                        if ($price > 0) {
+                            $r = $promoter->commission_change($price, $src, ['orderid' => $order->getId()]);
+                            if ($r && $r->update([], true)) {
+                                //记录佣金
+                                $log[] = [
+                                    'id' => $r->getId(),
+                                    'xval' => $r->getXVal(),
+                                    'openid' => $promoter->getOpenid(),
+                                    'name' => $promoter->getName(),
+                                    'mobile' => $promoter->getMobile(),
+                                ];
+                                $available_price -= $price;
+                                if ($available_price == 0) {
+                                    break;
+                                }
+                            } else {
+                                throw new Exception('创建推广员佣金失败！', State::ERROR);
+                            }
+                        }
+                    }
+                }
+            }
+
+            //开始处理运营人员佣金
             list($v, $way, $is_percent) = $keeper->getCommissionValue($device);
             if ($way != Keeper::COMMISSION_ORDER) {
                 continue;
@@ -403,7 +450,7 @@ class CommissionEventHandler
         int $commission_price,
         agentModelObj $agent,
         orderModelObj $order,
-        int $src =  CommissionBalance::GSP
+        int $src = CommissionBalance::GSP
     ): int {
         $available_price = $commission_price;
 

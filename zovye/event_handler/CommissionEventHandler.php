@@ -381,6 +381,7 @@ class CommissionEventHandler
                                     'openid' => $promoter->getOpenid(),
                                     'name' => $promoter->getName(),
                                     'mobile' => $promoter->getMobile(),
+                                    'promoter' => true,
                                 ];
                                 $available_price -= $price;
                                 if ($available_price == 0) {

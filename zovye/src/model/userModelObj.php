@@ -388,7 +388,7 @@ class userModelObj extends modelObj
                 'user_id' => $this->getId(),
                 'principal_id' => $principal_id,
                 'name' => $this->getName(),
-                'enable' => true,
+                'enabled' => true,
                 'extra' => $extra,
             ]);
         }

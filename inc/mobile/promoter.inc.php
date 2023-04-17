@@ -89,7 +89,7 @@ JSCODE;
 
 } elseif ($op == 'reg') {
 
-    $result = Util::transactionDo(function () {
+    $result = Util::transactionDo(function () use ($user) {
         $code = Request::trim('code');
         if (empty($code)) {
             throw new RuntimeException('输入的邀请码无效，请重新输入！');
@@ -117,8 +117,8 @@ JSCODE;
         $user->setSuperiorId($keeper->getId());
 
         if ($user->save() && $user->setPrincipal(Principal::Promoter, [
-            'keeper' => $keeper->getId(),
-        ])) {
+                'keeper' => $keeper->getId(),
+            ])) {
             return true;
         }
 
@@ -128,16 +128,16 @@ JSCODE;
     if (is_error($result)) {
         JSON::fail($result);
     }
-    
+
     JSON::success('恭喜您成为推广员！');
 
 } elseif ($op == 'brief') {
 
-   $data = $user->profile(false);
-   $data['balance'] = $user->getCommissionBalance()->total();
-   $data['promoter'] = $user->isPromoter();
+    $data = $user->profile(false);
+    $data['balance'] = $user->getCommissionBalance()->total();
+    $data['promoter'] = $user->isPromoter();
 
-   JSON::success($data);
+    JSON::success($data);
 
 } elseif ($op == 'log') {
 

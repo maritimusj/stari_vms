@@ -42,22 +42,25 @@ if ($op == 'default') {
         zovye_fn.brief = function() {
             return $.getJSON('$api_url', {op: 'brief'});
         };
+        \r\n
 JSCODE;
     if ($user->isPromoter()) {
         $tpl_data['js']['code'] .= <<<JSCODE
         zovye_fn.getList = function(page, size) {
             return $.getJSON('$api_url', {op: 'log', 'page': page, 'pagesize': size});
         };
+        \r\n
 JSCODE;
     } else {
         $tpl_data['js']['code'] .= <<<JSCODE
         zovye_fn.reg = function(code) {
             return $.getJSON('$api_url', {op: 'reg', 'code': code});
         };
+        \r\n
 JSCODE;
     }
     $tpl_data['js']['code'] .= <<<JSCODE
-\r\n</script>
+</script>
 JSCODE;
     app()->showTemplate($user->isPromoter() ? 'promoter/log' : 'promoter/reg', ['tpl' => $tpl_data]);
 

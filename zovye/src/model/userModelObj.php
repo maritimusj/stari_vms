@@ -971,21 +971,13 @@ class userModelObj extends modelObj
 
     public function getAgentLevel(): array
     {
-        $principal = Principal::findOne([
-            'user_id' => $this->getId(),
-            'principal_id' => Principal::Agent,
-        ]);
+        $level = $this->getAgentData('level', '');
+        if ($level) {
+            $data = settings("agent.levels.$level", []);
+            $data['level'] = $level;
 
-        if ($principal) {
-            $level = $principal->getExtraData('agent.level', '');
-            if ($level) {
-                $data = settings("agent.levels.$level", []);
-                $data['level'] = $level;
-
-                return $data;
-            }
+            return $data;
         }
-
         return [];
     }
 

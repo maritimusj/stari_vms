@@ -19,6 +19,8 @@ class Principal
     const Gspor = 4;
     const Tester = 5;
 
+    const Promoter = 7;
+
     public static function create($data): ?principalModelObj
     {
         if ($data['extra']) {
@@ -79,4 +81,8 @@ class Principal
         return m('tester_vw')->where(We7::uniacid([]))->where($condition);
     }
 
+    public static function promoter($condition = []): base\modelObjFinder
+    {
+        return m('promoter_vw')->where(We7::uniacid([]))->where($condition);
+    }
 }

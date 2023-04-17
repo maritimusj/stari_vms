@@ -22,11 +22,15 @@ class referralModelObj extends modelObj
 {
     /** @var int */
     protected $id;
+
     protected $uniacid;
+
     /** @var int */
     protected $agent_id;
+
     /** @var string */
     protected $code;
+
     /** @var int */
     protected $createtime;
 

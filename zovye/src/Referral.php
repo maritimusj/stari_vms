@@ -11,7 +11,40 @@ use zovye\model\referralModelObj;
 
 class Referral
 {
-    static function getAgent($code): ?agentModelObj
+    public static function query($condition): base\modelObjFinder
+    {
+        return m('referral')->query(We7::uniacid())->where($condition);
+    }
+
+    public static function get($id)
+    {
+        return self::query(['id' => $id])->findOne();
+    }
+
+    public static function getByCode($code)
+    {
+        return self::findOne([
+            'code' => $code,
+        ]);
+    }
+
+    public static function exists($condition = []): bool
+    {
+        return self::query($condition)->exists();
+    }
+
+    public static function findOne($condition = [])
+    {
+        return self::query($condition)->findOne();
+    }
+
+    public static function create($data = [])
+    {
+        $data = We7::uniacid($data);
+        return m('referral')->create($data);
+    }
+
+    public static function getAgent($code): ?agentModelObj
     {
         /** @var referralModelObj $referral */
         $referral = m('referral')->findOne(['code' => $code]);

@@ -8,6 +8,7 @@ namespace zovye\model;
 
 use zovye\GSP;
 use zovye\Principal;
+use zovye\Referral;
 use zovye\User;
 use zovye\Util;
 use zovye\Device;
@@ -15,7 +16,6 @@ use zovye\Device;
 use function zovye\err;
 use function zovye\is_error;
 use function zovye\m;
-use function zovye\settings;
 
 /**
  * Class agentModelObj
@@ -53,13 +53,13 @@ class agentModelObj extends userModelObj
     public function getReferral(): ?referralModelObj
     {
         /** @var referralModelObj $referral */
-        $referral = m('referral')->findOne(['agent_id' => $this->getId()]);
+        $referral = Referral::findOne(['agent_id' => $this->getId()]);
         if (empty($referral)) {
             do {
                 $code = Util::random(6, true);
-            } while (m('referral')->findOne(['code' => $code]));
+            } while (Referral::exists(['code' => $code]));
 
-            $referral = m('referral')->create(['agent_id' => $this->getId(), 'code' => $code]);
+            $referral = Referral::create(['agent_id' => $this->getId(), 'code' => $code]);
         }
 
         return $referral;

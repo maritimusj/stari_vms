@@ -40,7 +40,6 @@ class Referral
 
     public static function create($data = [])
     {
-        $data = We7::uniacid($data);
         return m('referral')->create($data);
     }
 

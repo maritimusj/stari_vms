@@ -22,7 +22,7 @@ SQL;
 
 if (We7::pdo_fieldexists($tb_name.'_referral', 'agent_id')) {
     $sql = <<<SQL
-ALTER TABLE `ims_zovye_vms_referral` CHANGE `agent_id` `user_id` TINYINT(4) NOT NULL DEFAULT '1';
+ALTER TABLE `ims_zovye_vms_referral` CHANGE `agent_id` `user_id` INT(11) NOT NULL DEFAULT '1';
 ALTER TABLE `ims_zovye_vms_referral` ADD UNIQUE(`code`);
 ALTER TABLE `ims_zovye_vms_referral` ADD INDEX(`user_id`);
 SQL;

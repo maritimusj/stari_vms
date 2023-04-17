@@ -42,6 +42,7 @@ if ($op == 'default') {
     $jquery_url = JS_JQUERY_URL;
     $vueJs_url = JS_VUE_URL;
     $js_sdk = Util::fetchJSSDK();
+    $pre_withdraw_url = Util::murl('promoter', ['op' => 'pre_withdraw']);
 
     $tpl_data['js']['code'] = <<<JSCODE
     <script src="$jquery_url"></script>
@@ -72,6 +73,9 @@ JSCODE;
         zovye_fn.getList = function(page, size) {
             return $.getJSON('$api_url', {op: 'log', 'page': page, 'pagesize': size});
         };
+        zovye_fn.redirectToWithdrawPage = function() {
+            window.location.href = "$pre_withdraw_url";
+        }
         \r\n
 JSCODE;
     } else {

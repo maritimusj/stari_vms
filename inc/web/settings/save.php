@@ -164,6 +164,7 @@ if ($page == 'device') {
     $settings['custom']['team']['enabled'] = Request::bool('teamEnabled') ? 1 : 0;
     $settings['custom']['cztv']['enabled'] = Request::bool('cztvEnabled') ? 1 : 0;
     $settings['custom']['flashEgg']['enabled'] = Request::bool('flashEggEnabled') ? 1 : 0;
+    $settings['custom']['promoter']['enabled'] = Request::bool('promoterEnabled') ? 1 : 0;
 
     Config::app('ad.sponsor.enabled', Request::bool('sponsorAd'), true);
 

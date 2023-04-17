@@ -667,4 +667,12 @@ class App
             return boolval(settings('custom.flashEgg.enabled'));
         });
     }
+
+    public static function isPromoterEnabled(): bool
+    {
+        return onceCall(function () {
+            return boolval(settings('custom.promoter.enabled'));
+        });
+    }
+    
 }

@@ -570,6 +570,13 @@ class keeper
         $user = $keeper->getUser();
         if ($user) {
             $result['balance_formatted'] = number_format($user->getCommissionBalance()->total() / 100, 2, '.', '');
+    
+            if (App::isPromoterEnabled()) {
+                $referral = $user->getReferral();
+                if ($referral) {
+                    $result['referral'] = $referral->getCode();
+                }
+            }
         }
 
         if (Request::has('remain')) {

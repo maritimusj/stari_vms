@@ -12,8 +12,9 @@ use zovye\model\deviceModelObj;
 use zovye\model\keeperModelObj;
 
 $id = Request::int('id');
+$from = Request::str('from');
 
-$result = Util::transactionDo(function() use ($id) {
+$result = Util::transactionDo(function() use ($id, &$from) {
 
     $user = User::get($id);
     if (empty($user)) {
@@ -320,6 +321,7 @@ $result = Util::transactionDo(function() use ($id) {
         if ($is_edit) {
             return ['message' => '保存成功！'];
         }
+        $from = 'edit';
         //使用控制中心推送通知
         Job::newAgent($user->getId());
         return ['message' => '代理商设置成功！'];
@@ -327,4 +329,4 @@ $result = Util::transactionDo(function() use ($id) {
     return err('保存失败！');
 });
 
-Util::itoast($result['message'], $this->createWebUrl('agent', ['op' => Request::str('from'), 'id' => $id]), is_error($result) ? 'error' : 'success');
+Util::itoast($result['message'], $this->createWebUrl('agent', ['op' => $from, 'id' => $id]), is_error($result) ? 'error' : 'success');

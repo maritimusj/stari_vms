@@ -452,7 +452,7 @@ class userModelObj extends modelObj
         } else {
             $res = We7::pdo_update(User::getTableName(), ['superior_id' => 0], ['superior_id' => $this->getId()]);
             if ($res !== false) {
-                return $this->removePrincipal(Principal::agent());
+                return $this->removePrincipal(Principal::Agent);
             }
         }
 

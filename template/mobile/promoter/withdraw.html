@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+    <title>提现</title>
+    <style>
+        html,
+        body {
+            position: relative;
+            width: 100vw;
+        }
+
+        body {
+            background-color: #F8F8F8;
+            font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            color: #1C1C1C;
+            font-weight: 400;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        #app {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        [v-cloak] {
+            display: none !important;
+        }
+
+        .withdraw {
+            width: calc(100% - 40px);
+            padding: 30px;
+            background-color: white;
+            margin-top: 20px;
+            box-shadow: 0 0 5px #eee;
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .title {
+            font-weight: bold;
+        }
+
+        .input-container {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            margin-top: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .unit {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        input {
+            width: 100%;
+            height: 44px;
+            margin-left: 10px;
+            font-size: 30px;
+            font-weight: bold;
+            border: none;
+            outline: none;
+        }
+
+        input::placeholder {
+            font-size: 26px;
+            color: #eee;
+            font-weight: normal;
+        }
+
+        .balance {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #9d9d9d;
+        }
+
+        .withdraw-all {
+            color: #1890ff;
+        }
+
+        .clickable:active {
+            opacity: 0.7;
+        }
+
+        .btn {
+            width: 100%;
+            height: 44px;
+            margin-top: 30px;
+            background-color: #26A65B;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            letter-spacing: 5px;
+        }
+    </style>
+</head>
+
+<body ontouchstart>
+    <div id="app" v-cloak>
+        <div class="withdraw" v-if="userInfo">
+            <span class="title">提现金额</span>
+            <div class="input-container">
+                <span class="unit">¥</span>
+                <input type="number" v-model="amount" placeholder="请输入">
+            </div>
+            <div class="balance">
+                <span>账户余额：¥{{(userInfo.balance / 100).toFixed(2)}}，</span>
+                <span class="withdraw-all clickable" @click="onWithdrawAll">全部提现</span>
+            </div>
+            <button class="btn clickable" @click="onWithdraw">提现</button>
+        </div>
+    </div>
+    {$tpl['js']['code']}
+    {php \zovye\url(true, JS_VUE_URL);}
+    <script>
+        (function () {
+            window.alert = function (name) {
+                var iframe = document.createElement("IFRAME");
+                iframe.style.display = "none";
+                iframe.setAttribute("src", 'data:text/plain');
+                document.documentElement.appendChild(iframe);
+                window.frames[0].window.alert(name);
+                iframe.parentNode.removeChild(iframe);
+            }
+        })();
+
+        const app = new Vue({
+            el: '#app',
+            data: {
+                userInfo: null,
+                amount: ''
+            },
+            created () {
+                this.getBrief()
+            },
+            methods: {
+                getBrief () {
+                    zovye_fn.brief().then(res => {
+                        if (res.status) {
+                            this.userInfo = res.data
+                        } else {
+                            alert(res.data.msg)
+                        }
+                    })
+                },
+                onWithdrawAll() {
+                    this.amount = (this.userInfo.balance / 100).toFixed(2)
+                },
+                onWithdraw() {
+                    zovye_fn.withdraw(this.amount).then(res => {
+                        alert(res.data.msg)
+                        if (res.status) {
+                            window.history.back()
+                        }
+                    })
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

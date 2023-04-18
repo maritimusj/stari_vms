@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+    <title>佣金明细</title>
+    <style>
+        html,
+        body {
+            position: relative;
+            width: 100vw;
+        }
+
+        body {
+            background-color: #F8F8F8;
+            font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            color: #1C1C1C;
+            font-weight: 400;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        #app {
+            width: 100%;
+        }
+
+        [v-cloak] {
+            display: none !important;
+        }
+
+        .header {
+            width: 100%;
+            height: 80px;
+            background-color: white;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 0 6px #eee;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 99;
+        }
+
+        .avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            box-shadow: 0 0 6px 6px #eee;
+        }
+
+        .info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            margin: 0 20px;
+        }
+
+        .nickname {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .balance {
+            font-size: 12px;
+            color: #333;
+        }
+
+        .balance .unit {
+            font-weight: bold;
+        }
+
+        .balance .value {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .withdraw {
+            width: 80px;
+            height: 36px;
+            border-radius: 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #26A65B;
+            color: white;
+        }
+
+        .clickable:active {
+            opacity: 0.7;
+        }
+
+        .list {
+            width: 100%;
+            margin-top: 80px;
+        }
+
+        .item-view {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            background-color: white;
+            padding: 10px 20px;
+        }
+
+        .item-view:not(:first-child) {
+            margin-top: 1px;
+        }
+
+        .memo {
+            flex: 1;
+        }
+
+        .xval {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .green {
+            color: #26A65B;
+        }
+
+        .red {
+            color: #FF4500;
+        }
+
+        dl {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0;
+        }
+
+        dt,
+        dd {
+            margin: 2px 0 0;
+        }
+
+        dt {
+            width: 80px;
+            font-weight: 500;
+        }
+
+        dd {
+            width: calc(100% - 80px);
+            color: #333;
+        }
+
+        dd img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin-right: 10rpx;
+        }
+
+        .footer {
+            width: 100%;
+            height: 40px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            color: #ccc;
+            font-size: 12px;
+        }
+
+        .divider {
+            flex: 1;
+            margin: 0 30px;
+            height: 1px;
+            background-color: #ccc;
+            transform: scaleY(0.5);
+        }
+
+        .no-data {
+            margin-top: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .no-data span {
+            margin-top: 10px;
+            color: #ccc;
+        }
+    </style>
+</head>
+
+<body ontouchstart>
+    <div id="app" v-cloak>
+        <div class="header" v-if="userInfo">
+            <img class="avatar" :src="userInfo.headimgurl">
+            <div class="info">
+                <span class="nickname">{{userInfo.nickname}}</span>
+                <div class="balance">
+                    <span>账户余额：</span>
+                    <span class="unit green">¥</span>
+                    <span class="value green">{{(userInfo.balance / 100).toFixed(2)}}</span>
+                </div>
+            </div>
+            <div class="withdraw clickable" @click="onWithdraw">提现</div>
+        </div>
+        <div class="list" v-if="list && list.length > 0">
+            <div class="item-view" v-for="(item, index) in list" :key="index">
+                <div class="memo">
+                    <span v-html="item.memo"></span>
+                    <dl>
+                        <dt>时间</dt>
+                        <dd>{{item.createtime}}</dd>
+                    </dl>
+                </div>
+                <span class="xval" :class="[parseFloat(item.xval) > 0 ? 'green' : 'red']">{{item.xval}}</span>
+            </div>
+        </div>
+        <div class="footer" v-if="loading">
+            <span>正在加载中...</span>
+        </div>
+        <div class="no-data" v-else-if="list && list.length === 0">
+            <svg viewBox="0 0 1137 1024" p-id="77521" width="80" height="80">
+                <path
+                    d="M0 906.477037c0 55.390815 254.511407 100.295111 568.471704 100.295111s568.481185-44.904296 568.481185-100.295111-254.520889-100.28563-568.481185-100.28563S0 851.086222 0 906.477037z"
+                    fill="#F6F6F8" p-id="77522"></path>
+                <path d="M1016.566519 592.232296h-896.18963l132.977778-160.464592h620.600889z" fill="#ACB5BF"
+                    p-id="77523"></path>
+                <path
+                    d="M867.963259 779.444148H282.358519c-15.587556 0-28.22637-12.47763-28.226371-27.856592V31.725037c0-15.388444 12.638815-27.866074 28.226371-27.866074h585.595259c15.587556 0 28.22637 12.47763 28.22637 27.866074v719.862519c0 15.388444-12.638815 27.856593-28.22637 27.856592z"
+                    fill="#F4F4F6" p-id="77524"></path>
+                <path
+                    d="M765.155556 324.79763H385.166222c-20.650667 0-37.394963-17.635556-37.394963-39.395556V110.108444c0-21.750519 16.744296-39.386074 37.394963-39.386074H765.155556c20.650667 0 37.394963 17.635556 37.394963 39.386074v175.29363c0 21.76-16.744296 39.395556-37.394963 39.395556z m14.411851 133.717333H384.132741c-12.695704 0-22.983111-11.975111-22.983111-26.737778 0-14.78163 10.287407-26.747259 22.983111-26.747259H779.567407c12.705185 0 22.983111 11.96563 22.983112 26.737778 0 14.772148-10.287407 26.737778-22.983112 26.737777z"
+                    fill="#DADEE4" p-id="77525"></path>
+                <path
+                    d="M970.230519 926.53037H166.72237c-25.6 0-46.336-20.641185-46.336-46.108444V592.232296h896.18963v288.18963c0 25.467259-20.764444 46.117926-46.345481 46.117926z"
+                    fill="#DCE0E6" p-id="77526"></path>
+                <path
+                    d="M717.217185 685.842963H433.114074c-39.74637 0-71.964444-32.521481-71.964444-72.63763v-1.820444c0-40.116148 32.218074-72.63763 71.964444-72.63763h284.103111c39.736889 0 71.964444 32.521481 71.964445 72.628148v1.829926c0 40.106667-32.227556 72.628148-71.964445 72.628148z"
+                    fill="#F4F4F6" p-id="77527"></path>
+                <path
+                    d="M779.567407 565.494519H384.132741c-12.695704 0-22.983111-11.975111-22.983111-26.74726 0-14.772148 10.287407-26.737778 22.983111-26.737778H779.567407c12.705185 0 22.983111 11.96563 22.983112 26.737778 0 14.772148-10.287407 26.737778-22.983112 26.737778z"
+                    fill="#DADEE4" p-id="77528"></path>
+            </svg>
+            <span>暂无数据</span>
+        </div>
+        <div class="footer" v-else-if="!more">
+            <div class="divider"></div>
+            <span>已经到底了</span>
+            <div class="divider"></div>
+        </div>
+    </div>
+    {$tpl['js']['code']}
+    {php \zovye\url(true, JS_VUE_URL);}
+    <script>
+        (function () {
+            window.alert = function (name) {
+                var iframe = document.createElement("IFRAME");
+                iframe.style.display = "none";
+                iframe.setAttribute("src", 'data:text/plain');
+                document.documentElement.appendChild(iframe);
+                window.frames[0].window.alert(name);
+                iframe.parentNode.removeChild(iframe);
+            }
+        })();
+
+        const app = new Vue({
+            el: '#app',
+            data: {
+                userInfo: null,
+                list: null,
+                page: 1,
+                size: 20,
+                loading: false,
+                more: true
+            },
+            created () {
+                this.getBrief()
+                this.getList()
+            },
+            mounted () {
+                window.addEventListener('scroll', this.onScroll)
+            },
+            methods: {
+                getBrief () {
+                    zovye_fn.brief().then(res => {
+                        if (res.status) {
+                            this.userInfo = res.data
+                        } else {
+                            alert(res.data.msg)
+                        }
+                    })
+                },
+                getList () {
+                    this.loading = true
+                    zovye_fn.getList(this.page, this.size).then(res => {
+                        this.loading = false
+                        if (res.status) {
+                            const list = res.data
+                            if (this.page === 1) {
+                                this.list = list
+                            } else {
+                                this.list = this.list.concat(list)
+                            }
+                            if (list.length < this.size) {
+                                this.more = false
+                            }
+                        } else {
+                            alert(res.data.msg)
+                        }
+                    })
+                },
+                onScroll () {
+                    let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight
+                    if (bottomOfWindow) {
+                        if (!this.loading && this.more) {
+                            this.page++
+                            this.getList()
+                        }
+                    }
+                },
+                onWithdraw () {
+                    zovye_fn.redirectToWithdrawPage()
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

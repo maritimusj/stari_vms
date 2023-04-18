@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+    <title>绑定邀请码</title>
+    <style>
+        html,
+        body {
+            position: relative;
+            width: 100vw;
+        }
+
+        body {
+            background-color: #000;
+            font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+            font-size: 16px;
+            color: #1C1C1C;
+            font-weight: 400;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        #app {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        [v-cloak] {
+            display: none !important;
+        }
+
+        .container {
+            width: calc(100% - 80px);
+            padding: 50px 20px;
+            border-radius: 10px;
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: white;
+            background: linear-gradient(#D24D57, #FC9D99);
+            /* border: 3px solid #EB7347; */
+            box-shadow: 0 0 2px 4px #EB7347;
+        }
+
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-top: -90px;
+            box-shadow: 0 -2px 2px 2px #EB7347;
+        }
+
+        .nickname {
+            margin-top: 30px;
+        }
+
+        .tips {
+            margin-top: 10px;
+        }
+
+        input {
+            width: calc(100% - 60px);
+            height: 40px;
+            border: none;
+            outline: none;
+            padding: 0 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        input::placeholder {
+            color: #9d9d9d;
+            font-size: 16px;
+            font-weight: normal;
+        }
+
+        .button {
+            width: calc(100% - 60px);
+            height: 40px;
+            background: linear-gradient(to bottom, #ff7f00, #ff5500);
+            border-radius: 10px;
+            color: #fff;
+            text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+            border: none;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.2s ease-in-out;
+            margin-top: 20px;
+        }
+
+        .button:active {
+            background: linear-gradient(to bottom, #ff5500, #ff7f00);
+            text-shadow: none;
+            box-shadow: none;
+        }
+    </style>
+</head>
+
+<body ontouchstart>
+    <div id="app" v-cloak>
+        <div class="container" v-if="userInfo">
+            <img class="avatar" :src="userInfo.headimgurl">
+            <span class="nickname">Hi~, {{userInfo.nickname}}</span>
+            <span class="tips">请输入邀请码</span>
+            <input type="number" v-model="code" placeholder="邀请码">
+            <button class="button" @click="onBind">绑定</button>
+        </div>
+    </div>
+    {$tpl['js']['code']}
+    {php \zovye\url(true, JS_VUE_URL);}
+    <script>
+        (function () {
+            window.alert = function (name) {
+                var iframe = document.createElement("IFRAME");
+                iframe.style.display = "none";
+                iframe.setAttribute("src", 'data:text/plain');
+                document.documentElement.appendChild(iframe);
+                window.frames[0].window.alert(name);
+                iframe.parentNode.removeChild(iframe);
+            }
+        })();
+
+        const app = new Vue({
+            el: '#app',
+            data: {
+                userInfo: null,
+                code: ''
+            },
+            created () {
+                this.getBrief()
+            },
+            methods: {
+                getBrief () {
+                    zovye_fn.brief().then(res => {
+                        if (res.status) {
+                            this.userInfo = res.data
+                        } else {
+                            alert(res.data.msg)
+                        }
+                    })
+                },
+                onBind () {
+                    if (this.code) {
+                        zovye_fn.reg(this.code).then(res => {
+                            if (res.status) {
+                                alert(res.data.msg)
+                                window.location.reload()
+                            } else {
+                                alert(res.data.msg)
+                            }
+                        })
+                    } else {
+                        alert('请输入邀请码')
+                    }
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

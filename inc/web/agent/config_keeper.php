@@ -27,4 +27,4 @@ $content = app()->fetchTemplate(
     ]
 );
 
-JSON::success(['title' => "推广员佣金配置", 'content' => $content, 'config' => $keeper->settings('promoter.commission', [])]);
+JSON::success(['title' => "推广员佣金配置", 'content' => $content]);

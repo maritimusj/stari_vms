@@ -44,11 +44,16 @@
                     <th style="text-align: center;width: 10em;">
                         <div>创建时间</div>
                     </th>
+                    {if \zovye\App::isPromoterEnabled()}
+                    <th>
+                        操作
+                    </th>
+                    {/if}
                 </tr>
                 </thead>
                 <tbody>
                 {loop $list $index $item}
-                <tr>
+                <tr data-id="{$item['id']}">
                     <td>{php echo $index + 1}</td>
                     <td>
                         <div class="profile">
@@ -70,6 +75,13 @@
                     <td>
                         <div style="color:#9E9E9E;font-size:12px;">{$item['createtime']}</div>
                     </td>
+                    {if \zovye\App::isPromoterEnabled()}
+                    <td>
+                        <div class="operate">
+                            <i class="fa fa-gear" data-op="configKeeper" title="配置"></i>
+                        </div>
+                    </td>
+                    {/if}
                 </tr>
                 {/loop}
                 </tbody>
@@ -86,6 +98,22 @@
     </div>
 </div>
 
+<script>
+    require(["{php \zovye\url(false, 'static/js/zovye.min.js')}"], function (zovye) {
+        zovye.enableOp();
+        zovye.setApiUrl("{php echo $this->createWebUrl('agent');}");
 
+        zovye.op('saveKeeperConfig', function(self, next) {
+            const e = self.closest('[data-id]');
+            const id = e.data('id');
+            const type = $('#editKeeperConfig input[name=type]:checked').val();
+            const val = $('#editKeeperConfig input[name=commissionVal]').val();
+            const tr = $('#keeperlist tr[data-id="'+id+'"]');
+            next({id, type, val}, function(res) {
+               $('#modal-message').modal('hide');
+            });
+        })
+    });
+</script>
 
 {template 'common/footer'}

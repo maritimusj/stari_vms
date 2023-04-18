@@ -44,7 +44,7 @@ CREATE OR REPLACE VIEW `ims_zovye_vms_promoter_vw` AS
 SELECT u.*,p.name as `name`,p.createtime as `updatetime`
 FROM 
 `ims_zovye_vms_principal` p INNER JOIN `ims_zovye_vms_user` u ON p.user_id=u.id
-WHERE p.principal_id=6;
+WHERE p.principal_id=7;
 
 CREATE OR REPLACE VIEW `ims_zovye_vms_inventory_goods_vw` AS
 SELECT s.*,g.agent_id,g.name,g.img,g.price FROM `ims_zovye_vms_inventory_goods` s INNER JOIN `ims_zovye_vms_goods` g ON s.goods_id=g.id;

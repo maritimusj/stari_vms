@@ -26,38 +26,28 @@ class promoter
             return err('找不到这个运营人员！');
         }
 
-        $result = [];
-
         $query = Principal::promoter(['superior_id' => $keeper->getId()]);
+
+        $total = $query->count();
+
+        $page = max(1, Request::int('page'));
+        $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
+    
+        $query->page($page, $page_size);
+
+        $list = [];
         /** @var userModelObj $promoter */
         foreach ($query->findAll() as $promoter) {
             $data = $promoter->profile(false);
             $data['commission_total'] = $promoter->getCommissionBalance()->total();
-            $result[] = $data;
+            $list[] = $data;
         }
 
-        return $result;
-    }
-
-    public static function KeeperGetPromoterLogs(): array
-    {
-        $keeper = keeper::getKeeper();
-
-        $user = User::get(Request::int('id'));
-        if (empty($user)) {
-            return err('推广员不存在！');
-        }
-
-        if (!$user->isPromoter()) {
-            return err('用户不是推广员！');
-        }
-
-        if ($keeper->getId() != $user->getSuperiorId()) {
-            return err('没有权限查看！');
-        }
-
-        return Helper::getUserCommissionLogs($user);
-
+        return [
+            'list' => $list,
+            'total' => $total,
+            'totalpage' => ceil($total / $page_size),
+        ];
     }
 
     public static function getPromoterLogs(): array
@@ -127,4 +117,51 @@ class promoter
         return $config;
     }
 
+    public static function keeperGetPromoterList(): array
+    {
+        $keeper = keeper::getKeeper();
+
+        $query = Principal::promoter(['superior_id' => $keeper->getId()]);
+
+        $total = $query->count();
+
+        $page = max(1, Request::int('page'));
+        $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
+    
+        $query->page($page, $page_size);
+
+        $list = [];
+        /** @var userModelObj $promoter */
+        foreach ($query->findAll() as $promoter) {
+            $data = $promoter->profile(false);
+            $data['commission_total'] = $promoter->getCommissionBalance()->total();
+            $list[] = $data;
+        }
+
+        return [
+            'list' => $list,
+            'total' => $total,
+            'totalpage' => ceil($total / $page_size),
+        ];
+    }
+
+    public static function KeeperGetPromoterLogs(): array
+    {
+        $keeper = keeper::getKeeper();
+
+        $user = User::get(Request::int('id'));
+        if (empty($user)) {
+            return err('推广员不存在！');
+        }
+
+        if (!$user->isPromoter()) {
+            return err('用户不是推广员！');
+        }
+
+        if ($keeper->getId() != $user->getSuperiorId()) {
+            return err('没有权限查看！');
+        }
+
+        return Helper::getUserCommissionLogs($user);
+    }
 }

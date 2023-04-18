@@ -1,0 +1,46 @@
+<form class="form-horizontal" id="editKeeperConfig" data-id="{$id}">
+    <div class="form-group">
+        <label class="col-xs-12 col-md-2 col-md-2 control-label">类型</label>
+        <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+            <label for="type0" class="radio-inline">
+                <input name="type" id="type0" type="radio" value="fixed" {if isset($config['fixed'])}checked="checked"{/if}>
+                固定金额
+            </label>
+            <label for="type1" class="radio-inline">
+                <input name="type" id="type1" type="radio" value="percent"  {if isset($config['percent'])}checked="checked"{/if}>
+                百分比
+            </label>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="commissionVal" class="col-md-2 control-label"><span id="commissionTitle">金额</span></label>
+        <div class="col-md-10">
+            <input type="number" class="form-control" name="commissionVal" id="commissionVal" value="{php echo number_format(($config['percent'] ?? $config['fixed']) / 100, 2, '.', '')}">
+            <span class="help-block"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10" style="text-align: right;">
+            <button type="button" class="btn btn-primary" data-op="saveKeeperConfig">保存</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">退出</button>
+        </div>
+    </div>
+</form>
+
+<script>
+    $(function() {
+        changeTitle("{php echo isset($config['fixed']) ? 'fixed' : 'percent'}")
+        $('input[name=type]').change(function() {
+            changeTitle($(this).val());
+        });
+    })
+    function changeTitle(type) {
+        if (type === 'percent') {
+            $('input#type1').prop('checked', true);
+        } else {
+            $('input#type0').prop('checked', true);
+        }
+        $('#commissionTitle').text(type === 'percent' ? '比例(%)' : '金额(元)');
+        $('#editKeeperConfig .help-block').text(type === 'percent' ? '* 按订单金额的百分比支付佣金' : '* 每售出一件商品支付固定金额的佣金');
+    }
+</script>

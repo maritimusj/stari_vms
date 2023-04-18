@@ -47,6 +47,9 @@ if ($s_principal) {
         case 'gspor':
             $query = Principal::gspor();
             break;
+        case 'promoter':
+            $query = Principal::promoter();
+            break;
     }
 }
 

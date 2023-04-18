@@ -127,7 +127,7 @@ JSCODE;
             return true;
         }
 
-        throw new RuntimeException('加入失败，请联系管理员！');
+        return err('加入失败，请联系管理员！');
     });
 
     if (is_error($result)) {
@@ -188,5 +188,5 @@ JSCODE;
     app()->showTemplate('promoter/withdraw', ['tpl' => $tpl_data]);
 
 } elseif ($op == 'withdraw') {
-    return balance::balanceWithdraw($user, Request::float('amount', 0, 2) * 100);
+    JSON::result(balance::balanceWithdraw($user, Request::float('amount', 0, 2) * 100));
 }

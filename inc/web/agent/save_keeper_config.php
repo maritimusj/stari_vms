@@ -27,5 +27,4 @@ $keeper->updateSettings('promoter.commission', $config);
 
 JSON::success([
     'msg' => '保存成功！',
-    'config' => $config,
 ]);

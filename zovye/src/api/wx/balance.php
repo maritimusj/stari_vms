@@ -147,8 +147,7 @@ class balance
             return err("提现金额不能大于{$max}元");
         }
 
-        $res = Util::transactionDo(
-            function () use ($amount, $memo, $balance, $user, $extra) {
+        $res = Util::transactionDo(function () use ($amount, $memo, $balance, $user, $extra) {
                 //计算手续费
                 $fee = 0;
                 $config = settings('commission.withdraw.fee', []);
@@ -248,7 +247,7 @@ class balance
                     }
                 }
 
-                return ['msg' => $msg];
+                return ['message' => $msg];
             }
         );
 

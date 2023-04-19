@@ -1,6 +1,6 @@
 {template 'common/header'}
 {php \zovye\url(true, 'static/css/common.css?v=20220517');}
-{php \zovye\url(true, 'static/css/orderlist.css?v=20220305');}
+{php \zovye\url(true, 'static/css/orderlist.css?v=20220306');}
 <style>
     #orderlist .transactionId {
         display: flex;
@@ -562,7 +562,7 @@
                                 {loop $order['commission']['keepers'] $index $item}
                                 {php $keeper = \zovye\User::get($item['openid'], true);}
                                 {if $keeper}
-                                <div class="gspor keeper_item">
+                                <div class="gspor keeper_item{if $item['promoter']} promoter{/if}">
                                     <div class="profile">
                                         <img src="{php echo $keeper->getAvatar();}" alt="">
                                         <span>{php echo $keeper->getName()}</span>

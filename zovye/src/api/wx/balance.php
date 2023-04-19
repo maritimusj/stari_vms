@@ -111,12 +111,12 @@ class balance
         }
 
         if ($amount < 1) {
-            return err('提现金额不正确！');
+            return err('提现金额必须大于0！');
         }
 
         $balance = $user->getCommissionBalance();
         if ($amount > $balance->total()) {
-            return err('可用余额不足！');
+            return err('账户可用余额不足！');
         }
 
         $withdraw = settings('commission.withdraw', []);

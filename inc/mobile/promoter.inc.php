@@ -86,12 +86,12 @@ JSCODE;
         \r\n
 JSCODE;
     }
-    if (User::isSnapshot()) {
-        $tpl_data['js']['code'] .= app()->snapshotJs(['entry' => 'promoter']);
-    }
     $tpl_data['js']['code'] .= <<<JSCODE
 </script>
 JSCODE;
+    if (User::isSnapshot()) {
+        $tpl_data['js']['code'] .= app()->snapshotJs(['entry' => 'promoter']);
+    }
     app()->showTemplate($user->isPromoter() ? 'promoter/log' : 'promoter/reg', ['tpl' => $tpl_data]);
 
 } elseif ($op == 'reg') {

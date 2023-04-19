@@ -145,7 +145,7 @@ class promoter
         ];
     }
 
-    public static function KeeperGetPromoterLogs(): array
+    public static function keeperGetPromoterLogs(): array
     {
         $keeper = keeper::getKeeper();
 
@@ -163,5 +163,25 @@ class promoter
         }
 
         return Helper::getUserCommissionLogs($user);
+    }
+
+    public static function keeperRemovePromoter(): array
+    {
+        $keeper = keeper::getKeeper();
+
+        $user = User::get(Request::int('id'));
+        if (empty($user)) {
+            return err('推广员不存在！');
+        }
+
+        if ($keeper->getId() != $user->getSuperiorId()) {
+            return err('没有权限删除！');
+        }
+
+        if ($user->removePrincipal(Principal::Promoter)) {
+            return '删除成功！';
+        }
+
+        return err('删除失败！');;
     }
 }

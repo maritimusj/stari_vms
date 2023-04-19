@@ -78,8 +78,8 @@
                     {if \zovye\App::isPromoterEnabled()}
                     <td>
                         <div class="operate">
-                            <i class="fa fa-gear fa-fw" data-op="configKeeper" title="推广员佣金设置"></i>
-                            <i class="fa fa-list fa-fw" data-op="promoterList" title="查看推广员列表"></i>
+                            <i class="fa fa-gear fa-fw" data-op="config" title="推广员佣金设置"></i>
+                            <i class="fa fa-list fa-fw" data-op="list" title="查看推广员列表"></i>
                         </div>
                     </td>
                     {/if}
@@ -102,16 +102,24 @@
 <script>
     require(["{php \zovye\url(false, 'static/js/zovye.min.js')}"], function (zovye) {
         zovye.enableOp();
-        zovye.setApiUrl("{php echo $this->createWebUrl('agent');}");
+        zovye.setApiUrl("{php echo $this->createWebUrl('promoter');}");
 
-        zovye.op('saveKeeperConfig', function(self, next) {
+        zovye.op('saveConfig', function(self, next) {
             const e = self.closest('[data-id]');
             const id = e.data('id');
-            const type = $('#editKeeperConfig input[name=type]:checked').val();
-            const val = $('#editKeeperConfig input[name=commissionVal]').val();
-            const tr = $('#keeperlist tr[data-id="'+id+'"]');
+            const type = $('#editPromoterConfig input[name=type]:checked').val();
+            const val = $('#editPromoterConfig input[name=commissionVal]').val();
             next({id, type, val}, function(res) {
                $('#modal-message').modal('hide');
+            });
+        })
+
+        zovye.op('remove', function(self, next) {
+            const e = self.closest('[data-id]');
+            next({id: e.data('id')}, function(res) {
+               if (res && res.status) {
+                    e.remove();
+               }
             });
         })
     });

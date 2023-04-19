@@ -12,10 +12,11 @@
             <th>用户</th>
             <th>余额</th>
             <th>创建时间</th>
+            <th></th>
         </thead>
         <tbody>
             {loop $list $index $item}
-            <tr>
+            <tr data-id="{$item['user']['id']}">
                 <td>{php echo $index + 1}</td>
                 <td>
                     <div class="profile">
@@ -32,6 +33,11 @@
                 </td>
                 <td>
                     {$item['createtime_formatted']}
+                </td>
+                <td>
+                    <div class="operate">
+                        <i class="fa fa-trash fa-fw" title="删除" data-op="remove"></i>
+                    </div>
                 </td>
             </tr>
             {/loop}

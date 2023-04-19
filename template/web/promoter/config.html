@@ -1,4 +1,4 @@
-<form class="form-horizontal" id="editKeeperConfig" data-id="{$id}">
+<form class="form-horizontal" id="editPromoterConfig" data-id="{$id}">
     <div class="form-group">
         <label class="col-xs-12 col-md-2 col-md-2 control-label">类型</label>
         <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
@@ -21,7 +21,7 @@
     </div>
     <div class="form-group">
         <div class="col-md-offset-2 col-md-10" style="text-align: right;">
-            <button type="button" class="btn btn-primary" data-op="saveKeeperConfig">保存</button>
+            <button type="button" class="btn btn-primary" data-op="saveConfig">保存</button>
             <button type="button" class="btn btn-default" data-dismiss="modal">退出</button>
         </div>
     </div>
@@ -41,6 +41,6 @@
             $('input#type0').prop('checked', true);
         }
         $('#commissionTitle').text(type === 'percent' ? '比例(%)' : '金额(元)');
-        $('#editKeeperConfig .help-block').text(type === 'percent' ? '* 按订单金额的百分比支付佣金' : '* 每售出一件商品支付固定金额的佣金');
+        $('#editPromoterConfig .help-block').text(type === 'percent' ? '* 按订单金额的百分比支付佣金' : '* 每售出一件商品支付固定金额的佣金');
     }
 </script>

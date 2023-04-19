@@ -20,7 +20,7 @@ if (empty($keeper)) {
 }
 
 $content = app()->fetchTemplate(
-    'web/agent/keeper_config',
+    'web/promoter/config',
     [
         'id' => $keeper->getId(),
         'config' => $keeper->settings('promoter.commission', []),

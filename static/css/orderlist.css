@@ -200,6 +200,10 @@
     content: "运营";
     background-color: #90028B;
 }
+#orderlist .gspor.keeper_item.promoter:hover:before {
+    content: "推广";
+    background-color: #90028B;
+}
 #orderlist .gspor.bonus_item:hover:before {
     content: "奖励";
     background-color: #9C27B0;

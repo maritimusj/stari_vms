@@ -23,7 +23,7 @@ class promoter
         $agent = common::getAgent();
 
         $keeper_id = Request::int('id');
-        $keeper = \zovye\Keeper::get($keeper_id);
+        $keeper = Keeper::get($keeper_id);
         if (empty($keeper) || $keeper->getAgentId() != $agent->getId()) {
             return err('找不到这个运营人员！');
         }
@@ -34,7 +34,7 @@ class promoter
 
         $page = max(1, Request::int('page'));
         $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
-    
+
         $query->page($page, $page_size);
 
         $list = [];
@@ -67,10 +67,10 @@ class promoter
         }
 
         if ($user->removePrincipal(Principal::Promoter)) {
-            return '删除成功！';
+            return ['msg' => '删除成功！'];
         }
 
-        return err('删除失败！');;
+        return err('删除失败！');
     }
 
     public static function getPromoterLogs(): array
@@ -88,7 +88,7 @@ class promoter
 
         $keeper_id = $user->getSuperiorId();
 
-        $keeper = \zovye\Keeper::get($keeper_id);
+        $keeper = Keeper::get($keeper_id);
         if (empty($keeper) || $keeper->getAgentId() != $agent->getId()) {
             return err('没有权限查看！');
         }
@@ -101,7 +101,7 @@ class promoter
         $agent = common::getAgent();
 
         $keeper_id = Request::int('id');
-        $keeper = \zovye\Keeper::get($keeper_id);
+        $keeper = Keeper::get($keeper_id);
         if (empty($keeper) || $keeper->getAgentId() != $agent->getId()) {
             return err('找不到这个运营人员！');
         }
@@ -114,7 +114,7 @@ class promoter
         $agent = common::getAgent();
 
         $keeper_id = Request::int('id');
-        $keeper = \zovye\Keeper::get($keeper_id);
+        $keeper = Keeper::get($keeper_id);
         if (empty($keeper) || $keeper->getAgentId() != $agent->getId()) {
             return err('找不到这个运营人员！');
         }
@@ -150,7 +150,7 @@ class promoter
 
         $page = max(1, Request::int('page'));
         $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
-    
+
         $query->page($page, $page_size);
 
         $list = [];
@@ -202,9 +202,9 @@ class promoter
         }
 
         if ($user->removePrincipal(Principal::Promoter)) {
-            return '删除成功！';
+            return ['msg' => '删除成功！'];
         }
 
-        return err('删除失败！');;
+        return err('删除失败！');
     }
 }

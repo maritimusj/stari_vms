@@ -1430,7 +1430,7 @@ HTML_CONTENT;
     }
 
     /**
-     * 获取返回jssdk字符串.
+     * 获取返回js sdk字符串.
      *
      * @param bool $debug
      *
@@ -1445,7 +1445,7 @@ HTML_CONTENT;
     }
 
     /**
-     * 获取需要通知的openids.
+     * 获取需要通知的openid list.
      *
      * @param agentModelObj $agent
      * @param string $type

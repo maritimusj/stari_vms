@@ -19,11 +19,20 @@ if (empty($keeper)) {
     JSON::fail('找不到这个运营人员！');
 }
 
-$config = [
-    Request::str('type') => intval(Request::float('val', 0, 2) * 100),
-];
+$type = Request::str('type');
+$val = intval(round(Request::float('val', 0, 2) * 100));
 
-$keeper->updateSettings('promoter.commission', $config);
+if ($type == 'percent') {
+    $val = max(0, min(10000, $val));
+} elseif ($type == 'fixed') {
+    $val = max(0, $val);
+} else {
+    JSON::fail('请求数据不正确！');
+}
+
+$keeper->updateSettings('promoter.commission', [
+    $type => $val,
+]);
 
 JSON::success([
     'msg' => '保存成功！',

@@ -132,7 +132,7 @@ class promoter
 
         if (substr($val, -1) == '%') {
             $val = rtrim($val, '%');
-            $percent = max(0, min(100, intval(round(floatval($val) * 100))));
+            $percent = max(0, min(10000, intval(round(floatval($val) * 100))));
             $config['percent'] = $percent;
         } else {
             $val = rtrim($val, '*');
@@ -142,6 +142,12 @@ class promoter
 
         if (!$keeper->updateSettings('promoter.commission', $config)) {
             return err('保存配置失败！');
+        }
+
+        if ($config['percent']) {
+            $config['percent'] = intval($config['percent']) / 100;
+        } elseif ($config['fixed']) {
+            $config['fixed'] = intval($config['fixed']) / 100;
         }
 
         return $config;

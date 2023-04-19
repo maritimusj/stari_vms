@@ -140,7 +140,7 @@ class promoter
             $config['fixed'] = $fixed;
         }
 
-        if ($keeper->updateSettings('promoter.commission', $config)) {
+        if (!$keeper->updateSettings('promoter.commission', $config)) {
             return err('保存配置失败！');
         }
 

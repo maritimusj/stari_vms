@@ -427,7 +427,7 @@ TRANSFER;
     protected static function format_order_memo($id, string $addition_spec = ''): string
     {
         if ($addition_spec) {
-            $addition_spec = "<dt>其它</dt><dd class=\"additional\">$addition_spec</dd>";
+            $addition_spec = "<dt>备注</dt><dd class=\"additional\">$addition_spec</dd>";
         }
 
         if ($id) {

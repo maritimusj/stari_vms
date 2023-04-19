@@ -113,7 +113,9 @@ JSCODE;
 JSCODE;
 
     if (User::isSnapshot()) {
-        $tpl['js']['code'] .= app()->snapshotJs($tpl['device']['imei']);
+        $tpl['js']['code'] .= app()->snapshotJs([
+            'device_imei' => $tpl['device']['imei'],
+        ]);
     }
 }
 

@@ -51,7 +51,10 @@ $tpl_data['js']['code'] = <<<JSCODE
 JSCODE;
 
 if (User::isSnapshot()) {
-    $tpl_data['js']['code'] .= app()->snapshotJs($device->getImei(), 'sample');
+    $tpl_data['js']['code'] .= app()->snapshotJs([
+        'device_imei' => $device->getImei(),
+        'entry' => 'sample',
+    ]);
 }
 
 $filename = Theme::getThemeFile($device, 'qrcode');

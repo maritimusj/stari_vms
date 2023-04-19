@@ -243,9 +243,6 @@ if ($op == 'default') {
     $token = Request::str('token');
 
     $original = api\wx\common::getUser($token);
-    if (empty($original)) {
-        JSON::fail('找不到这个用户！');
-    }
 
     if ($user->getId() == $original->getId()) {
         JSON::fail('已完成迁移！');
@@ -359,7 +356,10 @@ if ($op == 'default') {
     unset($_SESSION['oauth_acid']);
     unset($_SESSION['wx_user_id']);
 
-    $url = Util::murl(Request::trim('entry', 'entry'), ['device' => Request::str('device'), 'serial' => Util::random(10)]);
+    $entry = Request::trim('entry', 'entry');
+    $url = Util::murl($entry , ['device' => Request::str('device'), 'serial' => Util::random(10)]);
+
+    //设置框架参数
     $_SESSION['dest_url'] = $url;
     
     JSON::success([

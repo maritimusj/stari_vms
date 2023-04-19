@@ -243,7 +243,7 @@ class WeApp extends Settings
         return ob_get_clean();
     }
 
-    public function snapshotJs(string $device_imei, string $entry = 'entry'): string
+    public function snapshotJs($params = []): string
     {
         $gif_url = MODULE_URL . "static/img/here.gif";
         $html = <<<HTML
@@ -252,11 +252,19 @@ class WeApp extends Settings
             <div style="width: 80%;text-align: center;padding: 20px 20px;background: rgba(0,0,0,.5);">
             需要用户授权才能使用该功能，请点击右下角 <b style="color:#fc6;">“使用完整服务”</b>！</span>
             </div>
-            <img src="{$gif_url}" style="width:60px;bottom: 10px;right: 40px;position: absolute;">
+            <img src="$gif_url" style="width:60px;bottom: 10px;right: 40px;position: absolute;">
         </div>
         </div>
 HTML;
-        $snapshot_url = Util::murl('util', ['op' => 'snapshot', 'entry' => $entry, 'device' => $device_imei]);
+
+        if (empty($params['op'])) {
+            $params['op'] = 'snapshot';
+        }
+        if (empty($params['entry'])) {
+            $params['entry'] = 'entry';
+        }
+
+        $snapshot_url = Util::murl('util', $params);
 
         return <<<JSCODE
 \r\n
@@ -264,7 +272,7 @@ HTML;
             zovye_fn.snapshot = function() {
                 $.get("$snapshot_url").then(res => {
                     if (res.status && res.data && res.data.redirect) {
-                        window.location.reload();
+                        window.location.href = res.data.redirect;
                     }
                 });
             }

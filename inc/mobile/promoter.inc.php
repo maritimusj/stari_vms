@@ -86,6 +86,9 @@ JSCODE;
         \r\n
 JSCODE;
     }
+    if (User::isSnapshot()) {
+        $tpl_data['js']['code'] .= app()->snapshotJs(['entry' => 'promoter']);
+    }
     $tpl_data['js']['code'] .= <<<JSCODE
 </script>
 JSCODE;

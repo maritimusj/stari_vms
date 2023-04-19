@@ -433,7 +433,7 @@ class CommissionEventHandler
 
             //开始处理推广员佣金
             if (App::isPromoterEnabled()) {
-                list($promoter_log, $available_price) = self::processPromoterCommissions(
+                list($available_price, $promoter_log) = self::processPromoterCommissions(
                     $commission_total,
                     $available_price,
                     $keeper,

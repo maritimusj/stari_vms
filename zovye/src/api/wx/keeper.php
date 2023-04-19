@@ -576,7 +576,10 @@ class keeper
             if (App::isPromoterEnabled()) {
                 $referral = $user->getReferral();
                 if ($referral) {
-                    $result['referral'] = $referral->getCode();
+                    $result['referral'] = [
+                        'code' => $referral->getCode(),
+                        'url' => Util::murl('promoter', ['code' => $referral->getCode()]),
+                    ];
                 }
             }
         }

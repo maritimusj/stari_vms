@@ -1290,18 +1290,22 @@ include './index.php';
         We7::itoast($msg, $redirect, $type);
     }
 
-    public static function resultData($data)
+    public static function resultData($data, $web = false)
     {
         if (Request::is_ajax()) {
             JSON::result($data);
         } else {
-            if (is_string($data)) {
-                self::resultAlert($data);
+            if ($web) {
+                self::itoast(is_string($data) ? $data : ($data['message'] ?? '未知消息'), '', is_error($data) ? 'error' : 'success');
+            } else {
+                if (is_string($data)) {
+                    self::resultAlert($data);
+                }
+                if (is_error($data)) {
+                    self::resultAlert($data['message'], 'error');
+                }
+                self::resultAlert(is_string($data) ? $data : ($data['message'] ?? '未知消息'));
             }
-            if (is_error($data)) {
-                self::resultAlert($data['message'], 'error');
-            }
-            self::resultAlert($data['message'] ?? '未知消息');
         }
     }
 

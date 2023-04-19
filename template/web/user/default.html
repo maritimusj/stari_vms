@@ -104,6 +104,13 @@
     {else}
     <li role="presentation"><a href="{php echo $this->createWebUrl('user', array('s_principal' => 'tester'));}">测试人员</a></li>
     {/if}
+    {if \zovye\App::isPromoterEnabled()}
+    {if $s_principal=='promoter'}
+    <li role="presentation" class="active"><a href="#">推广员</a></li>
+    {else}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('user', array('s_principal' => 'promoter'));}">推广员</a></li>
+    {/if}
+    {/if}
     {if $commission_enabled}
     {if $s_principal=='gspor'}
     <li role="presentation" class="active"><a href="#">佣金用户</a></li>
@@ -116,6 +123,7 @@
     <div class="heading">
         <span class="operate">
             <i class="fa fa-filter" title="导出用户信息" data-op="exportUser"></i>
+            <i class="fa fa-share-alt" title="推广人员入口地址" data-url="{php echo $this->createMobileUrl('promoter')}"></i>
         </span>
     </div>
     <div class="panel-body">
@@ -340,7 +348,10 @@
                 <li><a href="{php echo $this->createWebUrl('tester', array('op'=>'remove', 'id'=>$item['id']));}" onclick="if(!confirm('确定要取消用户的测试员身份吗？')){return false;}"><i class="wi wi-system-info fa-fw"></i> 取消测试员身份</a></li>
             {else}
                 <li><a href="{php echo $this->createWebUrl('tester', array('op'=>'create', 'id'=>$item['id']));}"><i class="wi wi-system-info fa-fw"></i> 设置测试员</a></li>
-            {/if}          
+            {/if}         
+            {if $item['isPromoter']} 
+            <li><a href="{php echo $this->createWebUrl('promoter', array('op'=>'remove', 'id'=>$item['id']));}" onclick="if(!confirm('确定要取消用户的推广员身份吗？')){return false;}"><i class="fa fa-trash fa-fw"></i> 取消推广员身份</a></li>
+            {/if}
             <li role="separator" class="divider"></li>
             {if $item['isKeeper'] || $item['isAgent']}
             <li><a href="#" data-op="monthStat" ><i class="fa fa-money fa-fw"></i> 收提统计</a></li>

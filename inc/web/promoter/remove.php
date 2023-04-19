@@ -9,20 +9,18 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 if (!App::isPromoterEnabled()) {
-    JSON::fail('这个功能没有启用！');
+    Util::resultData(err('这个功能没有启用！'), true);
 }
 
 $user_id = Request::int('id');
 
 $user = User::get($user_id);
 if (empty($user)) {
-    JSON::fail('找不到这个用户！');
+    Util::resultData(err('找不到这个用户！'), true);
 }
 
 if ($user->removePrincipal(Principal::Promoter)) {
-    JSON::success([
-        'id' => $user->getId(),
-    ]);
+    Util::resultData('删除成功！', true);
 }
 
-JSON::fail('删除失败！');
+Util::resultData('删除失败！', true);

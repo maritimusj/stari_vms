@@ -141,6 +141,7 @@ foreach ($query->findAll() as $user) {
         'isKeeper' => $user->isKeeper(),
         'isTester' => $user->isTester(),
         'isGSPor' => $user->isGSPor(),
+        'isPromoter' => $user->isPromoter(),
         'verified' => $user->isIDCardVerified(),
     ];
 

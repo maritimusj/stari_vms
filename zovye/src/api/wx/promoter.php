@@ -7,7 +7,9 @@
 
 namespace zovye\api\wx;
 
+use zovye\api\wx\keeper as WxKeeper;
 use zovye\Helper;
+use zovye\Keeper;
 use zovye\model\userModelObj;
 use zovye\Principal;
 use zovye\Request;
@@ -20,7 +22,7 @@ class promoter
     {
         $agent = common::getAgent();
 
-        $keeper_id = Request::int('keeperid');
+        $keeper_id = Request::int('id');
         $keeper = \zovye\Keeper::get($keeper_id);
         if (empty($keeper) || $keeper->getAgentId() != $agent->getId()) {
             return err('找不到这个运营人员！');
@@ -48,6 +50,27 @@ class promoter
             'total' => $total,
             'totalpage' => ceil($total / $page_size),
         ];
+    }
+
+    public static function removePromoter(): array
+    {
+        $agent = common::getAgent();
+
+        $user = User::get(Request::int('id'));
+        if (empty($user)) {
+            return err('推广员不存在！');
+        }
+
+        $keeper = Keeper::get($user->getSuperiorId());
+        if (empty($keeper) || $keeper->getAgentId() != $agent->getId()) {
+            return err('没有权限删除！');
+        }
+
+        if ($user->removePrincipal(Principal::Promoter)) {
+            return '删除成功！';
+        }
+
+        return err('删除失败！');;
     }
 
     public static function getPromoterLogs(): array
@@ -77,7 +100,7 @@ class promoter
     {
         $agent = common::getAgent();
 
-        $keeper_id = Request::int('keeperid');
+        $keeper_id = Request::int('id');
         $keeper = \zovye\Keeper::get($keeper_id);
         if (empty($keeper) || $keeper->getAgentId() != $agent->getId()) {
             return err('找不到这个运营人员！');
@@ -90,7 +113,7 @@ class promoter
     {
         $agent = common::getAgent();
 
-        $keeper_id = Request::int('keeperid');
+        $keeper_id = Request::int('id');
         $keeper = \zovye\Keeper::get($keeper_id);
         if (empty($keeper) || $keeper->getAgentId() != $agent->getId()) {
             return err('找不到这个运营人员！');
@@ -119,7 +142,7 @@ class promoter
 
     public static function keeperGetPromoterList(): array
     {
-        $keeper = keeper::getKeeper();
+        $keeper = WxKeeper::getKeeper();
 
         $query = Principal::promoter(['superior_id' => $keeper->getId()]);
 
@@ -147,7 +170,7 @@ class promoter
 
     public static function keeperGetPromoterLogs(): array
     {
-        $keeper = keeper::getKeeper();
+        $keeper = WxKeeper::getKeeper();
 
         $user = User::get(Request::int('id'));
         if (empty($user)) {
@@ -167,7 +190,7 @@ class promoter
 
     public static function keeperRemovePromoter(): array
     {
-        $keeper = keeper::getKeeper();
+        $keeper = WxKeeper::getKeeper();
 
         $user = User::get(Request::int('id'));
         if (empty($user)) {

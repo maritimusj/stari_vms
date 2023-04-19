@@ -487,7 +487,7 @@
                                     {/if}
                                 </span>
                                     {if $order['discount']>0}
-                                        <span class="price">{php echo number_format($order['discount'], 2)}</span>
+                                        <span class="price">{php echo number_format($order['price'], 2)}</span>
                                     {/if}
                                     {if empty($order['refund']) && $order['type'] != 'charging' && $order['type'] != 'fueling'}
                                     <img src="{php echo MODULE_URL . 'static/img/refund.svg'}" class="icon" title="退款" data-op="refund">
@@ -518,7 +518,7 @@
                                         <img src="{php echo $bonus_user->getAvatar();}" alt="">
                                         <span>{php echo $bonus_user->getName()}</span>
                                         {if $bonus_user->getMobile()}                                
-                                        <span class="mobile" data-mobile="{php echo $bonus_user->getMobile();}" title="{php echo $bonus_user->getMobile();}"><i class="fa fa-mobile"></i></span>
+                                        <span class="mobile" data-mobile="{php echo $bonus_user->getMobile();}" title="{php echo $bonus_user->getMobile();}">&nbsp;<i class="fa fa-mobile"></i></span>
                                         {/if}
                                     </div>
                                     <div class="income">
@@ -537,7 +537,7 @@
                                         <img src="{php echo $gspor->getAvatar();}" alt="">
                                         <span>{php echo $gspor->getName()}</span>
                                         {if $gspor->getMobile()}                                
-                                        <span class="mobile" data-mobile="{php echo $gspor->getMobile();}" title="{php echo $gspor->getMobile();}"><i class="fa fa-mobile"></i></span>
+                                        <span class="mobile" data-mobile="{php echo $gspor->getMobile();}" title="{php echo $gspor->getMobile();}">&nbsp;<i class="fa fa-mobile"></i></span>
                                         {/if}
                                     </div>
                                     <div class="income">
@@ -567,7 +567,7 @@
                                         <img src="{php echo $keeper->getAvatar();}" alt="">
                                         <span>{php echo $keeper->getName()}</span>
                                         {if $keeper->getMobile()}                                
-                                        <span class="mobile" data-mobile="{php echo $keeper->getMobile();}" title="{php echo $keeper->getMobile();}"><i class="fa fa-mobile"></i></span>
+                                        <span class="mobile" data-mobile="{php echo $keeper->getMobile();}" title="{php echo $keeper->getMobile();}">&nbsp;<i class="fa fa-mobile"></i></span>
                                         {/if}
                                     </div>
                                     <div class="income">

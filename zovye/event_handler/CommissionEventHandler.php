@@ -360,7 +360,7 @@ class CommissionEventHandler
                 }
 
                 if ($config['percent']) {
-                    $price = intval(round($commission_total * intval($config['percent']) / 100));
+                    $price = intval(round($commission_total * intval($config['percent']) / 10000));
                 } elseif ($config['fixed']) {
                     $price = intval($config['fixed'] * $order->getNum());
                 } else {

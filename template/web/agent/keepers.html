@@ -70,7 +70,9 @@
                         {$item['mobile']}
                     </td>
                     <td style="text-align: center;">
-                        {$item['devices_total']}
+                        <a href="{php echo $this->createWebUrl('user', ['op' => 'keeper_device', 'id' => $item['user']['id']])}" title="查看设备列表">
+                            {$item['devices_total']}
+                        </a>
                     </td>
                     <td>
                         <div style="color:#9E9E9E;font-size:12px;">{$item['createtime']}</div>

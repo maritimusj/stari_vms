@@ -412,7 +412,7 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_keeper_devices` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `device_id` int(11) NOT NULL,
   `keeper_id` int(11) NOT NULL,
-  `commission_percent` tinyint(4) NOT NULL DEFAULT '-1',
+  `commission_percent` int(11) NOT NULL DEFAULT '-1',
   `commission_fixed` int(11) NOT NULL DEFAULT '-1',
   `kind` tinyint(4) NOT NULL DEFAULT '0',
   `way` tinyint(4) NOT NULL DEFAULT '0',

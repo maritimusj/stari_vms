@@ -154,13 +154,23 @@
         dd {
             width: calc(100% - 80px);
             color: #333;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            word-break: break-all;
         }
 
         dd img {
-            width: 30px;
-            height: 30px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
-            margin-right: 10rpx;
+            margin-right: 5px;
+        }
+
+        dd span {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
         }
 
         .footer {

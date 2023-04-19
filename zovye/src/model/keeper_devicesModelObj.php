@@ -76,7 +76,7 @@ class keeper_devicesModelObj extends modelObj
     public function getCommissionValue(): array
     {
         if ($this->commission_percent != -1) {
-            return [$this->commission_percent, intval($this->way), true];
+            return [$this->commission_percent / 100, intval($this->way), true];
         }
 
         if ($this->commission_fixed != -1) {

@@ -11,7 +11,7 @@ SQL;
 } else {
     $sql = <<<SQL
 ALTER TABLE `ims_zovye_vms_keeper_devices` MODIFY COLUMN `commission_fixed` int(11) NOT NULL DEFAULT -1;
-ALTER TABLE `ims_zovye_vms_keeper_devices` MODIFY COLUMN `commission_percent` tinyint(4) NOT NULL DEFAULT -1;
+ALTER TABLE `ims_zovye_vms_keeper_devices` MODIFY COLUMN `commission_percent` int(11) NOT NULL DEFAULT -1;
 SQL;
 }
 Migrate::execSQL($sql);
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_keeper_devices` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `device_id` int(11) NOT NULL,
   `keeper_id` int(11) NOT NULL,
-  `commission_percent` tinyint(4) NOT NULL DEFAULT '-1',
+  `commission_percent` int(11) NOT NULL DEFAULT '-1',
   `commission_fixed` int(11) NOT NULL DEFAULT '-1',
   `kind` tinyint(4) NOT NULL DEFAULT '0',
   `createtime` int(11) DEFAULT NULL,

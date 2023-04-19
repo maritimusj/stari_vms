@@ -29,6 +29,23 @@ SQL;
     Migrate::execSQL($sql);
 }
 
+if (!We7::pdo_fieldexists($tb_name.'_keeper_devices', 'f20230419')) {
+    $sql = <<<SQL
+ALTER TABLE `ims_zovye_vms_keeper_devices` ADD `f20230419` BOOLEAN NOT NULL AFTER `way`;
+ALTER TABLE `ims_zovye_vms_keeper_devices` CHANGE `commission_percent` `commission_percent` INT(11) NOT NULL DEFAULT '-1';
+SQL;
+    Migrate::execSQL($sql);
+
+    /** @var keeper_devicesModelObj $item */
+    foreach(m('keeper_devices')->findAll() as $item) {
+        $percent = $item->getCommissionPercent();
+        if ($percent && $percent != -1) {
+            $item->setCommissionPercent($percent * 100);
+            $item->save();
+        }
+    }
+}
+
 /** @var agentModelObj $agent */
 foreach (Agent::query()->findAll() as $agent) {
     if (empty($agent->getAgentLevel())) {

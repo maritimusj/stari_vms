@@ -34,7 +34,7 @@ if ($device->getCommissionFixed() != -1) {
     $commission_val = number_format(abs($device->getCommissionFixed()) / 100, 2);
     $commission_type = 'fixed';
 } else {
-    $commission_val = $device->getCommissionPercent();
+    $commission_val = number_format($device->getCommissionPercent() / 100, 2);
     $commission_type = 'percent';
 }
 

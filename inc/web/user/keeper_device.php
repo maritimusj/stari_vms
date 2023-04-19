@@ -43,7 +43,7 @@ foreach ($query->findAll() as $item) {
     if ($item->getCommissionFixed() != -1) {
         $commission_val = number_format(abs($item->getCommissionFixed()) / 100, 2).'元';
     } else {
-        $commission_val = $item->getCommissionPercent().'%';
+        $commission_val = number_format($item->getCommissionPercent() / 100, 2).'%';
     }
 
     $data['val'] = $commission_val;

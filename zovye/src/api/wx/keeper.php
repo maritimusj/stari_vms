@@ -392,7 +392,7 @@ class keeper
                     //%结尾表示百分比，*表示固定金额
                     if (substr($commission, -1) == '%') {
                         $commission = rtrim($commission, '%');
-                        $percent = max(0, min(100, intval($commission)));
+                        $percent = max(0, min(10000, intval($commission * 100)));
                         $set_commission = function (&$data) use ($percent) {
                             $data['percent'] = $percent;
                             unset($data['fixed']);
@@ -956,7 +956,6 @@ class keeper
                 $commission_price_calc = function ($num, $goods_id) use ($v) {
                     $goods = Goods::get($goods_id);
                     $price = $goods ? $goods->getPrice() : 0;
-
                     return intval(round($num * $price * $v / 100));
                 };
             } else {
@@ -1270,8 +1269,7 @@ class keeper
         return err('请求出错！');
     }
 
-    public
-    static function orderRefund(): array
+    public static function orderRefund(): array
     {
         if (!settings('agent.order.refund')) {
             return err('不允许退款，请联系管理员！');

@@ -41,7 +41,7 @@ $commission_type = Request::str('type', 'fixed');
 if ($commission_type == 'fixed') {
     $data['fixed'] = max(0, intval($commission_val * 100));
 } else {
-    $data['percent'] = max(0, min(100, intval($commission_val)));
+    $data['percent'] = max(0, min(10000, intval($commission_val * 100)));
 }
 
 $device->setKeeper($keeper, $data);
@@ -51,5 +51,5 @@ JSON::success([
     'way' => empty($data['way']) ? '销售分成' : '补货分成',
     'kind' => $data['kind'],
     'type' => $commission_type,
-    'val' => $commission_type == 'fixed' ? number_format($data['fixed'] / 100, 2, '.', '') . '元' : $data['percent'] . '%',
+    'val' => $commission_type == 'fixed' ? number_format($data['fixed'] / 100, 2, '.', '') . '元' : number_format($data['percent'] / 100, 2, '.', '') . '%',
 ]);

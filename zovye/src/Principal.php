@@ -46,7 +46,7 @@ class Principal
 
     public static function is(userModelObj $user, $id): bool
     {
-        return m('principal')->exists([
+        return self::exists([
             'user_id' => $user->getId(),
             'principal_id' => $id,
         ]);

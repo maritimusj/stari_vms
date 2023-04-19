@@ -8,6 +8,7 @@ namespace zovye;
 
 use RuntimeException;
 use zovye\api\wx\balance;
+use zovye\api\wx\common;
 
 if (!App::isPromoterEnabled()) {
     Util::resultAlert('这个功能没有启用，谢谢！', 'error');
@@ -72,6 +73,15 @@ JSCODE;
         $tpl_data['js']['code'] .= <<<JSCODE
         zovye_fn.getList = function(page, size) {
             return $.getJSON('$api_url', {op: 'log', 'page': page, 'pagesize': size});
+        };
+        zovye_fn.getData = function() {
+            return $.getJSON('$api_url', {op: 'getData'});
+        };
+        zovye_fn.setBank = function(data) {
+            return $.post('$api_url', {op: 'setData', 'fn': 'bank', ...data});
+        };
+        zovye_fn.setQRCode = function(type, data) {
+            return $.post('$api_url', {op: 'setData', 'fn': 'qrcode, ...data, type});
         };
         zovye_fn.redirectToWithdrawPage = function() {
             window.location.href = "$pre_withdraw_url";
@@ -138,6 +148,25 @@ JSCODE;
     }
 
     JSON::success('恭喜您成为推广员！');
+
+} elseif ($op == 'setData') {
+
+    $fn = Request::trim('fn');
+    if ($fn == 'bank') {
+        JSON::result(common::setUserBank($user));
+    } elseif ($fn == 'qrcode') {
+        $type = Request::str('type');
+        JSON::result(common::updateUserQRCode($user, $type));
+    }
+
+    JSON::fail('请求不正确！');
+
+} elseif ($op == 'getData') {
+
+    JSON::success([
+        'bank' => common::getUserBank($user),
+        'qrcode' => common::getUserQRCode($user),
+    ]);
 
 } elseif ($op == 'brief') {
 

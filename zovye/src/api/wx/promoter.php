@@ -96,52 +96,6 @@ class promoter
         return Helper::getUserCommissionLogs($user);
     }
 
-    public static function setPromoterData(): array
-    {
-        $agent = common::getAgent();
-
-        $user = User::get(Request::int('id'));
-        if (empty($user)) {
-            return err('推广员不存在！');
-        }
-
-        if (!$user->isPromoter()) {
-            return err('用户不是推广员！');
-        }
-
-        $keeper_id = $user->getSuperiorId();
-
-        $keeper = Keeper::get($keeper_id);
-        if (empty($keeper) || $keeper->getAgentId() != $agent->getId()) {
-            return err('没有权限查看！');
-        }
-
-        return common::setUserBank($user);
-    }
-
-    public static function getPromoterData(): array
-    {
-        $agent = common::getAgent();
-
-        $user = User::get(Request::int('id'));
-        if (empty($user)) {
-            return err('推广员不存在！');
-        }
-
-        if (!$user->isPromoter()) {
-            return err('用户不是推广员！');
-        }
-
-        $keeper_id = $user->getSuperiorId();
-
-        $keeper = Keeper::get($keeper_id);
-        if (empty($keeper) || $keeper->getAgentId() != $agent->getId()) {
-            return err('没有权限查看！');
-        }
-
-        return common::getUserBank($user);
-    }
-
     public static function getPromoterConfig(): array
     {
         $agent = common::getAgent();

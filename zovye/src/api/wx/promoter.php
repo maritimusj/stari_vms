@@ -106,7 +106,14 @@ class promoter
             return err('找不到这个运营人员！');
         }
 
-        return $keeper->settings('promoter.commission', []);
+        $config = $keeper->settings('promoter.commission', []);
+        if ($config['percent']) {
+            $config['percent'] = intval($config['percent']) / 100;
+        } elseif ($config['fixed']) {
+            $config['fixed'] = intval($config['fixed']) / 100;
+        }
+
+        return $config;
     }
 
     public static function updatePromoterConfig(): array
@@ -119,17 +126,17 @@ class promoter
             return err('找不到这个运营人员！');
         }
 
-        $commission = Request::str('commission', '', true);
+        $val = Request::str('val', '', true);
 
         $config = [];
 
-        if (substr($commission, -1) == '%') {
-            $commission = rtrim($commission, '%');
-            $percent = max(0, min(100, intval($commission)));
+        if (substr($val, -1) == '%') {
+            $val = rtrim($val, '%');
+            $percent = max(0, min(100, intval(round(floatval($val) * 100))));
             $config['percent'] = $percent;
         } else {
-            $commission = rtrim($commission, '*');
-            $fixed = max(0, intval($commission));
+            $val = rtrim($val, '*');
+            $fixed = max(0, intval(round(floatval($val) * 100)));
             $config['fixed'] = $fixed;
         }
 

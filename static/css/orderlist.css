@@ -202,7 +202,7 @@
 }
 #orderlist .gspor.keeper_item.promoter:hover:before {
     content: "推广";
-    background-color: #90028B;
+    background-color: #00bcd4;
 }
 #orderlist .gspor.bonus_item:hover:before {
     content: "奖励";

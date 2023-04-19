@@ -82,6 +82,7 @@ router::exec($op, [
     'GetPromoterConfig' => '\zovye\api\wx\promoter::getPromoterConfig',
     'GetPromoterList' => '\zovye\api\wx\promoter::getPromoterList',
     'GetPromoterLogs' => '\zovye\api\wx\promoter::getPromoterLogs',
+    'RemovePromoter' => '\zovye\api\wx\promoter::removePromoter',
 
     'KeeperGetPromoterList' => '\zovye\api\wx\promoter::keeperGetPromoterList',
     'KeeperGetPromoterLogs' => '\zovye\api\wx\promoter::keeperGetPromoterLogs',

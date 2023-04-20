@@ -327,9 +327,9 @@ class common
             ],
         ];
 
-        $user->updateSettings('agentData.bank', $bankData);
+        $result = $user->updateSettings('agentData.bank', $bankData);
 
-        return ['msg' => '保存成功！'];
+        return $result ? ['msg' => '保存成功！'] : err('保存失败！');
     }
 
     public static function getUserQRCode(userModelObj $user): array
@@ -363,9 +363,9 @@ class common
             $user_qrcode = $user->settings('qrcode', []);
             $user_qrcode[$type] = $filename;
 
-            $user->updateSettings('qrcode', $user_qrcode);
-
-            return ['status' => 'success', 'msg' => '上传成功！'];
+            if ($user->updateSettings('qrcode', $user_qrcode)) {
+                return ['status' => 'success', 'msg' => '上传成功！'];
+            }
         }
         
         return err('上传失败！');

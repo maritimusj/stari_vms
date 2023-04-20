@@ -60,29 +60,18 @@ if ($op == 'default') {
                     "menuItem:copyUrl",
                 ] // 要显示的菜单项，所有menu项见附录3
             });
-        });
-        const zovye_fn = {
-            api_url: "$api_url",
-        }
+        })
+        const zovye_fn = {}
         zovye_fn.brief = function() {
             return $.getJSON('$api_url', {op: 'brief'});
-        };
+        }
         \r\n
 JSCODE;
     if ($user->isPromoter()) {
         $tpl_data['js']['code'] .= <<<JSCODE
         zovye_fn.getList = function(page, size) {
             return $.getJSON('$api_url', {op: 'log', 'page': page, 'pagesize': size});
-        };
-        zovye_fn.getData = function() {
-            return $.getJSON('$api_url', {op: 'getData'});
-        };
-        zovye_fn.setBank = function(data) {
-            return $.post('$api_url', {op: 'setData', 'fn': 'bank', ...data});
-        };
-        zovye_fn.setQRCode = function(type, data) {
-            return $.post('$api_url', {op: 'setData', 'fn': 'qrcode, ...data, type});
-        };
+        }
         zovye_fn.redirectToWithdrawPage = function() {
             window.location.href = "$pre_withdraw_url";
         }
@@ -210,10 +199,30 @@ JSCODE;
         }
         zovye_fn.brief = function() {
             return $.getJSON('$api_url', {op: 'brief'});
-        };
+        }
         zovye_fn.withdraw = function(amount) {
             return $.getJSON('$api_url', {op: 'withdraw', amount});
-        };
+        }
+        zovye_fn.getData = function() {
+            return $.getJSON('$api_url', {op: 'getData'});
+        }
+        zovye_fn.setBank = function(data) {
+            return $.post('$api_url', {op: 'setData', 'fn': 'bank', ...data});
+        }
+        zovye_fn.setQRCode = function(type, file) {
+            const form = new FormData();
+            form.append("op", "setData");
+            form.append("fn", "qrcode");
+            form.append("type", type);
+            form.append("pic", file);
+            return $.ajax({
+                url: '$api_url',
+                data: form,
+                processData: false,
+                contentType: false,
+                type: 'POST',
+            });
+        }
 </script>
 JSCODE;
 

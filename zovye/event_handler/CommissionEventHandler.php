@@ -444,7 +444,7 @@ class CommissionEventHandler
                 }
 
                 if ($remaining_total < 1) {
-                    return true;
+                    break;
                 }
             }
 

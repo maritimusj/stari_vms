@@ -320,7 +320,7 @@ class CommissionEventHandler
     /**
      * @throws Exception
      */
-    protected static function processPromoterCommissions(
+    protected static function processPromoterCommission(
         int $commission_total,
         int $remaining_total,
         keeperModelObj $keeper,
@@ -409,7 +409,7 @@ class CommissionEventHandler
 
             //处理推广员佣金
             if (App::isPromoterEnabled()) {
-                list($remaining_total, $promoter_logs) = self::processPromoterCommissions(
+                list($remaining_total, $promoter_log) = self::processPromoterCommission(
                     $commission_total,
                     $remaining_total,
                     $keeper,
@@ -417,8 +417,8 @@ class CommissionEventHandler
                     $src
                 );
 
-                if ($promoter_logs) {
-                    $logs = array_merge($logs, $promoter_logs);
+                if ($promoter_log) {
+                    $logs[] = $promoter_log;
                 }
 
                 if ($remaining_total < 1) {

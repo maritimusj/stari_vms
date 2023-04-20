@@ -327,49 +327,49 @@ class CommissionEventHandler
         orderModelObj $order,
         int $src = CommissionBalance::GSP
     ): array {
-        $logs = [];
-
         $config = $keeper->settings('promoter.commission', []);
-        if (!isEmptyArray($config)) {
-
-            $user = $order->getUser();
-            if (empty($user)) {
-                return [$remaining_total, []];
-            }
-
-            $query = Principal::promoter(['superior_id' => $keeper->getId(), 'user_id' => $user->getId()]);
-
-            /** @var userModelObj $promoter */
-            $promoter = $query->findOne();
-
-            if (empty($promoter) || $promoter->isBanned()) {
-                return [$remaining_total, []];
-            }
-
-            if ($config['percent']) {
-                $val = intval(round($commission_total * intval($config['percent']) / 10000));
-            } elseif ($config['fixed']) {
-                $val = intval($config['fixed'] * $order->getNum());
-            } else {
-                $val = 0;
-            }
-
-            if ($val > $remaining_total) {
-                $val = $remaining_total;
-            }
-
-            if ($val > 0) {
-                $log = self::createCommission($promoter, $order, $val, $src);
-
-                $log['promoter'] = true;
-
-                $logs = $log;
-
-                $remaining_total -= $val;
-            }
+        if (isEmptyArray($config)) {
+            return [$remaining_total];
         }
 
-        return [$remaining_total, $logs];
+        $user = $order->getUser();
+        if (empty($user)) {
+            return [$remaining_total];
+        }
+
+        /** @var userModelObj $promoter */
+        $promoter = Principal::Promoter()->findOne([
+            'superior_id' => $keeper->getId(),
+            'user_id' => $user->getId(),
+        ]);
+
+        if (empty($promoter) || $promoter->isBanned()) {
+            return [$remaining_total];
+        }
+
+        if ($config['percent']) {
+            $val = intval(round($commission_total * intval($config['percent']) / 10000));
+        } elseif ($config['fixed']) {
+            $val = intval($config['fixed'] * $order->getNum());
+        } else {
+            $val = 0;
+        }
+
+        if ($val > $remaining_total) {
+            $val = $remaining_total;
+        }
+
+        if ($val < 1) {
+            return [$remaining_total];
+        }
+
+        $log = self::createCommission($promoter, $order, $val, $src);
+
+        $log['promoter'] = true;
+
+        $remaining_total -= $val;
+
+        return [$remaining_total, $log];
     }
 
     /**

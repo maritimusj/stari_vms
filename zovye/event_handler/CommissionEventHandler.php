@@ -510,8 +510,7 @@ class CommissionEventHandler
     ): int {
         $logs = [];
 
-        $createCommissionFN = function ($val, $user) use (
-            $commission_total,
+        $createCommissionFN = function ($user, $val) use (
             &$remaining_total,
             $order,
             $src,
@@ -520,6 +519,7 @@ class CommissionEventHandler
             if ($val > $remaining_total) {
                 $val = $remaining_total;
             }
+
             if ($val > 0) {
                 $gsp_r = $user->commission_change($val, $src, ['orderid' => $order->getId()]);
                 if ($gsp_r && $gsp_r->update([], true)) {
@@ -570,7 +570,7 @@ class CommissionEventHandler
                 } else {
                     $val = intval(round($commission_total * $percent / 10000));
                 }
-                if (!$createCommissionFN($val, $user)) {
+                if (!$createCommissionFN($user, $val)) {
                     //佣金为零，退出循环
                     break;
                 }
@@ -611,7 +611,7 @@ class CommissionEventHandler
                 } elseif ($entry->isAmount()) {
                     $val = intval($entry->getVal());
                 }
-                if (!$createCommissionFN($val, $user)) {
+                if (!$createCommissionFN($user, $val)) {
                     //佣金为零，退出循环
                     break;
                 }

@@ -68,7 +68,7 @@ class CommissionEventHandler
     /**
      * @throws Exception
      */
-    protected static function createCommission(userModelObj $user, orderModelObj $order, $val, int $src): array
+    protected static function createCommission(userModelObj $user, orderModelObj $order, int $val, int $src): array
     {
         $r = $user->getCommissionBalance()->change($val, $src, [
             'orderid' => $order->getId(),

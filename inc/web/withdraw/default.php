@@ -151,6 +151,8 @@ if ($total > 0) {
                         'mobile' => $keeper->getMobile(),
                     ];
                 }
+            } elseif ($user->isPromoter()) {
+                $data['promoter'] = true;
             }
             if (isEmptyArray($user_qrcode)) {
                 $user_qrcode = $user->settings('qrcode', []);

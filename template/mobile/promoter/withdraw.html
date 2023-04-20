@@ -68,7 +68,7 @@
             margin-top: 5px;
         }
 
-        input {
+        .input-container input {
             width: 100%;
             height: 44px;
             margin-left: 10px;
@@ -78,7 +78,7 @@
             outline: none;
         }
 
-        input::placeholder {
+        .input-container input::placeholder {
             font-size: 26px;
             color: #eee;
             font-weight: normal;
@@ -110,6 +110,161 @@
             border-radius: 5px;
             letter-spacing: 5px;
         }
+
+        .text-btn {
+            color: #1890ff;
+            margin-top: 30px;
+        }
+
+        .bank {
+            margin-top: 30px;
+        }
+
+        .qrcode {
+            margin-top: 10px;
+        }
+
+        .mask {
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.5);
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 99;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .container {
+            width: 100%;
+            padding: 30px;
+            background-color: white;
+            border-radius: 10px 10px 0 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            animation: rise .3s;
+        }
+
+        @keyframes rise {
+            from {
+                transform: translateY(100%);
+            }
+
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .close-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 20px;
+            height: 20px;
+        }
+
+        .header {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .section {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .section span {
+            width: 60px;
+        }
+
+        .section .input {
+            flex: 1;
+            height: 30px;
+            border: none;
+            outline: none;
+            margin-left: 20px;
+            font-size: 14px;
+            background-color: #f8f8f8;
+            padding: 0 10px;
+            border-radius: 2px;
+        }
+
+        .section .input::placeholder {
+            color: #9d9d9d;
+        }
+
+        .section .content {
+            flex: 1;
+        }
+
+        .footer {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .footer button {
+            width: 100px;
+            height: 35px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            border: none;
+            font-size: 14px;
+        }
+
+        .cancel {
+            background-color: #eee;
+            color: #333;
+        }
+
+        .save {
+            margin-left: 25px;
+            color: white;
+            background-color: #26A65B;
+        }
+
+        .upload {
+            width: 100px;
+            height: 100px;
+            background-color: #eee;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            font-weight: 200;
+            border: 1px dashed #ccc;
+            color: #ccc;
+            position: relative;
+        }
+
+        .upload img {
+            width: 100%;
+            height: 100%;
+        }
+
+        .file-chooser {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            left: 0;
+            top: 0;
+            opacity: 0;
+        }
     </style>
 </head>
 
@@ -126,6 +281,81 @@
                 <span class="withdraw-all clickable" @click="onWithdrawAll">全部提现</span>
             </div>
             <button class="btn clickable" @click="onWithdraw">提现</button>
+        </div>
+        <span class="text-btn bank clickable" @click="onPreviewBank">我的银行卡</span>
+        <span class="text-btn qrcode clickable" @click="onPreviewQrcode">我的收款码</span>
+        <div class="mask" v-if="bank.visible" @click="bank.visible = false">
+            <div class="container" @click.stop>
+                <span class="header">我的银行卡</span>
+                <div class="section">
+                    <span>真实姓名:</span>
+                    <input class="input" type="text" v-model="bank.data.realname" placeholder="请输入真实姓名">
+                </div>
+                <div class="section">
+                    <span>开户行:</span>
+                    <input class="input" type="text" v-model="bank.data.bank" placeholder="请输入开户行">
+                </div>
+                <div class="section">
+                    <span>开户省份:</span>
+                    <input class="input" type="text" v-model="bank.data.province" placeholder="请输入开户省份">
+                </div>
+                <div class="section">
+                    <span>开户城市:</span>
+                    <input class="input" type="text" v-model="bank.data.city" placeholder="请输入开户城市">
+                </div>
+                <div class="section">
+                    <span>开户支行:</span>
+                    <input class="input" type="text" v-model="bank.data.branch" placeholder="请输入开户支行">
+                </div>
+                <div class="section">
+                    <span>银行卡号:</span>
+                    <input class="input" type="text" v-model="bank.data.account" placeholder="请输入银行卡号">
+                </div>
+                <div class="footer">
+                    <button class="cancel clickable" @click="bank.visible = false">取消</button>
+                    <button class="save clickable" @click="onSaveBank">保存</button>
+                </div>
+            </div>
+        </div>
+        <div class="mask" v-if="qrcode.visible" @click="qrcode.visible = false">
+            <div class="container" @click.stop>
+                <span class="header">我的收款码</span>
+                <div class="section">
+                    <span style="width: 120px;">微信收款码:</span>
+                    <div class="content">
+                        <div class="upload clickable">
+                            <img :src="qrcode.data.wx" v-if="qrcode.data.wx">
+                            <div v-else>+</div>
+                            <input class="file-chooser" type="file" accept="image/*"
+                                @change="onChangeFile($event, 'wx')">
+                        </div>
+                    </div>
+                </div>
+                <div class="section">
+                    <span style="width: 120px;">支付宝收款码:</span>
+                    <div class="content">
+                        <div class="upload clickable">
+                            <img :src="qrcode.data.ali" v-if="qrcode.data.ali">
+                            <div v-else>+</div>
+                            <input class="file-chooser" type="file" accept="image/*"
+                                @change="onChangeFile($event, 'ali')">
+                        </div>
+                    </div>
+                </div>
+                <svg class="close-icon clickable" viewBox="0 0 1024 1024" p-id="7018" width="80" height="80"
+                    @click="qrcode.visible = false">
+                    <path d="M816 816m-32 0a32 32 0 1 0 64 0 32 32 0 1 0-64 0Z" fill="#3E3A39" p-id="7019"></path>
+                    <path
+                        d="M512 968a456 456 0 1 1 395.76-229.36 32 32 0 0 1-55.52-32 392 392 0 1 0-145.44 145.44 32 32 0 0 1 32 55.52A456 456 0 0 1 512 968z"
+                        fill="#3E3A39" p-id="7020"></path>
+                    <path
+                        d="M376 680a32 32 0 0 1-22.64-54.64L625.12 353.6a32 32 0 1 1 45.28 45.28L398.88 670.4A32 32 0 0 1 376 680z"
+                        fill="#3E3A39" p-id="7021"></path>
+                    <path
+                        d="M648 680a32 32 0 0 1-22.64-9.36L353.6 398.88a32 32 0 0 1 45.28-45.28L670.4 625.12A32 32 0 0 1 648 680z"
+                        fill="#3E3A39" p-id="7022"></path>
+                </svg>
+            </div>
         </div>
     </div>
     {$tpl['js']['code']}
@@ -146,10 +376,29 @@
             el: '#app',
             data: {
                 userInfo: null,
-                amount: ''
+                amount: '',
+                bank: {
+                    data: {
+                        realname: '',
+                        bank: '',
+                        province: '',
+                        city: '',
+                        branch: '',
+                        account: ''
+                    },
+                    visible: false
+                },
+                qrcode: {
+                    data: {
+                        wx: '',
+                        ali: ''
+                    },
+                    visible: false
+                }
             },
             created () {
                 this.getBrief()
+                this.getData()
             },
             methods: {
                 getBrief () {
@@ -161,14 +410,57 @@
                         }
                     })
                 },
-                onWithdrawAll() {
+                onWithdrawAll () {
                     this.amount = (this.userInfo.balance / 100).toFixed(2)
                 },
-                onWithdraw() {
+                onWithdraw () {
                     zovye_fn.withdraw(this.amount).then(res => {
                         alert(res.data.msg)
                         if (res.status) {
                             window.history.back()
+                        }
+                    })
+                },
+                getData () {
+                    zovye_fn.getData().then(res => {
+                        if (res.status) {
+                            const bank = res.data.bank
+                            this.bank.data.realname = bank.realname
+                            this.bank.data.bank = bank.bank
+                            this.bank.data.province = bank.address.province
+                            this.bank.data.city = bank.address.city
+                            this.bank.data.branch = bank.branch
+                            this.bank.data.account = bank.account
+
+                            const qrcode = res.data.qrcode
+                            this.qrcode.data.wx = qrcode.wx
+                            this.qrcode.data.ali = qrcode.ali
+                        } else {
+                            alert(res.data.msg)
+                        }
+                    })
+                },
+                onPreviewBank () {
+                    this.bank.visible = true
+                },
+                onPreviewQrcode () {
+                    this.qrcode.visible = true
+                },
+                onSaveBank () {
+                    zovye_fn.setBank(this.bank.data).then(res => {
+                        alert(res.data.msg)
+                        if (res.status) {
+                            this.bank.visible = false
+                        }
+                    })
+                },
+                onChangeFile (e, type) {
+                    const file = e.target.files[0]
+                    zovye_fn.setQRCode(type, file).then(res => {
+                        if (res.status) {
+                            this.getData()
+                        } else {
+                            alert(res.data.msg)
                         }
                     })
                 }

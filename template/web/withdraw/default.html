@@ -230,14 +230,24 @@
                     <td>
                         <div>
                             {if $item['keeper']}
+                            {if $item['keeper']['mobile']}
                             <a href="{php echo $this->createWebUrl('user', ['s_keywords' => $item['keeper']['mobile']]);}" title="搜索这个用户">
                                 <span class="mobile" title="搜索用户">{$item['keeper']['mobile']}</span>
                             </a>
+                            {else}
+                            <span class="text-muted">
+                                &lt;无&gt;
+                            </span>
+                            {/if}
                             {else}
                                 {if $item['agent']['mobile']}
                                 <a href="{php echo $this->createWebUrl('agent', ['keywords' => $item['agent']['mobile']]);}" title="搜索这个代理商">
                                     <span class="mobile" title="搜索代理商">{$item['agent']['mobile']}</span>
                                 </a>
+                                {else}
+                                <span class="text-muted">
+                                    &lt;无&gt;
+                                </span>
                                 {/if}
                             {/if}
                         </div>

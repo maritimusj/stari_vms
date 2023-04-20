@@ -61,16 +61,18 @@ if ($op == 'default') {
                 ] // 要显示的菜单项，所有menu项见附录3
             });
         })
-        const zovye_fn = {}
+        const zovye_fn = {
+            api_url: "$api_url",
+        }
         zovye_fn.brief = function() {
-            return $.getJSON('$api_url', {op: 'brief'});
+            return $.getJSON(this.api_url, {op: "brief"});
         }
         \r\n
 JSCODE;
     if ($user->isPromoter()) {
         $tpl_data['js']['code'] .= <<<JSCODE
         zovye_fn.getList = function(page, size) {
-            return $.getJSON('$api_url', {op: 'log', 'page': page, 'pagesize': size});
+            return $.getJSON(this.api_url, {op: "log", "page": page, "pagesize": size});
         }
         zovye_fn.redirectToWithdrawPage = function() {
             window.location.href = "$pre_withdraw_url";
@@ -80,7 +82,7 @@ JSCODE;
     } else {
         $tpl_data['js']['code'] .= <<<JSCODE
         zovye_fn.reg = function(code) {
-            return $.getJSON('$api_url', {op: 'reg', 'code': code});
+            return $.getJSON(this.api_url, {op: "reg", "code": code});
         };
         \r\n
 JSCODE;
@@ -198,16 +200,16 @@ JSCODE;
             api_url: "$api_url",
         }
         zovye_fn.brief = function() {
-            return $.getJSON('$api_url', {op: 'brief'});
+            return $.getJSON(this.api_url, {op: "brief"});
         }
         zovye_fn.withdraw = function(amount) {
-            return $.getJSON('$api_url', {op: 'withdraw', amount});
+            return $.getJSON(this.api_url, {op: "withdraw", amount});
         }
         zovye_fn.getData = function() {
-            return $.getJSON('$api_url', {op: 'getData'});
+            return $.getJSON(this.api_url, {op: "getData"});
         }
         zovye_fn.setBank = function(data) {
-            return $.post('$api_url', {op: 'setData', 'fn': 'bank', ...data});
+            return $.post(this.api_url, {op: "setData", "fn": "bank", ...data});
         }
         zovye_fn.setQRCode = function(type, file) {
             const form = new FormData();
@@ -216,11 +218,11 @@ JSCODE;
             form.append("type", type);
             form.append("pic", file);
             return $.ajax({
-                url: '$api_url',
+                url: this.api_url,
                 data: form,
                 processData: false,
                 contentType: false,
-                type: 'POST',
+                type: "POST",
             });
         }
 </script>

@@ -135,9 +135,9 @@ class CommissionEventHandler
      */
     protected static function reward(deviceModelObj $device, orderModelObj $order): bool
     {
-        $commission = intval(Config::app('wxapp.advs.reward.freeCommission', 0));
+        $val = intval(Config::app('wxapp.advs.reward.freeCommission', 0));
 
-        $commission_total = $commission * $order->getNum();
+        $commission_total = $val * $order->getNum();
 
         if ($commission_total < 1) {
             return true;
@@ -244,7 +244,7 @@ class CommissionEventHandler
             $available_price = self::processProfit($device, $order, $agent, $available_price, $available_price);
         }
 
-        //第4步，成本及剩余利润分配给代理商
+        //第4步，成本及剩余利润分配给代理商, cw 设置为成本是否作为佣金分配给设备代理商
         if ($goods && empty($goods->getExtraData('cw', 0))) {
             //成本参与分佣
             $available_price += $costPrice;
@@ -422,7 +422,8 @@ class CommissionEventHandler
             $user = $keeper->getUser();
             if (empty($user)) {
                 Log::error('keeper', [
-                    'err' => '营运人员对应的用户不存在！',
+                    'err' => '营运人员对应的用户不存在，忽略佣金分配！',
+                    'order' => $order->profile(),
                     'keeper' => [
                         'name' => $keeper->getName(),
                         'mobile' => $keeper->getMobile(),
@@ -431,7 +432,7 @@ class CommissionEventHandler
                 continue;
             }
 
-            //开始处理推广员佣金
+            //处理推广员佣金
             if (App::isPromoterEnabled()) {
                 list($available_price, $promoter_log) = self::processPromoterCommissions(
                     $commission_total,
@@ -441,7 +442,9 @@ class CommissionEventHandler
                     $order,
                     $src
                 );
-                $log = array_merge($log, $promoter_log);
+                if ($promoter_log) {
+                    $log = array_merge($log, $promoter_log);
+                }
             }
 
             //开始处理运营人员佣金

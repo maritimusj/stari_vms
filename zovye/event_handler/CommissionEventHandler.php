@@ -81,9 +81,9 @@ class CommissionEventHandler
 
         $order->setExtraData('commission.local.total', $order->getCommissionPrice());
 
+        //对服务费进行佣金分配
         $sf = $order->getChargingSF();
 
-        //第3步，对服务费进行佣金分配
         if ($sf > 0) {
             $sf = self::processProfit($device, $order, $agent, $sf, $sf, CommissionBalance::CHARGING_SERVICE_FEE);
         }
@@ -219,44 +219,45 @@ class CommissionEventHandler
             return true;
         }
 
-        $available_price = $order->getCommissionPrice();
-        if ($available_price < 1) {
+        $remaining_total = $order->getCommissionPrice();
+        if ($remaining_total < 1) {
             return true;
         }
 
         //第1步，扣除平台费用
-        $available_price = self::ProcessFee($available_price, $available_price, $agent, $order);
-        if ($available_price < 1) {
+        $remaining_total = self::ProcessFee($remaining_total, $remaining_total, $agent, $order);
+        if ($remaining_total < 1) {
             return true;
         }
 
-        $order->setExtraData('commission.local.total', $available_price);
+        $order->setExtraData('commission.local.total', $remaining_total);
 
         //第2步，计算商品利润（减去成本价）
         $goods = $order->getGoods();
 
-        $costPrice = empty($goods) ? 0 : $goods->getCostPrice() * $order->getNum();
+        $cost_price = empty($goods) ? 0 : $goods->getCostPrice() * $order->getNum();
 
-        $available_price -= $costPrice;
+        $remaining_total -= $cost_price;
 
         //第3步，对利润进行佣金分配
-        if ($available_price > 0) {
-            $available_price = self::processProfit($device, $order, $agent, $available_price, $available_price);
+        if ($remaining_total > 0) {
+            $remaining_total = self::processProfit($device, $order, $agent, $remaining_total, $remaining_total);
         }
 
         //第4步，成本及剩余利润分配给代理商, cw 设置为成本是否作为佣金分配给设备代理商
         if ($goods && empty($goods->getExtraData('cw', 0))) {
             //成本参与分佣
-            $available_price += $costPrice;
+            $remaining_total += $cost_price;
         }
 
-        if ($available_price < 1) {
+        if ($remaining_total < 1) {
             return true;
         }
 
+        //最后，剩余金额直接分给代理商
         $balance = $agent->getCommissionBalance();
 
-        $r = $balance->change($available_price, CommissionBalance::ORDER_WX_PAY, ['orderid' => $order->getId()]);
+        $r = $balance->change($remaining_total, CommissionBalance::ORDER_WX_PAY, ['orderid' => $order->getId()]);
         if ($r && $r->update([], true)) {
             //记录佣金
             $order->setExtraData('commission.agent', [
@@ -276,7 +277,7 @@ class CommissionEventHandler
      * @param deviceModelObj $device
      * @param orderModelObj $order
      * @param int $commission_total
-     * @param int $available_price
+     * @param int $remaining_total
      * @return bool
      * @throws Exception
      */
@@ -284,7 +285,7 @@ class CommissionEventHandler
         deviceModelObj $device,
         orderModelObj $order,
         int $commission_total,
-        int $available_price
+        int $remaining_total
     ): bool {
 
         $agent = $device->getAgent();
@@ -296,22 +297,22 @@ class CommissionEventHandler
             return true;
         }
 
-        $order->setExtraData('commission.local.total', $available_price);
+        $order->setExtraData('commission.local.total', $remaining_total);
 
         //可分佣的金额
-        $available_price = self::processGSP($commission_total, $available_price, $agent, $order);
-        if ($available_price < 1) {
+        $remaining_total = self::processGSP($commission_total, $remaining_total, $agent, $order);
+        if ($remaining_total < 1) {
             return true;
         }
 
-        $available_price = self::processKeeperCommissions($commission_total, $available_price, $device, $order);
-        if ($available_price < 1) {
+        $remaining_total = self::processKeeperCommissions($commission_total, $remaining_total, $device, $order);
+        if ($remaining_total < 1) {
             return true;
         }
 
-        //还有余额则为代理佣金
+        //还有剩余则为代理佣金
         $src = $order->getBalance() > 0 ? CommissionBalance::ORDER_BALANCE : CommissionBalance::ORDER_FREE;
-        $r = $agent->commission_change($available_price, $src, ['orderid' => $order->getId()]);
+        $r = $agent->commission_change($remaining_total, $src, ['orderid' => $order->getId()]);
         if ($r && $r->update([], true)) {
             //记录代理商所得佣金
             $order->setExtraData(
@@ -335,9 +336,8 @@ class CommissionEventHandler
      */
     protected static function processPromoterCommissions(
         int $commission_total,
-        int $available_price,
+        int $remaining_total,
         keeperModelObj $keeper,
-        deviceModelObj $device,
         orderModelObj $order,
         int $src = CommissionBalance::GSP
     ): array {
@@ -348,59 +348,56 @@ class CommissionEventHandler
 
             $user = $order->getUser();
             if (empty($user)) {
-                return [$available_price, []];
+                return [$remaining_total, []];
             }
 
-            $query = Principal::promoter(['superior_id' => $keeper->getId()]);
+            $query = Principal::promoter(['superior_id' => $keeper->getId(), 'user_id' => $user->getId()]);
 
             /** @var userModelObj $promoter */
-            foreach ($query->findAll() as $promoter) {
-                if ($promoter->isBanned() || $promoter->getId() != $user->getId()) {
-                    continue;
-                }
+            $promoter = $query->findOne();
 
-                if ($config['percent']) {
-                    $price = intval(round($commission_total * intval($config['percent']) / 10000));
-                } elseif ($config['fixed']) {
-                    $price = intval($config['fixed'] * $order->getNum());
+            if (empty($promoter) || $promoter->isBanned()) {
+                return [$remaining_total, []];
+            }
+
+            if ($config['percent']) {
+                $val = intval(round($commission_total * intval($config['percent']) / 10000));
+            } elseif ($config['fixed']) {
+                $val = intval($config['fixed'] * $order->getNum());
+            } else {
+                $val = 0;
+            }
+
+            if ($val > $remaining_total) {
+                $val = $remaining_total;
+            }
+
+            if ($val > 0) {
+                $r = $promoter->commission_change($val, $src, ['orderid' => $order->getId()]);
+                if ($r && $r->update([], true)) {
+                    //记录佣金
+                    $log[] = [
+                        'id' => $r->getId(),
+                        'xval' => $r->getXVal(),
+                        'openid' => $promoter->getOpenid(),
+                        'name' => $promoter->getName(),
+                        'mobile' => $promoter->getMobile(),
+                        'promoter' => true,
+                    ];
+                    $remaining_total -= $val;
                 } else {
-                    $price = 0;
-                }
-
-                if ($price > $available_price) {
-                    $price = $available_price;
-                }
-
-                if ($price > 0) {
-                    $r = $promoter->commission_change($price, $src, ['orderid' => $order->getId()]);
-                    if ($r && $r->update([], true)) {
-                        //记录佣金
-                        $log[] = [
-                            'id' => $r->getId(),
-                            'xval' => $r->getXVal(),
-                            'openid' => $promoter->getOpenid(),
-                            'name' => $promoter->getName(),
-                            'mobile' => $promoter->getMobile(),
-                            'promoter' => true,
-                        ];
-                        $available_price -= $price;
-                        if ($available_price == 0) {
-                            break;
-                        }
-                    } else {
-                        throw new Exception('创建推广员佣金失败！', State::ERROR);
-                    }
+                    throw new Exception('创建推广员佣金失败！', State::ERROR);
                 }
             }
         }
 
-        return [$available_price, $log];
+        return [$remaining_total, $log];
     }
 
     /**
      * 处理运营人员佣金
      * @param int $commission_total
-     * @param int $available_price
+     * @param int $remaining_total
      * @param deviceModelObj $device
      * @param orderModelObj $order
      * @param int $src
@@ -409,14 +406,14 @@ class CommissionEventHandler
      */
     protected static function processKeeperCommissions(
         int $commission_total,
-        int $available_price,
+        int $remaining_total,
         deviceModelObj $device,
         orderModelObj $order,
         int $src = CommissionBalance::GSP
     ): int {
         $keepers = $device->getKeepers();
 
-        $log = [];
+        $logs = [];
 
         foreach ($keepers as $keeper) {
             $user = $keeper->getUser();
@@ -434,16 +431,20 @@ class CommissionEventHandler
 
             //处理推广员佣金
             if (App::isPromoterEnabled()) {
-                list($available_price, $promoter_log) = self::processPromoterCommissions(
+                list($remaining_total, $promoter_logs) = self::processPromoterCommissions(
                     $commission_total,
-                    $available_price,
+                    $remaining_total,
                     $keeper,
-                    $device,
                     $order,
                     $src
                 );
-                if ($promoter_log) {
-                    $log = array_merge($log, $promoter_log);
+
+                if ($promoter_logs) {
+                    $logs = array_merge($logs, $promoter_logs);
+                }
+
+                if ($remaining_total < 1) {
+                    return true;
                 }
             }
 
@@ -454,28 +455,28 @@ class CommissionEventHandler
             }
 
             if ($is_percent) {
-                $price = intval(round($commission_total * intval($v) / 100));
+                $val = intval(round($commission_total * intval($v) / 100));
             } else {
-                $price = intval($v * $order->getNum());
+                $val = intval($v * $order->getNum());
             }
 
-            if ($price > $available_price) {
-                $price = $available_price;
+            if ($val > $remaining_total) {
+                $val = $remaining_total;
             }
 
-            if ($price > 0) {
-                $r = $user->commission_change($price, $src, ['orderid' => $order->getId()]);
+            if ($val > 0) {
+                $r = $user->commission_change($val, $src, ['orderid' => $order->getId()]);
                 if ($r && $r->update([], true)) {
                     //记录佣金
-                    $log[] = [
+                    $logs[] = [
                         'id' => $r->getId(),
                         'xval' => $r->getXVal(),
                         'openid' => $user->getOpenid(),
                         'name' => $keeper->getName(),
                         'mobile' => $keeper->getMobile(),
                     ];
-                    $available_price -= $price;
-                    if ($available_price == 0) {
+                    $remaining_total -= $val;
+                    if ($remaining_total < 1) {
                         break;
                     }
                 } else {
@@ -485,15 +486,15 @@ class CommissionEventHandler
         }
 
         //保存分佣记录
-        $order->setExtraData('commission.keepers', $log);
+        $order->setExtraData('commission.keepers', $logs);
 
-        return $available_price;
+        return $remaining_total;
     }
 
     /**
      * 处理佣金分享用户佣金
      * @param int $commission_total
-     * @param int $available_price
+     * @param int $remaining_total
      * @param agentModelObj $agent
      * @param orderModelObj $order
      * @param int $src
@@ -502,39 +503,39 @@ class CommissionEventHandler
      */
     protected static function processGSP(
         int $commission_total,
-        int $available_price,
+        int $remaining_total,
         agentModelObj $agent,
         orderModelObj $order,
         int $src = CommissionBalance::GSP
     ): int {
-        $gsp_log = [];
+        $logs = [];
 
-        $createCommission = function ($price, $user) use (
+        $createCommissionFN = function ($val, $user) use (
             $commission_total,
-            &$available_price,
+            &$remaining_total,
             $order,
             $src,
-            &$gsp_log
+            &$logs
         ) {
-            if ($price > $available_price) {
-                $price = $available_price;
+            if ($val > $remaining_total) {
+                $val = $remaining_total;
             }
-            if ($price > 0) {
-                $gsp_r = $user->commission_change($price, $src, ['orderid' => $order->getId()]);
+            if ($val > 0) {
+                $gsp_r = $user->commission_change($val, $src, ['orderid' => $order->getId()]);
                 if ($gsp_r && $gsp_r->update([], true)) {
-                    $gsp_log[] = [
+                    $logs[] = [
                         'id' => $gsp_r->getId(),
                         'xval' => $gsp_r->getXVal(),
                         'openid' => $user->getOpenid(),
                         'name' => $user->getName(),
                     ];
 
-                    $available_price -= $price;
-                    if ($available_price == 0) {
+                    $remaining_total -= $val;
+                    if ($remaining_total < 1) {
                         return false;
                     }
                 } else {
-                    throw new Exception('创建佣金分享失败！'.$price, State::ERROR);
+                    throw new Exception('创建佣金分享失败！', State::ERROR);
                 }
             }
 
@@ -565,12 +566,11 @@ class CommissionEventHandler
                     continue;
                 }
                 if ($entry['type'] == 'amount') {
-                    $price = intval($percent);
+                    $val = intval($percent);
                 } else {
-                    $price = intval(round($commission_total * $percent / 10000));
+                    $val = intval(round($commission_total * $percent / 10000));
                 }
-                $more = $createCommission($price, $user);
-                if (!$more) {
+                if (!$createCommissionFN($val, $user)) {
                     //佣金为零，退出循环
                     break;
                 }
@@ -601,29 +601,28 @@ class CommissionEventHandler
                         continue;
                     }
                 }
-                $price = 0;
+                $val = 0;
                 if ($entry->isPercent()) {
                     $percent = intval($entry->getVal());
                     if ($percent <= 0) {
                         continue;
                     }
-                    $price = intval(round($commission_total * $percent / 10000));
+                    $val = intval(round($commission_total * $percent / 10000));
                 } elseif ($entry->isAmount()) {
-                    $price = intval($entry->getVal());
+                    $val = intval($entry->getVal());
                 }
-                $more = $createCommission($price, $user);
-                if (!$more) {
+                if (!$createCommissionFN($val, $user)) {
                     //佣金为零，退出循环
                     break;
                 }
             }
         }
 
-        if ($gsp_log) {
-            $order->setExtraData('commission.gsp', $gsp_log);
+        if ($logs) {
+            $order->setExtraData('commission.gsp', $logs);
         }
 
-        return $available_price;
+        return $remaining_total;
     }
 
     /**
@@ -632,7 +631,7 @@ class CommissionEventHandler
      * @param orderModelObj $order
      * @param agentModelObj $agent
      * @param int $commission_total
-     * @param int $available_price
+     * @param int $remaining_total
      * @param int $src
      * @return int
      * @throws Exception
@@ -642,37 +641,37 @@ class CommissionEventHandler
         orderModelObj $order,
         agentModelObj $agent,
         int $commission_total,
-        int $available_price,
+        int $remaining_total,
         int $src = CommissionBalance::GSP
     ): int {
 
         //处理佣金分享用户
-        $available_price = self::processGSP($commission_total, $available_price, $agent, $order, $src);
-        if ($available_price < 1) {
+        $remaining_total = self::processGSP($commission_total, $remaining_total, $agent, $order, $src);
+        if ($remaining_total < 1) {
             return 0;
         }
 
         //处理运营人员佣金
-        return self::processKeeperCommissions($commission_total, $available_price, $device, $order, $src);
+        return self::processKeeperCommissions($commission_total, $remaining_total, $device, $order, $src);
     }
 
     /**
      * 处理平台手续费
      * @param int $commission_total
-     * @param int $available_price
+     * @param int $remaining_total
      * @param agentModelObj $agent
      * @param orderModelObj $order
      * @return int
      */
     protected static function ProcessFee(
         int $commission_total,
-        int $available_price,
+        int $remaining_total,
         agentModelObj $agent,
         orderModelObj $order
     ): int {
         $agent_data = $agent->getAgentData();
-        if ($agent_data && !empty($agent_data['commission'])) {
 
+        if ($agent_data && !empty($agent_data['commission'])) {
             $fee = intval($agent_data['commission']['fee']);
             if ($fee > 0) {
                 $fee_type = intval($agent_data['commission']['fee_type']);
@@ -683,16 +682,16 @@ class CommissionEventHandler
                     $val = intval(round($commission_total * $fee / 10000));
                 }
 
-                if ($val > $available_price) {
-                    $val = $available_price;
+                if ($val > $remaining_total) {
+                    $val = $remaining_total;
                 }
 
                 //记录手续费
                 $order->setExtraData('pay.fee', $val);
-                $available_price -= $val;
+                $remaining_total -= $val;
             }
         }
 
-        return $available_price;
+        return $remaining_total;
     }
 }

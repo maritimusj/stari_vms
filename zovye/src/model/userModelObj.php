@@ -506,7 +506,6 @@ class userModelObj extends modelObj
         $r = $balance->change($price, $src, $extra);
         if ($r) {
             $this->setPrincipal(Principal::Gspor);
-
             return $r;
         }
 

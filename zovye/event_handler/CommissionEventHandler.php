@@ -68,6 +68,30 @@ class CommissionEventHandler
     /**
      * @throws Exception
      */
+    protected static function createCommission(userModelObj $user, orderModelObj $order, $val, int $src): array
+    {
+        $r = $user->getCommissionBalance()->change($val, $src, [
+            'orderid' => $order->getId(),
+        ]);
+
+        if ($r && $r->update([], true)) {
+
+            return [
+                'id' => $r->getId(),
+                'xval' => $r->getXVal(),
+                'openid' => $user->getOpenid(),
+                'name' => $user->getName(),
+                'mobile' => $user->getMobile(),
+            ];
+
+        } else {
+            throw new Exception('创建佣金记录失败！', State::ERROR);
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
     protected static function charging(deviceModelObj $device, orderModelObj $order): bool
     {
         $agent = $device->getAgent();
@@ -88,40 +112,21 @@ class CommissionEventHandler
             $sf = self::processProfit($device, $order, $agent, $sf, $sf, CommissionBalance::CHARGING_SERVICE_FEE);
         }
 
-        $balance = $agent->getCommissionBalance();
-
         if ($sf > 0) {
-            $r1 = $balance->change($sf, CommissionBalance::CHARGING_SERVICE_FEE, ['orderid' => $order->getId()]);
-            if ($r1 && $r1->update([], true)) {
-                //记录佣金
-                $order->setExtraData('commission.agent', [
-                    'id' => $r1->getId(),
-                    'xval' => $r1->getXVal(),
-                    'openid' => $agent->getOpenid(),
-                    'name' => $agent->getName(),
-                ]);
-            } else {
-                throw new Exception('创建代理佣金数据失败！', State::ERROR);
-            }
+            $log_sf = self::createCommission($agent, $order, $sf, CommissionBalance::CHARGING_SERVICE_FEE);
+            $order->setExtraData('commission.agent', $log_sf);
         }
 
         //电费直接分给代理商
         $ef = $order->getChargingEF();
-        if ($ef < 1) {
-            return true;
-        }
+        if ($ef > 0) {
+            $log = self::createCommission($agent, $order, $ef, CommissionBalance::CHARGING_ELECTRIC_FEE);
 
-        $r2 = $balance->change($ef, CommissionBalance::CHARGING_ELECTRIC_FEE, ['orderid' => $order->getId()]);
-        if ($r2 && $r2->update([], true)) {
-            //记录佣金
-            $order->setExtraData('commission.agent', [
-                'id' => $r2->getId(),
-                'xval' => $r2->getXVal() + (isset($r1) ? $r1->getXVal() : 0),
-                'openid' => $agent->getOpenid(),
-                'name' => $agent->getName(),
-            ]);
-        } else {
-            throw new Exception('创建代理佣金数据失败！', State::ERROR);
+            if (isset($log_sf)) {
+                $log['xval'] += $log_sf['xval'];
+            }
+
+            $order->setExtraData('commission.agent', $log);
         }
 
         return true;
@@ -255,20 +260,9 @@ class CommissionEventHandler
         }
 
         //最后，剩余金额直接分给代理商
-        $balance = $agent->getCommissionBalance();
+        $log = self::createCommission($agent, $order, $remaining_total, CommissionBalance::ORDER_WX_PAY);
 
-        $r = $balance->change($remaining_total, CommissionBalance::ORDER_WX_PAY, ['orderid' => $order->getId()]);
-        if ($r && $r->update([], true)) {
-            //记录佣金
-            $order->setExtraData('commission.agent', [
-                'id' => $r->getId(),
-                'xval' => $r->getXVal(),
-                'openid' => $agent->getOpenid(),
-                'name' => $agent->getName(),
-            ]);
-        } else {
-            throw new Exception('创建代理佣金数据失败！', State::ERROR);
-        }
+        $order->setExtraData('commission.agent', $log);
 
         return true;
     }
@@ -301,32 +295,23 @@ class CommissionEventHandler
 
         //可分佣的金额
         $remaining_total = self::processGSP($commission_total, $remaining_total, $agent, $order);
+
         if ($remaining_total < 1) {
             return true;
         }
 
         $remaining_total = self::processKeeperCommissions($commission_total, $remaining_total, $device, $order);
+
         if ($remaining_total < 1) {
             return true;
         }
 
         //还有剩余则为代理佣金
         $src = $order->getBalance() > 0 ? CommissionBalance::ORDER_BALANCE : CommissionBalance::ORDER_FREE;
-        $r = $agent->commission_change($remaining_total, $src, ['orderid' => $order->getId()]);
-        if ($r && $r->update([], true)) {
-            //记录代理商所得佣金
-            $order->setExtraData(
-                'commission.agent',
-                [
-                    'id' => $r->getId(),
-                    'xval' => $r->getXVal(),
-                    'openid' => $agent->getOpenid(),
-                    'name' => $agent->getName(),
-                ]
-            );
-        } else {
-            throw new Exception('创建代理佣金数据失败！', State::FAIL);
-        }
+
+        $log = self::createCommission($agent, $order, $remaining_total, $src);
+
+        $order->setExtraData('commission.agent', $log);
 
         return true;
     }
@@ -341,7 +326,7 @@ class CommissionEventHandler
         orderModelObj $order,
         int $src = CommissionBalance::GSP
     ): array {
-        $log = [];
+        $logs = [];
 
         $config = $keeper->settings('promoter.commission', []);
         if (!isEmptyArray($config)) {
@@ -373,25 +358,17 @@ class CommissionEventHandler
             }
 
             if ($val > 0) {
-                $r = $promoter->commission_change($val, $src, ['orderid' => $order->getId()]);
-                if ($r && $r->update([], true)) {
-                    //记录佣金
-                    $log[] = [
-                        'id' => $r->getId(),
-                        'xval' => $r->getXVal(),
-                        'openid' => $promoter->getOpenid(),
-                        'name' => $promoter->getName(),
-                        'mobile' => $promoter->getMobile(),
-                        'promoter' => true,
-                    ];
-                    $remaining_total -= $val;
-                } else {
-                    throw new Exception('创建推广员佣金失败！', State::ERROR);
-                }
+                $log = self::createCommission($promoter, $order, $val, $src);
+
+                $log['promoter'] = true;
+
+                $logs = $log;
+
+                $remaining_total -= $val;
             }
         }
 
-        return [$remaining_total, $log];
+        return [$remaining_total, $logs];
     }
 
     /**
@@ -419,7 +396,7 @@ class CommissionEventHandler
             $user = $keeper->getUser();
             if (empty($user)) {
                 Log::error('keeper', [
-                    'err' => '营运人员对应的用户不存在，忽略佣金分配！',
+                    'err' => '营运人员对应的用户不存在，已忽略佣金分配！',
                     'order' => $order->profile(),
                     'keeper' => [
                         'name' => $keeper->getName(),
@@ -465,22 +442,12 @@ class CommissionEventHandler
             }
 
             if ($val > 0) {
-                $r = $user->commission_change($val, $src, ['orderid' => $order->getId()]);
-                if ($r && $r->update([], true)) {
-                    //记录佣金
-                    $logs[] = [
-                        'id' => $r->getId(),
-                        'xval' => $r->getXVal(),
-                        'openid' => $user->getOpenid(),
-                        'name' => $keeper->getName(),
-                        'mobile' => $keeper->getMobile(),
-                    ];
-                    $remaining_total -= $val;
-                    if ($remaining_total < 1) {
-                        break;
-                    }
-                } else {
-                    throw new Exception('创建运营人员佣金失败！', State::ERROR);
+                $logs[] = self::createCommission($user, $order, $val, $src);
+
+                $remaining_total -= $val;
+
+                if ($remaining_total < 1) {
+                    break;
                 }
             }
         }
@@ -521,21 +488,12 @@ class CommissionEventHandler
             }
 
             if ($val > 0) {
-                $gsp_r = $user->commission_change($val, $src, ['orderid' => $order->getId()]);
-                if ($gsp_r && $gsp_r->update([], true)) {
-                    $logs[] = [
-                        'id' => $gsp_r->getId(),
-                        'xval' => $gsp_r->getXVal(),
-                        'openid' => $user->getOpenid(),
-                        'name' => $user->getName(),
-                    ];
+                $logs[] = self::createCommission($user, $order, $val, $src);
 
-                    $remaining_total -= $val;
-                    if ($remaining_total < 1) {
-                        return false;
-                    }
-                } else {
-                    throw new Exception('创建佣金分享失败！', State::ERROR);
+                $remaining_total -= $val;
+
+                if ($remaining_total < 1) {
+                    return false;
                 }
             }
 
@@ -552,6 +510,7 @@ class CommissionEventHandler
                         continue;
                     }
                 }
+
                 //免费订单
                 if (($order->getPrice() == 0 && $order->getBalance() == 0) || ($order->getBalance(
                         ) > 0 && Balance::isFreeOrder())) {
@@ -559,17 +518,20 @@ class CommissionEventHandler
                         continue;
                     }
                 }
+
                 /** @var userModelObj $user */
                 $user = $entry['__obj'];
                 $percent = $entry['percent'];
                 if (empty($user) || $percent <= 0) {
                     continue;
                 }
+
                 if ($entry['type'] == 'amount') {
                     $val = intval($percent);
                 } else {
                     $val = intval(round($commission_total * $percent / 10000));
                 }
+
                 if (!$createCommissionFN($user, $val)) {
                     //佣金为零，退出循环
                     break;
@@ -584,14 +546,17 @@ class CommissionEventHandler
                 if (empty($user)) {
                     continue;
                 }
+
                 //支付订单
                 if ($order->getPrice() > 0 && !$entry->isPayOrderIncluded()) {
                     continue;
                 }
+
                 //免费订单
                 if ($order->getPrice() == 0 && $order->getBalance() == 0 && !$entry->isFreeOrderIncluded()) {
                     continue;
                 }
+
                 //积分订单
                 if ($order->getBalance() > 0) {
                     if (Balance::isFreeOrder() && !$entry->isFreeOrderIncluded()) {
@@ -601,6 +566,7 @@ class CommissionEventHandler
                         continue;
                     }
                 }
+
                 $val = 0;
                 if ($entry->isPercent()) {
                     $percent = intval($entry->getVal());
@@ -611,6 +577,7 @@ class CommissionEventHandler
                 } elseif ($entry->isAmount()) {
                     $val = intval($entry->getVal());
                 }
+
                 if (!$createCommissionFN($user, $val)) {
                     //佣金为零，退出循环
                     break;

@@ -206,6 +206,7 @@ class CommissionEventHandler
      * 第3步，对利润进行佣金分配
      *       1，处理佣金分享用户
      *       2，处理运营人员佣金
+     *          1*）处理推广员佣金
      * 第4步，成本及剩余利润分配给代理商
      *
      * @param deviceModelObj $device

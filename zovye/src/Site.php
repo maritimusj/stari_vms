@@ -59,7 +59,7 @@ class Site extends WeModuleSite
                 return;
             }
 
-            trigger_error('invalid request.');
+            trigger_error('invalid request: ' . $name);
         }
     }
 }

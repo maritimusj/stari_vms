@@ -20,7 +20,11 @@
 <ul class="nav nav-tabs" id="navbar">
     <li role="presentation"  class="active"><a href="#">首页</a></li>
     {if $commission_enabled}
+    {if \zovye\App::isFuelingDeviceEnabled()}
+    <li role="presentation" ><a href="{php echo $this->createWebUrl('fueling', array('op'=>'stats'));}">营收统计</a></li>
+    {else}
     <li role="presentation" ><a href="{php echo $this->createWebUrl('order', array('op'=>'stats'));}">营收统计</a></li>
+    {/if}
     <li role="presentation" ><a href="{php echo $this->createWebUrl('withdraw', array('op'=>'stats'));}">提现统计</a></li>
     <li role="presentation" ><a href="{php echo $this->createWebUrl('order', array('op'=>'export'));}">订单导出</a></li>
     <li role="presentation" ><a href="{php echo $this->createWebUrl('agent', array('op'=>'commissionExport'));}">收入明细</a></li>

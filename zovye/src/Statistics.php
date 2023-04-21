@@ -29,6 +29,7 @@ class Statistics
         } catch (Exception $e) {
             return null;
         }
+
         $date->modify('first day of this month 00:00');
 
         return $date;
@@ -61,7 +62,9 @@ class Statistics
 
         $result = [];
 
-        $result['free'] = (int)Order::query($condition)->where(['src' => [Order::ACCOUNT, Order::FREE]])->get('sum(num)');
+        $result['free'] = (int)Order::query($condition)->where(['src' => [Order::ACCOUNT, Order::FREE]])->get(
+            'sum(num)'
+        );
         $result['pay'] = (int)Order::query($condition)->where(['src' => Order::PAY])->get('sum(num)');
 
         if (App::isChargingDeviceEnabled()) {
@@ -95,16 +98,10 @@ class Statistics
         } catch (Exception $e) {
             return [];
         }
-        if (empty($start)) {
-            $begin->modify('first day of Jan this year 00:00');
-        } else {
-            $begin->modify('today 00:00');
-        }
-        if (empty($end)) {
-            $end = $begin->modify('first day of Jan next year 00:00');
-        } else {
-            $end->modify('next day 00:00');
-        }
+
+        $begin->modify('first day of Jan this year 00:00');
+
+        $end->modify('next day 00:00');
 
         return Util::cachedCall($end->getTimestamp() > time() ? 10 : 0, function () use ($device, $begin, $end) {
             return self::calc($device, $begin, $end);
@@ -189,17 +186,15 @@ class Statistics
 
     public static function monthData(modelObj $obj, $month = '', $day = 0)
     {
-        $counter = new OrderCounter();
-
-        $fn = function (DateTimeInterface $begin, $w = 'day') use ($obj, $counter) {
+        $fn = function (DateTimeInterface $begin, $w = 'day') use ($obj) {
             $result = [];
 
             $end = new DateTime($begin->format('Y-m-d 00:00'));
             if ($w == 'day') {
-                $result['order'] = $counter->getDayAll([$obj, 'goods'], $begin);
+                $result['order'] = (new OrderCounter())->getDayAll([$obj, 'goods'], $begin);
                 $end->modify('next day 00:00');
             } elseif ($w == 'month') {
-                $result['order'] = $counter->getMonthAll([$obj, 'goods'], $begin);
+                $result['order'] = (new OrderCounter())->getMonthAll([$obj, 'goods'], $begin);
                 $end->modify('first day of next month 00:00');
             } else {
                 return [];

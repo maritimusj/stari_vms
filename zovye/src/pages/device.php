@@ -310,7 +310,9 @@ JSCODE;
 $tpl['js']['code'] .= "\r\n</script>";
 
 if (User::isSnapshot()) {
-    $tpl['js']['code'] .= $this->snapshotJs($device_imei);
+    $tpl['js']['code'] .= app()->snapshotJs([
+        'device_imei' => $device_imei,
+    ]);
 }
 
 $file = Theme::getThemeFile($device, 'device');

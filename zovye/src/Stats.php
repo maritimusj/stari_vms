@@ -111,6 +111,7 @@ class Stats
         }
 
         $counter = new OrderCounter();
+
         $result = $counter->getDayAll([$obj, $w], $begin);
 
         self::calcBalanceOrder($result);
@@ -466,8 +467,12 @@ class Stats
                 $begin = new DateTime($first_day->format('Y-m-d 00:00'));
                 while ($begin < $last_day) {
                     $data = Stats::getDayTotal($item['obj'], $begin);
-                    $chart['series'][$index]['total'] += $data['total'];
-                    $chart['series'][$index]['data'][] = $data['total'];
+                    $total = $data['total'];
+                    if (App::isFuelingDeviceEnabled()) {
+                        $total /= 100;
+                    }
+                    $chart['series'][$index]['total'] += $total;
+                    $chart['series'][$index]['data'][] = $total;
                     $begin->modify('next day');
                 }
             } catch (Exception $e) {

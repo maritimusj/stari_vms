@@ -1314,6 +1314,11 @@ class keeper
     {
         $keeper = keeper::getKeeper();
 
+        $user = $keeper->getUser();
+        if (empty($user)) {
+            return [];
+        }
+
         try {
             $res = explode('-', Request::str('date'), 3);
             if (empty($res)) {
@@ -1352,11 +1357,6 @@ class keeper
 
         if (Request::has('src')) {
             $cond['src'] = Request::int('src');
-        }
-
-        $user = $keeper->getUser();
-        if (empty($user)) {
-            return [];
         }
 
         return agent::getUserStats($user->getOpenid(), $begin->getTimestamp(), $end->getTimestamp(), $cond);

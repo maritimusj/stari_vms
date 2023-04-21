@@ -454,7 +454,7 @@ class Stats
 
         foreach ($params['data'] as $index => $item) {
             $chart['series'][$index] = [
-                'type' => 'bar',
+                'type' => 'line',
                 'smooth' => true,
                 'stack' => '总量',
                 'areaStyle' => ['normal' => []],

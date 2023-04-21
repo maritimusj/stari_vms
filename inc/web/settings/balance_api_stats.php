@@ -13,7 +13,7 @@ $title = '';
 $content = app()->fetchTemplate('web/common/stats', [
     'chartid' => Util::random(10),
     'title' => $title,
-    'chart' => Stats::getBalanceApiStats($title),
+    'chart' => Stats::getBalanceApiStats(),
 ]);
 
 JSON::success(['title' => '接口积分统计', 'content' => $content]);

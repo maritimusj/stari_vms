@@ -1346,7 +1346,7 @@ class Stats
         return $result;
     }
 
-    public static function getBalanceApiStats($title): array
+    public static function getBalanceApiStats(): array
     {
         $chart = [
             'tooltip' => ['trigger' => 'axis'],

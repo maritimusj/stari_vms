@@ -50,7 +50,7 @@ if ($op == 'order_notify' && CtrlServ::checkJobSign(['id' => request('id')])) {
         }
 
         $price_formatted = number_format($order->getPrice() / 100, 2, '.', '') . '元';
-        $num_formatted = $device->isFuelingDevice() ? $order->getNum() / 100 : $order->getNum();
+        $num_formatted = number_format($order->getNum(), 2, '.', '');
         $goods = $order->getGoodsData();
         $type = '';
         if ($device->isFuelingDevice()) {

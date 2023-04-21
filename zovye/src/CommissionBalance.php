@@ -356,8 +356,8 @@ CHARGING;
                 }
                 $goods = $order->getGoodsData();
                 if ($goods) {
-                    $num = number_format($order->getNum() / 100, 2, '.', '');
-                    $goods_info = "<dt>商品</dt><dd class=\"admin\">{$goods['name']} x <span style='color:#2196f3;'>{$num}</span>{$goods['unit_title']}</dd>";
+                    $num = number_format($order->getNum(), 2, '.', '');
+                    $goods_info = "<dt>商品</dt><dd class=\"admin\">{$goods['name']} x <span style='color:#2196f3;'>$num</span>{$goods['unit_title']}</dd>";
                 }
             }
             $data['memo'] = <<<CHARGING

@@ -26,7 +26,6 @@ use function zovye\is_error;
  * @package zovye
  * @method getSrc()
  * @method getOpenid()
- * @method getNum()
  * @method getBalance()
  * @method getOrderId()
  * @method getAgentId()
@@ -95,6 +94,12 @@ class orderModelObj extends modelObj
     public static function getTableName($readOrWrite): string
     {
         return tb('order');
+    }
+
+    public function getNum(): int
+    {
+        $num = parent::getNum();
+        return $this->isFuelingOrder() ? $num / 100 : $num;
     }
 
     public function getAccount($obj = false)

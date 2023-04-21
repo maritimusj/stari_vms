@@ -312,7 +312,7 @@ class Stats
             'yAxis' => ['type' => 'value', 'axisLabel' => ['formatter' => '{value}'], 'minInterval' => 1],
             'series' => [
                 [
-                    'type' => 'line',
+                    'type' => 'bar',
                     'color' => '#FF3300',
                     'name' => '收入',
                     'data' => [],
@@ -453,7 +453,7 @@ class Stats
 
         foreach ($params['data'] as $index => $item) {
             $chart['series'][$index] = [
-                'type' => 'line',
+                'type' => 'bar',
                 'smooth' => true,
                 'stack' => '总量',
                 'areaStyle' => ['normal' => []],
@@ -1088,13 +1088,13 @@ class Stats
             'yAxis' => ['type' => 'value', 'axisLabel' => ['formatter' => '{value}'], 'minInterval' => 1],
             'series' => [
                 [
-                    'type' => 'line',
+                    'type' => 'bar',
                     'color' => '#00CC33',
                     'name' => '免费',
                     'data' => [],
                 ],
                 [
-                    'type' => 'line',
+                    'type' => 'bar',
                     'color' => '#FF3300',
                     'name' => '支付',
                     'data' => [],
@@ -1355,13 +1355,13 @@ class Stats
             'yAxis' => ['type' => 'value', 'axisLabel' => ['formatter' => '{value}'], 'minInterval' => 1],
             'series' => [
                 [
-                    'type' => 'line',
+                    'type' => 'bar',
                     'color' => '#00CC33',
                     'name' => '增加',
                     'data' => [],
                 ],
                 [
-                    'type' => 'line',
+                    'type' => 'bar',
                     'color' => '#FF3300',
                     'name' => '减少',
                     'data' => [],

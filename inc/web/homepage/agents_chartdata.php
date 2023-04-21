@@ -11,7 +11,7 @@ defined('IN_IA') or exit('Access Denied');
 $content = app()->fetchTemplate(
     'web/home/chart',
     [
-        'chartid' => Util::random(10),
+        'chartId' => Util::random(10),
         'data' => Util::cachedCall(30, function () {
             $n = Request::int('n', 10);
 

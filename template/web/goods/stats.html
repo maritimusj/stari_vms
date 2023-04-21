@@ -1,9 +1,9 @@
 {if $chart}
-<div style="width:700px;height:300px;" id="{$chartid}">
+<div style="width:700px;height:300px;" id="{$chartId}">
 </div>
 <script type="text/javascript">
    require(["{php \zovye\url(false, JS_ECHARTS_URL);}"], function(echarts){
-        const myChart = echarts.init(document.getElementById("{$chartid}"));
+        const myChart = echarts.init(document.getElementById("{$chartId}"));
         const option = JSON.parse('{php echo json_encode($chart);}');
         myChart.setOption(option);
     });

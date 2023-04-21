@@ -35,7 +35,7 @@ try {
 $content = app()->fetchTemplate(
     'web/account/stats',
     [
-        'chartid' => 'chart-'.Util::random(10),
+        'chartId' => Util::random(10),
         'chart' => $data ?? [],
     ]
 );

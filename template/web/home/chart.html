@@ -1,9 +1,9 @@
 {if $data}
-<div style="min-width:700px;min-height:400px;width:100%;height:100%;" id="{$chartid}">
+<div style="min-width:700px;min-height:400px;width:100%;height:100%;" id="{$chartId}">
 </div>
 <script type="text/javascript">
    require(["{php \zovye\url(false, JS_ECHARTS_URL);}"], function(echarts){
-        const chart = echarts.init(document.getElementById("{$chartid}"));
+        const chart = echarts.init(document.getElementById("{$chartId}"));
         const option = JSON.parse('{php echo json_encode($data);}');
         chart.setOption(option);
         window.addEventListener("resize", function () {

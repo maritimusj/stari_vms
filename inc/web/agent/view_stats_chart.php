@@ -24,7 +24,7 @@ $title = $day->format('Y年n月');
 $content = app()->fetchTemplate(
     'web/agent/stats',
     [
-        'chartid' => Util::random(10),
+        'chartId' => Util::random(10),
         'title' => $title,
         'chart' => Util::cachedCall(30, function () use ($agent, $day, $title) {
             return Stats::chartDataOfMonth($agent, $day, "代理商：{$agent->getName()}($title)");

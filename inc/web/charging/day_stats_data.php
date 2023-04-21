@@ -31,7 +31,7 @@ $chart = Stats::dayChartOfChargingGroup($group, $s_date, $e_date, $title);
 $content = app()->fetchTemplate(
     'web/common/stats',
     [
-        'chartid' => Util::random(10),
+        'chartId' => Util::random(10),
         'chart' => $chart,
     ]
 );

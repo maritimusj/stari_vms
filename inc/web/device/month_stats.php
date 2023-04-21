@@ -28,7 +28,7 @@ $title = $month->format('Y年n月');
 $content = app()->fetchTemplate(
     'web/common/stats',
     [
-        'chartid' => Util::random(10),
+        'chartId' => Util::random(10),
         'title' => $title,
         'chart' => Util::cachedCall(30, function () use ($device, $month, $title) {
             return Stats::chartDataOfMonth($device, $month, "设备：{$device->getName()}($title)", $device->isFuelingDevice() ? function ($val) {

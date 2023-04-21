@@ -21,7 +21,7 @@ $data = Stats::chartDataOfDay($goods, new DateTime(), "商品：{$goods->getName
 $content = app()->fetchTemplate(
     'web/goods/stats',
     [
-        'chartid' => Util::random(10),
+        'chartId' => Util::random(10),
         'title' => $title,
         'chart' => $data,
     ]

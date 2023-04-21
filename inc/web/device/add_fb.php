@@ -25,7 +25,7 @@ if ($res) {
 $content = app()->fetchTemplate(
     'web/device/deal_fb',
     [
-        'chartid' => Util::random(10),
+        'chartId' => Util::random(10),
         'id' => $res->getId(),
         'text' => $res->getText(),
     ]

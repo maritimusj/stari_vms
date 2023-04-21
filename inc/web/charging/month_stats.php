@@ -23,7 +23,7 @@ $title = $group->getTitle();
 $content = app()->fetchTemplate(
     'web/common/stats',
     [
-        'chartid' => Util::random(10),
+        'chartId' => Util::random(10),
         'title' => $title,
         'chart' => Stats::monthChartOfChargingGroup($group, $title),
     ]

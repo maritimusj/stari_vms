@@ -98,7 +98,7 @@ $tpl_data['first_total'] = intval($tpl_data['firstMsgStatistic'][date('Ym')][dat
 $tpl_data['day_stats'] = app()->fetchTemplate(
     'web/common/stats',
     [
-        'chartid' => Util::random(10),
+        'chartId' => Util::random(10),
         'chart' => Util::cachedCall(30, function () use ($device) {
             return Stats::chartDataOfDay($device, new DateTime());
         }, $device->getId()),
@@ -108,7 +108,7 @@ $tpl_data['day_stats'] = app()->fetchTemplate(
 $tpl_data['month_stats'] = app()->fetchTemplate(
     'web/common/stats',
     [
-        'chartid' => Util::random(10),
+        'chartId' => Util::random(10),
         'chart' => Util::cachedCall(30, function () use ($device) {
             return Stats::chartDataOfMonth($device, new DateTime());
         }, $device->getId()),

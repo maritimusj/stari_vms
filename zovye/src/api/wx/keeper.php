@@ -669,28 +669,30 @@ class keeper
                 $cond['device_id'][] = $device->getId();
             }
 
-            if (!isEmptyArray($cond['device_id'])) {
-                if (Request::has('src')) {
-                    $cond['src'] = Request::int('src');
-                }
+            if (empty($cond['device_id'])) {
+                return [];
+            }
 
-                $w = Request::str('w');
+            if (Request::has('src')) {
+                $cond['src'] = Request::int('src');
+            }
 
-                if (empty($w) || $w == 'today') {
-                    $result['today'] = agent::getUserTodayStats($user ? $user->getOpenid() : '', $cond);
-                }
+            $w = Request::str('w');
 
-                if (empty($w) || $w == 'yesterday') {
-                    $result['yesterday'] = agent::getUserYesterdayStats($user ? $user->getOpenid() : '', $cond);
-                }
+            if (empty($w) || $w == 'today') {
+                $result['today'] = agent::getUserTodayStats($user ? $user->getOpenid() : '', $cond);
+            }
 
-                if (empty($w) || $w == 'month') {
-                    $result['month'] = agent::getUserMonthStats($user ? $user->getOpenid() : '', $cond);
-                }
+            if (empty($w) || $w == 'yesterday') {
+                $result['yesterday'] = agent::getUserYesterdayStats($user ? $user->getOpenid() : '', $cond);
+            }
 
-                if (empty($w) || $w == 'year') {
-                    $result['year'] = agent::getUserYearStats($user ? $user->getOpenid() : '', $cond);
-                }
+            if (empty($w) || $w == 'month') {
+                $result['month'] = agent::getUserMonthStats($user ? $user->getOpenid() : '', $cond);
+            }
+
+            if (empty($w) || $w == 'year') {
+                $result['year'] = agent::getUserYearStats($user ? $user->getOpenid() : '', $cond);
             }
         }
 
@@ -959,6 +961,7 @@ class keeper
                 $commission_price_calc = function ($num, $goods_id) use ($v) {
                     $goods = Goods::get($goods_id);
                     $price = $goods ? $goods->getPrice() : 0;
+
                     return intval(round($num * $price * $v / 100));
                 };
             } else {
@@ -1305,5 +1308,57 @@ class keeper
         }
 
         return ['msg' => '退款成功！'];
+    }
+
+    public static function userStats(): array
+    {
+        $keeper = keeper::getKeeper();
+
+        try {
+            $res = explode('-', Request::str('date'), 3);
+            if (empty($res)) {
+                return err('请求的时间不正确！');
+            } elseif (count($res) == 1) {
+                $begin = new DateTimeImmutable(sprintf("%d-01-01 00:00", $res[0]));
+                $end = $begin->modify("first day of jan next year");
+            } elseif (count($res) == 2) {
+                $begin = new DateTimeImmutable(sprintf("%d-%02d-01", $res[0], $res[1]));
+                $end = $begin->modify('first day of next month');
+            } else {
+                $begin = new DateTimeImmutable(sprintf("%d-%02d-%02d", $res[0], $res[1], $res[2]));
+                $end = $begin->modify('next day');
+            }
+        } catch (Exception $e) {
+            return err('时间格式不正确！');
+        }
+
+        $now = new DateTime();
+        if ($end > $now) {
+            $end = $now;
+        }
+
+        $cond = [
+            'device_id' => [],
+        ];
+
+        $query = Device::keeper($keeper)->where(['agent_id' => $keeper->getAgentId()]);
+        foreach ($query->findAll() as $device) {
+            $cond['device_id'][] = $device->getId();
+        }
+
+        if (empty($cond['device_id'])) {
+            return [];
+        }
+
+        if (Request::has('src')) {
+            $cond['src'] = Request::int('src');
+        }
+
+        $user = $keeper->getUser();
+        if (empty($user)) {
+            return [];
+        }
+
+        return agent::getUserStats($user->getOpenid(), $begin->getTimestamp(), $end->getTimestamp(), $cond);
     }
 }

@@ -193,8 +193,12 @@ class Stats
      * @param callable|null $fn
      * @return array
      */
-    public static function chartDataOfDay(modelObj $obj, DateTimeInterface $day, string $title = '', callable $fn = null): array
-    {
+    public static function chartDataOfDay(
+        modelObj $obj,
+        DateTimeInterface $day,
+        string $title = '',
+        callable $fn = null
+    ): array {
         $chart = self::getChartInitData($title);
 
         try {
@@ -244,8 +248,12 @@ class Stats
      * @param callable|null $fn
      * @return array
      */
-    public static function chartDataOfMonth(modelObj $obj, DateTimeInterface $month, string $title = '', callable $fn = null): array
-    {
+    public static function chartDataOfMonth(
+        modelObj $obj,
+        DateTimeInterface $month,
+        string $title = '',
+        callable $fn = null
+    ): array {
         $chart = self::getChartInitData($title);
 
         try {
@@ -299,7 +307,7 @@ class Stats
     public static function getChargingChartInitData(string $title): array
     {
         $chart = [
-            'tooltip' => ['trigger' => 'axis'], 
+            'tooltip' => ['trigger' => 'axis'],
             'xAxis' => ['type' => 'category'],
             'yAxis' => ['type' => 'value', 'axisLabel' => ['formatter' => '{value}'], 'minInterval' => 1],
             'series' => [
@@ -325,37 +333,41 @@ class Stats
      * @param string $title
      * @return array
      */
-    public static function dayChartOfChargingGroup(device_groupsModelObj $group, $s_date, $e_date, string $title = ''): array
-    {
+    public static function dayChartOfChargingGroup(
+        device_groupsModelObj $group,
+        $s_date,
+        $e_date,
+        string $title = ''
+    ): array {
         $chart = self::getChargingChartInitData('');
 
-        $queryFN = function($begin) use($group) {
+        $queryFN = function ($begin) use ($group) {
             $query = We7::load()->object('query');
-        
+
             $query->from(m('order')->getTableName(), 'o')
-            ->leftJoin(m('device')->getTableName(), 'd')
-            ->on('o.device_id', 'd.id');
-        
+                ->leftJoin(m('device')->getTableName(), 'd')
+                ->on('o.device_id', 'd.id');
+
             $end = new DateTime();
             $end->setTimestamp($begin->getTimestamp());
             $end->modify('next day 00:00');
-            
+
             $query->where([
                 'd.group_id' => $group->getId(),
                 'o.createtime >=' => $begin->getTimestamp(),
                 'o.createtime <' => $end->getTimestamp(),
             ]);
-        
+
             $query->select('sum(price)');
-        
+
             $result = $query->get();
 
             return $result[0] ?? 0;
         };
-        
+
         $begin = new DateTime($s_date);
         $begin->modify('00:00');
-        
+
         $end = new DateTime($e_date);
         $end->modify('next day 00:00');
 
@@ -368,7 +380,7 @@ class Stats
             $begin->modify('+1 day');
         }
 
-        $total = number_format($total /100, 2);
+        $total = number_format($total / 100, 2);
         $chart['title']['text'] = "{$title}[ 总计{$total}元 ]";
 
         return $chart;
@@ -384,35 +396,35 @@ class Stats
     {
         $chart = self::getChargingChartInitData($title);
 
-        $queryFN = function($begin) use($group) {
+        $queryFN = function ($begin) use ($group) {
             $query = We7::load()->object('query');
-        
+
             $query->from(m('order')->getTableName(), 'o')
-            ->leftJoin(m('device')->getTableName(), 'd')
-            ->on('o.device_id', 'd.id');
-        
+                ->leftJoin(m('device')->getTableName(), 'd')
+                ->on('o.device_id', 'd.id');
+
             $end = new DateTime();
             $end->setTimestamp($begin->getTimestamp());
             $end->modify('first day of next month');
-            
+
             $query->where([
                 'd.group_id' => $group->getId(),
                 'o.createtime >=' => $begin->getTimestamp(),
                 'o.createtime <' => $end->getTimestamp(),
             ]);
-        
+
             $query->select('sum(price)');
-        
+
             $result = $query->get();
             $total = $result[0] ?? 0;
 
             return $total / 100;
         };
-        
+
         $begin = new DateTime();
         $begin->modify('-1 year');
         $begin->modify('first day of this month 00:00');
-        
+
         $end = new DateTime();
 
         while ($begin < $end) {
@@ -1332,5 +1344,45 @@ class Stats
         krsort($result);
 
         return $result;
+    }
+
+    public static function getBalanceApiStats($title): array
+    {
+        $chart = self::getChartInitData($title);
+
+        try {
+            $first = Balance::query(['src' => Balance::API_UPDATE])->orderBy('id asc')->findOne();
+            if (empty($first) || empty($first->getCreatetime())) {
+                return $chart;
+            }
+
+            $end = new DateTime('next day 00:00');
+            $begin = new DateTime('-12 months');
+
+            if ($begin->getTimestamp() > $first->getCreatetime()) {
+                $begin->setTimestamp($first->getCreatetime);
+            }
+
+            while ($begin < $end) {
+                $condition = [
+                    'src' => Balance::API_UPDATE,
+                    'createtime >=' => $begin->getTimestamp(),
+                ];
+
+                $chart['xAxis']['data'][] = $begin->format('Y年m月');
+
+                $begin->modify('first day of next month 00:00');
+
+                $condition['createtime <'] = $begin->getTimestamp();
+
+                $condition['xval >'] = 0;
+
+                $chart['series'][0]['data'][] = Balance::query($condition)->sum('xval');
+            }
+
+        } catch (Exception $e) {
+        }
+
+        return $chart;
     }
 }

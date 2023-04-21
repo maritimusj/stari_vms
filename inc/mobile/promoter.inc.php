@@ -14,7 +14,18 @@ if (!App::isPromoterEnabled()) {
     Util::resultAlert('这个功能没有启用，谢谢！', 'error');
 }
 
-$user = Util::getCurrentUser();
+//用户参数
+$params = [
+    'create' => true,
+    'update' => true,
+    'from' => [
+        'src' => 'promoter',
+        'ip' => CLIENT_IP,
+        'user-agent' => $_SERVER['HTTP_USER_AGENT'],
+    ],
+];
+
+$user = Util::getCurrentUser($params);
 if (empty($user)) {
     Util::resultAlert('请在微信中打开，谢谢！', 'error');
 }

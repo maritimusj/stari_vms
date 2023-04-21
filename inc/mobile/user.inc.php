@@ -13,7 +13,8 @@ use zovye\model\userModelObj;
 $op = Request::op('default');
 $app_key = Request::str('appkey');
 
-function findApiUser() :? userModelObj {
+function findApiUser(): ?userModelObj
+{
     if (Request::has('id')) {
         $user = User::get(Request::int('id'));
     } elseif (Request::has('openid')) {
@@ -21,6 +22,7 @@ function findApiUser() :? userModelObj {
     } elseif (Request::has('mobile')) {
         $user = User::findOne(['mobile' => Request::str('mobile'), 'app' => Request::int('app', User::WX)]);
     }
+
     return $user ?? null;
 }
 
@@ -46,7 +48,7 @@ if ($op == 'default') {
 
     /** @var userModelObj $user */
     foreach ($query->findAll() as $user) {
-        $data = $user->profile(true);
+        $data = $user->profile(false);
         $data['balance'] = $user->getBalance()->total();
         $result[] = $data;
     }

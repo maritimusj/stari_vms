@@ -116,11 +116,13 @@ if ($op == 'default') {
     if ($agent_id) {
         $agent = Agent::get($agent_id);
         if (empty($agent)) {
-            Request::is_ajax() ? JSON::fail('找不到上传广告的代理商！') : Util::resultAlert('找不到上传广告的代理商！', 'error');
+            Request::is_ajax() ? JSON::fail('找不到上传广告的代理商！') : Util::resultAlert(
+                '找不到上传广告的代理商！',
+                'error'
+            );
         }
         $tpl_data['agent'] = $agent->profile();
     }
-
 
     switch ($adv->getType()) {
         case Advertising::SCREEN:
@@ -186,11 +188,11 @@ if ($op == 'default') {
             $user->updateSettings('customData.sex', Request::int('sex'));
         }
     }
-    
+
     JSON::success([
         'redirect_url' => Util::murl('entry', ['device' => Request::str('device')]),
     ]);
-    
+
 } elseif ($op == 'upload_pic') {
 
     $user = Util::getCurrentUser();
@@ -223,7 +225,7 @@ if ($op == 'default') {
         'create' => true,
         'update' => true,
     ]);
-    
+
     if (empty($user) || $user->isBanned()) {
         JSON::fail('找不到用户！');
     }
@@ -261,7 +263,7 @@ if ($op == 'default') {
         $total = $original->getCommissionBalance()->total();
         $balance_total = $original->getBalance()->total();
 
-        $data =  [
+        $data = [
             'admin' => _W('username'),
             'ip' => CLIENT_IP,
             'user-agent' => $_SERVER['HTTP_USER_AGENT'],
@@ -324,7 +326,7 @@ if ($op == 'default') {
         if (!$user->remove('commission_balance')) {
             return err('无法清除余额缓存！');
         }
-        
+
         if (!$original->remove('balance:cache')) {
             return err('无法清除余额缓存！');
         }
@@ -357,11 +359,11 @@ if ($op == 'default') {
     unset($_SESSION['wx_user_id']);
 
     $entry = Request::trim('entry', 'entry');
-    $url = Util::murl($entry , ['device' => Request::str('device'), 'serial' => Util::random(10)]);
+    $url = Util::murl($entry, ['device' => Request::str('device'), 'serial' => Util::random(10)]);
 
     //设置框架参数
     $_SESSION['dest_url'] = $url;
-    
+
     JSON::success([
         'redirect' => $url,
     ]);

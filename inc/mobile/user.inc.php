@@ -64,7 +64,9 @@ if ($op == 'default') {
     }
 
     $data = $user->profile();
+
     $data['balance'] = $user->getBalance()->total();
+
     JSON::result($data);
 
 } elseif ($op == 'update') {
@@ -85,6 +87,10 @@ if ($op == 'default') {
         'reason' => Request::str('reason', '', true),
         'ip' => Util::getClientIp(),
     ]);
+
+    if (!$result) {
+        JSON::fail('操作失败！');
+    }
 
     JSON::success([
         'balance' => $user->getBalance()->total(),

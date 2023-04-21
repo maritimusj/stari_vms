@@ -8,7 +8,7 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-$title = '第三方api积分统计';
+$title = '';
 
 $content = app()->fetchTemplate('web/common/stats', [
     'chartid' => Util::random(10),
@@ -16,4 +16,4 @@ $content = app()->fetchTemplate('web/common/stats', [
     'chart' => Stats::getBalanceApiStats($title),
 ]);
 
-JSON::success(['title' => '积分第三方接口统计', 'content' => $content]);
+JSON::success(['title' => '接口积分统计', 'content' => $content]);

@@ -1348,7 +1348,26 @@ class Stats
 
     public static function getBalanceApiStats($title): array
     {
-        $chart = self::getChartInitData($title);
+        $chart = [
+            'tooltip' => ['trigger' => 'axis'],
+            'legend' => ['data' => ['增加', '减少'], 'bottom' => 0],
+            'xAxis' => ['type' => 'category'],
+            'yAxis' => ['type' => 'value', 'axisLabel' => ['formatter' => '{value}'], 'minInterval' => 1],
+            'series' => [
+                [
+                    'type' => 'line',
+                    'color' => '#00CC33',
+                    'name' => '增加',
+                    'data' => [],
+                ],
+                [
+                    'type' => 'line',
+                    'color' => '#FF3300',
+                    'name' => '减少',
+                    'data' => [],
+                ],
+            ],
+        ];
 
         try {
             $first = Balance::query(['src' => Balance::API_UPDATE])->orderBy('id asc')->findOne();
@@ -1360,7 +1379,7 @@ class Stats
             $begin = new DateTime('-12 months');
 
             if ($begin->getTimestamp() > $first->getCreatetime()) {
-                $begin->setTimestamp($first->getCreatetime);
+                $begin->setTimestamp($first->getCreatetime());
             }
 
             while ($begin < $end) {
@@ -1375,9 +1394,13 @@ class Stats
 
                 $condition['createtime <'] = $begin->getTimestamp();
 
-                $condition['xval >'] = 0;
+                $condition['x_val >'] = 0;
 
-                $chart['series'][0]['data'][] = Balance::query($condition)->sum('xval');
+                $chart['series'][0]['data'][] = Balance::query($condition)->sum('x_val');
+
+                $condition['x_val <'] = 0;
+
+                $chart['series'][1]['data'][] = Balance::query($condition)->sum('x_val');
             }
 
         } catch (Exception $e) {

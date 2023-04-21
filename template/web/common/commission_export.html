@@ -163,7 +163,7 @@
     <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('op'=>'stats'));}">营收统计</a></li>
     <li role="presentation"><a href="{php echo $this->createWebUrl('withdraw', array('op'=>'stats'));}">提现统计</a></li>
     <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('op'=>'export'));}">订单导出</a></li>
-    <li role="presentation" class="active"><a href="#">佣金明细</a></li>
+    <li role="presentation" class="active"><a href="#">收入明细</a></li>
     <li role="presentation"><a href="{php echo $this->createWebUrl('account', array('op'=>'platformStats'));}">平台分成</a></li>
 </ul>
 
@@ -238,7 +238,7 @@
         </div>
         {elseif $s_openid}
         <div class="text-center" style="color: #ccc;">
-            <i class="fa fa-question-circle"></i> 暂时没有任务佣金明细！
+            <i class="fa fa-question-circle"></i> 暂时没有任务收入明细！
         </div>
         {/if}
     </div> 

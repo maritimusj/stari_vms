@@ -29,7 +29,7 @@ $op = Request::op('default');
 if ($op == 'default') {
 
     if (!$user->isGSPor()) {
-        Util::resultAlert('用户未开通佣金账户！', 'error');
+        Util::resultAlert('用户未开通余额账户！', 'error');
     }
 
     $balance = $user->getCommissionBalance()->total();

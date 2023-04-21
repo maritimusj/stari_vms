@@ -102,7 +102,7 @@ if (Request::bool('is_export')) {
 
         if ($entry->getSrc() == CommissionBalance::WITHDRAW) {
             $status = $entry->getState();
-            $data['event'] = '佣金提现'.$status;
+            $data['event'] = '余额提现'.$status;
         } elseif ($entry->getSrc() == CommissionBalance::REFUND) {
             $data['event'] = '退款';
         } elseif (in_array(

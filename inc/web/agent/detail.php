@@ -25,7 +25,7 @@ $pages = [
         'title' => '订单列表',
     ],
     'commission' => [
-        'title' => '佣金明细',
+        'title' => '收入明细',
     ],
     'withdraw' => [
         'title' => '提现记录',

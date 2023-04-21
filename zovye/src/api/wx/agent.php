@@ -1154,8 +1154,9 @@ class agent
     }
 
     public
-    static function getAssociatedOrderList($condition = []): array
-    {
+    static function getAssociatedOrderList(
+        $condition = []
+    ): array {
         $query = Order::query();
 
         $query->where($condition);
@@ -1542,6 +1543,7 @@ class agent
             if (empty($res)) {
                 return err('用户不存在！');
             }
+
             return self::agentStatsData($res);
         }
 
@@ -1549,6 +1551,7 @@ class agent
             if ($agent->isPartner()) {
                 $agent = $agent->getPartnerAgent();
             }
+
             return self::agentStatsData($agent);
         }
 
@@ -2294,5 +2297,41 @@ class agent
         }
 
         return err('无法启动刷新任务，请联系管理员！');
+    }
+
+    public static function stats(): array
+    {
+        $agent = common::getAgent();
+        try {
+            $res = explode('-', Request::str('date'), 3);
+            if (empty($res)) {
+                return err('请求的时间不正确！');
+            } elseif (count($res) == 1) {
+                $begin = new DateTimeImmutable(sprintf("%d-01-01 00:00", $res[0]));
+                $end = $begin->modify("first day of jan next year");
+            } elseif (count($res) == 2) {
+                $begin = new DateTimeImmutable(sprintf("%d-%02d-01", $res[0], $res[1]));
+                $end = $begin->modify('first day of next month');
+            } else {
+                $begin = new DateTimeImmutable(sprintf("%d-%02d-%02d", $res[0], $res[1], $res[2]));
+                $end = $begin->modify('next day');
+            }
+        } catch (Exception $e) {
+            return err('时间格式不正确！');
+        }
+
+        $now = new DateTime();
+        if ($end > $now) {
+            $end = $now;
+        }
+
+        $cond = [];
+        $cond['agent_id'] = $agent->getId();
+
+        if (Request::has('src')) {
+            $cond['src'] = Request::int('src');
+        }
+
+        return self::getUserStats($agent->getOpenid(), $begin->getTimestamp(), $end->getTimestamp(), $cond);
     }
 }

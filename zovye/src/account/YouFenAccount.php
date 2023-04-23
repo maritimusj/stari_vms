@@ -129,7 +129,7 @@ class YouFenAccount
         string $yf_openid,
         callable $cb = null
     ) {
-        $fans = empty($user) ? Util::fansInfo() : $user->profile();
+        $fans = $user->profile();
         $uid = App::uid(6);
         $data = [
             'app_number' => $this->app_number,

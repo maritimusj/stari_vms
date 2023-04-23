@@ -81,6 +81,7 @@ class Balance
             );
             if ($result && $notify) {
                 $this->onChange($result);
+
                 return $result;
             }
         }
@@ -90,9 +91,10 @@ class Balance
 
     public function onChange(balanceModelObj $item)
     {
-        $notify_url = Config::balance('app.notify_url');
+        $config = Config::balance('app', []);
+        $notify_url = $config['notify_url'];
         if ($notify_url) {
-            $profile = $this->user->profile();
+            $profile = $this->user->profile(false, $config['key']);
             $profile['balance'] = $this->total();
             $profile['change'] = $item->getXVal();
 
@@ -217,28 +219,28 @@ TEXT;
         } elseif ($entry->getSrc() == Balance::ACCOUNT_BONUS) {
             $account_data = $entry->getExtraData('account');
             $account_typehint = [
-                    Account::NORMAL => ['公众号', '成功关注公众号'],
-                    Account::VIDEO => ['视频', '完成观看视频任务'],
-                    Account::DOUYIN => ['抖音', '完成关注抖音号任务'],
-                    Account::WXAPP => ['小程序', '完成进入小程序任务'],
-                    Account::AUTH => ['公众号', '关注公众号'],
-                    Account::JFB => ['准粉吧', '完成关准粉吧任务'],
-                    Account::MOSCALE => ['公锤', '完成公锤任务'],
-                    Account::YUNFENBA => ['云粉吧', '完成云粉吧任务'],
-                    Account::AQIINFO => ['阿旗', '完成阿旗数据平台任务'],
-                    Account::ZJBAO => ['纸巾宝', '完成纸巾宝任务'],
-                    Account::MEIPA => ['美葩', '完成美葩任务'],
-                    Account::KINGFANS => ['金粉吧', '完成金粉吧任务'],
-                    Account::SNTO => ['史莱姆', '完成史莱姆任务'],
-                    Account::YFB => ['粉丝宝', '完成粉丝宝任务'],
-                    Account::WxWORK => ['阿旗(企业微信)', '完成阿旗(企业微信)任务'],
-                    Account::YOUFEN => ['友粉', '完成友粉任务'],
-                    Account::MENGMO => ['涨啊', '完成涨啊任务'],
-                    Account::YIDAO => ['壹道', '完成壹道任务'],
-                    Account::WEISURE => ['微保', '完成微保任务'],
-                    Account::CloudFI => ['中科在线', '完成中科在线任务'],
-                    Account::QUESTIONNAIRE => ['问卷', '完成问卷调查'],
-                ][$account_data['type']] ?? ["未知({$account_data['id']})", '未知事件（任务已删除）'];
+                Account::NORMAL => ['公众号', '成功关注公众号'],
+                Account::VIDEO => ['视频', '完成观看视频任务'],
+                Account::DOUYIN => ['抖音', '完成关注抖音号任务'],
+                Account::WXAPP => ['小程序', '完成进入小程序任务'],
+                Account::AUTH => ['公众号', '关注公众号'],
+                Account::JFB => ['准粉吧', '完成关准粉吧任务'],
+                Account::MOSCALE => ['公锤', '完成公锤任务'],
+                Account::YUNFENBA => ['云粉吧', '完成云粉吧任务'],
+                Account::AQIINFO => ['阿旗', '完成阿旗数据平台任务'],
+                Account::ZJBAO => ['纸巾宝', '完成纸巾宝任务'],
+                Account::MEIPA => ['美葩', '完成美葩任务'],
+                Account::KINGFANS => ['金粉吧', '完成金粉吧任务'],
+                Account::SNTO => ['史莱姆', '完成史莱姆任务'],
+                Account::YFB => ['粉丝宝', '完成粉丝宝任务'],
+                Account::WxWORK => ['阿旗(企业微信)', '完成阿旗(企业微信)任务'],
+                Account::YOUFEN => ['友粉', '完成友粉任务'],
+                Account::MENGMO => ['涨啊', '完成涨啊任务'],
+                Account::YIDAO => ['壹道', '完成壹道任务'],
+                Account::WEISURE => ['微保', '完成微保任务'],
+                Account::CloudFI => ['中科在线', '完成中科在线任务'],
+                Account::QUESTIONNAIRE => ['问卷', '完成问卷调查'],
+            ][$account_data['type']] ?? ["未知({$account_data['id']})", '未知事件（任务已删除）'];
 
             $account_info = "<dt>$account_typehint[0]</dt><dd class=\"user\"><img src=\"{$account_data['img']}\" alt=''/>{$account_data['title']}</dd>";
             $data['memo'] = <<<TEXT

@@ -161,7 +161,7 @@ class userModelObj extends modelObj
         return $this->app == User::PSEUDO;
     }
 
-    public function profile($detail = true): array
+    public function profile($detail = true, $uid_secret_key = ''): array
     {
         $data = [
             'id' => $this->getId(),
@@ -171,6 +171,11 @@ class userModelObj extends modelObj
             'headimgurl' => $this->getAvatar(),
             'mobile' => $this->getMobile(),
         ];
+
+        if ($uid_secret_key) {
+            $data['uid'] = sha1("$uid_secret_key.{$this->getId()}");
+            unset($data['id']);
+        }
 
         if ($detail) {
             $fans_data = $this->get('fansData', []);

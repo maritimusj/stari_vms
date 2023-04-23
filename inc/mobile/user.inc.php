@@ -27,12 +27,6 @@ function findApiUser($app_key): ?userModelObj
     return $user ?? null;
 }
 
-function updateUID($app_key, &$data)
-{
-    $data['uid'] = sha1("$app_key{$data['id']}");
-    unset($data['id']);
-}
-
 if (empty($app_key) || $app_key !== Config::balance('app.key')) {
     JSON::fail('非法请求！');
 }
@@ -64,10 +58,7 @@ if ($op == 'default') {
 
     /** @var userModelObj $user */
     foreach ($query->findAll() as $user) {
-        $data = $user->profile(false);
-
-        updateUID($app_key, $data);
-        
+        $data = $user->profile(false, $app_key);
         $app = User::getUserCharacter($user);
         if ($app) {
             $data['app'] = [
@@ -90,9 +81,7 @@ if ($op == 'default') {
         JSON::fail('用户不存在！');
     }
 
-    $data = $user->profile();
-
-    updateUID($app_key, $data);
+    $data = $user->profile(false, $app_key);
 
     $data['balance'] = $user->getBalance()->total();
 

@@ -11,33 +11,71 @@
     <li role="presentation"><a
             href="{php echo $this->createWebUrl('account', array('op'=>'platformStats'));}">平台分成</a></li>
 </ul>
-<div class="panel panel-default nav-tab-item">
-    <div class="panel-body">
-        <div id="app">
-            <table class="table table-bordered" id="list">
-                <thead>
-                <tr class="active">
-                    <td>#</td>
-                    <td>名称</td>
-                    <td>金额</td>
-                    <td>数量</td>
-                </tr>
-                </thead>
-                <tr v-for="(item, index) in result.list" :key="item.id">
-                    <td>{{index + 1}}}</td>
-                    <td>
-                        <div>
-                            {{item.agent.name}}
-                        </div>
-                    </td>
-                    <td>
-                        {{ite.price}}
-                    </td>
-                    <td>
-                        {{item.total}}
-                    </td>
-                </tr>
-            </table>
+<div id="app">
+    <div class="panel panel-default nav-tab-item">
+        <div class="heading">
+            <span class="operate">
+                <i class="fa fa-reply" title="返回" @click="agent=null" v-show="agent"></i>
+            </span>        
+        </div>
+        <div class="panel-body">
+                <table class="table table-bordered" id="list" v-if="!agent">
+                    <thead>
+                    <tr class="active">
+                        <td class="center">排名</td>
+                        <td>代理商</td>
+                        <td class="center">金额</td>
+                        <td class="center">数量</td>
+                    </tr>
+                    </thead>
+                    <tr v-for="(item, index) in agentList.list">
+                        <td class="center">{{index + 1}}</td>
+                        <td>
+                            <div v-if="item.agent" @click="view(item.agent)">
+                                <div class="profile agent" style="position:relative">
+                                    <img :src="item.agent.avatar">
+                                    <span v-text="item.agent.name"></span>
+                                </div> 
+                            </div>
+                        </td>
+                        <td class="center">
+                            {{item.price}}
+                        </td>
+                        <td class="center">
+                            {{item.total}}
+                        </td>
+                    </tr>
+                </table>
+                <table class="table table-bordered" id="list" v-if="agent">
+                    <thead>
+                    <tr class="active">
+                        <td class="center">排名</td>
+                        <td>设备</td>
+                        <td>IMEI</td>
+                        <td class="center">金额</td>
+                        <td class="center">数量</td>
+                    </tr>
+                    </thead>
+                    <tr v-for="(item, index) in deviceList.list">
+                        <td class="center">{{index + 1}}</td>
+                        <td>
+                            <div v-if="item.device">
+                                {{item.device.name}}
+                            </div>
+                        </td>
+                        <td>
+                            <div v-if="item.device">
+                                {{item.device.imei}}
+                            </div>
+                        </td>
+                        <td class="center">
+                            {{item.price}}
+                        </td>
+                        <td class="center">
+                            {{item.total}}
+                        </td>
+                    </tr>
+                </table>
         </div>
     </div>
 </div>
@@ -49,10 +87,15 @@
         new Vue({
             el: "#app",
             data: {
-                result: {
+                agentList: {
                     list: [],
                     title: '',
-                }
+                },
+                deviceList: {
+                    list: [],
+                    title: '',
+                },
+                agent: null,
             },
             mounted() {
                 this.getAgentList();
@@ -62,7 +105,22 @@
                     const self = this;
                     $.getJSON(apiUrl, {fn: 'agent'}).then(res => {
                         if (res && res.status) {
-                            self.result = res.data;
+                            self.agentList = res.data;
+                        }
+                    })
+                },
+                view(agent) {
+                    if (agent) {
+                        this.agent = agent;
+                        this.getDeviceList(agent.id);
+                    }
+                },
+                getDeviceList(id) {
+                    const self = this;
+                    self.deviceList = [];
+                    $.getJSON(apiUrl, {fn: 'device', id}).then(res => {
+                        if (res && res.status) {
+                            self.deviceList = res.data;
                         }
                     })
                 }

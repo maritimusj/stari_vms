@@ -1,16 +1,73 @@
 {template 'common/header'}
 {php \zovye\url(true, 'static/css/common.css?v=20220516');}
 <ul class="nav nav-tabs" id="navbar">
-  <li role="presentation"><a href="{php echo $this->createWebUrl('homepage', array('op'=>'default'));}">首页</a></li>
-  <li role="presentation"  class="active"><a href="#">营收统计</a></li>
-  <li role="presentation" ><a href="{php echo $this->createWebUrl('withdraw', array('op'=>'stats'));}">提现统计</a></li>
-  <li role="presentation" ><a href="{php echo $this->createWebUrl('order', array('op'=>'export'));}">订单导出</a></li>
-  <li role="presentation" ><a href="{php echo $this->createWebUrl('agent', array('op'=>'commission_export'));}">收入明细</a></li>
-  <li role="presentation" ><a href="{php echo $this->createWebUrl('account', array('op'=>'platformStats'));}">平台分成</a></li>
+    <li role="presentation"><a href="{php echo $this->createWebUrl('homepage', array('op'=>'default'));}">首页</a></li>
+    <li role="presentation" class="active"><a href="#">营收统计</a></li>
+    <li role="presentation"><a href="{php echo $this->createWebUrl('withdraw', array('op'=>'stats'));}">提现统计</a>
+    </li>
+    <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('op'=>'export'));}">订单导出</a></li>
+    <li role="presentation"><a
+            href="{php echo $this->createWebUrl('agent', array('op'=>'commission_export'));}">收入明细</a></li>
+    <li role="presentation"><a
+            href="{php echo $this->createWebUrl('account', array('op'=>'platformStats'));}">平台分成</a></li>
 </ul>
 <div class="panel panel-default nav-tab-item">
-  <div class="panel-body">
-  </div>
+    <div class="panel-body">
+        <div id="app">
+            <table class="table table-bordered" id="list">
+                <thead>
+                <tr class="active">
+                    <td>#</td>
+                    <td>名称</td>
+                    <td>金额</td>
+                    <td>数量</td>
+                </tr>
+                </thead>
+                <tr v-for="(item, index) in result.list" :key="item.id">
+                    <td>{{index + 1}}}</td>
+                    <td>
+                        <div>
+                            {{item.agent.name}}
+                        </div>
+                    </td>
+                    <td>
+                        {{ite.price}}
+                    </td>
+                    <td>
+                        {{item.total}}
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
 </div>
 
+<script>
+    const vuejsUrl = "{php \zovye\url(false, JS_VUE_URL);}";
+    const apiUrl = "{$api_url}";
+    require(['jquery', 'util', vuejsUrl], function ($, util, Vue) {
+        new Vue({
+            el: "#app",
+            data: {
+                result: {
+                    list: [],
+                    title: '',
+                }
+            },
+            mounted() {
+                this.getAgentList();
+            },
+            methods: {
+                getAgentList() {
+                    const self = this;
+                    $.getJSON(apiUrl, {fn: 'agent'}).then(res => {
+                        if (res && res.status) {
+                            self.result = res.data;
+                        }
+                    })
+                }
+            }
+        })
+    })
+</script>
 {template 'common/footer'}

@@ -98,6 +98,7 @@
         new Vue({
             el: "#app",
             data: {
+                years: JSON.parse(`{php echo json_encode($years)}`),
                 agentList: {
                     list: [],
                     title: '',

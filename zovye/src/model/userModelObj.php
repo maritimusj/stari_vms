@@ -161,7 +161,7 @@ class userModelObj extends modelObj
         return $this->app == User::PSEUDO;
     }
 
-    public function profile($detail = true, $uid_secret_key = ''): array
+    public function profile($detail = true, $secret_key = ''): array
     {
         $data = [
             'id' => $this->getId(),
@@ -172,8 +172,8 @@ class userModelObj extends modelObj
             'mobile' => $this->getMobile(),
         ];
 
-        if ($uid_secret_key) {
-            $data['uid'] = sha1("$uid_secret_key{$this->getId()}");
+        if ($secret_key) {
+            $data['uid'] = Util::encrypt($this->getId(), $secret_key);
             unset($data['id']);
         }
 

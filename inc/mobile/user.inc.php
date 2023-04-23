@@ -18,7 +18,8 @@ function findApiUser(): ?userModelObj
     if (Request::has('uid')) {
         $uid = Request::str('uid');
         $app_key = Request::str('appkey');
-        $user = User::findOne("SHA1(CONCAT('$app_key', id))='$uid'");
+        $id = Util::decrypt($uid, $app_key);
+        $user = User::get($id);
     } elseif (Request::has('openid')) {
         $user = User::get(Request::str('openid'), true);
     } elseif (Request::has('mobile')) {

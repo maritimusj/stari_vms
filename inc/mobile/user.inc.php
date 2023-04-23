@@ -15,11 +15,8 @@ $app_key = Request::str('appkey');
 
 function findApiUser(): ?userModelObj
 {
-    if (Request::has('uid')) {
-        $uid = Request::str('uid');
-        $app_key = Request::str('appkey');
-        $id = Util::decrypt($uid, $app_key);
-        $user = User::get($id);
+    if (Request::has('id')) {
+        $user = User::get(Request::int('id'));
     } elseif (Request::has('openid')) {
         $user = User::get(Request::str('openid'), true);
     } elseif (Request::has('mobile')) {
@@ -60,7 +57,7 @@ if ($op == 'default') {
 
     /** @var userModelObj $user */
     foreach ($query->findAll() as $user) {
-        $data = $user->profile(false, $app_key);
+        $data = $user->profile(false);
         $app = User::getUserCharacter($user);
         if ($app) {
             $data['app'] = [
@@ -83,7 +80,7 @@ if ($op == 'default') {
         JSON::fail('用户不存在！');
     }
 
-    $data = $user->profile(false, $app_key);
+    $data = $user->profile(false);
 
     $data['balance'] = $user->getBalance()->total();
 

@@ -3320,23 +3320,4 @@ HTML_CONTENT;
 
         return $balance_obj;
     }
-
-    public static function encrypt($string, $key): string
-    {
-        $cipher = "AES-256-CBC";
-        $len = openssl_cipher_iv_length($cipher);
-        $iv = openssl_random_pseudo_bytes($len);
-        $ciphertext = openssl_encrypt($string, $cipher, $key, 0, $iv);
-        return base64_encode($iv . $ciphertext);
-    }
-
-    // Decrypt a string
-    public static function decrypt($string, $key) {
-        $cipher = "AES-256-CBC";
-        $len = openssl_cipher_iv_length($cipher);
-        $c = base64_decode($string);
-        $iv = substr($c, 0, $len);
-        $ciphertext = substr($c, $len);
-        return openssl_decrypt($ciphertext, $cipher, $key, 0, $iv);
-    }
 }

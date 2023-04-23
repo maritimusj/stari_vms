@@ -91,10 +91,9 @@ class Balance
 
     public function onChange(balanceModelObj $item)
     {
-        $config = Config::balance('app', []);
-        $notify_url = $config['notify_url'];
+        $notify_url = Config::balance('app.notify_url');
         if ($notify_url) {
-            $profile = $this->user->profile(false, $config['key']);
+            $profile = $this->user->profile(false);
             $profile['balance'] = $this->total();
             $profile['change'] = $item->getXVal();
 

@@ -13,10 +13,11 @@ use zovye\model\userModelObj;
 $op = Request::op('default');
 $app_key = Request::str('appkey');
 
-function findApiUser(): ?userModelObj
+function findApiUser($app_key): ?userModelObj
 {
-    if (Request::has('id')) {
-        $user = User::get(Request::int('id'));
+    if (Request::has('uid')) {
+        $uid = Request::str('uid');
+        $user = User::findOne("SHA1(CONCAT('$app_key', id))='$uid'");
     } elseif (Request::has('openid')) {
         $user = User::get(Request::str('openid'), true);
     } elseif (Request::has('mobile')) {
@@ -24,6 +25,12 @@ function findApiUser(): ?userModelObj
     }
 
     return $user ?? null;
+}
+
+function updateUID($app_key, &$data)
+{
+    $data['uid'] = sha1("$app_key{$data['id']}");
+    unset($data['id']);
 }
 
 if (empty($app_key) || $app_key !== Config::balance('app.key')) {
@@ -58,6 +65,9 @@ if ($op == 'default') {
     /** @var userModelObj $user */
     foreach ($query->findAll() as $user) {
         $data = $user->profile(false);
+
+        updateUID($app_key, $data);
+        
         $app = User::getUserCharacter($user);
         if ($app) {
             $data['app'] = [
@@ -74,7 +84,7 @@ if ($op == 'default') {
 
 } elseif ($op == 'detail') {
 
-    $user = findApiUser();
+    $user = findApiUser($app_key);
 
     if (empty($user)) {
         JSON::fail('用户不存在！');
@@ -82,13 +92,15 @@ if ($op == 'default') {
 
     $data = $user->profile();
 
+    updateUID($app_key, $data);
+
     $data['balance'] = $user->getBalance()->total();
 
     JSON::result($data);
 
 } elseif ($op == 'update') {
 
-    $user = findApiUser();
+    $user = findApiUser($app_key);
 
     if (empty($user)) {
         JSON::fail('用户不存在！');

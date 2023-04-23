@@ -46,6 +46,10 @@ if ($op == 'default') {
         $query->where(['mobile' => $mobile]);
     }
 
+    if (Request::isset('app')) {
+        $query->where(['app' => Request::int('app')]);
+    }
+
     $query->page($page, $page_size);
     $query->orderBy('id DESC');
 

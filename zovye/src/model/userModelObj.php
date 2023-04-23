@@ -173,7 +173,7 @@ class userModelObj extends modelObj
         ];
 
         if ($uid_secret_key) {
-            $data['uid'] = sha1("$uid_secret_key.{$this->getId()}");
+            $data['uid'] = sha1("$uid_secret_key{$this->getId()}");
             unset($data['id']);
         }
 

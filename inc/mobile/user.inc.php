@@ -13,10 +13,11 @@ use zovye\model\userModelObj;
 $op = Request::op('default');
 $app_key = Request::str('appkey');
 
-function findApiUser($app_key): ?userModelObj
+function findApiUser(): ?userModelObj
 {
     if (Request::has('uid')) {
         $uid = Request::str('uid');
+        $app_key = Request::str('appkey');
         $user = User::findOne("SHA1(CONCAT('$app_key', id))='$uid'");
     } elseif (Request::has('openid')) {
         $user = User::get(Request::str('openid'), true);
@@ -75,7 +76,7 @@ if ($op == 'default') {
 
 } elseif ($op == 'detail') {
 
-    $user = findApiUser($app_key);
+    $user = findApiUser();
 
     if (empty($user)) {
         JSON::fail('用户不存在！');
@@ -89,7 +90,7 @@ if ($op == 'default') {
 
 } elseif ($op == 'update') {
 
-    $user = findApiUser($app_key);
+    $user = findApiUser();
 
     if (empty($user)) {
         JSON::fail('用户不存在！');

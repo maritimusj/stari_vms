@@ -11,10 +11,16 @@
     <li role="presentation"><a
             href="{php echo $this->createWebUrl('account', array('op'=>'platformStats'));}">平台分成</a></li>
 </ul>
+{if $years}
 <div id="app">
     <div class="panel panel-default nav-tab-item">
         <div class="heading">
             <span class="operate">
+                <div>
+                    <span v-for="year in years">
+                        {{year}}
+                    </span>
+                </div>
                 <i class="fa fa-reply" title="返回" @click="agent=null" v-show="agent"></i>
             </span>        
         </div>
@@ -79,6 +85,11 @@
         </div>
     </div>
 </div>
+{else}
+<div class="text-center text-muted">
+    <i class="fa fa-question-circle"></i> 暂时没有数据！
+</div>
+{/if}
 
 <script>
     const vuejsUrl = "{php \zovye\url(false, JS_VUE_URL);}";

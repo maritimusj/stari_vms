@@ -7,6 +7,7 @@
 
 namespace zovye;
 
+use DateTime;
 use DateTimeImmutable;
 use Exception;
 
@@ -16,7 +17,21 @@ $fn = Request::str('fn', 'default');
 
 if ($fn == 'default') {
 
+    $years = [];
+    $first_order = Order::getFirstOrder();
+    if ($first_order) {
+        $begin = new DateTime();
+        $begin->setTimestamp($first_order['createtime']);
+        $begin->modify('first day of jan 00:00 this year');
+        $now = new DateTime();
+        while ($begin < $now) {
+            $years[] = $begin->format('Y年');
+            $begin->modify('next year');
+        }
+    }
+
     $tpl_data = [
+        'years' => $years,
         'api_url' => Util::url('fueling', ['op' => 'stats']),
     ];
 

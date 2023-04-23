@@ -75,14 +75,14 @@ class User
             'wxapp' => [
                 'id' => self::WxAPP,
                 'name' => 'wxapp',
-                'title' => '小程序',
+                'title' => '微信小程序',
                 'color' => '#00d410',
                 'icon' => MODULE_URL."static/img/wxapp.jpg",
             ],
             'wx' => [
                 'id' => self::WX,
                 'name' => 'wx',
-                'title' => '微信',
+                'title' => '微信公众号',
                 'color' => '#4CAF50',
                 'icon' => MODULE_URL."static/img/wxpay.jpg",
             ],

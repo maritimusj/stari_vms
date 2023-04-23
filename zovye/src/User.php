@@ -15,15 +15,15 @@ use zovye\base\modelObjFinder;
  */
 class User
 {
-    const PSEUDO = -1;   //虚拟用户
+    const PSEUDO = -1;      //虚拟用户
 
-    const WX = 0;   //微信H5用户
-    const WxAPP = 1;    //微信小程序用户
-    const ALI = 2;  //阿里支付宝用户
-    const DouYin = 3;   //抖音用户
-    const API = 10;     //API用户
+    const WX = 0;           //微信H5用户
+    const WxAPP = 1;        //微信小程序用户
+    const ALI = 2;          //阿里支付宝用户
+    const DouYin = 3;       //抖音用户
+    const API = 10;         //API用户
     const THIRD_ACCOUNT = 15;   //第三方公众号
-    const PROMO = 20; //PROMO 用户
+    const PROMO = 20;       //PROMO 用户
 
     const UNKNOWN = 0;
     const MALE = 1;
@@ -66,48 +66,56 @@ class User
     {
         static $data = [
             'ali' => [
+                'id' => self::ALI,
                 'name' => 'ali',
                 'title' => '支付宝',
                 'color' => '#1296DB',
                 'icon' => MODULE_URL."static/img/alipay.jpg",
             ],
             'wxapp' => [
+                'id' => self::WxAPP,
                 'name' => 'wxapp',
                 'title' => '小程序',
                 'color' => '#00d410',
                 'icon' => MODULE_URL."static/img/wxapp.jpg",
             ],
             'wx' => [
+                'id' => self::WX,
                 'name' => 'wx',
                 'title' => '微信',
                 'color' => '#4CAF50',
                 'icon' => MODULE_URL."static/img/wxpay.jpg",
             ],
             'api' => [
+                'id' => self::API,
                 'name' => 'api',
                 'title' => '第三方API用户',
                 'color' => '#4CAF50',
                 'icon' => MODULE_URL."static/img/api.svg",
             ],
             'third' => [
+                'id' => self::THIRD_ACCOUNT,
                 'name' => 'api',
                 'title' => '第三方公众号授权用户',
                 'color' => '#4CAF50',
                 'icon' => MODULE_URL."static/img/third.svg",
             ],
             'douyin' => [
+                'id' => self::DouYin,
                 'name' => 'douyin',
                 'title' => '抖音',
                 'color' => '#4CAF50',
                 'icon' => MODULE_URL."static/img/douyin.svg",
             ],
             'promo' => [
+                'id' => self::PROMO,
                 'name' => 'promo',
                 'title' => '推广用户',
                 'color' => '#ff9800',
                 'icon' => MODULE_URL."static/img/promo.svg",
             ],
             'pseudo' => [
+                'id' => self::PSEUDO,
                 'name' => 'pseudo',
                 'title' => '虚拟用户',
                 'color' => '#9e9e9e',

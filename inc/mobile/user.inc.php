@@ -41,6 +41,11 @@ if ($op == 'default') {
     $page = Request::int('page', 1);
     $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
+    $mobile = Request::trim('mobile');
+    if ($mobile) {
+        $query->where(['mobile' => $mobile]);
+    }
+
     $query->page($page, $page_size);
     $query->orderBy('id DESC');
 
@@ -49,6 +54,14 @@ if ($op == 'default') {
     /** @var userModelObj $user */
     foreach ($query->findAll() as $user) {
         $data = $user->profile(false);
+        $app = User::getUserCharacter($user);
+        if ($app) {
+            $data['app'] = [
+                'id' => $app['id'],
+                'name' => $app['name'],
+                'title' => $app['title'],
+            ];
+        }
         $data['balance'] = $user->getBalance()->total();
         $result[] = $data;
     }

@@ -169,7 +169,7 @@ function getParsedDate(): array
             $end = new DateTime(sprintf("%d-01-01 00:00", $res[0]));
             $end->modify("first day of jan next year");
         } elseif (count($res) == 2) {
-            $end = new DateTimeImmutable(sprintf("%d-%02d-01", $res[0], $res[1]));
+            $end = new DateTime(sprintf("%d-%02d-01", $res[0], $res[1]));
             $end->modify('first day of next month');
         } elseif (count($res) == 3) {
             $end = new DateTime(sprintf("%d-%02d-%02d", $res[0], $res[1], $res[2]));

@@ -21,17 +21,24 @@ if ($fn == 'default') {
     $first_order = Order::getFirstOrder();
     if ($first_order) {
         $begin = new DateTime();
+
         $begin->setTimestamp($first_order['createtime']);
         $begin->modify('first day of jan 00:00 this year');
+
         $now = new DateTime();
         while ($begin < $now) {
-            $years[] = $begin->format('Y年');
+            $years[] = $begin->format('Y');
             $begin->modify('next year');
         }
     }
 
+    $begin = new DateTime('first day of this month');
+    $end = new DateTime();
+
     $tpl_data = [
         'years' => $years,
+        's_start_date' => $begin->format('Y-m-d'),
+        's_end_date' => $end->format('Y-m-d'),
         'api_url' => Util::url('fueling', ['op' => 'stats']),
     ];
 
@@ -42,26 +49,50 @@ if ($fn == 'default') {
     extract(getParsedDate());
 
     $query = Order::query();
-    $query->where(['createtime <=' => $begin->getTimestamp()]);
-    $query->where(['createtime >' => $end->getTimestamp()]);
+
+    if ($begin) {
+        $query->where(['createtime >=' => $begin->getTimestamp()]);
+    }
+   
+    if ($end) {
+        $query->where(['createtime <' => $end->getTimestamp()]);
+    }
+    
     $query->groupBy('agent_id');
     $query->orderBy('price DESC');
 
     $list = [];
-    foreach ($query->getAll(['agent_id', 'SUM(price) AS price', 'SUM(num) AS total']) as $item) {
+    $summary = [
+        'order' => 0,
+        'price' => 0,
+        'amount' => 0,
+    ];
+    foreach ($query->getAll(['agent_id', 'COUNT(*) AS total', 'SUM(price) AS price', 'SUM(num) AS amount']) as $item) {
         $agent = Agent::get($item['agent_id']);
         if ($agent) {
+            $device_total = Device::query(['agent_id' => $agent->getId()])->count();
             $list[] = [
                 'agent' => $agent->profile(false),
+                'devices_total' => $device_total,
+                'order_total' => intval($item['total']),
                 'price' => number_format($item['price'] / 100, 2, '.', ''),
-                'total' => number_format($item['total'] / 100, 2, '.', ''),
+                'amount' => number_format($item['amount'] / 100, 2, '.', ''),
             ];
+            $summary['order'] += intval($item['total']);
+            $summary['price'] += $item['price'];
+            $summary['amount'] += $item['amount'];
         }
     }
 
+    $summary['price'] = number_format($summary['price'] / 100, 2, '.', '');
+    $summary['amount'] = number_format($summary['amount'] / 100, 2, '.', '');
+
     JSON::success([
+        'begin' => isset($begin) ? $begin->format('Y-m-d') : '',
+        'end' => isset($end) ? $end->modify('-1 day')->format('Y-m-d') : '',
         'list' => $list,
         'title' => $title,
+        'summary' => $summary,
     ]);
 
 } elseif ($fn == 'device') {
@@ -74,57 +105,78 @@ if ($fn == 'default') {
 
     $query = Order::query(['agent_id' => $agent->getId()]);
 
-    $query->where(['createtime <=' => $begin->getTimestamp()]);
-    $query->where(['createtime >' => $end->getTimestamp()]);
+    if ($begin) {
+        $query->where(['createtime >=' => $begin->getTimestamp()]);
+    }
+   
+    if ($end) {
+        $query->where(['createtime <' => $end->getTimestamp()]);
+    }
+
     $query->groupBy('device_id');
     $query->orderBy('price DESC');
 
     $list = [];
-    foreach ($query->getAll(['device_id', 'SUM(price) AS price', 'SUM(num) AS total']) as $item) {
+    $summary = [
+        'order' => 0,
+        'price' => 0,
+        'amount' => 0,
+    ];
+    foreach ($query->getAll(['device_id', 'COUNT(*) AS total', 'SUM(price) AS price', 'SUM(num) AS amount']) as $item) {
         $device = Device::get($item['device_id']);
         if ($device) {
             $list[] = [
                 'device' => $device->profile(),
+                'order_total' => intval($item['total']),
                 'price' => number_format($item['price'] / 100, 2, '.', ''),
-                'total' => number_format($item['total'] / 100, 2, '.', ''),
+                'amount' => number_format($item['amount'] / 100, 2, '.', ''),
             ];
+            $summary['order'] += intval($item['total']);
+            $summary['price'] += $item['price'];
+            $summary['amount'] += $item['amount'];
         }
     }
 
+    $summary['price'] = number_format($summary['price'] / 100, 2, '.', '');
+    $summary['amount'] = number_format($summary['amount'] / 100, 2, '.', '');
+
     JSON::success([
+        'begin' => isset($begin) ? $begin->format('Y-m-d') : '',
+        'end' => isset($end) ? $end->modify('-1 day')->format('Y-m-d') : '',
         'list' => $list,
         'title' => $title,
+        'summary' => $summary,
     ]);
 }
 
 function getParsedDate(): array
 {
-    $title = '';
     try {
-        $res = explode('-', Request::str('date'), 3);
-        if (count($res) == 1) {
-            $begin = new DateTimeImmutable(sprintf("%d-01-01 00:00", $res[0]));
-            $end = $begin->modify("first day of jan next year");
-            $title = $begin->format('Y年');
+        $res = explode('-', Request::str('begin'), 3);
+        if (count($res) == 1 && !empty($res[0])) {
+            $begin = new DateTime(sprintf("%d-01-01 00:00", $res[0]));
         } elseif (count($res) == 2) {
-            $begin = new DateTimeImmutable(sprintf("%d-%02d-01", $res[0], $res[1]));
-            $end = $begin->modify('first day of next month');
-            $title = $begin->format('Y年m月');
-        } else {
-            $begin = new DateTimeImmutable(sprintf("%d-%02d-%02d", $res[0], $res[1], $res[2]));
-            $end = $begin->modify('next day');
-            $title = $begin->format('Y年m月d日');
+            $begin = new DateTime(sprintf("%d-%02d-01", $res[0], $res[1]));
+        } elseif (count($res) == 3) {
+            $begin = new DateTime(sprintf("%d-%02d-%02d", $res[0], $res[1], $res[2]));
         }
     } catch (Exception $e) {
     }
 
-    if (!isset($begin)) {
-        $begin = new DateTimeImmutable('today 00:00');
+    try {
+        $res = explode('-', Request::str('end'), 3);
+        if (count($res) == 1 && !empty($res[0])) {
+            $end = new DateTime(sprintf("%d-01-01 00:00", $res[0]));
+            $end->modify("first day of jan next year");
+        } elseif (count($res) == 2) {
+            $end = new DateTimeImmutable(sprintf("%d-%02d-01", $res[0], $res[1]));
+            $end->modify('first day of next month');
+        } elseif (count($res) == 3) {
+            $end = new DateTime(sprintf("%d-%02d-%02d", $res[0], $res[1], $res[2]));
+            $end->modify('next day');
+        }
+    } catch (Exception $e) {
     }
 
-    if (!isset($end)) {
-        $end = new DateTimeImmutable('tomorrow 00:00');
-    }
-
-    return ['begin' => $begin, 'end' => $end, 'title' => $title];
+    return ['begin' => $begin, 'end' => $end];
 }

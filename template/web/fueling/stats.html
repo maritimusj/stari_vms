@@ -1,5 +1,64 @@
 {template 'common/header'}
 {php \zovye\url(true, 'static/css/common.css?v=20220516');}
+<style>
+    [v-cloak] {
+        display: none;
+    }
+    .device-list {
+        position: relative;
+    }
+    .year.active {
+        font-weight: bolder;
+    }
+    .operate .btn {
+        padding: 0;
+        border: 0;
+    }
+    .toolbar {
+        display: flex;
+        align-items: center;
+    }
+    .toolbar .year {
+        cursor: pointer;
+        text-decoration: underline;
+        margin-left: 3px;
+        color: #ccc;
+    }
+    .toolbar .year:hover {
+        color: #3f51b5;
+    }
+    .toolbar .year.active {
+        color: #3f51b5;
+    }
+    #app .toolbar .agent {
+        float: right;
+        width: unset;
+        overflow: hidden;
+    }
+    #app .toolbar .agent img {
+        width: 30px;
+        height: 30px;
+        left: 0;
+    }
+    #app  .agent {
+        cursor: pointer;
+    }
+    #app .device-total {
+        cursor: pointer;
+    }
+    #app .device-total:hover {
+        color: #3f51b5;
+    }
+    #app .summary {
+        float: right;
+    }
+    #app .date-title {
+        color: #ccc;
+    }
+    #app .date-title.active {
+        color: #3f51b5;
+    }
+</style>
 <ul class="nav nav-tabs" id="navbar">
     <li role="presentation"><a href="{php echo $this->createWebUrl('homepage', array('op'=>'default'));}">首页</a></li>
     <li role="presentation" class="active"><a href="#">营收统计</a></li>
@@ -12,52 +71,102 @@
             href="{php echo $this->createWebUrl('account', array('op'=>'platformStats'));}">平台分成</a></li>
 </ul>
 {if $years}
-<div id="app">
+<div id="app" v-cloak>
     <div class="panel panel-default nav-tab-item">
         <div class="heading">
-            <span class="operate">
+            <span class="operate toolbar">
+                <div class="profile agent selected" style="position:relative" v-if="agent" @click="back()" title="返回">
+                    <img :src="agent.avatar">
+                    <span v-text="agent.name"></span>
+                    &nbsp;
+                    <i class="fa fa-reply" title="返回"></i> 
+                </div>
                 <div>
-                    <span v-for="year in years">
-                        {{year}}
+                    <span v-for="y in years" class="year" :class="{'active': year == y}" :title="y+'年'"
+                    @click="changeYear(y)">
+                        {{y}}
                     </span>
                 </div>
-                <i class="fa fa-reply" title="返回" @click="agent=null" v-show="agent"></i>
+                <div>
+                    <input name="datelimit[start]" type="hidden" value="{php echo $s_start_date}"/>
+                    <input name="datelimit[end]" type="hidden" value="{php echo $s_end_date}"/>
+                    <button class="btn btn-default daterange daterange-date" type="button">
+                    <span class="date-title" :class="{'active': !year}">
+                        {if empty($s_start_date) && empty($s_end_date)}
+                        {else}
+                        {$s_start_date} 至 {$s_end_date}
+                        {/if}
+                    </span> <i class="fa fa-calendar"></i>
+                    </button>
+                </div>
             </span>        
         </div>
         <div class="panel-body">
-                <table class="table table-bordered" id="list" v-if="!agent">
-                    <thead>
-                    <tr class="active">
-                        <td class="center">排名</td>
-                        <td>代理商</td>
-                        <td class="center">金额</td>
-                        <td class="center">数量</td>
-                    </tr>
-                    </thead>
-                    <tr v-for="(item, index) in agentList.list">
-                        <td class="center">{{index + 1}}</td>
-                        <td>
-                            <div v-if="item.agent" @click="view(item.agent)">
-                                <div class="profile agent" style="position:relative">
-                                    <img :src="item.agent.avatar">
-                                    <span v-text="item.agent.name"></span>
-                                </div> 
+            <div class="text-center text-muted" v-show="loading">
+                <i class="fa fa-question-circle"></i> 正在加载中...
+            </div>
+            <table class="table table-bordered" id="list" v-if="!agent && !loading">
+                <thead>
+                <tr class="active">
+                    <td class="center">#</td>
+                    <td>代理商</td>
+                    <td class="center">设备总数</td>
+                    <td class="center">订单总数</td>
+                    <td class="center">金额</td>
+                    <td class="center">数量</td>
+                </tr>
+                </thead>
+                <tr v-for="(item, index) in agentList.list">
+                    <td class="center">{{index + 1}}</td>
+                    <td>
+                        <div v-if="item.agent" title="查看代理商设备统计">
+                            <div class="profile agent selected" style="position:relative" @click="view(item.agent)">
+                                <img :src="item.agent.avatar">
+                                <span v-text="item.agent.name"></span>
+                            </div> 
+                        </div>
+                    </td>
+                    <td class="center">
+                        <span class="device-total" @click="view(item.agent)">
+                        {{item.devices_total}}
+                        </span>
+                    </td>
+                    <td class="center">
+                        <span class="order-total">
+                            {{item.order_total}}
+                        </span>
+                        </td>
+                    <td class="center">
+                        {{item.price}}
+                    </td>
+                    <td class="center">
+                        {{item.amount}}
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="6">
+                        <div class="summary" v-if="agentList.summary">
+                            <div class="item">
+                                订单合计：{{agentList.summary.order}}
                             </div>
-                        </td>
-                        <td class="center">
-                            {{item.price}}
-                        </td>
-                        <td class="center">
-                            {{item.total}}
-                        </td>
-                    </tr>
-                </table>
-                <table class="table table-bordered" id="list" v-if="agent">
+                            <div class="item">
+                                金额合计：¥ {{agentList.summary.price}}
+                            </div>
+                            <div class="item">
+                                数量合计：{{agentList.summary.amount}}
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <div class="device-list" v-if="agent && !loading">
+                <table class="table table-bordered" id="list">
                     <thead>
                     <tr class="active">
-                        <td class="center">排名</td>
+                        <td class="center">#</td>
                         <td>设备</td>
                         <td>IMEI</td>
+                        <td class="center">订单总数</td>
                         <td class="center">金额</td>
                         <td class="center">数量</td>
                     </tr>
@@ -75,65 +184,155 @@
                             </div>
                         </td>
                         <td class="center">
+                            <span class="order-total">
+                                {{item.order_total}}
+                            </span>
+                            </td>
+                        <td class="center">
                             {{item.price}}
                         </td>
                         <td class="center">
-                            {{item.total}}
+                            {{item.amount}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="6">
+                            <div class="summary" v-if="deviceList.summary">
+                                <div class="item">
+                                    订单合计：{{deviceList.summary.order}}
+                                </div>
+                                <div class="item">
+                                    金额合计：¥ {{deviceList.summary.price}}
+                                </div>
+                                <div class="item">
+                                    数量合计：{{deviceList.summary.amount}}
+                                </div>
+                            </div>
                         </td>
                     </tr>
                 </table>
+            </div>
         </div>
     </div>
 </div>
 {else}
-<div class="text-center text-muted">
-    <i class="fa fa-question-circle"></i> 暂时没有数据！
+<div class="panel panel-default nav-tab-item">
+    <div class="panel-body">
+        <div class="text-center text-muted">
+            <i class="fa fa-question-circle"></i> 暂时没有数据！
+        </div>
+    </div>
 </div>
 {/if}
 
 <script>
     const vuejsUrl = "{php \zovye\url(false, JS_VUE_URL);}";
     const apiUrl = "{$api_url}";
-    require(['jquery', 'util', vuejsUrl], function ($, util, Vue) {
+    require(['jquery', 'util', vuejsUrl, "daterangepicker"], function ($, util, Vue) {
         new Vue({
             el: "#app",
             data: {
+                loading: false,
+                start: '{$s_start_date}',
+                end: '{$s_end_date}',
                 years: JSON.parse(`{php echo json_encode($years)}`),
                 agentList: {
-                    list: [],
-                    title: '',
                 },
                 deviceList: {
-                    list: [],
-                    title: '',
                 },
+                year: null,
                 agent: null,
             },
             mounted() {
-                this.getAgentList();
+                this.initDateCtrl();
+                this.getAgentList(this.start, this.end);
             },
             methods: {
-                getAgentList() {
+                back() {
+                    this.agent=null;
+                    if (this.year) {
+                        this.getAgentList(this.year, this.year);
+                    } else {
+                        this.getAgentList(this.start, this.end);
+                    }
+                },
+                getAgentList(begin, end) {
                     const self = this;
-                    $.getJSON(apiUrl, {fn: 'agent'}).then(res => {
+                    self.loading = true;
+
+                    self.agentList = {};
+                    $.getJSON(apiUrl, {fn: 'agent', begin, end}).then(res => {
                         if (res && res.status) {
                             self.agentList = res.data;
+                            self.begin = res.data.begin;
+                            self.end = res.data.end;
+                            if (self.begin && self.end) {
+                                $('.date-title').text(self.begin + ' 至 ' + self.end)
+                            } else {
+                                $('.date-title').text('')
+                            }
                         }
+                        self.loading = false;
                     })
+                },
+                changeYear(year) {
+                    this.year = year;
+                    if (this.agent) {
+                        this.getDeviceList(this.agent.id, this.year, this.year);
+                    } else {
+                        this.getAgentList(year, year);
+                    }
+                    
                 },
                 view(agent) {
                     if (agent) {
                         this.agent = agent;
-                        this.getDeviceList(agent.id);
+                        if (this.year) {
+                            this.getDeviceList(agent.id, this.year, this.year);
+                        } else {
+                            this.getDeviceList(agent.id, this.start, this.end);
+                        }
                     }
                 },
-                getDeviceList(id) {
+                getDeviceList(id, begin, end) {
                     const self = this;
-                    self.deviceList = [];
-                    $.getJSON(apiUrl, {fn: 'device', id}).then(res => {
+                    self.loading = true;
+                    self.deviceList = {};
+                    $.getJSON(apiUrl, {fn: 'device', id, begin, end}).then(res => {
                         if (res && res.status) {
                             self.deviceList = res.data;
                         }
+                        self.loading = false;
+                    })
+                },
+                getData() {
+                    this.year = null;
+                    if (this.agent) {
+                        this.getDeviceList(this.agent.id, this.start, this.end);
+                    } else {
+                         this.getAgentList(this.start, this.end);
+                    }
+                },
+                initDateCtrl() {
+                    const self = this;
+                    $(".daterange.daterange-date").each(function () {
+                        const elm = this;
+                        $(this).daterangepicker({
+                            startDate: $(elm).prev().prev().val() || moment("不限", "Y"),
+                            endDate: $(elm).prev().val() || moment("不限", "Y"),
+                            format: "YYYY-MM-DD",
+                            clear: 1
+                        }, function (start, end) {
+                            start = start.toDateStr().indexOf("0000-01-01") != -1 ? "" : start.toDateStr();
+                            end = end.toDateStr().indexOf("0000-01-01") != -1 ? "" : end.toDateStr();
+                            const html = (start === "" ? "" : start) + (start === "" && end === "" ? "" : (" 至 " + end))
+                            $(elm).find(".date-title").html(html);
+                            $(elm).prev().prev().val(start);
+                            $(elm).prev().val(end);
+                            self.start = start;
+                            self.end = end;
+                            self.getData();
+                        })
                     })
                 }
             }

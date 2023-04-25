@@ -479,7 +479,7 @@
                                 {else}
                                 单价：<span class="price">{php echo number_format(($order['goods']['price']??$order['package']['price']) / 100, 2)}</span>
                                 {if $order['price']>0 || $order['type'] == 'fueling'}
-                                / 总价：<span class="price{if $order['price']==0} zeroprice{/if}{if $order['discount'] > 0} discount{/if}" data-op="priceDetail">
+                                / 总价：<span class="price{if $order['price']==0} zeroprice{/if}{if $order['discount'] > 0} discount{/if}" {if $order['fueling']}data-op="priceDetail"{/if}>
                                     {if $order['discount'] > 0}
                                         {php echo number_format($order['goods']['price'] * $order['num'] / 100, 2)}
                                     {else}

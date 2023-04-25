@@ -340,7 +340,7 @@ class CommissionEventHandler
         /** @var userModelObj $promoter */
         $promoter = Principal::Promoter()->findOne([
             'superior_id' => $keeper->getId(),
-            'user_id' => $user->getId(),
+            'id' => $user->getId(),
         ]);
 
         if (empty($promoter) || $promoter->isBanned()) {

@@ -43,12 +43,12 @@ if ($op == 'order_pay_result' && CtrlServ::checkJobSign(['orderNO' => $order_no,
 
     $res = Pay::query($order_no);
     if (is_error($res)) {
-        if (time() - $start < 30) {
+        if (time() - $start < 300) {
             //重新加入一个支付结果检查任务
             $log['job schedule'] = Job::orderPayResult($order_no, $start);
         } else {
             //5分钟检查订单并执行退款
-            Job::refund($order_no, '获取支付结果失败，订单超时！', 0, false, 300);
+            $log['refund'] = Job::refund($order_no, '获取支付结果失败，订单超时！', 0, false, 300);
         }
         $log['error'] = $res;
         writeLogAndExit($log);
@@ -63,12 +63,6 @@ if ($op == 'order_pay_result' && CtrlServ::checkJobSign(['orderNO' => $order_no,
     $device = Device::get($res['deviceUID'], true);
     if (empty($device)) {
         $log['error'] = "找不到指定设备[{$res['deviceUID']}]";
-        writeLogAndExit($log);
-    }
-
-    $pay_log = Pay::getPayLog($order_no);
-    if (empty($pay_log)) {
-        $log['error'] = '找不到支付记录！';
         writeLogAndExit($log);
     }
 

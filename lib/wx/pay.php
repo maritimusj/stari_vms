@@ -69,6 +69,10 @@ class pay
             return err('xml结构错误');
         }
 
+        if (!empty($result['sign']) && $this->bulidsign($result) != $result['sign']) {
+            return err('验证签名出错！');
+        }
+
         if (isset($result['return_code']) && $result['return_code'] != 'SUCCESS') {
             return err($result['return_msg'] ?: '接口返回失败！');
         }
@@ -77,12 +81,8 @@ class pay
             return err($result['err_code_des'] ?: '接口返回失败！');
         }
 
-        if (isset($result['trade_state']) && $result['trade_state'] != 'SUCCESS') {
+        if (isset($result['trade_state']) && $result['trade_state'] != 'SUCCESS' && $result['trade_state'] != 'USERPAYING') {
             return err($result['trade_state_desc'] ?: '接口返回失败！');
-        }
-
-        if (!empty($result['sign']) && $this->bulidsign($result) != $result['sign']) {
-            return err('验证签名出错！');
         }
 
         return $result;

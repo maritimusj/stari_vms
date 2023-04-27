@@ -140,7 +140,7 @@ class WXPay implements IPay
             'signType' => 'MD5',
         ];
 
-        $data['paySign'] = $wx->bulidSign($data);
+        $data['paySign'] = $wx->buildSign($data);
 
         return $data;
     }
@@ -323,7 +323,7 @@ JS_CODE;
 
         $wx = $this->getWx();
 
-        return $wx->bulidSign($data) === $data['sign'];
+        return $wx->buildSign($data) === $data['sign'];
     }
 
     public function getResponse(bool $ok = true): string

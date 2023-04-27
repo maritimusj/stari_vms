@@ -10,6 +10,7 @@ use we7\ihttp;
 use zovye\Util;
 use zovye\We7;
 use function zovye\err;
+use function zovye\error;
 use function zovye\is_error;
 
 class pay
@@ -38,6 +39,7 @@ class pay
         } else {
             $data['out_trade_no'] = $no;
         }
+
         return $this->doRefund($data);
     }
 
@@ -51,6 +53,7 @@ class pay
         if (is_error($response)) {
             return $response;
         }
+
         return $this->parseResult($response['content']);
     }
 
@@ -69,7 +72,7 @@ class pay
             return err('xml结构错误');
         }
 
-        if (!empty($result['sign']) && $this->bulidsign($result) != $result['sign']) {
+        if (!empty($result['sign']) && $this->buildSign($result) != $result['sign']) {
             return err('验证签名出错！');
         }
 
@@ -78,10 +81,16 @@ class pay
         }
 
         if (isset($result['result_code']) && $result['result_code'] != 'SUCCESS') {
+            if ($result['err_code'] == "USERPAYING") {
+                return error(100, '正在支付中');
+            }
             return err($result['err_code_des'] ?: '接口返回失败！');
         }
 
-        if (isset($result['trade_state']) && $result['trade_state'] != 'SUCCESS' && $result['trade_state'] != 'USERPAYING') {
+        if (isset($result['trade_state']) && $result['trade_state'] != 'SUCCESS') {
+            if ($result['trade_state'] == 'USERPAYING') {
+                return error(100, '正在支付中');
+            }
             return err($result['trade_state_desc'] ?: '接口返回失败！');
         }
 
@@ -89,13 +98,13 @@ class pay
     }
 
 
-    public function bulidSign($params): string
+    public function buildSign($params): string
     {
         unset($params['sign']);
         ksort($params);
 
         $string = $this->array2url($params);
-        $string = $string . "&key={$this->config['key']}";
+        $string = $string."&key={$this->config['key']}";
         $string = md5($string);
 
         return strtoupper($string);
@@ -111,6 +120,7 @@ class pay
             }
             $str .= "$key=$val&";
         }
+
         return trim($str, '&');
     }
 
@@ -125,7 +135,7 @@ class pay
             'long_url' => $url,
             'nonce_str' => Util::random(32),
         );
-        $params['sign'] = $this->bulidSign($params);
+        $params['sign'] = $this->buildSign($params);
         $result = $this->requestApi('https://api.mch.weixin.qq.com/tools/shorturl', $params);
         if (is_error($result)) {
             return $result;
@@ -154,7 +164,7 @@ class pay
         $params['mch_id'] = $this->config['mch_id'];
         $params['spbill_create_ip'] = CLIENT_IP;
         $params['nonce_str'] = Util::random(32);
-        $params['sign'] = $this->bulidSign($params);
+        $params['sign'] = $this->buildSign($params);
 
         return $this->requestApi('https://api.mch.weixin.qq.com/pay/micropay', $params);
     }
@@ -162,7 +172,7 @@ class pay
     /*
      * 扫码模式一生成支付url
      * */
-    public function bulidNativePayurl($product_id, $short_url = true)
+    public function buildNativePayurl($product_id, $short_url = true)
     {
         $params = array(
             'appid' => $this->config['appid'],
@@ -171,8 +181,8 @@ class pay
             'nonce_str' => Util::random(32),
             'product_id' => $product_id,
         );
-        $params['sign'] = $this->bulidSign($params);
-        $url = 'weixin://wxpay/bizpayurl?' . $this->array2url($params);
+        $params['sign'] = $this->buildSign($params);
+        $url = 'weixin://wxpay/bizpayurl?'.$this->array2url($params);
         if ($short_url) {
             $url = $this->shortUrl($url);
         }
@@ -215,7 +225,7 @@ class pay
         $params['mch_id'] = $this->config['mch_id'];
         $params['spbill_create_ip'] = CLIENT_IP;
         $params['nonce_str'] = Util::random(32);
-        $params['sign'] = $this->bulidSign($params);
+        $params['sign'] = $this->buildSign($params);
 
         return $this->requestApi('https://api.mch.weixin.qq.com/pay/unifiedorder', $params);
     }
@@ -236,7 +246,7 @@ class pay
             $params['out_trade_no'] = $no;
         }
 
-        $params['sign'] = $this->bulidSign($params);
+        $params['sign'] = $this->buildSign($params);
 
         return $this->requestApi('https://api.mch.weixin.qq.com/pay/orderquery', $params);
     }
@@ -251,7 +261,7 @@ class pay
         $params['mch_id'] = $this->config['mch_id'];
         $params['nonce_str'] = Util::random(32);
 
-        $params['sign'] = $this->bulidSign($params);
+        $params['sign'] = $this->buildSign($params);
         $pem = $this->config['pem'];
 
         return $this->requestApi('https://api.mch.weixin.qq.com/secapi/pay/refund', $params, [

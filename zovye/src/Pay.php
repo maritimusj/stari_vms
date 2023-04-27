@@ -186,10 +186,6 @@ class Pay
             $res = err('unknown pay function:'.$fn);
         }
 
-        if (is_error($res)) {
-            return ['', $res];
-        }
-
         return [$order_no, $res];
     }
 

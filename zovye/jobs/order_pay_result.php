@@ -43,7 +43,7 @@ if ($op == 'order_pay_result' && CtrlServ::checkJobSign(['orderNO' => $order_no,
 
     $res = Pay::query($order_no);
     if (is_error($res)) {
-        if (time() - $start < 300) {
+        if (time() - $start < 60) {
             //重新加入一个支付结果检查任务
             $log['job schedule'] = Job::orderPayResult($order_no, $start);
         } else {

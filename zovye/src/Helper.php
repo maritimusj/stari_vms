@@ -710,7 +710,7 @@ class Helper
                 'qrcode' => $params,
             ]);
 
-            if (is_error($data)) {
+            if (is_error($data) && $data['errno'] != 100) {
                 Log::error('qr_pay', [
                     'order_no' => $order_no,
                     'data' => $data,

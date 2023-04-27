@@ -16,6 +16,7 @@ use zovye\Request;
 use zovye\Util;
 use function zovye\_W;
 use function zovye\err;
+use function zovye\error;
 use function zovye\is_error;
 
 class SQBPay implements IPay
@@ -82,7 +83,10 @@ class SQBPay implements IPay
             return $res;
         }
 
-        if ($res['result_code'] !== 'PAY_SUCCESS' && $res['result_code'] !== 'PAY_IN_PROGRESS') {
+        if ($res['result_code'] !== 'PAY_SUCCESS') {
+            if ($res['result_code'] == 'PAY_IN_PROGRESS') {
+                return error(100, '正在支付中');
+            }
             return err($res['error_message']);
         }
 
@@ -254,8 +258,9 @@ JS_CODE;
                     'deviceUID' => $data['operator'],
                 ];
             }
+
             if ($data['order_status'] == 'CREATED') {
-                return err('支付中');
+                return error(100, '正在支付中');
             }
 
             return err('状态不正确！');

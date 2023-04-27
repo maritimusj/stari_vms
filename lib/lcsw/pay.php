@@ -10,6 +10,7 @@ use we7\ihttp;
 use zovye\App;
 use zovye\Util;
 use function zovye\err;
+use function zovye\error;
 use function zovye\is_error;
 
 class pay
@@ -107,7 +108,10 @@ class pay
             return $res;
         }
 
-        if ($res['result_code'] !== '01' && $res['result_code'] !== '03') {
+        if ($res['result_code'] !== '01') {
+            if ($res['result_code'] == '03') {
+                return  error(100, '正在支付中');
+            }
             return err($res['return_msg'] ?? '订单付款失败！');
         }
 
@@ -214,6 +218,9 @@ class pay
         }
 
         if ($res['result_code'] !== '01') {
+            if ($res['result_code'] == '03') {
+                return error(100, '正在支付中');
+            }
             return err('查询订单失败！');
         }
 

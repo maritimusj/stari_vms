@@ -50,7 +50,7 @@
 				</div>
 				<span class="desc">{{free.desc}}</span>
 			</div>
-			<div class="menu-item clickable"
+			<!-- <div class="menu-item clickable"
 				style="background-image: linear-gradient(to top right, #FBAB7E , #F7CE68);position: relative;">
 				<div class="row">
 					<img src="{MODULE_URL}static/m/balance2/img/youtube_icon.svg">
@@ -69,7 +69,7 @@
 						</script>
 					</wx-open-launch-weapp>
 				</div>
-			</div>
+			</div> -->
 			<div class="menu-item clickable"
 				style="background-image: linear-gradient(to top right, #FA639B , #FFA2C9);" @click="payClick">
 				<div class="row">
@@ -82,23 +82,23 @@
 				style="background-image: linear-gradient(to top right, #FCBDAB , #FDD5C6);" @click="balanceClick" v-if="zovye_fn.redirectToBonusPage">
 				<div class="row">
 					<img src="{MODULE_URL}static/m/balance2/img/diamond_icon.svg">
-					<span>积分兑换</span>
+					<span>800积分兑换<br>领取产品一个</span>
 				</div>
 				<span class="desc">当前积分：{{userInfo ? userInfo.balance : 0}}</span>
 			</div>
-			<div class="menu-item clickable"
+			<!-- <div class="menu-item clickable"
 				style="background-image: linear-gradient(to top right, #1A83FB , #7AB4FF);" @click="missionClick" v-if="zovye_fn.redirectToBonusPage">
 				<div class="row">
 					<img src="{MODULE_URL}static/m/balance2/img/star_icon.svg">
 					<span>任务大厅</span>
 				</div>
 				<span class="desc">做任务，赚积分</span>
-			</div>
+			</div> -->
 			<div class="menu-item clickable"
 				style="background-image: linear-gradient(to right top, #FF4500, #FFA07A);" @click="moreClick">
 				<div class="row">
 					<img src="{MODULE_URL}static/m/mengmorwpt2/img/more_icon.svg">
-					<span>我要赚积分</span>
+					<span>我要赚积分<br>免费领产品</span>
 				</div>
 				<span class="desc">点击立即前往</span>
 			</div>

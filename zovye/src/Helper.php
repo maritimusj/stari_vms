@@ -678,7 +678,7 @@ class Helper
                 throw new RuntimeException('系统错误，创建用户失败！');
             }
 
-            $order_no = substr("U{$user->getId()}P$code", 0, MAX_ORDER_NO_LEN);
+            $order_no = substr("U{$user->getId()}P$code" . date('dH'), 0, MAX_ORDER_NO_LEN);
             if (Order::exists($order_no)) {
                 throw new RuntimeException('订单已存在！');
             }

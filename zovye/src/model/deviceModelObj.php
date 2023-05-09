@@ -2190,12 +2190,12 @@ class deviceModelObj extends modelObj
 
     /**
      * 请求mcb报告状态
-     * @param $code
+     * @param string $code
      * @return void
      */
-    public function reportMcbStatus($code)
+    public function reportMcbStatus(string $code = '')
     {
-        $this->mcbNotify('report', $code, []);
+        $this->mcbNotify('report', $code);
     }
 
     /**

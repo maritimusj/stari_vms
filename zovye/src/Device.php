@@ -889,12 +889,11 @@ class Device extends State
             $now = new DateTimeImmutable();
 
             if (Request::isset('online')) {
-                $online_time = $now->modify('-15 min');
                 //在线状态
                 if (Request::bool('online')) {
-                    $query->where(['last_ping >' => $online_time->getTimestamp()]);
+                    $query->where(['mcb_online' => true]);
                 } elseif (Request::bool('offline')) {
-                    $query->where(['last_ping <' => $online_time->getTimestamp()]);
+                    $query->where(['mcb_online' => false]);
                 }
             }
 

@@ -59,11 +59,14 @@ if (is_array($ids)) {
         } else {
             $status = $devices_status[$entry->getImei()];
             if (isset($status['mcb']['online'])) {
-                $data['status']['mcb'] = boolval($status['mcb']['online']);
+                $online = boolval($status['mcb']['online']);
+                $data['status']['mcb'] = $online;
+                $entry->setMcbOnline($online);
             }
 
             if (isset($status['app']['online'])) {
-                $data['status']['app'] = boolval($status['app']['online']);
+                $online = boolval($status['app']['online']);
+                $data['status']['app'] = $online;
                 if (!empty($status['app']['uid'])) {
                     $data['status']['appId'] = $status['app']['uid'];
                     $entry->setAppId($status['app']['uid']);

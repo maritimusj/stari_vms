@@ -892,7 +892,7 @@ class Device extends State
                 //在线状态
                 if (Request::bool('online')) {
                     $query->where(['mcb_online' => true]);
-                } elseif (Request::bool('offline')) {
+                } else {
                     $query->where(['mcb_online' => false]);
                 }
             }

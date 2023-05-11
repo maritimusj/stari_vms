@@ -80,6 +80,7 @@ use zovye\Pay;
  * @method getRank()
  * @method getS1()
  * @method setS1(int $int)
+ * @method setS2(int $param)
  */
 class deviceModelObj extends modelObj
 {

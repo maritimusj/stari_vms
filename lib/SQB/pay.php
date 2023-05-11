@@ -33,7 +33,8 @@ fwIDAQAB
 
     public function sign($params): string
     {
-        $data = json_encode($params) . $this->config['key'];
+        $data = json_encode($params).$this->config['key'];
+
         return md5($data);
     }
 
@@ -47,13 +48,14 @@ fwIDAQAB
         $res = ihttp::request($url, json_encode($params), [
             'Content-Type' => 'application/json',
             'Authorization' => "{$this->config['sn']} {$this->sign($params)}",
+            'X-Forwarded-For' => CLIENT_IP,
         ]);
 
-         Log::debug('SQB', [
-             'url' => $url,
-             'request' => $params,
-             'result' => $res,
-         ]);
+        Log::debug('SQB', [
+            'url' => $url,
+            'request' => $params,
+            'result' => $res,
+        ]);
 
         if (is_error($res)) {
             return $res;
@@ -74,6 +76,7 @@ fwIDAQAB
     public function activate($device_id, $code)
     {
         $path = '/terminal/activate';
+
         return $this->requestApi("$this->api$path", [
             'app_id' => $this->config['app_id'],
             'code' => $code,
@@ -84,6 +87,7 @@ fwIDAQAB
     public function checkin($device_id)
     {
         $path = '/terminal/checkin';
+
         return $this->requestApi("$this->api$path", [
             'terminal_sn' => $this->config['sn'],
             'device_id' => $device_id,
@@ -99,7 +103,7 @@ fwIDAQAB
 
         if (\zovye\Pay::isWxPayQrcode($code)) {
             $params['payway'] = '3';
-        } else{
+        } else {
             $params['payway'] = '1';
         }
 
@@ -112,6 +116,7 @@ fwIDAQAB
         }
 
         $path = '/upay/v2/pay';
+
         return $this->requestApi("$this->api$path", $params);
     }
 
@@ -124,7 +129,7 @@ fwIDAQAB
 
         if (App::isAliUser()) {
             $params['payway'] = '2';
-        } else{
+        } else {
             $params['payway'] = '3';
         }
 
@@ -138,6 +143,7 @@ fwIDAQAB
         }
 
         $path = '/upay/v2/precreate';
+
         return $this->requestApi("$this->api$path", $params);
     }
 
@@ -157,20 +163,21 @@ fwIDAQAB
         $getStr = function ($params) {
             $param_str = "";
             foreach ($params as $k => $v) {
-                $param_str .= $k . '=' . $v . '&';
+                $param_str .= $k.'='.$v.'&';
             }
+
             return $param_str;
         };
 
-        $sign = strtoupper(md5($getStr($params) . 'key=' . $this->config['key']));
+        $sign = strtoupper(md5($getStr($params).'key='.$this->config['key']));
 
         $params['subject'] = urlencode($params['subject']);
         $params['notify_url'] = urlencode($params['notify_url']);
         $params['return_url'] = urlencode($params['return_url']);
 
-        $paramsStr = $getStr($params) . 'sign=' . $sign;
+        $paramsStr = $getStr($params).'sign='.$sign;
 
-        return "https://qr.shouqianba.com/gateway?" . $paramsStr;
+        return "https://qr.shouqianba.com/gateway?".$paramsStr;
     }
 
     public function refund($uid, $amount, $isSN = false, $serial = '')
@@ -179,7 +186,7 @@ fwIDAQAB
         $params = [
             'terminal_sn' => $this->config['sn'],
             'refund_amount' => "$amount",
-            'refund_request_no' => empty($serial) ? 'R' . time() : $serial,
+            'refund_request_no' => empty($serial) ? 'R'.time() : $serial,
         ];
         if ($isSN) {
             $params['sn'] = $uid;
@@ -193,6 +200,7 @@ fwIDAQAB
     public function query($orderNO)
     {
         $path = '/upay/v2/query';
+
         return $this->requestApi("$this->api$path", [
             'terminal_sn' => $this->config['sn'],
             'client_sn' => $orderNO,

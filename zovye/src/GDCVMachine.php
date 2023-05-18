@@ -4,10 +4,9 @@
  * @url www.stariture.com
  */
 
-
 namespace zovye;
 
-use Iterator;
+use Traversable;
 use zovye\model\device_logsModelObj;
 use zovye\model\deviceModelObj;
 
@@ -42,13 +41,13 @@ class GDCVMachine
         return Util::post($url, $data);
     }
 
-    public function uploadDeviceInfo(Iterator $deviceIterator)
+    public function uploadDeviceInfo(Traversable $deviceIterator)
     {
         $data = [];
 
         /** @var deviceModelObj $device */
         foreach ($deviceIterator as $device) {
-            $location = $device->getLocation();
+            $location = $device->getLocation();var_dump($location);
             $v = [
                 'machineCode' => $device->getImei(),
                 'agentCode' => strval($this->config['agent']),
@@ -84,27 +83,29 @@ class GDCVMachine
 
     }
 
-    public function uploadOrder(Iterator $orderIterator)
+    public function uploadOrder(Traversable $orderIterator)
     {
         $data = [];
 
         /** @var device_logsModelObj $entry */
         foreach ($orderIterator as $entry) {
+            print_r($entry->getData());
             $goods = $entry->getData('goods');
             $user = $entry->getData('user');
-            $order = $entry->getData('order');
+            $order = Order::get($entry->getData('order'));
+            $params = $entry->getData('params');
             $data[] = [
                 'machineCode' => $entry->getTitle(),
                 'agentCode' => strval($this->config['agent']),
                 'channelCode' => $goods['cargo_lane'] + 1,
-                'productCode' => $goods['CVMachine.code'],
-                'billNumber' => $order['uid'],
-                'quantity' => $goods['num'],
-                'time' => date('Y-m-d H:i:s', $entry->getCreateTime()),
-                'type' => 1, //领取方式，1，身份证，2，二维码
+                'productCode' => strval($goods['CVMachine.code']),
+                'billNumber' => $order ? $order->getOrderNO() : '',
+                'quantity' => $params['num'],
+                'time' => date('Y-m-d H:i:s', $entry->getCreatetime()),
+                'type' => 2, //领取方式，1，身份证，2，二维码
                 'identity' => $user['identity'],
                 'name' => strval($user['name']),
-                'gender' => $user['gender'],
+                'gender' => $user['sex'] == 1 ? '男' : '女',
             ];
         }
 

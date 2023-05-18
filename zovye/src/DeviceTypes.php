@@ -200,9 +200,14 @@ class DeviceTypes
                     $lane['goods_img'] = Util::toMedia($goods_data['img'], true);
                     $lane['goods_price'] = $goods_data['price'];
                     $lane['goods_price_formatted'] = $goods_data['price_formatted'];
+
                     $lane[Goods::AllowPay] = $goods_data[Goods::AllowPay];
                     $lane[Goods::AllowFree] = $goods_data[Goods::AllowFree];
                     $lane[Goods::AllowBalance] = $goods_data[Goods::AllowBalance];
+
+                    if ($goods_data['CVMachine.code']) {
+                        $lane['CVMachine.code'] = $goods_data['CVMachine.code'];
+                    }
                 } else {
                     $lane['goods_id'] = 0;
                     $lane['goods_unit_title'] = '';

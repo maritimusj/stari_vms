@@ -81,6 +81,7 @@ use zovye\Pay;
  * @method getS1()
  * @method setS1(int $int)
  * @method setS2(int $param)
+ * @method getS2()
  */
 class deviceModelObj extends modelObj
 {

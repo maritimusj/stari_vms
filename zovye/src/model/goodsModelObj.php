@@ -165,6 +165,16 @@ class goodsModelObj extends modelObj
         return $this->setExtraData('appendage', $data);
     }
 
+    public function getCVMachineItemCode()
+    {
+        return $this->getExtraData('CVMachine.code', '');
+    }
+
+    public function setCVMachineItemCode($code)
+    {
+        return $this->setExtraData('CVMachine.code', $code);
+    }
+
     public function getQuota(string $w = ''): array
     {
         if (empty($w)) {
@@ -209,6 +219,11 @@ class goodsModelObj extends modelObj
     public function getType(): string
     {
         return $this->getExtraData('type', '');
+    }
+
+    public function setType($type)
+    {
+        return $this->setExtraData('type', $type);
     }
 
     public function isFlashEgg(): bool

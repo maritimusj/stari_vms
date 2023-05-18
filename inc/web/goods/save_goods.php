@@ -197,6 +197,9 @@ if (!empty($goods)) {
     if ($goods->isFlashEgg()) {
         $goods->setExtraData('redirect_url', request::trim('redirectUrl'));
     }
+    if (App::isGDCVMachineEnabled()) {
+        $goods->setCVMachineItemCode(Request::trim('GDCVMachineItemCode'));
+    }
     if ($goods->save()) {
         if ($params['syncAll']) {
             Job::goodsClone($goods->getId());

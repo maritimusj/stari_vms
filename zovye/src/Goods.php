@@ -225,6 +225,10 @@ class Goods
             }
         }
 
+        if (App::isGDCVMachineEnabled()) {
+            $data['CVMachine.code'] = $entry->getCVMachineItemCode();
+        }
+
         return $data;
     }
 

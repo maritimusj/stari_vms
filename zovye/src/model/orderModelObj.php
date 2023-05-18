@@ -151,6 +151,11 @@ class orderModelObj extends modelObj
         return null;
     }
 
+    public function getDeviceChannelId()
+    {
+
+    }
+
     public function getAgent(): ?agentModelObj
     {
         if ($this->agent_id) {

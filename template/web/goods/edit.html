@@ -115,6 +115,15 @@
                         <span class="help-block">* 商品成本价格(可以不填写)</span>
                     </div>
                 </div>
+                {if \zovye\App::isGDCVMachineEnabled()}
+                <div class="form-group">
+                    <label for="costPrice" class="col-md-2 control-label">商品代码</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" id="GDCVMachineItemCode" name="GDCVMachineItemCode" value="{php echo $goods? $goods['GDCVMachine.code'] : ''}">
+                        <span class="help-block">* 商品代码</span>
+                    </div>
+                </div>
+                {/if}
                 {if \zovye\App::isCommissionEnabled()}
                 <div class="form-group">
                     <label for="goodsCW" class="col-md-2 control-label"></label>
@@ -125,7 +134,6 @@
                     </div>
                 </div>
                 {/if}
-
                 <div class="form-group">
                     <label for="discountPrice" class="col-md-2 control-label">首单优惠（元）</label>
                     <div class="col-md-10">

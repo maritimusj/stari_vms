@@ -2,6 +2,8 @@
 
 namespace zovye;
 
+use zovye\model\accountModelObj;
+
 $tb_name = APP_NAME;
 
 if (!We7::pdo_fieldexists($tb_name.'_account', 'type')) {
@@ -12,6 +14,7 @@ SQL;
 
     $query = Account::query();
 
+    /** @var accountModelObj $entry */
     foreach ($query->findAll() as $entry) {
         $type = intval($entry->settings('config.type', 0));
         $entry->setType($type);

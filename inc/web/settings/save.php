@@ -165,6 +165,7 @@ if ($page == 'device') {
     $settings['custom']['cztv']['enabled'] = Request::bool('cztvEnabled') ? 1 : 0;
     $settings['custom']['flashEgg']['enabled'] = Request::bool('flashEggEnabled') ? 1 : 0;
     $settings['custom']['promoter']['enabled'] = Request::bool('promoterEnabled') ? 1 : 0;
+    $settings['custom']['GDCVMachine']['enabled'] = Request::bool('GDCVMachineEnabled') ? 1 : 0;
 
     Config::app('ad.sponsor.enabled', Request::bool('sponsorAd'), true);
 
@@ -681,6 +682,15 @@ if ($page == 'device') {
     Config::notify('inventory', [
         'key' => Request::str('inventoryAccessKey'),
     ], true);
+
+    if (App::isGDCVMachineEnabled()) {
+        Config::GDCVMachine('config', [
+            'url' => Request::trim('GDCVMachineApiUrl'),
+            'agent' => Request::trim('GDCVMachineAgentCode'),
+            'appId' => Request::trim('GDCVMachineAppId'),
+            'token' => Request::trim('GDCVMachineToken'),
+        ], true);
+    }
 
 } elseif ($page == 'payment') {
     $wx_enabled = Request::bool('wx') ? 1 : 0;

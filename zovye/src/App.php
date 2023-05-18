@@ -674,5 +674,11 @@ class App
             return boolval(settings('custom.promoter.enabled'));
         });
     }
-    
+
+    public static function isGDCVMachineEnabled(): bool
+    {
+        return onceCall(function () {
+            return boolval(settings('custom.GDCVMachine.enabled'));
+        });
+    }   
 }

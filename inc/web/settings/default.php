@@ -371,6 +371,10 @@ if ($page == 'device') {
         $tpl_data['donatePay'] = Config::donatePay('qsc');
     }
 
+    if (App::isGDCVMachineEnabled()) {
+        $tpl_data['GDCVMachine'] = Config::GDCVMachine('config');
+    }
+
     $tpl_data['notify_app_key'] = Config::notify('order.key', Util::random(16));
     $tpl_data['orderNotifyFree'] = Config::notify('order.f', true);
     $tpl_data['orderNotifyPay'] = Config::notify('order.p', true);

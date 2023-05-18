@@ -1,5 +1,5 @@
 {template 'common/header'}
-{php \zovye\url(true, 'static/css/common.css?v=20220516');}
+{php \zovye\url(true, 'static/css/common.css?v=20230518');}
 <style>
     fieldset[disabled] label,
     fieldset[disabled] select,
@@ -321,6 +321,39 @@
                     <div class="col-md-10">
                         <input type="number" step="0.01" class="form-control" name="zeroBonus" id="zeroBonus" value="{$settings['custom']['bonus']['zero']['v']}">
                         <span class="help-block"></span>
+                    </div>
+                </div>
+            </div>
+            {/if}
+            {if \zovye\App::isGDCVMachineEnabled()}
+            <div class="seg">
+                <div class="title">广东省避孕药具发放机接入</div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">API URL</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="GDCVMachineApiUrl" value="{$GDCVMachine['url']}">
+                        <span class="help-block">* 平台API网址</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">厂家代号</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="GDCVMachineAgentCode" value="{$GDCVMachine['agent']}">
+                        <span class="help-block">* 平台提供的厂家代号</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">appId</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="GDCVMachineAppId" value="{$GDCVMachine['appId']}">
+                        <span class="help-block">* 平台提供给厂商的appId</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">token</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="GDCVMachineToken" value="{$GDCVMachine['token']}">
+                        <span class="help-block">* 平台提供给厂商的token</span>
                     </div>
                 </div>
             </div>

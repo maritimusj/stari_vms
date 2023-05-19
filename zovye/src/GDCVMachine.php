@@ -12,7 +12,7 @@ use zovye\model\deviceModelObj;
 
 class GDCVMachine
 {
-    private $config = null;
+    private $config;
 
     public function __construct()
     {
@@ -51,7 +51,7 @@ class GDCVMachine
             $v = [
                 'machineCode' => $device->getImei(),
                 'agentCode' => strval($this->config['agent']),
-                'location' => "{$location['lat']},{$location['lng']}",
+                'location' => isset($location['lat']) && isset($location['lng']) ? "{$location['lat']},{$location['lng']}" : '',
                 'connectionStatus' => $device->isMcbOnline() ? 1 : 2,   //在线状态？1,正常，2,离线
                 'machineStatus' => $device->isDown() ? 2 : 1,           // 设备状态？1,正常， 2,故障
                 'stockStatus' => $device->getS2() ? 2 : 1,              //是否缺货？1,正常，2，缺货
@@ -83,13 +83,12 @@ class GDCVMachine
 
     }
 
-    public function uploadOrder(Traversable $orderIterator)
+    public function uploadOrderInfo(Traversable $orderIterator)
     {
         $data = [];
 
         /** @var device_logsModelObj $entry */
         foreach ($orderIterator as $entry) {
-            print_r($entry->getData());
             $goods = $entry->getData('goods');
             $user = $entry->getData('user');
             $order = Order::get($entry->getData('order'));
@@ -100,10 +99,10 @@ class GDCVMachine
                 'channelCode' => $goods['cargo_lane'] + 1,
                 'productCode' => strval($goods['CVMachine.code']),
                 'billNumber' => $order ? $order->getOrderNO() : '',
-                'quantity' => $params['num'],
+                'quantity' => intval($params['num']),
                 'time' => date('Y-m-d H:i:s', $entry->getCreatetime()),
                 'type' => 2, //领取方式，1，身份证，2，二维码
-                'identity' => $user['identity'],
+                'identity' => strval($user['identity']),
                 'name' => strval($user['name']),
                 'gender' => $user['sex'] == 1 ? '男' : '女',
             ];
@@ -112,7 +111,7 @@ class GDCVMachine
         $response = $this->post($data);
 
         Log::debug('GDCVMachine', [
-            'func' => 'upload order',
+            'func' => 'upload order info',
             'data' => $data,
             'response' => $response,
         ]);

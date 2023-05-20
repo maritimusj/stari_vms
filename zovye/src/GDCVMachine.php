@@ -24,7 +24,7 @@ class GDCVMachine
         return md5($this->config['appId'].$this->config['token'].$ts);
     }
 
-    protected function post($data = []): array
+    protected function post($path, $data = []): array
     {
         if (isEmptyArray($this->config)) {
             return err('配置不正确，请检查配置后再试！');
@@ -32,11 +32,14 @@ class GDCVMachine
 
         $ts = time();
 
-        $url = $this->config['url'].http_build_query([
-                'appId' => $this->config['appId'],
-                'timestamp' => $ts,
-                'sign' => $this->sign($ts),
-            ]);
+        $url = rtrim($this->config['url'], '/\\');
+        $url .= $path;
+        $url .= '?';
+        $url .= http_build_query([
+            'appId' => $this->config['appId'],
+            'timestamp' => $ts,
+            'sign' => $this->sign($ts),
+        ]);
 
         return Util::post($url, $data);
     }
@@ -47,14 +50,14 @@ class GDCVMachine
 
         /** @var deviceModelObj $device */
         foreach ($deviceIterator as $device) {
-            $location = $device->getLocation();var_dump($location);
+            $location = $device->getLocation();
             $v = [
                 'machineCode' => $device->getImei(),
                 'agentCode' => strval($this->config['agent']),
                 'location' => isset($location['lat']) && isset($location['lng']) ? "{$location['lat']},{$location['lng']}" : '',
-                'connectionStatus' => $device->isMcbOnline() ? 1 : 2,   //在线状态？1,正常，2,离线
+                'connectionStatus' => $device->isMcbOnline() ? 1 : 2,   // 在线状态？1,正常，2,离线
                 'machineStatus' => $device->isDown() ? 2 : 1,           // 设备状态？1,正常， 2,故障
-                'stockStatus' => $device->getS2() ? 2 : 1,              //是否缺货？1,正常，2，缺货
+                'stockStatus' => $device->getS2() ? 2 : 1,              // 是否缺货？1,正常，2，缺货
                 'channels' => [],
             ];
 
@@ -73,7 +76,7 @@ class GDCVMachine
             $data[] = $v;
         }
 
-        $response = $this->post($data);
+        $response = $this->post('/cgi-bin/machineinfo', $data);
 
         Log::debug('GDCVMachine', [
             'func' => 'upload device info',
@@ -101,14 +104,14 @@ class GDCVMachine
                 'billNumber' => $order ? $order->getOrderNO() : '',
                 'quantity' => intval($params['num']),
                 'time' => date('Y-m-d H:i:s', $entry->getCreatetime()),
-                'type' => 2, //领取方式，1，身份证，2，二维码
+                'type' => 2, // 领取方式，1，身份证，2，二维码
                 'identity' => strval($user['identity']),
                 'name' => strval($user['name']),
                 'gender' => $user['sex'] == 1 ? '男' : '女',
             ];
         }
 
-        $response = $this->post($data);
+        $response = $this->post('/cgi-bin/machleadrecord', $data);
 
         Log::debug('GDCVMachine', [
             'func' => 'upload order info',

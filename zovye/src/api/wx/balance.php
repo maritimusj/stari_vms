@@ -106,8 +106,8 @@ class balance
             return err('用户暂时无法提现！');
         }
 
-        if ($user->isBusyState()) {
-            return err('请等待订单结算完成后再试！');
+        if ($user->isBusy()) {
+            return err('请等待全部订单结算完成后再试！');
         }
 
         if ($amount < 1) {

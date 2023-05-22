@@ -3,8 +3,10 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
- 
+
 namespace zovye;
+
+use zovye\model\chargingNowDataModelObj;
 
 defined('IN_IA') or exit('Access Denied');
 
@@ -13,39 +15,49 @@ if (empty($user)) {
     JSON::fail('找不到这个用户！');
 }
 
-$data = $user->chargingNOWData();
-if (empty($data)) {
-    JSON::fail('没有发现用户充电信息！');
+$fn = Request::str('fn');
+if (empty($fn)) {
+    if (empty(ChargingNowData::countByUser($user))) {
+        JSON::fail('没有发现用户充电信息！');
+    }
+
+    $list = [];
+
+    /** @var chargingNowDataModelObj $charging_now_data */
+    foreach (ChargingNowData::getAllByUser($user) as $charging_now_data) {
+
+        $serial = $charging_now_data->getSerial();
+        $device = $charging_now_data->getDevice();
+        $order = Order::get($serial, true);
+        $list[] = [
+            'serial' => $serial,
+            'chargerID' => $charging_now_data->getChargerId(),
+            'device' => $device ?? $device->profile(),
+            'order' => $order ?? $order->profile(),
+        ];
+    }
+
+    $content = app()->fetchTemplate(
+        'web/user/charging',
+        [
+            'user' => $user->profile(),
+            'list' => $list,
+        ]
+    );
+
+    JSON::success(['title' => '充电信息', 'content' => $content]);
+
+} elseif ($fn == 'stop') {
+
+    $serial = Request::str('serial');
+
+    $charging_now_data = ChargingNowData::getByUser($user, $serial);
+
+    if (empty($charging_now_data)) {
+        JSON::fail('找不到这个充电记录！');
+    }
+
+    $result = Charging::stop($user, $serial);
+
+    JSON::result($result);
 }
-
-$device = Device::get($data['device']);
-if (empty($device)) {
-    $user->removeChargingNOWData();
-    JSON::success('找不到设备，已清除用户充电状态！');
-}
-
-$deviceNOW = $device->chargingNOWData($data['chargerID']);
-if (empty($deviceNOW) || $deviceNOW['serial'] != $data['serial']) {
-    $user->removeChargingNOWData();
-    JSON::success('设备状态不匹配，已清除用户充电状态！');
-}
-
-$order = Order::get($data['serial'], true);
-if (empty($order) || $order->isChargingFinished()) {
-    $user->removeChargingNOWData();
-    $device->removeChargingNOWData($data['chargerID']);
-    JSON::success('充电订单已结束，已清相关充电状态！');
-}
-
-// 暂时不做后续处理
-// $content = app()->fetchTemplate(
-//     'web/user/charging',
-//     [
-//         'user' => $user->profile(),
-//         'device' => $device->profile(),
-//         'order' => $order->profile(),
-//         'status' => $device->getChargerStatusData($data['chargerID']),
-//     ]
-// );
-
-// JSON::success(['title' => '充电信息', 'content' => $content]);

@@ -6,9 +6,11 @@ use zovye\api\wx\balance;
 use zovye\api\wx\common;
 use zovye\App;
 use zovye\Charging as IotCharging;
+use zovye\ChargingNowData;
 use zovye\Device;
 use zovye\Group;
 use zovye\Helper;
+use zovye\model\chargingNowDataModelObj;
 use zovye\model\device_groupsModelObj;
 use zovye\model\deviceModelObj;
 use zovye\Order;
@@ -38,19 +40,27 @@ class charging
         }
 
         if (App::isChargingDeviceEnabled()) {
-            $last_charging_data = $user->chargingNOWData();
-            if ($last_charging_data) {
-                $device = Device::get($last_charging_data['device']);
-                if ($device) {
-                    $serial = $last_charging_data['serial'];
-                    $chargerID = $last_charging_data['chargerID'];
-                    $chargerData = $device->getChargerBMSData($chargerID);
-                    if ($chargerData && $chargerData['serial'] == $serial) {
-                        $data['charging'] = [
-                            'device' => $device->profile(),
-                            'status' => $chargerData,
-                        ];
-                    } else {
+            $list = ChargingNowData::getAllByUser($user);
+
+            if ($list) {
+                $data['charging_now_data'] = [];
+
+                /** @var chargingNowDataModelObj $charging_now_data */
+                foreach ($list as $charging_now_data) {
+
+                    $serial = $charging_now_data->getSerial();
+                    $device = $charging_now_data->getDevice();
+                    $chargerID = $charging_now_data->getChargerId();
+                    $status = $device->getChargerBMSData($chargerID);
+
+                    $data['charging_now_data'][] = [
+                        'serial' => $serial,
+                        'device' => $device->profile(),
+                        'charger_id' => $chargerID,
+                        'status' => $status,
+                    ];
+
+                    if ($status['serial'] == $serial) {
                         IotCharging::settleCharging($serial);
                     }
                 }
@@ -234,16 +244,30 @@ class charging
         IotCharging::checkUnfinishedOrder($device);
 
         $chargerID = Request::int('chargerID');
+        $limit = Request::int('limit');
+
         $serial = $device->generateChargingSerial($chargerID);
 
-        return IotCharging::start($serial, $user->getCommissionBalanceCard(), $device, $chargerID);
+        return IotCharging::start($serial, $user->getCommissionBalanceCard(), $limit, $device, $chargerID);
     }
 
     public static function stop()
     {
         $user = common::getWXAppUser();
 
-        return IotCharging::stop($user);
+        $serial = Request::str('serial');
+
+        if (!empty($serial)) {
+            return IotCharging::stop($user, $serial);
+        }
+
+        $result = IotCharging::stopUserAllCharging($user);
+
+        if (empty($result)) {
+            return '已通知所有设备停止充电，请稍候！';
+        }
+
+        return $result;
     }
 
     public static function orderStatus(): array
@@ -256,15 +280,26 @@ class charging
     public static function status(): array
     {
         $user = common::getWXAppUser();
-        $last_charging_data = $user->chargingNOWData();
 
-        if (isEmptyArray($last_charging_data)) {
+        $list = ChargingNowData::getAllByUser($user);
+
+        if (empty($list)) {
             return err('没有发现正在充电的设备！');
         }
 
-        $serial = $last_charging_data['serial'];
+        $result = [];
 
-        return ['serial' => $serial];
+        /** @var chargingNowDataModelObj $charging_now_data */
+        foreach ($list as $charging_now_data) {
+            $device = $charging_now_data->getDevice();
+            $result[] = [
+                'serial' => $charging_now_data->getSerial(),
+                'device' => $device ?? $device->profile(),
+                'createtime' => date('Y-m-d H:is', $charging_now_data->getCreatetime()),
+            ];
+        }
+
+        return $result;
     }
 
     public static function orderList(): array
@@ -350,14 +385,20 @@ class charging
 
         $chargerID = Request::int('chargerID');
 
-        $charging_data = $device->chargingNOWData($chargerID);
-        if (!empty($charging_data)) {
+        $charging_now_data = ChargingNowData::getByDevice($device, $chargerID);
+        if (!empty($charging_now_data)) {
             return err('充电枪正在使用中！');
         }
 
         $price = intval(round(Request::float('price', 0, 2) * 100));
 
-        return Helper::createChargingOrder($user, $device, $chargerID, $price, $device->generateChargingSerial($chargerID));
+        return Helper::createChargingOrder(
+            $user,
+            $device,
+            $chargerID,
+            $price,
+            $device->generateChargingSerial($chargerID)
+        );
     }
 
     public static function withdraw(): array

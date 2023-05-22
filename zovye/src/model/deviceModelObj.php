@@ -259,8 +259,8 @@ class deviceModelObj extends modelObj
      */
     public function isVDevice(): bool
     {
-        return App::isVDeviceSupported() && ($this->settings('device.is_vd') || 
-        $this->getDeviceModel() == Device::VIRTUAL_DEVICE);
+        return App::isVDeviceSupported() && ($this->settings('device.is_vd') ||
+                $this->getDeviceModel() == Device::VIRTUAL_DEVICE);
     }
 
     /**
@@ -389,8 +389,8 @@ class deviceModelObj extends modelObj
     public function setChargerData($chargerID, array $data): bool
     {
         $saved = $this->getChargerStatusData($chargerID, []);
-        $data = array_merge($saved, $data); 
-        
+        $data = array_merge($saved, $data);
+
         return $this->updateSettings("charger_$chargerID", $data);
     }
 
@@ -401,8 +401,9 @@ class deviceModelObj extends modelObj
         }
 
         if (is_array($key)) {
-            $data =  $this->settings("charger_$chargerID", []);
+            $data = $this->settings("charger_$chargerID", []);
             $data = array_merge($data, $key);
+
             return $this->updateSettings("charger_$chargerID", $data);
         }
 
@@ -423,34 +424,15 @@ class deviceModelObj extends modelObj
     {
         if ($data) {
             $saved = $this->getChargerBMSData($chargerID);
-            $data = array_merge($saved, $data);            
+            $data = array_merge($saved, $data);
         }
-        
+
         return $this->updateSettings("chargerBMS.$chargerID", $data);
     }
 
     public function getChargerBMSData($chargerID): array
     {
         return $this->settings("chargerBMS.$chargerID", []);
-    }
-
-    public function setChargingNOWData(int $chargerID, $data): bool
-    {
-        return $this->updateSettings("chargingNOW.$chargerID", $data);
-    }
-
-    public function removeChargingNOWData(int $chargerID): bool
-    {
-        return $this->removeSettings('chargingNOW', $chargerID);
-    }
-
-    public function chargingNOWData(int $chargerID, string $key = '', $default = null)
-    {
-        $path = "chargingNOW.$chargerID";
-        if ($key) {
-            $path .= ".$key";
-        }
-        return $this->settings($path, $default);
     }
 
     /**
@@ -492,6 +474,7 @@ class deviceModelObj extends modelObj
         if ($key) {
             $path .= ".$key";
         }
+
         return $this->settings($path, $default);
     }
 
@@ -564,6 +547,7 @@ class deviceModelObj extends modelObj
         if (empty($iccid)) {
             return err('ICCID为空！');
         }
+
         return SIM::get($this->getICCID());
     }
 
@@ -697,10 +681,12 @@ class deviceModelObj extends modelObj
         if ($expiration) {
             try {
                 $expired_at = strtotime($expiration);
+
                 return $expired_at < time();
-            }catch (Exception $e) {
+            } catch (Exception $e) {
             }
         }
+
         return false;
     }
 
@@ -1161,8 +1147,8 @@ class deviceModelObj extends modelObj
     {
         if ($this->isChargingDevice()) {
             $chargerNum = $this->getChargerNum();
-            for($i = 0; $i < $chargerNum; $i++) {
-                
+            for ($i = 0; $i < $chargerNum; $i++) {
+
                 $chargerID = $i + 1;
 
                 $url = Util::murl('device', [
@@ -1170,10 +1156,14 @@ class deviceModelObj extends modelObj
                     'device' => $this->getImei(),
                     'charger' => $chargerID,
                 ]);
-                
-                $qrcode_file = Util::createQrcodeFile("device.$this->imei$chargerID", $url, function ($filename) use ($chargerID) {
-                    Util::renderTxt($filename, sprintf("%s%02d", $this->imei, $chargerID));
-                });
+
+                $qrcode_file = Util::createQrcodeFile(
+                    "device.$this->imei$chargerID",
+                    $url,
+                    function ($filename) use ($chargerID) {
+                        Util::renderTxt($filename, sprintf("%s%02d", $this->imei, $chargerID));
+                    }
+                );
                 if (is_error($qrcode_file)) {
                     return false;
                 }
@@ -1192,6 +1182,7 @@ class deviceModelObj extends modelObj
         }
 
         $this->setQrcode($qrcode_file);
+
         return $this->save();
     }
 
@@ -1652,8 +1643,10 @@ class deviceModelObj extends modelObj
                 }
                 reset($ads);
             }
+
             return current($ads);
         }
+
         return null;
     }
 
@@ -1959,7 +1952,7 @@ class deviceModelObj extends modelObj
 
     public function isDummyDevice(): bool
     {
-       return Device::isDummyDeviceIMEI($this->imei);
+        return Device::isDummyDeviceIMEI($this->imei);
     }
 
     public function getOnlineDetail($use_cache = true): array
@@ -2496,7 +2489,7 @@ class deviceModelObj extends modelObj
 
         if (empty($order_no)) {
             $no_str = Util::random(16, true);
-            $order_no =  'P'.We7::uniacid()."NO$no_str";
+            $order_no = 'P'.We7::uniacid()."NO$no_str";
         }
 
         $params = [
@@ -2968,8 +2961,8 @@ class deviceModelObj extends modelObj
             $quota = $goods->getQuota();
 
             if (!isEmptyArray($quota)) {
-                if ($goods->allowFree() || (($goods->allowBalance() || $goods->allowDelivery(
-                            )) && Balance::isFreeOrder())) {
+                if ($goods->allowFree() || (($goods->allowBalance() || $goods->allowDelivery()) && Balance::isFreeOrder(
+                        ))) {
                     $day_limit = $quota['free']['day'];
                     if ($day_limit > 0) {
                         $day_total = $user->getTodayFreeTotal($goods->getId());
@@ -3219,7 +3212,7 @@ class deviceModelObj extends modelObj
                 $index = intval($chargingData['index']);
             }
 
-            $index ++;
+            $index++;
 
             $this->updateSettings('extra.chargingData', [
                 'last' => time(),
@@ -3230,13 +3223,13 @@ class deviceModelObj extends modelObj
         } else {
             $index = rand(8000, 9999);
         }
-        
+
         $serial = sprintf('%s%02d%s%04d', $this->imei, $chargerID, date('Ymd'), $index);
         if (Order::exists($serial)) {
             return self::generateChargingSerial($chargerID);
         }
         if (Pay::getPayLog($serial)) {
-            return self::generateChargingSerial($chargerID); 
+            return self::generateChargingSerial($chargerID);
         }
 
         return $serial;

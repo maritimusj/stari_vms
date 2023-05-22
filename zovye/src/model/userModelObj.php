@@ -12,7 +12,7 @@ use DateTimeImmutable;
 use zovye\Account;
 use zovye\Balance;
 
-use zovye\Charging as IotCharging;
+use zovye\ChargingNowData;
 use zovye\Contract\ICard;
 use zovye\Fueling;
 use zovye\Locker;
@@ -506,6 +506,7 @@ class userModelObj extends modelObj
         $r = $balance->change($price, $src, $extra);
         if ($r) {
             $this->setPrincipal(Principal::Gspor);
+
             return $r;
         }
 
@@ -1018,14 +1019,10 @@ class userModelObj extends modelObj
         return $this->updateSettings('credit.val', $val);
     }
 
-    public function isBusyState(): bool
+    public function isBusy(): bool
     {
         if (App::isChargingDeviceEnabled()) {
-            $user_charging_data = $this->chargingNOWData();
-            if ($user_charging_data) {
-                return true;
-            }
-            if (IotCharging::hasUnpaidOrder($this)) {
+            if (ChargingNowData::countByUser($this) > 0) {
                 return true;
             }
         }
@@ -1041,26 +1038,6 @@ class userModelObj extends modelObj
         }
 
         return false;
-    }
-
-    public function setChargingNOWData($data): bool
-    {
-        return $this->updateSettings('chargingNOW', $data);
-    }
-
-    public function chargingNOWData(string $key = '', $default = [])
-    {
-        $path = 'chargingNOW';
-        if ($key) {
-            $path .= ".$key";
-        }
-
-        return $this->settings($path, $default);
-    }
-
-    public function removeChargingNOWData(): bool
-    {
-        return $this->remove('chargingNOW');
     }
 
     public function setFuelingNOWData($data): bool

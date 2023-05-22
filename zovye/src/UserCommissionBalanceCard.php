@@ -49,6 +49,12 @@ class UserCommissionBalanceCard implements ICard
             return false;
         }
 
+        if (App::isChargingDeviceEnabled()) {
+            if (ChargingNowData::countByUser($owner) >= Charging::getMaxDevicesNum()) {
+                return false;
+            }
+        }
+
         $isOrderFinished = function ($order_no) {
             $order = Order::get($order_no, true);
             if ($order) {
@@ -61,13 +67,6 @@ class UserCommissionBalanceCard implements ICard
             }
             return true;
         };
-
-        if (App::isChargingDeviceEnabled()) {
-            $data = $owner->chargingNOWData();
-            if ($data && !$isOrderFinished($data['serial'])) {
-                return false;
-            }
-        }
 
         if (App::isFuelingDeviceEnabled()) {
             $data = $owner->fuelingNOWData();

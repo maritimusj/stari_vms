@@ -9,15 +9,14 @@ namespace zovye\api\wx;
 use DateTime;
 use zovye\App;
 use zovye\Balance;
+use zovye\ChargingNowData;
 use zovye\Device;
 use zovye\Goods;
 use zovye\Request;
 use zovye\model\orderModelObj;
-use zovye\State;
 use zovye\User;
 use zovye\Util;
 use function zovye\err;
-use function zovye\error;
 use function zovye\is_error;
 
 class order
@@ -66,7 +65,8 @@ class order
                 $device = $order->getDevice();
                 if ($device) {
                     $chargerID = $order->getChargerID();
-                    if ($device->chargingNOWData($chargerID, 'serial', '') == $result['orderId']) {
+                    $charging_now_data = ChargingNowData::getByDevice($device, $chargerID);
+                    if ($charging_now_data && $charging_now_data->getSerial() == $result['orderId']) {
                         $result['charging']['status'] = $device->getChargerStatusData($chargerID);
                     }
                 }
@@ -197,7 +197,8 @@ class order
                     $device = $entry->getDevice();
                     if ($device) {
                         $chargerID = $entry->getChargerID();
-                        if ($device->chargingNOWData($chargerID, 'serial', '') == $data['orderId']) {
+                        $charging_now_data = ChargingNowData::getByDevice($device, $chargerID);
+                        if ($charging_now_data && $charging_now_data->getSerial() == $data['orderId']) {
                             $data['charging']['status'] = $device->getChargerStatusData($chargerID);
                         }
                     }

@@ -99,6 +99,7 @@ class orderModelObj extends modelObj
     public function getNum(): int
     {
         $num = parent::getNum();
+
         return $this->isFuelingOrder() ? $num / 100 : $num;
     }
 
@@ -252,6 +253,26 @@ class orderModelObj extends modelObj
         return !empty($pull_result) && !is_error($pull_result);
     }
 
+    public function setChargingStatus($data)
+    {
+        return $this->setExtraData('charging.status', $data);
+    }
+
+    public function getChargingStatus()
+    {
+        return $this->getExtraData('charging.status');
+    }
+
+    public function setChargingBMSData($sub, $data)
+    {
+        return $this->setExtraData("BMS.$sub", $data);
+    }
+
+    public function getChargingBMSData($sub)
+    {
+        return $this->getExtraData("BMS.$sub");
+    }
+
     public function isChargingResultOk(): bool
     {
         return $this->getExtraData('charging.result.re', 0) == 3;
@@ -288,7 +309,9 @@ class orderModelObj extends modelObj
             if (sha1(json_encode($saved)) == sha1(json_encode($record))) {
                 return true;
             }
+
             $ts = time();
+
             return $this->setExtraData("charging.record.$ts", $record);
         }
 
@@ -438,10 +461,13 @@ class orderModelObj extends modelObj
     {
         $saved = $this->getFuelingRecord();
         if ($saved) {
+
             if (sha1(json_encode($saved)) == sha1(json_encode($record))) {
                 return true;
             }
+
             $ts = time();
+
             return $this->setExtraData("fueling.record.$ts", $record);
         }
 

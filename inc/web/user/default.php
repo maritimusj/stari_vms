@@ -189,7 +189,7 @@ foreach ($query->findAll() as $user) {
     $data['type'] = User::getUserCharacter($user);
 
     if ($charging_device_enabled) {
-        $data['charging'] = $user->chargingNOWData();
+        $data['charging'] = ChargingNowData::countByUser($user);
     }
 
     if ($fueling_device_enabled) {

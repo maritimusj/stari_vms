@@ -739,7 +739,8 @@ class Order extends State
                         $device = $order->getDevice();
                         if ($device) {
                             $chargerID = $order->getChargerID();
-                            if ($device->chargingNOWData($chargerID, 'serial', '') == $data['orderId']) {
+                            $charging_now_data = ChargingNowData::getByDevice($device, $chargerID);
+                            if ($charging_now_data && $charging_now_data->getSerial() == $data['orderId']) {
                                 $data['charging']['status'] = $device->getChargerStatusData($chargerID);
                             }
                         }

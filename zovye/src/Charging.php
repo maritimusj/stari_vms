@@ -3,6 +3,7 @@
 namespace zovye;
 
 use zovye\Contract\ICard;
+use zovye\model\chargingNowDataModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\orderModelObj;
 use zovye\model\pay_logsModelObj;
@@ -10,6 +11,15 @@ use zovye\model\userModelObj;
 
 class Charging
 {
+    const FINISHED = 'finished';
+    const STOPPED = 'stopped';
+    const STATUS = 'status';
+
+    public static function getMaxDevicesNum()
+    {
+        return Config::charging('device.max', 1);
+    }
+
     public static function checkUnfinishedOrder(deviceModelObj $device)
     {
         $query = Order::query(['src' => Order::CHARGING_UNPAID, 'device_id' => $device->getId()]);
@@ -19,56 +29,67 @@ class Charging
         }
     }
 
-    public static function hasUnpaidOrder(userModelObj $user): bool
+    public static function getUnpaidOrderPriceTotal(userModelObj $user)
     {
+        $total = 0;
+
         $query = Order::query(['src' => Order::CHARGING_UNPAID, 'openid' => $user->getOpenid()]);
+
         /** @var orderModelObj $order */
         foreach ($query->findAll() as $order) {
-            if (!$order->isChargingFinished()) {
-                return true;
+            if ($order->isChargingFinished()) {
+                continue;
             }
-            $last_charging_status = $order->getExtraData('charging.status', []);
+            $last_charging_status = $order->getChargingStatus();
             if ($last_charging_status && $last_charging_status['priceTotal'] > 0) {
-                return true;
+                $total += $last_charging_status['priceTotal'];
             }
         }
-        return false;
+
+        return $total;
     }
 
-    public static function start(string $serial, ICard $card, deviceModelObj $device, $chargerID, $extra = [])
-    {
-        return Util::transactionDo(function () use ($card, $device, $chargerID, $serial, $extra) {
-            if (!$device->isChargingDevice()) {
-                return err('设备类型不正确！');
-            }
+    public static function start(
+        string $serial,
+        ICard $card,
+        int $limit,
+        deviceModelObj $device,
+        $chargerID,
+        $extra = []
+    ) {
+        if (!$device->isChargingDevice()) {
+            return err('设备类型不正确！');
+        }
 
-            $data = $device->getChargerStatusData($chargerID);
-            if (empty($data)) {
-                return err('充电枪不存在！');
-            }
+        $data = $device->getChargerStatusData($chargerID);
+        if (empty($data)) {
+            return err('充电枪不存在！');
+        }
 
-            $group = $device->getGroup();
-            if (empty($group)) {
-                return err('没有计费设置，请联系管理员！');
-            }
+        $group = $device->getGroup();
+        if (empty($group)) {
+            return err('没有计费设置，请联系管理员！');
+        }
 
-            if (!$device->isMcbOnline(false)) {
-                return err('设备离线，请稍后再试！');
-            }
+        if (!$device->isMcbOnline(false)) {
+            return err('设备离线，请稍后再试！');
+        }
 
-            if (!$device->lockAcquire()) {
-                return err('锁定设备失败，请稍后再试！');
-            }
+        if (!$device->lockAcquire()) {
+            return err('锁定设备失败，请稍后再试！');
+        }
+
+        return Util::transactionDo(function () use ($card, $limit, $device, $chargerID, $serial, $group, $extra) {
 
             $user = $card->getOwner();
 
-            $device_charging_data = $device->chargingNOWData($chargerID);
+            $device_charging_data = ChargingNowData::getByDevice($device, $chargerID);
             if ($device_charging_data) {
-                if ($device_charging_data['user'] != $user->getId()) {
+                if ($device_charging_data->getUserId() != $user->getId()) {
                     return err('设备正忙，请稍后再试！');
                 }
 
-                $order = Order::get($device_charging_data['serial'], true);
+                $order = Order::get($device_charging_data->getSerial(), true);
                 if ($order && !$order->isChargingFinished()) {
                     return err('设备正在充电中！');
                 }
@@ -78,19 +99,16 @@ class Charging
                 return err('用户锁定失败，请稍后再试！');
             }
 
-            if (self::hasUnpaidOrder($user)) {
-                return err('请等待订单结算完成后再试！');
+            if (ChargingNowData::countByUser($user) >= self::getMaxDevicesNum()) {
+                return err('正在充电设备已经超出最大限制，请稍后再试！');
             }
 
-            $user_charging_data = $user->chargingNOWData();
-            if ($user_charging_data) {
-                return err('用户卡正在使用中，请稍后再试！');
+            $remaining = $card->total() - self::getUnpaidOrderPriceTotal($user);
+            if ($remaining < 100) {
+                return err('用户卡余额已不足，请先充值后再试！');
             }
 
-            $total = $card->total();
-            if ($total < 100) {
-                return err('用户卡余额不足1.00元，请先充值后再试！');
-            }
+            $balance = $limit > 0 ? min($limit, $remaining) : $remaining;
 
             $order_data = [
                 'src' => Order::CHARGING_UNPAID,
@@ -114,9 +132,9 @@ class Charging
                     'chargerID' => $chargerID,
                     'card' => [
                         'uid' => $card->getUID(),
-                        'balance' => $card->total(),
+                        'balance' => $balance,
                         'type' => $card->getTypename(),
-                    ]
+                    ],
                 ],
             ];
 
@@ -134,7 +152,7 @@ class Charging
                 return err('创建订单失败！');
             }
 
-            $device->setChargerProperty($chargerID, [
+            if (!$device->setChargerProperty($chargerID, [
                 'timeTotal' => 0,
                 'timeRemain' => 0,
                 'chargedKWH' => 0,
@@ -146,24 +164,19 @@ class Charging
                 'soc' => 0,
                 'error' => 0,
                 'timestamp' => 0,
-            ]);
-
-            $device->setChargerBMSData($chargerID, []);
-
-            if (!$device->setChargingNOWData($chargerID, [
-                'serial' => $serial,
-                'user' => $user->getId(),
-                'time' => TIMESTAMP,
             ])) {
-                return err('保存数据失败！');
+                return err('重置充电枪状态失败！');
             }
 
-            if (!$user->setChargingNOWData([
-                'serial' => $serial,
-                'device' => $device->getId(),
-                'chargerID' => $chargerID,
-                'time' => TIMESTAMP,
-            ])) {
+            if (!$device->setChargerBMSData($chargerID, [])) {
+                return err('重置充电枪状态失败！');
+            }
+
+            if (!$device->save()) {
+                return err('保存设备状态失败！');
+            }
+
+            if (!ChargingNowData::set($serial, $user, $device, $chargerID)) {
                 return err('保存数据失败！');
             }
 
@@ -172,7 +185,7 @@ class Charging
                 'ch' => $chargerID,
                 'timeout' => 60,
                 'card' => $card->getUID(),
-                'balance' => $card->total(),
+                'balance' => $balance,
             ])) {
                 return err('设备通信失败！');
             }
@@ -187,19 +200,19 @@ class Charging
         });
     }
 
-    public static function stop(userModelObj $user)
+    public static function stop(userModelObj $user, string $serial)
     {
         if (!$user->acquireLocker(User::CHARGING_LOCKER)) {
             return err('用户锁定失败，请稍后再试！');
         }
 
-        $last_charging_data = $user->chargingNOWData();
+        $user_charging_data = ChargingNowData::getByUser($user, $serial);
 
-        if (isEmptyArray($last_charging_data)) {
+        if (empty($user_charging_data)) {
             return err('没有发现正在充电的设备！');
         }
 
-        $device = Device::get($last_charging_data['device']);
+        $device = $user_charging_data->getDevice();
         if (empty($device)) {
             return err('设备不存在！');
         }
@@ -208,29 +221,30 @@ class Charging
             return err('设备正忙，请稍后再试！');
         }
 
-        $chargerID = $last_charging_data['chargerID'];
+        $chargerID = $user_charging_data->getChargerId();
 
-        $last_charging_data = $device->chargingNOWData($chargerID);
-        if ($last_charging_data && $last_charging_data['user'] != $user->getId()) {
+        $last_charging_data = ChargingNowData::getByDevice($device, $chargerID);
+        if ($last_charging_data && $last_charging_data->getUserId() != $user->getId()) {
             return err('其他用户正在使用当前设备！');
         }
 
-        $serial = $last_charging_data['serial'];
+        $serial = $last_charging_data->getSerial();
 
         if (!$device->mcbNotify('config', '', [
             'req' => 'stop',
             'ch' => $chargerID,
-            'ser' => $last_charging_data['serial'],
+            'ser' => $serial,
         ])) {
             return err('设备通信失败，请重试！');
         }
 
         Job::chargingStopTimeout($serial);
 
-        return '已通知设备停止，请稍候！';
+        return '已通知设备停止充电，请稍候！';
     }
 
-    public static function stopCharging(deviceModelObj $device, $chargerID, $serial) {
+    public static function stopCharging(deviceModelObj $device, $chargerID, $serial)
+    {
         if (!$device->mcbNotify('config', '', [
             'req' => 'stop',
             'ch' => $chargerID,
@@ -240,6 +254,29 @@ class Charging
         }
 
         return true;
+    }
+
+    public static function stopUserAllCharging(userModelObj $user): array
+    {
+        $err = [];
+        /** @var chargingNowDataModelObj $charging_now_data */
+        foreach (ChargingNowData::getAllByUser($user) as $charging_now_data) {
+            $serial = $charging_now_data->getSerial();
+            $device = $charging_now_data->getDevice();
+            $chargerID = $charging_now_data->getChargerId();
+            if ($serial && $device) {
+                $result = self::stopCharging($device, $chargerID, $serial);
+                if (is_error($result)) {
+                    $err[] = [
+                        'device' => $device->profile(),
+                        'chargerID' => $chargerID,
+                        'error' => $result,
+                    ];
+                }
+            }
+        }
+
+        return $err;
     }
 
     public static function orderStatus($serial): array
@@ -272,7 +309,7 @@ class Charging
             return ['record' => $result];
         }
 
-        $finished = $order->getExtraData('BMS.finished');
+        $finished = $order->getChargingBMSData(self::FINISHED);
         if ($finished) {
             $result = ChargingServ::getChargingRecord($serial);
             if (!is_error($result) && isset($result['totalPrice'])) {
@@ -285,7 +322,7 @@ class Charging
             return ['finished' => $finished];
         }
 
-        $stopped = $order->getExtraData('BMS.stopped');
+        $stopped = $order->getChargingBMSData(self::STOPPED);
         if ($stopped) {
             return ['stopped' => $stopped];
         }
@@ -295,7 +332,7 @@ class Charging
             return err($timeout['reason'] ?? '设备响应超时！');
         }
 
-        $bms = $order->getExtraData('BMS.status', []);
+        $bms = $order->getChargingBMSData(self::STATUS);
         if ($bms && time() - $bms['timestamp'] > 120) {
             $chargerID = $order->getChargerID();
             self::end($serial, $chargerID, function ($order) {
@@ -323,6 +360,7 @@ class Charging
             } elseif ($result['re'] == 122) {
                 return err('启动失败：设备响应超时');
             }
+
             return err('启动失败：设备故障'.($result['re'] - 110));
         }
 
@@ -361,21 +399,18 @@ class Charging
                 return err('设备正忙，请稍后再试！');
             }
 
-            if ($device->chargingNOWData($chargerID, 'serial', '') == $serial) {
-                $device->removeChargingNOWData($chargerID);
+            $charging_now_data = ChargingNowData::getByDevice($device, $chargerID);
+            if ($charging_now_data && $charging_now_data->getSerial() == $serial) {
+                $charging_now_data->destroy();
             }
 
-            $user = $order->getUser();
+            $user = $charging_now_data->getUser();
             if (empty($user)) {
                 return err('找不到对应的用户！');
             }
 
             if (!$user->acquireLocker(User::CHARGING_LOCKER)) {
                 return err('用户锁定失败，请稍后再试！');
-            }
-
-            if ($user->chargingNOWData('serial', '') == $serial) {
-                $user->removeChargingNOWData();
             }
 
             if ($cb != null) {
@@ -409,6 +444,7 @@ class Charging
         $order = Order::get($serial, true);
         if ($order) {
             $order->setChargingResult($result);
+
             return $order->save();
         }
 
@@ -497,38 +533,37 @@ class Charging
 
     public static function checkCharging(deviceModelObj $device, $chargerID)
     {
-        $charging_data = $device->chargingNOWData($chargerID);
-        if ($charging_data) {
+        $charging_now_data = ChargingNowData::getByDevice($device, $chargerID);
+        if (empty($charging_now_data)) {
 
-            $serial = $charging_data['serial'] ?? '';
-            $order = Order::get($serial, true);
+            return;
+        }
 
-            if ($order) {
-                $res = ChargingServ::getChargingRecord($serial);
-                if ($res && !is_error($res) && isset($res['totalPrice'])) {
-                    Charging::settle($serial, $chargerID, $res);
-                } else {
-                    $chargerData = $device->getChargerStatusData($chargerID);
-                    if ($chargerData && $chargerData['status'] == 2) {
-                        Charging::end($serial, $chargerID, function ($order) {
-                            if (!$order->getChargingRecord()) {
-                                $order->setExtraData('timeout', [
-                                    'at' => time(),
-                                    'reason' => '充电枪已停止充电！',
-                                ]);
-                            }
-                        });
-                    }
+        $serial = $charging_now_data->getSerial();
+        $order = Order::get($serial, true);
+        if (empty($order)) {
+            $charging_now_data->destroy();
+
+            return;
+        }
+
+        $res = ChargingServ::getChargingRecord($serial);
+        if ($res && !is_error($res) && isset($res['totalPrice'])) {
+            Charging::settle($serial, $chargerID, $res);
+
+            return;
+        }
+
+        $chargerData = $device->getChargerStatusData($chargerID);
+        if ($chargerData && $chargerData['status'] == 2) {
+            Charging::end($serial, $chargerID, function ($order) {
+                if (!$order->getChargingRecord()) {
+                    $order->setExtraData('timeout', [
+                        'at' => time(),
+                        'reason' => '充电枪已停止充电！',
+                    ]);
                 }
-            } else {
-                $user = User::get($charging_data['user']);
-                if ($user) {
-                    if ($user->chargingNOWData('serial', '') == $serial) {
-                        $user->removeChargingNOWData();
-                    }
-                }
-                $device->removeChargingNOWData($chargerID);
-            }
+            });
         }
     }
 
@@ -564,7 +599,7 @@ class Charging
 
         $chargerID = $pay_log->getChargerID();
 
-        $res = self::start($pay_log->getOrderNO(), $pay_log, $device, $chargerID, [
+        $res = self::start($pay_log->getOrderNO(), $pay_log, 0, $device, $chargerID, [
             'ip' => $pay_log->getData('ip', ''),
             'pay_name' => $pay_log->getPayName(),
         ]);
@@ -580,7 +615,8 @@ class Charging
         return true;
     }
 
-    public static function onEventResult(deviceModelObj $device, $extra) {
+    public static function onEventResult(deviceModelObj $device, $extra)
+    {
         $res = self::setResult($extra['ser'], $extra['ch'], $extra);
         if (is_error($res)) {
             Log::error('charging', [
@@ -591,7 +627,8 @@ class Charging
         }
     }
 
-    public static function onEventReport(deviceModelObj $device, $extra) {
+    public static function onEventReport(deviceModelObj $device, $extra)
+    {
         if (isset($extra['firmwareVersion']) && isset($extra['protocolVersion'])) {
             $device->setChargingData($extra);
         }
@@ -606,13 +643,13 @@ class Charging
             if ($serial) {
                 $order = Order::get($serial, true);
                 if ($order) {
-                    //检查充电金额是否已经多于付款金额或帐户余额
                     $totalPrice = round($extra['status']['priceTotal'] * 100);
 
-                    $order->setExtraData('charging.status', $extra['status']);
                     $order->setPrice($totalPrice);
+                    $order->setChargingStatus($extra['status']);
                     $order->save();
 
+                    //检查充电金额是否已经多于付款金额或帐户余额
                     $pay_log = Pay::getPayLog($serial);
                     if ($pay_log) {
                         if ($totalPrice > $pay_log->total()) {
@@ -621,8 +658,12 @@ class Charging
                     } else {
                         //检查用户余额
                         $user = $order->getUser();
-                        if (empty($user) || $totalPrice > $user->getCommissionBalanceCard()->total()) {
+                        if (empty($user)) {
                             Charging::stopCharging($device, $chargerID, $serial);
+                        } else {
+                            if (self::getUnpaidOrderPriceTotal($user) > $user->getCommissionBalanceCard()->total()) {
+                                Charging::stopUserAllCharging($user);
+                            }
                         }
                     }
                 }
@@ -646,18 +687,19 @@ class Charging
 
                 $extra['BMS']['timestamp'] = time();
 
-                if ($extra['BMS']['event'] == 'finished') {
-                    Charging::end($serial, $chargerID, function($order) use($extra) {
-                        $order->setExtraData('BMS.finished', $extra['BMS']['data']);
+                if ($extra['BMS']['event'] == self::FINISHED) {
+                    Charging::end($serial, $chargerID, function (orderModelObj $order) use ($extra) {
+                        $order->setChargingBMSData(self::FINISHED, $extra['BMS']['data']);
                     });
-                } elseif ($extra['BMS']['event'] == 'stopped') {
-                    Charging::end($serial, $chargerID, function($order) use($extra) {
-                        $order->setExtraData('BMS.stopped', $extra['BMS']['data']);
+                } elseif ($extra['BMS']['event'] == self::STOPPED) {
+                    Charging::end($serial, $chargerID, function (orderModelObj $order) use ($extra) {
+                        $order->setChargingBMSData(self::STOPPED, $extra['BMS']['data']);
                     });
                 } else {
                     $order = Order::get($serial, true);
                     if ($order) {
-                        $order->setExtraData('BMS.status', $extra['BMS']['data']);
+                        $order->setChargingBMSData(self::STATUS, $extra['BMS']['data']);
+                        $order->save();
                     }
                 }
             }

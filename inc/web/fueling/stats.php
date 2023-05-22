@@ -67,7 +67,9 @@ if ($fn == 'default') {
         'price' => 0,
         'amount' => 0,
     ];
-    foreach ($query->getAll(['agent_id', 'COUNT(*) AS total', 'SUM(price) AS price', 'SUM(num) AS amount']) as $item) {
+
+    $all = $query->getAll(['agent_id', 'COUNT(*) AS total', 'SUM(price) AS price', 'SUM(num) AS amount']);
+    foreach ((array)$all as $item) {
         $agent = Agent::get($item['agent_id']);
         if ($agent) {
             $device_total = Device::query(['agent_id' => $agent->getId()])->count();
@@ -122,7 +124,8 @@ if ($fn == 'default') {
         'price' => 0,
         'amount' => 0,
     ];
-    foreach ($query->getAll(['device_id', 'COUNT(*) AS total', 'SUM(price) AS price', 'SUM(num) AS amount']) as $item) {
+    $all = $query->getAll(['device_id', 'COUNT(*) AS total', 'SUM(price) AS price', 'SUM(num) AS amount']);
+    foreach ((array)$all as $item) {
         $device = Device::get($item['device_id']);
         if ($device) {
             $list[] = [

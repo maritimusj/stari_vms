@@ -37,11 +37,19 @@ class GDCVMachine
         $url .= '?';
         $url .= http_build_query([
             'appId' => $this->config['appId'],
-            'timestamp' => $ts,
+            'timeStamp' => $ts,
             'sign' => $this->sign($ts),
         ]);
 
-        return Util::post($url, $data);
+        $response = Util::post($url, $data);
+
+        Log::debug('GDCVMachine', [
+            'url' => $url,
+            'data' => $data,
+            'response' => $response,
+        ]);
+
+        return $response;
     }
 
     public function uploadDeviceInfo(Traversable $deviceIterator)
@@ -78,12 +86,15 @@ class GDCVMachine
 
         $response = $this->post('/cgi-bin/machineinfo', $data);
 
-        Log::debug('GDCVMachine', [
-            'func' => 'upload device info',
-            'data' => $data,
-            'response' => $response,
-        ]);
+        if (empty($response)) {
+            return err('返回数据为空！');
+        }
 
+        if ($response['code'] === 0) {
+            return true;
+        }
+
+        return err($response['message']);
     }
 
     public function uploadOrderInfo(Traversable $orderIterator)
@@ -113,10 +124,14 @@ class GDCVMachine
 
         $response = $this->post('/cgi-bin/machleadrecord', $data);
 
-        Log::debug('GDCVMachine', [
-            'func' => 'upload order info',
-            'data' => $data,
-            'response' => $response,
-        ]);
+        if (empty($response)) {
+            return err('返回数据为空！');
+        }
+
+        if ($response['code'] === 0) {
+            return true;
+        }
+
+        return err($response['message']);
     }
 }

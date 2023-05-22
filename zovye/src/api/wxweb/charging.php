@@ -277,29 +277,39 @@ class charging
         return IotCharging::orderStatus($serial);
     }
 
+    /** chargingStatus api */
+    /**
+     * 返回设备指定充电枪的状态
+     * @return array
+     */
     public static function status(): array
     {
         $user = common::getWXAppUser();
 
-        $list = ChargingNowData::getAllByUser($user);
+        $device_uid = Request::trim('deviceId');
+        $charger_id = Request::int('chargerID');
 
-        if (empty($list)) {
-            return err('没有发现正在充电的设备！');
+        if (empty($device_uid) || empty($charger_id)) {
+            return err('请求参数错误！');
         }
 
-        $result = [];
+        $device = Device::get(Request::str('deviceId'), true);
+        if (empty($device)) {
+            return err('找不到这个设备！');
+        }
 
-        /** @var charging_now_dataModelObj $charging_now_data */
-        foreach ($list as $charging_now_data) {
-            $device = $charging_now_data->getDevice();
-            $result[] = [
+        $charging_now_data = ChargingNowData::getByDevice($device, $charger_id);
+        if ($charging_now_data) {
+            if ($charging_now_data->getUserId() != $user->getId()) {
+                return err('设备正在使用中！');
+            }
+            return [
                 'serial' => $charging_now_data->getSerial(),
-                'device' => $device ?? $device->profile(),
                 'createtime' => date('Y-m-d H:is', $charging_now_data->getCreatetime()),
             ];
         }
 
-        return $result;
+        return [];
     }
 
     public static function orderList(): array

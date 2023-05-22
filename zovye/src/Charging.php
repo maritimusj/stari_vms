@@ -332,9 +332,10 @@ class Charging
             return err($timeout['reason'] ?? '设备响应超时！');
         }
 
-        $bms = $order->getChargingBMSData(self::STATUS);
-        if ($bms && time() - $bms['timestamp'] > 120) {
+        $BMS = $order->getChargingBMSData(self::STATUS);
+        if ($BMS && time() - $BMS['timestamp'] > 120) {
             $chargerID = $order->getChargerID();
+
             self::end($serial, $chargerID, function ($order) {
                 $order->setExtraData('timeout', [
                     'at' => time(),
@@ -685,20 +686,23 @@ class Charging
 
                 $device->setChargerBMSData($chargerID, $extra['BMS']);
 
-                $extra['BMS']['timestamp'] = time();
+                $event = $extra['BMS']['event'];
+                $data = $extra['BMS']['data'];
+                
+                $data['timestamp'] = time();
 
-                if ($extra['BMS']['event'] == self::FINISHED) {
-                    Charging::end($serial, $chargerID, function (orderModelObj $order) use ($extra) {
-                        $order->setChargingBMSData(self::FINISHED, $extra['BMS']['data']);
+                if ($event == self::FINISHED) {
+                    Charging::end($serial, $chargerID, function (orderModelObj $order) use ($data) {
+                        $order->setChargingBMSData(self::FINISHED, $data);
                     });
-                } elseif ($extra['BMS']['event'] == self::STOPPED) {
-                    Charging::end($serial, $chargerID, function (orderModelObj $order) use ($extra) {
-                        $order->setChargingBMSData(self::STOPPED, $extra['BMS']['data']);
+                } elseif ($event == self::STOPPED) {
+                    Charging::end($serial, $chargerID, function (orderModelObj $order) use ($data) {
+                        $order->setChargingBMSData(self::STOPPED, $data);
                     });
                 } else {
                     $order = Order::get($serial, true);
                     if ($order) {
-                        $order->setChargingBMSData(self::STATUS, $extra['BMS']['data']);
+                        $order->setChargingBMSData(self::STATUS, $data);
                         $order->save();
                     }
                 }

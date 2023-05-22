@@ -752,13 +752,13 @@
                         <div class="radio">
                             <label>
                                 <input type="radio" name="principal" value="order" {if empty($agent_data['bonus']['principal']) || $agent_data['bonus']['principal'] == 'order'}checked{/if}>
-                                订单（每笔订单给予固定奖励）
+                                订单（固定金额）
                             </label>
                         </div>
                         <div class="radio">
                             <label>
                                 <input type="radio" name="principal" value="goods"  {if $agent_data['bonus']['principal'] == 'goods'}checked{/if}>
-                                商品（每个商品给予指定奖励）
+                                商品（金额 x 商品数量）
                             </label>
                         </div>
                     </div>

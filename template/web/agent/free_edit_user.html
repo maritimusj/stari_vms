@@ -51,8 +51,20 @@
                     </div>
                     <div class="radio">
                         <label>
+                            <input type="radio" name="mode_type" value="percent/goods" {if $mode_type == 'percent/goods'}checked{/if}>
+                            百分比(%) x 商品数量
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label>
                             <input type="radio" name="mode_type" value="amount"  {if $mode_type == 'amount'}checked{/if}>
                             固定金额(元)
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="mode_type" value="amount/goods"  {if $mode_type == 'amount/goods'}checked{/if}>
+                            固定金额(元) x 商品数量
                         </label>
                     </div>
                 </div>

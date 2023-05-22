@@ -3,7 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
- 
+
 namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
@@ -358,27 +358,27 @@ if ($page == 'device') {
         if ($settings['commission']['enabled']) {
             //佣金分享
             $settings['agent']['reg']['rel_gsp']['enabled'] = Request::bool('agentRelGsp') ? 1 : 0;
-            $settings['agent']['reg']['gsp_mode_type'] = Request::str('gsp_mode_type', 'percent');
+            $settings['agent']['reg']['gsp_mode_type'] = Request::str('gsp_mode_type', GSP::PERCENT);
 
             if ($settings['agent']['reg']['rel_gsp']['enabled']) {
 
-                $rel_0 = Request::float('rel_gsp_level0', 0, 2) * 100;
-                $rel_1 = Request::float('rel_gsp_level1', 0, 2) * 100;
-                $rel_2 = Request::float('rel_gsp_level2', 0, 2) * 100;
-                $rel_3 = Request::float('rel_gsp_level3', 0, 2) * 100;
+                $rel_0 = max(0, Request::float('rel_gsp_level0', 0, 2) * 100);
+                $rel_1 = max(0, Request::float('rel_gsp_level1', 0, 2) * 100);
+                $rel_2 = max(0, Request::float('rel_gsp_level2', 0, 2) * 100);
+                $rel_3 = max(0, Request::float('rel_gsp_level3', 0, 2) * 100);
 
-                if ($settings['agent']['reg']['gsp_mode_type'] == 'amount') {
-                    $rel_0 = intval(round($rel_0));
-                    $rel_1 = intval(round($rel_1));
-                    $rel_2 = intval(round($rel_2));
-                    $rel_3 = intval(round($rel_3));
+                if (in_array(
+                    $settings['agent']['reg']['gsp_mode_type'],
+                    [GSP::AMOUNT, GSP::AMOUNT_PER_GOODS]
+                )) {
+                    $rel_0 = intval($rel_0);
+                    $rel_1 = intval($rel_1);
+                    $rel_2 = intval($rel_2);
+                    $rel_3 = intval($rel_3);
                 } else {
-                    $total = $rel_0 + $rel_1 + $rel_2 + $rel_3;
-                    if ($total > 10000) {
-                        $rel_3 = round($rel_3 / $total * 10000, 2);
-                        $rel_2 = round($rel_2 / $total * 10000, 2);
-                        $rel_1 = round($rel_1 / $total * 10000, 2);
-                    }
+                    $rel_3 = min(10000, $rel_3);
+                    $rel_2 = min(10000, $rel_2);
+                    $rel_1 = min(10000, $rel_1);
                     $rel_0 = 10000 - $rel_1 - $rel_2 - $rel_3;
                 }
 

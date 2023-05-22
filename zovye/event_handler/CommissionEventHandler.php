@@ -478,20 +478,20 @@ class CommissionEventHandler
     ): int {
         $logs = [];
 
-        $createCommissionFN = function ($user, $val) use (
+        $createCommissionFN = function ($user, $gsp_val) use (
             &$remaining_total,
             $order,
             $src,
             &$logs
         ) {
-            if ($val > $remaining_total) {
-                $val = $remaining_total;
+            if ($gsp_val > $remaining_total) {
+                $gsp_val = $remaining_total;
             }
 
-            if ($val > 0) {
-                $logs[] = self::createCommission($user, $order, $val, $src);
+            if ($gsp_val > 0) {
+                $logs[] = self::createCommission($user, $order, $gsp_val, $src);
 
-                $remaining_total -= $val;
+                $remaining_total -= $gsp_val;
 
                 if ($remaining_total < 1) {
                     return false;
@@ -513,8 +513,8 @@ class CommissionEventHandler
                 }
 
                 //免费订单
-                if (($order->getPrice() == 0 && $order->getBalance() == 0) || ($order->getBalance(
-                        ) > 0 && Balance::isFreeOrder())) {
+                if (($order->getPrice() == 0 && $order->getBalance() == 0) || ($order->getBalance() > 0
+                        && Balance::isFreeOrder())) {
                     if (!$entry['order']['f']) {
                         continue;
                     }
@@ -522,18 +522,30 @@ class CommissionEventHandler
 
                 /** @var userModelObj $user */
                 $user = $entry['__obj'];
-                $percent = $entry['percent'];
-                if (empty($user) || $percent <= 0) {
+
+                $val = $entry['val'];
+                if (empty($user) || $val < 1) {
                     continue;
                 }
 
-                if ($entry['type'] == 'amount') {
-                    $val = intval($percent);
-                } else {
-                    $val = intval(round($commission_total * $percent / 10000));
+                $gsp_val = 0;
+
+                switch ($entry['type']) {
+                    case GSP::PERCENT:
+                        $gsp_val = intval(round($commission_total * $val / 10000));
+                        break;
+                    case GSP::PERCENT_PER_GOODS:
+                        $gsp_val = intval(round($commission_total * $val / 10000) * $order->getNum());
+                        break;
+                    case GSP::AMOUNT:
+                        $gsp_val = intval($val);
+                        break;
+                    case GSP::AMOUNT_PER_GOODS:
+                        $gsp_val = intval($val * $order->getNum());
+                        break;
                 }
 
-                if (!$createCommissionFN($user, $val)) {
+                if (!$createCommissionFN($user, $gsp_val)) {
                     //佣金为零，退出循环
                     break;
                 }
@@ -568,18 +580,29 @@ class CommissionEventHandler
                     }
                 }
 
-                $val = 0;
-                if ($entry->isPercent()) {
-                    $percent = intval($entry->getVal());
-                    if ($percent <= 0) {
-                        continue;
-                    }
-                    $val = intval(round($commission_total * $percent / 10000));
-                } elseif ($entry->isAmount()) {
-                    $val = intval($entry->getVal());
+                $val = intval($entry->getVal());
+                if ($val < 1) {
+                    continue;
                 }
 
-                if (!$createCommissionFN($user, $val)) {
+                $gsp_val = 0;
+
+                switch ($entry->getValType()) {
+                    case GSP::PERCENT:
+                        $gsp_val = intval(round($commission_total * $val / 10000));
+                        break;
+                    case GSP::PERCENT_PER_GOODS:
+                        $gsp_val = intval(round($commission_total * $val / 10000) * $order->getNum());
+                        break;
+                    case GSP::AMOUNT:
+                        $gsp_val = $val;
+                        break;
+                    case GSP::AMOUNT_PER_GOODS:
+                        $gsp_val = $val * $order->getNum();
+                        break;
+                }
+
+                if (!$createCommissionFN($user, $gsp_val)) {
                     //佣金为零，退出循环
                     break;
                 }

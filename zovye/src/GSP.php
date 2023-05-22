@@ -12,9 +12,16 @@ use zovye\model\userModelObj;
 
 class GSP
 {
-    const REL = 'rel';
-    const FREE = 'free';
-    const MIXED = 'mixed';
+    const PERCENT = 'percent'; // 百分比
+    const AMOUNT = 'amount'; // 固定金额
+
+    const PERCENT_PER_GOODS = 'percent/goods'; // 百分比 x 商品数量
+
+    const AMOUNT_PER_GOODS = 'amount/goods'; // 固定金额 x 商品数量
+
+    const REL = 'rel'; // 三级分佣
+    const FREE = 'free'; // 自收分佣
+    const MIXED = 'mixed'; // 混合分佣
 
     const LEVEL1 = '[level1]';
     const LEVEL2 = '[level2]';
@@ -65,7 +72,6 @@ class GSP
                 if ($superior) {
                     return $superior->getSuperior();
                 }
-
                 return null;
             case self::LEVEL3:
                 $superior = $agent->getSuperior();
@@ -75,7 +81,6 @@ class GSP
                         return $superior->getSuperior();
                     }
                 }
-
                 return null;
             default:
                 return User::get($obj->getUid(), true);

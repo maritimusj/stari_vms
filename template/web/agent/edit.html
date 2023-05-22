@@ -512,13 +512,25 @@
                         <div class="radio">
                             <label>
                                 <input type="radio" name="gsp_mode_type" value="percent" {if $agent_data['gsp']['mode_type'] == 'percent'}checked{/if}>
-                                百分比(%)
+                                百分比%（订单）
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="gsp_mode_type" value="percent/goods" {if $agent_data['gsp']['mode_type'] == 'percent/goods'}checked{/if}>
+                                百分比%（佣金 = 百分比% x 商品数量）
                             </label>
                         </div>
                         <div class="radio">
                             <label>
                                 <input type="radio" name="gsp_mode_type" value="amount"  {if $agent_data['gsp']['mode_type'] == 'amount'}checked{/if}>
-                                固定金额(元)
+                                固定金额（订单）
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="gsp_mode_type" value="amount/goods"  {if $agent_data['gsp']['mode_type'] == 'amount/goods'}checked{/if}>
+                                固定金额（佣金 = 固定金额 x 商品数量）
                             </label>
                         </div>
                     </div>

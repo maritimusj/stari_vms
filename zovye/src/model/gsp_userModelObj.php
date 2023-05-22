@@ -35,16 +35,6 @@ class gsp_userModelObj extends modelObj
         return tb('gsp_user');
     }
 
-    public function isPercent(): bool
-    {
-        return $this->val_type == 'percent';
-    }
-
-    public function isAmount(): bool
-    {
-        return $this->val_type == 'amount';
-    }
-
     public function isRole(): bool
     {
         return in_array($this->uid, [GSP::LEVEL1, GSP::LEVEL2, GSP::LEVEL3]);

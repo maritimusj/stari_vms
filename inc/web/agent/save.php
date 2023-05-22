@@ -156,23 +156,32 @@ $result = Util::transactionDo(function() use ($id, &$from) {
             $gsp_enabled = Request::bool('gsp_enabled');
             $user->updateSettings('agentData.gsp.enabled', $gsp_enabled);
             if ($gsp_enabled) {
-                $gsp_mode = in_array(Request::str('gsp_mode'), ['rel', 'free', 'mixed']) ? Request::str(
-                    'gsp_mode'
-                ) : 'rel';
-                $gsp_mode_type = Request::str('gsp_mode_type', 'percent');
+                $gsp_mode = in_array(Request::str('gsp_mode'), [GSP::REL, GSP::FREE, GSP::MIXED]) ?
+                    Request::str('gsp_mode') : GSP::REL;
+                $gsp_mode_type = Request::str('gsp_mode_type', GSP::PERCENT);
                 $user->updateSettings('agentData.gsp.mode', $gsp_mode);
                 $user->updateSettings('agentData.gsp.mode_type', $gsp_mode_type);
 
-                if ($gsp_mode == 'rel') {
+                if ($gsp_mode == GSP::REL) {
                     $user->updateSettings('agentData.gsp.order', [
                         'f' => Request::bool('freeOrderGSP') ? 1 : 0,
                         'b' => Request::bool('balanceOrderGSP') ? 1 : 0,
                         'p' => Request::bool('payOrderGSP') ? 1 : 0,
                     ]);
 
-                    $rel_1 = min(10000, max(0, Request::float('rel_level1', 0, 2) * 100));
-                    $rel_2 = min(10000, max(0, Request::float('rel_level2', 0, 2) * 100));
-                    $rel_3 = min(10000, max(0, Request::float('rel_level3', 0, 2) * 100));
+                    $rel_1 = max(0, Request::float('rel_level1', 0, 2) * 100);
+                    $rel_2 = max(0, Request::float('rel_level2', 0, 2) * 100);
+                    $rel_3 = max(0, Request::float('rel_level3', 0, 2) * 100);
+
+                    if (in_array($gsp_mode, [GSP::AMOUNT, GSP::AMOUNT_PER_GOODS])) {
+                        $rel_1 = intval($rel_1);
+                        $rel_2 = intval($rel_2);
+                        $rel_3 = intval($rel_3);
+                    } else {
+                        $rel_1 = min(10000, $rel_1);
+                        $rel_2 = min(10000, $rel_2);
+                        $rel_3 = min(10000, $rel_3);
+                    }
 
                     $user->updateSettings(
                         'agentData.gsp.rel',
@@ -182,6 +191,7 @@ $result = Util::transactionDo(function() use ($id, &$from) {
                             'level3' => $rel_3,
                         ]
                     );
+
                 }
             }
 

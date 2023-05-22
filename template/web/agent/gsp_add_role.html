@@ -14,13 +14,21 @@
         </label>
         <div class="col-md-10">
             <div class="control-label checkbox-inline text-left">
-                <label for="freeOrder1" class="radio-inline">
-                    <input name="freeOrderType" id="freeOrder1" type="radio" value="1" data-type="%">
-                    百分比&nbsp;
-                </label>
                 <label for="freeOrder0" class="radio-inline">
-                    <input name="freeOrderType" id="freeOrder0" type="radio" value="0" data-type="元">
-                    固定金额 &nbsp;
+                    <input name="freeOrderType" id="freeOrder0" type="radio" value="percent" data-type="%">
+                    百分比 &nbsp
+                </label>
+                <label for="freeOrder1" class="radio-inline">
+                    <input name="freeOrderType" id="freeOrder1" type="radio" value="percent/goods" data-type="%">
+                    百分比 x 商品数量
+                </label>
+                <label for="freeOrder2" class="radio-inline">
+                    <input name="freeOrderType" id="freeOrder2" type="radio" value="amount" data-type="元">
+                    固定金额 &nbsp
+                </label>
+                <label for="freeOrder3" class="radio-inline">
+                    <input name="freeOrderType" id="freeOrder3" type="radio" value="amount/goods" data-type="元">
+                    固定金额 x 商品数量
                 </label>
                 <input type="number"  class="form-control" style="display:inline-block;width:10em;" name="freeOrderVal" min="0" step="0.01">
                 <label class="type-text text-inline"></label>
@@ -34,12 +42,20 @@
         <div class="col-md-10">
             <div class="control-label checkbox-inline text-left">
                 <label for="payOrder1" class="radio-inline">
-                    <input name="payOrderType" id="payOrder1" type="radio" value="1" data-type="%">
-                    百分比&nbsp;
+                    <input name="payOrderType" id="payOrder0" type="radio" value="percent" data-type="%">
+                    百分比
+                </label>
+                <label for="payOrder1" class="radio-inline">
+                    <input name="payOrderType" id="payOrder1" type="radio" value="percent/goods" data-type="%">
+                    百分比 x 商品数量
                 </label>
                 <label for="payOrder0" class="radio-inline">
-                    <input name="payOrderType" id="payOrder0" type="radio" value="0" data-type="元">
-                    固定金额 &nbsp;
+                    <input name="payOrderType" id="payOrder2" type="radio" value="amount" data-type="元">
+                    固定金额
+                </label>
+                <label for="payOrder0" class="radio-inline">
+                    <input name="payOrderType" id="payOrder3" type="radio" value="amount/goods" data-type="元">
+                    固定金额 x 商品数量
                 </label>
                 <input type="number"  class="form-control" style="display:inline-block;width:10em;" name="payOrderVal" min="0" step="0.01">
                 <label class="type-text text-inline"></label>

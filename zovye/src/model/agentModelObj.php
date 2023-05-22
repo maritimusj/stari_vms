@@ -8,7 +8,6 @@ namespace zovye\model;
 
 use zovye\GSP;
 use zovye\Principal;
-use zovye\Referral;
 use zovye\User;
 use zovye\Util;
 use zovye\Device;
@@ -236,7 +235,6 @@ class agentModelObj extends userModelObj
     }
 
 
-
     /**
      * 是否为指定代理商的合伙人
      * @param agentModelObj|string $agent
@@ -289,9 +287,9 @@ class agentModelObj extends userModelObj
                 if ($superior && $superior->isCommissionEnabled()) {
 
                     $result[] = [
-                        'percent' => $this->settings('agentData.gsp.rel.level1', 0),
+                        'val' => $this->settings('agentData.gsp.rel.level1', 0),
                         '__obj' => $superior,
-                        'type' => $this->settings('agentData.gsp.mode_type', 'percent'),
+                        'type' => $this->settings('agentData.gsp.mode_type', GSP::PERCENT),
                         'order' => $order_settings,
                     ];
 
@@ -299,9 +297,9 @@ class agentModelObj extends userModelObj
                     $x_superior = $superior->getSuperior();
                     if ($x_superior && $x_superior->isCommissionEnabled()) {
                         $result[] = [
-                            'percent' => $this->settings('agentData.gsp.rel.level2', 0),
+                            'val' => $this->settings('agentData.gsp.rel.level2', 0),
                             '__obj' => $x_superior,
-                            'type' => $this->settings('agentData.gsp.mode_type', 'percent'),
+                            'type' => $this->settings('agentData.gsp.mode_type', GSP::PERCENT),
                             'order' => $order_settings,
                         ];
 
@@ -309,9 +307,9 @@ class agentModelObj extends userModelObj
                         $xx_superior = $x_superior->getSuperior();
                         if ($xx_superior && $xx_superior->isCommissionEnabled()) {
                             $result[] = [
-                                'percent' => $this->settings('agentData.gsp.rel.level3', 0),
+                                'val' => $this->settings('agentData.gsp.rel.level3', 0),
                                 '__obj' => $xx_superior,
-                                'type' => $this->settings('agentData.gsp.mode_type', 'percent'),
+                                'type' => $this->settings('agentData.gsp.mode_type', GSP::PERCENT),
                                 'order' => $order_settings,
                             ];
                         }
@@ -323,9 +321,7 @@ class agentModelObj extends userModelObj
             //自由分佣模式
             $gsp_users = $this->settings('agentData.gsp.users', []);
             foreach ($gsp_users as $openid => $entry) {
-
                 $user = User::get($openid, true);
-
                 if ($user) {
                     if (empty($device) || empty($entry['assigned']) || $device->isMatched($entry['assigned'])) {
                         $data = [
@@ -333,11 +329,11 @@ class agentModelObj extends userModelObj
                             'order' => is_array($entry['order']) ? $entry['order'] : $order_settings,
                         ];
                         if ($entry['percent'] > 0) {
-                            $data['percent'] = floatval($entry['percent']);
+                            $data['val'] = floatval($entry['percent']);
                             $data['type'] = 'percent';
                         } else {
                             if ($entry['amount'] > 0) {
-                                $data['percent'] = floatval($entry['amount']);
+                                $data['val'] = floatval($entry['amount']);
                                 $data['type'] = 'amount';
                             }
                         }

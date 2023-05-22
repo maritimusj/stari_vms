@@ -506,18 +506,13 @@ class CommissionEventHandler
             $gsp_users = $agent->getGspUsers();
             foreach ($gsp_users as $entry) {
                 //收费订单
-                if ($order->getPrice() > 0 || ($order->getBalance() > 0 && Balance::isPayOrder())) {
-                    if (!$entry['order']['p']) {
-                        continue;
-                    }
+                if ($order->isPay() && !$entry['order']['p']) {
+                    continue;
                 }
 
                 //免费订单
-                if (($order->getPrice() == 0 && $order->getBalance() == 0) || ($order->getBalance() > 0
-                        && Balance::isFreeOrder())) {
-                    if (!$entry['order']['f']) {
-                        continue;
-                    }
+                if ($order->isFree() && !$entry['order']['f']) {
+                    continue;
                 }
 
                 /** @var userModelObj $user */
@@ -555,29 +550,20 @@ class CommissionEventHandler
 
             /** @var gsp_userModelObj $entry */
             foreach ($query->findAll() as $entry) {
+
                 $user = GSP::getUser($agent, $entry);
                 if (empty($user)) {
                     continue;
                 }
 
                 //支付订单
-                if ($order->getPrice() > 0 && !$entry->isPayOrderIncluded()) {
+                if ($order->isPay() && !$entry->isPayOrderIncluded()) {
                     continue;
                 }
 
                 //免费订单
-                if ($order->getPrice() == 0 && $order->getBalance() == 0 && !$entry->isFreeOrderIncluded()) {
+                if ($order->isFree() && !$entry->isFreeOrderIncluded()) {
                     continue;
-                }
-
-                //积分订单
-                if ($order->getBalance() > 0) {
-                    if (Balance::isFreeOrder() && !$entry->isFreeOrderIncluded()) {
-                        continue;
-                    }
-                    if (Balance::isPayOrder() && !$entry->isPayOrderIncluded()) {
-                        continue;
-                    }
                 }
 
                 $val = intval($entry->getVal());

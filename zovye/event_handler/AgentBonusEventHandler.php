@@ -36,17 +36,13 @@ class AgentBonusEventHandler
         }
 
         //免费订单
-        if (!$agent->settings('agentData.bonus.order.f')) {
-            if ($order->isFree()) {
-                return true;
-            }
+        if ($order->isFree() && !$agent->settings('agentData.bonus.order.f')) {
+            return true;
         }
 
         //支付订单
-        if (!$agent->settings('agentData.bonus.order.p')) {
-            if ($order->isPay()) {
-                return true;
-            }
+        if ($order->isPay() && !$agent->settings('agentData.bonus.order.p')) {
+            return true;
         }
 
         $agents = ['level0' => $agent];

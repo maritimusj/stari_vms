@@ -47,6 +47,7 @@ if ($fn == 'adduser' || $fn == 'edituser') {
             $result_msg('找不到这个用户！', false);
         }
 
+        $tpl_data['fn'] = $fn;
         $tpl_data['user'] = $user;
 
         if ($fn == 'adduser') {
@@ -68,19 +69,21 @@ if ($fn == 'adduser' || $fn == 'edituser') {
             ];
 
             if ($data[GSP::PERCENT]) {
-                $tpl_data['mode_type'] = GSP::PERCENT;
+                $mode_type = GSP::PERCENT;
             } elseif ($data[GSP::PERCENT_PER_GOODS]) {
-                $tpl_data['mode_type'] = GSP::PERCENT_PER_GOODS;
+                $mode_type = GSP::PERCENT_PER_GOODS;
             } elseif ($data[GSP::AMOUNT]) {
-                $tpl_data['mode_type'] = GSP::AMOUNT;
+                $mode_type = GSP::AMOUNT;
             } elseif ($data[GSP::AMOUNT_PER_GOODS]) {
-                $tpl_data['mode_type'] = GSP::AMOUNT_PER_GOODS;
+                $mode_type = GSP::AMOUNT_PER_GOODS;
             }
 
-            $tpl_data['val'] = number_format($data['percent'] / 100, 2);
+            $tpl_data['mode_type'] = $mode_type;
+            $tpl_data['val'] = number_format($data[$mode_type] / 100, 2);
         }
 
-        app()->showTemplate('web/agent/free_edit_user', $tpl_data);
+        $content = app()->fetchTemplate('web/agent/free_edit_user', $tpl_data);
+        JSON::success(['title' => $fn == 'adduser' ? '增加佣金分享用户' : '编辑佣金分享用户', 'content' => $content]);
 
     } elseif ($from == GSP::MIXED) {
 
@@ -105,9 +108,11 @@ if ($fn == 'adduser' || $fn == 'edituser') {
         if (empty($user)) {
             $result_msg('找不到这个用户！', false);
         }
+        
         $tpl_data['user'] = $user;
 
-        app()->showTemplate('web/agent/mixed_edit_user', $tpl_data);
+        $content = app()->fetchTemplate('web/agent/mixed_edit_user', $tpl_data);
+        JSON::success(['title' => $fn == 'adduser' ? '增加佣金分享用户' : '编辑佣金分享用户', 'content' => $content]);
     } else {
         Util::resultAlert('不正确的操作！', 'error');
     }
@@ -127,7 +132,7 @@ if ($fn == 'adduser' || $fn == 'edituser') {
                 'b' => Request::bool('balanceOrder') ? 1 : 0,
                 'p' => Request::bool('payOrder') ? 1 : 0,
             ],
-            'createtime' => time(),
+            'createtime' => $agent->settings("agentData.gsp.users.{$user->getOpenid()}.createtime", time()),
         ];
 
         $mode_type = Request::trim('mode_type', GSP::PERCENT);
@@ -184,7 +189,7 @@ if ($fn == 'adduser' || $fn == 'edituser') {
         $agent->updateSettings('agentData.gsp.mode', GSP::MIXED);
     }
 
-    Util::message('保存成功！', $back_url, 'success');
+    $result_msg('保存成功！', 'success');
 
 } elseif ($fn == 'removeuser') {
 

@@ -10,57 +10,69 @@
         </div>
     </div>
     <div class="form-group">
-        <label class="col-md-2 control-label">免费订单<br/>佣金
+        <label class="col-md-2 control-label">免费订单
         </label>
         <div class="col-md-10">
-            <div class="control-label checkbox-inline text-left">
-                <label for="freeOrder0" class="radio-inline">
+            <div class="control-label checkbox text-left">
+                <label for="freeOrder0" class="radio">
                     <input name="freeOrderType" id="freeOrder0" type="radio" value="percent" data-type="%">
                     百分比 &nbsp
                 </label>
-                <label for="freeOrder1" class="radio-inline">
+                <label for="freeOrder1" class="radio">
                     <input name="freeOrderType" id="freeOrder1" type="radio" value="percent/goods" data-type="%">
                     百分比 x 商品数量
                 </label>
-                <label for="freeOrder2" class="radio-inline">
+                <label for="freeOrder2" class="radio">
                     <input name="freeOrderType" id="freeOrder2" type="radio" value="amount" data-type="元">
                     固定金额 &nbsp
                 </label>
-                <label for="freeOrder3" class="radio-inline">
+                <label for="freeOrder3" class="radio">
                     <input name="freeOrderType" id="freeOrder3" type="radio" value="amount/goods" data-type="元">
                     固定金额 x 商品数量
                 </label>
-                <input type="number"  class="form-control" style="display:inline-block;width:10em;" name="freeOrderVal" min="0" step="0.01">
-                <label class="type-text text-inline"></label>
-                <span class="help-block">* 用户通过广告免费领取商品时，所产生订单的佣金比例或者金额</span>
             </div>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-md-2 control-label">支付订单<br/>佣金
+        <label class="col-md-2 control-label">数值
         </label>
         <div class="col-md-10">
-            <div class="control-label checkbox-inline text-left">
-                <label for="payOrder1" class="radio-inline">
+            <input type="number"  class="form-control" name="freeOrderVal" min="0" step="0.01">
+            <label class="type-text text-inline"></label>
+            <span class="help-block">* 用户通过广告免费领取商品时，所产生订单的佣金比例或者金额</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label">支付订单
+        </label>
+        <div class="col-md-10">
+            <div class="control-label checkbox text-left">
+                <label for="payOrder0" class="radio">
                     <input name="payOrderType" id="payOrder0" type="radio" value="percent" data-type="%">
-                    百分比
+                    百分比%
                 </label>
-                <label for="payOrder1" class="radio-inline">
+                <label for="payOrder1" class="radio">
                     <input name="payOrderType" id="payOrder1" type="radio" value="percent/goods" data-type="%">
-                    百分比 x 商品数量
+                    百分比% x 商品数量
                 </label>
-                <label for="payOrder0" class="radio-inline">
+                <label for="payOrder2" class="radio">
                     <input name="payOrderType" id="payOrder2" type="radio" value="amount" data-type="元">
                     固定金额
                 </label>
-                <label for="payOrder0" class="radio-inline">
+                <label for="payOrder3" class="radio">
                     <input name="payOrderType" id="payOrder3" type="radio" value="amount/goods" data-type="元">
                     固定金额 x 商品数量
                 </label>
-                <input type="number"  class="form-control" style="display:inline-block;width:10em;" name="payOrderVal" min="0" step="0.01">
-                <label class="type-text text-inline"></label>
-                <span class="help-block">* 用户支付购买商品时，所产生订单的佣金比例或者金额</span>
             </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label">数值
+        </label>
+        <div class="col-md-10">
+            <input type="number"  class="form-control" name="payOrderVal" min="0" step="0.01">
+            <label class="type-text text-inline"></label>
+            <span class="help-block">* 用户支付购买商品时，所产生订单的佣金比例或者金额</span>
         </div>
     </div>
     <div class="form-group text-right">

@@ -65,9 +65,25 @@ if (in_array(
                         'createtime_formatted' => date('Y-m-d H:i:s', $entry['createtime']),
                     ];
                     if ($entry['percent']) {
-                        $data['percent'] = number_format($entry['percent'] / 100, 2);
-                    } else {
-                        $data['amount'] = number_format($entry['amount'] / 100, 2);
+                        $data['gsp'] = [
+                            'title' => '百分比%',
+                            'val' => number_format($entry['percent'] / 100, 2) . '%',
+                        ];
+                    } elseif ($entry['percent/goods']) {
+                        $data['gsp'] = [
+                            'title' => '百分比% x 商品数量',
+                            'val' => number_format($entry['percent/goods'] / 100, 2) . '%',
+                        ];
+                    } elseif ($entry['amount']) {
+                        $data['gsp'] = [
+                            'title' => '固定金额',
+                            'val' => '¥' . number_format($entry['amount'] / 100, 2),
+                        ];
+                    } elseif ($entry['amount/goods']) {
+                        $data['gsp'] = [
+                            'title' => '固定金额 x 商品数量',
+                            'val' => '¥' . number_format($entry['amount/goods'] / 100, 2),
+                        ];
                     }
                     $data['order_type'] = is_array($entry['order']) ? $entry['order'] : [
                         'f' => 1,

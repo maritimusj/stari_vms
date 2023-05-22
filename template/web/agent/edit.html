@@ -44,12 +44,6 @@
     .mixed_order_type .name {
         margin-right: 6px;
     }
-    .mixed_order_type span.percent:after {
-        content: '%';
-    }
-    .mixed_order_type span.amount:after {
-        content: '元';
-    }
     .rel {
         cursor: pointer;
     }
@@ -512,25 +506,25 @@
                         <div class="radio">
                             <label>
                                 <input type="radio" name="gsp_mode_type" value="percent" {if $agent_data['gsp']['mode_type'] == 'percent'}checked{/if}>
-                                百分比%（订单）
+                                百分比%
                             </label>
                         </div>
                         <div class="radio">
                             <label>
                                 <input type="radio" name="gsp_mode_type" value="percent/goods" {if $agent_data['gsp']['mode_type'] == 'percent/goods'}checked{/if}>
-                                百分比%（佣金 = 百分比% x 商品数量）
+                                百分比% x 商品数量
                             </label>
                         </div>
                         <div class="radio">
                             <label>
                                 <input type="radio" name="gsp_mode_type" value="amount"  {if $agent_data['gsp']['mode_type'] == 'amount'}checked{/if}>
-                                固定金额（订单）
+                                固定金额
                             </label>
                         </div>
                         <div class="radio">
                             <label>
                                 <input type="radio" name="gsp_mode_type" value="amount/goods"  {if $agent_data['gsp']['mode_type'] == 'amount/goods'}checked{/if}>
-                                固定金额（佣金 = 固定金额 x 商品数量）
+                                固定金额 x 商品数量
                             </label>
                         </div>
                     </div>
@@ -566,8 +560,9 @@
                             <tr>
                                 <th>#</th>
                                 <th>用户</th>
-                                <th></th>
-                                <th>佣金</th>
+                                <th>订单</th>
+                                <th>计算方式</th>
+                                <th>数值</th>
                                 <th>加入时间</th>
                                 <th>操作</th>
                             </tr>
@@ -586,16 +581,18 @@
                                 <td>
                                     {loop $item['order_type'] $index $o}
                                     {if $index != 'b'}
-                                    <span class="order_type {if $o}{$index}{/if}" title="{if $index == 'f'}免费订单{elseif $index == 'p'}支付订单{/if}">{if $index == 'f'}免费{/if}{if $index == 'p'}支付{/if}</span>
+                                    <span class="order_type {if $o}{$index}{/if}" title="{if $index == 'f'}免费订单{elseif $index == 'p'}支付订单{/if}">
+                                        {if $index == 'f'}免费{/if}
+                                        {if $index == 'p'}支付{/if}
+                                    </span>
                                     {/if}
                                     {/loop}
                                 </td>
                                 <td>
-                                    {if $item['percent']}
-                                    {$item['percent']}%
-                                    {else}
-                                    ¥{php echo number_format($item['amount'], 2)}
-                                    {/if}
+                                    {$item['gsp']['title']}
+                                </td>
+                                <td>
+                                    <span>{$item['gsp']['val']}</span>
                                 </td>
                                 <td>
                                     {$item['createtime_formatted']}
@@ -633,8 +630,9 @@
                                 <tr>
                                     <th>#</th>
                                     <th>用户</th>
-                                    <th>角色</th>
-                                    <th>佣金</th>
+                                    <th>用户身份</th>
+                                    <th>免费订单</th>
+                                    <th>支付订单</th>
                                     <th>操作</th>
                                 </tr>
                                 </thead>
@@ -652,30 +650,48 @@
                                     </td>
                                     <td>
                                         {if $index == '[level1]'}
-                                        <span class="rel level1" data-op="editRole" data-level="[level1]">直接上级（一级）</span>
+                                        <span>直接上级（一级）</span>
                                         {elseif $index == '[level2]'}
-                                        <span class="rel level2" data-op="editRole" data-level="[level2]">上上级（二级）</span>
+                                        <span>上上级（二级）</span>
                                         {elseif $index == '[level3]'}
-                                        <span class="rel level3" data-op="editRole" data-level="[level3]">上上上级（三级）</span>
+                                        <span>上上上级（三级）</span>
                                         {else}
+                                        <span class="text-muted">&lt;其它&gt;</span>
                                         {/if}
                                     </td>
                                     <td>
                                         {if $item['f']}
-                                        <div class="mixed_order_type f{if $item['f']['val'] == 0} none{/if}">
-                                            <span class="name">免费</span><span class="{$item['f']['val_type']}">{$item['f']['val']}</span>
+                                        <div>
+                                            {$item['f']['val']}{if $item['f']['val_type'] == 'percent'}%
+                                            {elseif $item['f']['val_type'] == 'percent/goods'}% x 商品数量
+                                            {elseif $item['f']['val_type'] == 'amount'}元
+                                            {elseif $item['f']['val_type'] == 'amount/goods'}元 x 商品数量
+                                            {/if}
                                         </div>                                        
                                         {/if}
+                                    </td>
+                                    <td>
                                         {if $item['p']}
-                                        <div class="mixed_order_type p{if $item['p']['val'] == 0} none{/if}">
-                                            <span class="name">支付</span><span class="{$item['p']['val_type']}">{$item['p']['val']}</span>
+                                        <div>
+                                            {$item['p']['val']}{if $item['p']['val_type'] == 'percent'}%
+                                            {elseif $item['p']['val_type'] == 'percent/goods'}% x 商品数量
+                                            {elseif $item['p']['val_type'] == 'amount'}元
+                                            {elseif $item['p']['val_type'] == 'amount/goods'}元 x 商品数量
+                                            {/if}
                                         </div>                                        
                                         {/if}
                                     </td>
                                     <td class="operate">
                                         <!--<i class="fa fa-wrench" title="指定设备" data-gsp-op="config"></i>-->
-                                        
-                                        {if !in_array($index, ['[level1]', '[level2]', '[level3]'])}
+                                        {if in_array($index, ['[level1]', '[level2]', '[level3]'])}
+                                        {if $index == '[level1]'}
+                                        <span class="rel level1" data-op="editRole" data-level="[level1]"><i class="fa fa-cog" title="设置"></i></span>
+                                        {elseif $index == '[level2]'}
+                                        <span class="rel level2" data-op="editRole" data-level="[level2]"><i class="fa fa-cog" title="设置"></i></span>
+                                        {elseif $index == '[level3]'}
+                                        <span class="rel level3" data-op="editRole" data-level="[level3]"><i class="fa fa-cog" title="设置"></i></span>
+                                        {/if}
+                                        {else}
                                         <i class="fa fa-cog" title="设置" data-gsp-op="mixed_edit"></i>
                                         <i class="fa fa-trash-o" title="删除" data-gsp-op="mixed_remove"></i>
                                         {/if}
@@ -694,7 +710,7 @@
                         <div class="col-md-12">
                             <div type="button" class="btn btn-success" data-op="addRole">
                                 <i class="fa fa-users" data-op="addRole"></i>
-                                设置角色
+                                三级分佣
                             </div>
                             <button type="button" class="btn btn-success" onclick="searchDlg.choose('mixed');">
                                 <i class="fa fa-user"></i>
@@ -853,7 +869,12 @@
     }
 
     api.edit = function (id, from) {
-        location.href = api.url + "&op=gsp&fn=edituser&id=" + id + "&from=" + from;
+        api.showResult({
+            op: 'gsp',
+            fn: 'edituser',
+            id,
+            from,
+        })
     }
 
     api.free_edit = function (id) {
@@ -884,7 +905,7 @@
 
     searchDlg.init('user', function (user, from) {
         if (user && user.id) {
-            location.href = api.url + "&op=gsp&fn=adduser&id=" + user.id + "&from=" + from;            
+            api.showResult({op: 'gsp', fn: 'adduser', id: user.id, from});
         }
     })
 

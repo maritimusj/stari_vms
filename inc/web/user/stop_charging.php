@@ -6,7 +6,7 @@
 
 namespace zovye;
 
-use zovye\model\chargingNowDataModelObj;
+use zovye\model\charging_now_dataModelObj;
 
 defined('IN_IA') or exit('Access Denied');
 
@@ -23,7 +23,7 @@ if (empty($fn)) {
 
     $list = [];
 
-    /** @var chargingNowDataModelObj $charging_now_data */
+    /** @var charging_now_dataModelObj $charging_now_data */
     foreach (ChargingNowData::getAllByUser($user) as $charging_now_data) {
 
         $serial = $charging_now_data->getSerial();

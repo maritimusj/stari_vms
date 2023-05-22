@@ -7,7 +7,7 @@
 
 namespace zovye;
 
-use zovye\model\chargingNowDataModelObj;
+use zovye\model\charging_now_dataModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 
@@ -28,7 +28,7 @@ class ChargingNowData
         return self::model()->create($data);
     }
 
-    public static function get($serial): ?chargingNowDataModelObj
+    public static function get($serial): ?charging_now_dataModelObj
     {
         return self::query(['serial' => $serial])->findOne();
     }
@@ -38,7 +38,7 @@ class ChargingNowData
         userModelObj $user,
         deviceModelObj $device,
         int $charger_id
-    ): ?chargingNowDataModelObj {
+    ): ?charging_now_dataModelObj {
         return self::create([
             'serial' => $serial,
             'user_id' => $user->getId(),
@@ -48,7 +48,7 @@ class ChargingNowData
         ]);
     }
 
-    public static function getByUser(userModelObj $user, string $serial): ?chargingNowDataModelObj
+    public static function getByUser(userModelObj $user, string $serial): ?charging_now_dataModelObj
     {
         return self::model()->findOne([
             'serial' => $serial,
@@ -56,7 +56,7 @@ class ChargingNowData
         ]);
     }
 
-    public static function getByDevice(deviceModelObj $device, int $charger_id): ?chargingNowDataModelObj
+    public static function getByDevice(deviceModelObj $device, int $charger_id): ?charging_now_dataModelObj
     {
         return self::model()->findOne([
             'device_id' => $device->getId(),

@@ -3,7 +3,7 @@
 namespace zovye;
 
 use zovye\Contract\ICard;
-use zovye\model\chargingNowDataModelObj;
+use zovye\model\charging_now_dataModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\orderModelObj;
 use zovye\model\pay_logsModelObj;
@@ -259,7 +259,7 @@ class Charging
     public static function stopUserAllCharging(userModelObj $user): array
     {
         $err = [];
-        /** @var chargingNowDataModelObj $charging_now_data */
+        /** @var charging_now_dataModelObj $charging_now_data */
         foreach (ChargingNowData::getAllByUser($user) as $charging_now_data) {
             $serial = $charging_now_data->getSerial();
             $device = $charging_now_data->getDevice();
@@ -400,8 +400,8 @@ class Charging
             }
 
             $charging_now_data = ChargingNowData::getByDevice($device, $chargerID);
-            if ($charging_now_data && $charging_now_data->getSerial() == $serial) {
-                $charging_now_data->destroy();
+            if (empty($charging_now_data) || $charging_now_data->getSerial() != $serial) {
+                return err('找不到这个设备的充电信息！');
             }
 
             $user = $charging_now_data->getUser();
@@ -420,8 +420,8 @@ class Charging
             if (!$order->save()) {
                 return err('保存数据失败！');
             }
-
-            return true;
+            
+            return $charging_now_data->destroy();
         });
     }
 

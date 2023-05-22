@@ -20,7 +20,7 @@ use function zovye\tb;
  * @method getChargerId();
  * @method getCreatetime();
  */
-class chargingNowDataModelObj extends modelObj
+class charging_now_dataModelObj extends modelObj
 {
     public static function getTableName($readOrWrite): string
     {

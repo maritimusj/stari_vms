@@ -10,7 +10,7 @@ use zovye\ChargingNowData;
 use zovye\Device;
 use zovye\Group;
 use zovye\Helper;
-use zovye\model\chargingNowDataModelObj;
+use zovye\model\charging_now_dataModelObj;
 use zovye\model\device_groupsModelObj;
 use zovye\model\deviceModelObj;
 use zovye\Order;
@@ -45,7 +45,7 @@ class charging
             if ($list) {
                 $data['charging_now_data'] = [];
 
-                /** @var chargingNowDataModelObj $charging_now_data */
+                /** @var charging_now_dataModelObj $charging_now_data */
                 foreach ($list as $charging_now_data) {
 
                     $serial = $charging_now_data->getSerial();
@@ -289,7 +289,7 @@ class charging
 
         $result = [];
 
-        /** @var chargingNowDataModelObj $charging_now_data */
+        /** @var charging_now_dataModelObj $charging_now_data */
         foreach ($list as $charging_now_data) {
             $device = $charging_now_data->getDevice();
             $result[] = [

@@ -42,11 +42,11 @@ class Charging
             }
             $last_charging_status = $order->getChargingStatus();
             if ($last_charging_status && $last_charging_status['priceTotal'] > 0) {
-                $total += $last_charging_status['priceTotal'];
+                $total += $last_charging_status['priceTotal'] * 100;
             }
         }
 
-        return $total;
+        return intval($total);
     }
 
     public static function start(
@@ -420,7 +420,7 @@ class Charging
             if (!$order->save()) {
                 return err('保存数据失败！');
             }
-            
+
             return $charging_now_data->destroy();
         });
     }

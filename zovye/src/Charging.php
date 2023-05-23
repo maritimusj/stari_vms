@@ -594,14 +594,7 @@ class Charging
 
         $chargerData = $device->getChargerStatusData($chargerID);
         if ($chargerData && $chargerData['status'] == 2) {
-            Charging::end($serial, $chargerID, function ($order) {
-                if (!$order->getChargingRecord()) {
-                    $order->setExtraData('timeout', [
-                        'at' => time(),
-                        'reason' => '充电枪已停止充电！',
-                    ]);
-                }
-            });
+            Charging::endOrder($serial, '充电枪已停止充电！');
         }
     }
 

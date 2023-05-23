@@ -117,7 +117,7 @@ class Charging
 
             $remaining = $card->total() - self::getUnpaidOrderPriceTotal($user);
             if ($remaining < 100) {
-                return err('用户卡余额已不足，请先充值后再试！');
+                return err('用户卡有效余额已不足，请先充值后再试！');
             }
 
             $balance = $limit > 0 ? min($limit, $remaining) : $remaining;

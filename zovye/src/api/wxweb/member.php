@@ -254,8 +254,8 @@ class member
                 return err('转帐金额不正确！');
             }
 
-            if ($total > $user->getCommissionBalance()->total()) {
-                return err('帐户余额不足！');
+            if ($total + \zovye\Charging::getUnpaidOrderPriceTotal($user) > $user->getCommissionBalance()->total()) {
+                return err('帐户有效余额不足，请充值再操作！');
             }
 
             $member = Team::getMember($id);

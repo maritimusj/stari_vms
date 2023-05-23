@@ -400,6 +400,7 @@ class charging
         }
 
         $chargerID = Request::int('chargerID');
+        $remark = Request::trim('remark');
 
         $charging_now_data = ChargingNowData::getByDevice($device, $chargerID);
         if (!empty($charging_now_data)) {
@@ -413,7 +414,8 @@ class charging
             $device,
             $chargerID,
             $price,
-            $device->generateChargingSerial($chargerID)
+            $device->generateChargingSerial($chargerID),
+            $remark
         );
     }
 

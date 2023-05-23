@@ -481,7 +481,8 @@ class Helper
         deviceModelObj $device,
         int $chargerID,
         int $total_price,
-        string $serial = ''
+        string $serial = '',
+        string $remark = ''
     ) {
         if ($total_price < 100) {
             return err('支付金额不能小于1元！');
@@ -493,8 +494,9 @@ class Helper
             $device,
             $user,
             [
-                'title' => '充电订单',
+                'title' => !empty($remark) ? $remark : '充电订单',
                 'price' => $total_price,
+
             ],
             [
                 'level' => LOG_CHARGING_PAY,

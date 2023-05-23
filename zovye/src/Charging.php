@@ -333,15 +333,7 @@ class Charging
         }
 
         if ($order->isChargingBMSReportTimeout(120)) {
-            $chargerID = $order->getChargerID();
-
-            self::end($serial, $chargerID, function ($order) {
-                $order->setExtraData('timeout', [
-                    'at' => time(),
-                    'reason' => '充电枪上报数据超时！',
-                ]);
-            });
-
+            self::endOrder($serial, '充电枪上报数据超时！');
             return err('充电枪上报数据超时！');
         }
 
@@ -400,16 +392,22 @@ class Charging
             }
 
             $charging_now_data = ChargingNowData::getByDevice($device, $chargerID);
-            if (empty($charging_now_data) || $charging_now_data->getSerial() != $serial) {
-                return err('找不到这个设备的充电信息！');
+            if ($charging_now_data) {
+                if ($charging_now_data->getSerial() == $serial) {
+                    $user = $charging_now_data->getUser();
+                    if (empty($user)) {
+                        return err('找不到对应的用户！');
+                    }
+                }
+
+                $charging_now_data->destroy();
             }
 
-            $user = $charging_now_data->getUser();
             if (empty($user)) {
-                return err('找不到对应的用户！');
+                $user = $order->getUser();
             }
 
-            if (!$user->acquireLocker(User::CHARGING_LOCKER)) {
+            if ($user && !$user->acquireLocker(User::CHARGING_LOCKER)) {
                 return err('用户锁定失败，请稍后再试！');
             }
 
@@ -451,6 +449,26 @@ class Charging
         return false;
     }
 
+    public static function endOrder(string $order_no, string $remark)
+    {
+        $order = Order::get($order_no, true);
+        if ($order) {
+
+            $status = $order-> getChargingStatus();
+            return self::settle($order_no, $order->getChargerID(), [
+                'serial' => $order->getOrderNO(),
+                'chargerID' => $order->getChargerID(),
+                'start' => $order->getCreatetime(),
+                'end' => time(),
+                'total' => $status['chargedKWH'] ?? '',
+                'stopReasonDesc' => $remark,
+                'createdAt' => $order->getCreatetime(),
+            ]);
+        }
+
+        return err('找不到这个订单！');
+    }
+
     public static function settle(string $serial, int $chargerID, array $record)
     {
         if (!Locker::try($serial)) {
@@ -464,9 +482,13 @@ class Charging
                 return true;
             }
 
-            $totalPrice = intval(round($record['totalPrice'] * 100));
+            if ($record['totalPrice'] > 0) {
+                $totalPrice = intval(round($record['totalPrice'] * 100));
+                $order->setPrice($totalPrice);
+            } else {
+                $totalPrice = $order->getPrice();
+            }
 
-            $order->setPrice($totalPrice);
             $order->setExtraData('timeout', []);
             $order->setSrc(Order::CHARGING);
 

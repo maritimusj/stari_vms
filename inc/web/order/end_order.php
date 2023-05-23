@@ -19,14 +19,7 @@ if (!$order->isChargingBMSReportTimeout()) {
     JSON::fail('对不起，请确认订单状态异常后再试！');
 }
 
-$chargerID = $order->getChargerID();
-
-$res = Charging::end($order->getOrderNO(), $chargerID, function ($order) {
-    $order->setExtraData('timeout', [
-        'at' => time(),
-        'reason' => '充电枪上报数据超时！',
-    ]);
-});
+$res = Charging::endOrder($order->getOrderNO(), '充电枪上报数据超时！');
 
 if (is_error($res)) {
     JSON::fail($res);

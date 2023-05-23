@@ -272,9 +272,14 @@
                             <img src="{MODULE_URL}static/img/charging.svg" class="balance">{$order['orderId']}                   
                         </div>
                             {if $order['charging']['record']['VIN']}
-                        <div class="orderId" title="VIN">
-                            <i class="fa fa-car"></i> {php echo $order['charging']['record']['VIN']}
-                        </div>
+                            <div class="orderId" title="VIN">
+                                <i class="fa fa-car"></i> {php echo $order['charging']['record']['VIN']}
+                            </div>
+                            {/if}
+                            {if !empty($order['remark'])}
+                            <div class="orderId" title="备注">
+                                <i class="fa fa-tag"></i> {$order['remark']}
+                            </div>
                             {/if}
                         {elseif $order['type'] == 'fueling'}
                         <div class="transactionId operate" title="尿素加注订单">

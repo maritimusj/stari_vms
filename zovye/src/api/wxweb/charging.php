@@ -49,16 +49,19 @@ class charging
                 foreach ($list as $charging_now_data) {
 
                     $serial = $charging_now_data->getSerial();
-                    $device = $charging_now_data->getDevice();
                     $chargerID = $charging_now_data->getChargerId();
 
+                    $device = $charging_now_data->getDevice();
                     $status = $device->getChargerBMSData($chargerID);
+
+                    $order = Order::get($serial, true);
 
                     $data['charging_now_data'][] = [
                         'serial' => $serial,
                         'device' => $device->profile(),
                         'charger_id' => $chargerID,
                         'status' => $status,
+                        'order' => $order->profile(),
                     ];
 
                     if ($status['serial'] == $serial) {
@@ -245,11 +248,13 @@ class charging
         IotCharging::checkUnfinishedOrder($device);
 
         $chargerID = Request::int('chargerID');
+
         $limit = Request::int('limit');
+        $remark = Request::trim('remark');
 
         $serial = $device->generateChargingSerial($chargerID);
 
-        return IotCharging::start($serial, $user->getCommissionBalanceCard(), $limit, $device, $chargerID);
+        return IotCharging::start($serial, $user->getCommissionBalanceCard(), $limit, $remark, $device, $chargerID);
     }
 
     public static function stop()

@@ -276,6 +276,7 @@ class orderModelObj extends modelObj
     public function isChargingBMSReportTimeout($timeout = 300)
     {
         $last_ts = $this->getExtraData('BMS.status.timestamp');
+
         return !empty($last_ts) && time() - $last_ts > $timeout;
     }
 
@@ -435,6 +436,8 @@ class orderModelObj extends modelObj
         return [
             'id' => $this->getId(),
             'orderNO' => $this->getOrderNO(),
+            'price' => $this->getPrice(),
+            'remark' => $this->getExtraData('remark', ''),
             'createtime' => $this->getCreatetime(),
         ];
     }

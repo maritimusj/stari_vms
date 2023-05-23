@@ -18,6 +18,7 @@ class Charging
     public static function isMaxDevicesNumExceeded(userModelObj $user): bool
     {
         $max = Config::charging('device.max', 0);
+
         return $max != 0 && ChargingNowData::countByUser($user) > $max;
     }
 
@@ -54,6 +55,7 @@ class Charging
         string $serial,
         ICard $card,
         int $limit,
+        string $remark,
         deviceModelObj $device,
         $chargerID,
         $extra = []
@@ -80,7 +82,16 @@ class Charging
             return err('锁定设备失败，请稍后再试！');
         }
 
-        return Util::transactionDo(function () use ($card, $limit, $device, $chargerID, $serial, $group, $extra) {
+        return Util::transactionDo(function () use (
+            $card,
+            $limit,
+            $remark,
+            $device,
+            $chargerID,
+            $serial,
+            $group,
+            $extra
+        ) {
 
             $user = $card->getOwner();
 
@@ -99,7 +110,7 @@ class Charging
             if (!$user->acquireLocker(User::CHARGING_LOCKER)) {
                 return err('用户锁定失败，请稍后再试！');
             }
-            
+
             if (self::isMaxDevicesNumExceeded($user)) {
                 return err('正在充电设备已经超出最大限制，请稍后再试！');
             }
@@ -136,6 +147,7 @@ class Charging
                         'balance' => $balance,
                         'type' => $card->getTypename(),
                     ],
+                    'remark' => $remark,
                 ],
             ];
 
@@ -198,7 +210,8 @@ class Charging
                 'serial' => $serial,
                 'msg' => '已通知设备开启，请及时插入充电枪！',
             ];
-        });
+        }
+        );
     }
 
     public static function stop(userModelObj $user, string $serial)
@@ -335,6 +348,7 @@ class Charging
 
         if ($order->isChargingBMSReportTimeout(120)) {
             self::endOrder($serial, '充电枪上报数据超时！');
+
             return err('充电枪上报数据超时！');
         }
 
@@ -455,7 +469,8 @@ class Charging
         $order = Order::get($order_no, true);
         if ($order) {
 
-            $status = $order-> getChargingStatus();
+            $status = $order->getChargingStatus();
+
             return self::settle($order_no, $order->getChargerID(), [
                 'serial' => $order->getOrderNO(),
                 'chargerID' => $order->getChargerID(),
@@ -622,7 +637,7 @@ class Charging
 
         $chargerID = $pay_log->getChargerID();
 
-        $res = self::start($pay_log->getOrderNO(), $pay_log, 0, $device, $chargerID, [
+        $res = self::start($pay_log->getOrderNO(), $pay_log, 0, '', $device, $chargerID, [
             'ip' => $pay_log->getData('ip', ''),
             'pay_name' => $pay_log->getPayName(),
         ]);
@@ -710,7 +725,7 @@ class Charging
 
                 $event = $extra['BMS']['event'];
                 $data = $extra['BMS']['data'];
-                
+
                 $data['timestamp'] = time();
 
                 if ($event == self::FINISHED) {

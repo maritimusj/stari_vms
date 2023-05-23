@@ -318,9 +318,10 @@ class Charging
             return ['message' => '已支付，请稍等..'];
         }
 
+        $remark = $order->getExtraData('remark', '');
         $result = $order->getChargingRecord();
         if ($result) {
-            return ['record' => $result];
+            return ['record' => $result, 'remark' => $remark];
         }
 
         $finished = $order->getChargingBMSData(self::FINISHED);
@@ -330,15 +331,15 @@ class Charging
                 $chargerID = $order->getChargerID();
                 self::settle($serial, $chargerID, $result);
 
-                return ['record' => $result];
+                return ['record' => $result, 'remark' => $remark];
             }
 
-            return ['finished' => $finished];
+            return ['finished' => $finished, 'remark' => $remark];
         }
 
         $stopped = $order->getChargingBMSData(self::STOPPED);
         if ($stopped) {
-            return ['stopped' => $stopped];
+            return ['stopped' => $stopped, 'remark' => $remark];
         }
 
         $timeout = $order->getExtraData('timeout', []);
@@ -385,7 +386,7 @@ class Charging
             $status['priceTotal'] = round($status['priceTotal'] - $status['serviceFee'], 2);
         }
 
-        return ['status' => $status];
+        return ['status' => $status, 'remark' => $remark];
     }
 
     public static function end(string $serial, int $chargerID, callable $cb)

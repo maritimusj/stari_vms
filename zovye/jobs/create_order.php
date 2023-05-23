@@ -164,6 +164,7 @@ function prepare(string $order_no)
         'user' => $user,
         'ip' => strval($pay_log->getData('orderData.ip')),
         'payResult' => [
+            'type' => $pay_result['type'],
             'result' => 'success',
             'from' => $pay_result['from'],
             'total' => $pay_result['total'],

@@ -1888,7 +1888,7 @@ class deviceModelObj extends modelObj
 
         $state_filter = is_array($state_filter) ? $state_filter : [$state_filter];
 
-        $accounts = $this->getAssignedAccounts();
+        $accounts = $this->getAssignedAccounts($this->isDummyDevice());
         foreach ($accounts as $index => $account) {
             if (in_array($account['type'], $state_filter)) {
                 $result[$index] = $account;

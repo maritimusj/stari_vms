@@ -293,7 +293,7 @@ class charging
             return err('请求参数错误！');
         }
 
-        $device = Device::get(Request::str('deviceId'), true);
+        $device = Device::get($device_uid, true);
         if (empty($device)) {
             return err('找不到这个设备！');
         }

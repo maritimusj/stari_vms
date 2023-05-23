@@ -419,7 +419,7 @@ class Charging
                 return err('保存数据失败！');
             }
 
-            return $charging_now_data->destroy();
+            return true;
         });
     }
 
@@ -472,7 +472,7 @@ class Charging
     public static function settle(string $serial, int $chargerID, array $record)
     {
         if (!Locker::try($serial)) {
-            return err('锁定订单失败！');
+            return err('锁定订单失败，请稍后再试！');
         }
 
         return self::end($serial, $chargerID, function (orderModelObj $order) use ($serial, $chargerID, $record) {

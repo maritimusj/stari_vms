@@ -468,6 +468,7 @@
                                 <small>单价：<span class="fee">{$order['group']['tips']}</span></small>
                                 {/if}                                
                             </span>
+                            {if $order['type'] != 'charging'}
                             <span   {if $order['pull_logs'] === true}  class="num" data-op="pullsDetail" title="查看出货记录..."
                                     {else}  class="num" {if $order['charging'] || $order['fueling']}data-op="priceDetail"{/if}
                                     {/if}> 
@@ -477,6 +478,7 @@
                                 <img src="{MODULE_URL}static/img/gun.svg" class="icon big" title="正在加注中" data-op="stopFueling">
                                 {/if}
                             </span>
+                            {/if}
                         </div>
                     </td>
                     <td>

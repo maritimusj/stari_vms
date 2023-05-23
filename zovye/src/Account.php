@@ -353,7 +353,7 @@ class Account extends State
             }
             $list[$index] = function () use ($getter_fn, $acc, $device, $user) {
                 if ($acc->getBonusType() == Account::BALANCE) {
-                    $res = Util::checkBalanceAvailable($user, $acc);
+                        $res = Util::checkBalanceAvailable($user, $acc);
                 } else {
                     //检查用户是否允许
                     $res = Util::checkAvailable($user, $acc, $device);
@@ -1192,6 +1192,10 @@ class Account extends State
     protected static function isReady(array $account): bool
     {
         switch ($account['type']) {
+            case Account::TASK:
+            case Account::FlashEgg:
+                //不需要检查
+                return true;
             case Account::VIDEO:
                 if (empty($account['media'])) {
                     return false;
@@ -1224,8 +1228,6 @@ class Account extends State
                 if (isEmptyArray($questions)) {
                     return false;
                 }
-                break;
-            case Account::FlashEgg:
                 break;
             default:
                 if ($account['redirect_url']) {

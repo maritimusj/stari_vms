@@ -51,6 +51,7 @@ class charging
                     $serial = $charging_now_data->getSerial();
                     $device = $charging_now_data->getDevice();
                     $chargerID = $charging_now_data->getChargerId();
+
                     $status = $device->getChargerBMSData($chargerID);
 
                     $data['charging_now_data'][] = [

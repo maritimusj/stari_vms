@@ -15,7 +15,7 @@ class Charging
     const STOPPED = 'stopped';
     const STATUS = 'status';
 
-    public static function isMaxDevicesNumExceeded(userModelObj $user)
+    public static function isMaxDevicesNumExceeded(userModelObj $user): bool
     {
         $max = Config::charging('device.max', 0);
         return $max != 0 && ChargingNowData::countByUser($user) > $max;
@@ -30,7 +30,7 @@ class Charging
         }
     }
 
-    public static function getUnpaidOrderPriceTotal(userModelObj $user)
+    public static function getUnpaidOrderPriceTotal(userModelObj $user): int
     {
         $total = 0;
 

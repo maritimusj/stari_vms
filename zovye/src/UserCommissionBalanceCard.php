@@ -49,10 +49,8 @@ class UserCommissionBalanceCard implements ICard
             return false;
         }
 
-        if (App::isChargingDeviceEnabled()) {
-            if (ChargingNowData::countByUser($owner) >= Charging::getMaxDevicesNum()) {
-                return false;
-            }
+        if (App::isChargingDeviceEnabled() && Charging::isMaxDevicesNumExceeded($owner)) {
+            return false;
         }
 
         $isOrderFinished = function ($order_no) {

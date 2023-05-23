@@ -15,9 +15,10 @@ class Charging
     const STOPPED = 'stopped';
     const STATUS = 'status';
 
-    public static function getMaxDevicesNum()
+    public static function isMaxDevicesNumExceeded(userModelObj $user)
     {
-        return Config::charging('device.max', 1);
+        $max = Config::charging('device.max', 0);
+        return $max != 0 && ChargingNowData::countByUser($user) > $max;
     }
 
     public static function checkUnfinishedOrder(deviceModelObj $device)
@@ -98,8 +99,8 @@ class Charging
             if (!$user->acquireLocker(User::CHARGING_LOCKER)) {
                 return err('用户锁定失败，请稍后再试！');
             }
-
-            if (ChargingNowData::countByUser($user) >= self::getMaxDevicesNum()) {
+            
+            if (self::isMaxDevicesNumExceeded($user)) {
                 return err('正在充电设备已经超出最大限制，请稍后再试！');
             }
 

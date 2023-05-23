@@ -54,7 +54,13 @@
         left: -14px;
     }
     {/if}
- 
+    #orderlist div.charging.timeout {
+        color:#FF9800;
+    }
+    #orderlist div.charging.timeout [data-op]:hover {
+        color:#2196F3;
+        text-decoration: underline;
+    }
     #orderlist .fee {
         color: #4caf50;
     }
@@ -382,6 +388,11 @@
                                         <div class="charging">
                                             <i class="fa fa fa-ellipsis-h fa-fw"></i> 电池电量：<strong>{php echo $order['charging']['status']['soc']}</strong> %
                                         </div>
+                                        {if $order['BMS']['timeout']}
+                                        <div class="charging timeout">
+                                            <i class="fa fa-info-circle fa-fw"></i> 充电数据上报已超时，<span data-op="endOrder">立即结算?</span>
+                                        </div>
+                                        {/if}
                                     {/if}
                                     {elseif $order['charging']['result']}
                                     <div>
@@ -794,8 +805,13 @@
             params.set('page', 1);
         });
     }
+
     api.priceDetail = function(id) {
         api.showResult({ op: 'priceDetail', id: id });
+    }
+
+    api.endOrder = function(id) {
+        api.showResult({ op: 'endOrder', id: id });
     }
 
     function reloadPageWithFilter(fn) {

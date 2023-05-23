@@ -332,8 +332,7 @@ class Charging
             return err($timeout['reason'] ?? '设备响应超时！');
         }
 
-        $BMS = $order->getChargingBMSData(self::STATUS);
-        if ($BMS && time() - $BMS['timestamp'] > 120) {
+        if ($order->isChargingBMSReportTimeout(120)) {
             $chargerID = $order->getChargerID();
 
             self::end($serial, $chargerID, function ($order) {

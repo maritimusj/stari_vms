@@ -21,7 +21,7 @@ class GDCVMachine
 
     protected function sign($ts): string
     {
-        return md5($this->config['appId'].$this->config['token'].$ts);
+        return md5("{$this->config['appId']}{$this->config['token']}$ts");
     }
 
     protected function post($path, $data = []): array
@@ -45,6 +45,7 @@ class GDCVMachine
 
         Log::debug('GDCVMachine', [
             'url' => $url,
+            'config' => $this->config,
             'data' => $data,
             'response' => $response,
         ]);
@@ -74,7 +75,7 @@ class GDCVMachine
                 foreach ($payload['cargo_lanes'] as $index => $lane) {
                     $v['channels'][] = [
                         'index' => $index + 1,
-                        'productCode' => strval($lane['CVMachine.code']),
+                        'productCode' => 313,//strval($lane['CVMachine.code']),
                         'status' => 1,
                         'quantity' => $lane['num'],
                     ];

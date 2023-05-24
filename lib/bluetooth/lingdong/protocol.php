@@ -22,12 +22,7 @@ class protocol implements IBlueToothProtocol
 
     function onConnected($device_id, $data = ''): ?ICmd
     {
-        $device = Device::get($device_id, true);
-        if ($device) {
-            return new ShakeHandCmd($device_id);
-        }
-
-        return null;
+        return new ShakeHandCmd($device_id);
     }
 
     function initialize($device_id)

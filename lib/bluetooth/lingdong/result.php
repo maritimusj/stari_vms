@@ -56,7 +56,7 @@ class result implements IResult
 
     function getCode()
     {
-        return $this->device_id;
+        return $this->getPayloadData(4, 1);
     }
 
     function getMessage()
@@ -81,7 +81,7 @@ class result implements IResult
 
     function getDeviceID()
     {
-        return $this->getPayloadData(5, 6);
+        return $this->device_id;
     }
 
     function getSerial()

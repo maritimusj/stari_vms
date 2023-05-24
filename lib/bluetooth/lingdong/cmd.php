@@ -82,26 +82,31 @@ class cmd implements ICmd
         return $seq;
     }
 
-    function crc($data) {
-        $v = 0x00;
-        for ($i = 0; $i < strlen($data); $i++) {
-            $c = unpack('c', $data[$i]);
-            $v = $v ^ $c[1];
+    function crc($data) 
+    {
+        $crc = 0;
+        $len = strlen($data);
+        
+        for ($i = 0; $i < $len; $i++) {
+          $crc ^= ord($data[$i]);
+          for ($j = 0; $j < 8; $j++) {
+            if ($crc & 0x80) {
+              $crc = ($crc << 1) ^ 0x07;
+            } else {
+              $crc <<= 1;
+            }
+          }
         }
 
-        return $v;
+        return $crc & 0xFF;
     }
 
     function encode()
     {
-        $data = pack(
-            'C*',
-            self::HEADER,
-            $this->nextSEQ(),
-            $this->device_id,
-            $this->id,
-            ...$this->data
-        );
+        $data = pack('C*', ...self::HEADER)
+            .pack('C*', $this->nextSEQ())
+            .pack('H*',  $this->device_id)
+            .pack('C*',$this->id,...$this->data);
         return $data . pack('C*', $this->crc($data));
     }
 

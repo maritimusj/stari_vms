@@ -10,7 +10,6 @@ namespace bluetooth\lingdong;
 use zovye\Contract\bluetooth\IBlueToothProtocol;
 use zovye\Contract\bluetooth\ICmd;
 use zovye\Contract\bluetooth\IResult;
-use zovye\Device;
 
 class protocol implements IBlueToothProtocol
 {

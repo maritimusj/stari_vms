@@ -1302,6 +1302,7 @@ class common
         }
 
         $token = sha1(Util::random(16));
+
         $data = [
             'src' => LoginData::USER,
             'user_id' => $user->getId(),

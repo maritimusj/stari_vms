@@ -118,7 +118,7 @@ class keeper
             return err('登录失败，请稍后再试！[501]');
         }
 
-        $token = sha1(Util::random(16));
+        $token = time() . Util::random(16);
 
         $data = [
             'src' => LoginData::KEEPER,

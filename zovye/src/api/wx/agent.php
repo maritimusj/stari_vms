@@ -148,7 +148,7 @@ class agent
                 $entry->destroy();
             }
 
-            $token = sha1(Util::random(16));
+            $token = time() . Util::random(16);
 
             $data = [
                 'src' => LoginData::AGENT,
@@ -1872,7 +1872,7 @@ class agent
             $entry->destroy();
         }
 
-        $token = sha1(Util::random(16));
+        $token = time() . Util::random(16);
 
         $data = [
             'src' => LoginData::AGENT_WEB,

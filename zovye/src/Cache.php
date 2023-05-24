@@ -101,6 +101,22 @@ class Cache
         }
     }
 
+    public static function set($obj, $v): ?cacheModelObj
+    {
+        $uid = self::makeUID($obj);
+        $data = [
+            'uid' => $uid,
+        ];
+
+        $data['data'] = json_encode($v);
+
+        $now = time();
+        $data['createtime'] = $now;
+        $data['updatetime'] = $now;
+
+        return self::create($data);
+    }
+
     /**
      * @param $obj
      * @param callable|null $fn 初始化方法

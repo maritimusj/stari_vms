@@ -2366,7 +2366,7 @@ class deviceModelObj extends modelObj
                 $option = ['locker' => $mcb_channel];
             }
 
-            $msg = $protocol->Open($this->getBUID(), $option);
+            $msg = $protocol->open($this->getBUID(), $option);
             if ($msg) {
                 Device::createBluetoothCmdLog($this, $msg);
                 $result = $msg->getEncoded(IBlueToothProtocol::BASE64);

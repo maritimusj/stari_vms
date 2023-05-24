@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_advertising` (
   `updatetime` int(11) DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `agent_id` (`uniacid`, `agent_id`),
-  KEY `type` (`type`)
+  KEY `type` (`uniacid`, `type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_advs_stats` (

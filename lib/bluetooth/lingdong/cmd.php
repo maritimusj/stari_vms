@@ -66,10 +66,9 @@ class cmd implements ICmd
         return '未知命令';
     }
 
-    function resetSEQ()
+    function resetSEQ($device_id)
     {
-        $uid = "SEQ:$this->device_id";
-        Cache::set($uid, 0);
+        Cache::set("SEQ:$device_id", 0);
     }
 
     function nextSEQ()

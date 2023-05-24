@@ -94,16 +94,16 @@ class cmd implements ICmd
     {
         $crc = 0;
         $len = strlen($data);
-        
+
         for ($i = 0; $i < $len; $i++) {
-          $crc ^= ord($data[$i]);
-          for ($j = 0; $j < 8; $j++) {
-            if ($crc & 0x80) {
-              $crc = ($crc << 1) ^ 0x07;
-            } else {
-              $crc <<= 1;
+            $crc ^= ord($data[$i]);
+            for ($j = 0; $j < 8; $j++) {
+                if ($crc & 0x80) {
+                    $crc = ($crc << 1) ^ 0x07;
+                } else {
+                    $crc <<= 1;
+                }
             }
-          }
         }
 
         return $crc & 0xFF;
@@ -111,11 +111,12 @@ class cmd implements ICmd
 
     function encode(): string
     {
-        $data = pack('C*', ...self::HEADER)
-            .pack('C*', self::nextSEQ($this->device_id))
-            .pack('H*',  $this->device_id)
-            .pack('C*',$this->id,...$this->data);
-        return $data . pack('C*', $this->crc($data));
+        $data = pack('C*', ...self::HEADER).
+            pack('C*', self::nextSEQ($this->device_id)).
+            pack('H*', $this->device_id).
+            pack('C*', $this->id, ...$this->data);
+
+        return $data.pack('C*', $this->crc($data));
     }
 
     function getEncoded($fn = null)

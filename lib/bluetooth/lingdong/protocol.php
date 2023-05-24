@@ -28,9 +28,9 @@ class protocol implements IBlueToothProtocol
         return new ShakeHandCmd($device_id);
     }
 
-    function initialize($device_id)
+    function initialize($device_id): ?ICmd
     {
-        return null;
+        return new ShakeHandCmd($device_id);
     }
 
     function open($device_id, $data): ?ICmd

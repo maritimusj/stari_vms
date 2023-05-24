@@ -31,26 +31,27 @@ class response implements IResponse
 
     function isOpenResultOk(): bool
     {
-        return $this->getID() == 0x03 && $this->getPayloadData(12, 1) == 0x01;
+        return $this->getID() == 0x03 && $this->getResultValue() == 0x01;
     }
 
     function isOpenResultFail(): bool
     {
-        return $this->getID() == 0x03 && $this->getPayloadData(12, 1) == 0x00;
+        return $this->getID() == 0x03 && $this->getResultValue() == 0x00;
     }
 
     function isReady(): bool
     {
-        return $this->getBatteryValue() > 0;
+        return $this->getResultValue() == 0x01 || $this->getResultValue() > 0x10;
     }
 
     function getBatteryValue()
     {
         if ($this->getID() == 0x01) {
-            $v = $this->getPayloadData(12, 1);
-            if ($v >= 0x10) {
+            $v = $this->getResultValue();
+            if ($v > 0x10) {
                 return max(0, min(100, ($v - 0x10) * 25));
             }
+            return 1;
         }
         return -1;
     }
@@ -66,7 +67,7 @@ class response implements IResponse
     function getMessage(): string
     {
         $id = $this->getID();
-        $res = $this->getPayloadData(12, 1);
+        $res = $this->getResultValue();
 
         switch ($id) {
             case 0x01:
@@ -90,7 +91,7 @@ class response implements IResponse
 
     function getSerial(): string
     {
-        return '';
+        return  $this->getPayloadData(4, 1);
     }
 
     function getRawData()
@@ -101,6 +102,11 @@ class response implements IResponse
     function getCmd(): ?ICmd
     {
         return null;
+    }
+
+    function getResultValue()
+    {
+        return $this->getPayloadData(12, 1);
     }
 
     function getPayloadData($pos = 0, $len = 0)

@@ -122,6 +122,10 @@ class Util
         return $ret;
     }
 
+    public static function getTokenValue(): string
+    {
+        return time() . self::random(16);
+    }
 
     /**
      * 获取当前用户信息.

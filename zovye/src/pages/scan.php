@@ -12,7 +12,7 @@ defined('IN_IA') or exit('Access Denied');
 $params = Util::getTemplateVar();
 $tpl = is_array($params) ? $params : [];
 
-$token = time() . Util::random(16);
+$token = Util::getTokenValue();
 $redirect_url = Util::murl('entry', ['from' => 'scan', 'device' => $token]);
 $js_sdk = Util::fetchJSSDK();
 $jquery_url = JS_JQUERY_URL;

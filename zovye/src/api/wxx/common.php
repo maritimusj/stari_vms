@@ -1301,7 +1301,7 @@ class common
             $entry->destroy();
         }
 
-        $token = time() . Util::random(16);
+        $token = Util::getTokenValue();
 
         $data = [
             'src' => LoginData::USER,

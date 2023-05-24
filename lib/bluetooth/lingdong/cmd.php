@@ -69,14 +69,17 @@ class cmd implements ICmd
     function nextSEQ()
     {
         $uid = "SEQ:$this->device_id";
+
         $seq = Cache::fetch($uid, function () {
             return 0;
         });
+
         if ($seq > 255) {
             $seq = 0;
         } else {
             $seq++;
         }
+
         Cache::set($uid, $seq);
 
         return $seq;

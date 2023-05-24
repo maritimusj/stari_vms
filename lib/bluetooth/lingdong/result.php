@@ -47,7 +47,7 @@ class result implements IResult
     {
         if ($this->getCode() == 0x01) {
             $v = $this->getPayloadData(12, 1);
-            if ($v > 0x10) {
+            if ($v >= 0x10) {
                 return max(0, min(100, ($v - 0x10) * 25));
             }
         }
@@ -56,20 +56,24 @@ class result implements IResult
 
     function getCode()
     {
-        return $this->getPayloadData(11, 1);
+        return $this->device_id;
     }
 
     function getMessage()
     {
         $code = $this->getCode();
+        $res = $this->getPayloadData(12, 1);
 
         switch ($code) {
             case 0x01:
-                return '<= 握手结果';
-            case 0x03:
-                return '<= 开锁结果';
-            case 0x04:
-                return '<= 电量结果';
+                if ($res) {
+                    return '<= 握手结果(成功)，电量：'. $this->getBatteryValue() . '%';
+                }
+                return '<= 握手结果(失败)';
+            case 0x02:
+                return '<= 开锁结果(' . $res == 0x03 ? '成功' : '失败' . ')';
+            case 0x05:
+                return '<= 电量：' . $this->getBatteryValue() . '%';
         }
 
         return '<= 未知消息';
@@ -77,7 +81,7 @@ class result implements IResult
 
     function getDeviceID()
     {
-        return $this->device_id;
+        return $this->getPayloadData(5, 6);
     }
 
     function getSerial()

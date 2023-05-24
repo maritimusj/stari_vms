@@ -49,8 +49,8 @@ CREATE TABLE IF NOT EXISTS $we7tb_name (
     `createtime` int(11) DEFAULT NULL,
     `locked_uid` VARCHAR( 64 ) NULL DEFAULT  'n/a',
     PRIMARY KEY (`id`),
-    KEY `name` (`name`(32),`uniacid`),
-    KEY `createtime` (`createtime`)
+    KEY `name` (`uniacid`,`name`(32)),
+    KEY `createtime` (`uniacid`,`createtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 CODE;
             We7::pdo_run($sql);

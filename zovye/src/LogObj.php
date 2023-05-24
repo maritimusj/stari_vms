@@ -33,9 +33,9 @@ CREATE TABLE IF NOT EXISTS $we7tb_name (
     `data` text,
     `createtime` int(11) DEFAULT NULL,
     PRIMARY KEY (`id`),
-    KEY `level` (`level`),
-    KEY `title` (`title`),
-    KEY `createtime` (`createtime`)
+    KEY `level` (`uniacid`, `level`),
+    KEY `title` (`uniacid`, `title`),
+    KEY `createtime` (`uniacid`, `createtime`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 SQL_STATEMENT;
             We7::pdo_run($sql);

@@ -104,17 +104,32 @@ class Cache
     public static function set($obj, $v): ?cacheModelObj
     {
         $uid = self::makeUID($obj);
-        $data = [
-            'uid' => $uid,
-        ];
 
-        $data['data'] = json_encode($v);
+         if (Locker::try($uid)) {
 
-        $now = time();
-        $data['createtime'] = $now;
-        $data['updatetime'] = $now;
+             /** @var cacheModelObj $result */
+             $result = self::get($uid, true);
+             if ($result) {
+                 $result->setData(json_encode($v));
+                 $result->setUpdatetime(time());
+                 $result->save();
+                 return $result;
+             }
 
-        return self::create($data);
+             $data = [
+                 'uid' => $uid,
+             ];
+
+             $data['data'] = json_encode($v);
+
+             $now = time();
+             $data['createtime'] = $now;
+             $data['updatetime'] = $now;
+
+             return self::create($data);
+         }
+
+         return null;
     }
 
     /**

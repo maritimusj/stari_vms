@@ -67,83 +67,87 @@ class keeper
         $res = common::getDecryptedWxUserData();
         if (is_error($res)) {
             Log::error('wxapi', $res);
-        } else {
-            $mobile = $res['phoneNumber'];
-            $session_key = $res['session_key'];
+            return err('登录失败，请稍后再试！[500]');
+        }
 
-            if (empty($mobile)) {
-                return err('获取手机号码失败，请稍后再试！');
+        $mobile = $res['phoneNumber'];
+        $session_key = $res['session_key'];
+
+        if (empty($mobile)) {
+            return err('获取手机号码失败，请稍后再试！');
+        }
+
+        $user = User::findOne(['mobile' => $mobile, 'app' => User::WX]);
+        if (empty($user)) {
+            $url = Util::murl('keeper', ['mobile' => $mobile]);
+            JSON::fail(['msg' => '您还没有绑定手机号码，请立即绑定！', 'url' => $url]);
+        }
+
+        $query = \zovye\Keeper::query(['mobile' => $mobile]);
+        if (empty($query->count())) {
+            return err('找不到相应的运营人员信息！');
+        }
+
+        $keeper_data = [];
+
+        /** @var keeperModelObj $keeper */
+        foreach ($query->findAll() as $keeper) {
+            //清除原来的登录信息
+            foreach (LoginData::keeper(['user_id' => $keeper->getId()])->findAll() as $entry) {
+                $entry->destroy();
             }
-
-            $user = User::findOne(['mobile' => $mobile, 'app' => User::WX]);
-            if (empty($user)) {
-                $url = Util::murl('keeper', ['mobile' => $mobile]);
-                JSON::fail(['msg' => '您还没有绑定手机号码，请立即绑定！', 'url' => $url]);
-            }
-
-            $query = \zovye\Keeper::query(['mobile' => $mobile]);
-            if (empty($query->count())) {
-                return err('找不到相应的运营人员信息！');
-            }
-
-            $keeper_data = [];
-
-            /** @var keeperModelObj $keeper */
-            foreach ($query->findAll() as $keeper) {
-                //清除原来的登录信息
-                foreach (LoginData::keeper(['user_id' => $keeper->getId()])->findAll() as $entry) {
-                    $entry->destroy();
+            $agent = $keeper->getAgent();
+            if ($agent) {
+                if ($res['config'] && !$agent->isWxAppAllowed($res['config']['key'])) {
+                    continue;
                 }
-                $agent = $keeper->getAgent();
-                if ($agent) {
-                    if ($res['config'] && !$agent->isWxAppAllowed($res['config']['key'])) {
-                        continue;
-                    }
-                    $keeper_data[] = [
-                        'id' => $keeper->getId(),
-                        'user_id' => $user->getId(),
-                        'name' => $keeper->getName(),
-                        'agent' => [
-                            'id' => $agent->getId(),
-                            'name' => $agent->getName(),
-                            'avatar' => $agent->getAvatar(),
-                        ],
-                    ];
-                }
-            }
-
-            if ($keeper_data) {
-                $token = sha1(time()."$mobile$session_key");
-                $data = [
-                    'src' => LoginData::KEEPER,
-                    'user_id' => 0,
-                    'session_key' => $session_key,
-                    'openid_x' => $user->getOpenid(),
-                    'token' => $token,
+                $keeper_data[] = [
+                    'id' => $keeper->getId(),
+                    'user_id' => $user->getId(),
+                    'name' => $keeper->getName(),
+                    'agent' => [
+                        'id' => $agent->getId(),
+                        'name' => $agent->getName(),
+                        'avatar' => $agent->getAvatar(),
+                    ],
                 ];
-
-                if (count($keeper_data) == 1) {
-                    $keeper = current($keeper_data);
-                    $data['user_id'] = $keeper['id'];
-                }
-
-                if (LoginData::create($data)) {
-                    $result = [
-                        'token' => $token,
-                        'profile' => $keeper_data,
-                        'msg' => '登录成功!',
-                    ];
-                    $agreement = Config::agent('agreement.keeper', []);
-                    if ($agreement && $agreement['enabled']) {
-                        $result['agreement'] = $agreement['content'];
-                    }
-
-                    return $result;
-                }
             }
         }
 
-        return err('登录失败，请稍后再试！');
+        if (empty($keeper_data)) {
+            return err('登录失败，请稍后再试！[501]');
+        }
+
+        $token = sha1(Util::random(16));
+
+        $data = [
+            'src' => LoginData::KEEPER,
+            'user_id' => 0,
+            'session_key' => $session_key,
+            'openid_x' => $user->getOpenid(),
+            'token' => $token,
+        ];
+
+        if (count($keeper_data) == 1) {
+            $keeper = current($keeper_data);
+            $data['user_id'] = $keeper['id'];
+        }
+
+        if (LoginData::create($data)) {
+            $result = [
+                'token' => $token,
+                'profile' => $keeper_data,
+                'msg' => '登录成功!',
+            ];
+            $agreement = Config::agent('agreement.keeper', []);
+            if ($agreement && $agreement['enabled']) {
+                $result['agreement'] = $agreement['content'];
+            }
+
+            return $result;
+        }
+
+        return err('登录失败，请稍后再试！[502]');
     }
 
     /**

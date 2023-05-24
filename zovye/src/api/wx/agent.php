@@ -148,7 +148,7 @@ class agent
                 $entry->destroy();
             }
 
-            $token = sha1($mobile.time());
+            $token = sha1(Util::random(16));
             $data = [
                 'src' => LoginData::AGENT,
                 'user_id' => $user->getId(),
@@ -1871,7 +1871,7 @@ class agent
             $entry->destroy();
         }
 
-        $token = sha1(time()."$mobile$session_key");
+        $token = sha1(Util::random(16));
 
         $data = [
             'src' => LoginData::AGENT_WEB,

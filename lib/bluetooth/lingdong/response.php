@@ -7,9 +7,10 @@
 
 namespace bluetooth\lingdong;
 
-use zovye\Contract\bluetooth\IResult;
+use zovye\Contract\bluetooth\ICmd;
+use zovye\Contract\bluetooth\IResponse;
 
-class result implements IResult
+class response implements IResponse
 {
     private $device_id;
     private $data;
@@ -23,29 +24,29 @@ class result implements IResult
         $this->data = base64_decode($data);
     }
 
-    function isValid()
+    function getID()
     {
-        return strlen($this->data) == 18;
+        return $this->getPayloadData(4, 1);
     }
 
-    function isOpenResultOk()
+    function isOpenResultOk(): bool
     {
-        return $this->getCode() == 0x03 && $this->getPayloadData(12, 1) == 0x01;
+        return $this->getID() == 0x03 && $this->getPayloadData(12, 1) == 0x01;
     }
 
-    function isOpenResultFail()
+    function isOpenResultFail(): bool
     {
-        return $this->getCode() == 0x03 && $this->getPayloadData(12, 1) == 0x00;
+        return $this->getID() == 0x03 && $this->getPayloadData(12, 1) == 0x00;
     }
 
-    function isReady()
+    function isReady(): bool
     {
         return $this->getBatteryValue() > 0;
     }
 
     function getBatteryValue()
     {
-        if ($this->getCode() == 0x01) {
+        if ($this->getID() == 0x01) {
             $v = $this->getPayloadData(12, 1);
             if ($v >= 0x10) {
                 return max(0, min(100, ($v - 0x10) * 25));
@@ -54,17 +55,20 @@ class result implements IResult
         return -1;
     }
 
-    function getCode()
+    function getErrorCode(): int
     {
-        return $this->getPayloadData(4, 1);
+        if ($this->isOpenResultFail()) {
+            return -1;
+        }
+        return 0;
     }
 
-    function getMessage()
+    function getMessage(): string
     {
-        $code = $this->getCode();
+        $id = $this->getID();
         $res = $this->getPayloadData(12, 1);
 
-        switch ($code) {
+        switch ($id) {
             case 0x01:
                 if ($res) {
                     return '<= 握手结果(成功)，电量：'. $this->getBatteryValue() . '%';
@@ -84,7 +88,7 @@ class result implements IResult
         return $this->device_id;
     }
 
-    function getSerial()
+    function getSerial(): string
     {
         return '';
     }
@@ -94,7 +98,7 @@ class result implements IResult
         return $this->data;
     }
 
-    function getCmd()
+    function getCmd(): ?ICmd
     {
         return null;
     }
@@ -113,4 +117,5 @@ class result implements IResult
         }
         return array_slice($data, $pos, $len);
     }
+
 }

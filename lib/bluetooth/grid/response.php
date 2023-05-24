@@ -6,11 +6,12 @@
 
 namespace bluetooth\grid;
 
-use zovye\Contract\bluetooth\IResult;
+use zovye\Contract\bluetooth\ICmd;
+use zovye\Contract\bluetooth\IResponse;
 use zovye\Device;
 use zovye\We7;
 
-class result implements IResult
+class response implements IResponse
 {
     private $device_id;
     private $data;
@@ -34,22 +35,22 @@ class result implements IResult
         $this->data = base64_decode($data);
     }
 
-    function isValid()
+    function getID()
     {
-        return true;
+        return '';
     }
 
-    function isOpenResultOk()
+    function isOpenResultOk(): bool
     {
         return We7::starts_with($this->data, self::OPEN_SUCCESS);
     }
 
-    function isOpenResultFail()
+    function isOpenResultFail(): bool
     {
         return We7::starts_with($this->data, self::ERR);
     }
 
-    function getCode()
+    function getErrorCode(): int
     {
         if ($this->isOpenResultFail()) {
             return intval(trim(ltrim($this->data, self::ERR)));
@@ -57,33 +58,34 @@ class result implements IResult
         return 0;
     }
 
-    function isResponse()
+    function isResponse(): bool
     {
         return We7::starts_with($this->data, self::RESPONSE);
     }
 
-    function isAuthSuccess()
+    function isAuthSuccess(): bool
     {
         return We7::starts_with($this->data, self::AUTH_SUCCESS);
     }
 
-    function isOpenSuccess()
+    function isOpenSuccess(): bool
     {
         return We7::starts_with($this->data, self::OPEN_SUCCESS);
     }
 
-    function isVoltage()
+    function isVoltage(): bool
     {
         return We7::starts_with($this->data, self::VOLTAGE);
     }
 
-    function isError()
+    function isError(): bool
     {
         return We7::starts_with($this->data, self::ERR);
     }
 
-    function getErrMsg() {
-        $err = $this->getCode();
+    function getErrMsg(): string
+    {
+        $err = $this->getErrorCode();
         if ($err > 0) {
             $msg = self::$err_msg[$err];
             return $msg ?? '未知错误';
@@ -91,7 +93,7 @@ class result implements IResult
         return '';
     }
 
-    function getMessage()
+    function getMessage(): string
     {
         if ($this->isResponse()) {
             return '<= 密钥回复';
@@ -109,12 +111,7 @@ class result implements IResult
         return '<= 未知数据';
     }
 
-    function getDeviceID()
-    {
-        return $this->device_id;
-    }
-
-    function getSerial()
+    function getSerial(): string
     {
         return '';
     }
@@ -124,7 +121,8 @@ class result implements IResult
         return $this->data;
     }
 
-    function getAuthCmd() {
+    function getAuthCmd(): ?ICmd
+    {
         $device = Device::get($this->device_id, true);
         if ($device) {
             $mac = $device->getMAC();
@@ -140,26 +138,22 @@ class result implements IResult
         return null;
     }
 
-    function isReady()
+    function isReady(): bool
     {
         return $this->isAuthSuccess();
     }
 
-    public function getBatteryValue()
+    public function getBatteryValue(): int
     {
         return -1;
     }
 
-    function getCmd()
+    function getCmd(): ?ICmd
     {
         if ($this->isResponse()) {
             return $this->getAuthCmd();
         }
 
         return null;
-    }
-
-    function getPayloadData()
-    {
     }
 }

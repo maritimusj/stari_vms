@@ -52,7 +52,7 @@ class cmd implements ICmd
         return $this->data;
     }
 
-    function getMessage()
+    function getMessage(): string
     {
         switch ($this->id) {
             case 0x01:
@@ -66,14 +66,14 @@ class cmd implements ICmd
         return '未知命令';
     }
 
-    function resetSEQ($device_id)
+    static function resetSEQ($device_id)
     {
         Cache::set("SEQ:$device_id", 0);
     }
 
-    function nextSEQ()
+    static function nextSEQ($device_id)
     {
-        $uid = "SEQ:$this->device_id";
+        $uid = "SEQ:$device_id";
 
         $seq = Cache::fetch($uid, function () {
             return 0;
@@ -90,7 +90,7 @@ class cmd implements ICmd
         return $seq;
     }
 
-    function crc($data) 
+    function crc($data): int
     {
         $crc = 0;
         $len = strlen($data);
@@ -109,10 +109,10 @@ class cmd implements ICmd
         return $crc & 0xFF;
     }
 
-    function encode()
+    function encode(): string
     {
         $data = pack('C*', ...self::HEADER)
-            .pack('C*', $this->nextSEQ())
+            .pack('C*', self::nextSEQ($this->device_id))
             .pack('H*',  $this->device_id)
             .pack('C*',$this->id,...$this->data);
         return $data . pack('C*', $this->crc($data));

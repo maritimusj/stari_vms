@@ -12,6 +12,7 @@ class ShakeHandCMD extends cmd
     {
         $data[] = 0;
         $data[] = 0;
+
         parent::__construct($device_id, protocol::CMD_SHAKE_HAND, protocol::KEY_SHAKE, $data);
     }
 }

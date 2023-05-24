@@ -277,35 +277,35 @@ class common
             return err('无法加载蓝牙协议！');
         }
 
-        $result = $proto->parseMessage($device->getBUID(), $data);
-        if (empty($result)) {
+        $response = $proto->parseResponse($device->getBUID(), $data);
+        if (empty($response)) {
             return err('无法解析消息！');
         }
 
-        if ($result->isOpenResultOk() || $result->isOpenResultFail()) {
+        if ($response->isOpenResultOk() || $response->isOpenResultFail()) {
 
             $order = Order::getLastOrderOfDevice($device);
 
             if ($order && empty($order->getExtraData('bluetooth.raw'))) {
 
-                $order->setExtraData('bluetooth.raw', $result->getRawData());
+                $order->setExtraData('bluetooth.raw', $response->getRawData());
 
-                if ($result->isOpenResultOk()) {
+                if ($response->isOpenResultOk()) {
                     $order->setBluetoothResultOk();
-                } elseif ($result->isOpenResultFail()) {
-                    $order->setBluetoothResultFail($result->getMessage());
+                } elseif ($response->isOpenResultFail()) {
+                    $order->setBluetoothResultFail($response->getMessage());
                     if (Helper::NeedAutoRefund($device)) {
                         //启动退款
-                        Job::refund($order->getOrderNO(), $result->getMessage());
+                        Job::refund($order->getOrderNO(), $response->getMessage());
                     }
                 }
 
                 $order->save();
             }
 
-            if ($result->isOpenResultFail()) {
-                $code = intval($result->getCode());
-                $message = strval($result->getMessage());
+            if ($response->isOpenResultFail()) {
+                $code = intval($response->getErrorCode());
+                $message = strval($response->getMessage());
                 $device->setError($code, $message);
                 $device->scheduleErrorNotifyJob($code, $message);
             } else {
@@ -313,17 +313,17 @@ class common
             }
         }
 
-        if ($result->isReady()) {
+        if ($response->isReady()) {
             $device->setBluetoothStatus(Device::BLUETOOTH_READY);
         }
 
-        Device::createBluetoothEventLog($device, $result);
+        Device::createBluetoothEventLog($device, $response);
 
         $data = [
             'data' => null,
         ];
 
-        $battery = $result->getBatteryValue();
+        $battery = $response->getBatteryValue();
 
         if ($battery != -1) {
             $device->setQoe($battery);
@@ -338,7 +338,7 @@ class common
 
         $device->save();
 
-        $cmd = $result->getCmd();
+        $cmd = $response->getCmd();
         if ($cmd) {
             Device::createBluetoothCmdLog($device, $cmd);
 

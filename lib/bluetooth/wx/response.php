@@ -6,9 +6,10 @@
 
 namespace bluetooth\wx;
 
-use zovye\Contract\bluetooth\IResult;
+use zovye\Contract\bluetooth\ICmd;
+use zovye\Contract\bluetooth\IResponse;
 
-class result implements IResult
+class response implements IResponse
 {
     const MSG_ID_OFFSET = 4;
     const DEVICE_ID_OFFSET = 5;
@@ -40,19 +41,24 @@ class result implements IResult
         }
     }
 
-    public function isValid()
+    function getID(): int
+    {
+        return 0;
+    }
+
+    public function isValid(): bool
     {
         return strlen($this->data) > 12;
     }
 
-    public function isReady()
+    public function isReady(): bool
     {
-        return $this->getCode() == 0x02 || $this->getCode() >= 0x10;
+        return $this->getErrorCode() == 0x02 || $this->getErrorCode() >= 0x10;
     }
 
     public function getBatteryValue()
     {
-        $v = $this->getCode();
+        $v = $this->getErrorCode();
         if ($v < 0x10) {
             return -1;
         }
@@ -63,17 +69,17 @@ class result implements IResult
         return min(100, ($v - 0x10)*25);
     }   
 
-    public function isOpenResultOk()
+    public function isOpenResultOk(): bool
     {
-        return $this->getCode() == 0x01 || $this->getCode() == 0x03;
+        return $this->getErrorCode() == 0x01 || $this->getErrorCode() == 0x03;
     }
 
-    public function isOpenResultFail()
+    public function isOpenResultFail(): bool
     {
-        return $this->getCode() === 0 || $this->getCode() == 0x04 || $this->getCode() == 0x05;
+        return $this->getErrorCode() === 0 || $this->getErrorCode() == 0x04 || $this->getErrorCode() == 0x05;
     }
 
-    public function getCode()
+    public function getErrorCode(): int
     {
         if ($this->isValid()) {
             $res = unpack('C', $this->data[self::RESULT_OFFSET]);
@@ -84,16 +90,16 @@ class result implements IResult
         return 0;
     }
 
-    public function getMessage()
+    public function getMessage(): string
     {
-        $code = $this->getCode();
+        $code = $this->getErrorCode();
         if (isset(self::$strMsg[$code])) {
             return self::$strMsg[$code];
         }
         return 'unknown';
     }
 
-    public function getDeviceID()
+    public function getDeviceID(): string
     {
         if ($this->isValid()) {
             return ltrim(bin2hex(substr($this->data, self::DEVICE_ID_OFFSET, 6)), '0');
@@ -112,18 +118,13 @@ class result implements IResult
         return 0;
     }
 
-    public function getRawData()
+    public function getRawData(): string
     {
         return bin2hex($this->data);
     }
 
-    function getCmd()
+    function getCmd(): ?ICmd
     {
         return null;
-    }
-
-    function getPayloadData()
-    {
-
     }
 }

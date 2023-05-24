@@ -14,7 +14,7 @@ use zovye\model\agentModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\keeperModelObj;
 use zovye\Contract\bluetooth\ICmd;
-use zovye\Contract\bluetooth\IResult;
+use zovye\Contract\bluetooth\IResponse;
 use zovye\Contract\bluetooth\IBlueToothProtocol;
 
 class Device extends State
@@ -578,16 +578,16 @@ class Device extends State
         }
     }
 
-    public static function createBluetoothEventLog(deviceModelObj $device, IResult $result)
+    public static function createBluetoothEventLog(deviceModelObj $device, IResponse $result)
     {
         if ($device->isEventLogEnabled()) {
             if ($result->getRawData()) {
                 $data = We7::uniacid([
-                    'event' => $result->getCode(),
+                    'event' => $result->getID(),
                     'device_uid' => $device->getUid(),
                     'extra' => [
                         'raw' => base64_encode($result->getRawData()),
-                        'code' => $result->getCode(),
+                        'code' => $result->getErrorCode(),
                         'message' => $result->getMessage(),
                     ],
                 ]);

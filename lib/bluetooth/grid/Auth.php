@@ -16,17 +16,17 @@ class Auth extends cmd
         $this->password = strval($password);
     }
 
-    function getID()
+    function getID(): string
     {
         return "AUTH";
     }
 
-    function getRaw()
+    function getRaw(): string
     {
-        return "+PK:{$this->password}\r\n";
+        return "+PK:$this->password\r\n";
     }
 
-    function getMessage()
+    function getMessage(): string
     {
         return "=> 请求授权";
     }

@@ -7,9 +7,9 @@
 namespace bluetooth\wx9se;
 
 use zovye\Contract\bluetooth\ICmd;
-use zovye\Contract\bluetooth\IResult;
+use zovye\Contract\bluetooth\IResponse;
 
-class result implements IResult
+class response implements IResponse
 {
     private $device_id;
     private $data;
@@ -25,6 +25,12 @@ class result implements IResult
         $this->data = base64_decode($data);
     }
 
+    function getID()
+    {
+        $v = unpack('C', $this->data);
+        return $v ? $v[1] : 0;
+    }
+
     function setCmd(ICmd $cmd = null)
     {
         $this->cmd = $cmd;
@@ -37,7 +43,7 @@ class result implements IResult
 
     function isOpenResultOk(): bool
     {
-        if ($this->getCode() == protocol::CMD_CONFIG && $this->getKey() == protocol::KEY_LOCKER) {
+        if ($this->getID() == protocol::CMD_CONFIG && $this->getKey() == protocol::KEY_LOCKER) {
             return $this->getPayloadData(2, 1) == protocol::RESULT_LOCKER_SUCCESS;
         }
         return false;
@@ -45,35 +51,38 @@ class result implements IResult
 
     function isOpenResultFail(): bool
     {
-        if ($this->getCode() == protocol::CMD_CONFIG && $this->getKey() == protocol::KEY_LOCKER) {
+        if ($this->getID() == protocol::CMD_CONFIG && $this->getKey() == protocol::KEY_LOCKER) {
             $v = $this->getPayloadData(2, 1);
             return $v != protocol::RESULT_LOCKER_SUCCESS && $v != protocol::RESULT_LOCKER_WAIT;
         }
         return false;
     }
 
-    function isReady()
+    function isReady(): bool
     {
         return $this->getBatteryValue() > 0;
     }
 
     function getBatteryValue(): int
     {
-        if (($this->getCode() == protocol::CMD_QUERY || $this->getCode() == protocol::CMD_NOTIFY) && $this->getKey() == protocol::KEY_BATTERY) {
+        if (($this->getID() == protocol::CMD_QUERY || $this->getID() == protocol::CMD_NOTIFY)
+            && $this->getKey() == protocol::KEY_BATTERY) {
             return $this->getPayloadData(7, 1) * 20;
         }
         return -1;
     }
 
-    function getCode()
+    function getErrorCode(): int
     {
-        $v = unpack('C', $this->data);
-        return $v ? $v[1] : 0;
+        if ($this->isOpenResultFail()) {
+            return -1;
+        }
+        return 0;
     }
 
     function getMessage(): string
     {
-        $cmd_code = $this->getCode();
+        $cmd_code = $this->getID();
         $cmd_key = $this->getKey();
 
         if ($cmd_code == protocol::CMD_SHAKE_HAND) {
@@ -143,7 +152,7 @@ class result implements IResult
         return $this->data;
     }
 
-    function getCmd()
+    function getCmd(): ?ICmd
     {
         return $this->cmd;
     }

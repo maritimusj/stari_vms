@@ -14,5 +14,4 @@ class AppVerifyCMD extends cmd
         $data[] = 0;
         parent::__construct(0, protocol::CMD_SHAKE_HAND, protocol::KEY_VERIFY, $data);
     }
-
 }

@@ -16,17 +16,17 @@ class Unlock extends cmd
         $this->lane = $lane;
     }
 
-    function getID()
+    function getID(): string
     {
         return "UNLOCK";
     }
 
-    function getRaw()
+    function getRaw(): string
     {
-        return "+OPEN:{$this->lane}\r\n";
+        return "+OPEN:$this->lane\r\n";
     }
 
-    function getMessage()
+    function getMessage(): string
     {
         return "=> 请求开锁";
     }

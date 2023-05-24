@@ -11,6 +11,15 @@ interface IBlueToothProtocol
     const BASE64 = '\base64_encode';
     const HEX = '\bin2hex';
 
+    /**
+     * 返回协议的中文名称
+     * @return string
+     */
+    function getTitle(): string;
+
+    /**
+     * 把设备BUID转化为协议需要的UID
+     */
     function transUID($uid);
 
     /**
@@ -20,7 +29,6 @@ interface IBlueToothProtocol
      * @return ICmd
      */
     function onConnected($device_id, $data = ''): ?ICmd;
-
 
     /**
      * 初始化蓝牙设备
@@ -41,13 +49,7 @@ interface IBlueToothProtocol
      * 处理蓝牙设备返回的消息
      * @param  $device_id
      * @param $data
-     * @return IResult
+     * @return IResponse
      */
-    function parseMessage($device_id, $data): ?IResult;
-
-    /**
-     * 返回协议的中文名称
-     * @return string
-     */
-    function getTitle(): string;
+    function parseResponse($device_id, $data): ?IResponse;
 }

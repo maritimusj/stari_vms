@@ -8,11 +8,16 @@ namespace bluetooth\grid;
 
 use zovye\Contract\bluetooth\IBlueToothProtocol;
 use zovye\Contract\bluetooth\ICmd;
-use zovye\Contract\bluetooth\IResult;
+use zovye\Contract\bluetooth\IResponse;
 use zovye\Device;
 
 class protocol implements IBlueToothProtocol
 {
+    function getTitle(): string
+    {
+        return "第三方厂商蓝牙协议 BLE-v3";
+    }
+
     function transUID($uid)
     {
         return $uid;
@@ -41,9 +46,9 @@ class protocol implements IBlueToothProtocol
     /**
      * @inheritDoc
      */
-    function parseMessage($device_id, $data): ?IResult
+    function parseResponse($device_id, $data): ?IResponse
     {
-        $result =  new result($device_id, $data);
+        $result =  new response($device_id, $data);
         if ($result->isOpenSuccess()) {
             $device = Device::get($device_id, true);
             if ($device) {
@@ -53,12 +58,7 @@ class protocol implements IBlueToothProtocol
         return null;
     }
 
-    function getTitle(): string
-    {
-        return "第三方厂商蓝牙协议 BLE-v3";
-    }
-
-    function initialize($device_id)
+    function initialize($device_id): ?ICmd
     {
         $device = Device::get($device_id, true);
         if ($device) {

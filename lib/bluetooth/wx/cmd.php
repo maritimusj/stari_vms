@@ -25,7 +25,7 @@ class cmd implements ICmd
     private $data;
     private $msgID;
 
-    function crc($data)
+    function crc($data): int
     {
         $v = 0x00;
         for ($i = 0; $i < strlen($data); $i++) {
@@ -37,12 +37,12 @@ class cmd implements ICmd
     }
 
     /**
-     * cmd constructor.
+     * cmd.
      * @param $device_id
      * @param $id
-     * @param array $data
+     * @param $data
      */
-    public function __construct($device_id, $id, $data = [])
+    public function __construct($device_id, $id, $data)
     {
         $this->device_id = $device_id;
         $this->id = $id;
@@ -66,9 +66,6 @@ class cmd implements ICmd
         return $this->id;
     }
 
-    /**
-     * @return array
-     */
     public function getData()
     {
         return $this->data;
@@ -79,7 +76,7 @@ class cmd implements ICmd
         return pack('H*', str_pad($device_id, 12, '0', STR_PAD_LEFT));
     }
 
-    function encode()
+    function encode(): string
     {
         $customData = '';
         foreach ($this->data as $c) {
@@ -94,7 +91,7 @@ class cmd implements ICmd
         return $result . pack('c', $this->crc($result));
     }
 
-    public function getRaw()
+    public function getRaw(): string
     {
         return $this->encode();
     }
@@ -104,8 +101,8 @@ class cmd implements ICmd
         return is_callable($fn) ? call_user_func($fn, $this->encode()) : base64_encode($this->encode());
     }
 
-    function getMessage()
+    function getMessage(): string
     {
-        return isset(self::$strMsg[$this->id]) ? self::$strMsg[$this->id] : '<未知>';
+        return self::$strMsg[$this->id] ?? '<未知>';
     }
 }

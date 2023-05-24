@@ -8,17 +8,17 @@ namespace bluetooth\grid;
 
 class R extends cmd
 {
-    function getID()
+    function getID(): string
     {
         return "R";
     }
 
-    function getRaw()
+    function getRaw(): string
     {
         return "+R?\r\n";
     }
 
-    function getMessage()
+    function getMessage(): string
     {
         return "=> 请求密钥";
     }

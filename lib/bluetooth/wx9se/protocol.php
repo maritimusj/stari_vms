@@ -9,7 +9,7 @@ namespace bluetooth\wx9se;
 use mermshaus\CRC\CRC16XModem;
 use zovye\Contract\bluetooth\IBlueToothProtocol;
 use zovye\Contract\bluetooth\ICmd;
-use zovye\Contract\bluetooth\IResult;
+use zovye\Contract\bluetooth\IResponse;
 use zovye\Device;
 use zovye\Log;
 
@@ -26,7 +26,7 @@ class protocol implements IBlueToothProtocol
     public static $strMsg = [
         self::CMD_SHAKE_HAND => [
             self::KEY_SHAKE => '=> 握手',
-            self::KEY_VERIFY => '=> 校验'
+            self::KEY_VERIFY => '=> 校验',
         ],
         self::CMD_QUERY => [
             self::KEY_INFO => '=> 获取基本信息',
@@ -71,14 +71,16 @@ class protocol implements IBlueToothProtocol
     const LOW = 0;
     const HIGH = 1;
 
+    function getTitle(): string
+    {
+        return '9位电子烟售货机蓝牙协议 v1.0';
+    }
+
     function transUID($uid)
     {
         return $uid;
     }
 
-    /**
-     * @inheritDoc
-     */
     function onConnected($device_id, $data = ''): ?ICmd
     {
         $device = Device::get($device_id, true);
@@ -115,15 +117,12 @@ class protocol implements IBlueToothProtocol
         }
     }
 
-    /**
-     * @inheritDoc
-     */
     function open($device_id, $data): ?ICmd
     {
         if (isset($data['locker'])) {
             return new OpenDeviceCMD($data['locker']);
         }
-        
+
         return null;
     }
 
@@ -148,6 +147,7 @@ class protocol implements IBlueToothProtocol
 
             $crc16->reset();
         }
+
         return $result;
     }
 
@@ -162,31 +162,29 @@ class protocol implements IBlueToothProtocol
                 return false;
             }
         }
+
         return true;
     }
 
-
-    /**
-     * @inheritDoc
-     */
-    function parseMessage($device_id, $data):?IResult
+    function parseResponse($device_id, $data): ?IResponse
     {
         $device = Device::get($device_id, true);
         if (empty($device)) {
             return null;
         }
 
-        $result = new result($device_id, $data);
+        $result = new response($device_id, $data);
         if (!$result->isValid()) {
             Log::error($device_id, [
                 'data' => $data,
                 'hex' => bin2hex(base64_decode($data)),
                 'error' => '无效的回复！',
             ]);
+
             return null;
         }
 
-        $cmd_code = $result->getCode();
+        $cmd_code = $result->getID();
         $cmd_key = $result->getKey();
         switch ($cmd_code) {
             case self::CMD_SHAKE_HAND:
@@ -196,7 +194,7 @@ class protocol implements IBlueToothProtocol
                     $data = $result->getPayloadData(2, 16);
                     if ($this->verifyCRC16Data($mac, $randomData, $data)) {
                         //握手通过，返回APP检验请求
-                        $crc  = $this->getCrc16Data($mac, $randomData, self::HIGH);
+                        $crc = $this->getCrc16Data($mac, $randomData, self::HIGH);
                         $result->setCmd(new AppVerifyCMD($crc));
                     }
                 } elseif ($cmd_key == self::KEY_VERIFY) {
@@ -230,10 +228,5 @@ class protocol implements IBlueToothProtocol
         }
 
         return $result;
-    }
-
-    function getTitle(): string
-    {
-        return '9位电子烟售货机蓝牙协议 v1.0';
     }
 }

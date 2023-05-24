@@ -78,10 +78,12 @@ class ChargingNowData
         ])->findAll();
     }
 
-    public static function removeAllByDevice(deviceModelObj $device): bool
+    public static function removeAllByDevice(deviceModelObj $device)
     {
-        return self::model()->delete([
-            'device_id' => $device->getId(),
-        ]);
+        /** @var charging_now_dataModelObj $data */
+        foreach (self::model()->query(['device_id' => $device->getId()]) as $data) {
+            Charging::endOrder($data->getSerial(), '设备已经停用并删除！');
+            $data->destroy();
+        }
     }
 }

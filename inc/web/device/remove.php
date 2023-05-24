@@ -29,6 +29,10 @@ $device->remove('statsData');
 $device->remove('lastErrorData');
 $device->remove('extra');
 
+if ($device->isChargingDevice()) {
+    ChargingNowData::removeAllByDevice($device);
+}
+
 //删除相关套餐
 foreach (Package::query(['device_id' => $device->getId()])->findAll() as $entry) {
     $entry->destroy();

@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_migration` (
   `end` int(11) NOT NULL,
   `createtime` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`,`uniacid`)
+  UNIQUE KEY `name` (`uniacid`, `name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_weapp_config` (
@@ -30,8 +30,8 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_weapp_config` (
   `createtime` int(11) NOT NULL DEFAULT '0',
   `locked_uid` varchar(64) NOT NULL DEFAULT 'n/a',
   PRIMARY KEY (`id`),
-  KEY `name` (`name`,`uniacid`),
-  KEY `locked_uid` (`locked_uid`,`uniacid`)
+  KEY `name` (`uniacid`, `name`),
+  KEY `locked_uid` (`uniacid`, `locked_uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_settings_order` (
@@ -42,8 +42,8 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_settings_order` (
   `createtime` int(11) NOT NULL DEFAULT '0',
   `locked_uid` varchar(64) NOT NULL DEFAULT 'n/a',
   PRIMARY KEY (`id`),
-  KEY `name` (`name`,`uniacid`),
-  KEY `locked_uid` (`locked_uid`,`uniacid`)
+  KEY `name` (`uniacid`, `name`),
+  KEY `locked_uid` (`uniacid`, `locked_uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_account` (
@@ -70,9 +70,9 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_account` (
   `extra` text,
   `createtime` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uid` (`uid`,`uniacid`),
-  KEY `name` (`name`,`uniacid`),
-  KEY `agent_id` (`agent_id`,`uniacid`)
+  UNIQUE KEY `uid` (`uniacid`, `uid`),
+  KEY `name` (`uniacid`, `name`),
+  KEY `agent_id` (`uniacid`, `agent_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_advertising` (
@@ -86,7 +86,7 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_advertising` (
   `createtime` int(11) DEFAULT '0',
   `updatetime` int(11) DEFAULT '0',
   PRIMARY KEY (`id`),
-  KEY `agent_id` (`agent_id`,`uniacid`),
+  KEY `agent_id` (`uniacid`, `agent_id`),
   KEY `type` (`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -102,7 +102,7 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_advs_stats` (
   `extra` text,
   `createtime` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `openid` (`openid`,`advs_id`)
+  KEY `openid` (`uniacid`, `openid`,`advs_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_agent_app` (
@@ -160,9 +160,9 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_commission_balance` (
   `createtime` int(11) DEFAULT NULL,
   `updatetime` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `openid` (`openid`,`uniacid`),
-  KEY `createtime` (`createtime`),
-  KEY `src` (`src`)
+  KEY `openid` (`uniacid`, `openid`),
+  KEY `createtime` (`uniacid`, `createtime`),
+  KEY `src` (`uniacid`, `src`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_balance` (
@@ -174,9 +174,9 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_balance` (
   `extra` text,
   `createtime` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `openid` (`openid`,`uniacid`),
-  KEY `createtime` (`createtime`),
-  KEY `src` (`src`)
+  KEY `openid` (`uniacid`, `openid`),
+  KEY `createtime` (`uniacid`, `createtime`),
+  KEY `src` (`uniacid`, `src`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_component_user` (
@@ -188,9 +188,9 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_component_user` (
   `extra` text,
   `createtime` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`,`uniacid`),
-  KEY `appid` (`appid`,`uniacid`),
-  KEY `openid` (`openid`,`uniacid`)
+  KEY `user_id` (`uniacid`, `user_id`),
+  KEY `appid` (`uniacid`, `appid`),
+  KEY `openid` (`uniacid`, `openid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_coupon` (
@@ -206,7 +206,7 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_coupon` (
   `memo` text,
   `createtime` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uid` (`uid`,`uniacid`)
+  UNIQUE KEY `uid` (`uniacid`, `uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
@@ -251,14 +251,14 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_device` (
   `error_code` int(11) DEFAULT '0',
   `createtime` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `imei` (`imei`,`uniacid`),
-  KEY `app_id` (`app_id`,`uniacid`),
-  KEY `agent_id` (`agent_id`,`uniacid`),
-  KEY `shadow_id` (`shadow_id`,`uniacid`),
+  UNIQUE KEY `imei` (`uniacid`, `imei`),
+  KEY `app_id` (`uniacid`, `app_id`),
+  KEY `agent_id` (`uniacid`, `agent_id`),
+  KEY `shadow_id` (`uniacid`, `shadow_id`),
   KEY `createtime` (`createtime`),
-  KEY `s3` (`s3`,`uniacid`),
-  KEY `s2` (`s2`,`uniacid`),
-  KEY `s1` (`s1`,`uniacid`)
+  KEY `s3` (`uniacid`, `s3`),
+  KEY `s2` (`uniacid`, `s2`),
+  KEY `s1` (`uniacid`, `s1`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_device_events` (
@@ -269,7 +269,7 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_device_events` (
   `extra` text,
   `createtime` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `device_uid` (`device_uid`(8),`event`,`uniacid`)
+  KEY `device_uid` (`uniacid`, `device_uid`(8),`event`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_device_feedback` (
@@ -282,7 +282,7 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_device_feedback` (
   `remark` varchar(200) NOT NULL,
   `createtime` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `device_id` (`device_id`,`uniacid`)
+  KEY `device_id` (`uniacid`, `device_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_device_groups` (
@@ -293,7 +293,7 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_device_groups` (
   `agent_id` int(11) NOT NULL DEFAULT '0',
   `createtime` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
-  KEY `agent_id` (`agent_id`,`uniacid`)
+  KEY `agent_id` (`uniacid`, `agent_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_device_logs` (
@@ -304,8 +304,8 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_device_logs` (
   `data` text,
   `createtime` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `title` (`title`(16),`uniacid`, `level`),
-  KEY `createtime` (`createtime`)
+  KEY `title` (`uniacid`, `title`(16), `level`),
+  KEY `createtime` (`uniacid`, `createtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_device_record` (
@@ -317,9 +317,9 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_device_record` (
   `agent_id` int(11) NOT NULL,
   `createtime` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `device_id` (`device_id`,`uniacid`),
-  KEY `user_id` (`user_id`,`uniacid`),
-  KEY `agent_id` (`agent_id`,`uniacid`)
+  KEY `device_id` (`uniacid`, `device_id`),
+  KEY `user_id` (`uniacid`, `user_id`),
+  KEY `agent_id` (`uniacid`, `agent_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_device_types` (
@@ -331,8 +331,8 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_device_types` (
   `extra` text,
   `createtime` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `agent_id` (`agent_id`,`uniacid`),
-  KEY `device_id` (`device_id`,`uniacid`)
+  KEY `agent_id` (`uniacid`, `agent_id`),
+  KEY `device_id` (`uniacid`, `device_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_files` (
@@ -357,7 +357,7 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_goods` (
   `extra` text,
   `createtime` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `agent_id` (`agent_id`,`uniacid`)
+  KEY `agent_id` (`uniacid`, `agent_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_goods_voucher` (
@@ -373,8 +373,8 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_goods_voucher` (
   `end` int(11) NOT NULL,
   `createtime` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `agent_id` (`agent_id`,`uniacid`),
-  KEY `goods_id` (`goods_id`,`uniacid`)
+  KEY `agent_id` (`uniacid`, `agent_id`),
+  KEY `goods_id` (`uniacid`, `goods_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_goods_voucher_logs` (
@@ -391,8 +391,8 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_goods_voucher_logs` (
   `device_id` int(11) NOT NULL DEFAULT '0',
   `createtime` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `code` (`code`,`uniacid`),
-  KEY `voucher_id` (`voucher_id`,`uniacid`)  
+  UNIQUE KEY `code` (`uniacid`, `code`),
+  KEY `voucher_id` (`uniacid`, `voucher_id`)  
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_gsp_user` (
@@ -431,8 +431,8 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_keepers` (
   `extra` text,
   `createtime` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `mobile` (`mobile`),
-  KEY `agent_id` (`agent_id`,`uniacid`)
+  UNIQUE KEY `mobile` (`uniacid`, `mobile`),
+  KEY `agent_id` (`uniacid`, `agent_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_login_data` (
@@ -458,7 +458,7 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_maintenance` (
   `result` text,
   `createtime` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `device_id` (`device_id`,`uniacid`)
+  KEY `device_id` (`uniacid`, `device_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_migration` (
@@ -472,7 +472,7 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_migration` (
   `end` int(11) NOT NULL,
   `createtime` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`,`uniacid`)
+  UNIQUE KEY `name` (`uniacid`, `name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_msg` (
@@ -504,15 +504,16 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_order` (
   `createtime` int(11) DEFAULT NULL,
   `updatetime` int(11) DEFAULT '0',
   PRIMARY KEY (`id`),
-  KEY `device_id` (`device_id`,`uniacid`),
-  KEY `order_id` (`order_id`,`uniacid`),
-  KEY `agent_id` (`agent_id`,`uniacid`),
-  KEY `openid` (`openid`,`uniacid`),
-  KEY `result_code` (`result_code`,`uniacid`),
-  KEY `refund` (`refund`,`uniacid`),
-  KEY `createtime` (`createtime`),
-  KEY `updatetime` (`updatetime`),
-  KEY `account` (`account`,`uniacid`)
+  KEY `uniacid` (`uniacid`),
+  KEY `device_id` (`uniacid`, `device_id`),
+  KEY `order_id` (`uniacid`, `order_id`),
+  KEY `agent_id` (`uniacid`, `agent_id`),
+  KEY `openid` (`uniacid`, `openid`),
+  KEY `result_code` (`uniacid`, `result_code`),
+  KEY `refund` (`uniacid`, `refund`),
+  KEY `createtime` (`uniacid`, `createtime`),
+  KEY `updatetime` (`uniacid`, `updatetime`),
+  KEY `account` (`uniacid`, `account`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_payload_logs` (
@@ -525,8 +526,8 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_payload_logs` (
   `extra` text NOT NULL,
   `createtime` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `goods_id` (`goods_id`,`uniacid`),
-  KEY `device_id` (`device_id`,`uniacid`)
+  KEY `goods_id` (`uniacid`, `goods_id`),
+  KEY `device_id` (`uniacid`, `device_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_principal` (
@@ -562,10 +563,10 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_replenish` (
   `extra` text,
   `createtime` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `device_uid` (`device_uid`,`uniacid`),
-  KEY `agent_id` (`agent_id`,`uniacid`),
-  KEY `keeper_id` (`keeper_id`,`uniacid`),
-  KEY `goods_id` (`goods_id`,`uniacid`)
+  KEY `device_uid` (`uniacid`, `device_uid`),
+  KEY `agent_id` (`uniacid`, `agent_id`),
+  KEY `keeper_id` (`uniacid`, `keeper_id`),
+  KEY `goods_id` (`uniacid`, `goods_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_settings_account` (
@@ -576,7 +577,7 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_settings_account` (
   `createtime` int(11) DEFAULT NULL,
   `locked_uid` varchar(64) DEFAULT 'n/a',
   PRIMARY KEY (`id`),
-  KEY `name` (`name`(16),`uniacid`),
+  KEY `name` (`uniacid`, `name`(16)),
   KEY `createtime` (`createtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -588,7 +589,7 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_settings_advertising` (
   `createtime` int(11) DEFAULT NULL,
   `locked_uid` varchar(64) DEFAULT 'n/a',
   PRIMARY KEY (`id`),
-  KEY `name` (`name`(16),`uniacid`),
+  KEY `name` (`uniacid`, `name`(16)),
   KEY `createtime` (`createtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -600,8 +601,8 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_settings_commission_balance` (
   `createtime` int(11) DEFAULT NULL,
   `locked_uid` varchar(64) DEFAULT 'n/a',
   PRIMARY KEY (`id`),
-  KEY `name` (`name`(16),`uniacid`),
-  KEY `createtime` (`createtime`)
+  KEY `name` (`uniacid`, `name`(16)),
+  KEY `createtime` (`uniacid`, `createtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_settings_component_user` (
@@ -612,7 +613,7 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_settings_component_user` (
   `createtime` int(11) DEFAULT NULL,
   `locked_uid` varchar(64) DEFAULT 'n/a',
   PRIMARY KEY (`id`),
-  KEY `name` (`name`(16),`uniacid`),
+  KEY `name` (`uniacid`, `name`(16)),
   KEY `createtime` (`createtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -624,7 +625,7 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_settings_device` (
   `createtime` int(11) DEFAULT NULL,
   `locked_uid` varchar(64) DEFAULT 'n/a',
   PRIMARY KEY (`id`),
-  KEY `name` (`name`(16),`uniacid`),
+  KEY `name` (`uniacid`, `name`(16)),
   KEY `createtime` (`createtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -636,7 +637,7 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_settings_device_types` (
   `createtime` int(11) DEFAULT NULL,
   `locked_uid` varchar(64) DEFAULT 'n/a',
   PRIMARY KEY (`id`),
-  KEY `name` (`name`(16),`uniacid`),
+  KEY `name` (`uniacid`, `name`(16)),
   KEY `createtime` (`createtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -648,7 +649,7 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_settings_goods` (
   `createtime` int(11) DEFAULT NULL,
   `locked_uid` varchar(64) DEFAULT 'n/a',
   PRIMARY KEY (`id`),
-  KEY `name` (`name`(16),`uniacid`),
+  KEY `name` (`uniacid`, `name`(16)),
   KEY `createtime` (`createtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -660,7 +661,7 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_settings_keeper` (
   `createtime` int(11) DEFAULT NULL,
   `locked_uid` varchar(64) DEFAULT 'n/a',
   PRIMARY KEY (`id`),
-  KEY `name` (`name`(16),`uniacid`),
+  KEY `name` (`uniacid`, `name`(16)),
   KEY `createtime` (`createtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -672,8 +673,8 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_settings_order` (
   `createtime` int(11) NOT NULL DEFAULT '0',
   `locked_uid` varchar(64) NOT NULL DEFAULT 'n/a',
   PRIMARY KEY (`id`),
-  KEY `name` (`name`,`uniacid`),
-  KEY `locked_uid` (`locked_uid`,`uniacid`)
+  KEY `name` (`uniacid`, `name`(16)),
+  KEY `locked_uid` (`uniacid`, `locked_uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_settings_user` (
@@ -684,7 +685,7 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_settings_user` (
   `createtime` int(11) DEFAULT NULL,
   `locked_uid` varchar(64) DEFAULT 'n/a',
   PRIMARY KEY (`id`),
-  KEY `name` (`name`(16),`uniacid`),
+  KEY `name` (`uniacid`, `name`(16)),
   KEY `createtime` (`createtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -695,7 +696,7 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_tags` (
   `count` int(11) DEFAULT '0',
   `createtime` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `title` (`title`(16),`uniacid`)
+  KEY `title` (`uniacid`, `title`(16))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_user` (
@@ -712,9 +713,10 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_user` (
   `locked_uid` varchar(64) NOT NULL DEFAULT 'n/a',
   `createtime` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `openid` (`openid`,`uniacid`),
-  KEY `mobile` (`mobile`,`uniacid`),
-  KEY `superior_id` (`superior_id`),
+  KEY `uniacid` (`uniacid`),
+  KEY `openid` (`uniacid`, `openid`),
+  KEY `mobile` (`uniacid`, `mobile`),
+  KEY `superior_id` (`uniacid`, `superior_id`),
   KEY `createtime` (`createtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -726,7 +728,7 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_user_logs` (
   `data` text,
   `createtime` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `title` (`title`(16),`uniacid`, `level`),
+  KEY `title` (`uniacid`, `title`(16), `level`),
   KEY `createtime` (`createtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -752,19 +754,19 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_voucher` (
   `memo` text,
   `createtime` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uid` (`uid`,`uniacid`)
+  UNIQUE KEY `uid` (`uniacid`, `uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_weapp_config` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) NOT NULL DEFAULT '0',
   `name` varchar(128) NOT NULL,
+  `locked_uid` varchar(64) NOT NULL DEFAULT 'n/a',
   `data` text,
   `createtime` int(11) NOT NULL DEFAULT '0',
-  `locked_uid` varchar(64) NOT NULL DEFAULT 'n/a',
   PRIMARY KEY (`id`),
-  KEY `name` (`name`,`uniacid`),
-  KEY `locked_uid` (`locked_uid`,`uniacid`)
+  KEY `name` (`uniacid`, `name`),
+  KEY `locked_uid` (`uniacid`, `locked_uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_wx_app` (
@@ -775,7 +777,7 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_wx_app` (
   `secret` varchar(64) NOT NULL,
   `createtime` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `key` (`key`,`uniacid`)
+  UNIQUE KEY `key` (`uniacid`, `key`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_data_vw` (
@@ -783,7 +785,8 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_data_vw` (
   `k` varchar(60) NOT NULL,
   `v` varchar(120) NOT NULL,
   `createtime` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `k` (`k`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 SQL;
 

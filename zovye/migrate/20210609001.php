@@ -16,8 +16,8 @@ CREATE TABLE `ims_zovye_vms_payload_logs` (
      `extra` TEXT , 
      `createtime` INT NOT NULL , 
      PRIMARY KEY (`id`), 
-     INDEX `device_id` (`device_id`, `uniacid`), 
-     INDEX `goods_id` (`goods_id`, `uniacid`)
+     INDEX `device_id` (`uniacid`, `device_id`), 
+     INDEX `goods_id` (`uniacid`, `goods_id`)
      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 SQL;
     Migrate::execSQL($sql);

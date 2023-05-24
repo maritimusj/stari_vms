@@ -12,7 +12,7 @@ CREATE TABLE `ims_zovye_vms_wx_app` (
     `name` VARCHAR(128) NOT NULL , 
     `key` VARCHAR(64) NOT NULL , 
     `secret` VARCHAR(64) NOT NULL , 
-    `createtime` INT NOT NULL , PRIMARY KEY (`id`), UNIQUE `key` (`key`)
+    `createtime` INT NOT NULL , PRIMARY KEY (`id`), UNIQUE `key` (`uniacid`, `key`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 SQL;
     Migrate::execSQL($sql);

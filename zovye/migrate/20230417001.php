@@ -3,6 +3,7 @@
 namespace zovye;
 
 use zovye\model\agentModelObj;
+use zovye\model\keeper_devicesModelObj;
 
 $tb_name = APP_NAME;
 

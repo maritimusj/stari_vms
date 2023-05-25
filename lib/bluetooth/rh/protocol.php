@@ -15,7 +15,6 @@ use zovye\model\deviceModelObj;
 
 class protocol implements IBlueToothProtocol
 {
-    private static $random_key_array = [];
     const CODE = [0xB8, 0x48, 0xC5, 0xE2];
 
     const RESULT = 'result';
@@ -69,13 +68,17 @@ class protocol implements IBlueToothProtocol
         $device = Device::get($device_id, true);
         if ($device) {
             $response = new response($device_id, $data);
+
             if ($response->getID() == self::SECRET) {
                 $key = $response->getRawData();
             } else {
                 $key = '';
             }
+
             $device->updateSettings('RH.random_key', $key);
             $device->save();
+
+            Device::createBluetoothEventLog($device, $response);
         }
 
         return null;

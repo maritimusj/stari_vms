@@ -39,6 +39,7 @@ class response implements IResponse
     {
         if ($this->getID() == protocol::RESULT) {
             $result = json_decode(hex2bin($this->data), true);
+
             return $result['Res'] === 0;
         }
 
@@ -49,6 +50,7 @@ class response implements IResponse
     {
         if ($this->getID() == protocol::RESULT) {
             $result = json_decode(hex2bin($this->data), true);
+
             return $result['Res'] !== 0;
         }
 
@@ -60,6 +62,7 @@ class response implements IResponse
         if ($this->isOpenResultOk()) {
             return 0;
         }
+
         return -1;
     }
 
@@ -76,8 +79,10 @@ class response implements IResponse
             if ($v) {
                 return min(100, max(0, round($v[1] / 450) * 100));
             }
+
             return 1;
         }
+
         return -1;
     }
 
@@ -85,12 +90,13 @@ class response implements IResponse
     {
         switch ($this->getID()) {
             case protocol::VOLTAGE:
-                return '=> 电压电量：' . $this->getBatteryValue() . '%';
+                return '=> 电压电量：'.$this->getBatteryValue().'%';
             case protocol::SECRET:
-                return '=> 随机密钥：' . $this->data;
+                return '=> 随机密钥：'.$this->data;
             case protocol::RESULT:
                 return $this->isOpenResultOk() ? '=> 出货成功' : '=> 出货失败';
         }
+
         return '=> 未知消息';
     }
 
@@ -104,6 +110,7 @@ class response implements IResponse
         if ($this->getID() == protocol::RESULT) {
             return hex2bin($this->data);
         }
+
         return $this->data;
     }
 

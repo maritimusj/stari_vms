@@ -113,12 +113,12 @@ class cmd implements ICmd
 
     function encode(): string
     {
-        $data = pack('c*', ...self::HEADER).
+        $msg = pack('c*', ...self::HEADER).
             pack('c', self::nextSEQ($this->device_id)).
             pack('H*', $this->device_id).
             pack('c',  $this->id).
             pack('c*', ...$this->data);
-        return $data.pack('c*', $this->crc($data));
+        return $msg.pack('c*', $this->crc($msg));
     }
 
     function getEncoded($fn = null)

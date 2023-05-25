@@ -64,7 +64,7 @@ class common
 
         return self::doUserLogin(
             $res,
-            Request::array('userInfo', []),
+            Request::array('userInfo'),
             $h5_openid,
             '',
             Request::str('from')
@@ -266,7 +266,7 @@ class common
     public static function onDeviceData(): array
     {
         $imei = Request::str('device');
-        $data = request('data');
+        $data = Request::str('data');
 
         /** @var deviceModelObj $device */
         $device = Device::get($imei, true);
@@ -558,7 +558,7 @@ class common
     public static function FBPic(): array
     {
         We7::load()->func('file');
-        $res = We7::file_upload($_FILES['pic'], 'image');
+        $res = We7::file_upload($_FILES['pic']);
 
         if (is_error($res)) {
             Log::error('FBPic', $res);
@@ -584,10 +584,10 @@ class common
     {
         $user = self::getUser();
 
-        $device_id = request('device');
+        $device_id = Request::str('device');
 
-        $text = request('text');
-        $pics = request('pics');
+        $text = Request::trim('text');
+        $pics = Request::str('pics');
 
         $device = Device::get($device_id, true);
         $data = [
@@ -1065,8 +1065,8 @@ class common
     {
         $user = self::getUser();
 
-        $nickname = request('nickname');
-        $avatar = request('avatar');
+        $nickname = Request::str('nickname');
+        $avatar = Request::str('avatar');
 
         $user->setNickname($nickname);
         $user->setAvatar($avatar);
@@ -1338,8 +1338,8 @@ class common
             'owner_id' => $user->getId(),
         ];
 
-        $type = request('type');
-        if (isset($type)) {
+        $type = Request::str('type');
+        if ($type) {
             $params['type'] = $type;
         }
 

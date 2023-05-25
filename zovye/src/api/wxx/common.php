@@ -75,19 +75,25 @@ class common
     public static function getDeviceInfo(): array
     {
         $imei = Request::trim('imei');
-        $res = Device::get($imei, true);
-        if (empty($res)) {
+        /** @var deviceModelObj $device */
+        $device = Device::get($imei, true);
+        if (empty($device)) {
             return err('没有数据！');
         }
 
         $data = [
-            'id' => $res->getId(),
-            'name' => $res->getName(),
+            'id' => $device->getId(),
+            'name' => $device->getName(),
             'mobile' => '',
         ];
-        $agent = $res->getAgent();
+
+        $agent = $device->getAgent();
         if ($agent) {
             $data['mobile'] = $agent->getMobile();
+        }
+
+        if ($device->isBlueToothDevice()) {
+            $data['protocol'] = $device->getBlueToothProtocolName();
         }
 
         return ['data' => $data];

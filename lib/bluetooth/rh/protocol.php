@@ -44,6 +44,7 @@ class protocol implements IBlueToothProtocol
     {
         $key = self::getEncryptKey($device_id);
 
+        //设备需要的数据长度为16?
         return substr(openssl_encrypt($data, 'aes-128-ecb', $key, OPENSSL_RAW_DATA), 0, 16);
     }
 

@@ -199,7 +199,7 @@ function prepare(string $order_no)
     $device->goodsLog($level, $log_data);
 
     if (is_error($log_data['result'])) {
-        ExceptionNeedsRefund::throwWith($device, $result['message']);
+        ExceptionNeedsRefund::throwWith($device, $log_data['result']['message']);
     }
 }
 

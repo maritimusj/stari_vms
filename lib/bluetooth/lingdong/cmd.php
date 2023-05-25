@@ -9,6 +9,8 @@ namespace bluetooth\lingdong;
 
 use zovye\Cache;
 use zovye\Contract\bluetooth\ICmd;
+use zovye\Device;
+use zovye\Util;
 
 class cmd implements ICmd
 {
@@ -68,26 +70,28 @@ class cmd implements ICmd
 
     static function resetSEQ($device_id)
     {
-        Cache::set("SEQ:$device_id", 0);
+        $device = Device::get($device_id, true);
+        if ($device) {
+            $device->updateSettings('lingdong.seq', 0);
+        }
     }
 
     static function nextSEQ($device_id)
     {
-        $uid = "SEQ:$device_id";
+        $device = Device::get($device_id, true);
+        if ($device) {
+            $seq = $device->settings('lingdong.seq', 0);
+            if ($seq > 255) {
+                $seq = 0;
+            } else {
+                $seq ++;
+            }
 
-        $seq = Cache::fetch($uid, function () {
-            return 0;
-        });
-
-        if ($seq > 255) {
-            $seq = 0;
-        } else {
-            $seq++;
+            $device->updateSettings('lingdong.seq', $seq);
+            return $seq;
         }
 
-        Cache::set($uid, $seq);
-
-        return $seq;
+        return rand(0, 256);
     }
 
     function crc($data): int

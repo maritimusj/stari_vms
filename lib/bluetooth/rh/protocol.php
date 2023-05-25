@@ -27,9 +27,11 @@ class protocol implements IBlueToothProtocol
         /** @var deviceModelObj $device */
         $device = Device::get($device_id, true);
         if ($device) {
-            return $device->settings('RH.random_key', '');
+            $v = $device->settings('RH.random_key', '');
+            if ($v) {
+                return hex2bin($v);
+            }
         }
-
         return '';
     }
 
@@ -42,13 +44,12 @@ class protocol implements IBlueToothProtocol
     {
         $key = self::getEncryptKey($device_id);
 
-        return openssl_encrypt($data, 'aes-128-ecb', $key, OPENSSL_RAW_DATA);
+        return substr(openssl_encrypt($data, 'aes-128-ecb', $key, OPENSSL_RAW_DATA), 0, 16);
     }
 
     public static function getEncryptKey($device_id): string
     {
         $key = self::getRandomKey($device_id);
-
         return substr($key, 0, 3).substr($device_id, -6).substr($key, -3).pack('C*', ...self::CODE);
     }
 

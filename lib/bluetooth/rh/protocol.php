@@ -7,7 +7,6 @@
 
 namespace bluetooth\rh;
 
-use zovye\Cache;
 use zovye\Contract\bluetooth\IBlueToothProtocol;
 use zovye\Contract\bluetooth\ICmd;
 use zovye\Contract\bluetooth\IResponse;

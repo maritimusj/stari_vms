@@ -96,7 +96,7 @@ class common
             $data['protocol'] = $device->getBlueToothProtocolName();
         }
 
-        return $data;
+        return ['data' => $data];
     }
 
     /**

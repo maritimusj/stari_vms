@@ -73,7 +73,7 @@ class protocol implements IBlueToothProtocol
 
     function getTitle(): string
     {
-        return '9位电子烟售货机蓝牙协议 v1.0';
+        return '9位电子烟售货机蓝牙协议(v1.0)';
     }
 
     function transUID($uid)

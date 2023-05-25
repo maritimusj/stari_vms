@@ -15,7 +15,7 @@ class protocol implements IBlueToothProtocol
 {
     function getTitle(): string
     {
-        return "第三方厂商蓝牙协议 BLE-v3";
+        return '第三方厂商蓝牙协议(BLE-v3)';
     }
 
     function transUID($uid)

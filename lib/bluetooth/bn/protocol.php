@@ -5,7 +5,7 @@
  */
 
 
-namespace bluetooth\lingdong;
+namespace bluetooth\bn;
 
 use zovye\Contract\bluetooth\IBlueToothProtocol;
 use zovye\Contract\bluetooth\ICmd;
@@ -13,38 +13,34 @@ use zovye\Contract\bluetooth\IResponse;
 
 class protocol implements IBlueToothProtocol
 {
+
     function getTitle(): string
     {
-        return '蓝牙售货机协议(LD v1.4.1)';
+        return '蓝牙电子烟售货机交互协议(BN v0.1)';
     }
 
     function transUID($uid)
     {
-        return $uid;
+        // TODO: Implement transUID() method.
     }
 
     function onConnected($device_id, $data = ''): ?ICmd
     {
-        return new ShakeHandCmd($device_id);
+        // TODO: Implement onConnected() method.
     }
 
-    function initialize($device_id): ?ICmd
+    function initialize($device_id)
     {
-        return new ShakeHandCmd($device_id);
+        // TODO: Implement initialize() method.
     }
 
     function open($device_id, $data): ?ICmd
     {
-        $locker = $data['locker'] ?? null;
-        if (is_int($locker)) {
-            return new OpenDeviceCmd($device_id, $locker);
-        }
-
-        return null;
+        // TODO: Implement open() method.
     }
 
     function parseResponse($device_id, $data): ?IResponse
     {
-        return new response($device_id, $data);
+        // TODO: Implement parseResponse() method.
     }
 }

@@ -23,12 +23,12 @@ class response implements IResponse
 
     function getID(): string
     {
-        if (count($this->data) == 2) {
+        if (strlen($this->data) == 4) {
             return protocol::VOLTAGE;
         }
 
-        if (count($this->data) == 6) {
-            return protocol::VOLTAGE;
+        if (strlen($this->data) == 12) {
+            return protocol::SECRET;
         }
 
         return protocol::RESULT;
@@ -83,13 +83,13 @@ class response implements IResponse
     {
         switch ($this->getID()) {
             case protocol::VOLTAGE:
-                return '<= 电压电量';
+                return '=> 电压电量';
             case protocol::SECRET:
-                return '<= 随机密钥';
+                return '=> 随机密钥';
             case protocol::RESULT:
-                return $this->isOpenResultOk() ? '出货成功' : '出货失败';
+                return $this->isOpenResultOk() ? '=> 出货成功' : '=> 出货失败';
         }
-        return '<= 未知消息';
+        return '=> 未知消息';
     }
 
     function getSerial(): string

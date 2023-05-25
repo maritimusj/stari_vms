@@ -67,18 +67,20 @@ class protocol implements IBlueToothProtocol
         /** @var deviceModelObj $device */
         $device = Device::get($device_id, true);
         if ($device) {
-            $response = new response($device_id, $data);
+            if ($data) {
+                $response = new response($device_id, $data);
 
-            if ($response->getID() == self::SECRET) {
-                $key = $response->getRawData();
-            } else {
-                $key = '';
+                if ($response->getID() == self::SECRET) {
+                    $key = $response->getRawData();
+                } else {
+                    $key = '';
+                }
+
+                $device->updateSettings('RH.random_key', $key);
+                $device->save();
+
+                Device::createBluetoothEventLog($device, $response);                
             }
-
-            $device->updateSettings('RH.random_key', $key);
-            $device->save();
-
-            Device::createBluetoothEventLog($device, $response);
         }
 
         return null;

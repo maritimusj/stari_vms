@@ -202,7 +202,7 @@ class common
             ];
         }
 
-        return err('无法获取指令！');
+        return ['msg' => 'success'];
     }
 
     public static function deviceStatus(): array

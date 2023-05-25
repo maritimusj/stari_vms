@@ -118,7 +118,7 @@ class cmd implements ICmd
             pack('H*', $this->device_id).
             pack('C*', $this->id, ...$this->data);
 
-        return $data.pack('C*', $this->crc($data));
+        return strtoupper($data.pack('C*', $this->crc($data)));
     }
 
     function getEncoded($fn = null)

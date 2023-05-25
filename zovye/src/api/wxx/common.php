@@ -208,7 +208,7 @@ class common
             ];
         }
 
-        return ['msg' => 'success'];
+        return ['msg' => 'Ok'];
     }
 
     public static function deviceStatus(): array

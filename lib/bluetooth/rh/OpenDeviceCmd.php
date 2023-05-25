@@ -21,6 +21,6 @@ class OpenDeviceCmd extends cmd
 
     function getMessage(): string
     {
-        return "<= 出货请求，{$this->lane}货道";
+        return "<= 出货请求，货道 {$this->lane}";
     }
 }

@@ -56,6 +56,11 @@ class response implements IResponse
         return $this->getErrorCode() == 0x02 || $this->getErrorCode() >= 0x10;
     }
 
+    function hasBatteryValue(): bool
+    {
+        return $this->getBatteryValue() == -1;
+    }
+
     public function getBatteryValue()
     {
         $v = $this->getErrorCode();
@@ -67,7 +72,12 @@ class response implements IResponse
             return 1;
         }
         return min(100, ($v - 0x10)*25);
-    }   
+    }
+
+    function isOpenResult(): bool
+    {
+       return $this->isOpenResultOk() || $this->isOpenResultFail();
+    }
 
     public function isOpenResultOk(): bool
     {
@@ -123,7 +133,7 @@ class response implements IResponse
         return bin2hex($this->data);
     }
 
-    function getCmd(): ?ICmd
+    function getAttachedCMD(): ?ICmd
     {
         return null;
     }

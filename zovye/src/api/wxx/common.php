@@ -288,7 +288,9 @@ class common
             return err('无法解析消息！');
         }
 
-        if ($response->isOpenResultOk() || $response->isOpenResultFail()) {
+        Device::createBluetoothEventLog($device, $response);
+
+        if ($response->isOpenResult()) {
 
             $order = Order::getLastOrderOfDevice($device);
 
@@ -323,15 +325,13 @@ class common
             $device->setBluetoothStatus(Device::BLUETOOTH_READY);
         }
 
-        Device::createBluetoothEventLog($device, $response);
-
         $data = [
             'data' => null,
         ];
 
-        $battery = $response->getBatteryValue();
+        if ($response->hasBatteryValue()) {
+            $battery = $response->getBatteryValue();
 
-        if ($battery != -1) {
             $device->setQoe($battery);
             if ($device->isLowBattery()) {
                 $device->setError(Device::ERROR_LOW_BATTERY, Device::desc(Device::ERROR_LOW_BATTERY));
@@ -344,7 +344,7 @@ class common
 
         $device->save();
 
-        $cmd = $response->getCmd();
+        $cmd = $response->getAttachedCMD();
         if ($cmd) {
             Device::createBluetoothCmdLog($device, $cmd);
 

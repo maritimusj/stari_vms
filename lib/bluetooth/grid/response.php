@@ -40,6 +40,11 @@ class response implements IResponse
         return '';
     }
 
+    function isOpenResult(): bool
+    {
+        return $this->isOpenResultOk() || $this->isOpenResultFail();
+    }
+
     function isOpenResultOk(): bool
     {
         return We7::starts_with($this->data, self::OPEN_SUCCESS);
@@ -143,12 +148,17 @@ class response implements IResponse
         return $this->isAuthSuccess();
     }
 
+    function hasBatteryValue(): bool
+    {
+        return false;
+    }
+
     public function getBatteryValue(): int
     {
         return -1;
     }
 
-    function getCmd(): ?ICmd
+    function getAttachedCMD(): ?ICmd
     {
         if ($this->isResponse()) {
             return $this->getAuthCmd();

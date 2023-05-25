@@ -18,6 +18,11 @@ class response implements IResponse
         // TODO: Implement getID() method.
     }
 
+    function isOpenResult()
+    {
+        // TODO: Implement isOpenResult() method.
+    }
+
     function isOpenResultOk()
     {
         // TODO: Implement isOpenResultOk() method.
@@ -36,6 +41,11 @@ class response implements IResponse
     function isReady()
     {
         // TODO: Implement isReady() method.
+    }
+
+    function hasBatteryValue()
+    {
+
     }
 
     function getBatteryValue()
@@ -58,7 +68,7 @@ class response implements IResponse
         // TODO: Implement getRawData() method.
     }
 
-    function getCmd(): ?ICmd
+    function getAttachedCMD(): ?ICmd
     {
         // TODO: Implement getCmd() method.
     }

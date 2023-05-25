@@ -29,6 +29,11 @@ class response implements IResponse
         return $this->getPayloadData(4, 1);
     }
 
+    function isOpenResult(): bool
+    {
+        return $this->getID() == 0x03;
+    }
+
     function isOpenResultOk(): bool
     {
         return $this->getID() == 0x03 && $this->getResultValue() == 0x01;
@@ -42,6 +47,11 @@ class response implements IResponse
     function isReady(): bool
     {
         return $this->getResultValue() == 0x01 || $this->getResultValue() > 0x10;
+    }
+
+    function hasBatteryValue(): bool
+    {
+        return $this->getID() == 0x01;
     }
 
     function getBatteryValue()
@@ -99,7 +109,7 @@ class response implements IResponse
         return $this->data;
     }
 
-    function getCmd(): ?ICmd
+    function getAttachedCMD(): ?ICmd
     {
         return null;
     }

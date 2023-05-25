@@ -14,12 +14,17 @@ interface IResponse
     function getID();
 
     /**
-     * 是否为出货成功
+     * 是否为出货结果
+     */
+    function isOpenResult();
+
+    /**
+     * 出货是否成功
      */
     function isOpenResultOk();
 
     /**
-     * 是否为出货失败
+     * 出货是否失败
      */
     function isOpenResultFail();
 
@@ -32,6 +37,11 @@ interface IResponse
      * 设备是否已经准备好出货
      */
     function isReady();
+
+    /**
+     * 有没有包含电量信息
+     */
+    function hasBatteryValue();
 
     /**
      * 获取电量值，0-100；不支持或者不包含电量，返回-1
@@ -56,5 +66,5 @@ interface IResponse
     /**
      * 获取附加的命令，没有返回null
      */
-    function getCmd(): ?ICmd;
+    function getAttachedCMD(): ?ICmd;
 }

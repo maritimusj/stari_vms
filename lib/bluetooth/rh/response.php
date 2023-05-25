@@ -33,6 +33,11 @@ class response implements IResponse
         return protocol::RESULT;
     }
 
+    function isOpenResult(): bool
+    {
+        return $this->getID() == protocol::RESULT;
+    }
+
     function isOpenResultOk(): bool
     {
         if ($this->getID() == protocol::RESULT) {
@@ -67,6 +72,11 @@ class response implements IResponse
     function isReady(): bool
     {
         return protocol::isReady($this->device_id);
+    }
+
+    function hasBatteryValue(): bool
+    {
+        return $this->getID() == protocol::VOLTAGE;
     }
 
     function getBatteryValue()
@@ -112,7 +122,7 @@ class response implements IResponse
         return $this->data;
     }
 
-    function getCmd(): ?ICmd
+    function getAttachedCMD(): ?ICmd
     {
         return null;
     }

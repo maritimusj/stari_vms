@@ -41,6 +41,11 @@ class response implements IResponse
         return strlen($this->data) === protocol::MSG_LEN;
     }
 
+    function isOpenResult(): bool
+    {
+        return $this->getID() == protocol::CMD_CONFIG && $this->getKey() == protocol::KEY_LOCKER;
+    }
+
     function isOpenResultOk(): bool
     {
         if ($this->getID() == protocol::CMD_CONFIG && $this->getKey() == protocol::KEY_LOCKER) {
@@ -61,6 +66,11 @@ class response implements IResponse
     function isReady(): bool
     {
         return $this->getBatteryValue() > 0;
+    }
+
+    function hasBatteryValue(): bool
+    {
+        return $this->getBatteryValue() == -1;
     }
 
     function getBatteryValue(): int
@@ -152,7 +162,7 @@ class response implements IResponse
         return $this->data;
     }
 
-    function getCmd(): ?ICmd
+    function getAttachedCMD(): ?ICmd
     {
         return $this->cmd;
     }

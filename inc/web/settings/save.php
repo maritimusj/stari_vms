@@ -111,13 +111,6 @@ if ($page == 'device') {
         ];
     }
 
-    if (App::isBalanceEnabled()) {
-        Config::balance('user', [
-            'new' => Request::int('newUser'),
-            'ref' => Request::int('newUserRef'),
-        ], true);
-    }
-
 } elseif ($page == 'ctrl') {
     $url = Request::trim('controlAddr');
     if (empty($url)) {
@@ -886,6 +879,11 @@ if ($page == 'device') {
             max(Request::int('accountPromoteBonusMin'), Request::int('accountPromoteBonusMax')),
             true
         );
+
+        Config::balance('user', [
+            'new' => Request::int('newUser'),
+            'ref' => Request::int('newUserRef'),
+        ], true);
     }
 }
 

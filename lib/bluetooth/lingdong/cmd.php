@@ -7,10 +7,8 @@
 
 namespace bluetooth\lingdong;
 
-use zovye\Cache;
 use zovye\Contract\bluetooth\ICmd;
 use zovye\Device;
-use zovye\Util;
 
 class cmd implements ICmd
 {
@@ -58,14 +56,14 @@ class cmd implements ICmd
     {
         switch ($this->id) {
             case 0x01:
-                return '=> 连接握手';
+                return '<= 连接握手';
             case 0x02:
-                return '=> 请求开锁';
+                return '<= 请求开锁';
             case 0x05:
-                return '=> 获取电量';
+                return '<= 获取电量';
         }
 
-        return '未知命令';
+        return '<= 未知命令';
     }
 
     static function resetSEQ($device_id)

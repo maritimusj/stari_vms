@@ -36,6 +36,7 @@ class protocol implements IBlueToothProtocol
     function open($device_id, $data): ?ICmd
     {
         $locker = $data['locker'] ?? null;
+        
         if (is_int($locker)) {
             return new OpenDeviceCmd($device_id, $locker);
         }

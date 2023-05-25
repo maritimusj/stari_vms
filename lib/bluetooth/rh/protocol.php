@@ -95,7 +95,13 @@ class protocol implements IBlueToothProtocol
 
     function open($device_id, $data): ?ICmd
     {
-        return new OpenDeviceCmd($device_id, $data['locker']);
+        $locker = $data['locker'] ?? null;
+
+        if (is_int($locker)) {
+            return new OpenDeviceCmd($device_id, $locker);
+        }
+        
+        return null;
     }
 
     function parseResponse($device_id, $data): ?IResponse

@@ -72,16 +72,16 @@ class response implements IResponse
         switch ($id) {
             case 0x01:
                 if ($res) {
-                    return '<= 握手结果(成功)，电量：'. $this->getBatteryValue() . '%';
+                    return '=> 握手结果(成功)，电量：'. $this->getBatteryValue() . '%';
                 }
-                return '<= 握手结果(失败)';
+                return '=> 握手结果(失败)';
             case 0x02:
-                return '<= 开锁结果(' . $res == 0x03 ? '成功' : '失败' . ')';
+                return '=> 开锁结果(' . $res == 0x03 ? '成功' : '失败' . ')';
             case 0x05:
-                return '<= 电量：' . $this->getBatteryValue() . '%';
+                return '=> 电量：' . $this->getBatteryValue() . '%';
         }
 
-        return '<= 未知消息';
+        return '=> 未知消息';
     }
 
     function getDeviceID()

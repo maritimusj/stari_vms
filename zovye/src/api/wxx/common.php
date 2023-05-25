@@ -34,7 +34,6 @@ use zovye\model\userModelObj;
 use zovye\Util;
 use zovye\We7;
 use function zovye\err;
-use function zovye\request;
 use function zovye\is_error;
 use function zovye\m;
 use function zovye\settings;
@@ -74,9 +73,10 @@ class common
 
     public static function getDeviceInfo(): array
     {
-        $imei = Request::trim('imei');
+        $device_id = Request::str('device');
+
         /** @var deviceModelObj $device */
-        $device = Device::get($imei, true);
+        $device = Device::get($device_id, true);
         if (empty($device)) {
             return err('没有数据！');
         }
@@ -177,7 +177,7 @@ class common
     public static function onConnected(): array
     {
         $imei = Request::str('device');
-        $data = request('data');
+        $data = Request::str('data');
 
         /** @var deviceModelObj $device */
         $device = Device::get($imei, true);

@@ -32,6 +32,7 @@ class protocol implements IBlueToothProtocol
                 return hex2bin($v);
             }
         }
+
         return '';
     }
 
@@ -51,6 +52,7 @@ class protocol implements IBlueToothProtocol
     public static function getEncryptKey($device_id): string
     {
         $key = self::getRandomKey($device_id);
+
         return substr($key, 0, 3).substr($device_id, -6).substr($key, -3).pack('C*', ...self::CODE);
     }
 
@@ -81,7 +83,7 @@ class protocol implements IBlueToothProtocol
                 $device->updateSettings('RH.random_key', $key);
                 $device->save();
 
-                Device::createBluetoothEventLog($device, $response);                
+                Device::createBluetoothEventLog($device, $response);
             }
         }
 

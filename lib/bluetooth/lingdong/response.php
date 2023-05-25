@@ -113,7 +113,7 @@ class response implements IResponse
     {
         static $data = null;
         if (!isset($data)) {
-            $data = array_values(unpack('C*', $this->data));
+            $data = array_values(unpack('C*', hex2bin($this->data)));
         }
         if ($pos == 0 && $len == 0) {
             return $data;

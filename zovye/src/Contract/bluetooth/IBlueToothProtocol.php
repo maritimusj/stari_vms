@@ -18,7 +18,7 @@ interface IBlueToothProtocol
     function getTitle(): string;
 
     /**
-     * 把设备BUID转化为协议需要的UID
+     * 把后台设置的设备BUID转化为协议需要的UID
      */
     function transUID($uid);
 

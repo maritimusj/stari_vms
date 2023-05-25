@@ -305,12 +305,15 @@ class Charging
             if ($pay_log->isCancelled()) {
                 return err('支付已取消！');
             }
+
             if ($pay_log->isTimeout()) {
                 return err('支付已超时！');
             }
+
             if ($pay_log->isRefund()) {
                 return err('支付已退款！');
             }
+
             if (!$pay_log->isPaid()) {
                 return ['message' => '正在查询支付结果..'];
             }
@@ -342,17 +345,6 @@ class Charging
             return ['stopped' => $stopped, 'remark' => $remark];
         }
 
-        $timeout = $order->getExtraData('timeout', []);
-        if ($timeout) {
-            return err($timeout['reason'] ?? '设备响应超时！');
-        }
-
-        if ($order->isChargingBMSReportTimeout(120)) {
-            self::endOrder($serial, '充电枪上报数据超时！');
-
-            return err('充电枪上报数据超时！');
-        }
-
         $result = $order->getChargingResult();
         if ($result && $result['re'] != 3) {
             if ($result['re'] == 112) {
@@ -370,6 +362,17 @@ class Charging
             }
 
             return err('启动失败：设备故障'.($result['re'] - 110));
+        }
+
+        if ($order->isChargingBMSReportTimeout(120)) {
+            self::endOrder($serial, '充电枪上报数据超时！');
+
+            return err('充电枪上报数据超时！');
+        }
+
+        $timeout = $order->getExtraData('timeout', []);
+        if ($timeout) {
+            return err($timeout['reason'] ?? '设备响应超时！');
         }
 
         $device = $order->getDevice();

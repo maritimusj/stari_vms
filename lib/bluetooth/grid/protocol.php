@@ -62,7 +62,7 @@ class protocol implements IBlueToothProtocol
     {
         $device = Device::get($device_id, true);
         if ($device) {
-            $password = $device->settings("extra.bluetooth.grid.password");
+            $password = $device->settings('grid.password');
             if ($password) {
                 return new Auth($device_id, $password);
             }

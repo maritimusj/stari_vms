@@ -181,6 +181,10 @@ class Cache
             $res = $conf['data'];
         }
 
+        if (is_null($res)) {
+            return null;
+        }
+
         $data['data'] = json_encode($res);
 
         $now = time();

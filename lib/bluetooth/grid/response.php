@@ -131,7 +131,7 @@ class response implements IResponse
                 $result = (unpack('c', substr($mac, -1))[1]) ^ (unpack('c', substr($mac, -2, 1))[1]) ^ $code[1];
                 $password = pack('c', $result);
 
-                $device->updateSettings("extra.bluetooth.grid.password", $password);
+                $device->updateSettings('grid.password', $password);
                 return new Auth($device->getImei(), $password);
             }
         }

@@ -265,11 +265,11 @@ class common
      */
     public static function onDeviceData(): array
     {
-        $imei = Request::str('device');
+        $device_id = Request::str('device');
         $data = Request::str('data');
 
         /** @var deviceModelObj $device */
-        $device = Device::get($imei, true);
+        $device = Device::get($device_id, true);
         if (empty($device)) {
             return err('找不到这个设备！');
         }

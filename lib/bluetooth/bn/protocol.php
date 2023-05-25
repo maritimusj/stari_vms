@@ -21,12 +21,19 @@ class protocol implements IBlueToothProtocol
 
     function transUID($uid)
     {
-        // TODO: Implement transUID() method.
+        return $uid;
     }
 
+    /**
+     * $data 携带设备广播的数据
+     */
     function onConnected($device_id, $data = ''): ?ICmd
     {
-        // TODO: Implement onConnected() method.
+        if ($data) {
+
+        }
+
+        return null;
     }
 
     function initialize($device_id)

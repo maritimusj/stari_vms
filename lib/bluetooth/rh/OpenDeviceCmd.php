@@ -4,7 +4,6 @@
  * @url www.stariture.com
  */
 
-
 namespace bluetooth\rh;
 
 class OpenDeviceCmd extends cmd

@@ -4,12 +4,10 @@
  * @url www.stariture.com
  */
 
-
 namespace bluetooth\rh;
 
 use zovye\Contract\bluetooth\ICmd;
 use zovye\Contract\bluetooth\IResponse;
-use zovye\Log;
 
 class response implements IResponse
 {

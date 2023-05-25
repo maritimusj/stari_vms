@@ -4,7 +4,6 @@
  * @url www.stariture.com
  */
 
-
 namespace bluetooth\rh;
 
 use zovye\Contract\bluetooth\IBlueToothProtocol;

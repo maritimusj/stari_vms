@@ -337,9 +337,8 @@ class common
                 $device->setError(Device::ERROR_LOW_BATTERY, Device::desc(Device::ERROR_LOW_BATTERY));
                 $device->scheduleErrorNotifyJob(Device::ERROR_LOW_BATTERY, Device::desc(Device::ERROR_LOW_BATTERY));
             }
-            if ($battery >= 0) {
-                $data['battery'] = $battery;
-            }
+
+            $data['battery'] = $battery;
         }
 
         $device->save();

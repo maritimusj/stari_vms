@@ -78,7 +78,7 @@ class common
         /** @var deviceModelObj $device */
         $device = Device::get($device_id, true);
         if (empty($device)) {
-            return err('没有数据！');
+            return err('找不到这个设备！');
         }
 
         $data = [

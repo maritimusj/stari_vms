@@ -79,7 +79,7 @@ class protocol implements IBlueToothProtocol
                     $key = '';
                 }
 
-                $device->updateSettings('RH.random_key', $key);
+                $device->updateSettings('RH.random_key', bin2hex($key));
                 $device->save();
 
                 Device::createBluetoothEventLog($device, $response);

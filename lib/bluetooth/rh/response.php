@@ -41,7 +41,7 @@ class response implements IResponse
     function isOpenResultOk(): bool
     {
         if ($this->getID() == protocol::RESULT) {
-            $result = json_decode(hex2bin($this->data), true);
+            $result = json_decode($this->data, true);
 
             return $result['Res'] === 0;
         }
@@ -52,7 +52,7 @@ class response implements IResponse
     function isOpenResultFail(): bool
     {
         if ($this->getID() == protocol::RESULT) {
-            $result = json_decode(hex2bin($this->data), true);
+            $result = json_decode($this->data, true);
 
             return $result['Res'] !== 0;
         }
@@ -82,8 +82,7 @@ class response implements IResponse
     function getBatteryValue()
     {
         if ($this->getID() == protocol::VOLTAGE) {
-            $data = hex2bin($this->data);
-            $v = unpack('n', $data);
+            $v = unpack('n', $this->data);
             if ($v) {
                 return min(100, max(0, round($v[1] / 450) * 100));
             }
@@ -100,7 +99,7 @@ class response implements IResponse
             case protocol::VOLTAGE:
                 return '=> 电压电量：'.$this->getBatteryValue().'%';
             case protocol::SECRET:
-                return '=> 随机密钥：'.$this->data;
+                return '=> 随机密钥：'.bin2hex($this->data);
             case protocol::RESULT:
                 return $this->isOpenResultOk() ? '=> 出货成功' : '=> 出货失败';
         }

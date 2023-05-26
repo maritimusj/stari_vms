@@ -45,7 +45,7 @@ if ($op == 'create_order' && CtrlServ::checkJobSign(['orderNO' => $order_no])) {
                 $device->appShowMessage('退款失败，请联系客服，谢谢！');
                 Log::fatal('order_create', [
                     'orderNO' => $order_no,
-                    'msg' => '启动退款任务！',
+                    'msg' => '启动退款任务失败！',
                 ]);
             } else {
                 $device->appShowMessage('正在退款，请稍后再试，谢谢！');
@@ -172,7 +172,7 @@ function prepare(string $order_no)
         ],
     ];
 
-    $result = Util::transactionDo(function () use (&$params, $order_no, $goods, $mcb_channel, &$log_data) {
+    Util::transactionDo(function () use (&$params, $order_no, $goods, $mcb_channel, &$log_data) {
 
         list($result, $order) = createOrder($params, $order_no, $goods, $mcb_channel);
 
@@ -201,6 +201,8 @@ function prepare(string $order_no)
     if (is_error($log_data['result'])) {
         ExceptionNeedsRefund::throwWith($device, $log_data['result']['message']);
     }
+
+    Log::debug('create_order', $log_data);
 }
 
 /**
@@ -265,7 +267,7 @@ function createOrder(array $params, string $order_no, array $goods, int $mcb_cha
 
     $order = Order::create($order_data);
     if (empty($order)) {
-        return [err('领取失败，创建订单失败'), null];
+        return [err('领取失败，创建订单失败')];
     }
 
     unset($params['src']);
@@ -277,14 +279,14 @@ function createOrder(array $params, string $order_no, array $goods, int $mcb_cha
         //事件：订单已经创建
         EventBus::on('device.orderCreated', $params);
     } catch (Exception $e) {
-        return [err($e->getMessage()), null];
+        return [err($e->getMessage())];
     }
 
     $user->remove('last');
 
     foreach ($params as $entry) {
         if ($entry instanceof modelObj && !$entry->save()) {
-            return [err('无法保存数据，请重试'), null];
+            return [err('无法保存数据，请重试')];
         }
     }
 
@@ -323,7 +325,7 @@ function createOrder(array $params, string $order_no, array $goods, int $mcb_cha
     }
 
     if (!$order->save()) {
-        return [err('无法保存订单数据！'), null];
+        return [err('无法保存订单数据！')];
     }
 
     if (is_error($res)) {
@@ -350,7 +352,7 @@ function createOrder(array $params, string $order_no, array $goods, int $mcb_cha
             $voucher->setUsedUserId($user->getId());
             $voucher->setUsedtime(time());
             if (!$voucher->save()) {
-                return [err('使用取货码失败！'), null];
+                return [err('使用取货码失败！')];
             }
         }
     }

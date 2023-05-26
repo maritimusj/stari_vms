@@ -16,7 +16,7 @@ class response implements IResponse
     private $data;
     /**
      * @param $device_id
-     * @param $data
+     * @param $data base64encode
      */
     public function __construct($device_id, $data)
     {
@@ -24,37 +24,37 @@ class response implements IResponse
         $this->data = base64_decode($data);
     }
 
-    function getID()
+    public function getID()
     {
-        return $this->getPayloadData(4, 1);
+        return $this->getPayloadData(11, 1);
     }
 
-    function isOpenResult(): bool
+    public function isOpenResult(): bool
     {
-        return $this->getID() == 0x03;
+        return $this->getID() == 0x02;
     }
 
-    function isOpenResultOk(): bool
+    public function isOpenResultOk(): bool
     {
-        return $this->getID() == 0x03 && $this->getResultValue() == 0x01;
+        return $this->getID() == 0x02 && $this->getResultValue() == 0x03;
     }
 
-    function isOpenResultFail(): bool
+    public function isOpenResultFail(): bool
     {
-        return $this->getID() == 0x03 && $this->getResultValue() == 0x00;
+        return $this->getID() == 0x02 && $this->getResultValue() != 0x03;
     }
 
-    function isReady(): bool
+    public function isReady(): bool
     {
         return $this->getResultValue() == 0x01 || $this->getResultValue() > 0x10;
     }
 
-    function hasBatteryValue(): bool
+    public function hasBatteryValue(): bool
     {
         return $this->getID() == 0x01;
     }
 
-    function getBatteryValue()
+    public function getBatteryValue()
     {
         if ($this->getID() == 0x01) {
             $v = $this->getResultValue();
@@ -66,7 +66,7 @@ class response implements IResponse
         return -1;
     }
 
-    function getErrorCode(): int
+    public function getErrorCode(): int
     {
         if ($this->isOpenResultFail()) {
             return -1;
@@ -74,7 +74,7 @@ class response implements IResponse
         return 0;
     }
 
-    function getMessage(): string
+    public function getMessage(): string
     {
         $id = $this->getID();
         $res = $this->getResultValue();
@@ -82,11 +82,11 @@ class response implements IResponse
         switch ($id) {
             case 0x01:
                 if ($res) {
-                    return '=> 握手结果(成功)，电量：'. $this->getBatteryValue() . '%';
+                    return '=> 握手成功，电量：'. $this->getBatteryValue() . '%';
                 }
-                return '=> 握手结果(失败)';
+                return '=> 握手失败';
             case 0x02:
-                return '=> 开锁结果(' . $res == 0x03 ? '成功' : '失败' . ')';
+                return '=> 开锁' . ($res == 0x03 ? '成功' : '失败');
             case 0x05:
                 return '=> 电量：' . $this->getBatteryValue() . '%';
         }
@@ -94,22 +94,22 @@ class response implements IResponse
         return '=> 未知消息';
     }
 
-    function getDeviceID()
+    public function getDeviceID()
     {
         return $this->device_id;
     }
 
-    function getSerial(): string
+    public function getSerial(): string
     {
         return  $this->getPayloadData(4, 1);
     }
 
-    function getRawData()
+    public function getRawData()
     {
         return $this->data;
     }
 
-    function getAttachedCMD(): ?ICmd
+    public function getAttachedCMD(): ?ICmd
     {
         return null;
     }

@@ -14,7 +14,7 @@ class Helper
 {
     const CODE = [0xB8, 0x48, 0xC5, 0xE2];
 
-    public static function setRandomKey($device, $key)
+    public static function setRandomKey(deviceModelObj $device, $key)
     {
         $device->updateSettings('RH.random_key', bin2hex($key));
         $device->save();

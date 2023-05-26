@@ -301,7 +301,7 @@ function createOrder(array $params, string $order_no, array $goods, int $mcb_cha
         'ip' => $order->getExtraData('from.ip'),
     ];
 
-    $loc = $device->settings('extra.location', []);
+    $loc = $device->getLocation();
     if ($loc && $loc['lng'] && $loc['lat']) {
         $data['location']['device'] = [
             'lng' => $loc['lng'],

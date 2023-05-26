@@ -6,7 +6,6 @@
 
 namespace bluetooth\wx9se;
 
-use mermshaus\CRC\CRC16XModem;
 use zovye\Contract\bluetooth\IBlueToothProtocol;
 use zovye\Contract\bluetooth\ICmd;
 use zovye\Contract\bluetooth\IResponse;
@@ -68,8 +67,7 @@ class protocol implements IBlueToothProtocol
     const KEY_TIME = 0x13;
     const KEY_LIGHTS_SCHEDULE = 0x14;
 
-    const LOW = 0;
-    const HIGH = 1;
+
 
     function getTitle(): string
     {
@@ -126,46 +124,6 @@ class protocol implements IBlueToothProtocol
         return null;
     }
 
-    function getCrc16Data($mac, array $code, $lowOrHigh): array
-    {
-        $mac = hex2bin(implode('', array_reverse(explode(':', $mac))));
-
-        $crc16 = new CRC16XModem();
-
-        $result = [];
-        foreach ($code as $c) {
-            $crc16->update(pack('C', $c));
-            $crc16->update($mac);
-            $v = $crc16->finish();
-
-            $v = unpack('C2', $v);
-            if ($v === false) {
-                $result[] = 0;
-            } else {
-                $result[] = $lowOrHigh === self::LOW ? $v[2] : $v[1];
-            }
-
-            $crc16->reset();
-        }
-
-        return $result;
-    }
-
-    function verifyCRC16Data($mac, array $code, array $crc16): bool
-    {
-        $data = $this->getCrc16Data($mac, $code, self::LOW);
-        if (count($data) != count($crc16)) {
-            return false;
-        }
-        foreach ($data as $index => $v) {
-            if ($v != $crc16[$index]) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     function parseResponse($device_id, $data): ?IResponse
     {
         $device = Device::get($device_id, true);
@@ -192,9 +150,9 @@ class protocol implements IBlueToothProtocol
                     $mac = $device->getMAC();
                     $randomData = $device->settings('wx9se.random.data', []);
                     $data = $result->getPayloadData(2, 16);
-                    if ($this->verifyCRC16Data($mac, $randomData, $data)) {
+                    if (Helper::verifyCRC16Data($mac, $randomData, $data)) {
                         //握手通过，返回APP检验请求
-                        $crc = $this->getCrc16Data($mac, $randomData, self::HIGH);
+                        $crc = Helper::getCrc16Data($mac, $randomData, Helper::HIGH);
                         $result->setCmd(new AppVerifyCMD($crc));
                     }
                 } elseif ($cmd_key == self::KEY_VERIFY) {

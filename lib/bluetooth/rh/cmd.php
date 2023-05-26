@@ -53,7 +53,7 @@ class cmd implements ICmd
 
     function encode()
     {
-        return protocol::encrypt($this->device_id, $this->data);
+        return Helper::encrypt($this->device_id, $this->data);
     }
 
     public function getEncoded($fn = null)

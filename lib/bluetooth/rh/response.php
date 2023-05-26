@@ -71,7 +71,7 @@ class response implements IResponse
 
     public function isReady(): bool
     {
-        return protocol::isReady($this->device_id);
+        return Helper::isReady($this->device_id);
     }
 
     public function hasBatteryValue(): bool

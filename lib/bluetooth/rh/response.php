@@ -99,7 +99,7 @@ class response implements IResponse
             case protocol::VOLTAGE:
                 return '=> 电压电量：'.$this->getBatteryValue().'%';
             case protocol::SECRET:
-                return '=> 随机密钥：'.bin2hex($this->data);
+                return '=> 随机密钥：'.$this->getEncodeData();
             case protocol::RESULT:
                 return $this->isOpenResultOk() ? '=> 出货成功' : '=> 出货失败';
         }

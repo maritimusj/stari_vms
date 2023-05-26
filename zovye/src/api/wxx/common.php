@@ -605,7 +605,7 @@ class common
         return err('反馈失败！');
     }
 
-    public static function deviceAdvs(): array
+    public static function deviceAds(): array
     {
         $type = Request::int('typeid');
         $num = Request::int('num', 10);

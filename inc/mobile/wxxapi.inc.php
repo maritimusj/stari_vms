@@ -29,7 +29,7 @@ router::exec($op, [
     'GetDeviceInfo' => '\zovye\api\wxx\common::getDeviceInfo',
     'FBPic' => '\zovye\api\wxx\common::FBPic',
     'FeedBack' => '\zovye\api\wxx\common::feedback',
-    'DeviceAdvs' => '\zovye\api\wxx\common::deviceAdvs',
+    'DeviceAdvs' => '\zovye\api\wxx\common::deviceAds',
     'OrderDefault' => '\zovye\api\wxx\common::orderDefault',
     'HomepageDefault' => '\zovye\api\wxx\common::homepageDefault',
     'HomepageOrderStat' => '\zovye\api\wxx\common::homepageOrderStat',

@@ -16,7 +16,7 @@ class response implements IResponse
     private $data;
     /**
      * @param $device_id
-     * @param $data base64encode
+     * @param $data
      */
     public function __construct($device_id, $data)
     {
@@ -51,12 +51,12 @@ class response implements IResponse
 
     public function hasBatteryValue(): bool
     {
-        return $this->getID() == 0x01;
+        return $this->getID() == 0x01 || $this->getID() == 0x05;
     }
 
     public function getBatteryValue()
     {
-        if ($this->getID() == 0x01) {
+        if ($this->hasBatteryValue()) {
             $v = $this->getResultValue();
             if ($v > 0x10) {
                 return max(0, min(100, ($v - 0x10) * 25));

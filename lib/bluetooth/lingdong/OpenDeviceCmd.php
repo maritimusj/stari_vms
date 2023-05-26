@@ -19,6 +19,6 @@ class OpenDeviceCmd extends cmd
 
     public function getMessage(): string
     {
-        return '<= 请求开锁, '.$this->locker_id;
+        return '<= 请求开锁：'.$this->locker_id;
     }
 }

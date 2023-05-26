@@ -5,7 +5,7 @@
  */
 
 
-namespace bluetooth\lingdong;
+namespace bluetooth\ld;
 
 class OpenDeviceCmd extends cmd
 {

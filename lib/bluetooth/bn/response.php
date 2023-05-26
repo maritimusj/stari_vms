@@ -68,6 +68,11 @@ class response implements IResponse
         // TODO: Implement getRawData() method.
     }
 
+    function getEncodeData()
+    {
+        // TODO: Implement getEncodeData() method.
+    }
+
     function getAttachedCMD(): ?ICmd
     {
         // TODO: Implement getCmd() method.

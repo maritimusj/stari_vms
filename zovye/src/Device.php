@@ -581,13 +581,13 @@ class Device extends State
     public static function createBluetoothEventLog(deviceModelObj $device, IResponse $result)
     {
         if ($device->isEventLogEnabled()) {
-            $raw = $result->getRawData();
-            if ($raw) {
+            $result_data = $result->getEncodeData();
+            if ($result_data) {
                 $data = We7::uniacid([
                     'event' => $result->getID(),
                     'device_uid' => $device->getUid(),
                     'extra' => [
-                        'raw' => bin2hex($result->getRawData()),
+                        'raw' => $result_data,
                         'code' => $result->getErrorCode(),
                         'message' => $result->getMessage(),
                     ],

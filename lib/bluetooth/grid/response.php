@@ -126,6 +126,11 @@ class response implements IResponse
         return $this->data;
     }
 
+    function getEncodeData(): string
+    {
+        return $this->data;
+    }
+
     function getAuthCmd(): ?ICmd
     {
         $device = Device::get($this->device_id, true);

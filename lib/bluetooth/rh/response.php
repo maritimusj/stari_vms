@@ -117,6 +117,11 @@ class response implements IResponse
         return $this->data;
     }
 
+    function getEncodeData(): string
+    {
+        return bin2hex($this->data);
+    }
+
     function getAttachedCMD(): ?ICmd
     {
         return null;

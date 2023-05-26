@@ -18,6 +18,7 @@ use zovye\Balance;
 use zovye\Contract\bluetooth\IBlueToothProtocol;
 use zovye\Device;
 use zovye\Goods;
+use zovye\Locker;
 use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\GoodsVoucher;
@@ -294,21 +295,22 @@ class common
 
             $order = Order::getLastOrderOfDevice($device);
 
-            if ($order && empty($order->getExtraData('bluetooth.raw'))) {
-
-                $order->setExtraData('bluetooth.raw', bin2hex($response->getRawData()));
-
-                if ($response->isOpenResultOk()) {
-                    $order->setBluetoothResultOk();
-                } elseif ($response->isOpenResultFail()) {
-                    $order->setBluetoothResultFail($response->getMessage());
-                    if (Helper::NeedAutoRefund($device)) {
-                        //启动退款
-                        Job::refund($order->getOrderNO(), $response->getMessage());
+            if ($order) {
+                Locker::try("order:{$order->getOrderNO()}:result", function () use ($order, $device, $response) {
+                    if (empty($order->getExtraData('bluetooth.raw'))) {
+                        $order->setExtraData('bluetooth.raw', $response->getEncodeData());
+                        if ($response->isOpenResultOk()) {
+                            $order->setBluetoothResultOk();
+                        } elseif ($response->isOpenResultFail()) {
+                            $order->setBluetoothResultFail($response->getMessage());
+                            if (Helper::NeedAutoRefund($device)) {
+                                //启动退款
+                                Job::refund($order->getOrderNO(), $response->getMessage());
+                            }
+                        }
+                        $order->save();
                     }
-                }
-
-                $order->save();
+                });
             }
 
             if ($response->isOpenResultFail()) {

@@ -64,6 +64,11 @@ interface IResponse
     function getRawData();
 
     /**
+     * 获取数据
+     */
+    function getEncodeData();
+
+    /**
      * 获取附加的命令，没有返回null
      */
     function getAttachedCMD(): ?ICmd;

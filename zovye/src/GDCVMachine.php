@@ -30,7 +30,7 @@ class GDCVMachine
             return err('配置不正确，请检查配置后再试！');
         }
 
-        $ts = time();
+        $ts = time() * 1000;
 
         $url = rtrim($this->config['url'], '/\\');
         $url .= $path;

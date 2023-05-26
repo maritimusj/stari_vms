@@ -880,6 +880,7 @@ class keeper
             if ($device->getMAC()) {
                 $result['device']['mac'] = $device->getMAC();
             }
+            $result['device']['protocol'] = $device->getBlueToothProtocolName();
         } elseif (App::isChargingDeviceEnabled() && $device->isChargingDevice()) {
             $result['charger'] = [];
             $chargerNum = $device->getChargerNum();

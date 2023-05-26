@@ -20,12 +20,11 @@ trait ExtraDataGettersAndSetters
 
     /**
      * @param $data
-     * @return mixed|string
+     * @return mixed
      */
-    public static function serializeExtra($data): string
+    public static function serializeExtra($data)
     {
-        $res = json_encode($data);
-        return $res === false ? '' : $res;
+        return json_encode($data);
     }
 
     /**
@@ -37,6 +36,7 @@ trait ExtraDataGettersAndSetters
     public function getExtraData($key = '', $default = null)
     {
         $this->unserializeExtra();
+
         if ($key) {
             return getArray($this->__extraData, $key, $default);
         }

@@ -252,7 +252,6 @@ function createOrder(array $params, string $order_no, array $goods, int $mcb_cha
         ],
     ];
 
-
     if ($voucher) {
         $order_data['src'] = Order::VOUCHER;
         $order_data['extra']['voucher'] = [

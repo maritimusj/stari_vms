@@ -113,12 +113,8 @@ class response implements IResponse
         return '';
     }
 
-    function getRawData()
+    function getRawData(): string
     {
-        if ($this->getID() == protocol::RESULT) {
-            return hex2bin($this->data);
-        }
-
         return $this->data;
     }
 

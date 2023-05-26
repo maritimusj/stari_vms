@@ -104,10 +104,9 @@ class response implements IResponse
         return  $this->getPayloadData(4, 1);
     }
 
-    public function getRawData()
+    public function getRawData(): string
     {
-        //注意：必须要bin2hex转换，否则json_encode()会出错！
-        return bin2hex($this->data);
+        return $this->data;
     }
 
     public function getAttachedCMD(): ?ICmd

@@ -296,7 +296,7 @@ class common
 
             if ($order && empty($order->getExtraData('bluetooth.raw'))) {
 
-                $order->setExtraData('bluetooth.raw', $response->getRawData());
+                $order->setExtraData('bluetooth.raw', bin2hex($response->getRawData()));
 
                 if ($response->isOpenResultOk()) {
                     $order->setBluetoothResultOk();

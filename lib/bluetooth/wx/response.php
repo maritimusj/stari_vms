@@ -130,7 +130,7 @@ class response implements IResponse
 
     public function getRawData(): string
     {
-        return bin2hex($this->data);
+        return $this->data;
     }
 
     function getAttachedCMD(): ?ICmd

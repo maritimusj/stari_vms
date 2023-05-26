@@ -757,7 +757,12 @@ class Order extends State
             } elseif ($order->isFuelingOrder()) {
                 $data['num'] = number_format($data['num'] / 100, 2, '.', '');
                 $goods = $order->getExtraData('goods');
-                $data['goods'] = $goods;
+                if ($goods) {
+                    $data['goods'] = $goods;
+                } else {
+                    $data['goods'] = Goods::data($order->getGoodsId());
+                }
+
                 $data['goods']['img'] = Util::toMedia($data['goods']['img'], true);
                 $data['fueling'] = $order->getExtraData('fueling', []);
                 $data['fueling']['chargerID'] = $order->getChargerID();

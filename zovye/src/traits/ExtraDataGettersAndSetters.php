@@ -53,10 +53,13 @@ trait ExtraDataGettersAndSetters
     public function setExtraData($key, $val = null)
     {
         $this->unserializeExtra();
-        if (is_string($key)) {
-            setArray($this->__extraData, $key, $val);
-        } else {
-            setArray($this->__extraData, '', $key);
+
+        if (is_array($this->__extraData)) {
+            if (is_string($key)) {
+                setArray($this->__extraData, $key, $val);
+            } else {
+                setArray($this->__extraData, '', $key);
+            }
         }
 
         return static::setExtra(json_encode($this->__extraData));

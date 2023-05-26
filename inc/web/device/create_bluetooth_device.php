@@ -61,15 +61,20 @@ if ($data['agent_id']) {
 }
 
 $type_id = request('typeid');
-$device_type = DeviceTypes::get($type_id);
-if (empty($device_type)) {
-    JSON::fail('设备类型不正确!');
+if ($type_id) {
+    $device_type = DeviceTypes::get($type_id);
+    if (empty($device_type)) {
+        JSON::fail('设备类型不正确!');
+    }
+
+    $type_data = DeviceTypes::format($device_type);
+
+    $data['device_type'] = $type_data['id'];
+    $extra['cargo_lanes'] = $type_data['cargo_lanes'];
+} else {
+    $data['device_type'] = 0;
+    $extra['cargo_lanes'] = [];
 }
-
-$type_data = DeviceTypes::format($device_type);
-
-$data['device_type'] = $type_data['id'];
-$extra['cargo_lanes'] = $type_data['cargo_lanes'];
 
 $device = Device::create($data);
 

@@ -22,11 +22,11 @@ class response implements IResponse
 
     function getID(): string
     {
-        if (strlen($this->data) == 4) {
+        if (strlen($this->data) == 2) {
             return protocol::VOLTAGE;
         }
 
-        if (strlen($this->data) == 12) {
+        if (strlen($this->data) == 6) {
             return protocol::SECRET;
         }
 

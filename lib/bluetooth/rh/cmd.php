@@ -12,13 +12,13 @@ class cmd implements ICmd
 {
     private $device_id;
 
-    private $uid;
+    private $id;
     private $data;
 
-    public function __construct($device_id, $uid, $data)
+    public function __construct($device_id, $id, $data)
     {
         $this->device_id = $device_id;
-        $this->uid = $uid;
+        $this->id = $id;
         $this->data = $data;
     }
 
@@ -29,7 +29,7 @@ class cmd implements ICmd
 
     function getID()
     {
-        return $this->uid;
+        return $this->id;
     }
 
     function getData()
@@ -44,7 +44,7 @@ class cmd implements ICmd
 
     function getMessage(): string
     {
-        if ($this->uid == protocol::OPEN) {
+        if ($this->id == protocol::OPEN) {
             return '<= 出货请求';
         }
 

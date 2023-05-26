@@ -35,7 +35,7 @@ class response implements IResponse
         $this->data = base64_decode($data);
     }
 
-    function getID()
+    function getID(): string
     {
         return '';
     }

@@ -106,7 +106,8 @@ class response implements IResponse
 
     public function getRawData()
     {
-        return $this->data;
+        //注意：必须要bin2hex转换，否则json_encode()会出错！
+        return bin2hex($this->data);
     }
 
     public function getAttachedCMD(): ?ICmd

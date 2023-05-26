@@ -36,7 +36,7 @@ $extra = [
 ];
 
 $protocol = strtolower(request('protocol'));
-if (!in_array($protocol, ['wx', 'grid'])) {
+if (!in_array($protocol, ['wx', 'grid', 'ld', 'wx9se', 'bn', 'rh'])) {
     $protocol = 'wx';
 }
 

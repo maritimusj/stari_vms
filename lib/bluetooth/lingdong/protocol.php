@@ -10,7 +10,6 @@ namespace bluetooth\lingdong;
 use zovye\Contract\bluetooth\IBlueToothProtocol;
 use zovye\Contract\bluetooth\ICmd;
 use zovye\Contract\bluetooth\IResponse;
-use zovye\Device;
 
 class protocol implements IBlueToothProtocol
 {
@@ -48,31 +47,5 @@ class protocol implements IBlueToothProtocol
     public function parseResponse($device_id, $data): ?IResponse
     {
         return new response($device_id, $data);
-    }
-
-    public static function resetSEQ($device_id)
-    {
-        $device = Device::get($device_id, true);
-        if ($device) {
-            $device->updateSettings('lingdong.seq', 0);
-        }
-    }
-
-    public static function nextSEQ($device_id)
-    {
-        $device = Device::get($device_id, true);
-        if ($device) {
-            $seq = $device->settings('lingdong.seq', 0);
-            if ($seq > 255) {
-                $seq = 0;
-            } else {
-                $seq ++;
-            }
-
-            $device->updateSettings('lingdong.seq', $seq);
-            return $seq;
-        }
-
-        return rand(0, 256);
     }
 }

@@ -65,8 +65,6 @@ class cmd implements ICmd
         return '<= 未知命令';
     }
 
-
-
     function crc($data): int
     {
         $crc = 0;
@@ -89,7 +87,7 @@ class cmd implements ICmd
     function encode(): string
     {
         $msg = pack('c*', ...self::HEADER).
-            pack('c', protocol::nextSEQ($this->device_id)).
+            pack('c', Helper::nextSEQ($this->device_id)).
             pack('H*', $this->device_id).
             pack('c',  $this->id).
             pack('c*', ...$this->data);

@@ -308,8 +308,13 @@ class common
                                 Job::refund($order->getOrderNO(), $response->getMessage());
                             }
                         }
-                        $order->save();
-                    }                    
+                        if (!$order->save()) {
+                            Log::error('order', [
+                                'order' => $order->profile(),
+                                'error' => 'save order failed',
+                            ]);
+                        }
+                    }
                 }
             }
 

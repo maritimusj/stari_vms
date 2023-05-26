@@ -296,7 +296,7 @@ class common
             $order = Order::getLastOrderOfDevice($device);
 
             if ($order) {
-                Locker::try("order:{$order->getOrderNO()}:result", function () use ($order, $device, $response) {
+                if (Locker::try("order:{$order->getOrderNO()}")) {
                     if (empty($order->getExtraData('bluetooth.raw'))) {
                         $order->setExtraData('bluetooth.raw', $response->getEncodeData());
                         if ($response->isOpenResultOk()) {
@@ -309,8 +309,8 @@ class common
                             }
                         }
                         $order->save();
-                    }
-                });
+                    }                    
+                }
             }
 
             if ($response->isOpenResultFail()) {

@@ -25,7 +25,6 @@ trait ExtraDataGettersAndSetters
     public static function serializeExtra($data): string
     {
         $res = json_encode($data);
-
         return $res === false ? '' : $res;
     }
 
@@ -60,9 +59,7 @@ trait ExtraDataGettersAndSetters
             setArray($this->__extraData, '', $key);
         }
 
-        $data = json_encode($this->__extraData);
-
-        return static::setExtra($data);
+        return static::setExtra(json_encode($this->__extraData));
     }
 
     public function unserializeExtra()

@@ -133,12 +133,12 @@ class response implements IResponse
         return $this->data;
     }
 
-    function getEncodeData(): string
+    public function getEncodeData(): string
     {
         return bin2hex($this->data);
     }
 
-    function getAttachedCMD(): ?ICmd
+    public function getAttachedCMD(): ?ICmd
     {
         return null;
     }

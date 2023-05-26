@@ -22,27 +22,27 @@ class cmd implements ICmd
         $this->data = $data;
     }
 
-    function getDeviceID()
+    public function getDeviceID()
     {
         return $this->device_id;
     }
 
-    function getID()
+    public function getID()
     {
         return $this->id;
     }
 
-    function getData()
+    public function getData()
     {
         return $this->data;
     }
 
-    function getRaw()
+    public function getRaw()
     {
         return $this->data;
     }
 
-    function getMessage(): string
+    public function getMessage(): string
     {
         if ($this->id == protocol::OPEN) {
             return '<= 出货请求';
@@ -56,7 +56,7 @@ class cmd implements ICmd
         return protocol::encrypt($this->device_id, $this->data);
     }
 
-    function getEncoded($fn = null)
+    public function getEncoded($fn = null)
     {
         return is_callable($fn) ? call_user_func($fn, $this->encode()) : base64_encode($this->encode());
     }

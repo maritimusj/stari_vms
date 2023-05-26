@@ -8,7 +8,6 @@
 namespace bluetooth\lingdong;
 
 use zovye\Contract\bluetooth\ICmd;
-use zovye\Device;
 
 class cmd implements ICmd
 {
@@ -32,27 +31,27 @@ class cmd implements ICmd
         $this->data = $data;
     }
 
-    function getDeviceID()
+    public function getDeviceID()
     {
         return $this->device_id;
     }
 
-    function getID()
+    public function getID()
     {
         return $this->id;
     }
 
-    function getData()
+    public function getData()
     {
         return $this->data;
     }
 
-    function getRaw()
+    public function getRaw()
     {
         return $this->data;
     }
 
-    function getMessage(): string
+    public function getMessage(): string
     {
         switch ($this->id) {
             case 0x01:
@@ -66,31 +65,7 @@ class cmd implements ICmd
         return '<= 未知命令';
     }
 
-    static function resetSEQ($device_id)
-    {
-        $device = Device::get($device_id, true);
-        if ($device) {
-            $device->updateSettings('lingdong.seq', 0);
-        }
-    }
 
-    static function nextSEQ($device_id)
-    {
-        $device = Device::get($device_id, true);
-        if ($device) {
-            $seq = $device->settings('lingdong.seq', 0);
-            if ($seq > 255) {
-                $seq = 0;
-            } else {
-                $seq ++;
-            }
-
-            $device->updateSettings('lingdong.seq', $seq);
-            return $seq;
-        }
-
-        return rand(0, 256);
-    }
 
     function crc($data): int
     {
@@ -114,14 +89,14 @@ class cmd implements ICmd
     function encode(): string
     {
         $msg = pack('c*', ...self::HEADER).
-            pack('c', self::nextSEQ($this->device_id)).
+            pack('c', protocol::nextSEQ($this->device_id)).
             pack('H*', $this->device_id).
             pack('c',  $this->id).
             pack('c*', ...$this->data);
         return $msg.pack('c*', $this->crc($msg));
     }
 
-    function getEncoded($fn = null)
+    public function getEncoded($fn = null)
     {
         return is_callable($fn) ? call_user_func($fn, $this->encode()) : base64_encode($this->encode());
     }

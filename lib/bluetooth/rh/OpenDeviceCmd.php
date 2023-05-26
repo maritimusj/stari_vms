@@ -18,7 +18,7 @@ class OpenDeviceCmd extends cmd
         parent::__construct($device_id, protocol::OPEN, $data);
     }
 
-    function getMessage(): string
+    public function getMessage(): string
     {
         return "<= 出货请求，货道 {$this->lane}";
     }

@@ -35,6 +35,13 @@ class protocol implements IBlueToothProtocol
         return '';
     }
 
+    public static function getEncryptKey($device_id): string
+    {
+        $key = self::getRandomKey($device_id);
+
+        return substr($key, 0, 3).substr($device_id, -6).substr($key, -3).pack('C*', ...self::CODE);
+    }
+
     public static function isReady($device_id): bool
     {
         return !empty(self::getRandomKey($device_id));
@@ -48,24 +55,17 @@ class protocol implements IBlueToothProtocol
         return substr(openssl_encrypt($data, 'aes-128-ecb', $key, OPENSSL_RAW_DATA), 0, 16);
     }
 
-    public static function getEncryptKey($device_id): string
-    {
-        $key = self::getRandomKey($device_id);
-
-        return substr($key, 0, 3).substr($device_id, -6).substr($key, -3).pack('C*', ...self::CODE);
-    }
-
-    function getTitle(): string
+    public function getTitle(): string
     {
         return '五格蓝牙设备协议(RH v1.0)';
     }
 
-    function transUID($uid)
+    public function transUID($uid)
     {
         return $uid;
     }
 
-    function onConnected($device_id, $data = ''): ?ICmd
+    public function onConnected($device_id, $data = ''): ?ICmd
     {
         /** @var deviceModelObj $device */
         $device = Device::get($device_id, true);
@@ -89,11 +89,11 @@ class protocol implements IBlueToothProtocol
         return null;
     }
 
-    function initialize($device_id)
+    public function initialize($device_id)
     {
     }
 
-    function open($device_id, $data): ?ICmd
+    public function open($device_id, $data): ?ICmd
     {
         $locker = $data['locker'] ?? null;
 
@@ -104,7 +104,7 @@ class protocol implements IBlueToothProtocol
         return null;
     }
 
-    function parseResponse($device_id, $data): ?IResponse
+    public function parseResponse($device_id, $data): ?IResponse
     {
         return new response($device_id, $data);
     }

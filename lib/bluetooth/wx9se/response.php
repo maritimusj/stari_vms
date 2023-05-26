@@ -25,13 +25,13 @@ class response implements IResponse
         $this->data = base64_decode($data);
     }
 
-    function getID()
+    public function getID()
     {
         $v = unpack('C', $this->data);
         return $v ? $v[1] : 0;
     }
 
-    function setCmd(ICmd $cmd = null)
+    public function setCmd(ICmd $cmd = null)
     {
         $this->cmd = $cmd;
     }
@@ -41,12 +41,12 @@ class response implements IResponse
         return strlen($this->data) === protocol::MSG_LEN;
     }
 
-    function isOpenResult(): bool
+    public function isOpenResult(): bool
     {
         return $this->getID() == protocol::CMD_CONFIG && $this->getKey() == protocol::KEY_LOCKER;
     }
 
-    function isOpenResultOk(): bool
+    public function isOpenResultOk(): bool
     {
         if ($this->getID() == protocol::CMD_CONFIG && $this->getKey() == protocol::KEY_LOCKER) {
             return $this->getPayloadData(2, 1) == protocol::RESULT_LOCKER_SUCCESS;
@@ -54,7 +54,7 @@ class response implements IResponse
         return false;
     }
 
-    function isOpenResultFail(): bool
+    public function isOpenResultFail(): bool
     {
         if ($this->getID() == protocol::CMD_CONFIG && $this->getKey() == protocol::KEY_LOCKER) {
             $v = $this->getPayloadData(2, 1);
@@ -63,17 +63,17 @@ class response implements IResponse
         return false;
     }
 
-    function isReady(): bool
+    public function isReady(): bool
     {
         return $this->getBatteryValue() > 0;
     }
 
-    function hasBatteryValue(): bool
+    public function hasBatteryValue(): bool
     {
         return $this->getBatteryValue() == -1;
     }
 
-    function getBatteryValue(): int
+    public function getBatteryValue(): int
     {
         if (($this->getID() == protocol::CMD_QUERY || $this->getID() == protocol::CMD_NOTIFY)
             && $this->getKey() == protocol::KEY_BATTERY) {
@@ -82,7 +82,7 @@ class response implements IResponse
         return -1;
     }
 
-    function getErrorCode(): int
+    public function getErrorCode(): int
     {
         if ($this->isOpenResultFail()) {
             return -1;
@@ -90,7 +90,7 @@ class response implements IResponse
         return 0;
     }
 
-    function getMessage(): string
+    public function getMessage(): string
     {
         $cmd_code = $this->getID();
         $cmd_key = $this->getKey();
@@ -147,27 +147,27 @@ class response implements IResponse
         return '<= 未知数据';
     }
 
-    function getDeviceID()
+    public function getDeviceID()
     {
         return $this->device_id;
     }
 
-    function getSerial(): string
+    public function getSerial(): string
     {
         return '';
     }
 
-    function getRawData()
+    public function getRawData()
     {
         return $this->data;
     }
 
-    function getEncodeData(): string
+    public function getEncodeData(): string
     {
         return bin2hex($this->data);
     }
 
-    function getAttachedCMD(): ?ICmd
+    public function getAttachedCMD(): ?ICmd
     {
         return $this->cmd;
     }

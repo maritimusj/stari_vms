@@ -20,7 +20,7 @@ class response implements IResponse
         $this->data = base64_decode($data);
     }
 
-    function getID(): string
+    public function getID(): string
     {
         if (strlen($this->data) == 2) {
             return protocol::VOLTAGE;
@@ -33,12 +33,12 @@ class response implements IResponse
         return protocol::RESULT;
     }
 
-    function isOpenResult(): bool
+    public function isOpenResult(): bool
     {
         return $this->getID() == protocol::RESULT;
     }
 
-    function isOpenResultOk(): bool
+    public function isOpenResultOk(): bool
     {
         if ($this->getID() == protocol::RESULT) {
             $result = json_decode($this->data, true);
@@ -49,7 +49,7 @@ class response implements IResponse
         return false;
     }
 
-    function isOpenResultFail(): bool
+    public function isOpenResultFail(): bool
     {
         if ($this->getID() == protocol::RESULT) {
             $result = json_decode($this->data, true);
@@ -60,7 +60,7 @@ class response implements IResponse
         return false;
     }
 
-    function getErrorCode(): int
+    public function getErrorCode(): int
     {
         if ($this->isOpenResultOk()) {
             return 0;
@@ -69,17 +69,17 @@ class response implements IResponse
         return -1;
     }
 
-    function isReady(): bool
+    public function isReady(): bool
     {
         return protocol::isReady($this->device_id);
     }
 
-    function hasBatteryValue(): bool
+    public function hasBatteryValue(): bool
     {
         return $this->getID() == protocol::VOLTAGE;
     }
 
-    function getBatteryValue()
+    public function getBatteryValue()
     {
         if ($this->getID() == protocol::VOLTAGE) {
             $v = unpack('n', $this->data);
@@ -93,7 +93,7 @@ class response implements IResponse
         return -1;
     }
 
-    function getMessage(): string
+    public function getMessage(): string
     {
         switch ($this->getID()) {
             case protocol::VOLTAGE:
@@ -107,22 +107,22 @@ class response implements IResponse
         return '=> 未知消息';
     }
 
-    function getSerial(): string
+    public function getSerial(): string
     {
         return '';
     }
 
-    function getRawData(): string
+    public function getRawData(): string
     {
         return $this->data;
     }
 
-    function getEncodeData(): string
+    public function getEncodeData(): string
     {
         return bin2hex($this->data);
     }
 
-    function getAttachedCMD(): ?ICmd
+    public function getAttachedCMD(): ?ICmd
     {
         return null;
     }

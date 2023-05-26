@@ -17,7 +17,7 @@ class response implements IResponse
     public function __construct($device_id, $data)
     {
         $this->device_id = $device_id;
-        $this->data = $data;
+        $this->data = base64_decode($data);
     }
 
     function getID(): string

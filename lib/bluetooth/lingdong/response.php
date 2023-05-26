@@ -68,7 +68,7 @@ class response implements IResponse
 
     public function getErrorCode(): int
     {
-        if ($this->isOpenResultFail()) {
+        if ($this->isOpenResult() && $this->isOpenResultFail()) {
             return -1;
         }
         return 0;

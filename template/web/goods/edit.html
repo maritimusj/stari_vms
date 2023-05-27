@@ -119,8 +119,13 @@
                 <div class="form-group">
                     <label for="costPrice" class="col-md-2 control-label">商品代码</label>
                     <div class="col-md-10">
-                        <input type="text" class="form-control" id="GDCVMachineItemCode" name="GDCVMachineItemCode" value="{php echo $goods? $goods['CVMachine.code'] : ''}">
-                        <span class="help-block">* 商品代码</span>
+                        <select class="col-md-9" id="GDCVMachineItemCode" name="GDCVMachineItemCode" style="width: 80%;">
+                            <option value="" {if empty($goods) || empty($goods['CVMachine.code'])}selected{/if}>&lt;未设置&gt;</option>
+                            <option value="313" {if $goods && $goods['CVMachine.code']==313}selected{/if}>壬苯醇醚膜 [313]</option>
+                            <option value="309" {if $goods && $goods['CVMachine.code']==309}selected{/if}>壬苯醇醚栓 [309]</option>
+                            <option value="327" {if $goods && $goods['CVMachine.code']==327}selected{/if}>天然胶乳橡胶避孕套 [327]</option>
+                            <option value="312" {if $goods && $goods['CVMachine.code']==312}selected{/if}>壬苯醇醚凝胶 [312]</option>
+                        </select>
                     </div>
                 </div>
                 {/if}

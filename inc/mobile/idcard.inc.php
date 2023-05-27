@@ -242,11 +242,6 @@ if ($op == 'default') {
         JSON::fail('操作超时，请重新扫描设备二维码！');
     }
 
-    $res = Util::checkAvailable($user, $account, $device, ['ignore_assigned' => true]);
-    if (is_error($res)) {
-        JSON::fail($res);
-    }
-
     $goods_id = Request::int('id');
     $goods = $device->getGoods($goods_id);
     if (empty($goods)) {

@@ -2141,6 +2141,7 @@ HTML_CONTENT;
                         'device' => [
                             'imei' => $device->getImei(),
                             'name' => $device->getName(),
+                            'ch' => $mcb_channel,
                         ],
                         'user' => $user->profile(),
                     ],

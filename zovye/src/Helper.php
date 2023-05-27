@@ -293,6 +293,7 @@ class Helper
 
         $log_data = [
             'order' => $order->getId(),
+            'ch' => $mcb_channel,
             'result' => $result,
             'user' => $user->profile(),
             'goods' => $goods,

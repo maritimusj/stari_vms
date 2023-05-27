@@ -6,6 +6,7 @@
 
 namespace zovye;
 
+use zovye\model\device_logsModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\orderModelObj;
 
@@ -191,12 +192,55 @@ class GDCVMachine
         ];
     }
 
+    public function formatOrderLog($order): array
+    {
+        $profile = $order->getExtraData('CV.profile', []);
+
+        $condition = We7::uniacid([
+            'createtime >=' => $order->getCreatetime(),
+            'createtime <' => $order->getCreatetime() + 3600,
+            'data REGEXP' => "s:5:\"order\";i:{$order->getId()};",
+        ]);
+
+        $device = $order->getDevice();
+        if ($device) {
+            $condition['title'] = $device->getImei();
+        }
+
+        $query = m('device_logs')->where($condition);
+
+        $list = [];
+        /** @var device_logsModelObj $entry */
+        foreach ($query->findAll() as $entry) {
+            $goods = $entry->getData('goods', []);
+            $list[] = [
+                'machineCode' => $device->getImei(),
+                'agentCode' => strval($this->config['agent']),
+                'channelCode' => $entry->getData('ch') + 1,
+                'productCode' => strval($goods['CVMachine.code']),
+                'billNumber' => $order->getOrderNO(),
+                'quantity' => $order->getNum(),
+                'time' => date('Y-m-d H:i:s', $order->getCreatetime()),
+                'type' => $order->getExtraData('CV.type', 2), // 领取方式，1，身份证，2，二维码
+                'identity' => $profile['num'] ?? '',
+                'name' => $profile['name'] ?? '',
+                'gender' => $profile['gender'] ?? '',
+            ];
+        }
+
+        return $list;
+    }
+
     public function uploadOrdersInfo(array $list = [])
     {
         $data = [];
 
         foreach ($list as $order) {
-            $data[] = $this->formatOrder($order);
+            if ($order->getNum() == 1) {
+                $data[] = $this->formatOrder($order);
+            } else {
+                $data = array_merge($data, $this->formatOrderLog($order));
+            }
         }
 
         $response = $this->post('/cgi-bin/machleadrecord', $data);
@@ -210,7 +254,7 @@ class GDCVMachine
             return err('返回数据为空！');
         }
 
-        $result = array_merge($response, [ 'ts' => time() ]);
+        $result = array_merge($response, ['ts' => time()]);
 
         /** @var orderModelObj $order */
         foreach ($list as $order) {

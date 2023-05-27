@@ -248,6 +248,7 @@ function createOrder(array $params, string $order_no, array $goods, int $mcb_cha
             'device' => [
                 'imei' => $device->getImei(),
                 'name' => $device->getName(),
+                'ch' => $mcb_channel,
             ],
             'user' => $user->profile(),
         ],

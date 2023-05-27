@@ -192,6 +192,9 @@ if ($op == 'default') {
 } elseif ($op == 'detail') {
 
     $data = $user->getIDCardVerifiedData();
+    if (isEmptyArray($data)) {
+        JSON::fail('没有身份信息！');
+    }
     JSON::success($data);
 
 } elseif ($op == 'save') {

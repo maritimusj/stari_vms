@@ -143,12 +143,16 @@ class GDCVMachine
             $data[] = $this->formatDevice($device);
         }
 
-        $response = $this->post('/cgi-bin/machineinfo', $data);
+        if ($data) {
+            Config::GDCVMachine('last.device_upload', time(), true);
 
-        Log::debug('CV_device_log', [
-            'request' => $data,
-            'response' => $response,
-        ]);
+            $response = $this->post('/cgi-bin/machineinfo', $data);
+
+            Log::debug('CV_device_log', [
+                'request' => $data,
+                'response' => $response,
+            ]);
+        }
     }
 
     public function uploadDeviceInfo(deviceModelObj $device)
@@ -228,22 +232,24 @@ class GDCVMachine
             }
         }
 
-        $response = $this->post('/cgi-bin/machleadrecord', $data);
+        if ($data) {
+            Config::GDCVMachine('last.order_upload', time(), true);
 
-        Log::debug('CV_order_log', [
-            'request' => $data,
-            'response' => $response,
-        ]);
+            $response = $this->post('/cgi-bin/machleadrecord', $data);
 
-        if (empty($response)) {
-            return err('返回数据为空！');
-        }
+            Log::debug('CV_order_log', [
+                'request' => $data,
+                'response' => $response,
+            ]);
 
-        /** @var orderModelObj $order */
-        foreach ($list as $index => $order) {
-            $result = $response[$index] ?? [];
-            $order->setExtraData('CV.upload', $result);
-            $order->save();
+            if (!empty($response)) {
+                /** @var orderModelObj $order */
+                foreach ($list as $index => $order) {
+                    $result = $response[$index] ?? [];
+                    $order->setExtraData('CV.upload', $result);
+                    $order->save();
+                }
+            }
         }
     }
 

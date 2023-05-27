@@ -682,6 +682,7 @@ if ($page == 'device') {
             'agent' => Request::trim('GDCVMachineAgentCode'),
             'appId' => Request::trim('GDCVMachineAppId'),
             'token' => Request::trim('GDCVMachineToken'),
+            'account' => Request::trim('GDCVMachineAccountUID'),
         ], true);
     }
 

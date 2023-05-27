@@ -88,7 +88,16 @@ class GDCVMachine
         $last_ts = Config::GDCVMachine('last.device_upload', 0);
         $delay = max(1, 60 - (time() - $last_ts));
 
-        return CtrlServ::scheduleDelayJob('upload_gv_info', ['w' => 'device', 'id' => $device->getId()], $delay);
+        $result = CtrlServ::scheduleDelayJob('upload_gv_info', ['w' => 'device', 'id' => $device->getId()], $delay);
+
+        if (empty($result)) {
+            Log::error('CV_device_log', [
+                'device' => $device->profile(),
+                'error' => '无法启动任务！',
+            ]);
+        }
+
+        return $result;
     }
 
     public static function scheduleUploadDeviceJobForDeviceType(int $type_id)
@@ -96,7 +105,16 @@ class GDCVMachine
         $last_ts = Config::GDCVMachine('last.device_upload', 0);
         $delay = max(1, 60 - (time() - $last_ts));
 
-        return CtrlServ::scheduleDelayJob('upload_gv_info', ['w' => 'types', 'id' => $type_id], $delay);
+        $result = CtrlServ::scheduleDelayJob('upload_gv_info', ['w' => 'types', 'id' => $type_id], $delay);
+
+        if (empty($result)) {
+            Log::error('CV_device_log', [
+                'type_id' => $type_id,
+                'error' => '无法启动任务！',
+            ]);
+        }
+
+        return $result;
     }
 
     public static function scheduleUploadOrderLogJob(orderModelObj $order)
@@ -104,7 +122,16 @@ class GDCVMachine
         $last_ts = Config::GDCVMachine('last.order_upload', 0);
         $delay = max(1, 60 - (time() - $last_ts));
 
-        return CtrlServ::scheduleDelayJob('upload_gv_info', ['w' => 'order', 'id' => $order->getId()], $delay);
+        $result = CtrlServ::scheduleDelayJob('upload_gv_info', ['w' => 'order', 'id' => $order->getId()], $delay);
+
+        if (empty($result)) {
+            Log::error('CV_order_log', [
+                'order' => $order->profile(),
+                'error' => '无法启动任务！',
+            ]);
+        }
+
+        return $result;
     }
 
     public function uploadDevicesInfo(array $list = [])

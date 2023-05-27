@@ -176,7 +176,7 @@ if ($op == 'default') {
 
     $s_query = m('settings_user');
     $s_query = $s_query->query(We7::uniacid([]));
-    $s_count = $s_query->where(['data LIKE' => "%$hash%"])->count();
+    $s_count = $s_query->where(['data LIKE' => "%$hash%"])->limit(1)->count();
     if ($s_count > 0) {
         JSON::fail('该身份证已用于认证！');
     }

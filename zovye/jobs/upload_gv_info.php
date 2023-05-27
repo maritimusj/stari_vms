@@ -13,7 +13,6 @@ use zovye\GDCVMachine;
 use zovye\Log;
 use zovye\Order;
 use zovye\Request;
-use function zovye\is_error;
 
 $data = [
     'id' => Request::int('id'),
@@ -35,13 +34,8 @@ if ($op == 'upload_gv_info' && CtrlServ::checkJobSign($data)) {
             $delay = max(1, 60 - (time() - $last_ts));
             sleep($delay);
 
-            $res = (new GDCVMachine())->uploadDeviceInfo($device);
-            if (is_error($res)) {
-                Log::error('upload_gv_info', [
-                    'error' => $res,
-                ]);
-            }
-            $data['result'] = $res;
+            (new GDCVMachine())->uploadDeviceInfo($device);
+
         } else {
             $data['error'] = '找不到这个设备！';
         }
@@ -59,13 +53,7 @@ if ($op == 'upload_gv_info' && CtrlServ::checkJobSign($data)) {
         $delay = max(1, 60 - (time() - $last_ts));
         sleep($delay);
 
-        $res = (new GDCVMachine())->uploadDevicesInfo($list);
-        if (is_error($res)) {
-            Log::error('upload_gv_info', [
-                'error' => $res,
-            ]);
-        }
-        $data['result'] = $res;
+        (new GDCVMachine())->uploadDevicesInfo($list);
 
     } elseif ($w == 'order') {
 
@@ -75,13 +63,7 @@ if ($op == 'upload_gv_info' && CtrlServ::checkJobSign($data)) {
 
         $order = Order::get($id);
         if ($order) {
-            $res = (new GDCVMachine())->uploadOrderInfo($order);
-            if ($res) {
-                Log::error('upload_gv_info', [
-                    'error' => $res,
-                ]);
-            }
-            $data['result'] = $res;
+            (new GDCVMachine())->uploadOrderInfo($order);
         } else {
             $data['error'] = '找不到这个订单！';
         }

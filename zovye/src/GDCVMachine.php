@@ -149,26 +149,11 @@ class GDCVMachine
             'request' => $data,
             'response' => $response,
         ]);
-
-        if (empty($response)) {
-            return err('返回数据为空！');
-        }
-
-        if ($response['code'] === 0) {
-            return true;
-        }
-
-        Log::error('CV_device_log', [
-            'request' => $data,
-            'response' => $response,
-        ]);
-
-        return err($response['message']);
     }
 
     public function uploadDeviceInfo(deviceModelObj $device)
     {
-        return $this->uploadDevicesInfo([$device]);
+        $this->uploadDevicesInfo([$device]);
     }
 
     function formatOrder(orderModelObj $order): array
@@ -254,28 +239,16 @@ class GDCVMachine
             return err('返回数据为空！');
         }
 
-        $result = array_merge($response, ['ts' => time()]);
-
         /** @var orderModelObj $order */
-        foreach ($list as $order) {
+        foreach ($list as $index => $order) {
+            $result = $response[$index] ?? [];
             $order->setExtraData('CV.upload', $result);
             $order->save();
         }
-
-        if ($response['code'] === 0) {
-            return true;
-        }
-
-        Log::error('CV_order_log', [
-            'request' => $data,
-            'response' => $response,
-        ]);
-
-        return err($response['message']);
     }
 
     public function uploadOrderInfo(orderModelObj $order)
     {
-        return $this->uploadOrdersInfo([$order]);
+        $this->uploadOrdersInfo([$order]);
     }
 }

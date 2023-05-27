@@ -10,6 +10,7 @@ use zovye\Config;
 use zovye\CtrlServ;
 use zovye\Device;
 use zovye\GDCVMachine;
+use zovye\Locker;
 use zovye\Log;
 use zovye\Order;
 use zovye\Request;
@@ -29,13 +30,13 @@ if ($op == 'upload_gv_info' && CtrlServ::checkJobSign($data)) {
     if ($w == 'device') {
         $device = Device::get($id);
         if ($device) {
-            
-            $last_ts = Config::GDCVMachine('last.device_upload', 0);
-            $delay = max(1, 60 - (time() - $last_ts));
-            sleep($delay);
+            if (Locker::try("GDCVMachine:device_upload")) {
+                $last_ts = Config::GDCVMachine('last.device_upload', 0);
+                $delay = max(1, 60 - (time() - $last_ts));
+                sleep($delay);
 
-            (new GDCVMachine())->uploadDeviceInfo($device);
-
+                (new GDCVMachine())->uploadDeviceInfo($device);
+            }
         } else {
             $data['error'] = '找不到这个设备！';
         }
@@ -49,21 +50,24 @@ if ($op == 'upload_gv_info' && CtrlServ::checkJobSign($data)) {
             $list[] = $device;
         }
 
-        $last_ts = Config::GDCVMachine('last.device_upload', 0);
-        $delay = max(1, 60 - (time() - $last_ts));
-        sleep($delay);
+        if (Locker::try("GDCVMachine:device_upload")) {
+            $last_ts = Config::GDCVMachine('last.device_upload', 0);
+            $delay = max(1, 60 - (time() - $last_ts));
+            sleep($delay);
 
-        (new GDCVMachine())->uploadDevicesInfo($list);
+            (new GDCVMachine())->uploadDevicesInfo($list);
+        }
 
     } elseif ($w == 'order') {
-
-        $last_ts = Config::GDCVMachine('last.order_upload', 0);
-        $delay = max(1, 60 - (time() - $last_ts));
-        sleep($delay);
-
         $order = Order::get($id);
         if ($order) {
-            (new GDCVMachine())->uploadOrderInfo($order);
+            if (Locker::try("GDCVMachine:order_upload")) {
+                $last_ts = Config::GDCVMachine('last.order_upload', 0);
+                $delay = max(1, 60 - (time() - $last_ts));
+                sleep($delay);
+
+                (new GDCVMachine())->uploadOrderInfo($order);
+            }
         } else {
             $data['error'] = '找不到这个订单！';
         }

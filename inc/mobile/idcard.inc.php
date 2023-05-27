@@ -273,9 +273,5 @@ if ($op == 'default') {
     //准备领取商品的ticket
     $user->setLastActiveData('ticket', $ticket_data);
 
-    $url = Util::murl('getx', [
-        'ticket' => REQUEST_ID,
-    ]);
-
-    JSON::success(['url' => $url]);
+    JSON::success(['url' => Util::murl('account', ['op' => 'get'])]);
 }

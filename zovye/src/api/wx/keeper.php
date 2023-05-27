@@ -14,6 +14,7 @@ use zovye\App;
 use zovye\CommissionBalance;
 use zovye\Config;
 use zovye\Device;
+use zovye\GDCVMachine;
 use zovye\Inventory;
 use zovye\Locker;
 use zovye\Log;
@@ -1084,6 +1085,10 @@ class keeper
 
         $device->updateAppRemain();
         $device->save();
+
+        if (App::isGDCVMachineEnabled()) {
+            GDCVMachine::scheduleUploadDeviceJob($device);
+        }
 
         return ['msg' => '设置成功！'];
     }

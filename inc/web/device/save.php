@@ -380,6 +380,10 @@ if (is_error($result)) {
     Util::itoast($result['message'], $id ? We7::referer() : $this->createWebUrl('device'), 'error');
 }
 
+if ($device && App::isGDCVMachineEnabled()) {
+    GDCVMachine::scheduleUploadDeviceJob($device);
+}
+
 $redirect_url = $this->createWebUrl('device', [
     'op' => 'edit',
     'id' => $device ? $device->getId() : $id,

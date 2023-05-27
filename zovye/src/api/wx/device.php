@@ -8,6 +8,7 @@ namespace zovye\api\wx;
 
 use DateTime;
 use Exception;
+use zovye\GDCVMachine;
 use zovye\Inventory;
 use zovye\Locker;
 use zovye\model\agentModelObj;
@@ -387,6 +388,10 @@ class device
                 if (is_error($v)) {
                     return $v;
                 }
+            }
+
+            if (App::isGDCVMachineEnabled()) {
+                GDCVMachine::scheduleUploadDeviceJob($device);
             }
 
             return ['msg' => '设置成功！'];
@@ -939,6 +944,10 @@ class device
             if (empty($device_type)) {
                 return err('创建设备型号失败！');
             }
+        }
+
+        if (App::isGDCVMachineEnabled()) {
+            GDCVMachine::scheduleUploadDeviceJobForDeviceType($device_type->getId());
         }
 
         return ['msg' => '保存设备型号成功！'];

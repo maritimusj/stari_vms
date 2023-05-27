@@ -19,6 +19,10 @@ class JobEventHandler
         if ($order) {
             Job::order($order->getId());
 
+            if (App::isGDCVMachineEnabled()) {
+                GDCVMachine::scheduleUploadOrderLogJob($order);
+            }
+
             //订单通知
             $notify = Config::notify('order', []);
             if (!empty($notify['url'])) {
@@ -43,10 +47,10 @@ class JobEventHandler
                     ];
 
                     if ($order->isFree()) {
-                        $$orderData['goods']['is_free'] = true;
+                        $orderData['goods']['is_free'] = true;
                     }
                     if ($order->isPay()) {
-                        $$orderData['goods']['is_pay'] = true;
+                        $orderData['goods']['is_pay'] = true;
                     }
                     
                     $data = [

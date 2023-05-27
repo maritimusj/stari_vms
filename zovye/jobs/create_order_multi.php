@@ -7,6 +7,7 @@
 namespace zovye\job\createOrderMulti;
 
 use Exception;
+use zovye\App;
 use zovye\CtrlServ;
 use zovye\Device;
 use zovye\EventBus;
@@ -262,6 +263,12 @@ function createOrder(
     $qrcode = $pay_log->getData('qrcode.code', '');
     if ($qrcode) {
         $order_data['extra']['qrcode'] = $qrcode;
+    }
+
+    if (App::isGDCVMachineEnabled()) {
+        $order_data['extra']['CV'] = [
+            'profile' => $user->getIDCardVerifiedData(),
+        ];
     }
 
     //定制功能：零佣金

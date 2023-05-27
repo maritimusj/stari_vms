@@ -189,7 +189,7 @@ if ($user->isBanned()) {
 }
 
 if (App::isUserVerify18Enabled() && !$user->isIDCardVerified()) {
-    app()->showTemplate(Theme::file('verify_18'), [
+    app()->showTemplate(Theme::getThemeFile($device, 'verify_18'), [
         'verify18' => settings('user.verify_18', []),
         'entry_url' => Util::murl('entry', ['from' => $from, 'device' => $device_id, 'account' => $account_id]),
     ]);

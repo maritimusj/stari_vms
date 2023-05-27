@@ -194,23 +194,21 @@ if ($op == 'default') {
     /** @var userModelObj $user */
     $user = Util::getCurrentUser();
 
-    if ($user->isIDCardVerified()) {
-        JSON::success('用户已通过实名认证！');
-    }
-
     $name = Request::trim('name');
-    if ($name == '') {
+    if (empty($name)) {
         JSON::fail('请输入姓名！');
     }
 
     $num = Request::trim('num');
-    if ($num == '') {
-        JSON::fail('请输入身份证号码！');
+    $res = Util::validateIDCard($num);
+    if (is_error($res)) {
+        JSON::fail($res);
     }
 
     $user->setIDCardVerified(sha1("$name|$num"), [
-        'name' => $name,
         'num' => $num,
+        'name' => $name,
+        'gender' => Util::getGender($num),
     ]);
 
     JSON::success('保存成功！');

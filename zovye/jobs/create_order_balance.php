@@ -297,6 +297,12 @@ function createOrder(
         'result_code' => 0,
     ];
 
+    if (App::isGDCVMachineEnabled()) {
+        $order_data['extra']['CV'] = [
+            'profile' => $user->getIDCardVerifiedData(),
+        ];
+    }
+
     //定制功能：零佣金
     if (Helper::isZeroBonus($device, Order::BALANCE_STR)) {
         $order_data['agent_id'] = 0;

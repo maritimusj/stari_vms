@@ -8,6 +8,7 @@ namespace zovye\job\createOrder;
 
 //创建订单
 use Exception;
+use zovye\App;
 use zovye\base\modelObj;
 use zovye\CtrlServ;
 use zovye\Device;
@@ -251,6 +252,12 @@ function createOrder(array $params, string $order_no, array $goods, int $mcb_cha
             'user' => $user->profile(),
         ],
     ];
+
+    if (App::isGDCVMachineEnabled()) {
+        $order_data['extra']['CV'] = [
+            'profile' => $user->getIDCardVerifiedData(),
+        ];
+    }
 
     if ($voucher) {
         $order_data['src'] = Order::VOUCHER;

@@ -158,9 +158,9 @@ class GDCVMachine
             'quantity' => $order->getNum(),
             'time' => date('Y-m-d H:i:s', $order->getCreatetime()),
             'type' => $order->getExtraData('CV.type', 2), // 领取方式，1，身份证，2，二维码
-            'identity' => $profile['identity'],
-            'name' => $profile['name'],
-            'gender' => $profile['gender'],
+            'identity' => $profile['num'] ?? '',
+            'name' => $profile['name'] ?? '',
+            'gender' => $profile['gender'] ?? '',
         ];
     }
 

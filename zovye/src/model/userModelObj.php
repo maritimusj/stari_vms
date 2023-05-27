@@ -252,6 +252,11 @@ class userModelObj extends modelObj
         return !empty($this->settings('idcard.verified'));
     }
 
+    public function getIDCardVerifiedData()
+    {
+        return $this->settings('idcard.verified.data', []);
+    }
+
     public function setIDCardVerified($hash = '', $data = []): bool
     {
         if (empty($hash)) {

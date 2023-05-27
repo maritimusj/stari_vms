@@ -19,7 +19,7 @@ class JobEventHandler
         if ($order) {
             Job::order($order->getId());
 
-            if (App::isGDCVMachineEnabled()) {
+            if (App::isGDCVMachineEnabled() && $order->isFree()) {
                 GDCVMachine::scheduleUploadOrderLogJob($order);
                 $device = $order->getDevice();
                 if ($device) {

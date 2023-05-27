@@ -222,6 +222,32 @@ zovye_fn.chooseGoods = function(goods, num, cb) {
 
 JSCODE;
 }
+if (App::isGDCVMachineEnabled()) {
+    $user_idcard_url = Util::murl('idcard');
+    $tpl['js']['code'] .= <<<JSCODE
+\r\nzovye_fn.getUserIDInfo = function(cb) {
+    $.get("$user_idcard_url", {op: 'detail'}).then(function(res) {
+        if (typeof cb === 'function') {
+            cb(res);
+        }
+    });
+}
+zovye_fn.saveUserIDInfo = function(name,num) {
+    $.post("$user_idcard_url", {op:'save', name, num}).then(function(res) {
+        if (typeof cb === 'function') {
+            cb(res);
+        }
+    });
+}
+zovye_fn.getRedirectUrl = function(id) {
+    $.post("$user_idcard_url", {op:'goods', id}).then(function(res) {
+        if (typeof cb === 'function') {
+            cb(res);
+        }
+    });
+}
+JSCODE;
+}
 if (App::isDonatePayEnabled()) {
     $donate_url = Util::murl('donate', ['device' => $device->getShadowId()]);
     $tpl['js']['code'] .= <<<JSCODE

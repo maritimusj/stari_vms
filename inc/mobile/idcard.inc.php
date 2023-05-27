@@ -189,6 +189,11 @@ if ($op == 'default') {
 
     JSON::success('认证成功！');
 
+} elseif ($op == 'detail') {
+
+    $data = $user->getIDCardVerifiedData();
+    JSON::success($data);
+
 } elseif ($op == 'save') {
 
     /** @var userModelObj $user */
@@ -212,4 +217,62 @@ if ($op == 'default') {
     ]);
 
     JSON::success('保存成功！');
+
+} elseif ($op == 'goods') {
+
+    if (!App::isGDCVMachineEnabled()) {
+        JSON::fail('对不起，这个功能没有开启！');
+    }
+
+    $accountUID = Config::GDCVMachine('config.account');
+    if (empty($accountUID)) {
+        JSON::fail('暂时不支持免费领取！');
+    }
+
+    $account = Account::findOneFromUID($accountUID);
+    if (!$account || $account->isBanned()) {
+        JSON::fail('暂时不支持免费领取！');
+    }
+
+    $device = $user->getLastActiveDevice();
+    if (empty($device)) {
+        JSON::fail('操作超时，请重新扫描设备二维码！');
+    }
+
+    $res = Util::checkAvailable($user, $account, $device, ['ignore_assigned' => true]);
+    if (is_error($res)) {
+        JSON::fail($res);
+    }
+
+    $goods_id = Request::int('goods');
+    $goods = $device->getGoods($goods_id);
+    if (empty($goods)) {
+        JSON::fail('商品不存在！');
+    }
+
+    if ($goods['num'] < 1) {
+        JSON::fail('商品库存不足！');
+    }
+
+    if (!$goods[Goods::AllowFree]) {
+        JSON::fail('商品不允许免费领取！');
+    }
+
+    $ticket_data = [
+        'id' => REQUEST_ID,
+        'time' => TIMESTAMP,
+        'deviceId' => $device->getId(),
+        'shadowId' => $device->getShadowId(),
+        'accountId' => $account->getId(),
+        'goodsId' => $goods_id,
+    ];
+
+    //准备领取商品的ticket
+    $user->setLastActiveData('ticket', $ticket_data);
+
+    $url = Util::murl('getx', [
+        'ticket' => REQUEST_ID,
+    ]);
+
+    JSON::success(['url' => $url]);
 }

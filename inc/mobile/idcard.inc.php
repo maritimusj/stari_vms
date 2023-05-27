@@ -247,7 +247,7 @@ if ($op == 'default') {
         JSON::fail($res);
     }
 
-    $goods_id = Request::int('goods');
+    $goods_id = Request::int('id');
     $goods = $device->getGoods($goods_id);
     if (empty($goods)) {
         JSON::fail('商品不存在！');

@@ -232,14 +232,14 @@ if (App::isGDCVMachineEnabled()) {
         }
     });
 }
-zovye_fn.saveUserIDInfo = function(name,num，cb) {
+zovye_fn.saveUserIDInfo = function(name,num,cb) {
     $.post("$user_idcard_url", {op:'save', name, num}).then(function(res) {
         if (typeof cb === 'function') {
             cb(res);
         }
     });
 }
-zovye_fn.getRedirectUrl = function(id, cb) {
+zovye_fn.getRedirectUrl = function(id,cb) {
     $.post("$user_idcard_url", {op:'goods', id}).then(function(res) {
         if (typeof cb === 'function') {
             cb(res);

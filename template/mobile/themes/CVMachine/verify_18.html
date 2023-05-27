@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>实名登记</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <style type="text/css">
+        html,
+        body {
+            position: relative;
+            width: 100%;
+            height: 110%;
+        }
+
+        body {
+            background-color: #eee;
+            font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+            font-size: 16px;
+            color: #000;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #J_body {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .identity {
+            width: 80px;
+            height: 80px;
+            margin-top: 8px;
+        }
+
+        .row-view {
+            width: 75%;
+            height: 40px;
+            background-color: #fff;
+            border: 1px solid #4F88F7;
+            border-radius: 8px;
+            margin-top: 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .row-head {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .row-code {
+            width: 75%;
+            height: 40px;
+            margin-top: 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .c1 {
+            background-color: #fff;
+            border: 1px solid #4F88F7;
+            border-radius: 8px;
+            width: 6em;
+            height: 92%;
+            display: flex;
+
+            flex-direction: row;
+            align-items: center;
+        }
+
+        .c2 {
+            border: 1px solid #f8f8f8;
+            background-color: #fff !important;
+            color: #000 !important;
+            width: 8em;
+            height: 40px;
+        }
+
+        .bg-gray {
+            background-color: #a8a8a8 !important;
+        }
+
+        input {
+            width: calc(100% - 40px);
+            background: none;
+            outline: none;
+            border: none;
+            margin-left: 20px;
+            font-size: 16px;
+        }
+
+        .btn {
+            background-color: #4F88F7;
+            color: #fff;
+        }
+
+        .btn:active {
+            opacity: 0.7;
+        }
+
+        .desc {
+            padding: 0 20px;
+            font-size: 13px;
+            color: #333;
+            margin-top: 10px;
+        }
+        #success .desc {
+            font-size: 16px;
+        }
+        .imgs {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .r18 {
+            display: inline;
+            width: 30px;
+            height: 30px;
+        }
+
+        .cigarette {
+            width: 80px;
+            height: 80px;
+        }
+
+        .forget-btn {
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .forget-btn:active {
+            opacity: 0.7;
+        }
+
+        .main {
+            margin-top: 3em;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .main img {
+            width: 45px;
+        }
+
+        .c-title {
+            margin-top: .5em;
+            font-size: 1.5em;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body >
+<div id="J_body">
+
+    <span class="c-title">{$verify18['Title']}</span>
+    <div class="row-head">
+        <img class="r18" src="{MODULE_URL}static/img/r18.png"><span>未成年人禁止使用</span>
+    </div>
+    <img class="identity" src="{MODULE_URL}static/img/identity.png">
+    <span style="margin-top: 20px;">为保护未成年人，保障合法权益，</span>
+    <span style="margin-top: 5px;">首次购买需要进行实名登记</span>
+    <div class="row-view">        
+        <input type="text" id="name" placeholder="姓名">
+    </div>  
+    <div class="row-view">        
+        <input type="text" id="num" placeholder="身份证号码">
+    </div>
+    <div class="row-view btn" id="verify-btn">开始验证</div>
+    <!-- <span class="desc">注：按照国家要求进行实名认证，我们绝对不会保存您的任何身份信息！</span> -->
+</div>
+
+{php \zovye\url(true, JS_JQUERY_URL);}
+<script type="text/javascript">
+    $(function () {
+
+        $('#verify-btn').click(function () {
+            const name = $('#name').val().trim();
+            const num = $('#num').val().trim();
+
+            $.post('{php echo $this->createMobileUrl("idcard", ["op"=>"save"])}', {
+                    name: name,
+                    num: num
+                }, function (res) {
+                    if (res['status']) {
+                        const str = `<div id="success" class="main">
+                            <img class="icon" src="{MODULE_URL}static/img/success_icon.jpg"/>
+                            <div class="desc">实名认证成功！</div>
+                            <div class="desc">3秒后返回购物，请稍等...</div>
+                            </div>`;
+                        $('#J_body').html(str);
+                        setTimeout(function () {
+                            window.location.href = "{$entry_url}";
+                        }, 3000);
+                    } else {
+                        alert(res['data']['msg']);
+                    }
+                });
+        });
+        $('#refund').click(function () {
+            zovye_fn.refund();
+        });
+    });
+
+    //去掉字符串头尾空格
+    function trim(str) {
+        return str.replace(/(^\s*)|(\s*$)/g, "");
+    }
+</script>
+</body>
+</html>

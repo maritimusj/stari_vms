@@ -29,7 +29,7 @@ if ($op == 'upload_gv_info' && CtrlServ::checkJobSign($data)) {
     if ($w == 'device') {
         $device = Device::get($id);
         if ($device) {
-
+            
             $last_ts = Config::GDCVMachine('last.device_upload', 0);
             $delay = max(1, 60 - (time() - $last_ts));
             sleep($delay);

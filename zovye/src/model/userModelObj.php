@@ -252,7 +252,7 @@ class userModelObj extends modelObj
         return !empty($this->settings('idcard.verified'));
     }
 
-    public function setIDCardVerified($hash): bool
+    public function setIDCardVerified($hash = '', $data = []): bool
     {
         if (empty($hash)) {
             return $this->updateSettings('idcard.verified', []);
@@ -263,6 +263,7 @@ class userModelObj extends modelObj
             [
                 'matched' => true,
                 'hash' => $hash,
+                'data' => $data,
                 'createdAt' => time(),
             ]
         );

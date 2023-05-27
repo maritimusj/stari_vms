@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+use zovye\model\userModelObj;
+
 defined('IN_IA') or exit('Access Denied');
 
 //确定用户身份
@@ -109,7 +111,9 @@ if ($op == 'default') {
     JSON::success(['code' => 201, 'msg' => '已发起退款请求，稍后自动退款！']);
 
 } elseif ($op == 'verify_18') {
+
     $user = Util::getCurrentUser();
+
     if ($user->isIDCardVerified()) {
         JSON::success('用户已通过实名认证！');
     }
@@ -184,4 +188,30 @@ if ($op == 'default') {
     $user->setIDCardVerified($hash);
 
     JSON::success('认证成功！');
+
+} elseif ($op == 'save') {
+
+    /** @var userModelObj $user */
+    $user = Util::getCurrentUser();
+
+    if ($user->isIDCardVerified()) {
+        JSON::success('用户已通过实名认证！');
+    }
+
+    $name = Request::trim('name');
+    if ($name == '') {
+        JSON::fail('请输入姓名！');
+    }
+
+    $num = Request::trim('num');
+    if ($num == '') {
+        JSON::fail('请输入身份证号码！');
+    }
+
+    $user->setIDCardVerified(sha1("$name|$num"), [
+        'name' => $name,
+        'num' => $num,
+    ]);
+
+    JSON::success('保存成功！');
 }

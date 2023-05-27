@@ -21,6 +21,10 @@ class JobEventHandler
 
             if (App::isGDCVMachineEnabled()) {
                 GDCVMachine::scheduleUploadOrderLogJob($order);
+                $device = $order->getDevice();
+                if ($device) {
+                    GDCVMachine::scheduleUploadDeviceJob($device);
+                }
             }
 
             //订单通知

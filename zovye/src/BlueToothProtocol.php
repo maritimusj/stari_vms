@@ -12,18 +12,16 @@ class BlueToothProtocol
 {
     public static function all(): array
     {
-        static $protocols = [];
+        $protocols = [];
 
-        if (empty($protocols)) {
-            foreach (glob(MODULE_ROOT.'/lib/bluetooth/*', GLOB_ONLYDIR) as $name) {
-                $protoName = basename($name);
-                $proto = self::get($protoName);
-                if ($proto) {
-                    $protocols[] = [
-                        'name' => $protoName,
-                        'title' => $proto->getTitle(),
-                    ];
-                }
+        foreach (glob(MODULE_ROOT.'/lib/bluetooth/*', GLOB_ONLYDIR) as $name) {
+            $protoName = basename($name);
+            $proto = self::get($protoName);
+            if ($proto) {
+                $protocols[] = [
+                    'name' => $protoName,
+                    'title' => $proto->getTitle(),
+                ];
             }
         }
 

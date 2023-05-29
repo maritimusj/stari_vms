@@ -132,7 +132,7 @@ class GDCVMachine
             ]);
         }
 
-        return $result;
+        return $result;       
     }
 
     public function uploadDevicesInfo(array $list = [])
@@ -144,14 +144,14 @@ class GDCVMachine
         }
 
         if ($data) {
-            Config::GDCVMachine('last.device_upload', time(), true);
-
             $response = $this->post('/cgi-bin/machineinfo', $data);
 
             Log::debug('CV_device_log', [
                 'request' => $data,
                 'response' => $response,
             ]);
+
+            Config::GDCVMachine('last.device_upload', time(), true);
         }
     }
 
@@ -233,14 +233,14 @@ class GDCVMachine
         }
 
         if ($data) {
-            Config::GDCVMachine('last.order_upload', time(), true);
-
             $response = $this->post('/cgi-bin/machleadrecord', $data);
 
             Log::debug('CV_order_log', [
                 'request' => $data,
                 'response' => $response,
             ]);
+
+            Config::GDCVMachine('last.order_upload', time(), true);
 
             if (!empty($response)) {
                 /** @var orderModelObj $order */

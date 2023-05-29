@@ -89,6 +89,12 @@
     strong.total {
         color: #8bc34a;
     }
+    #orderlist i.upload-success {
+        color: #4caf50;
+    }
+    #orderlist i.upload-fail {
+        color: #9E9E9E;
+    }
 </style>
 <ul class="nav nav-tabs" id="navbar">
     {if empty($s_way)}
@@ -334,7 +340,13 @@
                             <img src="{MODULE_URL}static/img/scanner.svg" class="balance" title="付款码">        
                             {/if}
                             {if $order['cv.upload']}
-                            <i class="fa fa-check-circle"></i>
+                                {if $order['cv.upload']['uploading']}
+                                <i class="fa fa-clock-o" title="等待上传中..."></i>
+                                {elseif $order['cv.upload']['code'] == 0}
+                                <i class="fa fa-check-circle fa-fw upload-success" title="{php echo $order['cv.upload']['message']}"></i>
+                                {else}
+                                <i class="fa fa-info-circle fa-fw upload-fail" title="{php echo $order['cv.upload']['message']}" data-op="uploadCV"></i>
+                                {/if}
                             {/if}
                             {$order['orderId']}
                         </div>
@@ -822,6 +834,14 @@
 
     api.endOrder = function(id) {
         api.showResult({ op: 'endOrder', id: id });
+    }
+
+    api.uploadCV = function(id, self) {
+        api.showResult({ op: 'uploadCV', id: id }, null, false, function() {
+            $(self).removeAttr('data-op');
+            $(self).addClass('fa-clock-o');
+            $(self).removeClass('fa-info-circle upload-fail');
+        });
     }
 
     function reloadPageWithFilter(fn) {

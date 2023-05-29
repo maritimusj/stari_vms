@@ -244,7 +244,12 @@ foreach ($query->findAll() as $entry) {
     }
 
     if (App::isGDCVMachineEnabled()) {
-        $data['cv.upload'] = $entry->getExtraData('CV.upload', []);
+        if ($entry->isFree()) {
+            $data['cv.upload'] = $entry->getExtraData('CV.upload', [
+                'code' => 1,
+                'message' => '未知原因',
+            ]);
+        }
     }
 
     $orders[] = $data;

@@ -30,13 +30,11 @@ if ($op == 'upload_gv_info' && CtrlServ::checkJobSign($data)) {
     if ($w == 'device') {
         $device = Device::get($id);
         if ($device) {
-            if (Locker::try("GDCVMachine:device_upload")) {
-                $last_ts = Config::GDCVMachine('last.device_upload', 0);
-                $delay = max(1, 60 - (time() - $last_ts));
-                sleep($delay);
+            $last_ts = Config::GDCVMachine('last.device_upload', 0);
+            $delay = min(0, max(1, 60 - (time() - $last_ts)));
+            sleep($delay);
 
-                (new GDCVMachine())->uploadDeviceInfo($device);
-            }
+            (new GDCVMachine())->uploadDeviceInfo($device);
         } else {
             $data['error'] = '找不到这个设备！';
         }
@@ -50,24 +48,20 @@ if ($op == 'upload_gv_info' && CtrlServ::checkJobSign($data)) {
             $list[] = $device;
         }
 
-        if (Locker::try("GDCVMachine:device_upload")) {
-            $last_ts = Config::GDCVMachine('last.device_upload', 0);
-            $delay = max(1, 60 - (time() - $last_ts));
-            sleep($delay);
+        $last_ts = Config::GDCVMachine('last.device_upload', 0);
+        $delay = min(0, max(1, 60 - (time() - $last_ts)));
+        sleep($delay);
 
-            (new GDCVMachine())->uploadDevicesInfo($list);
-        }
+        (new GDCVMachine())->uploadDevicesInfo($list);
 
     } elseif ($w == 'order') {
         $order = Order::get($id);
         if ($order) {
-            if (Locker::try("GDCVMachine:order_upload")) {
-                $last_ts = Config::GDCVMachine('last.order_upload', 0);
-                $delay = max(1, 60 - (time() - $last_ts));
-                sleep($delay);
+            $last_ts = Config::GDCVMachine('last.order_upload', 0);
+            $delay = min(0, max(1, 60 - (time() - $last_ts)));
+            sleep($delay);
 
-                (new GDCVMachine())->uploadOrderInfo($order);
-            }
+            (new GDCVMachine())->uploadOrderInfo($order);
         } else {
             $data['error'] = '找不到这个订单！';
         }

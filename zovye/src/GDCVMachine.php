@@ -182,12 +182,11 @@ class GDCVMachine
 
     function formatOrder(orderModelObj $order): array
     {
-        $device = $order->getDevice();
         $goods = $order->getGoodsData();
         $profile = $order->getExtraData('CV.profile', []);
 
         return [
-            'machineCode' => $device->getImei(),
+            'machineCode' => $order->getExtraData('device.imei', ''),
             'agentCode' => strval($this->config['agent']),
             'channelCode' => $order->getDeviceChannelId() + 1,
             'productCode' => strval($goods['CVMachine.code']),

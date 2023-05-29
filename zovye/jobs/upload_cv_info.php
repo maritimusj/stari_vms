@@ -16,7 +16,6 @@ use zovye\Request;
 use function zovye\m;
 
 $data = [
-    'id' => Request::int('id'),
     'w' => Request::str('w'),
 ];
 
@@ -24,12 +23,10 @@ $op = Request::op('default');
 
 if ($op == 'upload_cv_info' && CtrlServ::checkJobSign($data)) {
 
-    $id = Request::int('id');
     $w = Request::str('w');
 
     if ($w == 'device') {
         $list = [];
-        $entries = [];
         /** @var cv_upload_deviceModelObj $entry */
         foreach (m('cv_upload_device')->findAll() as $entry) {
             $device = $entry->getDevice();
@@ -37,8 +34,11 @@ if ($op == 'upload_cv_info' && CtrlServ::checkJobSign($data)) {
                 $list[] = $device;
             }
 
-            $entries = $entry;
+            $entry->destroy();
         }
+
+        $list = array_values($list);
+        $data['list'] = $list;
 
         if ($list) {
             $last_ts = Config::GDCVMachine('last.device_upload', 0);
@@ -47,24 +47,24 @@ if ($op == 'upload_cv_info' && CtrlServ::checkJobSign($data)) {
 
             $response = (new GDCVMachine())->uploadDevicesInfo($list);
             if ($response) {
+                $data['response'] = $response;
                 Config::GDCVMachine('last.device_upload', time(), true);
-                foreach($entries as $entry) {
-                    $entry->destroy();
-                }
             }
         }
 
     } elseif ($w == 'order') {
         $list = [];
-        $entries = [];
         /** @var cv_upload_orderModelObj $entry */
-        foreach (m('cv_upload_device')->findAll() as $entry) {
+        foreach (m('cv_upload_order')->findAll() as $entry) {
             $order = $entry->getOrder();
             if ($order) {
                 $list[$order->getId()] = $order;
             }
-            $entries = $entry;
+            $entry->destroy();
         }
+
+        $list = array_values($list);
+        $data['list'] = $list;
 
         if ($list) {
             $last_ts = Config::GDCVMachine('last.order_upload', 0);
@@ -73,19 +73,16 @@ if ($op == 'upload_cv_info' && CtrlServ::checkJobSign($data)) {
 
             $response = (new GDCVMachine())->uploadOrdersInfo($list);
             if ($response) {
+                $data['response'] = $response;
                 Config::GDCVMachine('last.order_upload', time(), true);
                 if (!empty($response)) {
                     /** @var cv_upload_orderModelObj $order */
-                    foreach ($list as $index => $entry) {
+                    foreach ($list as $index => $order) {
                         $result = $response[$index] ?? [];
-                        $order = $entry->getOrder();
                         if ($order) {
                             $order->setExtraData('CV.upload', $result);
                             $order->save();
                         }
-                    }
-                    foreach($entries as $entry) {
-                        $entry->destroy();
                     }
                 }
             }

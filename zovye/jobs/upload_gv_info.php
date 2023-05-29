@@ -44,7 +44,7 @@ if ($op == 'upload_gv_info' && CtrlServ::checkJobSign($data)) {
 
         if ($list) {
             $last_ts = Config::GDCVMachine('last.device_upload', 0);
-            $delay = min(0, max(1, 60 - (time() - $last_ts)));
+            $delay = min(0, max(1, 65 - (time() - $last_ts)));
             sleep($delay);
 
             $response = (new GDCVMachine())->uploadDevicesInfo($list);
@@ -74,7 +74,7 @@ if ($op == 'upload_gv_info' && CtrlServ::checkJobSign($data)) {
 
         if ($list) {
             $last_ts = Config::GDCVMachine('last.order_upload', 0);
-            $delay = min(0, max(1, 60 - (time() - $last_ts)));
+            $delay = min(0, max(1, 65 - (time() - $last_ts)));
             sleep($delay);
 
             $response = (new GDCVMachine())->uploadOrdersInfo($list);

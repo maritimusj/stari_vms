@@ -6,7 +6,7 @@ $tb_name = APP_NAME;
 
 if (!We7::pdo_tableexists($tb_name.'_cv_upload_device')) {
     $sql = <<<SQL
-CREATE TABLE `_cv_upload_device` (
+CREATE TABLE `ims_zovye_vms_cv_upload_device` (
     `id` INT NOT NULL AUTO_INCREMENT , 
 `uniacid` INT NOT NULL , 
 `device_id` INT NOT NULL ,
@@ -18,7 +18,7 @@ SQL;
 }
 if (!We7::pdo_tableexists($tb_name.'_cv_upload_order')) {
     $sql = <<<SQL
-CREATE TABLE `_cv_upload_order` (
+CREATE TABLE `ims_zovye_vms_cv_upload_order` (
 `id` INT NOT NULL AUTO_INCREMENT , 
 `uniacid` INT NOT NULL , 
 `order_id` INT NOT NULL ,

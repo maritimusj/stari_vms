@@ -38,7 +38,7 @@ if ($op == 'upload_gv_info' && CtrlServ::checkJobSign($data)) {
         foreach (m('cv_upload_device')->findAll() as $entry) {
             $device = $entry->getDevice();
             if ($device) {
-                $list[] = $device;
+                $list[$device->getId()] = $device;
             }
         }
 
@@ -68,7 +68,7 @@ if ($op == 'upload_gv_info' && CtrlServ::checkJobSign($data)) {
         foreach (m('cv_upload_device')->findAll() as $entry) {
             $order = $entry->getOrder();
             if ($order) {
-                $list[] = $order;
+                $list[$order->getId()] = $order;
             }
         }
 

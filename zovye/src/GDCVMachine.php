@@ -93,7 +93,7 @@ class GDCVMachine
         $last_ts = Config::GDCVMachine('last.device_upload', 0);
         $delay = max(1, 60 - (time() - $last_ts));
 
-        $result = CtrlServ::scheduleDelayJob('upload_cv_info', ['w' => 'device', 'id' => $device->getId()], $delay);
+        $result = CtrlServ::scheduleDelayJob('upload_cv_info', ['w' => 'device'], $delay);
 
         if (empty($result)) {
             Log::error('CV_device_log', [

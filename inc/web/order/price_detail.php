@@ -36,8 +36,9 @@ if ($order->isFuelingOrder()) {
 
     $data = $order->getFuelingRecord();
 
+    $data['time_total_formatted'] = formatTimeTotalF($data['time_total']);
     $list[] = $data;
-    $data['time_total_formatted'] = formatTimeTotalF($data);
+
     foreach ($data as $i => $v) {
         if (is_array($v) && $v['ser']) {
             $v['time_total_formatted'] = formatTimeTotalF($v['time_total']);

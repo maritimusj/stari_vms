@@ -29,12 +29,15 @@ if ($op == 'upload_cv_info' && CtrlServ::checkJobSign($data)) {
 
     if ($w == 'device') {
         $list = [];
+        $entries = [];
         /** @var cv_upload_deviceModelObj $entry */
         foreach (m('cv_upload_device')->findAll() as $entry) {
             $device = $entry->getDevice();
             if ($device) {
                 $list[] = $device;
             }
+
+            $entries = $entry;
         }
 
         if ($list) {
@@ -45,7 +48,7 @@ if ($op == 'upload_cv_info' && CtrlServ::checkJobSign($data)) {
             $response = (new GDCVMachine())->uploadDevicesInfo($list);
             if ($response) {
                 Config::GDCVMachine('last.device_upload', time(), true);
-                foreach($list as $entry) {
+                foreach($entries as $entry) {
                     $entry->destroy();
                 }
             }
@@ -53,12 +56,14 @@ if ($op == 'upload_cv_info' && CtrlServ::checkJobSign($data)) {
 
     } elseif ($w == 'order') {
         $list = [];
+        $entries = [];
         /** @var cv_upload_orderModelObj $entry */
         foreach (m('cv_upload_device')->findAll() as $entry) {
             $order = $entry->getOrder();
             if ($order) {
                 $list[$order->getId()] = $order;
             }
+            $entries = $entry;
         }
 
         if ($list) {
@@ -78,6 +83,8 @@ if ($op == 'upload_cv_info' && CtrlServ::checkJobSign($data)) {
                             $order->setExtraData('CV.upload', $result);
                             $order->save();
                         }
+                    }
+                    foreach($entries as $entry) {
                         $entry->destroy();
                     }
                 }

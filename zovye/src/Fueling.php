@@ -670,7 +670,7 @@ class Fueling
     public static function onEventFee(deviceModelObj $device, $data)
     {
         $serial = strval($data['ser']);
-        if (Locker::try('fueling:' . $serial)) {
+        if (Locker::try('fueling:' . $serial, REQUEST_ID, 3)) {
             if ($data['solo'] === self::MODE_SOLO) {
                 $result = self::createOrderFromSoloModeData($device, $data);
             } else {

@@ -58,7 +58,7 @@ class response implements IResponse
 
     function hasBatteryValue(): bool
     {
-        return $this->getBatteryValue() == -1;
+        return $this->getBatteryValue() != -1;
     }
 
     public function getBatteryValue()

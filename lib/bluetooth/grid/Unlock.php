@@ -28,6 +28,6 @@ class Unlock extends cmd
 
     function getMessage(): string
     {
-        return "=> 请求开锁";
+        return "<= 请求开锁";
     }
 }

@@ -20,6 +20,6 @@ class R extends cmd
 
     function getMessage(): string
     {
-        return "=> 请求密钥";
+        return "<= 请求密钥";
     }
 }

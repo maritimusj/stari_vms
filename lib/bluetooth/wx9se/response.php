@@ -97,16 +97,16 @@ class response implements IResponse
 
         if ($cmd_code == protocol::CMD_SHAKE_HAND) {
             if ($cmd_key == protocol::KEY_SHAKE) {
-                return '<= APP握手结果';
+                return '=> APP握手结果';
             } elseif ($cmd_key == protocol::KEY_VERIFY) {
                 $result = $this->getPayloadData(2, 1);
-                return $result ? '<= APP检验成功' : '<= APP检验失败';
+                return $result ? '=> APP检验成功' : '=> APP检验失败';
             }
-            return '<= 未知握手数据';
+            return '=> 未知握手数据';
         } elseif ($cmd_code == protocol::CMD_CONFIG) {
             $result = $this->getPayloadData(2, 1);
             if ($cmd_key == protocol::KEY_LOCKER) {
-                $prefix = '<= 开锁结果：';
+                $prefix = '=> 开锁结果：';
                 switch ($result) {
                     case protocol::RESULT_LOCKER_FAIL:
                         return $prefix . '失败';
@@ -122,29 +122,29 @@ class response implements IResponse
                         return $prefix . '未知';
                 }
             } elseif ($cmd_key == protocol::KEY_TIMER) {
-                return $result ? '<= 设置时间：成功' : '<= 设置时间：失败';
+                return $result ? '=> 设置时间：成功' : '=> 设置时间：失败';
             } elseif ($cmd_key == protocol::KEY_LIGHTS) {
-                return $result ? '<= 设置开关灯时间：成功' : '<= 设置时间：失败';
+                return $result ? '=> 设置开关灯时间：成功' : '=> 设置时间：失败';
             }
-            return '<= 未知设置结果';
+            return '=> 未知设置结果';
 
         } elseif ($cmd_code == protocol::CMD_QUERY || $cmd_code == protocol::CMD_NOTIFY) {
             if ($cmd_key == protocol::KEY_INFO) {
-                return '<= 设备基本信息';
+                return '=> 设备基本信息';
             } elseif ($cmd_key == protocol::KEY_BATTERY) {
                 $v = $this->getBatteryValue();
-                return '<= 设备电量：' . ($v != -1 ? $v . '%' : '<未知>');
+                return '=> 设备电量：' . ($v != -1 ? $v . '%' : '<未知>');
             } elseif ($cmd_key == protocol::KEY_TIME) {
                 //todo
             } elseif ($cmd_key == protocol::KEY_LIGHTS_SCHEDULE) {
                 //todo
             }
-            return '<= 未知请求结果';
+            return '=> 未知请求结果';
 
         } elseif ($cmd_code = protocol::CMD_TEST) {
             //todo
         }
-        return '<= 未知数据';
+        return '=> 未知数据';
     }
 
     public function getDeviceID()

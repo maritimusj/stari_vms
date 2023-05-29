@@ -24,19 +24,19 @@ class protocol implements IBlueToothProtocol
 
     public static $strMsg = [
         self::CMD_SHAKE_HAND => [
-            self::KEY_SHAKE => '=> 握手',
-            self::KEY_VERIFY => '=> 校验',
+            self::KEY_SHAKE => '<= 握手',
+            self::KEY_VERIFY => '<= 校验',
         ],
         self::CMD_QUERY => [
-            self::KEY_INFO => '=> 获取基本信息',
-            self::KEY_BATTERY => '=> 获取电池电量',
-            self::KEY_TIME => '=> 获取时间',
-            self::KEY_LIGHTS_SCHEDULE => '=> 获取灯光计划',
+            self::KEY_INFO => '<= 获取基本信息',
+            self::KEY_BATTERY => '<= 获取电池电量',
+            self::KEY_TIME => '<= 获取时间',
+            self::KEY_LIGHTS_SCHEDULE => '<= 获取灯光计划',
         ],
         self::CMD_CONFIG => [
-            self::KEY_LOCKER => '=> 开锁',
-            self::KEY_TIMER => '=> 时间',
-            self::KEY_LIGHTS => '=> 灯光',
+            self::KEY_LOCKER => '<= 开锁',
+            self::KEY_TIMER => '<= 时间',
+            self::KEY_LIGHTS => '<= 灯光',
         ],
         self::CMD_NOTIFY => [
 

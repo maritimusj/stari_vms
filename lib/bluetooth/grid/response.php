@@ -101,19 +101,19 @@ class response implements IResponse
     function getMessage(): string
     {
         if ($this->isResponse()) {
-            return '<= 密钥回复';
+            return '=> 密钥回复';
         } elseif ($this->isAuthSuccess()) {
-            return '<= 授权成功';
+            return '=> 授权成功';
         } elseif ($this->isOpenSuccess()) {
-            return '<= 开锁成功';
+            return '=> 开锁成功';
         } elseif ($this->isVoltage()) {
-            return '<= 电池电量';
+            return '=> 电池电量';
         } elseif ($this->isError()) {
-            return '<= 发生错误：' . $this->getErrMsg();
+            return '=> 发生错误：' . $this->getErrMsg();
         } elseif ($this->isOpenResultFail()) {
-            return '<= ' . $this->getErrMsg();
+            return '=> ' . $this->getErrMsg();
         }
-        return '<= 未知数据';
+        return '=> 未知数据';
     }
 
     function getSerial(): string

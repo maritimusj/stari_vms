@@ -28,6 +28,6 @@ class Auth extends cmd
 
     function getMessage(): string
     {
-        return "=> 请求授权";
+        return "<= 请求授权";
     }
 }

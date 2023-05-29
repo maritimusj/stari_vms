@@ -16,8 +16,8 @@ class cmd implements ICmd
     const CMD_RUN = 0x02;
 
     static $strMsg = [
-        self::CMD_SHAKE_HAND => '=> 握手请求',
-        self::CMD_RUN => '=> 出货请求',
+        self::CMD_SHAKE_HAND => '<= 握手请求',
+        self::CMD_RUN => '<= 出货请求',
     ];
 
     private $device_id;

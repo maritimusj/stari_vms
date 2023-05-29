@@ -196,6 +196,7 @@ class common
         }
 
         $device->setBluetoothStatus(Device::BLUETOOTH_CONNECTED);
+        $device->setMcbOnline(true);
         $device->setLastOnline(TIMESTAMP);
         $device->save();
 

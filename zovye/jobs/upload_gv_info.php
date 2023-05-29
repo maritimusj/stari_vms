@@ -12,8 +12,13 @@ use zovye\Device;
 use zovye\GDCVMachine;
 use zovye\Locker;
 use zovye\Log;
+use zovye\model\cv_upload_deviceModelObj;
+use zovye\model\cv_upload_orderModelObj;
+use zovye\model\deviceModelObj;
+use zovye\model\orderModelObj;
 use zovye\Order;
 use zovye\Request;
+use function zovye\m;
 
 $data = [
     'id' => Request::int('id'),
@@ -28,42 +33,66 @@ if ($op == 'upload_gv_info' && CtrlServ::checkJobSign($data)) {
     $w = Request::str('w');
 
     if ($w == 'device') {
-        $device = Device::get($id);
-        if ($device) {
+        $list = [];
+        /** @var cv_upload_deviceModelObj $entry */
+        foreach (m('cv_upload_device')->findAll() as $entry) {
+            $device = $entry->getDevice();
+            if ($device) {
+                $list[] = $device;
+            }
+        }
+
+        if ($list) {
             $last_ts = Config::GDCVMachine('last.device_upload', 0);
             $delay = min(0, max(1, 60 - (time() - $last_ts)));
             sleep($delay);
 
-            (new GDCVMachine())->uploadDeviceInfo($device);
-        } else {
-            $data['error'] = '找不到这个设备！';
+            $response = (new GDCVMachine())->uploadDevicesInfo($list);
+            if ($response) {
+                Config::GDCVMachine('last.device_upload', time(), true);
+                if (!empty($response)) {
+                    /** @var cv_upload_deviceModelObj $order */
+                    foreach ($list as $index => $entry) {
+                        $result = $response[$index] ?? [];
+                        if ($result['code'] === 0) {
+                            $entry->destroy();
+                        }
+                    }
+                }
+            }
         }
-
-    } elseif ($w == 'types') {
-
-        $list = [];
-
-        $query = Device::query(['device_type' => $id]);
-        foreach ($query->findAll() as $device) {
-            $list[] = $device;
-        }
-
-        $last_ts = Config::GDCVMachine('last.device_upload', 0);
-        $delay = min(0, max(1, 60 - (time() - $last_ts)));
-        sleep($delay);
-
-        (new GDCVMachine())->uploadDevicesInfo($list);
 
     } elseif ($w == 'order') {
-        $order = Order::get($id);
-        if ($order) {
+        $list = [];
+        /** @var cv_upload_orderModelObj $entry */
+        foreach (m('cv_upload_device')->findAll() as $entry) {
+            $order = $entry->getOrder();
+            if ($order) {
+                $list[] = $order;
+            }
+        }
+
+        if ($list) {
             $last_ts = Config::GDCVMachine('last.order_upload', 0);
             $delay = min(0, max(1, 60 - (time() - $last_ts)));
             sleep($delay);
 
-            (new GDCVMachine())->uploadOrderInfo($order);
-        } else {
-            $data['error'] = '找不到这个订单！';
+            $response = (new GDCVMachine())->uploadOrdersInfo($list);
+            if ($response) {
+                Config::GDCVMachine('last.order_upload', time(), true);
+                if (!empty($response)) {
+                    /** @var cv_upload_orderModelObj $order */
+                    foreach ($list as $index => $entry) {
+                        $result = $response[$index] ?? [];
+                        $order = $entry->getOrder();
+                        if ($order) {
+                            $order->setExtraData('CV.upload', $result);
+                            $order->save();
+                        }
+                        $entry->destroy();
+                    }
+                }
+            }
         }
     }
 } else {

@@ -86,6 +86,10 @@ class GDCVMachine
 
     public static function scheduleUploadDeviceJob(deviceModelObj $device)
     {
+        m('cv_upload_device')->create(We7::uniacid([
+            'device_id' => $device->getId(),
+        ]));
+
         $last_ts = Config::GDCVMachine('last.device_upload', 0);
         $delay = max(1, 60 - (time() - $last_ts));
 
@@ -103,10 +107,17 @@ class GDCVMachine
 
     public static function scheduleUploadDeviceJobForDeviceType(int $type_id)
     {
+        $query = Device::query(['device_type' => $type_id]);
+        foreach ($query->findAll() as $device) {
+            m('cv_upload_device')->create(We7::uniacid([
+                'device_id' => $device->getId(),
+            ]));
+        }
+
         $last_ts = Config::GDCVMachine('last.device_upload', 0);
         $delay = max(1, 60 - (time() - $last_ts));
 
-        $result = CtrlServ::scheduleDelayJob('upload_gv_info', ['w' => 'types', 'id' => $type_id], $delay);
+        $result = CtrlServ::scheduleDelayJob('upload_gv_info', ['w' => 'device'], $delay);
 
         if (empty($result)) {
             Log::error('CV_device_log', [
@@ -120,10 +131,14 @@ class GDCVMachine
 
     public static function scheduleUploadOrderLogJob(orderModelObj $order)
     {
+        m('cv_upload_order')->create(We7::uniacid([
+            'order_id' => $order->getId(),
+        ]));
+
         $last_ts = Config::GDCVMachine('last.order_upload', 0);
         $delay = max(1, 60 - (time() - $last_ts));
 
-        $result = CtrlServ::scheduleDelayJob('upload_gv_info', ['w' => 'order', 'id' => $order->getId()], $delay);
+        $result = CtrlServ::scheduleDelayJob('upload_gv_info', ['w' => 'order'], $delay);
 
         if (empty($result)) {
             Log::error('CV_order_log', [
@@ -135,7 +150,7 @@ class GDCVMachine
         return $result;       
     }
 
-    public function uploadDevicesInfo(array $list = [])
+    public function uploadDevicesInfo(array $list = []): array
     {
         $data = [];
 
@@ -151,8 +166,10 @@ class GDCVMachine
                 'response' => $response,
             ]);
 
-            Config::GDCVMachine('last.device_upload', time(), true);
+           return $response;
         }
+
+        return [];
     }
 
     public function uploadDeviceInfo(deviceModelObj $device)
@@ -220,7 +237,7 @@ class GDCVMachine
         return $list;
     }
 
-    public function uploadOrdersInfo(array $list = [])
+    public function uploadOrdersInfo(array $list = []): array
     {
         $data = [];
 
@@ -240,17 +257,10 @@ class GDCVMachine
                 'response' => $response,
             ]);
 
-            Config::GDCVMachine('last.order_upload', time(), true);
-
-            if (!empty($response)) {
-                /** @var orderModelObj $order */
-                foreach ($list as $index => $order) {
-                    $result = $response[$index] ?? [];
-                    $order->setExtraData('CV.upload', $result);
-                    $order->save();
-                }
-            }
+            return $response;
         }
+
+        return [];
     }
 
     public function uploadOrderInfo(orderModelObj $order)

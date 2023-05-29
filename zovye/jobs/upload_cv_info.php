@@ -4,19 +4,14 @@
  * @url www.stariture.com
  */
 
-namespace zovye\job\upload_gv_info;
+namespace zovye\job\upload_cv_info;
 
 use zovye\Config;
 use zovye\CtrlServ;
-use zovye\Device;
 use zovye\GDCVMachine;
-use zovye\Locker;
 use zovye\Log;
 use zovye\model\cv_upload_deviceModelObj;
 use zovye\model\cv_upload_orderModelObj;
-use zovye\model\deviceModelObj;
-use zovye\model\orderModelObj;
-use zovye\Order;
 use zovye\Request;
 use function zovye\m;
 
@@ -27,7 +22,7 @@ $data = [
 
 $op = Request::op('default');
 
-if ($op == 'upload_gv_info' && CtrlServ::checkJobSign($data)) {
+if ($op == 'upload_cv_info' && CtrlServ::checkJobSign($data)) {
 
     $id = Request::int('id');
     $w = Request::str('w');
@@ -50,7 +45,7 @@ if ($op == 'upload_gv_info' && CtrlServ::checkJobSign($data)) {
             $response = (new GDCVMachine())->uploadDevicesInfo($list);
             if ($response) {
                 Config::GDCVMachine('last.device_upload', time(), true);
-                if (!empty($response) && $response['code'] === 0) {
+                foreach($list as $entry) {
                     $entry->destroy();
                 }
             }
@@ -93,4 +88,4 @@ if ($op == 'upload_gv_info' && CtrlServ::checkJobSign($data)) {
     $data['error'] = '签名不正确！';
 }
 
-Log::debug('upload_gv_info', $data);
+Log::debug('upload_cv_info', $data);

@@ -157,7 +157,7 @@ class orderModelObj extends modelObj
         $this->setExtraData('device.ch', $id);
     }
 
-    public function getDeviceChannelId()
+    public function getDeviceChannelId(): int
     {
         return intval($this->getExtraData('device.ch', 0));
     }

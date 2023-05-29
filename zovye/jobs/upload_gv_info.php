@@ -38,7 +38,7 @@ if ($op == 'upload_gv_info' && CtrlServ::checkJobSign($data)) {
         foreach (m('cv_upload_device')->findAll() as $entry) {
             $device = $entry->getDevice();
             if ($device) {
-                $list[$device->getId()] = $device;
+                $list[] = $device;
             }
         }
 
@@ -51,10 +51,7 @@ if ($op == 'upload_gv_info' && CtrlServ::checkJobSign($data)) {
             if ($response) {
                 Config::GDCVMachine('last.device_upload', time(), true);
                 if (!empty($response) && $response['code'] === 0) {
-                    /** @var cv_upload_deviceModelObj $order */
-                    foreach ($list as $entry) {
-                        $entry->destroy();
-                    }
+                    $entry->destroy();
                 }
             }
         }

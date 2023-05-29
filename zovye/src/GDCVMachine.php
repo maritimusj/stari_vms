@@ -154,12 +154,15 @@ class GDCVMachine
     {
         $data = [];
 
+        /** @var deviceModelObj $device */
         foreach ($list as $device) {
-            $data[] = $this->formatDevice($device);
+            if (!$data[$device->getId()]) {
+                $data[$device->getId()] = $this->formatDevice($device);
+            }
         }
 
         if ($data) {
-            $response = $this->post('/cgi-bin/machineinfo', $data);
+            $response = $this->post('/cgi-bin/machineinfo', array_values($data));
 
             Log::debug('CV_device_log', [
                 'request' => $data,
@@ -198,7 +201,7 @@ class GDCVMachine
         ];
     }
 
-    public function formatOrderLog($order): array
+    public function formatOrderLog(orderModelObj $order): array
     {
         $profile = $order->getExtraData('CV.profile', []);
 
@@ -217,9 +220,9 @@ class GDCVMachine
 
         $list = [];
         /** @var device_logsModelObj $entry */
-        foreach ($query->findAll() as $entry) {
+        foreach ($query->findAll() as $index => $entry) {
             $goods = $entry->getData('goods', []);
-            $list[] = [
+            $list["{$order->getId()}:$index"] = [
                 'machineCode' => $device->getImei(),
                 'agentCode' => strval($this->config['agent']),
                 'channelCode' => $entry->getData('ch') + 1,
@@ -241,16 +244,25 @@ class GDCVMachine
     {
         $data = [];
 
+        /** @var orderModelObj $order */
         foreach ($list as $order) {
-            if ($order->getNum() == 1) {
-                $data[] = $this->formatOrder($order);
-            } else {
-                $data = array_merge($data, $this->formatOrderLog($order));
+            if (!$data[$order->getId()]) {
+                if ($order->getNum() == 1) {
+                    $data[$order->getId()] = $this->formatOrder($order);
+                } else {
+                    $logs = $this->formatOrderLog($order);
+                    if (count($logs) > 0) {
+                        $data[$order->getId()] = array_shift($logs);
+                        $data = array_merge($data, $logs);
+                    } else {
+                        $data[$order->getId()] = $this->formatOrder($order);
+                    }
+                }
             }
         }
 
         if ($data) {
-            $response = $this->post('/cgi-bin/machleadrecord', $data);
+            $response = $this->post('/cgi-bin/machleadrecord', array_values($data));
 
             Log::debug('CV_order_log', [
                 'request' => $data,

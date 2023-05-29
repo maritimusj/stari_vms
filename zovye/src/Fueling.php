@@ -585,7 +585,7 @@ class Fueling
                             $should_stop_fueling = true;
                         } else {
                             $card = $user->getCommissionBalanceCard();
-                            if (empty($card) || $card->total() < $total_price) {
+                            if ($card->total() < $total_price) {
                                 $should_stop_fueling = true;
                             }
                         }

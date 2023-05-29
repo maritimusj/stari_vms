@@ -50,13 +50,10 @@ if ($op == 'upload_gv_info' && CtrlServ::checkJobSign($data)) {
             $response = (new GDCVMachine())->uploadDevicesInfo($list);
             if ($response) {
                 Config::GDCVMachine('last.device_upload', time(), true);
-                if (!empty($response)) {
+                if (!empty($response) && $response['code'] === 0) {
                     /** @var cv_upload_deviceModelObj $order */
-                    foreach ($list as $index => $entry) {
-                        $result = $response[$index] ?? [];
-                        if ($result['code'] === 0) {
-                            $entry->destroy();
-                        }
+                    foreach ($list as $entry) {
+                        $entry->destroy();
                     }
                 }
             }

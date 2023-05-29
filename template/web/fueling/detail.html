@@ -1,62 +1,81 @@
+<style>
+    .fee {
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        padding: 20px;
+        margin: 13px;
+    }
+</style>
 <div id="price_detail" style="max-height: 300px;overflow: auto;">
-    <table class="table">
-        <tbody>
-        <tr>
-            <td>交易流水号</td>
-            <td>{$data['ser']}</td>
-        </tr>
-        <tr>
-            <td>模式</td>
-            <td>{php echo $data['solo'] ? '联网' : '单机'}</td>
-        </tr>
-        <tr>
-            <td>停止原因</td>
-            <td>
-                {if $data['reason'] == 2}
-                <span class="error">超时停止</span>
-                {elseif $data['reason'] == 3}
-                <span class="success">挂枪停止</span>
-                {elseif $data['reason'] == 4}
-                <span class="success">远程停止</span>
-                {elseif $data['reason'] == 5}
-                <span class="warning">余额不足</span>
-                {elseif $data['reason'] == 7}
-                <span class="error">停电终止</span>
-                {elseif $data['reason'] == 9}
-                <span class="warning">设备正忙</span>
+    {loop $list $index $data}
+    <div class="fee">
+        <table class="table">
+            <tbody>
+            <tr>
+                <td>交易流水号</td>
+                <td>{$data['ser']}</td>
+            </tr>
+            <tr>
+                <td>模式</td>
+                {if isset($data['solo'])}
+                <td>{php echo $data['solo'] ? '联网' : '单机'}</td>
+                {else}
+                <td>未知</td>
                 {/if}
-            </td>
-        </tr>
-        <tr>
-            <td>单价</td>
-            <td>¥ {php echo number_format($data['price'] / 100, 2, '.', '')}</td>
-        </tr>
-        <tr>
-            <td>加注量</td>
-            <td>{php echo number_format($data['amount'] / 100, 2, '.', '')} 升</td>
-        </tr>
-        <tr>
-            <td>总金额</td>
-            <td>¥ {php echo number_format($data['price_total'] / 100, 2, '.', '')}</td>
-        </tr>
-        <tr>
-            <td>开始时间</td>
-            <td>{php echo $data['begin'] ? date('Y-m-d H:i:s', $data['begin']) : 'n/a'}</td>
-        </tr>
-        <tr>
-            <td>结束时间</td>
-            <td>{php echo $data['end'] ? date('Y-m-d H:i:s', $data['end']) : 'n/a'}</td>
-        </tr>
-        <tr>
-            <td>全部用时</td>
-            <td>{$data['time_total_formatted']}</td>
-        </tr>
-        {if $data['card']}
-        <tr>
-            <td>卡号</td>
-            <td>{$data['card']}</td>
-        </tr>
-        {/if}
-        </tbody>
-    </table>
+            </tr>
+            <tr>
+                <td>停止原因</td>
+                <td>
+                    {if $data['reason'] == -1}
+                    <span class="error">强制停止</span>
+                    {elseif $data['reason'] == 2}
+                    <span class="error">超时停止</span>
+                    {elseif $data['reason'] == 3}
+                    <span class="success">挂枪停止</span>
+                    {elseif $data['reason'] == 4}
+                    <span class="success">远程停止</span>
+                    {elseif $data['reason'] == 5}
+                    <span class="warning">余额不足</span>
+                    {elseif $data['reason'] == 7}
+                    <span class="error">停电终止</span>
+                    {elseif $data['reason'] == 9}
+                    <span class="warning">设备正忙</span>
+                    {/if}
+                </td>
+            </tr>
+            <tr>
+                <td>单价</td>
+                <td>¥ {php echo number_format($data['price'] / 100, 2, '.', '')}</td>
+            </tr>
+            <tr>
+                <td>加注量</td>
+                <td>{php echo number_format($data['amount'] / 100, 2, '.', '')} 升</td>
+            </tr>
+            <tr>
+                <td>总金额</td>
+                <td>¥ {php echo number_format($data['price_total'] / 100, 2, '.', '')}</td>
+            </tr>
+            <tr>
+                <td>开始时间</td>
+                <td>{php echo $data['begin'] ? date('Y-m-d H:i:s', $data['begin']) : 'n/a'}</td>
+            </tr>
+            <tr>
+                <td>结束时间</td>
+                <td>{php echo $data['end'] ? date('Y-m-d H:i:s', $data['end']) : 'n/a'}</td>
+            </tr>
+            <tr>
+                <td>全部用时</td>
+                <td>{$data['time_total_formatted']}</td>
+            </tr>
+            {if $data['card']}
+            <tr>
+                <td>卡号</td>
+                <td>{$data['card']}</td>
+            </tr>
+            {/if}
+            </tbody>
+        </table>
+    </div>
+
+    {/loop}
 </div>

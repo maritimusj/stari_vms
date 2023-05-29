@@ -3,7 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
- 
+
 namespace zovye;
 
 use DateInterval;
@@ -19,19 +19,37 @@ if (!$order) {
     JSON::fail('找不到这个订单！');
 }
 
-if ($order->isFuelingOrder()) {
-    $data = $order->getFuelingRecord();
+function formatTimeTotalF($ts): string
+{
     try {
-        $interval = new DateInterval('PT'.intval($data['time_total']).'S');
+        $interval = new DateInterval('PT'.intval($ts).'S');
         $time = new DateTime('00:00:00');
         $time->add($interval);
-        $data['time_total_formatted'] = $time->format('H:i:s');
+        return $time->format('H:i:s');
     } catch (Exception $e) {
     }
+    return '';
+}
+
+if ($order->isFuelingOrder()) {
+    $list = [];
+
+    $data = $order->getFuelingRecord();
+
+    $list[] = $data;
+    $data['time_total_formatted'] = formatTimeTotalF($data);
+    foreach ($data as $i => $v) {
+        if (is_array($v) && $v['ser']) {
+            $v['time_total_formatted'] = formatTimeTotalF($v['time_total']);
+            $list[] = $v;
+            unset($data[$i]);
+        }
+    }
+
     $content = app()->fetchTemplate(
         'web/fueling/detail',
         [
-            'data' => $data,
+            'list' => $list,
         ]
     );
 } elseif ($order->isChargingOrder()) {

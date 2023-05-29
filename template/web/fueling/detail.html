@@ -40,6 +40,8 @@
                     <span class="error">停电终止</span>
                     {elseif $data['reason'] == 9}
                     <span class="warning">设备正忙</span>
+                    {else}
+                    <span class="warning">未知代码：{$data['reason']}</span>
                     {/if}
                 </td>
             </tr>

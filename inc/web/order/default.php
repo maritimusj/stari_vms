@@ -243,6 +243,10 @@ foreach ($query->findAll() as $entry) {
         $data['qrcode'] = true;
     }
 
+    if (App::isGDCVMachineEnabled()) {
+        $data['cv.upload'] = $entry->getExtraData('CV.upload', []);
+    }
+
     $orders[] = $data;
 }
 

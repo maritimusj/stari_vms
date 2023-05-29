@@ -333,6 +333,9 @@
                             {if $order['qrcode']}
                             <img src="{MODULE_URL}static/img/scanner.svg" class="balance" title="付款码">        
                             {/if}
+                            {if $order['cv.upload']}
+                            <i class="fa fa-check-circle"></i>
+                            {/if}
                             {$order['orderId']}
                         </div>
                         {/if}

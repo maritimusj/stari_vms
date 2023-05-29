@@ -38,7 +38,6 @@ if ($op == 'upload_cv_info' && CtrlServ::checkJobSign($data)) {
         }
 
         $list = array_values($list);
-        $data['list'] = $list;
 
         if ($list) {
             $last_ts = Config::GDCVMachine('last.device_upload', 0);
@@ -64,7 +63,6 @@ if ($op == 'upload_cv_info' && CtrlServ::checkJobSign($data)) {
         }
 
         $list = array_values($list);
-        $data['list'] = $list;
 
         if ($list) {
             $last_ts = Config::GDCVMachine('last.order_upload', 0);

@@ -13,6 +13,7 @@ use zovye\Log;
 use zovye\model\cv_upload_deviceModelObj;
 use zovye\model\cv_upload_orderModelObj;
 use zovye\Request;
+å
 use function zovye\m;
 
 $data = [
@@ -76,7 +77,7 @@ if ($op == 'upload_cv_info' && CtrlServ::checkJobSign($data)) {
                 if (!empty($response)) {
                     /** @var cv_upload_orderModelObj $order */
                     foreach ($list as $index => $order) {
-                        $result = $response[$index] ?? [];
+                        $result = $response[$index] ?? ['code' => -1, 'message' => '返回数据为空或者错误！'];
                         if ($order) {
                             $order->setExtraData('CV.upload', $result);
                             $order->save();

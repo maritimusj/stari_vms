@@ -342,7 +342,7 @@
                             {if $order['cv.upload']}
                                 {if $order['cv.upload']['uploading']}
                                 <i class="fa fa-clock-o" title="等待上传中..."></i>
-                                {elseif $order['cv.upload']['code'] == 0}
+                                {elseif isset($order['cv.upload']['code']) && order['cv.upload']['code'] == 0}
                                 <i class="fa fa-check-circle fa-fw upload-success" title="{php echo $order['cv.upload']['message']}"></i>
                                 {else}
                                 <i class="fa fa-info-circle fa-fw upload-fail" title="{php echo $order['cv.upload']['message']}" data-op="uploadCV"></i>

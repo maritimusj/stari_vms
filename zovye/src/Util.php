@@ -407,7 +407,7 @@ class Util
                 'str' => $str,
                 'file' => $file,
                 'line' => $line,
-                'context' => $context,
+                //'context' => $context,
             ]);
         }, E_ALL ^ E_NOTICE);
 
@@ -418,7 +418,7 @@ class Util
                 'msg' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString(),
+                //'trace' => $e->getTraceAsString(),
             ]);
         });
     }

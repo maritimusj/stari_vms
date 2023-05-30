@@ -124,13 +124,13 @@ router::exec($op, [
     "MpDouyinAuthQRCode" => '\zovye\api\wx\mp::getDouyinAuthQRCode',
     "MpDouyinAuthResult" => '\zovye\api\wx\mp::getDouyinAuthResult',
 
-    'AdvAssign' => '\zovye\api\wx\adv::assign',
-    'Advs' => '\zovye\api\wx\adv::list',
-    'AdvsCreate' => '\zovye\api\wx\adv::createOrUpdate',
-    'AdvsUpdate' => '\zovye\api\wx\adv::createOrUpdate',
-    'AdvDelete' => '\zovye\api\wx\adv::delete',
-    'UploadFile' => '\zovye\api\wx\adv::uploadFile',
-    'AdvGroupAssign' => '\zovye\api\wx\adv::groupAssign',
+    'AdvAssign' => '\zovye\api\wx\ad::assign',
+    'Advs' => '\zovye\api\wx\ad::list',
+    'AdvsCreate' => '\zovye\api\wx\ad::createOrUpdate',
+    'AdvsUpdate' => '\zovye\api\wx\ad::createOrUpdate',
+    'AdvDelete' => '\zovye\api\wx\ad::delete',
+    'UploadFile' => '\zovye\api\wx\ad::uploadFile',
+    'AdvGroupAssign' => '\zovye\api\wx\ad::groupAssign',
 
     'AdvGetBonus' => '\zovye\api\wxweb\api::reward',
 

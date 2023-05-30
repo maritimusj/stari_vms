@@ -358,7 +358,7 @@ class Goods
         return self::query($cond)->findOne();
     }
 
-    public static function safeDelete(goodsModelObj $goods)
+    public static function safeDelete(goodsModelObj $goods): bool
     {
         if (InventoryGoods::exists(['goods_id' => $goods->getId()])) {
             $goods->delete();

@@ -21,7 +21,7 @@ use function zovye\err;
 use function zovye\request;
 use function zovye\is_error;
 
-class adv
+class ad
 {
     /**
      * 保存广告分配.

@@ -174,79 +174,80 @@ class Device extends State
         $result = [];
 
         $device_type = DeviceTypes::from($device);
-        if ($device_type) {
-            $cargo_lanes = $device_type->getCargoLanes();
-            if (empty($data)) {
-                foreach ($cargo_lanes as $index => $lane) {
-                    $data[$index] = 0;
-                }
-            } elseif (isset($data['*'])) {
-                $v = $data['*'];
-                $data = [];
-                foreach ($cargo_lanes as $index => $lane) {
-                    $data[$index] = $v;
-                }
-            }
-
-            $lanes_data = $device->getCargoLanes();
-            $lowest = null;
-
-            foreach ($data as $index => $lane) {
-                if (isset($cargo_lanes[$index])) {
-                    $lane_id = "l$index";
-                    $old = $lanes_data[$lane_id]['num'];
-
-                    if (is_array($lane)) {
-                        $num = $lane['num'];
-                        if (isset($lane['price'])) {
-                            $lanes_data[$lane_id]['price'] = $lane['price'];
-                        }
-                    } else {
-                        $num = $lane;
-                    }
-
-                    $max_capacity = intval($cargo_lanes[$index]['capacity']);
-
-                    if (We7::starts_with($num, '@')) {
-                        $lanes_data[$lane_id]['num'] = max(0, intval(ltrim($num, '@')));
-                    } else {
-                        if ($num == 0) {
-                            $lanes_data[$lane_id]['num'] = $max_capacity;
-                        } else {
-                            $lanes_data[$lane_id]['num'] = max(0, $old + intval($num));
-                        }
-                    }
-
-                    //不能超过最大容量
-                    $lanes_data[$lane_id]['num'] = min($max_capacity, $lanes_data[$lane_id]['num']);
-
-                    if (is_null($lowest) || $lanes_data[$lane_id]['num'] < $lowest) {
-                        $lowest = $lanes_data[$lane_id]['num'];
-                    }
-
-                    //统计商品补货数量
-                    $goods = $cargo_lanes[$index]['goods'];
-                    $changed = $lanes_data[$lane_id]['num'] - $old;
-                    if ($changed != 0) {
-                        $result[$goods] = [
-                            'goodsId' => $goods,
-                            'org' => intval($result[$goods]['org']) + $old,
-                            'num' => intval($result[$goods]['num']) + $changed,
-                        ];
-                    }
-                }
-            }
-
-            //把remain设备为货道商品最少的数量
-            $device->setRemain(intval($lowest));
-            $device->setCargoLanes($lanes_data);
-        } else {
+        if (empty($device_type)) {
             Log::error("resetPayload", [
                 'device' => $device->profile(),
                 'error' => '货道数据错误！',
                 'data' => $data,
             ]);
+            return err('设备型号不正确！');
         }
+
+        $cargo_lanes = $device_type->getCargoLanes();
+        if (empty($data)) {
+            foreach ($cargo_lanes as $index => $lane) {
+                $data[$index] = 0;
+            }
+        } elseif (isset($data['*'])) {
+            $v = $data['*'];
+            $data = [];
+            foreach ($cargo_lanes as $index => $lane) {
+                $data[$index] = $v;
+            }
+        }
+
+        $lanes_data = $device->getCargoLanes();
+        $lowest = null;
+
+        foreach ($data as $index => $lane) {
+            if (isset($cargo_lanes[$index])) {
+                $lane_id = "l$index";
+                $old = $lanes_data[$lane_id]['num'];
+
+                if (is_array($lane)) {
+                    $num = $lane['num'];
+                    if (isset($lane['price'])) {
+                        $lanes_data[$lane_id]['price'] = $lane['price'];
+                    }
+                } else {
+                    $num = $lane;
+                }
+
+                $max_capacity = intval($cargo_lanes[$index]['capacity']);
+
+                if (We7::starts_with($num, '@')) {
+                    $lanes_data[$lane_id]['num'] = max(0, intval(ltrim($num, '@')));
+                } else {
+                    if ($num == 0) {
+                        $lanes_data[$lane_id]['num'] = $max_capacity;
+                    } else {
+                        $lanes_data[$lane_id]['num'] = max(0, $old + intval($num));
+                    }
+                }
+
+                //不能超过最大容量
+                $lanes_data[$lane_id]['num'] = min($max_capacity, $lanes_data[$lane_id]['num']);
+
+                if (is_null($lowest) || $lanes_data[$lane_id]['num'] < $lowest) {
+                    $lowest = $lanes_data[$lane_id]['num'];
+                }
+
+                //统计商品补货数量
+                $goods = $cargo_lanes[$index]['goods'];
+                $changed = $lanes_data[$lane_id]['num'] - $old;
+                if ($changed != 0) {
+                    $result[$goods] = [
+                        'goodsId' => $goods,
+                        'org' => intval($result[$goods]['org']) + $old,
+                        'num' => intval($result[$goods]['num']) + $changed,
+                    ];
+                }
+            }
+        }
+
+        //把remain设备为货道商品最少的数量
+        $device->setRemain(intval($lowest));
+        $device->setCargoLanes($lanes_data);
 
         return array_values($result);
     }

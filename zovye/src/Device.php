@@ -242,6 +242,7 @@ class Device extends State
             $device->setCargoLanes($lanes_data);
         } else {
             Log::error("resetPayload", [
+                'device' => $device->profile(),
                 'error' => '货道数据错误！',
                 'data' => $data,
             ]);

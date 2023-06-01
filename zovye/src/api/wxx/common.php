@@ -76,6 +76,10 @@ class common
     {
         $device_id = Request::str('device');
 
+        if (empty($device_id)) {
+            $device_id = Request::str('imei');
+        }
+
         /** @var deviceModelObj $device */
         $device = Device::get($device_id, true);
         if (empty($device)) {
@@ -106,9 +110,9 @@ class common
      */
     public static function pageInfo(): array
     {
-        $imei = Request::str('device');
+        $device_id = Request::str('device');
 
-        $device = Device::get($imei, true);
+        $device = Device::get($device_id, true);
         if (empty($device)) {
             return err('找不到这个设备！');
         }
@@ -141,9 +145,9 @@ class common
      */
     public static function ads(): array
     {
-        $imei = Request::str('device');
+        $device_id = Request::str('device');
 
-        $device = Device::get($imei, true);
+        $device = Device::get($device_id, true);
         if (empty($device)) {
             return err('找不到这个设备！');
         }
@@ -177,11 +181,10 @@ class common
      */
     public static function onConnected(): array
     {
-        $imei = Request::str('device');
-        $data = Request::str('data');
+        $device_id = Request::str('device');
 
         /** @var deviceModelObj $device */
-        $device = Device::get($imei, true);
+        $device = Device::get($device_id, true);
         if (empty($device)) {
             return err('找不到这个设备！');
         }
@@ -200,6 +203,7 @@ class common
         $device->setLastOnline(TIMESTAMP);
         $device->save();
 
+        $data = Request::str('data');
         $cmd = $proto->onConnected($device->getBUID(), $data);
         if ($cmd) {
             Device::createBluetoothCmdLog($device, $cmd);
@@ -215,10 +219,10 @@ class common
 
     public static function deviceStatus(): array
     {
-        $imei = Request::str('device');
+        $device_id = Request::str('device');
 
         /** @var deviceModelObj $device */
-        $device = Device::get($imei, true);
+        $device = Device::get($device_id, true);
         if (empty($device)) {
             return err('找不到这个设备！');
         }
@@ -268,7 +272,6 @@ class common
     public static function onDeviceData(): array
     {
         $device_id = Request::str('device');
-        $data = Request::str('data');
 
         /** @var deviceModelObj $device */
         $device = Device::get($device_id, true);
@@ -285,6 +288,7 @@ class common
             return err('无法加载蓝牙协议！');
         }
 
+        $data = Request::str('data');
         $response = $proto->parseResponse($device->getBUID(), $data);
         if (empty($response)) {
             return err('无法解析消息！');
@@ -368,8 +372,8 @@ class common
      */
     public static function voucherGet(): array
     {
-        $imei = Request::str('device');
-        $device = Device::get($imei, true);
+        $device_id = Request::str('device');
+        $device = Device::get($device_id, true);
         if (empty($device)) {
             return err('找不到这个设备！');
         }
@@ -444,9 +448,9 @@ class common
             return err('无法锁定用户，请稍后再试！');
         }
 
-        $imei = Request::str('device');
+        $device_id = Request::str('device');
 
-        $device = Device::get($imei, true);
+        $device = Device::get($device_id, true);
         if (empty($device)) {
             return err('找不到这个设备！');
         }
@@ -473,8 +477,9 @@ class common
 
     public static function orderGet(): array
     {
-        $imei = Request::str('device');
-        $device = Device::get($imei, true);
+        $device_id = Request::str('device');
+
+        $device = Device::get($device_id, true);
         if (empty($device)) {
             return err('找不到这个设备！');
         }
@@ -515,8 +520,9 @@ class common
      */
     public static function orderStats(): array
     {
-        $imei = Request::str('device');
-        $device = Device::get($imei, true);
+        $device_id = Request::str('device');
+
+        $device = Device::get($device_id, true);
         if (empty($device)) {
             return err('找不到这个设备！');
         }
@@ -593,10 +599,14 @@ class common
 
         $device_id = Request::str('device');
 
+        $device = Device::get($device_id, true);
+        if (empty($device)) {
+            JSON::fail('找不到这个设备！');
+        }
+
         $text = Request::trim('text');
         $pics = Request::str('pics');
 
-        $device = Device::get($device_id, true);
         $data = [
             'device_id' => $device->getId(),
             'user_id' => $user->getId(),
@@ -615,13 +625,18 @@ class common
 
     public static function deviceAds(): array
     {
-        $type = Request::int('typeid');
-        $num = Request::int('num', 10);
+        $device_id = Request::str('device');
+        if (empty($device_id)) {
+            $device_id = Request::str('deviceid');
+        }
 
-        $device = Device::get(Request::str('deviceid'), true);
+        $device = Device::get($device_id, true);
         if (empty($device)) {
             return err('找不到这个设备！');
         }
+
+        $type = Request::int('typeid');
+        $num = Request::int('num', 10);
 
         return Util::getDeviceAds($device, $type, $num);
     }
@@ -1367,9 +1382,9 @@ class common
      */
     public static function getGoodsList(): array
     {
-        $imei = Request::str('device');
+        $device_id = Request::str('device');
 
-        $device = Device::get($imei, true);
+        $device = Device::get($device_id, true);
         if (empty($device)) {
             return err('找不到这个设备！');
         }

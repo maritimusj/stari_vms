@@ -55,24 +55,31 @@ class fb
         if (empty($token)) {
             $token = common::getToken();
         }
+
         if (empty($token)) {
             return err('请先登录后再请求数据！[101]');
         }
+
         $login_data = LoginData::get($token);
         if (empty($login_data)) {
             return err('请先登录后再请求数据！[102]');
         }
+
         $user = User::get($login_data->getUserId());
         if (empty($user)) {
             return err('请先登录后再请求数据！[103]');
         }
 
-        $device_id = Request::int('device');
+        $device_id = Request::str('device');
 
         $text = Request::str('text');
         $pics = Request::array('pics');
 
         $device = Device::get($device_id, true);
+        if (empty($device)) {
+            return err('设备不存在！');
+        }
+
         $data = [
             'device_id' => $device->getId(),
             'user_id' => $user->getId(),

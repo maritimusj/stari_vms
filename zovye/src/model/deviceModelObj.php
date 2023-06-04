@@ -1963,7 +1963,12 @@ class deviceModelObj extends modelObj
                 'mcb' => true,
             ];
         }
+        
         $res = CtrlServ::getV2("device/$this->imei/online", ['nocache' => $use_cache ? 'false' : 'true']);
+        if (is_error($res)) {
+            return $res;
+        }
+
         if ($res['status'] === true) {
             return $res['data'];
         }

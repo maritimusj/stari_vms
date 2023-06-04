@@ -24,7 +24,7 @@ try {
     EventBus::init();
 
     //设置CtrlServ
-    CtrlServ::init(new we7HttpClient(), settings('ctl', []));
+    CtrlServ::init(new we7HttpClient(), settings('ctrl', []));
 
     if (App::isChargingDeviceEnabled()) {
         ChargingServ::setHttpClient(new we7HttpClient(), Config::charging('server', []));

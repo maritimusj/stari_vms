@@ -19,13 +19,16 @@ class CtrlServ
 
     static $app = [];
 
+    static $config = [];
+
     private function __construct()
     {
     }
 
-    public static function setHttpClient(IHttpClient $http_client)
+    public static function init(IHttpClient $http_client, array $config)
     {
         self::$http_client = $http_client;
+        self::$config = $config;
     }
 
     /**
@@ -108,85 +111,87 @@ class CtrlServ
         string $contentType = '',
         string $method = ''
     ) {
-        if (self::$http_client) {
-            $ctrlServerUrl = settings('ctrl.url');
-            $appKey = settings('ctrl.appKey');
-
-            if (empty($ctrlServerUrl) || empty($appKey)) {
-                return err('控制中心配置错误！');
-            }
-
-            if ($ctrlServerUrl[strlen($ctrlServerUrl) - 1] != '/') {
-                $ctrlServerUrl .= '/';
-            }
-
-            $ctrlServerUrl .= $version;
-            $ctrlServerUrl .= "/$path";
-
-            $params['nostr'] = TIMESTAMP;
-            $ctrlServerUrl .= '?'.http_build_query($params);
-
-            $headers = [];
-
-            if ($body) {
-                if (empty($method)) {
-                    $method = 'POST';
-                }
-
-                if (is_string($body)) {
-                    if (empty($contentType)) {
-                        $contentType = 'application/x-www-form-urlencoded';
-
-                    }
-                    if ($contentType == 'application/x-www-form-urlencoded') {
-                        parse_str($body, $result);
-                        $params = array_merge($params, $result);
-                    }
-                } else {
-                    $contentType = 'application/json';
-                    $body = json_encode($body);
-                }
-
-                if ($contentType) {
-                    $headers['Content-Type'] = $contentType;
-                }
-
-            } else {
-                if (empty($method)) {
-                    $method = 'GET';
-                }
-            }
-
-            if ($version == 'v1') {
-                $sign = self::makeCtrlServerSignV1($method, $params);
-
-                $headers['llt-appkey'] = $appKey;
-                $headers['llt-sign'] = $sign;
-            } else {
-                $headers['zovye-key'] = $appKey;
-                $headers['zovye-sign'] = self::makeCtrlServerSign(
-                    settings('ctrl.appKey', ''),
-                    settings('ctrl.appSecret', ''),
-                    $params['nostr']
-                );
-            }
-
-            return self::$http_client->request($ctrlServerUrl, $method, $headers, $body);
+        if (!self::$http_client) {
+            return err('没有配置请求对象！');
         }
 
-        return err('没有配置请求对象！');
+        $api_url = self::$config['url'];
+        $app_key = self::$config['appKey'];
+        $app_secret = self::$config['appSecret'];
+
+        if (empty($api_url) || empty($app_key)) {
+            return err('控制中心配置错误！');
+        }
+
+        if ($api_url[strlen($api_url) - 1] != '/') {
+            $api_url .= '/';
+        }
+
+        $api_url .= $version;
+        $api_url .= "/$path";
+
+        $params['nostr'] = TIMESTAMP;
+        $api_url .= '?'.http_build_query($params);
+
+        $headers = [];
+
+        if ($body) {
+            if (empty($method)) {
+                $method = 'POST';
+            }
+
+            if (is_string($body)) {
+                if (empty($contentType)) {
+                    $contentType = 'application/x-www-form-urlencoded';
+
+                }
+                if ($contentType == 'application/x-www-form-urlencoded') {
+                    parse_str($body, $result);
+                    $params = array_merge($params, $result);
+                }
+            } else {
+                $contentType = 'application/json';
+                $body = json_encode($body);
+            }
+
+            if ($contentType) {
+                $headers['Content-Type'] = $contentType;
+            }
+
+        } else {
+            if (empty($method)) {
+                $method = 'GET';
+            }
+        }
+
+        if ($version == 'v1') {
+            $sign = self::makeCtrlServerSignV1($app_key, $app_secret, $method, $params);
+            $headers['llt-appkey'] = $app_key;
+            $headers['llt-sign'] = $sign;
+        } else {
+            $headers['zovye-key'] = $app_key;
+            $headers['zovye-sign'] = self::makeCtrlServerSign(
+                $app_key,
+                $app_secret,
+                $params['nostr']
+            );
+        }
+
+        return self::$http_client->request($api_url, $method, $headers, $body);
     }
 
     /**
      * 生成控制中心通信签名
+     * @param $app_key
+     * @param $app_secret
      * @param $method
      * @param array $params
      * @return string
      */
-    public static function makeCtrlServerSignV1($method, array $params): string
+    public static function makeCtrlServerSignV1($app_key, $app_secret, $method, array $params): string
     {
-        $params['appkey'] = settings('ctrl.appKey');
-        $params['appsecret'] = settings('ctrl.appSecret');
+        $params['appkey'] = $app_key;
+        $params['appsecret'] = $app_secret;
         $params['method'] = $method;
 
         ksort($params);
@@ -229,6 +234,7 @@ class CtrlServ
     public static function postV2(string $path = '', $body = [])
     {
         $body = is_string($body) ? $body : json_encode($body);
+
         return self::queryData('v2', $path, [], $body, 'application/json');
     }
 
@@ -411,7 +417,7 @@ class CtrlServ
     {
         ksort($params);
 
-        return sha1(http_build_query($params).settings('ctrl.signature'));
+        return sha1(http_build_query($params).self::$config['signature']);
     }
 
     private static function makeJobUrl($op, array $params = []): string

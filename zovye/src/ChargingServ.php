@@ -17,15 +17,16 @@ class ChargingServ
      */
     static $http_client = null;
 
-    static $app = [];
+    static $config = [];
 
     private function __construct()
     {
     }
 
-    public static function setHttpClient(IHttpClient $http_client)
+    public static function setHttpClient(IHttpClient $http_client, array $config)
     {
         self::$http_client = $http_client;
+        self::$config = $config;
     }
 
     public static function query(
@@ -39,8 +40,8 @@ class ChargingServ
             return err('没有配置请求对象！');
         }
 
-        $url = Config::charging('server.url');
-        $access_token = Config::charging('server.access_token');
+        $url = self::$config['url'];
+        $access_token = self::$config['access_token'];
 
         if (empty($url) || empty($access_token)) {
             return err('配置错误！');

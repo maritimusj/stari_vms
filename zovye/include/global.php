@@ -16,18 +16,18 @@ Util::setErrorHandler();
 
 try {
     Util::extraAjaxJsonData();
-    
+
     //设置request数据来源
     Request::setData($GLOBALS['_GPC']);
 
     //初始化事件驱动
     EventBus::init();
 
-    //设置httpClient
-    CtrlServ::setHttpClient(new we7HttpClient());
+    //设置CtrlServ
+    CtrlServ::init(new we7HttpClient(), settings('ctl', []));
 
     if (App::isChargingDeviceEnabled()) {
-        ChargingServ::setHttpClient(new we7HttpClient());
+        ChargingServ::setHttpClient(new we7HttpClient(), Config::charging('server', []));
     }
 
     //默认加载缓存

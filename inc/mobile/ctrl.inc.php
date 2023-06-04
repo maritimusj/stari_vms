@@ -24,10 +24,10 @@ if (Request::has('op')) {
 $sign = Request::header('HTTP_ZOVYE_SIGN');
 $no_str = Request::header('HTTP_ZOVYE_NOSTR');
 
+$config = settings('ctrl', []);
+
 //检查回调签名
-if (settings('ctrl.checkSign') && CtrlServ::makeNotifierSign(
-        settings('ctrl.appKey'),
-        settings('ctrl.appSecret'),
+if ($config['checkSign'] && CtrlServ::makeNotifierSign($config['appKey'], $config['appSecret'],
         $no_str,
         Request::raw()
     ) !== $sign) {

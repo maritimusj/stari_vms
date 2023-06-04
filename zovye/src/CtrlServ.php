@@ -130,7 +130,10 @@ class CtrlServ
         $api_url .= $version;
         $api_url .= "/$path";
 
-        $params['nostr'] = TIMESTAMP;
+        if (empty($params['nostr'])) {
+            $params['nostr'] = TIMESTAMP;
+        }
+        
         $api_url .= '?'.http_build_query($params);
 
         $headers = [];

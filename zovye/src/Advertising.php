@@ -148,7 +148,7 @@ class Advertising extends State
     {
         if ($obj instanceof advertisingModelObj) {
             //广告变动了
-            if ($obj->update() && self::setAdvsLastUpdate($obj->getType(), $obj->getUpdatetime())) {
+            if ($obj->update() && self::setLastUpdate($obj->getType(), $obj->getUpdatetime())) {
                 return true;
             }
         }
@@ -156,11 +156,11 @@ class Advertising extends State
         return false;
     }
 
-    public static function setAdvsLastUpdate($type, $ts = null): bool
+    public static function setLastUpdate($type, $ts = null): bool
     {
         $ts = $ts ?? time();
 
-        return updateSettings("advs.version.type$type", $ts);
+        return updateSettings("ads.version.type$type", $ts);
     }
 
     /**
@@ -172,7 +172,7 @@ class Advertising extends State
     {
         $type = $obj instanceof advertisingModelObj ? $obj->getType() : intval($obj);
 
-        return settings("advs.version.type$type", 0);
+        return settings("ads.version.type$type", 0);
     }
 
     public static function getMediaData(): array

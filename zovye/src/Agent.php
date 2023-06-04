@@ -172,7 +172,7 @@ class Agent
             $query = Advertising::query(['agent_id' => $agent->getId()]);
             /** @var advertisingModelObj $adv */
             foreach ($query->findAll() as $adv) {
-                Advertising::setAdvsLastUpdate($adv->getType());
+                Advertising::setLastUpdate($adv->getType());
                 $adv->destroy();
             }
 

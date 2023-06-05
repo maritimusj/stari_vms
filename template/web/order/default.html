@@ -594,7 +594,7 @@
                                 {if $order['commission']['keepers']}
                                 {loop $order['commission']['keepers'] $index $item}
                                 {php $keeper = \zovye\User::get($item['openid'], true);}
-                                {if !$keeper}
+                                {if $keeper}
                                 <div class="gspor keeper_item{if $item['promoter']} promoter{/if}">
                                     <div class="profile">
                                         <img src="{php echo $keeper->getAvatar();}" alt="">

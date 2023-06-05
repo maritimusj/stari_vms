@@ -1889,6 +1889,10 @@ HTML_CONTENT;
             return err('找不到这个设备！');
         }
 
+        if ($device->isBlueToothDevice()) {
+            return err('对不起，蓝牙设备不支持后台测试出货！');
+        }
+
         if ($device->isFuelingDevice() && App::isFuelingDeviceEnabled()) {
             if (!$device->isMcbOnline()) {
                 return err('设备不在线！');

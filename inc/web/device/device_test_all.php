@@ -25,6 +25,7 @@ if ($device->isChargingDevice()) {
     $data = [
         'device_id' => $device->getId(),
         'is_fueling_device' => $device->isFuelingDevice(),
+        'is_bluetooth_device' => $device->isBlueToothDevice(),
         'params' => $device->getPayload(true),
     ];
 }

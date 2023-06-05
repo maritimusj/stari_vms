@@ -2500,7 +2500,6 @@ class deviceModelObj extends modelObj
 
         $params = [
             'deviceGUID' => $this->imei,
-            'src' => json_encode($extra),
             'channel' => $channel,
             'timeout' => $timeout,
             'num' => $num,

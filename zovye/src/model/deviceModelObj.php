@@ -983,32 +983,35 @@ class deviceModelObj extends modelObj
         }
 
         $result = Device::resetPayload($this, $data);
-        if ($result) {
-            foreach ($result as $entry) {
-                $code = $this->getPayloadCode($now);
-                if (!empty($entry['reason'])) {
-                    $reason = $reason."({$entry['reason']})";
-                }
-                if (!PayloadLogs::create([
-                    'device_id' => $this->id,
-                    'goods_id' => $entry['goodsId'],
-                    'org' => $entry['org'],
-                    'num' => $entry['num'],
-                    'extra' => [
-                        'reason' => $reason,
-                        'code' => $code,
-                        'clr' => $clr,
-                    ],
-                    'createtime' => $now,
-                ])) {
-                    return err('保存库存记录失败！');
-                }
-                if (!$this->updateSettings('last', [
+        
+        if (is_error($result)) {
+            return $result;
+        }
+
+        foreach ($result as $entry) {
+            $code = $this->getPayloadCode($now);
+            if (!empty($entry['reason'])) {
+                $reason = $reason."({$entry['reason']})";
+            }
+            if (!PayloadLogs::create([
+                'device_id' => $this->id,
+                'goods_id' => $entry['goodsId'],
+                'org' => $entry['org'],
+                'num' => $entry['num'],
+                'extra' => [
+                    'reason' => $reason,
                     'code' => $code,
-                    'time' => $now,
-                ])) {
-                    return err('保存流水记录失败！');
-                }
+                    'clr' => $clr,
+                ],
+                'createtime' => $now,
+            ])) {
+                return err('保存库存记录失败！');
+            }
+            if (!$this->updateSettings('last', [
+                'code' => $code,
+                'time' => $now,
+            ])) {
+                return err('保存流水记录失败！');
             }
         }
 

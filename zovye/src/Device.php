@@ -175,12 +175,7 @@ class Device extends State
 
         $device_type = DeviceTypes::from($device);
         if (empty($device_type)) {
-            Log::error("resetPayload", [
-                'device' => $device->profile(),
-                'error' => '货道数据错误！',
-                'data' => $data,
-            ]);
-            return err('设备型号不正确！');
+            return [];
         }
 
         $cargo_lanes = $device_type->getCargoLanes();

@@ -1103,6 +1103,9 @@
                     if (i !== -1) {
                         this.currentType.cargo_lanes.splice(i, 1);
                     }
+                    if(this.currentType.cargo_lanes.length == 0) {
+                        this.addCargoLane();
+                    }
                 },
                 newPackage() {
                     Vue.set(this, 'currentPackage', {

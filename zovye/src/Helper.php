@@ -208,7 +208,7 @@ class Helper
     /**
      * @param orderModelObj|null $order
      * @param deviceModelObj $device
-     * @param userModelObj $user
+     * @param userModelObj|null $user
      * @param array $goods
      * @return array
      */

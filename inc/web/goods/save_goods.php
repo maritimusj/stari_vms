@@ -95,6 +95,12 @@ if (isset($params['goodsId'])) {
             }
         }
 
+        if (isset($params['goodsSizeUnit'])) {
+            if ($params['goodsSizeUnit'] != $goods->getExtraData('lottery.unit')) {
+                $goods->setExtraData('lottery.unit', intval($params['goodsSizeUnit']));
+            }
+        }
+
         if (App::isBalanceEnabled()) {
             if (isset($params['balance'])) {
                 $goods->setExtraData('balance', max(0, intval($params['balance'])));
@@ -170,6 +176,7 @@ if (isset($params['goodsId'])) {
         $data['extra']['lottery'] = [
             'size' => intval($params['goodsSize']),
             'index' => intval($params['goodsMcbIndex']),
+            'unit' => intval($params['goodsSizeUnit']),
         ];
     }
 

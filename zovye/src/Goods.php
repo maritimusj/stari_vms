@@ -96,7 +96,6 @@ class Goods
             $detail = in_array('detail', $params) || $params['detail'];
             $use_image_proxy = in_array('useImageProxy', $params) || $params['useImageProxy'];
             $fullPath = in_array('fullPath', $params) || $params['fullPath'];
-
             return self::format($goods, $detail, $use_image_proxy, $fullPath);
         }
 

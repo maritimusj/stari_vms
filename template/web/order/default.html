@@ -594,7 +594,7 @@
                                 {if $order['commission']['keepers']}
                                 {loop $order['commission']['keepers'] $index $item}
                                 {php $keeper = \zovye\User::get($item['openid'], true);}
-                                {if $keeper}
+                                {if !$keeper}
                                 <div class="gspor keeper_item{if $item['promoter']} promoter{/if}">
                                     <div class="profile">
                                         <img src="{php echo $keeper->getAvatar();}" alt="">
@@ -606,6 +606,11 @@
                                     <div class="income">
                                         <b>佣金：</b><span class="money">￥{php echo number_format($item['xval'] / 100, 2);}元</span>
                                     </div>
+                                </div>
+                                {else}
+                                <div class="profile text-muted">&lt;已删除&gt;</div>
+                                <div class="income">
+                                    <b>佣金：</b><span class="money">￥{php echo number_format($item['xval'] / 100, 2);}元</span>
                                 </div>
                                 {/if}
                                 {/loop}

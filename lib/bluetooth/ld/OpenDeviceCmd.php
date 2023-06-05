@@ -14,7 +14,7 @@ class OpenDeviceCmd extends cmd
     public function __construct($device_id, $locker_id)
     {
         $this->locker_id = $locker_id;
-        parent::__construct($device_id, 0x02, [$locker_id, 0x0, 0x0, 0x0, 0x0]);
+        parent::__construct($device_id, 0x02, [$locker_id, 0, 0, 0, 0]);
     }
 
     public function getMessage(): string

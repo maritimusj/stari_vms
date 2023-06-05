@@ -110,7 +110,7 @@
                 <label for="goodsMcbIndex" class="col-md-2 control-label">出货口</label>
                 <div class="col-md-10">
                     <input type="number" class="form-control" id="goodsMcbIndex" name="goodsMcbIndex" value="{php echo !empty($goods)&&isset($goods['lottery'])?$goods['lottery']['index'] : ''}" min="0">
-                    <span class="help-block">* 设备拥有多个出票窗口时，请指定编号</span>
+                    <span class="help-block">* 注意：没有指定出货口的情况下，<b>STA4DZ协议</b>以出货长度值做为出货口，出货长度固定为20cm；<b>STA4CP协议</b>出货口固定为0，长度单位固定为英寸。</i></span>
                 </div>
             </div>
             {if empty($goods['agent'])}

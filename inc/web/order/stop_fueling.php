@@ -24,6 +24,6 @@ if (!$device) {
     JSON::fail('找不到这个设备！');
 }
 
-Fueling::checkUnfinishedOrder($device, "force");
+Fueling::settleTimeoutOrder($device, "force");
 
 JSON::success('已强制停止关联订单，请刷新页面检查订单情况！');

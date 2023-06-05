@@ -491,7 +491,8 @@ class Fueling
         return $result;
     }
 
-    public static function checkUnfinishedOrder(deviceModelObj $device, string $exclude_serial = '')
+    // 处理超时订单
+    public static function settleTimeoutOrder(deviceModelObj $device, string $exclude_serial = '', $timeout = 300)
     {
         $query = Order::query(['src' => Order::FUELING_UNPAID, 'device_id' => $device->getId()]);
         /** @var orderModelObj $order */
@@ -501,7 +502,7 @@ class Fueling
             }
 
             $last_update_time = $order->getExtraData('fueling.stats.time', $order->getCreatetime());
-            if ($exclude_serial || time() - $last_update_time > 300) {
+            if ($exclude_serial || time() - $last_update_time > $timeout) {
                 self::settle($device, [
                     'ser' => $order->getOrderNO(),
                     'ch' => $order->getChargerID(),
@@ -557,7 +558,7 @@ class Fueling
     {
         $serial = strval($data['ser']);
         if ($serial) {
-            self::checkUnfinishedOrder($device, $serial);
+            self::settleTimeoutOrder($device, $serial);
 
             $chargerID = intval($data['ch']);
             $device->setFuelingStatusData($chargerID, $data);

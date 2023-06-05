@@ -67,21 +67,13 @@ class cmd implements ICmd
 
     function crc($data): int
     {
-        $crc = 0;
-        $len = strlen($data);
-
-        for ($i = 0; $i < $len; $i++) {
-            $crc ^= ord($data[$i]);
-            for ($j = 0; $j < 8; $j++) {
-                if ($crc & 0x80) {
-                    $crc = ($crc << 1) ^ 0x07;
-                } else {
-                    $crc <<= 1;
-                }
-            }
+        $v = 0x00;
+        for ($i = 0; $i < strlen($data); $i++) {
+            $c = unpack('c', $data[$i]);
+            $v = $v ^ $c[1];
         }
 
-        return $crc & 0xFF;
+        return $v;
     }
 
     function encode(): string

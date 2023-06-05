@@ -2506,7 +2506,7 @@ class deviceModelObj extends modelObj
             'num' => $num,
         ];
 
-        if ($extra['index']) {
+        if (isset($extra['index'])) {
             $params['index'] = $extra['index'];
             $params['unit'] = $extra['unit'];
         }

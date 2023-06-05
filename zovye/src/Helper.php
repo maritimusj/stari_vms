@@ -215,13 +215,13 @@ class Helper
     public static function preparePullData(
         ?orderModelObj $order,
         deviceModelObj $device,
-        userModelObj $user,
+        ?userModelObj $user,
         array $goods
     ): array {
         $pull_data = [
             'online' => false,
             'timeout' => App::getDeviceWaitTimeout(),
-            'userid' => $user->getOpenid(),
+            'userid' => $user ? $user->getOpenid() : '',
             'num' => $order ? $order->getNum() : 1,
             'user-agent' => $order ? $order->getExtraData('from.user_agent') : '',
             'ip' => $order ? $order->getExtraData('from.ip') : CLIENT_IP,

@@ -120,15 +120,17 @@ class goods
 
             //固定货道商品商品指定货道
             if (Request::isset('goodsLaneID')) {
-                if (Request::int('goodsLaneID') != $goods->getExtraData('lottery.size')) {
-                    $goods->setExtraData('lottery.size', Request::int('goodsLaneID'));
-                }
+                $goods->setExtraData('lottery.size', Request::int('goodsLaneID'));
             }
 
             if (Request::isset('goodsMcbIndex')) {
-                if (Request::int('goodsMcbIndex') != $goods->getExtraData('lottery.index')) {
-                    $goods->setExtraData('lottery.index', Request::int('goodsMcbIndex'));
-                }
+                $goods->setExtraData('lottery.index', Request::int('goodsMcbIndex'));
+            } else {
+                $goods->setExtraData('lottery.index');
+            }
+
+            if (Request::isset('goodsSizeUnit')) {
+                $goods->setExtraData('lottery.unit', Request::int('goodsSizeUnit'));
             }
 
             if (Request::isset('costPrice')) {
@@ -196,9 +198,15 @@ class goods
             if (Request::is_string('goodsLaneID')) {
                 $goods_data['extra']['lottery']['size'] = Request::int('goodsLaneID');
             }
-            if (Request::has('goodsMcbIndex')) {
+
+            if (Request::isset('goodsMcbIndex')) {
                 $goods_data['extra']['lottery']['index'] = Request::int('goodsMcbIndex');
             }
+
+            if (Request::isset('goodsSizeUnit')) {
+                $goods_data['extra']['lottery']['unit'] = Request::int('goodsSizeUnit');
+            }
+
             if (Request::isset('costPrice')) {
                 $goods_data['extra']['costPrice'] = Request::float('costPrice', 0, 2) * 100;
             }

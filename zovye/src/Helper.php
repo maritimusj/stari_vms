@@ -260,18 +260,19 @@ class Helper
 
         if ($goods['lottery']) {
             $mcb_channel = intval($goods['lottery']['size']);
+            if ($mcb_channel < 1) {
+                return err('商品长度不正确！');
+            }
             if (isset($goods['lottery']['index'])) {
                 $pull_data['index'] = intval($goods['lottery']['index']);
-                $pull_data['unit'] = isset($goods['lottery']['unit']) ? intval($goods['lottery']['unit']) : 1;//1 表示以inch为单位
             }
+            $pull_data['unit'] = isset($goods['lottery']['unit']) ? intval($goods['lottery']['unit']) : 1;//1 默认1，inch为单位
         } else {
             $mcb_channel = Device::cargoLane2Channel($device, $goods['cargo_lane']);
+            if ($mcb_channel == Device::CHANNEL_INVALID) {
+                return err('商品货道配置不正确！');
+            }
         }
-
-        if ($mcb_channel == Device::CHANNEL_INVALID) {
-            return err('商品货道配置不正确！');
-        }
-
         $pull_data['channel'] = $mcb_channel;
 
         $result = $device->pull($pull_data);

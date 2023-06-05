@@ -89,7 +89,7 @@ if (isset($params['goodsId'])) {
             }
         }
 
-        if (isset($params['goodsMcbIndex'])) {
+        if ($params['goodsMcbIndex'] != '') {
             if ($params['goodsMcbIndex'] != $goods->getExtraData('lottery.index')) {
                 $goods->setExtraData('lottery.index', intval($params['goodsMcbIndex']));
             }

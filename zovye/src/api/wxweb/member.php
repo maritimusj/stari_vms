@@ -26,6 +26,7 @@ class member
             if (empty($locker)) {
                 return err('用户被占用，请重试！');
             }
+
             $team = Team::getFor($user);
             if (empty($team)) {
                 $team = Team::createFor($user, '默认车队');

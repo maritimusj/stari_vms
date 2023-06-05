@@ -135,7 +135,7 @@ if (isset($params['goodsId'])) {
             $goods->setGallery($images);
         } else {
             $goods->setDetailImg('');
-            $goods->setGallery([]);
+            $goods->setGallery();
         }
 
         if ($params['syncAll'] != $goods->getSync()) {

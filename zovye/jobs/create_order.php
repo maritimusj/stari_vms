@@ -138,16 +138,6 @@ function prepare(string $order_no)
         ExceptionNeedsRefund::throwWith($device, '对不起，商品库存为零！');
     }
 
-    if ($goods['lottery']) {
-        $mcb_channel = intval($goods['lottery']['size']);
-    } else {
-        $mcb_channel = Device::cargoLane2Channel($device, $goods['cargo_lane']);
-    }
-
-    if ($mcb_channel == Device::CHANNEL_INVALID) {
-        ExceptionNeedsRefund::throwWith($device, '商品货道配置不正确！');
-    }
-
     //事件：设备已锁定
     EventBus::on('device.locked', $eventData);
 
@@ -173,9 +163,9 @@ function prepare(string $order_no)
         ],
     ];
 
-    Util::transactionDo(function () use (&$params, $order_no, $goods, $mcb_channel, &$log_data) {
+    Util::transactionDo(function () use (&$params, $order_no, $goods, &$log_data) {
 
-        list($result, $order) = createOrder($params, $order_no, $goods, $mcb_channel);
+        list($result, $order) = createOrder($params, $order_no, $goods);
 
         if (is_error($result)) {
             $log_data['result'] = $result;
@@ -210,10 +200,9 @@ function prepare(string $order_no)
  * @param array $params
  * @param string $order_no
  * @param array $goods
- * @param int $mcb_channel
  * @return array
  */
-function createOrder(array $params, string $order_no, array $goods, int $mcb_channel): array
+function createOrder(array $params, string $order_no, array $goods): array
 {
     /** @var deviceModelObj $device */
     $device = $params['device'];
@@ -248,7 +237,6 @@ function createOrder(array $params, string $order_no, array $goods, int $mcb_cha
             'device' => [
                 'imei' => $device->getImei(),
                 'name' => $device->getName(),
-                'ch' => $mcb_channel,
             ],
             'user' => $user->profile(),
         ],
@@ -297,26 +285,14 @@ function createOrder(array $params, string $order_no, array $goods, int $mcb_cha
         }
     }
 
-    $data = [
-        'online' => false,
-        'channel' => $mcb_channel,
-        'timeout' => settings('device.waitTimeout', DEFAULT_DEVICE_WAIT_TIMEOUT),
-        'userid' => $user->getOpenid(),
-        'num' => $order->getNum(),
-        'from' => empty($acc) ? '' : $acc->name(),
-        'user-agent' => $order->getExtraData('from.user_agent'),
-        'ip' => $order->getExtraData('from.ip'),
-    ];
-
-    $loc = $device->getLocation();
-    if ($loc && $loc['lng'] && $loc['lat']) {
-        $data['location']['device'] = [
-            'lng' => $loc['lng'],
-            'lat' => $loc['lat'],
-        ];
+    $pull_data = Helper::preparePullData($order, $device, $user, $goods);
+    if (is_error($pull_data)) {
+        return $pull_data;
     }
 
-    $res = $device->pull($data);
+    $res = $device->pull($pull_data);
+
+    $order->setExtraData('device.ch', $pull_data['channel']);
 
     if (is_error($res)) {
         $order->setResultCode($res['errno']);

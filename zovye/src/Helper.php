@@ -205,15 +205,26 @@ class Helper
         return false;
     }
 
-    public static function preparePullData(orderModelObj $order, deviceModelObj $device, userModelObj $user): array
-    {
+    /**
+     * @param orderModelObj|null $order
+     * @param deviceModelObj $device
+     * @param userModelObj $user
+     * @param array $goods
+     * @return array
+     */
+    public static function preparePullData(
+        ?orderModelObj $order,
+        deviceModelObj $device,
+        userModelObj $user,
+        array $goods
+    ): array {
         $pull_data = [
             'online' => false,
             'timeout' => App::getDeviceWaitTimeout(),
             'userid' => $user->getOpenid(),
-            'num' => $order->getNum(),
-            'user-agent' => $order->getExtraData('from.user_agent'),
-            'ip' => $order->getExtraData('from.ip'),
+            'num' => $order ? $order->getNum() : 1,
+            'user-agent' => $order ? $order->getExtraData('from.user_agent') : '',
+            'ip' => $order ? $order->getExtraData('from.ip') : CLIENT_IP,
         ];
 
         $loc = $device->settings('extra.location', []);
@@ -225,6 +236,26 @@ class Helper
                 ],
             ];
         }
+
+        if ($goods['lottery']) {
+            $mcb_channel = intval($goods['lottery']['size']);
+            if ($mcb_channel < 1) {
+                return err('商品长度不正确！');
+            }
+            if (isset($goods['lottery']['index'])) {
+                $pull_data['index'] = intval($goods['lottery']['index']);
+            }
+            $pull_data['unit'] = isset($goods['lottery']['unit']) ? intval(
+                $goods['lottery']['unit']
+            ) : 1;//1 默认1，inch为单位
+        } else {
+            $mcb_channel = Device::cargoLane2Channel($device, $goods['cargo_lane']);
+            if ($mcb_channel == Device::CHANNEL_INVALID) {
+                return err('商品货道配置不正确！');
+            }
+        }
+
+        $pull_data['channel'] = $mcb_channel;
 
         return $pull_data;
     }
@@ -256,26 +287,15 @@ class Helper
             return err('对不起，商品库存不足！');
         }
 
-        $pull_data = self::preparePullData($order, $device, $user);
-
-        if ($goods['lottery']) {
-            $mcb_channel = intval($goods['lottery']['size']);
-            if ($mcb_channel < 1) {
-                return err('商品长度不正确！');
-            }
-            if (isset($goods['lottery']['index'])) {
-                $pull_data['index'] = intval($goods['lottery']['index']);
-            }
-            $pull_data['unit'] = isset($goods['lottery']['unit']) ? intval($goods['lottery']['unit']) : 1;//1 默认1，inch为单位
-        } else {
-            $mcb_channel = Device::cargoLane2Channel($device, $goods['cargo_lane']);
-            if ($mcb_channel == Device::CHANNEL_INVALID) {
-                return err('商品货道配置不正确！');
-            }
+        $pull_data = self::preparePullData($order, $device, $user, $goods);
+        if (is_error($pull_data)) {
+            return $pull_data;
         }
-        $pull_data['channel'] = $mcb_channel;
 
         $result = $device->pull($pull_data);
+
+        //保存货道
+        $order->setExtraData('device.ch', $pull_data['channel']);
 
         //v1版本新版本返回数据包含在json的data下
         if (!is_error($result)) {
@@ -294,7 +314,7 @@ class Helper
 
         $log_data = [
             'order' => $order->getId(),
-            'ch' => $mcb_channel,
+            'ch' => $pull_data['channel'],
             'result' => $result,
             'user' => $user->profile(),
             'goods' => $goods,
@@ -686,7 +706,7 @@ class Helper
                 throw new RuntimeException('系统错误，创建用户失败！');
             }
 
-            $order_no = substr("U{$user->getId()}P$code" . date('dH'), 0, MAX_ORDER_NO_LEN);
+            $order_no = substr("U{$user->getId()}P$code".date('dH'), 0, MAX_ORDER_NO_LEN);
             if (Order::exists($order_no)) {
                 throw new RuntimeException('订单已存在！');
             }

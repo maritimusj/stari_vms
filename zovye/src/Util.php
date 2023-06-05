@@ -1916,32 +1916,29 @@ HTML_CONTENT;
             $params
         );
 
-        $goods = Device::getGoodsByLane($device, $lane);
-        if ($goods['lottery']) {
-            $data['channel'] = $goods['lottery']['size'];
-            if ($goods['lottery']['index']) {
-                $data['index'] = intval($goods['lottery']['index']);
-                $data['unit'] = 1;//1 表示以inch为单位
-            }
-        } else {
-            $data['channel'] = Device::cargoLane2Channel($device, $lane);
-        }
-
         if (!$device->lockAcquire()) {
             return err('设备锁定失败，请重试！');
         }
 
+        $goods = Device::getGoodsByLane($device, $lane);
+
+        $pull_data = Helper::preparePullData(null, $device, $user, $goods);
+        if (is_error($pull_data)) {
+            return $pull_data;
+        }
+
         $log_data = [
-            'goods' => Device::getGoodsByLane($device, $lane),
+            'goods' => $goods,
             'user' => isset($user) ? $user->profile() : _W('username'),
-            'params' => $data,
+            'params' => $pull_data,
             'payload' => $device->getPayload(),
         ];
 
-        $pull_result = $device->pull($data);
+        $pull_result = $device->pull($pull_data);
 
         $log_data['result'] = $pull_result;
 
+        //创建出货记录
         $device->goodsLog(LOG_GOODS_TEST, $log_data);
 
         if (is_error($pull_result)) {
@@ -2077,23 +2074,6 @@ HTML_CONTENT;
         //事件：设备已锁定
         EventBus::on('device.locked', $params);
 
-        $mcb_index = '';
-        $mcb_unit = 0;
-        if ($goods['lottery']) {
-            $mcb_channel = intval($goods['lottery']['size']);
-            if ($goods['lottery']['index']) {
-                $mcb_channel = intval($goods['lottery']['index']);
-                $mcb_index = intval($goods['lottery']['size']);
-                $mcb_unit = 1; // 1表示inch单位
-            }
-        } else {
-            $mcb_channel = Device::cargoLane2Channel($device, $goods['cargo_lane']);
-        }
-
-        if ($mcb_channel == Device::CHANNEL_INVALID) {
-            return err('商品货道配置不正确');
-        }
-
         $log_data = [
             'user' => $user->profile(),
             'goods' => $goods,
@@ -2113,7 +2093,7 @@ HTML_CONTENT;
 
         //开启事务
         $result = Util::transactionDo(
-            function () use (&$params, $goods, $mcb_index, $mcb_channel, &$mcb_unit, &$log_data, $args) {
+            function () use (&$params, $goods, &$log_data, $args) {
                 /** @var deviceModelObj $device */
                 $device = $params['device'];
 
@@ -2145,7 +2125,6 @@ HTML_CONTENT;
                         'device' => [
                             'imei' => $device->getImei(),
                             'name' => $device->getName(),
-                            'ch' => $mcb_channel,
                         ],
                         'user' => $user->profile(),
                     ],
@@ -2229,33 +2208,19 @@ HTML_CONTENT;
                     }
                 }
 
-                $data = [
-                    'online' => !($args['online'] === false),
-                    'index' => $mcb_index,
-                    'channel' => $mcb_channel,
-                    'unit' => $mcb_unit,
-                    'timeout' => settings('device.waitTimeout', DEFAULT_DEVICE_WAIT_TIMEOUT),
-                    'userid' => $user->getOpenid(),
-                    'num' => $order->getNum(),
-                    'from' => $acc ? $acc->name() : '',
-                    'user-agent' => $order->getExtraData('from.user_agent'),
-                    'ip' => $order->getExtraData('from.ip'),
-                ];
-
-                $loc = $device->settings('extra.location', []);
-                if ($loc && $loc['lng'] && $loc['lat']) {
-                    $data['location']['device'] = [
-                        'lng' => $loc['lng'],
-                        'lat' => $loc['lat'],
-                    ];
+                $pull_data = Helper::preparePullData($order, $device, $user, $goods);
+                if (is_error($pull_data)) {
+                    return $pull_data;
                 }
 
-                $res = $device->pull($data);
+                $res = $device->pull($pull_data);
 
-                $log_data['params'] = $data;
+                $log_data['params'] = $pull_data;
                 $log_data['result'] = $res;
                 $log_data['order'] = $order->getId();
                 $log_data['result'] = $res;
+
+                $order->setExtraData('device.ch', $pull_data['channel']);
 
                 if (is_error($res)) {
                     $order->setResultCode($res['errno']);

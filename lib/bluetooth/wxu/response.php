@@ -46,7 +46,7 @@ class response implements IResponse
 
     public function isReady(): bool
     {
-        return $this->getResultValue() == 0x01 || $this->getResultValue() > 0x10;
+        return $this->getResultValue() == 0x01 || ($this->getID() == 0x01 && $this->getResultValue() == 0x02);
     }
 
     public function hasBatteryValue(): bool

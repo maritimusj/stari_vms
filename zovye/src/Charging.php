@@ -676,8 +676,13 @@ class Charging
             $device->setChargerData($chargerID, $extra['status']);
 
             if ($serial) {
+                $should_stop_charging = false;
                 $order = Order::get($serial, true);
                 if ($order) {
+                    if ($order->getSrc() != Order::CHARGING_UNPAID) {
+                        $should_stop_charging = true;
+                    }
+
                     $totalPrice = round($extra['status']['priceTotal'] * 100);
 
                     $order->setPrice($totalPrice);
@@ -687,21 +692,23 @@ class Charging
                     //检查充电金额是否已经多于付款金额或帐户余额
                     $pay_log = Pay::getPayLog($serial);
                     if ($pay_log) {
-                        if ($totalPrice > $pay_log->total()) {
-                            Charging::stopCharging($device, $chargerID, $serial);
+                        if ($totalPrice >= $pay_log->total()) {
+                            $should_stop_charging = true;
                         }
                     } else {
                         //检查用户余额
                         $user = $order->getUser();
-                        if (empty($user)) {
-                            Charging::stopCharging($device, $chargerID, $serial);
-                        } else {
-                            if (self::getUnpaidOrderPriceTotal($user) > $user->getCommissionBalanceCard()->total()) {
-                                Charging::stopUserAllCharging($user);
-                            }
+                        if (empty($user) || $user->isBanned() ||
+                            self::getUnpaidOrderPriceTotal($user) >= $user->getCommissionBalanceCard()->total()) {
+                            Charging::stopUserAllCharging($user);
                         }
                     }
                 }
+
+                if ($should_stop_charging) {
+                    Charging::stopCharging($device, $chargerID, $serial);
+                }
+
             } else {
                 if ($extra['status']['status'] == 2) {
                     //空闲

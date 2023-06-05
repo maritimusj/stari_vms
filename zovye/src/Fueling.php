@@ -565,33 +565,45 @@ class Fueling
             //检查当前费用是否已经超出支付费用或卡余额
             $should_stop_fueling = false;
             $total_price = intval($data['price_total']);
-            if ($total_price) {
-                $pay_log = Pay::getPayLog($serial, LOG_FUELING_PAY);
-                if ($pay_log) {
-                    if ($total_price > $pay_log->getPrice()) {
-                        $should_stop_fueling = true;
-                    }
-                } else {
-                    $order = Order::get($serial, true);
-                    if ($order) {
-                        $order->setPrice($total_price);
-                        $amount = intval($data['amount']);
-                        $order->setNum($amount);
-                        $order->setExtraData('fueling.status.time', time());
-                        $order->save();
 
+            $order = Order::get($serial, true);
+            if ($order) {
+                if ($order->getSrc() != Order::FUELING_UNPAID) {
+                    $should_stop_fueling = true;
+                }
+
+                if ($data['amount']) {
+                    $amount = intval($data['amount']);
+                    $order->setNum($amount);
+                }
+
+                //更新订单状态
+                if ($total_price) {
+                    $order->setPrice($total_price);
+
+                    //检查余额是否有剩余
+                    $pay_log = Pay::getPayLog($serial, LOG_FUELING_PAY);
+                    if ($pay_log) {
+                        if ($total_price >= $pay_log->getPrice()) {
+                            $should_stop_fueling = true;
+                        }
+                    } else {
                         $user = $order->getUser();
                         if (empty($user) || $user->isBanned()) {
                             $should_stop_fueling = true;
                         } else {
                             $card = $user->getCommissionBalanceCard();
-                            if ($card->total() < $total_price) {
+                            if ($card->total() <= $total_price) {
                                 $should_stop_fueling = true;
                             }
                         }
                     }
                 }
+
+                $order->setExtraData('fueling.status.time', time());
+                $order->save();
             }
+
             if ($should_stop_fueling) {
                 self::stopFueling($device, $chargerID, $serial);
             }

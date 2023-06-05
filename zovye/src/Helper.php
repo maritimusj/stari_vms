@@ -676,6 +676,10 @@ class Helper
                 $_SESSION['wx_user_id'] = $code;
             }
 
+            if (!Locker::try($code)) {
+                throw new RuntimeException('锁定失败，请重试！');
+            }
+
             $user = User::getPseudoUser($code, '匿名用户');
             if (empty($user)) {
                 throw new RuntimeException('系统错误，创建用户失败！');

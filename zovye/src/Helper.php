@@ -260,9 +260,9 @@ class Helper
 
         if ($goods['lottery']) {
             $mcb_channel = intval($goods['lottery']['size']);
-            if ($goods['lottery']['index']) {
+            if (isset($goods['lottery']['index'])) {
                 $pull_data['index'] = intval($goods['lottery']['index']);
-                $pull_data['unit'] = 1;//1 表示以inch为单位
+                $pull_data['unit'] = isset($goods['lottery']['unit']) ? intval($goods['lottery']['unit']) : 1;//1 表示以inch为单位
             }
         } else {
             $mcb_channel = Device::cargoLane2Channel($device, $goods['cargo_lane']);

@@ -2334,12 +2334,6 @@ class deviceModelObj extends modelObj
      */
     public function pull(array $options = [])
     {
-        if ($options['online'] && !$this->isMcbOnline()) {
-            return err('设备已关机！');
-        }
-
-        $num = max(1, $options['num']);
-
         //虚拟设备直接返回成功
         if ($this->isVDevice()) {
             return [
@@ -2349,13 +2343,16 @@ class deviceModelObj extends modelObj
             ];
         }
 
-        $mcb_channel = isset($options['channel']) ? intval($options['channel']) : Device::CHANNEL_DEFAULT;
+        if ($this->isChargingDevice() || $this->isFuelingDevice()) {
+            return err('设备不支持这个操作！');
+        }
 
         $result = null;
 
-        if ($this->isChargingDevice()) {
-            return err('设备不支持这个操作！');
-        }
+        $num = max(1, $options['num']);
+
+        $mcb_channel = isset($options['channel']) ? intval($options['channel']) : Device::CHANNEL_DEFAULT;
+
         //蓝牙设备
         if ($this->isBlueToothDevice()) {
             $protocol = $this->getBlueToothProtocol();
@@ -2380,6 +2377,10 @@ class deviceModelObj extends modelObj
                 $result = $msg->getEncoded(IBlueToothProtocol::BASE64);
             }
         } else {
+            if ($options['online'] && !$this->isMcbOnline()) {
+                return err('设备已关机！');
+            }
+
             //zovye接口出货
             $timeout = isset($options['timeout']) ? intval($options['timeout']) : DEFAULT_DEVICE_WAIT_TIMEOUT;
             if ($timeout <= 0) {

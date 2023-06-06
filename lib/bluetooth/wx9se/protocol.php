@@ -6,6 +6,7 @@
 
 namespace bluetooth\wx9se;
 
+use zovye\BlueToothProtocol;
 use zovye\Contract\bluetooth\IBlueToothProtocol;
 use zovye\Contract\bluetooth\ICmd;
 use zovye\Contract\bluetooth\IResponse;
@@ -67,11 +68,18 @@ class protocol implements IBlueToothProtocol
     const KEY_TIME = 0x13;
     const KEY_LIGHTS_SCHEDULE = 0x14;
 
-
-
     function getTitle(): string
     {
         return '9位电子烟售货机蓝牙协议(wx9se v1.0)';
+    }
+
+    function support($fn): bool
+    {
+        if ($fn == BlueToothProtocol::BATTERY) {
+            return true;
+        }
+
+        return false;
     }
 
     function transUID($uid)

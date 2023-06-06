@@ -6,6 +6,7 @@
 
 namespace bluetooth\grid;
 
+use zovye\BlueToothProtocol;
 use zovye\Contract\bluetooth\IBlueToothProtocol;
 use zovye\Contract\bluetooth\ICmd;
 use zovye\Contract\bluetooth\IResponse;
@@ -16,6 +17,15 @@ class protocol implements IBlueToothProtocol
     function getTitle(): string
     {
         return '第三方厂商蓝牙协议(grid v3)';
+    }
+
+    function support($fn): bool
+    {
+        if ($fn == BlueToothProtocol::BATTERY) {
+            return true;
+        }
+
+        return false;
     }
 
     function transUID($uid)

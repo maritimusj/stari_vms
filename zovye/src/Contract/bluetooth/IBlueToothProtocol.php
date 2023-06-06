@@ -12,6 +12,13 @@ interface IBlueToothProtocol
     const HEX = '\bin2hex';
 
     /**
+     * 返回协议的功能是否支持
+     * @param $fn
+     * @return mixed
+     */
+    function support($fn);
+
+    /**
      * 返回协议的中文名称
      * @return string
      */

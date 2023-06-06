@@ -6,6 +6,7 @@
 
 namespace bluetooth\rh;
 
+use zovye\BlueToothProtocol;
 use zovye\Contract\bluetooth\IBlueToothProtocol;
 use zovye\Contract\bluetooth\ICmd;
 use zovye\Contract\bluetooth\IResponse;
@@ -22,6 +23,15 @@ class protocol implements IBlueToothProtocol
     public function getTitle(): string
     {
         return '五格蓝牙设备协议(rh v1.0)';
+    }
+
+    function support($fn): bool
+    {
+        if ($fn == BlueToothProtocol::BATTERY) {
+            return true;
+        }
+
+        return false;
     }
 
     public function transUID($uid)

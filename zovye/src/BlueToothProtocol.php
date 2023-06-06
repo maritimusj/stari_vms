@@ -10,6 +10,8 @@ use zovye\Contract\bluetooth\IBlueToothProtocol;
 
 class BlueToothProtocol
 {
+    const BATTERY = 'battery';
+
     public static function all(): array
     {
         $protocols = [];

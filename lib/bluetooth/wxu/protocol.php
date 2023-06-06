@@ -19,6 +19,11 @@ class protocol implements IBlueToothProtocol
         return '蓝牙售货机协议(wxu v1.1)';
     }
 
+    function support($fn): bool
+    {
+        return false;
+    }
+
     public function transUID($uid)
     {
         return $uid;

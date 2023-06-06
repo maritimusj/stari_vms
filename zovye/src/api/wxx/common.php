@@ -15,6 +15,7 @@ use zovye\Advertising;
 use zovye\Agent;
 use zovye\App;
 use zovye\Balance;
+use zovye\BlueToothProtocol;
 use zovye\Contract\bluetooth\IBlueToothProtocol;
 use zovye\Device;
 use zovye\Goods;
@@ -236,7 +237,7 @@ class common
             return err('无法加载蓝牙协议！');
         }
 
-        if ($device->isLowBattery()) {
+        if ($proto->support(BlueToothProtocol::BATTERY) && $device->isLowBattery()) {
             return err('设备电量低，暂时无法购买！');
         }
 

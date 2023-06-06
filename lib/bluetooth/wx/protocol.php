@@ -6,6 +6,7 @@
 
 namespace bluetooth\wx;
 
+use zovye\BlueToothProtocol;
 use zovye\Contract\bluetooth\IBlueToothProtocol;
 use zovye\Contract\bluetooth\ICmd;
 use zovye\Contract\bluetooth\IResponse;
@@ -16,6 +17,15 @@ class protocol implements IBlueToothProtocol
     public function getTitle(): string
     {
         return '第三方厂商蓝牙协议(wx v1.0)';
+    }
+
+    function support($fn): bool
+    {
+        if ($fn == BlueToothProtocol::BATTERY) {
+            return true;
+        }
+
+        return false;
     }
 
     public function transUID($uid): string

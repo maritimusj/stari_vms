@@ -10,7 +10,7 @@ use zovye\Contract\bluetooth\IBlueToothProtocol;
 
 class BlueToothProtocol
 {
-    const BATTERY = 'battery';
+    const QOE = 'qoe'; //电量
 
     public static function all(): array
     {

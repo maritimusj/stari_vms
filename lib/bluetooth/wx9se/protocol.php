@@ -75,7 +75,7 @@ class protocol implements IBlueToothProtocol
 
     function support($fn): bool
     {
-        if ($fn == BlueToothProtocol::BATTERY) {
+        if ($fn == BlueToothProtocol::QOE) {
             return true;
         }
 

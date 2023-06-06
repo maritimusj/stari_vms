@@ -237,7 +237,7 @@ class common
             return err('无法加载蓝牙协议！');
         }
 
-        if ($proto->support(BlueToothProtocol::BATTERY) && $device->isLowBattery()) {
+        if ($proto->support(BlueToothProtocol::QOE) && $device->isLowBattery()) {
             return err('设备电量低，暂时无法购买！');
         }
 
@@ -342,16 +342,20 @@ class common
             'data' => null,
         ];
 
-        if ($response->hasBatteryValue()) {
-            $battery = $response->getBatteryValue();
+        if (!$proto->support(BlueToothProtocol::QOE)) {
+            $device->setQoe(-1);
+        } else {
+            if ($response->hasBatteryValue()) {
+                $battery = $response->getBatteryValue();
 
-            $device->setQoe($battery);
-            if ($device->isLowBattery()) {
-                $device->setError(Device::ERROR_LOW_BATTERY, Device::desc(Device::ERROR_LOW_BATTERY));
-                $device->scheduleErrorNotifyJob(Device::ERROR_LOW_BATTERY, Device::desc(Device::ERROR_LOW_BATTERY));
+                $device->setQoe($battery);
+                if ($device->isLowBattery()) {
+                    $device->setError(Device::ERROR_LOW_BATTERY, Device::desc(Device::ERROR_LOW_BATTERY));
+                    $device->scheduleErrorNotifyJob(Device::ERROR_LOW_BATTERY, Device::desc(Device::ERROR_LOW_BATTERY));
+                }
+
+                $data['battery'] = $battery;
             }
-
-            $data['battery'] = $battery;
         }
 
         $device->save();

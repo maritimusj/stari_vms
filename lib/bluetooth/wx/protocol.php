@@ -9,6 +9,7 @@ namespace bluetooth\wx;
 use zovye\Contract\bluetooth\IBlueToothProtocol;
 use zovye\Contract\bluetooth\ICmd;
 use zovye\Contract\bluetooth\IResponse;
+use function zovye\err;
 
 class protocol implements IBlueToothProtocol
 {
@@ -45,7 +46,7 @@ class protocol implements IBlueToothProtocol
 
     function initialize($device_id)
     {
-        return Helper::newShakeHandMsg($device_id);
+        return err('无法连接设备，请联系管理员！');
     }
 
     /**

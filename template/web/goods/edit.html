@@ -18,9 +18,7 @@
                 <a href="{php echo $this->createWebUrl('goods');}"><i class="fa fa-reply" title="返回"></i></a>
             </span>
         </div>
-        <div class="panel-body">
-            <div class="seg">
-                <div class="title">基本设置</div>
+        <div class="panel-body seg">
                 {if !isset($goods) || $goods['id'] > 0}
                 <div class="form-group">
                     <label for="find_agent_select" class="col-md-2 control-label">所属代理商</label>
@@ -67,9 +65,6 @@
                         <span class="help-block">* 单位名称，比如：个、包、支、盒等等，默认单位名称是“包”</span>
                     </div>
                 </div>
-            </div>
-            <div class="seg">
-                <div class="title">扩展设置</div>
                 <div class="form-group">
                     <label class="col-md-2 control-label">领取方式</label>
                     <div class="col-md-10">
@@ -115,20 +110,6 @@
                         <span class="help-block">* 商品成本价格(可以不填写)</span>
                     </div>
                 </div>
-                {if \zovye\App::isGDCVMachineEnabled()}
-                <div class="form-group">
-                    <label for="costPrice" class="col-md-2 control-label">商品代码</label>
-                    <div class="col-md-10">
-                        <select class="col-md-9" id="GDCVMachineItemCode" name="GDCVMachineItemCode" style="width: 80%;">
-                            <option value="" {if empty($goods) || empty($goods['CVMachine.code'])}selected{/if}>&lt;未设置&gt;</option>
-                            <option value="313" {if $goods && $goods['CVMachine.code']==313}selected{/if}>壬苯醇醚膜 [313]</option>
-                            <option value="309" {if $goods && $goods['CVMachine.code']==309}selected{/if}>壬苯醇醚栓 [309]</option>
-                            <option value="327" {if $goods && $goods['CVMachine.code']==327}selected{/if}>天然胶乳橡胶避孕套 [327]</option>
-                            <option value="312" {if $goods && $goods['CVMachine.code']==312}selected{/if}>壬苯醇醚凝胶 [312]</option>
-                        </select>
-                    </div>
-                </div>
-                {/if}
                 {if \zovye\App::isCommissionEnabled()}
                 <div class="form-group">
                     <label for="goodsCW" class="col-md-2 control-label"></label>
@@ -147,6 +128,20 @@
                     </div>
                 </div>
                 </fieldset>
+                {if \zovye\App::isGDCVMachineEnabled()}
+                <div class="form-group">
+                    <label for="costPrice" class="col-md-2 control-label">商品代码</label>
+                    <div class="col-md-10">
+                        <select class="col-md-9" id="GDCVMachineItemCode" name="GDCVMachineItemCode" style="width: 80%;">
+                            <option value="" {if empty($goods) || empty($goods['CVMachine.code'])}selected{/if}>&lt;未设置&gt;</option>
+                            <option value="313" {if $goods && $goods['CVMachine.code']==313}selected{/if}>壬苯醇醚膜 [313]</option>
+                            <option value="309" {if $goods && $goods['CVMachine.code']==309}selected{/if}>壬苯醇醚栓 [309]</option>
+                            <option value="327" {if $goods && $goods['CVMachine.code']==327}selected{/if}>天然胶乳橡胶避孕套 [327]</option>
+                            <option value="312" {if $goods && $goods['CVMachine.code']==312}selected{/if}>壬苯醇醚凝胶 [312]</option>
+                        </select>
+                    </div>
+                </div>
+                {/if}
                 {if empty($goods['agent'])}
                 <div class="form-group">
                     <label for="syncAll" class="col-md-2 control-label"></label>
@@ -157,7 +152,6 @@
                     </div>
                 </div>
                 {/if}
-            </div>
         </div>
     </div>
     <div class="form-group pull-right">

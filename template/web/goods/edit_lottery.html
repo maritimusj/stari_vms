@@ -18,7 +18,7 @@
                 <a href="{php echo $this->createWebUrl('goods');}"><i class="fa fa-reply" title="返回"></i></a>
             </span>
         </div>
-        <div class="panel-body">
+        <div class="panel-body seg">
             {if !isset($goods) || $goods['id'] > 0}
             <div class="form-group">
                 <label for="find_agent_select" class="col-md-2 control-label">所属代理商</label>
@@ -74,6 +74,14 @@
                     <label class="checkbox-inline">
                         <input type="checkbox" name="allowPay" value="price" {if empty($goods) || $goods['allowPay']}checked{/if}> 支付领取
                     </label>
+                    {if \zovye\App::isBalanceEnabled()}
+                    <label class="checkbox-inline" title="使用积分兑换领取">
+                        <input type="checkbox" name="allowBalance" value="_balance" {if empty($goods) || $goods['allowBalance']}checked{/if}> 积分兑换
+                    </label>
+                    <label class="checkbox-inline" title="商城使用积分兑换">
+                        <input type="checkbox" name="allowDelivery" value="_delivery" {if empty($goods) || $goods['allowDelivery']}checked{/if}> 商城
+                    </label>                        
+                    {/if}
                 </div>
             </div>
             <fieldset {if $goods && !$goods['allowPay']}disabled{/if} id="price">
@@ -85,6 +93,17 @@
                 </div>
             </div>
             </fieldset>
+            {if empty($goods['agent'])}
+            <div class="form-group">
+                <label for="syncAll" class="col-md-2 control-label"></label>
+                <div class="col-md-10">
+                    <label class="checkbox-inline">
+                        <input type="checkbox" id="syncAll" name="syncAll" value="1" {if $goods && $goods['sync']}checked{/if}> 复制该商品到所有代理商
+                    </label>
+                </div>
+            </div>
+            {/if}
+            <div class="seg-divider"></div>
             <div class="form-group">
                 <label for="goodsSize" class="col-md-2 control-label">出货长度</label>
                 <div class="col-md-10">
@@ -101,39 +120,29 @@
                     </label>
                     <label for="goodsSizeUnit0" class="radio-inline">
                         <input name="goodsSizeUnit" id="goodsSizeUnit0" type="radio" value="0"  {if empty($goods) || empty($goods['lottery']['unit'])}checked="checked"{/if}>
-                        厘米
+                        亳米
                     </label>
-                    <span class="help-block">* 长度单位: 出货长度所使用的单位，英寸或者厘米</span>
+                    <span class="help-block">* 长度单位: 出货长度所使用的单位，英寸或者亳米</span>
                 </div>
             </div>
             <div class="form-group">
                 <label for="goodsMcbIndex" class="col-md-2 control-label">出货口</label>
                 <div class="col-md-10">
                     <input type="number" class="form-control" id="goodsMcbIndex" name="goodsMcbIndex" value="{php echo !empty($goods)&&isset($goods['lottery'])?$goods['lottery']['index'] : ''}" min="0">
-                    <span class="help-block">* 注意：没有指定出货口的情况下，<b>STA4DZ协议</b>以出货长度值做为出货口，出货长度固定为20cm；<b>STA4CP协议</b>出货口固定为0，长度单位固定为英寸。</i></span>
+                    <span class="help-block">* 注意：没有指定出货口的情况下，<b>STA4DZ协议</b>以出货长度值做为出货口，出货长度固定为200mm；<b>STA4CP协议</b>出货口固定为0，长度单位固定为英寸。</i></span>
                 </div>
             </div>
-            {if empty($goods['agent'])}
-            <div class="form-group">
-                <label for="syncAll" class="col-md-2 control-label"></label>
-                <div class="col-md-10">
-                    <label class="checkbox-inline">
-                        <input type="checkbox" id="syncAll" name="syncAll" value="1" {if $goods && $goods['sync']}checked{/if}> 复制该商品到所有代理商
-                    </label>
-                </div>
-            </div>
+        </div>
+    </div>
+    <div class="form-group pull-right">
+        <div class="col-md-12">
+            {if $goods}
+            <input type="hidden" name="goodsId" value="{php echo !empty($goods)?$goods['id'] : -1}">
             {/if}
-            <div class="form-group pull-right">
-                <div class="col-md-12">
-                    {if $goods}
-                    <input type="hidden" name="goodsId" value="{php echo !empty($goods)?$goods['id'] : -1}">
-                    {/if}
-                    <button type="submit" class="btn btn-primary">确定</button>
-                    <a href="{php echo $this->createWebUrl('goods');}">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">返回</button>
-                    </a> 
-                </div>
-            </div>
+            <button type="submit" class="btn btn-primary">确定</button>
+            <a href="{php echo $this->createWebUrl('goods');}">
+                <button type="button" class="btn btn-default" data-dismiss="modal">返回</button>
+            </a> 
         </div>
     </div>
 </form>

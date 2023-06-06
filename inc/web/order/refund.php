@@ -33,4 +33,4 @@ if (is_error($res)) {
     JSON::fail($res);
 }
 
-JSON::success('退款成功！');
+JSON::success('退款申请已提交，请等待支付商处理！');

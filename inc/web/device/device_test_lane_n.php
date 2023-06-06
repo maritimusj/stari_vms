@@ -13,6 +13,10 @@ if (empty($device)) {
     JSON::fail('找不到这个设备！');
 }
 
+if ($device->isBlueToothDevice()) {
+    return err('对不起，蓝牙设备不支持后台测试出货！');
+}
+
 $lane = max(0, Request::int('lane'));
 $res = Util::deviceTest(null, $device, $lane);
 

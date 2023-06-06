@@ -543,8 +543,10 @@ class Device extends State
         if (empty($imei)) {
             $imei = self::DUMMY_DEVICE_PREFIX.Util::random(16, true);
         }
+
         $device->setName('');
         $device->setImei($imei);
+
         return $device;
     }
 
@@ -737,7 +739,6 @@ class Device extends State
 
         if (self::reset($device, $agent ? '绑定设备' : '解绑设备')) {
             $device->appNotify('update');
-
             return true;
         }
 
@@ -752,10 +753,6 @@ class Device extends State
      */
     public static function isOwner(deviceModelObj $device, userModelObj $user): bool
     {
-        if (empty($user) || empty($device)) {
-            return false;
-        }
-
         $owner = $device->getAgent();
         $superior_ids = [];
 
@@ -921,7 +918,7 @@ class Device extends State
 
             //指定设备id获取设备列表
             if (Request::has('ids')) {
-                $ids = Request::array('ids', []);
+                $ids = Request::array('ids');
                 $query->where(['id' => $ids]);
             }
 

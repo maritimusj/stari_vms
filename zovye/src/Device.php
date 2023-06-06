@@ -271,10 +271,8 @@ class Device extends State
                     if (empty($result['num'])) {
                         return true;
                     }
-
                     return $lane['num'] < $result['num'];
                 }
-
                 return false;
             };
         }
@@ -300,7 +298,6 @@ class Device extends State
         }
 
         $result['num'] = $total;
-
         return $result;
     }
 

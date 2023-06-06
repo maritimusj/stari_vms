@@ -376,7 +376,7 @@ class Device extends State
                     'remain' => DEFAULT_DEVICE_CAPACITY,
                 ];
 
-                $defaultType = App::getDefaultDeviceType();
+                $defaultType = DeviceTypes::getDefault();
                 if ($defaultType) {
                     $data['device_type'] = $defaultType->getId();
                 }
@@ -670,7 +670,7 @@ class Device extends State
         $device->remove('wx9se');
 
         //设备类型
-        $defaultDeviceType = App::getDefaultDeviceType();
+        $defaultDeviceType = DeviceTypes::getDefault();
         if ($defaultDeviceType) {
             $device->setDeviceType($defaultDeviceType->getId());
         } else {

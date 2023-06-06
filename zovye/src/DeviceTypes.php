@@ -15,6 +15,16 @@ class DeviceTypes
 {
     const UNKNOWN_TYPE = -1;
 
+    public static function getDefault(): ?device_typesModelObj
+    {
+        $id = settings('device.multi-types.first');
+        if ($id) {
+            return self::get($id);
+        }
+
+        return null;
+    }
+
     /**
      * @param $id
      * @return device_typesModelObj|null

@@ -288,7 +288,7 @@ class device
         if (empty($device)) {
             $params = [];
 
-            $defaultType = App::getDefaultDeviceType();
+            $defaultType = DeviceTypes::getDefault();
             if ($defaultType) {
                 $params['device_type'] = $defaultType->getId();
             }

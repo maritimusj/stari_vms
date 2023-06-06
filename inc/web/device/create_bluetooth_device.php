@@ -36,7 +36,7 @@ $extra = [
 ];
 
 $protocol = strtolower(request('protocol'));
-if (!in_array($protocol, ['wx', 'grid', 'ld', 'wx9se', 'bn', 'rh'])) {
+if (empty($protocol)) {
     $protocol = 'wx';
 }
 
@@ -72,8 +72,13 @@ if ($type_id) {
     $data['device_type'] = $type_data['id'];
     $extra['cargo_lanes'] = $type_data['cargo_lanes'];
 } else {
-    $data['device_type'] = 0;
-    $extra['cargo_lanes'] = [];
+    $defaultType = DeviceTypes::getDefault();
+    if ($defaultType) {
+        $data['device_type'] = $defaultType->getId();
+    } else {
+        $data['device_type'] = 0;
+        $extra['cargo_lanes'] = [];
+    }
 }
 
 $device = Device::create($data);

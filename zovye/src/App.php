@@ -547,16 +547,6 @@ class App
         });
     }
 
-    public static function getDefaultDeviceType(): ?device_typesModelObj
-    {
-        $id = settings('device.multi-types.first');
-        if ($id) {
-            return DeviceTypes::get($id);
-        }
-
-        return null;
-    }
-
     public static function isUseAccountQRCode(): bool
     {
         return onceCall(function () {

@@ -1,5 +1,5 @@
 {template 'common/header'}
-{php \zovye\url(true, 'static/css/common.css?v=20220516');}
+{php \zovye\url(true, 'static/css/common.css?v=20220518');}
 <style>
     .we7-modal-dialog .modal-body{
         max-height: 1000px;
@@ -36,17 +36,6 @@
         color: #ccc;
     }
 </style>
-<div class="panel panel-default">
-    <div class="panel-body">
-        <form class="form-inline" action="{php echo $this->createWebUrl('agent')}" method="post" id="search-form">
-          <div class="form-group">
-            <label for="keywords"></label>
-            <input type="text" class="form-control" name="keywords" id="keywords" placeholder="请输入代理商呢称/手机号码搜索" value="{$keywords}">
-          </div>
-          <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i>&nbsp;搜索</button>
-        </form>
-    </div>
-</div>
 <ul class="nav nav-tabs" id="navbar">
   <li role="presentation" class="active"><a href="#">所有代理商</a></li>
   <li role="presentation"><a href="{php echo $this->createWebUrl('agent', array('op'=>'app'));}">合作申请</a></li>
@@ -63,6 +52,14 @@
         </span>
     </div>
     <div class="panel-body">
+        <form class="form-inline" action="{php echo $this->createWebUrl('agent')}" method="post" id="search-form">
+            <div id="search-bar">
+                <div class="text-input">
+                    <input type="text" class="form-control" name="keywords" placeholder="请输入代理商呢称/手机号码搜索..." value="{$keywords}">
+                    <button type="submit" class="button" role="button"><i class="fa fa-search"></i>&nbsp;搜索</span>
+                </div>
+            </div>            
+        </form>
         {if $agents}
         <table class="table" id="userslist">
             <thead>

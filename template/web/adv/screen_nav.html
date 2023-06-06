@@ -1,5 +1,5 @@
 {template 'common/header'}
-{php \zovye\url(true, 'static/css/common.css?v=20220516');}
+{php \zovye\url(true, 'static/css/common.css?v=20220518');}
 <style>
     #list div.owner{
     display: flex;
@@ -17,6 +17,7 @@
     </div>
     <div class="panel-body">
         {if $advs}
+        {template 'web/adv/search'}
         <table class="table" id="list">
             <thead>
                 <tr>

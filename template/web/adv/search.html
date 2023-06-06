@@ -1,0 +1,18 @@
+
+<form class="form-inline" action="{$search_url}" method="post" id="search-form">
+    <div id="search-bar">
+        <div class="text-input">
+            <input type="text" class="form-control" name="keywords" placeholder="请输入关键字搜索..." value="{$keywords}">
+            <button type="submit" class="button" role="button"><i class="fa fa-search"></i>&nbsp;搜索</span>
+        </div>
+    </div>   
+    
+    <input type="hidden" name="type" value="{$type}">
+    {if isset($filter_agentId)}
+    <input type="hidden" name="agentId" value="{$filter_agentId}">
+    {/if}
+    {if $filter_media}
+    <input type="hidden" name="media" value="{$filter_media}">
+    {/if}
+
+</form>

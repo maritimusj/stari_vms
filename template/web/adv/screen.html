@@ -1,5 +1,5 @@
 {template 'common/header'}
-{php \zovye\url(true, 'static/css/common.css?v=20220516');}
+{php \zovye\url(true, 'static/css/common.css?v=20220518');}
 {if $op == 'default'}
 <style>
 .type span {
@@ -43,7 +43,7 @@
 }
 .type a span:hover, a .agent .profile:hover {
     box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.2);
-}
+}    
 </style>
 {template 'web/adv/nav'}
 <div class="panel panel-default panel-first nav-tab-item">
@@ -61,6 +61,7 @@
     </div>
     <div class="panel-body">
         {if $advs}
+        {template 'web/adv/search'}
         <table class="table" id="list">
             <thead>
                 <tr>

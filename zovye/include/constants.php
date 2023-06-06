@@ -118,6 +118,11 @@ define('CSS_ANIMATE_URL', 'https://cdn.staticfile.org/animate.css/4.1.1/animate.
 
 define('UPGRADE_URL', 'http://127.0.0.1:9012');
 
+define(
+    'HTTP_USER_AGENT',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36'
+);
+
 defined('DEVELOPMENT') or define('DEVELOPMENT', DEBUG);
 defined('TIMESTAMP') or define('TIMESTAMP', time());
 defined('CLIENT_IP') or define('CLIENT_IP', Util::getClientIp());

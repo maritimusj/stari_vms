@@ -3024,7 +3024,7 @@ HTML_CONTENT;
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
 
         if (empty($params[CURLOPT_USERAGENT])) {
-            $params[CURLOPT_USERAGENT] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36';
+            $params[CURLOPT_USERAGENT] = HTTP_USER_AGENT;
         }
 
         $headers = [];
@@ -3102,7 +3102,7 @@ HTML_CONTENT;
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
 
         if (empty($params[CURLOPT_USERAGENT])) {
-            $params[CURLOPT_USERAGENT] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36';
+            $params[CURLOPT_USERAGENT] = HTTP_USER_AGENT;
         }
 
         foreach ($params as $index => $val) {

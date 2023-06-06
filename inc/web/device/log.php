@@ -95,12 +95,12 @@ foreach ($query->findAll() as $entry) {
 
     $order_tid = $entry->getData('order.tid');
     if ($order_tid) {
-        $data['memo'] = '订单编号:'.$order_tid;
+        $data['memo'] = $order_tid;
     }
 
     $acc = $entry->getData('account');
     if ($acc) {
-        $data['memo'] = '公众号:'.$acc['name'];
+        $data['memo'] = $acc['title'].'('.$acc['name'].')';
     }
 
     $order_id = $entry->getData('order');

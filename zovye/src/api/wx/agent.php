@@ -837,25 +837,24 @@ class agent
         if (empty($agent_id)) {
             //绑定
             if ($agent->isAgent()) {
-                if (Device::bind($device, $agent)) {
-                    return ['op' => 'bind', 'result' => true];
+                if (!Device::bind($device, $agent)) {
+                    return err('绑定失败，请联系管理员！');
                 }
-            } else {
-                return err('只能绑定到代理商帐号！');
-            }
-        } else {
-            if (!$user->hasFactoryPermission()) {
-                if ($device->getAgentId() != $user->getAgentId()) {
-                    return err('没有权限管理这个设备！');
-                }
+                return ['op' => 'bind', 'result' => true];
             }
 
-            if (Device::unbind($device)) {
-                return ['op' => 'unbind', 'result' => true];
-            }
+            return err('只能绑定到代理商帐号！');
         }
 
-        return err('操作失败，请稍后再试！');
+        if (!$user->hasFactoryPermission() && $device->getAgentId() != $user->getAgentId()) {
+            return err('没有权限管理这个设备！');
+        }
+
+        if (!Device::unbind($device)) {
+            return err('解绑失败，请联系管理员！');
+        }
+
+        return ['op' => 'unbind', 'result' => true];
     }
 
     /**

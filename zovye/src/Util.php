@@ -1885,7 +1885,7 @@ HTML_CONTENT;
             $device = Device::get($device);
         }
 
-        if (!$device) {
+        if (empty($device)) {
             return err('找不到这个设备！');
         }
 

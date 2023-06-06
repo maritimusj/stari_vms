@@ -249,7 +249,7 @@ class Helper
                 $goods['lottery']['unit']
             ) : 1;//1 默认1，inch为单位
         } else {
-            $mcb_channel = Device::cargoLane2Channel($device, $goods['cargo_lane']);
+            $mcb_channel = Device::cargoLane2Channel($device, $goods['cargo_lane'] ?? -1);
             if ($mcb_channel == Device::CHANNEL_INVALID) {
                 return err('商品货道配置不正确！');
             }

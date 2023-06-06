@@ -44,7 +44,7 @@ if ($device) {
                             'id' => intval($adv['id']),
                             'name' => strval($adv['name']),
                             'image' => strval(Util::toMedia($image)),
-                            'url' => Util::murl('advsStats', $url_params),
+                            'url' => Util::murl('adsstats', $url_params),
                         ];
                     }
                 }

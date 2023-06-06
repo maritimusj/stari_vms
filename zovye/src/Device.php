@@ -345,24 +345,15 @@ class Device extends State
 
     public static function getGoodsByLane(deviceModelObj $device, $lane_id): array
     {
-        $result = [];
-
         $payload = self::getPayload($device);
         $lane = $payload['cargo_lanes'][$lane_id];
 
-        if (!empty($lane)) {
-            $goods_id = $lane['goods'];
-            $result = Goods::data($goods_id);
-            if ($result) {
-                $result['num'] = $lane['num'];
-                if ($lane['goods_price']) {
-                    $result['price'] = $lane['goods_price'];
-                    $result['price_formatted'] = $lane['goods_price_formatted'];
-                }
-            }
+        if (empty($lane)) {
+            return [];
         }
 
-        return $result;
+        $goods_id = $lane['goods'];
+        return self::getGoods($device, $goods_id);
     }
 
     /**

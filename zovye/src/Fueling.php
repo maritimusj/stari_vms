@@ -385,11 +385,12 @@ class Fueling
             return ['status' => $status];
         }
 
-        self::settleTimeoutOrder($device);
-
-        $result = $order->getFuelingRecord();
-        if ($result) {
-            return ['record' => $result];
+        $ids = self::settleTimeoutOrder($device);
+        if (in_array($order->getId(), $ids)) {
+            $result = $order->getFuelingRecord();
+            if ($result) {
+                return ['record' => $result];
+            }
         }
 
         return ['message' => '正在查询状态...'];
@@ -499,9 +500,11 @@ class Fueling
     }
 
     // 处理超时订单
-    public static function settleTimeoutOrder(deviceModelObj $device, string $exclude_serial = '', $timeout = 300)
+    public static function settleTimeoutOrder(deviceModelObj $device, string $exclude_serial = '', $timeout = 300): array
     {
         $query = Order::query(['src' => Order::FUELING_UNPAID, 'device_id' => $device->getId()]);
+
+        $result = [];
 
         /** @var orderModelObj $order */
         foreach ($query->findAll() as $order) {
@@ -517,8 +520,11 @@ class Fueling
                     'reason' => -1,
                     'time' => time(),
                 ]);
+                $reuslt[] = $order->getId();
             }
         }
+
+        return $result;
     }
 
     public static function onEventOnline(deviceModelObj $device)

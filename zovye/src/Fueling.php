@@ -436,10 +436,7 @@ class Fueling
             if ($order) {
                 $order->setSrc(Order::FUELING);
 
-                $user = $order->getUser();
-
                 $num = $order->getNum();
-
                 if ($num > 0) {
                     //减少库存
                     $locker = $device->payloadLockAcquire(3);
@@ -455,6 +452,7 @@ class Fueling
                     $locker->unlock();
                 }
 
+                $user = $order->getUser();
                 $card_type = $order->getExtraData('card.type', '');
 
                 if ($card_type != VIPCard::getTypename()) {

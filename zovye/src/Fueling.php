@@ -49,6 +49,7 @@ class Fueling
 
         return true;
     }
+
     public static function start(string $serial, ICard $card, deviceModelObj $device, $chargerID = 0, $extra = [])
     {
         return Util::transactionDo(function () use ($serial, $card, $device, $chargerID, $extra) {
@@ -421,7 +422,16 @@ class Fueling
             $order->setFuelingRecord($data);
         });
 
-        $result = Util::transactionDo(function () use($serial, $device, $chargerID) {
+        if (!Locker::try("settle:".$serial, REQUEST_ID, 2)) {
+            Log::error("fueling", [
+                'error' => '结算订单时，锁定失败！',
+                'data' => $data,
+                'device' => $device->profile(),
+            ]);
+            return err('订单锁订失败！');
+        }
+
+        $result = Util::transactionDo(function () use ($serial, $device, $chargerID) {
             $order = Order::findOne(['order_id' => $serial, 'src' => Order::FUELING_UNPAID]);
             if ($order) {
                 $order->setSrc(Order::FUELING);
@@ -476,7 +486,7 @@ class Fueling
                                 'serial' => $serial,
                                 'chargerID' => $chargerID,
                             ];
-                            if (!$balance->change(0 -  $order->getPrice(), CommissionBalance::FUELING_FEE, $extra)) {
+                            if (!$balance->change(0 - $order->getPrice(), CommissionBalance::FUELING_FEE, $extra)) {
                                 return err('用户扣款失败！');
                             }
                         }
@@ -485,6 +495,7 @@ class Fueling
 
                 Job::orderNotify($order);
             }
+
             return true;
         });
 
@@ -500,8 +511,11 @@ class Fueling
     }
 
     // 处理超时订单
-    public static function settleTimeoutOrder(deviceModelObj $device, string $exclude_serial = '', $timeout = 300): array
-    {
+    public static function settleTimeoutOrder(
+        deviceModelObj $device,
+        string $exclude_serial = '',
+        $timeout = 300
+    ): array {
         $query = Order::query(['src' => Order::FUELING_UNPAID, 'device_id' => $device->getId()]);
 
         $result = [];
@@ -511,7 +525,6 @@ class Fueling
             if ($exclude_serial && $order->getOrderNO() == $exclude_serial) {
                 continue;
             }
-
             $last_update_time = $order->getExtraData('fueling.stats.time', $order->getCreatetime());
             if ($exclude_serial || time() - $last_update_time > $timeout) {
                 self::settle($device, [
@@ -520,7 +533,7 @@ class Fueling
                     'reason' => -1,
                     'time' => time(),
                 ]);
-                $reuslt[] = $order->getId();
+                $result[] = $order->getId();
             }
         }
 
@@ -627,9 +640,9 @@ class Fueling
 
     public static function getSoloUser(): userModelObj
     {
-        return User::getOrCreate('fueling_user_' . We7::uniacid(), User::PSEUDO, [
+        return User::getOrCreate('fueling_user_'.We7::uniacid(), User::PSEUDO, [
             'nickname' => '普通用户',
-            'avatar' => MODULE_URL . 'static/img/unknown.svg',
+            'avatar' => MODULE_URL.'static/img/unknown.svg',
         ]);
     }
 
@@ -697,7 +710,7 @@ class Fueling
     public static function onEventFee(deviceModelObj $device, $data)
     {
         $serial = strval($data['ser']);
-        if (Locker::try('fueling:' . $serial, REQUEST_ID, 3)) {
+        if (Locker::try('fueling:'.$serial, REQUEST_ID, 3)) {
             if ($data['solo'] === self::MODE_SOLO) {
                 $result = self::createOrderFromSoloModeData($device, $data);
             } else {

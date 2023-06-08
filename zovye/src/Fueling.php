@@ -385,6 +385,13 @@ class Fueling
             return ['status' => $status];
         }
 
+        self::settleTimeoutOrder($device);
+
+        $result = $order->getFuelingRecord();
+        if ($result) {
+            return ['record' => $result];
+        }
+
         return ['message' => '正在查询状态...'];
     }
 
@@ -495,6 +502,7 @@ class Fueling
     public static function settleTimeoutOrder(deviceModelObj $device, string $exclude_serial = '', $timeout = 300)
     {
         $query = Order::query(['src' => Order::FUELING_UNPAID, 'device_id' => $device->getId()]);
+
         /** @var orderModelObj $order */
         foreach ($query->findAll() as $order) {
             if ($exclude_serial && $order->getOrderNO() == $exclude_serial) {
@@ -558,8 +566,6 @@ class Fueling
     {
         $serial = strval($data['ser']);
         if ($serial) {
-            self::settleTimeoutOrder($device, $serial);
-
             $chargerID = intval($data['ch']);
             $device->setFuelingStatusData($chargerID, $data);
 
@@ -608,6 +614,8 @@ class Fueling
             if ($should_stop_fueling) {
                 self::stopFueling($device, $chargerID, $serial);
             }
+
+            self::settleTimeoutOrder($device, $serial);
         }
     }
 

@@ -284,6 +284,9 @@ class Device extends State
             //统计商品总库存
             if ($lane['goods'] == $goods_id) {
                 $total += $lane['num'];
+                if (!isset($result['cargo_lane'])) {
+                    $result['cargo_lane'] = $index;
+                }
             }
 
             //根据出货策略匹配货道

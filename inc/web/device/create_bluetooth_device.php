@@ -21,6 +21,10 @@ if (empty($data['name']) || empty($data['imei'])) {
     JSON::fail('设备名称或IMEI不能为空！');
 }
 
+if (!Locker::try('create:' . $data['imei'])) {
+    JSON::fail('无法锁定，请稍后重试！');
+}
+
 if (Device::get($data['imei'], true)) {
     JSON::fail('IMEI已经存在！');
 }

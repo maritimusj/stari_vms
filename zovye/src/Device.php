@@ -353,7 +353,16 @@ class Device extends State
         }
 
         $goods_id = $lane['goods'];
-        return self::getGoods($device, $goods_id);
+        $result = Goods::data($goods_id);
+        if ($result) {
+            $result['num'] = $lane['num'];
+            if ($lane['goods_price']) {
+                $result['price'] = $lane['goods_price'];
+                $result['price_formatted'] = $lane['goods_price_formatted'];
+            }
+            $result['cargo_lane'] = $lane_id;
+        }
+        return $result;
     }
 
     /**

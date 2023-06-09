@@ -675,13 +675,13 @@ include './index.php';
             list($query, $m) = $e;
 
             $query->limit($limit);
-            $count = $m == 'sum' ? $query->sum('num') : $query->count();
+            $total = $m == 'sum' ? $query->sum('num') : $query->count();
 
-            if ($count >= $limit) {
+            if ($total >= $limit) {
                 return true;
             }
 
-            $limit -= $count;
+            $limit -= $total;
         }
 
         return false;

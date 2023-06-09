@@ -633,7 +633,10 @@ include './index.php';
             if ($user) {
                 $cond['user_id'] = $user->getId();
             }
-            $arr[] = BalanceLog::query($cond);
+            $arr[] = [
+                BalanceLog::query($cond),
+                'count',
+            ];
         } elseif ($account->isQuestionnaire()) {
             $cond = array_merge($params, [
                 'level' => $account->getId(),
@@ -641,7 +644,10 @@ include './index.php';
             if ($user) {
                 $cond['title'] = $user->getOpenid();
             }
-            $arr[] = Questionnaire::log($cond);
+            $arr[] = [
+                Questionnaire::log($cond),
+                'count',
+            ];
         } else {
             $cond = array_merge($params, [
                 'account_id' => $account->getId(),
@@ -649,23 +655,32 @@ include './index.php';
             if ($user) {
                 $cond['user_id'] = $user->getId();
             }
-            $arr[] = BalanceLog::query($cond);
-
+            $arr[] = [
+                BalanceLog::query($cond),
+                'count',
+            ];
             $cond2 = array_merge($params, [
                 'account' => $account->getName(),
             ]);
             if ($user) {
                 $cond2['openid'] = $user->getOpenid();
             }
-            $arr[] = Order::query($cond2);
+            $arr[] = [
+                Order::query($cond2),
+                'sum',
+            ];
         }
 
-        foreach ($arr as $query) {
+        foreach ($arr as $e) {
+            list($query, $m) = $e;
+
             $query->limit($limit);
-            $count = $query->sum('num');
+            $count = $m == 'sum' ? $query->sum('num') : $query->count();
+
             if ($count >= $limit) {
                 return true;
             }
+
             $limit -= $count;
         }
 

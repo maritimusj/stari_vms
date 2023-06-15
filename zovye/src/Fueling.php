@@ -422,7 +422,7 @@ class Fueling
             $order->setFuelingRecord($data);
         });
 
-        if (!Locker::try("settle:".$serial, REQUEST_ID, 2)) {
+        if (!Locker::try("settle:".$serial, REQUEST_ID, 3)) {
             Log::error("fueling", [
                 'error' => '结算订单时，锁定失败！',
                 'data' => $data,
@@ -464,10 +464,6 @@ class Fueling
                     ]);
                 }
 
-                if (!$order->save()) {
-                    return err('保存订单失败！');
-                }
-
                 $pay_log = Pay::getPayLog($serial);
                 if ($pay_log) {
                     $remain = $pay_log->getPrice() - $order->getPrice();
@@ -492,6 +488,10 @@ class Fueling
                 }
 
                 Job::orderNotify($order);
+
+                if (!$order->save()) {
+                    return err('保存订单失败！');
+                }
             }
 
             return true;
@@ -707,28 +707,25 @@ class Fueling
 
     public static function onEventFee(deviceModelObj $device, $data)
     {
-        $serial = strval($data['ser']);
-        if (Locker::try('fueling:'.$serial, REQUEST_ID, 3)) {
-            if ($data['solo'] === self::MODE_SOLO) {
-                $result = self::createOrderFromSoloModeData($device, $data);
-            } else {
-                $result = self::settle($device, $data);
-            }
+        if ($data['solo'] === self::MODE_SOLO) {
+            $result = self::createOrderFromSoloModeData($device, $data);
+        } else {
+            $result = self::settle($device, $data);
+        }
 
+        if (is_error($result)) {
+            Log::error('fueling', [
+                'error' => $result,
+                'data' => $data,
+            ]);
+
+        } else {
+            $serial = strval($data['ser']);
+            $result = self::confirm($device, $serial);
             if (is_error($result)) {
                 Log::error('fueling', [
-                    'error' => $result,
-                    'data' => $data,
+                    'confirm' => $result,
                 ]);
-
-            } else {
-                $serial = strval($data['ser']);
-                $result = self::confirm($device, $serial);
-                if (is_error($result)) {
-                    Log::error('fueling', [
-                        'confirm' => $result,
-                    ]);
-                }
             }
         }
     }

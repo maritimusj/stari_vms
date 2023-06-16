@@ -67,9 +67,9 @@ if (Request::has('account_id')) {
 
 $way = Request::str('way');
 if ($way == 'free') {
-    $query->where(['src' => [Order::FREE, Order::ACCOUNT]]);
+    $query->where(['src' => [Order::FREE, Order::ACCOUNT, Order::FUELING_SOLO]]);
 } elseif ($way == 'pay') {
-    $query->where(['src' => Order::PAY]);
+    $query->where(['src' => [Order::PAY, Order::FUELING, Order::FUELING_UNPAID]]);
 } elseif ($way == 'balance') {
     $query->where(['src' => Order::BALANCE]);
 }  elseif ($way == 'charging') {

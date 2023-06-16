@@ -112,6 +112,7 @@ if ($page == 'device') {
     }
 
 } elseif ($page == 'ctrl') {
+
     $url = Request::trim('controlAddr');
     if (empty($url)) {
         $url = "http://127.0.0.1:8080";

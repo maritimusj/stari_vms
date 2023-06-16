@@ -28,6 +28,8 @@
                 <td>
                     {if $data['reason'] == -1}
                     <span class="error">强制停止</span>
+                    {elseif $data['reason'] == 1}
+                    <span class="warning">未提枪</span>
                     {elseif $data['reason'] == 2}
                     <span class="error">超时停止</span>
                     {elseif $data['reason'] == 3}

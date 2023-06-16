@@ -3,7 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
- 
+
 namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
@@ -67,14 +67,22 @@ if (Request::has('account_id')) {
 
 $way = Request::str('way');
 if ($way == 'free') {
-    $query->where(['src' => [Order::FREE, Order::ACCOUNT, Order::FUELING_SOLO]]);
+    if (App::isFuelingDeviceEnabled()) {
+        $query->where(['src' => [Order::FREE, Order::ACCOUNT, Order::FUELING_SOLO]]);
+    } else {
+        $query->where(['src' => Order::FREE]);
+    }
 } elseif ($way == 'pay') {
-    $query->where(['src' => [Order::PAY, Order::FUELING, Order::FUELING_UNPAID]]);
+    if (App::isFuelingDeviceEnabled()) {
+        $query->where(['src' => [Order::PAY, Order::FUELING, Order::FUELING_UNPAID]]);
+    } else {
+        $query->where(['src' => Order::PAY]);
+    }
 } elseif ($way == 'balance') {
     $query->where(['src' => Order::BALANCE]);
-}  elseif ($way == 'charging') {
+} elseif ($way == 'charging') {
     $query->where(['src' => [Order::CHARGING, Order::CHARGING_UNPAID]]);
-}   elseif ($way == 'fueling') {
+} elseif ($way == 'fueling') {
     $query->where(['src' => [Order::FUELING, Order::FUELING_UNPAID, Order::FUELING_SOLO]]);
 } elseif ($way == 'refund') {
     $query->where(['refund' => 1]);

@@ -8,7 +8,6 @@ namespace zovye;
 
 use zovye\model\userModelObj;
 use zovye\model\agentModelObj;
-use zovye\model\device_typesModelObj;
 use zovye\model\deviceModelObj;
 
 class App
@@ -676,6 +675,13 @@ class App
     {
         return onceCall(function () {
             return boolval(settings('custom.MultiGoodsItem.enabled'));
+        });
+    }
+
+    public static function getUserBalanceByMobileEnabled(): bool
+    {
+        return onceCall(function () {
+            return boolval(settings('custom.getUserBalanceByMobile.enabled'));
         });
     }
 }

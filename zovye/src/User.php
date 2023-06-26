@@ -341,4 +341,18 @@ class User
 
         return $discount;
     }
+
+    public static function getAllUserByMobile($mobile): array
+    {
+        $result = [];
+
+        /** @var userModelObj $user */
+        foreach (User::query(['mobile' => $mobile])->findAll() as $user) {
+            if (!$user->isBanned()) {
+                $result[] = $user;
+            }
+        }
+
+        return $result;
+    }
 }

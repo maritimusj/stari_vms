@@ -121,55 +121,68 @@ class Balance
         }
     }
 
+
+
     /**
      * 获取当前余额
      * @return int
      */
     public function total(): int
     {
-        $total = 0;
-
-        if ($this->user) {
-
-            $openid = $this->user->getOpenid();
-            $query = Balance::query(['openid' => $openid]);
-
-            $last_id = 0;
-            $last_total = 0;
-            $last_time = 0;
-
-            $cache = $this->user->get('balance:cache', []);
-            if ($cache && isset($cache['id']) && isset($cache['total'])) {
-
-                $last_id = intval($cache['id']);
-                $last_total = intval($cache['total']);
-                $last_time = intval($cache['time']);
-
-                $query->where(['id >' => $last_id]);
-            }
-
-            if (time() - $last_time > self::CACHE_EXPIRATION) {
-
-                list($total, $id) = $query->get(['sum(x_val)', 'max(id)']);
-
-                if (isset($id) && $id > $last_id) {
-                    $total += $last_total;
-                    $locker = $this->user->acquireLocker(User::BALANCE_LOCKER);
-                    if ($locker) {
-                        $this->user->set('balance:cache', [
-                            'id' => $id,
-                            'total' => $total,
-                            'time' => time(),
-                        ]);
-                        $locker->unlock();
-                    }
-                } else {
-                    $total = $last_total;
+        if (App::getUserBalanceByMobileEnabled()) {
+            $mobile = $this->user->getMobile();
+            if (!empty($mobile)) {
+                $total = 0;
+                $allUser = User::getAllUserByMobile($mobile);
+                foreach($allUser as $user) {
+                    $total += self::getTotal($user);
                 }
-
-            } else {
-                $total = $query->get('sum(x_val)') + $last_total;
+                return $total;
             }
+        }
+
+        return self::getTotal($this->user);
+    }
+
+    protected static function getTotal(userModelObj $user) {
+
+        $query = Balance::query(['openid' => $user->getOpenid()]);
+
+        $last_id = 0;
+        $last_total = 0;
+        $last_time = 0;
+
+        $cache = $user->get('balance:cache', []);
+        if ($cache && isset($cache['id']) && isset($cache['total'])) {
+
+            $last_id = intval($cache['id']);
+            $last_total = intval($cache['total']);
+            $last_time = intval($cache['time']);
+
+            $query->where(['id >' => $last_id]);
+        }
+
+        if (time() - $last_time > self::CACHE_EXPIRATION) {
+
+            list($total, $id) = $query->get(['sum(x_val)', 'max(id)']);
+
+            if (isset($id) && $id > $last_id) {
+                $total += $last_total;
+                $locker = $user->acquireLocker(User::BALANCE_LOCKER);
+                if ($locker) {
+                    $user->set('balance:cache', [
+                        'id' => $id,
+                        'total' => $total,
+                        'time' => time(),
+                    ]);
+                    $locker->unlock();
+                }
+            } else {
+                $total = $last_total;
+            }
+
+        } else {
+            $total = $query->get('sum(x_val)') + $last_total;
         }
 
         return $total;

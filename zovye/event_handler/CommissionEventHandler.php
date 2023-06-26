@@ -142,7 +142,7 @@ class CommissionEventHandler
     {
         $val = intval(Config::app('wxapp.advs.reward.freeCommission', 0));
 
-        $commission_total = $val * $order->getNum();
+        $commission_total = $val * $order->getItemNum();
 
         if ($commission_total < 1) {
             return true;
@@ -161,7 +161,7 @@ class CommissionEventHandler
     {
         $val = intval(Config::balance('order.commission.val', 0));
 
-        $commission_total = $val * $order->getNum();
+        $commission_total = $val * $order->getItemNum();
 
         if ($commission_total < 1) {
             return true;
@@ -241,7 +241,7 @@ class CommissionEventHandler
         //第2步，计算商品利润（减去成本价）
         $goods = $order->getGoods();
 
-        $cost_price = empty($goods) ? 0 : $goods->getCostPrice() * $order->getNum();
+        $cost_price = empty($goods) ? 0 : $goods->getCostPrice() * $order->getItemNum();
 
         $remaining_total -= $cost_price;
 
@@ -350,7 +350,7 @@ class CommissionEventHandler
         if ($config['percent']) {
             $val = intval(round($commission_total * intval($config['percent']) / 10000));
         } elseif ($config['fixed']) {
-            $val = intval($config['fixed'] * $order->getNum());
+            $val = intval($config['fixed'] * $order->getItemNum());
         } else {
             $val = 0;
         }
@@ -435,7 +435,7 @@ class CommissionEventHandler
             if ($is_percent) {
                 $val = intval(round($commission_total * intval($v) / 100));
             } else {
-                $val = intval($v * $order->getNum());
+                $val = intval($v * $order->getItemNum());
             }
 
             if ($val > $remaining_total) {
@@ -530,13 +530,13 @@ class CommissionEventHandler
                         $gsp_val = intval(round($commission_total * $val / 10000));
                         break;
                     case GSP::PERCENT_PER_GOODS:
-                        $gsp_val = intval(round($commission_total * $val / 10000) * $order->getNum());
+                        $gsp_val = intval(round($commission_total * $val / 10000) * $order->getItemNum());
                         break;
                     case GSP::AMOUNT:
                         $gsp_val = intval($val);
                         break;
                     case GSP::AMOUNT_PER_GOODS:
-                        $gsp_val = intval($val * $order->getNum());
+                        $gsp_val = intval($val * $order->getItemNum());
                         break;
                 }
 
@@ -578,13 +578,13 @@ class CommissionEventHandler
                         $gsp_val = intval(round($commission_total * $val / 10000));
                         break;
                     case GSP::PERCENT_PER_GOODS:
-                        $gsp_val = intval(round($commission_total * $val / 10000) * $order->getNum());
+                        $gsp_val = intval(round($commission_total * $val / 10000) * $order->getItemNum());
                         break;
                     case GSP::AMOUNT:
                         $gsp_val = $val;
                         break;
                     case GSP::AMOUNT_PER_GOODS:
-                        $gsp_val = $val * $order->getNum();
+                        $gsp_val = $val * $order->getItemNum();
                         break;
                 }
 
@@ -654,7 +654,7 @@ class CommissionEventHandler
                 $fee_type = intval($agent_data['commission']['fee_type']);
 
                 if ($fee_type == 0) {
-                    $val = $fee * $order->getNum();
+                    $val = $fee * $order->getItemNum();
                 } else {
                     $val = intval(round($commission_total * $fee / 10000));
                 }

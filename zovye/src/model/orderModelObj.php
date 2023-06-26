@@ -103,6 +103,20 @@ class orderModelObj extends modelObj
         return $this->isFuelingOrder() ? $num / 100 : $num;
     }
 
+    public function getItemNum(): int
+    {
+        if (App::isMultiGoodsItemEnabled()) {
+            if (!$this->isPackage()) {
+                $goods = $this->getGoodsData();
+                if (!empty($goods['itemNum'])) {
+                    return $this->getNum() * intval($goods['itemNum']);
+                }
+            }
+        }
+
+        return $this->getNum();
+    }
+
     public function getAccount($obj = false)
     {
         if ($obj) {

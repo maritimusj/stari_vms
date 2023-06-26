@@ -129,8 +129,10 @@ class Balance
     public function total(): int
     {
         if (App::getUserBalanceByMobileEnabled()) {
+
             $mobile = $this->user->getMobile();
             if (!empty($mobile)) {
+
                 $total = 0;
                 $allUser = User::getAllUserByMobile($mobile);
 
@@ -149,7 +151,6 @@ class Balance
 
     protected static function getTotal(userModelObj $user)
     {
-
         $query = Balance::query(['openid' => $user->getOpenid()]);
 
         $last_id = 0;

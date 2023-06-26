@@ -122,7 +122,6 @@ class Balance
     }
 
 
-
     /**
      * 获取当前余额
      * @return int
@@ -134,17 +133,22 @@ class Balance
             if (!empty($mobile)) {
                 $total = 0;
                 $allUser = User::getAllUserByMobile($mobile);
-                foreach($allUser as $user) {
-                    $total += self::getTotal($user);
+
+                if (!empty($allUser)) {
+                    foreach ($allUser as $user) {
+                        $total += self::getTotal($user);
+                    }
+
+                    return $total;
                 }
-                return $total;
             }
         }
 
         return self::getTotal($this->user);
     }
 
-    protected static function getTotal(userModelObj $user) {
+    protected static function getTotal(userModelObj $user)
+    {
 
         $query = Balance::query(['openid' => $user->getOpenid()]);
 

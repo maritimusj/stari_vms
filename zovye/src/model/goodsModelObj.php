@@ -216,6 +216,11 @@ class goodsModelObj extends modelObj
         return intval($this->getExtraData('costPrice', 0));
     }
 
+    public function getItemNum()
+    {
+        return $this->getExtraData('itemNum');
+    }
+
     public function getType(): string
     {
         return $this->getExtraData('type', '');

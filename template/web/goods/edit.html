@@ -103,6 +103,15 @@
                         <span class="help-block">* 用户使用微信支付购买时的价格</span>
                     </div>
                 </div>
+                {if \zovye\App::isMultiGoodsItemEnabled()}
+                <div class="form-group">
+                    <label for="itemNum" class="col-md-2 control-label">物品数量</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" id="itemNum" name="itemNum" step="1" value="{php echo $goods? strval($goods['itemNum']) : ''}">
+                        <span class="help-block">* 每件商品实际包含的物品数量，不填写则默认为1</span>
+                    </div>
+                </div>
+                {/if}
                 <div class="form-group">
                     <label for="costPrice" class="col-md-2 control-label">成本（元）</label>
                     <div class="col-md-10">

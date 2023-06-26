@@ -118,6 +118,12 @@ if (isset($params['goodsId'])) {
             $goods->setExtraData('costPrice', floatval($params['costPrice'] * 100));
         }
 
+        if (App::isMultiGoodsItemEnabled() && is_numeric($params['itemNum'])) {
+            $goods->setExtraData('itemNum', intval($params['itemNum']));
+        } else {
+            $goods->setExtraData('itemNum', '');
+        }
+
         $goods->setExtraData('cw', empty($params['goodsCW']) ? 0 : 1);
 
         if (isset($params['discountPrice'])) {
@@ -184,6 +190,10 @@ if (isset($params['goodsId'])) {
 
     if (isset($params['costPrice'])) {
         $data['extra']['costPrice'] = round(floatval($params['costPrice']) * 100);
+    }
+
+    if (App::isMultiGoodsItemEnabled() && is_numeric($params['itemNum'])) {
+        $data['extra']['itemNum'] = intval($params['itemNum']);
     }
 
     //成本是否参与分佣

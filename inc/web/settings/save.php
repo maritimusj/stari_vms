@@ -160,6 +160,7 @@ if ($page == 'device') {
     $settings['custom']['flashEgg']['enabled'] = Request::bool('flashEggEnabled') ? 1 : 0;
     $settings['custom']['promoter']['enabled'] = Request::bool('promoterEnabled') ? 1 : 0;
     $settings['custom']['GDCVMachine']['enabled'] = Request::bool('GDCVMachineEnabled') ? 1 : 0;
+    $settings['custom']['MultiGoodsItem']['enabled'] = Request::bool('MultiGoodsItemEnabled') ? 1 : 0;
 
     Config::app('ad.sponsor.enabled', Request::bool('sponsorAd'), true);
 

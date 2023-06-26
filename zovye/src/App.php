@@ -670,5 +670,12 @@ class App
         return onceCall(function () {
             return boolval(settings('custom.GDCVMachine.enabled'));
         });
-    }   
+    }
+
+    public static function isMultiGoodsItemEnabled(): bool
+    {
+        return onceCall(function () {
+            return boolval(settings('custom.MultiGoodsItem.enabled'));
+        });
+    }
 }

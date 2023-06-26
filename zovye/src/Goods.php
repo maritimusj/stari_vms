@@ -189,6 +189,13 @@ class Goods
             $data['costPrice_formatted'] = '￥'.number_format($cost_price / 100, 2).'元';
         }
 
+        if (App::isMultiGoodsItemEnabled()) {
+            $itemNum = $entry->getItemNum();
+            if (!empty($itemNum)) {
+                $data['itemNum'] = intval($itemNum);
+            }
+        }
+
         if (App::isBalanceEnabled()) {
             $data['balance'] = $entry->getBalance();
         }

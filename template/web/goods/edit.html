@@ -108,7 +108,7 @@
                     <label for="itemNum" class="col-md-2 control-label">物品数量</label>
                     <div class="col-md-10">
                         <input type="number" class="form-control" id="itemNum" name="itemNum" step="1" value="{php echo $goods? strval($goods['itemNum']) : ''}">
-                        <span class="help-block">* 每件商品实际包含的物品数量，不填写则默认为1</span>
+                        <span class="help-block">* 每件商品实际包含的物品数量，不填写则默认为1（佣金计算的实际数量）</span>
                     </div>
                 </div>
                 {/if}

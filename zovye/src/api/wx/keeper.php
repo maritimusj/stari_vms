@@ -85,6 +85,8 @@ class keeper
                 }
                 $user->setMobile($mobile);
                 $user->save();
+            } else {
+                $mobile = $user->getMobile();
             }
         } else {
             $mobile = strval($res['phoneNumber']);

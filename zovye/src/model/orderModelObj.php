@@ -106,11 +106,9 @@ class orderModelObj extends modelObj
     public function getItemNum(): int
     {
         if (App::isMultiGoodsItemEnabled()) {
-            if (!$this->isPackage()) {
-                $goods = $this->getGoodsData();
-                if (!empty($goods['itemNum'])) {
-                    return $this->getNum() * intval($goods['itemNum']);
-                }
+            $goods = $this->getGoodsData();
+            if (!empty($goods['itemNum'])) {
+                return $this->getNum() * intval($goods['itemNum']);
             }
         }
 

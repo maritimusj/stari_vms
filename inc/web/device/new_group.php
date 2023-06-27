@@ -37,6 +37,8 @@ $total = $query->count();
 //列表数据
 $query->page($page, $page_size);
 
+$query->orderBy('id desc');
+
 $list = [];
 /** @var device_groupsModelObj $entry */
 foreach ($query->findAll() as $entry) {

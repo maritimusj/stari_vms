@@ -11,10 +11,14 @@ defined('IN_IA') or exit('Access Denied');
 use zovye\model\device_groupsModelObj;
 
 $title = Request::trim('title');
-$clr = request('clr');
+$clr = Request::trim('clr');
+if (empty($clr)) {
+    $clr = Util::randColor();
+}
+
 $agent_id = Request::int('agentId');
 
-$id = Request::int('id') ?: time();
+$id = Request::int('id');
 
 /** @var device_groupsModelObj $one */
 $one = Group::get($id);

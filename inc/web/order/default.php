@@ -226,6 +226,7 @@ foreach ($query->findAll() as $entry) {
     $commission = $entry->getExtraData('commission', []);
     if ($commission) {
         $data['commission'] = $commission;
+        $data['commission']['fee'] = $entry->getExtraData('pay.fee');
     }
 
     $pay_result = $entry->getExtraData('payResult');

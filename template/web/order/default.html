@@ -95,6 +95,10 @@
     #orderlist i.upload-fail {
         color: #9E9E9E;
     }
+    #orderlist .commission-fee {
+        color: #9E9E9E;
+        font-size: 9px;
+    }
 </style>
 <ul class="nav nav-tabs" id="navbar">
     {if empty($s_way)}
@@ -540,7 +544,15 @@
                             {if $order['commission']}
                             <div class="commission_detail local">
                                 <div class="total">
-                                    <span class="title">订单佣金 </span><span data-op="commissionDetail">￥{php echo number_format($order['commission']['local']['total'] / 100, 2)}元</span>
+                                    <span class="title">订单佣金 </span>
+                                    <span data-op="commissionDetail">
+                                        ￥{php echo number_format($order['commission']['local']['total'] / 100, 2)}元
+                                        {if $order['commission']['fee']}
+                                        <span class="commission-fee">
+                                            (扣除手续费￥{php echo number_format($order['commission']['fee'] / 100, 2)}元)
+                                        </span>
+                                        {/if}
+                                    </span>
                                 </div>
                                 {if $order['commission']['bonus']}
                                 {loop $order['commission']['bonus'] $index $item}

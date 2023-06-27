@@ -117,7 +117,7 @@ class agent
         $user = User::get($openid, true);
         if ($user) {
             if (empty($user->getMobile())) {
-                $mobile = $res['phoneNumber'];
+                $mobile = strval($res['phoneNumber']);
                 if (empty($mobile)) {
                     return error(1001, '用户没有绑定手机号码！');
                 }

@@ -42,4 +42,4 @@ if (is_error($result)) {
     );
 }
 
-Util::itoast($result['msg'], $this->createWebUrl('adv', ['op' => 'edit', 'type' => $adv->getType(), 'id' => $id]), 'success');
+Util::itoast($result['msg'], $this->createWebUrl('adv', ['op' => 'edit', 'type' => $from_type, 'media' => $from_media, 'id' => $id]), 'success');

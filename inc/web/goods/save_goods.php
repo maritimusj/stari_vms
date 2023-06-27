@@ -94,7 +94,7 @@ if (isset($params['goodsId'])) {
                 $goods->setExtraData('lottery.index', intval($params['goodsMcbIndex']));
             }
         } else {
-            $goods->setExtraData('lottery.index');
+            $goods->setExtraData('lottery');
         }
 
         if (isset($params['goodsSizeUnit'])) {

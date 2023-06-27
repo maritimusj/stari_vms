@@ -111,7 +111,7 @@ class agent
     {
         $openid = strval($res['openId']);
         if (empty($openid)) {
-            return err('用户openid为空！');
+            return err('登录失败，无法获取用户openid！');
         }
 
         $user = User::get($openid, true);
@@ -119,7 +119,7 @@ class agent
             if (empty($user->getMobile())) {
                 $mobile = strval($res['phoneNumber']);
                 if (empty($mobile)) {
-                    return error(1001, '用户没有绑定手机号码！');
+                    return error(1001, '登录失败，用户没有绑定手机号码！');
                 }
                 $user->setMobile($mobile);
                 $user->save();
@@ -139,7 +139,7 @@ class agent
         }
 
         if (empty($mobile)) {
-            return err('用户手机号码获取失败！');
+            return err('登录失败，用户手机号码获取失败！');
         }
 
         $user = User::findOne(['mobile' => $mobile, 'app' => User::WX]);

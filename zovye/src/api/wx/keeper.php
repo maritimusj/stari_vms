@@ -31,7 +31,7 @@ use zovye\User;
 use zovye\Util;
 use zovye\We7;
 use function zovye\err;
-use function zovye\isEmptyArray;
+use function zovye\error;
 use function zovye\request;
 use function zovye\is_error;
 use function zovye\m;
@@ -71,8 +71,32 @@ class keeper
             return err('登录失败，请稍后再试！[500]');
         }
 
-        $mobile = $res['phoneNumber'];
-        $session_key = $res['session_key'];
+        $openid = strval($res['openId']);
+        if (empty($openid)) {
+            return err('登录失败，无法获取用户openid！');
+        }
+
+        $user = User::get($openid, true);
+        if ($user) {
+            if (empty($user->getMobile())) {
+                $mobile = strval($res['phoneNumber']);
+                if (empty($mobile)) {
+                    return error(1001, '用户没有绑定手机号码！');
+                }
+                $user->setMobile($mobile);
+                $user->save();
+            }
+        } else {
+            $mobile = strval($res['phoneNumber']);
+            User::create([
+                'app' => User::WxAPP,
+                'openid' => $openid,
+                'nickname' => '微信用户',
+                'avatar' => '',
+                'mobile' => $mobile,
+                'createtime' => time(),
+            ]);
+        }
 
         if (empty($mobile)) {
             return err('获取手机号码失败，请稍后再试！');
@@ -124,7 +148,7 @@ class keeper
         $data = [
             'src' => LoginData::KEEPER,
             'user_id' => 0,
-            'session_key' => $session_key,
+            'session_key' => strval($res['session_key']),
             'openid_x' => $user->getOpenid(),
             'token' => $token,
         ];

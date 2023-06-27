@@ -165,7 +165,7 @@ if ($op === 'create') {
 
         if (App::isIDCardVerifyEnabled() && !$user->isIDCardVerified()) {
             JSON::success(['code' => 101, 'msg' => '请先填写实名认主证信息！']);
-        }        
+        }
     }
 
     $order_no = Request::str('orderNO');
@@ -179,6 +179,7 @@ if ($op === 'create') {
                 'msg' => '订单正在处理中...',
             ];
         } elseif ($errno == 0) {
+
             $response = [
                 'code' => 200,
                 'msg' => '出货完成!',
@@ -214,11 +215,18 @@ if ($op === 'create') {
             ];
         }
 
+        $goods = $order->getGoodsData();
+        if ($goods['redirect_url']) {
+            //闪蛋商品设置的转跳
+            $response['redirect_url'] = $goods['redirect_url'];
+            JSON::success($response);
+        }
+
         $device = $order->getDevice();
         if ($device) {
             $url = $device->getRedirectUrl()['url'];
             if (!empty($url)) {
-                $response['redirect'] = $url;
+                $response['redirect_url'] = $url;
             }
             if ($device->isVDevice()) {
                 $response['goods'] = Goods::data($order->getGoodsId(), ['useImageProxy' => true]);

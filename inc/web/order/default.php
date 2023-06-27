@@ -209,7 +209,7 @@ foreach ($query->findAll() as $entry) {
         }
         $data['clr'] = $accounts[$account_name]['clr'];
     } else {
-        if ($data['type'] == 'normla') {
+        if ($data['type'] == 'normal') {
             if ($data['balance']) {
                 $data['clr'] = '#ffc107';
             } else {

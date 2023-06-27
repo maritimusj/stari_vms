@@ -177,6 +177,11 @@
                                 this.status = 'success'
                                 this.text = res.data.text || ''
                                 this.msg = res.data.msg || ''
+                                if (res.data && res.data.redirect) {
+                                    setTimeout(() => {
+                                        window.location.href = res.data.redirect
+                                    }, 2000)
+                                }
                             } else {
                                 this.status = 'fail'
                                 this.text = res.data.text || ''

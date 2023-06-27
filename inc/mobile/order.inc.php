@@ -218,7 +218,7 @@ if ($op === 'create') {
         $goods = $order->getGoodsData();
         if ($goods['redirect_url']) {
             //闪蛋商品设置的转跳
-            $response['redirect_url'] = $goods['redirect_url'];
+            $response['redirect'] = $goods['redirect_url'];
             JSON::success($response);
         }
 
@@ -226,7 +226,7 @@ if ($op === 'create') {
         if ($device) {
             $url = $device->getRedirectUrl()['url'];
             if (!empty($url)) {
-                $response['redirect_url'] = $url;
+                $response['redirect'] = $url;
             }
             if ($device->isVDevice()) {
                 $response['goods'] = Goods::data($order->getGoodsId(), ['useImageProxy' => true]);

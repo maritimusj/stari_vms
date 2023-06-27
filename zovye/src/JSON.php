@@ -50,7 +50,7 @@ class JSON
         }
 
         if (is_error($data)) {
-            Util::resultJSON(false, ['msg' => empty($data['message']) ? '操作失败！' : $data['message']]);
+            Util::resultJSON(false, ['code' => $data['errno'], 'msg' => empty($data['message']) ? '操作失败！' : $data['message']]);
         }
 
         if ($data instanceof Exception) {

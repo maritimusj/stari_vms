@@ -43,6 +43,7 @@ use zovye\Util;
 use zovye\We7;
 use function zovye\_W;
 use function zovye\err;
+use function zovye\error;
 use function zovye\request;
 use function zovye\is_error;
 use function zovye\m;
@@ -108,30 +109,37 @@ class agent
 
     public static function doUserLogin($res): array
     {
-        $mobile = $res['phoneNumber'];
-        $session_key = $res['session_key'];
-
-        if (empty($mobile)) {
-            return err('获取用户手机号码失败，请稍后再试！');
+        $openid = strval($res['openId']);
+        if (empty($openid)) {
+            return err('用户openid为空！');
         }
 
-        //创建 or 更新该小程序用户
-        $openid = strval($res['openId']);
-        if ($openid) {
-            $user = User::get($openid, true);
-            if ($user) {
+        $user = User::get($openid, true);
+        if ($user) {
+            if (empty($user->getMobile())) {
+                $mobile = $res['phoneNumber'];
+                if (empty($mobile)) {
+                    return error(1001, '用户没有绑定手机号码！');
+                }
                 $user->setMobile($mobile);
                 $user->save();
             } else {
-                User::create([
-                    'app' => User::WxAPP,
-                    'openid' => $openid,
-                    'nickname' => '微信用户',
-                    'avatar' => '',
-                    'mobile' => $mobile,
-                    'createtime' => time(),
-                ]);
+                $mobile = $user->getMobile();
             }
+        } else {
+            $mobile = strval($res['phoneNumber']);
+            User::create([
+                'app' => User::WxAPP,
+                'openid' => $openid,
+                'nickname' => '微信用户',
+                'avatar' => '',
+                'mobile' => $mobile,
+                'createtime' => time(),
+            ]);
+        }
+
+        if (empty($mobile)) {
+            return err('用户手机号码获取失败！');
         }
 
         $user = User::findOne(['mobile' => $mobile, 'app' => User::WX]);
@@ -154,7 +162,7 @@ class agent
             $data = [
                 'src' => LoginData::AGENT,
                 'user_id' => $user->getId(),
-                'session_key' => $session_key,
+                'session_key' => $res['session_key'],
                 'openid_x' => $user->getOpenid(),
                 'token' => $token,
             ];
@@ -840,6 +848,7 @@ class agent
                 if (!Device::bind($device, $agent)) {
                     return err('绑定失败，请联系管理员！');
                 }
+
                 return ['op' => 'bind', 'result' => true];
             }
 

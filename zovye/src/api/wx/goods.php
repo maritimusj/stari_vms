@@ -126,7 +126,7 @@ class goods
             if (Request::isset('goodsMcbIndex')) {
                 $goods->setExtraData('lottery.index', Request::int('goodsMcbIndex'));
             } else {
-                $goods->setExtraData('lottery.index');
+                $goods->setExtraData('lottery');
             }
 
             if (Request::isset('goodsSizeUnit')) {

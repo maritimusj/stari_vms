@@ -2539,7 +2539,7 @@ class deviceModelObj extends modelObj
      */
     public function getLastDeviceErrorNotify(): array
     {
-        return $this->get('lastErrorNotify', []);
+        return (array)$this->get('lastErrorNotify', []);
     }
 
     /**

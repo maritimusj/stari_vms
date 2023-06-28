@@ -183,7 +183,7 @@ class balance
                         }
                     }
 
-                    $fee_rec = $balance->change(-$fee, CommissionBalance::FEE, []);
+                    $fee_rec = $balance->change(-$fee, CommissionBalance::FEE);
                     if (empty($fee_rec)) {
                         return err('创建手续费失败！');
                     }

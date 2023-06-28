@@ -1279,11 +1279,11 @@ class Stats
 
             if ($src == CommissionBalance::WITHDRAW) {
                 $data['withdraw'] += $x_val;
+            } elseif ($src == CommissionBalance::FEE) {
+                $data['fee'] += $x_val;
             } else {
                 if ($x_val > 0) {
                     $data['income'] += $x_val;
-                } else {
-                    $data['fee'] += $x_val;
                 }
             }
         }

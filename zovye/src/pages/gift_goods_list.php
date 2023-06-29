@@ -57,6 +57,20 @@ $tpl_data['js']['code'] .= <<<JSCODE
             }
         })
     }
+    zovye_fn.getFreeGoodsList = function(fn) {
+        $.getJSON("$api_url", {op: 'goods', 'free': true}).then(function(res){
+            if (typeof fn === 'function') {
+                fn(res);
+            }
+        })
+    }
+    zovye_fn.getPayGoodsList = function(fn) {
+        $.getJSON("$api_url", {op: 'goods', 'pay': true}).then(function(res){
+            if (typeof fn === 'function') {
+                fn(res);
+            }
+        })
+    }
     zovye_fn.getGoodsDetail = function(id, fn) {
         $.getJSON("$api_url", {op: 'detail', id: id, device: "{$device->getImei()}"}).then(function(res){
             if (typeof fn === 'function') {

@@ -755,7 +755,7 @@ class Order extends State
                 $data['pay'] = (array)$order->getExtraData('card', []);
                 $data['BMS']['timeout'] = $order->isChargingBMSReportTimeout();
             } elseif ($order->isFuelingOrder()) {
-                $data['num'] = number_format($data['num'] / 100, 2, '.', '');
+                $data['num'] = number_format($data['num'], 2, '.', '');
                 $data['goods'] = $order->getExtraData('goods');
                 $data['goods']['img'] = Util::toMedia($data['goods']['img'], true);
                 $data['fueling'] = $order->getExtraData('fueling', []);

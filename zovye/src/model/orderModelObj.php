@@ -96,11 +96,11 @@ class orderModelObj extends modelObj
         return tb('order');
     }
 
-    public function getNum(): int
+    public function getNum()
     {
         $num = parent::getNum();
 
-        return $this->isFuelingOrder() ? $num / 100 : $num;
+        return $this->isFuelingOrder() ? round($num / 100, 2) : $num;
     }
 
     public function getItemNum(): int

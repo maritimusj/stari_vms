@@ -381,7 +381,7 @@
             </ul>
             <div class="goods flex flex-row flex-wrap">
                 <div class="item flex flex-col" :class="{'disabled': tabs.active === 'free' && item.limited}"
-                    v-for="(item, index) in goods" :key="index" @click="onClickGoodsItem(item)">
+                    v-for="item in getList" :key="item.id" @click="onClickGoodsItem(item)">
                     <img class="picture" :src="item.img">
                     <span class="name">{{item.name}}</span>
                     <div class="remain flex flex-row align-center">
@@ -479,7 +479,10 @@
                     }],
                     active: 'free'
                 },
-                goods: [],
+                goods: {
+                    free: [],
+                    pay: []
+                },
                 detail: {
                     visible: false,
                     data: null
@@ -509,16 +512,35 @@
                 this.visibilitychange()
             },
             mounted () {
-                zovye_fn.getGoodsList(res => {
-                    if (res.status) {
-                        this.goods = res.data.map(e => {
-                            e.count = 1
-                            return e
-                        })
-                    }
-                })
+                this.getFreeGoodsList()
+                this.getPayGoodsList()
+            },
+            computed: {
+                getList() {
+                    return this.tabs.active === 'free' ? this.goods.free : this.goods.pay
+                }
             },
             methods: {
+                getFreeGoodsList () {
+                    zovye_fn.getFreeGoodsList(res => {
+                        if (res.status) {
+                            this.goods.free = res.data.map(e => {
+                                e.count = 1
+                                return e
+                            })
+                        }
+                    })
+                },
+                getPayGoodsList () {
+                    zovye_fn.getPayGoodsList(res => {
+                        if (res.status) {
+                            this.goods.pay = res.data.map(e => {
+                                e.count = 1
+                                return e
+                            })
+                        }
+                    })
+                },
                 visibilitychange () {
                     document.addEventListener('visibilitychange', () => {
                         this.isHidden = document.hidden

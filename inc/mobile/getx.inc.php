@@ -68,7 +68,7 @@ try {
 
     $goods = $device->getGoods($goods_id);
     if (empty($goods) || empty($goods[Goods::AllowFree])) {
-        JSON::fail('无法领取这个商品，请联系管理员！');
+        throw new RuntimeException('无法领取这个商品，请联系管理员！');
     }
 
     $result = Util::transactionDo(function () use ($device, $user, $account, $goods_id, $ticket_data_saved) {

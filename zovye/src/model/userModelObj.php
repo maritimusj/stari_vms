@@ -557,14 +557,16 @@ class userModelObj extends modelObj
 
     public function signIn($val): bool
     {
-        $res = $this->getBalance()->change($val, Balance::SIGN_IN_BONUS, [
-            'date' => date('Y-m-d'),
-            'user-agent' => $_SERVER['HTTP_USER_AGENT'],
-            'ip' => $this->getLastActiveIp(),
-        ]);
+        if ($val > 0) {
+            $res = $this->getBalance()->change($val, Balance::SIGN_IN_BONUS, [
+                'date' => date('Y-m-d'),
+                'user-agent' => $_SERVER['HTTP_USER_AGENT'],
+                'ip' => $this->getLastActiveIp(),
+            ]);
 
-        if (empty($res)) {
-            return false;
+            if (empty($res)) {
+                return false;
+            }
         }
 
         Util::expire("daily:sign_in:{$this->getId()}");

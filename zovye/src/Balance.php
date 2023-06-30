@@ -488,13 +488,13 @@ TEXT;
             }
         }
 
-        if (empty($val)) {
-            return err('真遗憾，没有获得积分！');
-        }
-
         $res = $user->signIn($val);
         if (empty($res)) {
             return err('签到失败！');
+        }
+
+        if (empty($val)) {
+            return err('真遗憾，没有获得积分！');
         }
 
         return $val;

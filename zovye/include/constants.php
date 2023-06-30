@@ -128,7 +128,7 @@ defined('TIMESTAMP') or define('TIMESTAMP', time());
 defined('CLIENT_IP') or define('CLIENT_IP', Util::getClientIp());
 defined('MATERIAL_WEXIN') or define('MATERIAL_WEXIN', 'perm'); //微信素材类型
 define('REGULAR_EMAIL', '/\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/i');
-define('REGULAR_TEL', '/^1[3456789][0-9]{9}$/');
+define('REGULAR_TEL', '/^(?:\+|\d)[\d-]{6,14}\d$/');
 defined('MODULE_URL') or define('MODULE_URL', ZOVYE_STATIC_URL);
 defined('ATTACHMENT_ROOT') or define('ATTACHMENT_ROOT', ZOVYE_ROOT.'/attachment/');
 defined('MODULE_ROOT') or define('MODULE_ROOT', ZOVYE_ROOT);

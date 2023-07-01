@@ -72,6 +72,7 @@ class Agent
     public static function getLevels($level = '')
     {
         $key = 'agent.levels';
+
         return settings($level ? "$key.$level" : $key, []);
     }
 
@@ -103,21 +104,22 @@ class Agent
         $msg_owners = [$agent->getId()];
         //移除合伙人
         $agent_data = $agent->get('agentData', []);
-
         if ($agent_data) {
-            $partners = $agent_data['partners'] ?: [];
-
-            foreach ($partners as $partner_id => $data) {
-                if (!$agent->removePartner($partner_id)) {
-                    return err('移除合伙人失败！');
+            $partners = is_array($agent_data['partners']) ? $agent_data['partners'] : [];
+            if ($partners) {
+                foreach ($partners as $partner_id => $data) {
+                    if (!$agent->removePartner($partner_id)) {
+                        return err('移除合伙人失败！');
+                    }
+                    $msg_owners[] = $partner_id;
                 }
-                $msg_owners[] = $partner_id;
             }
         }
 
-        if ($agent->setAgent(false) && $agent->setSuperiorId(0) && $agent->remove('agentData') && $agent->remove(
-                'keepers'
-            )) {
+        if ($agent->setAgent(false) &&
+            $agent->setSuperiorId(0) &&
+            $agent->remove('agentData') &&
+            $agent->remove('keepers')) {
 
             //删除登记会话数据
             $login_data = $agent->getLoginData();

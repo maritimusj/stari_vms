@@ -70,7 +70,7 @@ if ($way == 'free') {
     if (App::isFuelingDeviceEnabled()) {
         $query->where(['src' => [Order::FREE, Order::ACCOUNT, Order::FUELING_SOLO]]);
     } else {
-        $query->where(['src' => Order::FREE]);
+        $query->where(['src' => [Order::FREE, Order::ACCOUNT]]);
     }
 } elseif ($way == 'pay') {
     if (App::isFuelingDeviceEnabled()) {

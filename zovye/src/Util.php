@@ -1628,7 +1628,6 @@ HTML_CONTENT;
      * 获取ip地址定位信息.
      *
      * @param $ip
-     *
      * @return mixed
      */
     public static function getIpInfo($ip)
@@ -1662,7 +1661,7 @@ HTML_CONTENT;
             }
         }
 
-        return '';
+        return [];
     }
 
     /**

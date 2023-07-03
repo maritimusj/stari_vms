@@ -754,11 +754,11 @@ include './index.php';
                 $ip = self::getClientIp();
                 $info = Util::getIpInfo($ip);
                 if ($info) {
-                    if ($limits['province'] && $info['province'] != $limits['province']) {
+                    if ($limits['area']['province'] && $info['data']['province'] != $limits['area']['province']) {
                         return err('区域（省）不允许！');
                     }
 
-                    if ($limits['city'] && $info['city'] != $limits['city']) {
+                    if ($limits['area']['city'] && $info['data']['city'] != $limits['area']['city']) {
                         return err('区域（市）不允许！');
                     }
                 }
@@ -1631,7 +1631,7 @@ HTML_CONTENT;
      *
      * @return mixed
      */
-    public static function getIpInfo($ip): string
+    public static function getIpInfo($ip)
     {
         $data = We7::cache_read($ip);
         if ($data) {

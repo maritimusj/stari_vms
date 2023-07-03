@@ -4,8 +4,11 @@
     #navbar i.fa-youtube-play {
         color: #cf1010;
     }
+    .form-control.tpl-district {
+      display: none;
+      visibility: hidden;
+    }
 </style>
-
 <div id="app"  v-cloak>
     <ul class="nav nav-tabs" id="navbar">
         <li role="presentation" :class="{'active': nav.op === active}" @click="active=nav.op" v-for="nav in navs">
@@ -162,6 +165,12 @@
                             <label class="checkbox-inline">
                             <input type="checkbox" id="phoneCheckbox2" name="limits[]" value="android" {if $limits && $limits['android'] or empty($limits)}checked{/if}> Android手机
                             </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="priority" class="col-md-2 control-label">地区</label>
+                        <div class="col-md-10">
+                            {php echo \tpl_form_field_district('area', $limits['area']);}
                         </div>
                     </div>
                 </div>

@@ -381,6 +381,10 @@ $res = Util::transactionDo(function () {
             }
         }
 
+        if (Request::has('area')) {
+            $limits['area'] = Request::array('area');
+        }
+
         $account->set('limits', $limits);
 
         if (Request::isset('questionnaire')) {

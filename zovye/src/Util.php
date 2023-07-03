@@ -749,6 +749,20 @@ include './index.php';
                     }
                 }
             }
+
+            if (!isEmptyArray($limits['area'])) {
+                $ip = self::getClientIp();
+                $info = Util::getIpInfo($ip);
+                if ($info) {
+                    if ($limits['province'] && $info['province'] != $limits['province']) {
+                        return err('区域（省）不允许！');
+                    }
+
+                    if ($limits['city'] && $info['city'] != $limits['city']) {
+                        return err('区域（市）不允许！');
+                    }
+                }
+            }
         }
 
         if ($params['unfollow'] || in_array('unfollow', $params, true)) {
@@ -1619,6 +1633,11 @@ HTML_CONTENT;
      */
     public static function getIpInfo($ip): string
     {
+        $data = We7::cache_read($ip);
+        if ($data) {
+            return $data;
+        }
+
         $lbs_key = settings('user.location.appkey', DEFAULT_LBS_KEY);
         $url = "https://apis.map.qq.com/ws/location/v1/ip?ip=$ip&key=$lbs_key";
 
@@ -1628,14 +1647,18 @@ HTML_CONTENT;
             $res = json_decode($resp['content'], true);
 
             if ($res && $res['status'] == 0 && is_array($res['result'])) {
+
                 $data = $res['result'];
+
                 $data['data'] = [
-                    'region' => $data['ad_info']['province'],
+                    'province' => $data['ad_info']['province'],
                     'city' => $data['ad_info']['city'],
                     'district' => $data['ad_info']['district'],
                 ];
 
-                return json_encode($data);
+                We7::cache_write($ip, $data);
+
+                return $data;
             }
         }
 

@@ -850,7 +850,7 @@ class Order extends State
             //ip地址信息
             $ip_info = $order->getIpAddress();
             if ($ip_info) {
-                $data['ip_info'] = "{$ip_info['data']['region']}{$ip_info['data']['city']}{$ip_info['data']['district']}";
+                $data['ip_info'] = "{$ip_info['data']['province']}{$ip_info['data']['city']}{$ip_info['data']['district']}";
             }
 
             $voucher_id = intval($order->getExtraData('voucher.id'));

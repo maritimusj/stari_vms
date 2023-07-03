@@ -440,7 +440,7 @@ class orderModelObj extends modelObj
             }
         }
 
-        return empty($info) ? [] : json_decode($info, true);
+        return is_string($info) ? json_decode($info, true) : $info;
     }
 
     public function isZeroBonus()

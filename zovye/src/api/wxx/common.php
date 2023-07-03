@@ -770,9 +770,9 @@ class common
                     }
                 }
                 if ($info) {
-                    $json = json_decode($info, true);
+                    $json = is_string($info) ? json_decode($info, true) : $info;
                     if ($json) {
-                        $data['ip_info'] = "{$json['data']['region']}{$json['data']['city']}{$json['data']['district']}";
+                        $data['ip_info'] = "{$json['data']['province']}{$json['data']['city']}{$json['data']['district']}";
                     }
                 }
             }

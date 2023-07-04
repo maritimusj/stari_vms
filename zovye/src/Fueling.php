@@ -436,7 +436,7 @@ class Fueling
             if ($order) {
                 $order->setSrc(Order::FUELING);
 
-                $num = $order->getNum();
+                $num = intval($order->getNum() * 100); // 需要x100
                 if ($num > 0) {
                     //减少库存
                     $locker = $device->payloadLockAcquire(3);

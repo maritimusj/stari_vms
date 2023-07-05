@@ -684,4 +684,11 @@ class App
             return boolval(settings('custom.getUserBalanceByMobile.enabled'));
         });
     }
+
+    public static function isTKPromotingEnabled(): bool
+    {
+        return onceCall(function () {
+            return boolval(settings('custom.TKPromoting.enabled'));
+        });
+    }
 }

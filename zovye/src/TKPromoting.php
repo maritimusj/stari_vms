@@ -1,0 +1,100 @@
+<?php
+/**
+ * @author jin@stariture.com
+ * @url www.stariture.com
+ */
+
+
+namespace zovye;
+
+class TKPromoting
+{
+    const REDIRECT_URL = 'https://cloud.tk.cn/tkproperty/nprd/S2023062001/?fromId=77973&channelCode=999999990004&cusType=3&device_id={device_uid}&utm_source=FPDJK168708928ac9&extra={user_uid}';
+
+    const EncryptKey = 'fe355d547d506890689f2889464f323a63666543001011061';
+
+    const DebugApiUrl = 'http://tkoh-t.tk.cn/hopen/cusoptui/channel/order/confirmOrder';
+    const ProdApiUrl = 'https://cloud.tk.cn/hopen/cusoptui/channel/order/confirmOrder';
+
+    public static function getAd(): array
+    {
+        return [
+            'id' => 0,
+            'title' => '泰康保险',
+            'data' => [
+                'images' => [
+                    MODULE_URL.'static/img/tk001.png',
+                ],
+                'link' => self::REDIRECT_URL,
+            ],
+        ];
+    }
+
+    public static function getAccount()
+    {
+        $uid = Config::tk('account_uid');
+        if (empty($uid)) {
+            return err('没有配置公众号！');
+        }
+
+        $acc = Account::findOneFromUID($uid);
+        if (empty($acc)) {
+            return err('公众号配置不正确！');
+        }
+
+        if ($acc->isBanned()) {
+            return err('公众号已禁用！');
+        }
+
+        return $acc;
+    }
+
+    public static function sign($event_time)
+    {
+        $config = Config::tk('app');
+        if (isEmptyArray($config) || empty($config['id']) || empty($config['secret'])) {
+            return err('配置不正确！');
+        }
+
+        $hash_val = md5($config['id'].$event_time);
+
+        return "$hash_val.$event_time";
+    }
+
+    public static function confirm($proposalNo): array
+    {
+        if (empty($proposalNo)) {
+            return err('用户没有签约信息！');
+        }
+
+        $data = [
+            'requestId' => REQUEST_ID,
+            'requestTime' => date('YmdHis'),
+            'requestData' => self::encrypt([
+                'orderType' => 1,
+                'proposalNo' => $proposalNo,
+            ]),
+        ];
+
+        $result = Util::post(DEBUG ? self::DebugApiUrl : self::ProdApiUrl, $data);
+
+        Log::debug('tk', [
+            'request' => $data,
+            'response' => $result,
+        ]);
+
+        return $result;
+    }
+
+    public static function encrypt($json_data): string
+    {
+        return AESUtil::encrypt(self::EncryptKey, json_encode($json_data));
+    }
+
+    public static function decrypt($str)
+    {
+        $decrypted = AESUtil::decrypt(self::EncryptKey, $str);
+
+        return json_decode($decrypted, true);
+    }
+}

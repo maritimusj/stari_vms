@@ -8,6 +8,7 @@ namespace zovye\job\createOrderAccount;
 
 use Exception;
 use zovye\Account;
+use zovye\App;
 use zovye\CtrlServ;
 use zovye\Device;
 use zovye\Goods;
@@ -18,6 +19,7 @@ use zovye\model\userModelObj;
 use zovye\Order;
 use zovye\Request;
 use zovye\State;
+use zovye\TKPromoting;
 use zovye\User;
 use zovye\Util;
 use zovye\ZovyeException;
@@ -39,6 +41,10 @@ $params = [
     'orderUID' => $order_uid,
     'ip' => $ip,
 ];
+
+if (Request::has('proposalNo')) {
+    $params['proposalNo'] = Request::str('proposalNo');
+}
 
 $op = Request::op('default');
 
@@ -128,6 +134,10 @@ if ($op == 'create_order_account' && CtrlServ::checkJobSign($params)) {
 
         if (!empty($order_uid)) {
             $data['orderId'] = $order_uid;
+        }
+
+        if ($params['proposalNo']) {
+            $data['proposalNo'] = $params['proposalNo'];
         }
 
         if (!empty($order)) {

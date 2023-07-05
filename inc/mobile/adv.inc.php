@@ -38,6 +38,16 @@ if (is_error($result)) {
     JSON::fail($result);
 }
 
+if (App::isTKPromotingEnabled() && $type_id == Advertising::WELCOME_PAGE) {
+    $account = TKPromoting::getAccount();
+    if ($account) {
+        $res = Util::checkAvailable($user, $account, $device, ['ignore_assigned' => true]);
+        if (!is_error($res)) {
+            $result[] = TKPromoting::getAd();
+        }
+    }
+}
+
 $params = [$user, $device, new DateTime()];
 
 foreach ($result as $index => $adv) {

@@ -2163,6 +2163,12 @@ HTML_CONTENT;
                     ],
                 ];
 
+                if (App::isTKPromotingEnabled()) {
+                    $order_data['extra']['tk'] = [
+                        'proposalNo' => $params['proposalNo'],
+                    ];
+                }
+
                 if (App::isGDCVMachineEnabled()) {
                     $order_data['extra']['CV'] = [
                         'profile' => $user->getIDCardVerifiedData(),
@@ -2320,6 +2326,10 @@ HTML_CONTENT;
         EventBus::on('device.openSuccess', $params);
 
         $order = $params['order'];
+
+        if ($args['proposalNo']) {
+            TKPromoting::confirm($args['proposalNo']);
+        }
 
         return [
             'result' => $result,

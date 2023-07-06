@@ -9,9 +9,7 @@ namespace zovye;
 
 class TKPromoting
 {
-    const REDIRECT_URL = 'https://cloud.tk.cn/tkproperty/nprd/S2023062001/?fromId=77973&channelCode=999999990004&cusType=3&device_id={device_uid}&utm_source=FPDJK168708928ac9&extra={user_uid}';
-
-    const EncryptKey = 'fe355d547d506890689f2889464f323a63666543001011061';
+    const REDIRECT_URL = 'https://cloud.tk.cn/tkproperty/nprd/S2023062001/?fromId=77973&channelCode=999999990004&cusType=3&device_id={device_uid}&extra={user_uid}';
 
     const DebugApiUrl = 'http://tkoh-t.tk.cn/hopen/cusoptui/channel/order/confirmOrder';
     const ProdApiUrl = 'https://cloud.tk.cn/hopen/cusoptui/channel/order/confirmOrder';
@@ -86,12 +84,13 @@ class TKPromoting
         return $result;
     }
 
-    static function pkcs7_pad($data, $block_size) {
+    static function pkcs7_pad($data, $block_size): string
+    {
         $padding = $block_size - (strlen($data) % $block_size);
         return $data . str_repeat(chr($padding), $padding);
     }
-    
-    static function pkcs7_unpad($data) {
+
+    static function pkcs7_unpad($data): string {
         $padding = ord($data[strlen($data) - 1]);
         return substr($data, 0, -$padding);
     }
@@ -101,7 +100,7 @@ class TKPromoting
         $key = Config::tk('config.key');var_dump($key);
 
         $block_size = 16;
-        $data = self::pkcs7_pad($data, $block_size);
+        $data = self::pkcs7_pad(json_encode($data), $block_size);
         $iv = str_repeat(chr(0), $block_size);
         $encrypted = openssl_encrypt($data, 'AES-256-ECB', $key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $iv);
         return base64_encode($encrypted);
@@ -115,6 +114,6 @@ class TKPromoting
         $data = base64_decode($data);
         $iv = str_repeat(chr(0), $block_size);
         $decrypted = openssl_decrypt($data, 'AES-256-ECB', $key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $iv);
-        return self::pkcs7_unpad($decrypted);
+        return json_decode(self::pkcs7_unpad($decrypted), true);
     }
 }

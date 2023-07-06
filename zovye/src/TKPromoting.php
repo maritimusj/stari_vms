@@ -9,7 +9,7 @@ namespace zovye;
 
 class TKPromoting
 {
-    const REDIRECT_URL = 'https://cloud.tk.cn/tkproperty/nprd/S2023062001/?fromId=77973&channelCode=999999990004&cusType=3&device_id=testdeviceId&extra=tuobai{user_uid}';
+    const REDIRECT_URL = 'https://cloud.tk.cn/tkproperty/nprd/S2023062001/?fromId=77973&channelCode=999999990004&cusType=3&device_id={device_uid}&extra=tuobai{user_uid}';
 
     const DebugApiUrl = 'http://tkoh-t.tk.cn/hopen/cusoptui/channel/order/confirmOrder';
     const ProdApiUrl = 'https://cloud.tk.cn/hopen/cusoptui/channel/order/confirmOrder';

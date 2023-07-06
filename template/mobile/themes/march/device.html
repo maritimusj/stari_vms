@@ -148,7 +148,7 @@
 
         #adv-swiper-container {
             width: 100vw;
-            margin-top: 50px;
+            margin-top: 15px;
             --swiper-theme-color: #F07057;
         }
 
@@ -695,6 +695,14 @@
                 <span class="marquee-text">{$tpl['site']['warning']}</span>
             </div>
             {/if}
+            <div class="swiper" id="adv-swiper-container" v-if="slides.length > 0">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide" v-for="(item, index) in slides" :key="index" @click="slideClick(item)">
+                        <img class="swiper-img" :src="item.image" />
+                    </div>
+                </div>
+                <div class="swiper-pagination"></div>
+            </div>
             <div class="free-btn clickable" v-if="account.list.length > 0" @click="freeClick">
                 <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="25271" width="64"
                     height="64">
@@ -748,14 +756,6 @@
                     <div v-if="item.num > 0" class="choose-btn clickable" @click="buyClick(item)">购买</div>
                     <span v-else style="color: #9d9d9d;">已售罄</span>
                 </div>
-            </div>
-            <div class="swiper" id="adv-swiper-container" v-if="slides.length > 0">
-                <div class="swiper-wrapper">
-                    <div class="swiper-slide" v-for="(item, index) in slides" :key="index" @click="slideClick(item)">
-                        <img class="swiper-img" :src="item.image" />
-                    </div>
-                </div>
-                <div class="swiper-pagination"></div>
             </div>
             <div class="none-view"
                 v-if="!loading && account.list.length === 0 && pay.length === 0 && packages.length === 0">

@@ -365,6 +365,7 @@ if ($page == 'device') {
         $app_key = Util::random(16);
         updateSettings('app.key', $app_key);
     }
+    
     $tpl_data['app_key'] = $app_key;
     $tpl_data['account'] = settings('api.account', '');
     if (App::isDonatePayEnabled()) {

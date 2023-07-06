@@ -9,7 +9,7 @@ namespace zovye;
 
 class TKPromoting
 {
-    const REDIRECT_URL = 'https://cloud.tk.cn/tkproperty/nprd/S2023062001/?fromId=77973&channelCode=999999990004&cusType=3&device_id={device_uid}&extra={user_uid}';
+    const REDIRECT_URL = 'https://cloud.tk.cn/tkproperty/nprd/S2023062001/?fromId=77973&channelCode=999999990004&cusType=3&device_id=testdeviceId&extra=tuobai{user_uid}';
 
     const DebugApiUrl = 'http://tkoh-t.tk.cn/hopen/cusoptui/channel/order/confirmOrder';
     const ProdApiUrl = 'https://cloud.tk.cn/hopen/cusoptui/channel/order/confirmOrder';
@@ -30,7 +30,7 @@ class TKPromoting
 
     public static function getAccount()
     {
-        $uid = Config::tk('config.account');
+        $uid = Config::tk('config.account_uid');
         if (empty($uid)) {
             return err('没有配置公众号！');
         }
@@ -50,11 +50,11 @@ class TKPromoting
     public static function sign($event_time)
     {
         $config = Config::tk('config');
-        if (isEmptyArray($config) || empty($config['id']) || empty($config['secret'])) {
+        if (empty($config['id']) || empty($config['secret'])) {
             return err('配置不正确！');
         }
 
-        $hash_val = md5($config['id'].$event_time);
+        $hash_val = md5($config['id'].$config['secret'].$event_time);
 
         return "$hash_val.$event_time";
     }
@@ -65,18 +65,37 @@ class TKPromoting
             return err('用户没有签约信息！');
         }
 
+        $now = date('YmdHis');
         $data = [
             'requestId' => REQUEST_ID,
-            'requestTime' => date('YmdHis'),
+            'requestTime' => $now,
             'requestData' => self::encrypt([
                 'orderType' => 1,
                 'proposalNo' => $proposalNo,
             ]),
         ];
 
-        $result = Util::post(DEBUG ? self::DebugApiUrl : self::ProdApiUrl, $data);
+
+        $app_key = Config::tk('config.app_key', '');
+        if (empty($app_key)) {
+            return err('appkey设置不正确！');
+        }
+
+        $auth_key = self::sign($now);
+        if (is_error($auth_key)) {
+            return $auth_key;
+        }
+
+        $result = Util::post(DEBUG ? self::DebugApiUrl : self::ProdApiUrl, $data, true, 3, [
+            CURLOPT_HTTPHEADER => [
+                "AppKey: $app_key",
+                "AuthKey: $auth_key",
+            ],
+        ]);
 
         Log::debug('tk', [
+            'appkey' => $app_key,
+            'proposalNo' => $proposalNo,
             'request' => $data,
             'response' => $result,
         ]);
@@ -97,7 +116,7 @@ class TKPromoting
 
     public static function encrypt($data): string
     {
-        $key = Config::tk('config.key');
+        $key = Config::tk('config.aes_key');
 
         $block_size = 16;
         $data = self::pkcs7_pad(json_encode($data), $block_size);
@@ -108,7 +127,7 @@ class TKPromoting
 
     public static function decrypt($data)
     {
-        $key = Config::tk('config.key');
+        $key = Config::tk('config.aes_key');
 
         $block_size = 16;
         $data = base64_decode($data);

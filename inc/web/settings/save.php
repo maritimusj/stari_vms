@@ -694,8 +694,9 @@ if ($page == 'device') {
         Config::tk('config', [
             'id' => Request::trim('TKClientId'),
             'secret' => Request::trim('TKClientSecret'),
-            'key' => Request::trim('TKClientEncryptKey'),
-            'account' => Request::trim('TKAccountUID'),
+            'app_key' => Request::trim('TKAppKey'),
+            'aes_key' => Request::trim('TKClientEncryptKey'),
+            'account_uid' => Request::trim('TKAccountUID'),
         ], true);
     }
 

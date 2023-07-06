@@ -383,16 +383,23 @@
                     </div>
                 </div>
                 <div class="form-group">
+                    <label class="col-md-2 control-label">appkey</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="TKAppKey" value="{$Tk['app_key']}">
+                        <span class="help-block">* 泰康分配的appkey</span>
+                    </div>
+                </div>
+                <div class="form-group">
                     <label class="col-md-2 control-label">通讯加密key</label>
                     <div class="col-md-10">
-                        <input type="text" class="form-control" name="TKClientEncryptKey" value="{$Tk['key']}">
+                        <input type="text" class="form-control" name="TKClientEncryptKey" value="{$Tk['aes_key']}">
                         <span class="help-block">* 泰康api AES加密使用的key</span>
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-md-2 control-label">关联公众号</label>
                     <div class="col-md-10">
-                        <input type="text" class="form-control" name="TKAccountUID" value="{$Tk['account']}">
+                        <input type="text" class="form-control" name="TKAccountUID" value="{$Tk['account_uid']}">
                         <span class="help-block">* 填写公众号UID，使用该公众号的限制规则，未设置用户无法领取</span>
                     </div>
                 </div>

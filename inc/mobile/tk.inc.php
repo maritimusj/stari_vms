@@ -32,7 +32,7 @@ try {
         throw new RuntimeException('无法解密requestData');
     }
 
-    if (TKPromoting::sign(strval($requestData['eventTime'])) !== $auth_key) {
+    if (TKPromoting::sign($requestData['eventTime']) !== $auth_key) {
         throw new RuntimeException('签名检验失败！');
     }
 

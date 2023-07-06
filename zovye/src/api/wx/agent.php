@@ -1184,7 +1184,7 @@ class agent
             $data = [
                 'id' => $order->getId(),
                 'orderId' => $order->getOrderId(),
-                'num' => intval($order->getNum()),
+                'num' => $order->getNum(),
                 'price' => number_format($order->getPrice() / 100, 2),
                 'refund' => !empty($order->getExtraData('refund')),
                 'account' => $order->getAccount(),

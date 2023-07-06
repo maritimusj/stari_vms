@@ -31,7 +31,7 @@ class Stats
     public static function update(orderModelObj $order, $objs, callable $fn = null)
     {
         if ($objs) {
-            $num = intval($order->getNum());
+            $num = $order->getNum();
 
             if ($num > 0) {
                 $objs = is_array($objs) ? $objs : [$objs];
@@ -767,7 +767,7 @@ class Stats
 
     public static function calc(orderModelObj $order, array &$stats)
     {
-        $num = intval($order->getNum());
+        $num = $order->getNum();
         if ($num > 0) {
             if ($order->isPay() || $order->getSrc() == Order::CHARGING) {
                 $way = 'p';

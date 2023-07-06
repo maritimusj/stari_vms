@@ -102,36 +102,28 @@ class TKPromoting
         return $result;
     }
 
-    static function pkcs7_pad($data, $block_size): string
+    public static function encrypt($data) 
     {
-        $padding = $block_size - (strlen($data) % $block_size);
-        return $data . str_repeat(chr($padding), $padding);
+        return self::aes_encrypt(json_encode($data), Config::tk('config.aes_key'));
     }
 
-    static function pkcs7_unpad($data): string {
-        $padding = ord($data[strlen($data) - 1]);
-        return substr($data, 0, -$padding);
+    public static function decrypt($data) 
+    {
+        $res = self::aes_decrypt($data, Config::tk('config.aes_key'));
+        return empty($res) ? $res : json_decode($res, true);
     }
 
-    public static function encrypt($data): string
-    {
-        $key = Config::tk('config.aes_key');
-
-        $block_size = 16;
-        $data = self::pkcs7_pad(json_encode($data), $block_size);
-        $iv = str_repeat(chr(0), $block_size);
-        $encrypted = openssl_encrypt($data, 'AES-256-ECB', $key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $iv);
+    static function aes_encrypt($data, $key) {
+        $cipher = "aes-256-ecb";
+        $options = OPENSSL_RAW_DATA;
+        $encrypted = openssl_encrypt($data, $cipher, $key, $options);
         return base64_encode($encrypted);
-    }
-
-    public static function decrypt($data)
-    {
-        $key = Config::tk('config.aes_key');
-
-        $block_size = 16;
-        $data = base64_decode($data);
-        $iv = str_repeat(chr(0), $block_size);
-        $decrypted = openssl_decrypt($data, 'AES-256-ECB', $key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $iv);
-        return json_decode(self::pkcs7_unpad($decrypted), true);
-    }
+      }
+      
+      static function aes_decrypt($data, $key) {
+        $cipher = "aes-256-ecb";
+        $options = OPENSSL_RAW_DATA;
+        $decrypted = openssl_decrypt(base64_decode($data), $cipher, $key, $options);
+        return $decrypted;
+      }
 }

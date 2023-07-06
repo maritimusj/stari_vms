@@ -97,7 +97,7 @@ class TKPromoting
 
     public static function encrypt($data): string
     {
-        $key = Config::tk('config.key');var_dump($key);
+        $key = Config::tk('config.key');
 
         $block_size = 16;
         $data = self::pkcs7_pad(json_encode($data), $block_size);

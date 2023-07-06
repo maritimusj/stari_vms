@@ -375,6 +375,10 @@ if ($page == 'device') {
         $tpl_data['GDCVMachine'] = Config::GDCVMachine('config');
     }
 
+    if (App::isTKPromotingEnabled()) {
+        $tpl_data['Tk'] = Config::tk('config');
+    }
+
     $tpl_data['notify_app_key'] = Config::notify('order.key', Util::random(16));
     $tpl_data['orderNotifyFree'] = Config::notify('order.f', true);
     $tpl_data['orderNotifyPay'] = Config::notify('order.p', true);

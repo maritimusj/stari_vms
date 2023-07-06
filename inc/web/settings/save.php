@@ -690,6 +690,15 @@ if ($page == 'device') {
         ], true);
     }
 
+    if (App::isTKPromotingEnabled()) {
+        Config::tk('config', [
+            'id' => Request::trim('TKClientId'),
+            'secret' => Request::trim('TKClientSecret'),
+            'key' => Request::trim('TKClientEncryptKey'),
+            'account' => Request::trim('TKAccountUID'),
+        ], true);
+    }
+
 } elseif ($page == 'payment') {
     $wx_enabled = Request::bool('wx') ? 1 : 0;
     $settings['pay']['wx']['enable'] = $wx_enabled;

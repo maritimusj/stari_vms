@@ -32,7 +32,7 @@ class TKPromoting
 
     public static function getAccount()
     {
-        $uid = Config::tk('account_uid');
+        $uid = Config::tk('config.account');
         if (empty($uid)) {
             return err('没有配置公众号！');
         }
@@ -51,7 +51,7 @@ class TKPromoting
 
     public static function sign($event_time)
     {
-        $config = Config::tk('app');
+        $config = Config::tk('config');
         if (isEmptyArray($config) || empty($config['id']) || empty($config['secret'])) {
             return err('配置不正确！');
         }
@@ -86,15 +86,35 @@ class TKPromoting
         return $result;
     }
 
-    public static function encrypt($json_data): string
-    {
-        return AESUtil::encrypt(self::EncryptKey, json_encode($json_data));
+    static function pkcs7_pad($data, $block_size) {
+        $padding = $block_size - (strlen($data) % $block_size);
+        return $data . str_repeat(chr($padding), $padding);
+    }
+    
+    static function pkcs7_unpad($data) {
+        $padding = ord($data[strlen($data) - 1]);
+        return substr($data, 0, -$padding);
     }
 
-    public static function decrypt($str)
+    public static function encrypt($data): string
     {
-        $decrypted = AESUtil::decrypt(self::EncryptKey, $str);
+        $key = Config::tk('config.key');var_dump($key);
 
-        return json_decode($decrypted, true);
+        $block_size = 16;
+        $data = self::pkcs7_pad($data, $block_size);
+        $iv = str_repeat(chr(0), $block_size);
+        $encrypted = openssl_encrypt($data, 'AES-256-ECB', $key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $iv);
+        return base64_encode($encrypted);
+    }
+
+    public static function decrypt($data)
+    {
+        $key = Config::tk('config.key');
+
+        $block_size = 16;
+        $data = base64_decode($data);
+        $iv = str_repeat(chr(0), $block_size);
+        $decrypted = openssl_decrypt($data, 'AES-256-ECB', $key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $iv);
+        return self::pkcs7_unpad($decrypted);
     }
 }

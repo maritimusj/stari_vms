@@ -75,7 +75,6 @@ class TKPromoting
             ]),
         ];
 
-
         $app_key = Config::tk('config.app_key', '');
         if (empty($app_key)) {
             return err('appkey设置不正确！');

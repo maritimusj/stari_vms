@@ -79,7 +79,16 @@ class response implements IResponse
                 }
                 return '=> 握手失败';
             case 0x02:
-                return '=> 开锁' . ($res == 0x03 ? '成功' : '失败');
+                if ($res == 0x03) {
+                    return '=> 开锁成功';
+                }
+                if ($res == 0x04) {
+                    return '=> 开锁失败（电量低）';
+                }
+                if ($res == 0x05) {
+                    return '=> 开锁失败（机器故障）';
+                }
+                return '=> 开锁失败';
         }
 
         return '=> 未知消息';

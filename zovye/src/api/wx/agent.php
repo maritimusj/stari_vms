@@ -82,10 +82,9 @@ class agent
     {
         $login_data = LoginData::get(common::getToken());
         if ($login_data) {
-            $session_key = $login_data->getSessionKey() ?: _W('token');
-
+            $secret_key = common::getSecretKey();
             /** @var userModelObj $res */
-            $res = User::findOne("SHA1(CONCAT('$session_key', id))='$guid'");
+            $res = User::findOne("SHA1(CONCAT('$secret_key', id))='$guid'");
             if ($res) {
                 if ($res->isAgent()) {
                     return $res->agent();

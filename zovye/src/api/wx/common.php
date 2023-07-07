@@ -210,18 +210,14 @@ class common
     {
         $id = $target ? $target->getId() : false;
 
-        $session_key = '';
+        $secret_key = self::getSecretKey();
 
-        $login_data = LoginData::get(common::getToken());
-        if ($login_data) {
-            $session_key = $login_data->getSessionKey();
-        }
+        return sha1("$secret_key$id");
+    }
 
-        if (empty($session_key)) {
-            $session_key = _W('token');
-        }
-
-        return sha1("$session_key$id");
+    public static function getSecretKey(): string
+    {
+        return self::getToken();
     }
 
     /**

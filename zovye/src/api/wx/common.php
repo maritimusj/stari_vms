@@ -227,7 +227,7 @@ class common
      *
      * @return bool
      */
-    public static function checkFuncs($assign_data, $fn, callable $cb = null): bool
+    public static function checkEnabledFunctions($assign_data, $fn, callable $cb = null): bool
     {
         //空$assign_data认为是拥有全部权限
         if (isset($assign_data)) {
@@ -268,7 +268,7 @@ class common
         $commission_state = App::isCommissionEnabled() && $user->isCommissionEnabled();
 
         $funcs = $user->settings('agentData.funcs');
-        $res = common::checkFuncs($funcs, $fn, function ($name) use ($commission_state) {
+        $res = common::checkEnabledFunctions($funcs, $fn, function ($name) use ($commission_state) {
             if ($name == 'F_cm') {
                 return $commission_state;
             } else {

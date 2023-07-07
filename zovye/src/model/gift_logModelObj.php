@@ -91,6 +91,10 @@ class gift_logModelObj extends modelObj
         $gift = $this->getGift();
         if ($gift) {
             $data['gift'] = $gift->profile($fullpath);
+        } else {
+            $data['gift'] = [
+                'name' => '<活动已删除>',
+            ];
         }
 
         return $data;

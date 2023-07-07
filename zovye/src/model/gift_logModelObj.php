@@ -88,6 +88,7 @@ class gift_logModelObj extends modelObj
         if ($user) {
             $data['user'] = $user->profile(false);
         }
+        
         $gift = $this->getGift();
         if ($gift) {
             $data['gift'] = $gift->profile($fullpath);

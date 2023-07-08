@@ -1213,7 +1213,7 @@ class Order extends State
                     case 'address':
                         $info = $entry->get('ip_info', []);
                         if ($info) {
-                            $json = json_decode($info, true);
+                            $json = is_string($info) ? json_decode($info, true) : $info;
                             if ($json) {
                                 $data[$header] = "{$json['data']['region']}{$json['data']['city']}{$json['data']['district']}";
                             } else {

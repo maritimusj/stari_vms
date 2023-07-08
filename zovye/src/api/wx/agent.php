@@ -142,76 +142,76 @@ class agent
         }
 
         $user = User::findOne(['mobile' => $mobile, 'app' => User::WX]);
-        if ($user) {
-            if ($res['config'] && !$user->isWxAppAllowed($res['config']['key'])) {
-                return err('登录失败，无法使用这个小程序！');
-            }
-
-            if (!($user->isAgent() || $user->isPartner())) {
-                return err('您还不是我们的代理商，立即注册?');
-            }
-
-            //清除原来的登录信息
-            foreach (LoginData::agent(['user_id' => $user->getId()])->findAll() as $entry) {
-                $entry->destroy();
-            }
-
-            $token = Util::getTokenValue();
-
-            $data = [
-                'src' => LoginData::AGENT,
-                'user_id' => $user->getId(),
-                'session_key' => $res['session_key'],
-                'openid_x' => $user->getOpenid(),
-                'token' => $token,
-            ];
-
-            if (LoginData::create($data)) {
-                $result = ['token' => $token];
-
-                $agent_levels = settings('agent.levels');
-
-                $agent = $user->agent();
-                $agent_data = $agent->getAgentData();
-                $FNs = is_array($agent_data['funcs']) ? $agent_data['funcs'] : [];
-                $result['profile'] = [
-                    'id' => $user->getId(),
-                    'name' => $agent->getName(),
-                    'company' => $agent_data['company'] ?: '<未登记>',
-                    'level' => $agent_levels[$agent_data['level']],
-                    'funcs' => array_merge(Util::getAgentFNs(false), $FNs),
-                ];
-
-                $referral = $agent->getReferral();
-                if ($referral) {
-                    $result['referral'] = [
-                        'code' => $referral->getCode(),
-                    ];
-                    //兼容老版本小程序
-                    $result['referal'] = [
-                        'code' => $referral->getCode(),
-                    ];
-                }
-
-                //F_cm = 佣金系统
-                $commission_enabled = App::isCommissionEnabled() && $agent_data['commission']['enabled'];
-                $result['profile']['funcs']['F_cm'] = $commission_enabled ? 1 : 0;
-
-                if ($user->isAgent()) {
-                    $result['profile']['passport'] = 'agent';
-                } elseif ($user->isPartner()) {
-                    $result['profile']['passport'] = 'partner';
-                }
-
-                $result['msg'] = '登录成功！';
-
-                return $result;
-            } else {
-                return err('登录失败！[101]');
-            }
+        if (empty($user)) {
+            return err('您还不是我们的代理商，立即注册?[102]');
         }
 
-        return err('您还不是我们的代理商,立即注册?[102]');
+        if ($res['config'] && !$user->isWxAppAllowed($res['config']['key'])) {
+            return err('登录失败，无法使用这个小程序！');
+        }
+
+        if (!($user->isAgent() || $user->isPartner())) {
+            return err('您还不是我们的代理商，立即注册?');
+        }
+
+        //清除原来的登录信息
+        foreach (LoginData::agent(['user_id' => $user->getId()])->findAll() as $entry) {
+            $entry->destroy();
+        }
+
+        $token = Util::getTokenValue();
+
+        $data = [
+            'src' => LoginData::AGENT,
+            'user_id' => $user->getId(),
+            'session_key' => $res['session_key'],
+            'openid_x' => $user->getOpenid(),
+            'token' => $token,
+        ];
+
+        if (LoginData::create($data)) {
+            return err('登录失败！[101]');
+        }
+
+        $result = ['token' => $token];
+
+        $agent_levels = settings('agent.levels');
+
+        $agent = $user->agent();
+        $agent_data = $agent->getAgentData();
+        $FNs = is_array($agent_data['funcs']) ? $agent_data['funcs'] : [];
+        $result['profile'] = [
+            'id' => $user->getId(),
+            'name' => $agent->getName(),
+            'company' => $agent_data['company'] ?: '<未登记>',
+            'level' => $agent_levels[$agent_data['level']],
+            'funcs' => array_merge(Util::getAgentFNs(false), $FNs),
+        ];
+
+        $referral = $agent->getReferral();
+        if ($referral) {
+            $result['referral'] = [
+                'code' => $referral->getCode(),
+            ];
+            //兼容老版本小程序
+            $result['referal'] = [
+                'code' => $referral->getCode(),
+            ];
+        }
+
+        //F_cm = 佣金系统
+        $commission_enabled = App::isCommissionEnabled() && $agent_data['commission']['enabled'];
+        $result['profile']['funcs']['F_cm'] = $commission_enabled ? 1 : 0;
+
+        if ($user->isAgent()) {
+            $result['profile']['passport'] = 'agent';
+        } elseif ($user->isPartner()) {
+            $result['profile']['passport'] = 'partner';
+        }
+
+        $result['msg'] = '登录成功！';
+
+        return $result;
     }
 
     public

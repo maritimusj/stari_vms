@@ -124,7 +124,7 @@ class Util
 
     public static function getTokenValue(): string
     {
-        return time().self::random(16);
+        return self::random(16);
     }
 
     /**

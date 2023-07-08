@@ -16,7 +16,7 @@ $year = Request::str('year', (new DateTime())->format('Y'));
 list($years, $data) = Stats::getUserMonthCommissionStatsOfYear($user, $year);
 
 $content = app()->fetchTemplate(
-    'web/user/month_stat',
+    'web/user/month_stats',
     [
         'data' => $data,
         'years' => $years && count($years) > 1 ? $years : [],
@@ -25,4 +25,4 @@ $content = app()->fetchTemplate(
     ]
 );
 
-JSON::success(['title' => "<b>{$user->getName()}</b>的收提统计", 'content' => $content]);
+JSON::success(['title' => "<b>{$user->getName()}</b>的收入统计", 'content' => $content]);

@@ -35,6 +35,17 @@
     .busy i {
         color: #ccc;
     }
+    [data-url] {
+        cursor: pointer;
+    }
+    .year {
+        color: #2196f3;
+        cursor: pointer;
+    }
+    .year .current {
+        text-decoration: underline;
+        font-weight: bolder;
+    }
 </style>
 <ul class="nav nav-tabs" id="navbar">
   <li role="presentation" class="active"><a href="#">所有代理商</a></li>
@@ -185,7 +196,7 @@
                                 {/if}
                                 {if isset($agent['commission'])}
                                 <li role="separator" class="divider"></li>
-                                <li><a href="#" data-op="viewCommissionLog"><i class="fa fa-rmb fa-fw"></i> 收入明细</a></li>
+                                <li><a href="#" data-op="monthStats"><i class="fa fa-money fa-fw"></i> 收入统计</a></li>
                                 <li><a href="{php echo $this->createWebUrl('withdraw', array('op'=>'default', 'agentId'=>$agent['id']));}"><i class="fa fa-credit-card fa-fw"></i> 提现记录</a></li>
                                 {/if}
                                 <li role="separator" class="divider"></li>
@@ -406,11 +417,13 @@
     api.viewKeepers = function (id) {
         window.location.href = "{php echo $this->createWebUrl('agent', ['op' => 'keepers', 'id' => '__id__']);}".replace('__id__', id);
     }
-    api.showMonthStats = function(data, e) {
-        const self = $(e.target);
-        const tr = self.closest('tr');
-        const [id, month] = data.split(':');
-        api.showResult({ op: 'viewStatsChart', id, month });
+    api.monthStats = function (userid) {
+        api.showResult({op: 'month_stats', id: userid}, api.user_url);
+    }
+    api.monthStatsOfYear = function (_, _, self) {
+        const year = self.data('year');
+        const userid = self.closest('.year').data('user');
+        api.showResult({op: 'month_stats', id: userid, year}, api.user_url);
     }
     $("#userslist").on("click", "[data-stats]", function (e) {
         const agent_id = $(this).closest('tr').data('id');
@@ -418,13 +431,13 @@
             api.viewStats(agent_id);
         }
     })
-    $("body").on("click", "[data-op]", function (e) {
-        e.preventDefault();
+    $('body').on('click', '[data-op]', function(e){
         const op = $(this).data('op');
         if (op && api[op]) {
             const agent_id = $(this).closest('tr').data('id');
-            agent_id && api[op](agent_id, e);
+            api[op](agent_id, e, $(this));
         }
+        e.preventDefault();
     })
     $("body").on('click', '.dialog_pager .pagination li:not(.active) a', function (e) {
         e.preventDefault();

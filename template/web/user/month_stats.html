@@ -1,16 +1,16 @@
 {if $data}
 <div class="year" data-user="{$user_id}">
     {loop $years $year}
-    <span {if $year === $current}class="current"{else} class="item" data-year="{$year}" data-op="monthStatOfYear"{/if}>{$year}</span>
+    <span {if $year === $current}class="current"{else} class="item" data-year="{$year}" data-op="monthStatsOfYear"{/if}>{$year}</span>
     {/loop}
 </div>
 <table class="table table-bordered table-hover" style="margin-top:1em;text-align:center;">
     <thead>
     <tr class="active">
         <th style="text-align:center;">月份</th>
-        <th style="text-align:center;">收入金额</th>
-        <th style="text-align:center;">提现金额</th>
-        <th style="text-align:center;">支出费用</th>
+        <th style="text-align:center;">收入</th>
+        <th style="text-align:center;">提现</th>
+        <th style="text-align:center;">支出</th>
     </tr>
     </thead>
     {loop $data $i $item}

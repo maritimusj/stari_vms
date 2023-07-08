@@ -354,7 +354,7 @@
             {/if}
             <li role="separator" class="divider"></li>
             {if $item['isKeeper'] || $item['isAgent']}
-            <li><a href="#" data-op="monthStat" ><i class="fa fa-money fa-fw"></i> 收提统计</a></li>
+            <li><a href="#" data-op="monthStats" ><i class="fa fa-money fa-fw"></i> 收入统计</a></li>
             <li role="separator" class="divider"></li>
             {/if}
             {if \zovye\App::isInventoryEnabled()}
@@ -600,14 +600,14 @@
         api.showResult({op: 'keeper_replenish', id: userid});
     }
 
-    api.monthStat = function (userid) {
-        api.showResult({op: 'month_stat', id: userid});
+    api.monthStats = function (userid) {
+        api.showResult({op: 'month_stats', id: userid});
     }
 
-    api.monthStatOfYear = function (_, _, self) {
+    api.monthStatsOfYear = function (_, _, self) {
         const year = self.data('year');
         const userid = self.closest('.year').data('user');
-        api.showResult({op: 'month_stat', id: userid, year});
+        api.showResult({op: 'month_stats', id: userid, year});
     }
 
     api.stopCharging = function (userid) {

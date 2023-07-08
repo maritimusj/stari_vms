@@ -57,8 +57,7 @@ $res = Util::transactionDo(
         if ($agent->setPartner($user, $name, $mobile, $notice)) {
             return true;
         }
-
-        return err('fail');
+        return err('设置失败！');
     }
 );
 

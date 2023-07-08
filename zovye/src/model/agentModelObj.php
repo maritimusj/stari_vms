@@ -190,7 +190,7 @@ class agentModelObj extends userModelObj
             return false;
         }
 
-        if ($user->isAgent() || $user->isPartner()) {
+        if ($user->isAgent()) {
             return false;
         }
 

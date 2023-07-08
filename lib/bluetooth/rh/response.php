@@ -42,8 +42,7 @@ class response implements IResponse
     {
         if ($this->getID() == protocol::RESULT) {
             $result = json_decode($this->data, true);
-
-            return $result['Res'] === 0;
+            return is_array($result) && $result['Res'] === 0;
         }
 
         return false;
@@ -53,8 +52,7 @@ class response implements IResponse
     {
         if ($this->getID() == protocol::RESULT) {
             $result = json_decode($this->data, true);
-
-            return $result['Res'] !== 0;
+            return is_array($result) && $result['Res'] !== 0;
         }
 
         return false;

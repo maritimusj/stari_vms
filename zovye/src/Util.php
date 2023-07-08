@@ -2757,6 +2757,24 @@ HTML_CONTENT;
         //return is_error($res) || empty($res['short_url']) ? $url : $res['short_url'];
     }
 
+    public static function releaseDevice($imei)
+    {
+        $res = CtrlServ::queryData('v2', "device/$imei", [], '', '', 'DELETE');
+        if (empty($res)) {
+            return err('接口返回空！');
+        }
+
+        if (is_error($res)) {
+            return $res;
+        }
+
+        if (!$res['status']) {
+            return err($res['data']['message'] ?? '操作失败！');
+        }
+
+        return $res;
+    }
+
     /**
      * 激活设备.
      *

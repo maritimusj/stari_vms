@@ -38,6 +38,19 @@ foreach (Package::query(['device_id' => $device->getId()])->findAll() as $entry)
     $entry->destroy();
 }
 
+if ($device->isNormalDevice()) {
+    $imei = $device->getImei();
+    if (!empty($imei)) {
+        $res =Util::releaseDevice($imei);
+        if (is_error($res)) {
+            Log::error('device', [
+                'message' => '释放设备失败！',
+                'result' => $res,
+            ]);
+        }
+    }
+}
+
 //通知实体设备
 $device->appNotify('update');
 

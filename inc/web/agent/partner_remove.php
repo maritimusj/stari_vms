@@ -8,32 +8,31 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-$from = Request::trim('from') ?: 'user';
-$user_id = Request::int('id');
+$agent_id = Request::int('agentid');
+$partner_id = Request::int('partnerid');
 
-if ($user_id) {
-    $res = Util::transactionDo(function () use ($user_id) {
-        $user = User::get($user_id);
-        if (empty($user)) {
-            return err('找不到这个用户！');
-        }
-        if (!$user->isPartner()) {
-            return err('用户不是任何代理商的合伙人！');
-        }
-
-        $agent = $user->getPartnerAgent();
-        if ($agent) {
-            if ($agent->removePartner($user)) {
-                return ['message' => '成功！'];
-            }
-        }
-
-        return err('失败！');
-    });
-
-    if (!is_error($res)) {
-        Util::itoast('已取消用户代理身份！', $this->createWebUrl($from), 'success');
-    }
+$agent = Agent::get($agent_id);
+if (empty($agent)) {
+    Util::itoast('找不到这个代理商！', $this->createWebUrl('agent', ['op' => 'partner', 'id' => $agent_id]), 'error');
 }
 
-Util::itoast(empty($res['message']) ? '操作失败！' : $res['message'], $this->createWebUrl($from), 'error');
+$res = Util::transactionDo(
+    function () use ($agent, $partner_id) {
+
+        foreach (m('agent_msg')->where(We7::uniacid(['agent_id' => $partner_id]))->findAll() as $msg) {
+            $msg->destroy();
+        }
+
+        if ($agent->removePartner($partner_id)) {
+            return true;
+        }
+
+        return err('fail');
+    }
+);
+
+if (is_error($res)) {
+    Util::itoast('合伙人删除失败！', $this->createWebUrl('agent', ['op' => 'partner', 'id' => $agent_id]), 'error');
+}
+
+Util::itoast('合伙人删除成功！', $this->createWebUrl('agent', ['op' => 'partner', 'id' => $agent_id]), 'success');

@@ -32,7 +32,7 @@ if ($user->isAgent() || $user->isPartner()) {
 $partner_data['mobile'] = $user->getMobile();
 
 app()->showTemplate('web/agent/partner_edit', [
-    'op' => 'partneradd',
+    'op' => 'partnerAdd',
     'agent_id' => $agent_id,
     'user_id' => $user_id,
     'back_url' => $back_url,

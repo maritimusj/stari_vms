@@ -53,9 +53,9 @@
                     <td>{$item['mobile']}</td>
                     <td>{$item['createtime']}</td>
                     <td class="operate">
-                        <a href="{php echo $this->createWebUrl('agent', array('op'=>'partneredit', 'agentid'=>$agent->getId(), 'partnerid'=>$item['id']));}"><i class="fa fa-gear" title="设置"></i></a>
+                        <a href="{php echo $this->createWebUrl('agent', array('op'=>'partnerEdit', 'agentid'=>$agent->getId(), 'partnerid'=>$item['id']));}"><i class="fa fa-gear" title="设置"></i></a>
                         <i class="fa fa-envelope" title="他的消息..." data-op="viewmsg"></i>
-                        <a href="{php echo $this->createWebUrl('agent', array('op'=>'partnerremove', 'agentid'=>$agent->getId(), 'partnerid'=>$item['id']));}" onclick="if(!confirm('确定要删除这个合伙人吗？')){return false;}"><i class="fa fa-trash-o" title="删除？"></i></a>                        
+                        <a href="{php echo $this->createWebUrl('agent', array('op'=>'partnerRemove', 'agentid'=>$agent->getId(), 'partnerid'=>$item['id']));}" onclick="if(!confirm('确定要删除这个合伙人吗？')){return false;}"><i class="fa fa-trash-o" title="删除？"></i></a>
                     </td>         
                 </tr>
                 {/loop}
@@ -108,7 +108,7 @@
         if(user && user.id && typename === 'partner') {
             location.href = api.url + '&' + $.param({
                 'userid': user.id,
-                'op': 'partneradd',
+                'op': 'partnerAdd',
             })
         }
     })

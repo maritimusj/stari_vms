@@ -8,7 +8,7 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-$from = Request::str('from') ?: 'partneradd';
+$from = Request::str('from') ?: 'partnerAdd';
 
 $agent_id = Request::int('agentid');
 $user_id = Request::int('userid');

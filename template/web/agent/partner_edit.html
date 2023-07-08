@@ -18,10 +18,10 @@
         </div>
     </div>
     <div  style="display:inline-block;margin:0 10px;">
-        正在{if $op=='partneradd'}创建{else}编辑{/if}合伙人
+        正在{if $op=='partnerAdd'}创建{else}编辑{/if}合伙人
     </div>        
     <div class="agent" title="{$level['title']}">
-        <div class="profile"  {if $op=='partneredit'}style="background-color:{$level['clr']}"{/if}>
+        <div class="profile"  {if $op=='partnerEdit'}style="background-color:{$level['clr']}"{/if}>
             <img src="{php echo $user->getAvatar()}">
             <div class="nickname">{php echo $user->getName();}</div>                            
         </div>
@@ -92,9 +92,9 @@
 <div class="form-btn">
     <input type="hidden" name="agentid" value="{php echo $agent->getId();}">
     <input type="hidden" name="userid" value="{php echo $user->getId();}">
-    <input type="hidden" name="op" value="partnersave">
+    <input type="hidden" name="op" value="partnerSave">
     <input type="hidden" name="from" value="{$op}">
-    <button type="submit" class="btn btn-primary">{if $op=='partneradd'}创建{else}保存{/if}</button>
+    <button type="submit" class="btn btn-primary">{if $op=='partnerAdd'}创建{else}保存{/if}</button>
     <button type="button" class="btn btn-default" onclick='location.href="{$back_url}"'>返回</button>
 </div>
 </form>

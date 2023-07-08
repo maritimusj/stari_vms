@@ -31,7 +31,7 @@ $agent_data = $agent->getAgentData();
 $notice = $agent_data['partners'][$user->getId()]['notice'] ?: [];
 
 app()->showTemplate('web/agent/partner_edit', [
-    'op' => 'partneredit',
+    'op' => 'partnerEdit',
     'agent_id' => $agent_id,
     'user_id' => $user_id,
     'back_url' => $back_url,

@@ -340,7 +340,7 @@
                 {if empty($item['isPartner'])}
                 <li><a href="{php echo $this->createWebUrl('agent', array('op'=>'create', 'id'=>$item['id']));}"><i class="fa fa-diamond fa-fw"></i> 设置代理商</a></li>
                 {else}
-                <li><a href="{php echo $this->createWebUrl('agent', array('op'=>'partner_remove', 'id'=>$item['id']));}" onclick="if(!confirm('确定要取消合伙人身份吗？')){return false;}"><i class="fa fa-users fa-fw"></i> 取消合伙人身份</a></li>
+                <li><a href="{php echo $this->createWebUrl('agent', array('op'=>'user_partner_remove', 'id'=>$item['id']));}" onclick="if(!confirm('确定要取消合伙人身份吗？')){return false;}"><i class="fa fa-users fa-fw"></i> 取消合伙人身份</a></li>
                 {/if}
             {/if}
             <li role="separator" class="divider"></li>

@@ -62,8 +62,8 @@
                         {if $item['review']}
                         <div class="review">
                             {if $item['review']['result'] == zovye\ReviewResult::WAIT}
-                            <a href="{php echo $this->createWebUrl('adv', array('op'=>'reviewpassed', 'type'=>$item['type'], 'id'=>$item['id']));}"><i class="fa fa-check" title="通过审核"></i></a>
-                            <a href="{php echo $this->createWebUrl('adv', array('op'=>'reviewrejected', 'type'=>$item['type'], 'id'=>$item['id']));}"><i class="fa fa-close" title="拒绝发布"></i></a>
+                            <a href="{php echo $this->createWebUrl('adv', array('op'=>'reviewPass', 'type'=>$item['type'], 'id'=>$item['id']));}"><i class="fa fa-check" title="通过审核"></i></a>
+                            <a href="{php echo $this->createWebUrl('adv', array('op'=>'reviewReject', 'type'=>$item['type'], 'id'=>$item['id']));}"><i class="fa fa-close" title="拒绝发布"></i></a>
                             {/if}
                         </div>
                         {/if}

@@ -2759,7 +2759,7 @@ HTML_CONTENT;
 
     public static function releaseDevice($imei)
     {
-        $res = CtrlServ::queryData('v2', "device/$imei", [], '', '', 'DELETE');
+        $res = CtrlServ::deleteV2("device/$imei");
         if (empty($res)) {
             return err('接口返回空！');
         }

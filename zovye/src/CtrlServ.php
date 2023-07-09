@@ -229,6 +229,11 @@ class CtrlServ
         return err('请求失败！');
     }
 
+    public static function deleteV2(string $path = '', array $params = [])
+    {
+        return self::queryData('v2', $path, $params, '', '', 'DELETE');
+    }
+
     public static function getV2(string $path = '', array $params = [])
     {
         return self::queryData('v2', $path, $params);

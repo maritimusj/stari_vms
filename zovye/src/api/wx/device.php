@@ -294,7 +294,7 @@ class device
             }
 
             /** @var deviceModelObj $device */
-            $device = Util::activeDevice($id, $params);
+            $device = \zovye\Device::activate($id, $params);
             if (is_error($device)) {
                 return err('找不到这个设备，请重新扫描二维码！');
             }

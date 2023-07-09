@@ -3,7 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
- 
+
 namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
@@ -41,7 +41,7 @@ foreach (Package::query(['device_id' => $device->getId()])->findAll() as $entry)
 if ($device->isNormalDevice()) {
     $imei = $device->getImei();
     if (!empty($imei)) {
-        $res =Util::releaseDevice($imei);
+        $res = Device::release($imei);
         if (is_error($res)) {
             Log::error('device', [
                 'message' => '释放设备失败！',

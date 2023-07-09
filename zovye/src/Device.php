@@ -271,8 +271,10 @@ class Device extends State
                     if (empty($result['num'])) {
                         return true;
                     }
+
                     return $lane['num'] < $result['num'];
                 }
+
                 return false;
             };
         }
@@ -301,6 +303,7 @@ class Device extends State
         }
 
         $result['num'] = $total;
+
         return $result;
     }
 
@@ -362,6 +365,7 @@ class Device extends State
             }
             $result['cargo_lane'] = $lane_id;
         }
+
         return $result;
     }
 
@@ -548,6 +552,94 @@ class Device extends State
         $device->setImei($imei);
 
         return $device;
+    }
+
+    /**
+     * 激活设备.
+     *
+     * @param $imei
+     * @param array $params
+     *
+     * @return mixed
+     */
+    public static function activate($imei, array $params = [])
+    {
+        $res = CtrlServ::query("device/$imei/active", [], '', '', 'PUT');
+        if (is_error($res)) {
+            return $res;
+        }
+
+        //刷新域名转发缓存
+        $url = str_replace('{imei}', urlencode($imei), settings('ctrl.qrcode.url', FLUSH_DEVICE_FORWARDER_URL));
+        if (file_get_contents($url) === false) {
+            return err('刷新域名缓存失败！');
+        }
+
+        $device = Device::get($imei, true);
+        if (empty($device)) {
+            $data = array_merge(
+                [
+                    'name' => $imei,
+                    'imei' => $imei,
+                ],
+                $params
+            );
+
+            $extra = [];
+
+            if (App::isDeviceWithDoorEnabled() && empty($data['extra']['door'])) {
+                $extra['door'] = [
+                    'num' => Request::int('doorNum', 1),
+                ];
+            }
+
+            //设置默认型号
+            $type_id = settings('device.multi-types.first', 0);
+            $device_type = DeviceTypes::get($type_id);
+            if (!empty($device_type)) {
+                $data['device_type'] = $type_id;
+            }
+
+            $device = Device::create($data);
+            if (empty($device)) {
+                return err('创建设备失败！');
+            }
+
+            if ($extra) {
+                $device->set('extra', $extra);
+            }
+
+            $device->updateQrcode(true);
+            $device->updateAppRemain();
+
+            //更新公众号缓存
+            $device->updateAccountData();
+            $device->updateScreenAdvsData();
+
+            $device->updateAppId();
+
+            $device->save();
+        }
+
+        return $device;
+    }
+
+    public static function release($imei)
+    {
+        $res = CtrlServ::deleteV2("device/$imei");
+        if (empty($res)) {
+            return err('接口返回空！');
+        }
+
+        if (is_error($res)) {
+            return $res;
+        }
+
+        if (!$res['status']) {
+            return err($res['data']['message'] ?? '操作失败！');
+        }
+
+        return $res;
     }
 
     public static function createBluetoothCmdLog(deviceModelObj $device, ICmd $cmd)
@@ -739,6 +831,7 @@ class Device extends State
 
         if (self::reset($device, $agent ? '绑定设备' : '解绑设备')) {
             $device->appNotify('update');
+
             return true;
         }
 

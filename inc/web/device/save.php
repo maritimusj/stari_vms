@@ -180,7 +180,7 @@ $result = Util::transactionDo(function () use ($id, &$device) {
         $device->setDeviceModel($device_model);
 
         if ($device->isNormalDevice() || $device->isChargingDevice() || $device->isFuelingDevice()) {
-            $activeRes = Util::activeDevice($device->getImei());
+            $activeRes = Device::activate($device->getImei());
         }
 
         //绑定套餐

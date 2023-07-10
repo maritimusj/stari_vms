@@ -13,16 +13,16 @@ class unlock implements ICmd
 {
     private $device_id;
 
-    private $id;
+    private $locker_id;
 
     /**
      * @param $device_id
-     * @param $id
+     * @param $locker_id
      */
-    public function __construct($device_id, $id)
+    public function __construct($device_id, $locker_id)
     {
         $this->device_id = $device_id;
-        $this->id = $id;
+        $this->locker_id = $locker_id;
     }
 
     function getDeviceID()
@@ -37,17 +37,17 @@ class unlock implements ICmd
 
     function getData()
     {
-        return $this->id;
+        return $this->locker_id;
     }
 
     function getRaw()
     {
-        return pack('C*', 0xa5, 0x02, $this->id, 0x05);
+        return pack('c*', 0xa5, 0x02, $this->locker_id, 0x05);
     }
 
     function getMessage(): string
     {
-        return '<= 请求开锁：'.$this->id;
+        return '<= 请求开锁：'.$this->locker_id;
     }
 
     function getEncoded($fn = null)

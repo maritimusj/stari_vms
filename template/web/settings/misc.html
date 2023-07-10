@@ -369,31 +369,17 @@
             <div class="seg">
                 <div class="title">泰康保险</div>
                 <div class="form-group">
-                    <label class="col-md-2 control-label">clientId</label>
+                    <label class="col-md-2 control-label">app id</label>
                     <div class="col-md-10">
-                        <input type="text" class="form-control" name="TKClientId" value="{$Tk['id']}">
-                        <span class="help-block">* 泰康分配的clientId</span>
+                        <input type="text" class="form-control" name="TKAppId" value="{$Tk['id']}">
+                        <span class="help-block">* 泰康分配的app id</span>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-md-2 control-label">clientSecret</label>
+                    <label class="col-md-2 control-label">app secret</label>
                     <div class="col-md-10">
-                        <input type="text" class="form-control" name="TKClientSecret" value="{$Tk['secret']}">
-                        <span class="help-block">* 泰康分配的clientSecret</span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">appkey</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" name="TKAppKey" value="{$Tk['app_key']}">
-                        <span class="help-block">* 泰康分配的appkey</span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">通讯加密key</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" name="TKClientEncryptKey" value="{$Tk['aes_key']}">
-                        <span class="help-block">* 泰康api AES加密使用的key</span>
+                        <input type="text" class="form-control" name="TKAppSecret" value="{$Tk['secret']}">
+                        <span class="help-block">* 泰康分配的app secret</span>
                     </div>
                 </div>
                 <div class="form-group">

@@ -692,10 +692,8 @@ if ($page == 'device') {
 
     if (App::isTKPromotingEnabled()) {
         Config::tk('config', [
-            'id' => Request::trim('TKClientId'),
-            'secret' => Request::trim('TKClientSecret'),
-            'app_key' => Request::trim('TKAppKey'),
-            'aes_key' => Request::trim('TKClientEncryptKey'),
+            'id' => Request::trim('TKAppId'),
+            'secret' => Request::trim('TKAppSecret'),
             'account_uid' => Request::trim('TKAccountUID'),
         ], true);
     }

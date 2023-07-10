@@ -169,7 +169,7 @@ class agent
             'token' => $token,
         ];
 
-        if (LoginData::create($data)) {
+        if (!LoginData::create($data)) {
             return err('登录失败！[101]');
         }
 

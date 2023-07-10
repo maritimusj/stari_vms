@@ -1447,6 +1447,6 @@ sup.id:hover {
     color: #666;
 }
 sup.id::before {
-    content: '▸';
+    content: '\25B8';
     padding-right: 3px;
 }

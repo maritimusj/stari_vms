@@ -51,7 +51,7 @@ class response implements IResponse
 
     public function hasBatteryValue(): bool
     {
-        return false;
+        return $this->getID() == 0x06;
     }
 
     public function getBatteryValue(): int

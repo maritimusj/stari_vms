@@ -57,7 +57,7 @@ class response implements IResponse
     public function getBatteryValue(): int
     {
         // 正常电压范围 0x42 ~ 0x62
-        return min(100, max(0, ($this->getResultValue() - 0x42) / 20 * 100));
+        return min(100, max(0, ($this->getResultValue() - 0x42) / 0x20 * 100));
     }
 
     public function getErrorCode(): int

@@ -35,6 +35,9 @@ class AccountEventHandler
             if ($account->isFlashEgg() || settings('api.account', 'n/a') == $account->getUid()) {
                 $params['ignore_assigned'] = true;
             }
+            if (App::isTKPromotingEnabled() && Config::tk('config.account_uid') == $account->getUid()) {
+                $params['ignore_assigned'] = true;
+            }
             $res = Util::checkAvailable($user, $account, $device, $params);
             if (is_error($res)) {
                 ZovyeException::throwWith($res['message'], -1, $device);

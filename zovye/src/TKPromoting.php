@@ -60,31 +60,6 @@ class TKPromoting
         return $acc;
     }
 
-    static function getApiUrl(): string
-    {
-        return DEBUG ? self::DebugApiUrl : self::ProdApiUrl;
-    }
-
-    public function sign($timestamp): string
-    {
-        return sha1($this->app_id.$this->app_secret.$timestamp);
-    }
-
-    public function setNotifyUrl(): array
-    {
-        return $this->post('/channel', [
-            'notify_url' => Util::murl('tk'),
-        ]);
-    }
-
-    public function reg(deviceModelObj $device): array
-    {
-        return $this->post('/device', [
-            'device_no' => $device->getImei(),
-            'name' => $device->getName(),
-        ]);
-    }
-
     public static function deviceReg(deviceModelObj $device): bool
     {
         $config = Config::tk('config', []);
@@ -135,6 +110,31 @@ class TKPromoting
         }
 
         return true;
+    }
+
+    static function getApiUrl(): string
+    {
+        return DEBUG ? self::DebugApiUrl : self::ProdApiUrl;
+    }
+
+    public function sign($timestamp): string
+    {
+        return sha1($this->app_id.$this->app_secret.$timestamp);
+    }
+
+    public function setNotifyUrl(): array
+    {
+        return $this->post('/channel', [
+            'notify_url' => Util::murl('tk'),
+        ]);
+    }
+
+    public function reg(deviceModelObj $device): array
+    {
+        return $this->post('/device', [
+            'device_no' => $device->getImei(),
+            'name' => $device->getName(),
+        ]);
     }
 
     public function confirm(deviceModelObj $device, string $order_no): array

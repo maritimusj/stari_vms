@@ -9,9 +9,9 @@ namespace zovye;
 use Exception;
 use RuntimeException;
 
-$app_id = Request::header('x-app-id');
-$ts = Request::header('x-timestamp');
-$token = Request::header('x-token');
+$app_id = Request::header('HTTP_X_APP_ID');
+$ts = Request::header('HTTP_X_TIMESTAMP');
+$token = Request::header('HTTP_X_TOKEN');
 
 $data = Request::json();
 
@@ -65,10 +65,16 @@ try {
         throw new RuntimeException($account['message']);
     }
 
-    $device = $user->getLastActiveDevice();
+    $device_uid = $data['device_no'];
+    if (empty($device_uid)) {
+        $device = $user->getLastActiveDevice();
+    } else {
+        $device = Device::get($device_uid, true);
+    }
+
     if (empty($device)) {
         throw new RuntimeException('找不到设备或者用户操作超时！');
-    }
+    }   
 
     $res = Util::checkAvailable($user, $account, $device, ['ignore_assigned' => true]);
     if (is_error($res)) {

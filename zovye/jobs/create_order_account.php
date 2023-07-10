@@ -42,8 +42,8 @@ $params = [
     'ip' => $ip,
 ];
 
-if (Request::has('proposalNo')) {
-    $params['proposalNo'] = Request::str('proposalNo');
+if (Request::has('tk_order_no')) {
+    $params['tk_order_no'] = Request::str('tk_order_no');
 }
 
 $op = Request::op('default');

@@ -73,7 +73,7 @@ class TKPromoting
     public function setNotifyUrl(): array
     {
         return $this->post('/channel', [
-            'notify' => Util::murl('tk'),
+            'notify_url' => Util::murl('tk'),
         ]);
     }
 

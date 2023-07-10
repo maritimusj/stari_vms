@@ -9,10 +9,11 @@ namespace zovye;
 use Exception;
 use RuntimeException;
 
-$data = Request::json();
 $app_id = Request::header('x-app-id');
 $ts = Request::header('x-timestamp');
 $token = Request::header('x-token');
+
+$data = Request::json();
 
 Log::debug('tk', [
     'header' => [

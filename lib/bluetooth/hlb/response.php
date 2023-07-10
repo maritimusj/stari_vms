@@ -60,8 +60,8 @@ class response implements IResponse
 
     function getBatteryValue(): int
     {
-        // 6.1v电压主板返回值为009d,所以假定9d为100%电量
-        $v = intval(hexdec($this->data) / 0x9d * 100);
+        // 6.1v电压主板返回值为009d,所以假定9d为100%电量, 2.0v电压返回值为003f，此时认定为电量0
+        $v = intval((hexdec($this->data) - 0x3f) / (0x9d - 0x3f) * 100);
         return min(100, max(0, $v));
     }
 

@@ -11,11 +11,13 @@ use zovye\Device;
 
 class Helper
 {
-    public static function resetSEQ($device_id)
+    public static function reset($device_id)
     {
         $device = Device::get($device_id, true);
         if ($device) {
+            $device->setQoe(-1);
             $device->updateSettings('wxu.seq', 0);
+            $device->save();
         }
     }
 

@@ -46,7 +46,7 @@ class response implements IResponse
 
     public function isReady(): bool
     {
-        return $this->getResultValue() == 0x01 || ($this->getID() == 0x01 && $this->getResultValue() == 0x02);
+        return $this->getID() == 0x06 && $this->getBatteryValue() > 0;
     }
 
     public function hasBatteryValue(): bool
@@ -56,7 +56,8 @@ class response implements IResponse
 
     public function getBatteryValue(): int
     {
-        return -1;
+        // 正常电压范围 0x42 ~ 0x62
+        return min(100, max(0, ($this->getResultValue() - 0x42) / 20 * 100));
     }
 
     public function getErrorCode(): int
@@ -89,6 +90,8 @@ class response implements IResponse
                     return '=> 开锁失败（机器故障）';
                 }
                 return '=> 开锁失败';
+            case 0x06:
+                return "=> 当前电量：{$this->getBatteryValue()}%";
         }
 
         return '=> 未知消息';

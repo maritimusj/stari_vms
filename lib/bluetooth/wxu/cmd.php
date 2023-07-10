@@ -60,6 +60,8 @@ class cmd implements ICmd
                 return '<= 请求开锁';
             case 0x04:
                 return '<= 开锁测试';
+            case 0x06:
+                return '<= 查询电量';
         }
 
         return '<= 未知命令';

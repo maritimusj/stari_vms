@@ -32,7 +32,7 @@ class unlock implements ICmd
 
     function getID(): string
     {
-        return hex2bin($this->$this->getRaw());
+        return bin2hex($this->getRaw());
     }
 
     function getData()

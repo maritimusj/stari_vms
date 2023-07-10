@@ -50,7 +50,7 @@ class response implements IResponse
 
     function isReady(): bool
     {
-        return $this->hasBatteryValue() && $this->getBatteryValue() > 0;
+        return $this->hasBatteryValue() && $this->getBatteryValue() > 1;
     }
 
     function hasBatteryValue(): bool
@@ -62,7 +62,7 @@ class response implements IResponse
     {
         // 6.1v电压主板返回值为009d,所以假定9d为100%电量, 2.0v电压返回值为003f，此时认定为电量0
         $v = intval((hexdec($this->data) - 0x3f) / (0x9d - 0x3f) * 100);
-        return min(100, max(0, $v));
+        return min(100, max(1, $v)); //电量0时返回一个"低电量"值
     }
 
     function getMessage(): string

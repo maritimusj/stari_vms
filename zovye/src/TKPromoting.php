@@ -13,8 +13,8 @@ class TKPromoting
 {
     const REDIRECT_URL = 'https://cloud.tk.cn/tkproperty/nprd/S2023062001/?fromId=77973&channelCode=999999990004&cusType=3&device_id={device_uid}&extra={user_uid}';
 
-    const DebugApiUrl = 'https://bag-gateway-test.ylkang.vip';
-    const ProdApiUrl = 'https://bag-gateway.ylkang.vip';
+    const DebugApiUrl = 'https://bag-gateway-test.ylkang.vip/bag-marketing';
+    const ProdApiUrl = 'https://bag-gateway.ylkang.vip/bag-marketing';
 
     const RESPONSE = '{"code": "SUCCESS"}';
 

@@ -58,7 +58,7 @@ class response implements IResponse
 
     function getBatteryValue(): int
     {
-        return intval(hexdec($this->data) / 255 * 100);
+        return intval(hexdec($this->data) / 0x9d * 100);
     }
 
     function getMessage(): string

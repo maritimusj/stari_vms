@@ -4,7 +4,6 @@
  * @url www.stariture.com
  */
 
-
 namespace zovye;
 
 use zovye\model\deviceModelObj;
@@ -63,6 +62,7 @@ class TKPromoting
     public static function deviceReg(deviceModelObj $device): bool
     {
         $config = Config::tk('config', []);
+
         if (empty($config) || empty($config['id']) || empty($config['secret'])) {
             Log::error('tk', [
                 'reg device' => $device->profile(),
@@ -89,6 +89,7 @@ class TKPromoting
     public static function confirmOrder(deviceModelObj $device, string $tk_order_no): bool
     {
         $config = Config::tk('config', []);
+
         if (empty($config) || empty($config['id']) || empty($config['secret'])) {
             Log::error('tk', [
                 'confirm order' => $tk_order_no,
@@ -110,11 +111,6 @@ class TKPromoting
         }
 
         return true;
-    }
-
-    static function getApiUrl(): string
-    {
-        return DEBUG ? self::DebugApiUrl : self::ProdApiUrl;
     }
 
     public function sign($timestamp): string
@@ -145,7 +141,12 @@ class TKPromoting
         ]);
     }
 
-    public function post($path, $data): array
+    protected static function getApiUrl(): string
+    {
+        return DEBUG ? self::DebugApiUrl : self::ProdApiUrl;
+    }
+
+    protected function post($path, $data): array
     {
         $header = [
             "x-app-id: ".$this->app_id,

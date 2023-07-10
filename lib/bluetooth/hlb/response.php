@@ -15,12 +15,11 @@ class response implements IResponse
 
     /**
      * @param $data
-     * @param bool $base64encode
      */
-    public function __construct($data, bool $base64encode = true)
+    public function __construct($data)
     {
         if (!empty($data)) {
-            $this->data = $base64encode ? base64_decode($data) : $data;
+            $this->data = bin2hex(base64_decode($data));
         }
     }
 

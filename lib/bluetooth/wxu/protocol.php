@@ -40,7 +40,7 @@ class protocol implements IBlueToothProtocol
 
     public function initialize($device_id): ?ICmd
     {
-        return new BatteryCmd($device_id);
+        return null;
     }
 
     public function open($device_id, $data): ?ICmd

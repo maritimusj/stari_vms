@@ -119,6 +119,9 @@ class response implements IResponse
 
     public function getAttachedCMD(): ?ICmd
     {
+        if ($this->getID() == 0x01) {
+            return new BatteryCmd($this->device_id);
+        }
         return null;
     }
 

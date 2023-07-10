@@ -85,12 +85,38 @@ class TKPromoting
         ]);
     }
 
+    public static function deviceReg(deviceModelObj $device): bool
+    {
+        $config = Config::tk('config', []);
+        if (empty($config) || empty($config['id']) || empty($config['secret'])) {
+            Log::error('tk', [
+                'reg device' => $device->profile(),
+                'error' => '配置不正确！',
+            ]);
+
+            return false;
+        }
+
+        $res = (new TKPromoting($config['id'], $config['secret']))->reg($device);
+
+        if (is_error($res)) {
+            Log::error('tk', [
+                'reg device' => $device->profile(),
+                'error' => $res,
+            ]);
+
+            return false;
+        }
+
+        return true;
+    }
+
     public static function confirmOrder(deviceModelObj $device, string $tk_order_no): bool
     {
         $config = Config::tk('config', []);
         if (empty($config) || empty($config['id']) || empty($config['secret'])) {
             Log::error('tk', [
-                'confirm' => $tk_order_no,
+                'confirm order' => $tk_order_no,
                 'error' => '配置不正确！',
             ]);
 

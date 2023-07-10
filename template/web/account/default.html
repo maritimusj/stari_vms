@@ -155,6 +155,27 @@
         color: #fff;
         border-top-left-radius: 10px;
     }
+    .account-name {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        width: 120px;
+    }
+    .account-uid {
+        display: none;
+        color: #9E9E9E;
+    }
+    .account-uid .text {
+        display: inline-block;
+        width: 200px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+    .profile:hover .account-uid {
+        display: flex;
+        align-items: center;
+    }
 </style>
 {template "web/account/nav"}
 <div class="panel panel-default{if empty($banned)} panel-first{/if} nav-tab-item"  id="accountlist">
@@ -276,37 +297,46 @@
                     </td>
                     <td>
                         <div class="profile">
-                            <img src="{media $a['img']}" title="点击复制UID [ {$a['uid']} ]" data-url="{$a['uid']}">
-                            <span>{$a['title']}{if $a['more_url']} <sup title="需要关注多个公众号">{php echo '+'.count($a['more_url']);}</sup>{/if}</span>
-                            {if $a['type'] == \zovye\Account::AUTH}
-                            {if $a['service'] == 2}
-                            <span class="state auth" title="授权接入的服务号{if $a['verified']}(已认证){else}(未认证){/if}"><i class="fa fa-check-circle"></i></span>
-                            {else}
-                            <span class="state auth" title="授权接入的订阅号{if $a['verified']}(已认证){else}(未认证){/if}"><i class="fa fa-check-circle-o"></i></span>
-                            {/if}
-                            {elseif $a['type'] == \zovye\Account::VIDEO}
-                            <span class="state video" title="视频"><i class="fa fa-youtube-play"></i></span>
-                            {elseif $a['type'] == \zovye\Account::DOUYIN}
-                            <span class="state auth{if empty($a['openid'])} disabled{/if}" title="抖音号">
-                                <img src="{php echo MODULE_URL . 'static/img/douyin2.svg'}">
-                            </span>
-                            {elseif $a['type'] == \zovye\Account::WXAPP}
-                            <span class="state auth{if empty($a['username'])} disabled{/if}" title="小程序">
-                                <img src="{php echo MODULE_URL . 'static/img/wxapp.jpg'}">
-                            </span>
-                            {elseif $a['type'] == \zovye\Account::QUESTIONNAIRE}
-                             <span class="state auth" title="问卷">
-                                <a href="{php echo $this->createWebUrl('account', ['op' => 'questionnaire_logs', 'account' => $a['id']]);}"  title="查看用户提交记录">
-                                    <img src="{php echo MODULE_URL . 'static/img/questionnaire.svg'}">
-                                </a>
-                            </span>                           
-                            {elseif $a['type'] == \zovye\Account::TASK}
-                            <span class="state auth">
-                                <a href="{php echo $this->createWebUrl('task', ['op' => 'view', 'account' => $a['id']]);}"  title="查看自定义任务用户记录">
-                                    <img src="{php echo MODULE_URL . 'static/img/task.svg'}">
-                                </a>
-                            </span>
-                            {/if}
+                            <div>
+                                <img src="{media $a['img']}">
+                            </div>
+                            <div class="account-name">
+                                <span>
+                                    {$a['title']}{if $a['more_url']} <sup title="需要关注多个公众号">{php echo '+'.count($a['more_url']);}</sup>{/if}
+                                    {if $a['type'] == \zovye\Account::AUTH}
+                                    {if $a['service'] == 2}
+                                    <span class="state auth" title="授权接入的服务号{if $a['verified']}(已认证){else}(未认证){/if}"><i class="fa fa-check-circle"></i></span>
+                                    {else}
+                                    <span class="state auth" title="授权接入的订阅号{if $a['verified']}(已认证){else}(未认证){/if}"><i class="fa fa-check-circle-o"></i></span>
+                                    {/if}
+                                    {elseif $a['type'] == \zovye\Account::VIDEO}
+                                    <span class="state video" title="视频"><i class="fa fa-youtube-play"></i></span>
+                                    {elseif $a['type'] == \zovye\Account::DOUYIN}
+                                    <span class="state auth{if empty($a['openid'])} disabled{/if}" title="抖音号">
+                                        <img src="{php echo MODULE_URL . 'static/img/douyin2.svg'}">
+                                    </span>
+                                    {elseif $a['type'] == \zovye\Account::WXAPP}
+                                    <span class="state auth{if empty($a['username'])} disabled{/if}" title="小程序">
+                                        <img src="{php echo MODULE_URL . 'static/img/wxapp.jpg'}">
+                                    </span>
+                                    {elseif $a['type'] == \zovye\Account::QUESTIONNAIRE}
+                                     <span class="state auth" title="问卷">
+                                        <a href="{php echo $this->createWebUrl('account', ['op' => 'questionnaire_logs', 'account' => $a['id']]);}"  title="查看用户提交记录">
+                                            <img src="{php echo MODULE_URL . 'static/img/questionnaire.svg'}">
+                                        </a>
+                                    </span>                           
+                                    {elseif $a['type'] == \zovye\Account::TASK}
+                                    <span class="state auth">
+                                        <a href="{php echo $this->createWebUrl('task', ['op' => 'view', 'account' => $a['id']]);}"  title="查看自定义任务用户记录">
+                                            <img src="{php echo MODULE_URL . 'static/img/task.svg'}">
+                                        </a>
+                                    </span>
+                                    {/if}
+                                </span>
+                                <div class="account-uid operate">
+                                    <span title="{$a['uid']}" class="text">{$a['uid']}</span> <i class="fa fa-paste" title="点击复制" data-url="{$a['uid']}"></i>
+                                </div>
+                            </div>
                         </div>
                     </td>
                     <td class="bonus">

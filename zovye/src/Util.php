@@ -2165,7 +2165,7 @@ HTML_CONTENT;
 
                 if (App::isTKPromotingEnabled()) {
                     $order_data['extra']['tk'] = [
-                        'proposalNo' => $params['proposalNo'],
+                        'order_no' => $params['tk_order_no'],
                     ];
                 }
 
@@ -2327,8 +2327,8 @@ HTML_CONTENT;
 
         $order = $params['order'];
 
-        if ($args['proposalNo']) {
-            TKPromoting::confirm($args['proposalNo']);
+        if ($args['tk_order_no']) {
+            TKPromoting::confirmOrder($device, $args['tk_order_no']);
         }
 
         return [

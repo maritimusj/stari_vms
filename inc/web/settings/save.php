@@ -691,11 +691,21 @@ if ($page == 'device') {
     }
 
     if (App::isTKPromotingEnabled()) {
-        Config::tk('config', [
+        $config = [
             'id' => Request::trim('TKAppId'),
             'secret' => Request::trim('TKAppSecret'),
             'account_uid' => Request::trim('TKAccountUID'),
-        ], true);
+        ];
+
+        Config::tk('config', $config, true);
+
+        if ($config['id'] && $config['secret']) {
+            // 注册回调通知网址
+            $res = (new TKPromoting($config['id'], $config['secret']))->setNotifyUrl();
+            Log::debug('tk', [
+                'set notify url' => $res,
+            ]);
+        }
     }
 
 } elseif ($page == 'payment') {

@@ -7,12 +7,25 @@
 
 namespace zovye;
 
+use zovye\model\deviceModelObj;
+
 class TKPromoting
 {
-    const REDIRECT_URL = 'https://cloud.tk.cn/tkproperty/nprd/S2023062001/?fromId=77973&channelCode=999999990004&cusType=3&device_id={device_uid}&extra=tuobai{user_uid}';
+    const REDIRECT_URL = 'https://cloud.tk.cn/tkproperty/nprd/S2023062001/?fromId=77973&channelCode=999999990004&cusType=3&device_id={device_uid}&extra={user_uid}';
 
-    const DebugApiUrl = 'http://tkoh-t.tk.cn/hopen/cusoptui/channel/order/confirmOrder';
-    const ProdApiUrl = 'https://cloud.tk.cn/hopen/cusoptui/channel/order/confirmOrder';
+    const DebugApiUrl = 'https://bag-gateway-test.ylkang.vip';
+    const ProdApiUrl = 'https://bag-gateway.ylkang.vip';
+
+    const RESPONSE = '{"code": "SUCCESS"}';
+
+    private $app_id;
+    private $app_secret;
+
+    public function __construct($app_id, $app_secret)
+    {
+        $this->app_id = $app_id;
+        $this->app_secret = $app_secret;
+    }
 
     public static function getAd(): array
     {
@@ -47,83 +60,84 @@ class TKPromoting
         return $acc;
     }
 
-    public static function sign($event_time)
+    static function getApiUrl(): string
     {
-        $config = Config::tk('config');
-        if (empty($config['id']) || empty($config['secret'])) {
-            return err('配置不正确！');
-        }
-
-        $hash_val = md5($config['id'].$config['secret'].$event_time);
-
-        return "$hash_val.$event_time";
+        return DEBUG ? self::DebugApiUrl : self::ProdApiUrl;
     }
 
-    public static function confirm($proposalNo): array
+    public function sign($timestamp): string
     {
-        if (empty($proposalNo)) {
-            return err('用户没有签约信息！');
+        return sha1($this->app_id.$this->app_secret.$timestamp);
+    }
+
+    public function setNotifyUrl(): array
+    {
+        return $this->post('/channel', [
+            'notify' => Util::murl('tk'),
+        ]);
+    }
+
+    public function reg(deviceModelObj $device): array
+    {
+        return $this->post('/device', [
+            'device_no' => $device->getImei(),
+            'name' => $device->getName(),
+        ]);
+    }
+
+    public static function confirmOrder(deviceModelObj $device, string $tk_order_no): bool
+    {
+        $config = Config::tk('config', []);
+        if (empty($config) || empty($config['id']) || empty($config['secret'])) {
+            Log::error('tk', [
+                'confirm' => $tk_order_no,
+                'error' => '配置不正确！',
+            ]);
+
+            return false;
         }
 
-        $now = date('YmdHis');
-        $data = [
-            'requestId' => REQUEST_ID,
-            'requestTime' => $now,
-            'requestData' => self::encrypt([
-                'orderType' => 1,
-                'proposalNo' => $proposalNo,
-            ]),
+        $res = (new TKPromoting($config['id'], $config['secret']))->confirm($device, $tk_order_no);
+
+        if (is_error($res)) {
+            Log::error('tk', [
+                'confirm' => $tk_order_no,
+                'error' => $res,
+            ]);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    public function confirm(deviceModelObj $device, string $order_no): array
+    {
+        return $this->post('/order-confirm', [
+            'device_no' => $device->getImei(),
+            'order_no' => $order_no,
+        ]);
+    }
+
+    public function post($path, $data): array
+    {
+        $header = [
+            "x-app-id: ".$this->app_id,
+            "x-timestamp: ".TIMESTAMP,
+            "x-token: ".$this->sign(TIMESTAMP),
         ];
 
-        $app_key = Config::tk('config.app_key', '');
-        if (empty($app_key)) {
-            return err('appkey设置不正确！');
-        }
-
-        $auth_key = self::sign($now);
-        if (is_error($auth_key)) {
-            return $auth_key;
-        }
-
-        $result = Util::post(DEBUG ? self::DebugApiUrl : self::ProdApiUrl, $data, true, 3, [
-            CURLOPT_HTTPHEADER => [
-                "AppKey: $app_key",
-                "AuthKey: $auth_key",
-            ],
+        $res = Util::post(self::getApiUrl().$path, $data, true, 3, [
+            CURLOPT_HTTPHEADER => $header,
         ]);
 
         Log::debug('tk', [
-            'appkey' => $app_key,
-            'proposalNo' => $proposalNo,
+            'path' => $path,
+            'header' => $header,
             'request' => $data,
-            'response' => $result,
+            'response' => $res,
         ]);
 
-        return $result;
+        return $res;
     }
-
-    public static function encrypt($data) 
-    {
-        return self::aes_encrypt(json_encode($data), Config::tk('config.aes_key'));
-    }
-
-    public static function decrypt($data) 
-    {
-        $res = self::aes_decrypt($data, Config::tk('config.aes_key'));
-        return empty($res) ? $res : json_decode($res, true);
-    }
-
-    static function aes_encrypt($data, $key) {
-        $cipher = "aes-256-ecb";
-        $options = OPENSSL_RAW_DATA;
-        $encrypted = openssl_encrypt($data, $cipher, $key, $options);
-        return base64_encode($encrypted);
-      }
-      
-      static function aes_decrypt($data, $key) {
-        $cipher = "aes-256-ecb";
-        $options = OPENSSL_RAW_DATA;
-        $decrypted = openssl_decrypt(base64_decode($data), $cipher, $key, $options);
-        return $decrypted;
-      }
 }

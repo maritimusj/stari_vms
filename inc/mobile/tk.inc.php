@@ -10,11 +10,17 @@ use Exception;
 use RuntimeException;
 
 $data = Request::json();
-$auth_key = Request::header('AuthKey');
+$app_id = Request::header('x-app-id');
+$ts = Request::header('x-timestamp');
+$token = Request::header('x-token');
 
 Log::debug('tk', [
-    'header' => $auth_key,
-    '$data' => $data,
+    'header' => [
+        'app_id' => $app_id,
+        'timestamp' => $ts,
+        'token' => $token,
+    ],
+    'data' => $data,
 ]);
 
 try {
@@ -22,24 +28,24 @@ try {
         throw new RuntimeException('没有启用这个功能！');
     }
 
-    $requestId = $data['requestId'];
-    if (empty($requestId)) {
-        throw new RuntimeException('无效的请求!');
+    $config = Config::tk('config', []);
+    if (empty($config) || empty($config['id']) || empty($config['secret'])) {
+        throw new RuntimeException('配置不正确！');
     }
 
-    $requestData = TKPromoting::decrypt($data['requestData']);
-    if (empty($requestData)) {
-        throw new RuntimeException('无法解密requestData');
-    }
-
-    if (TKPromoting::sign($requestData['eventTime']) !== $auth_key) {
+    if ($app_id !== $config['id'] || (new TKPromoting($config['id'], $config['secret']))->sign($ts) !== $token) {
         throw new RuntimeException('签名检验失败！');
     }
 
-    $user_uid = $requestData['extra'];
-    $proposalNo = $requestData['proposalNo'];
+    $kind = $data['kind'];
+    if (empty($kind) || $kind !== 'contract_policy') {
+        throw new RuntimeException('无效的请求!');
+    }
 
-    if (empty($user_uid) || empty($proposalNo)) {
+    $order_no = strval($data['order_no']);
+    $user_uid = strval($data['extra']);
+
+    if (empty($order_no) || empty($user_uid)) {
         throw new RuntimeException('缺少必要信息！');
     }
 
@@ -52,11 +58,6 @@ try {
     if ($user->isBanned()) {
         throw new RuntimeException('用户不可用！');
     }
-
-    $user->updateSettings('tk.proposal', [
-        'time' => time(),
-        'No' => $proposalNo,
-    ]);
 
     $account = TKPromoting::getAccount();
     if (is_error($account)) {
@@ -73,7 +74,7 @@ try {
         throw new RuntimeException($res['message']);
     }
 
-    $order_uid = Order::makeUID($user, $device, $requestId);
+    $order_uid = Order::makeUID($user, $device, $order_no);
 
     $res = Job::createAccountOrder([
         'orderUID' => $order_uid,
@@ -82,34 +83,16 @@ try {
         'user' => $user->getId(),
         'goods' => 0, // 由出货job决定商品
         'ip' => $user->getLastActiveIp(),
-        'proposalNo' => $proposalNo,
+        'tk_order_no' => $order_no,
     ]);
 
     if (!$res) {
         throw new RuntimeException('无法启用出货任务！');
     }
-
-    JSON::fail([
-        'requestId' => $requestId,
-        'responseTime' => date('YmdHis'),
-        'responseCode' => '000_000_000',
-        'responseMsg' => '成功',
-        'responseData' => null,
-    ]);
-
 } catch (Exception $e) {
-
     Log::error('tk', [
-        'header' => $auth_key,
-        'data' => $data,
         'error' => $e->getMessage(),
     ]);
-
-    JSON::fail([
-        'requestId' => $requestId ?? '',
-        'responseTime' => date('YmdHis'),
-        'responseCode' => '000_000_001',
-        'responseMsg' => $e->getMessage(),
-        'responseData' => null,
-    ]);
 }
+
+echo TKPromoting::RESPONSE;

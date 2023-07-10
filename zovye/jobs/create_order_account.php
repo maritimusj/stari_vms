@@ -136,8 +136,8 @@ if ($op == 'create_order_account' && CtrlServ::checkJobSign($params)) {
             $data['orderId'] = $order_uid;
         }
 
-        if ($params['proposalNo']) {
-            $data['proposalNo'] = $params['proposalNo'];
+        if ($params['tk_order_no']) {
+            $data['tk_order_no'] = $params['tk_order_no'];
         }
 
         if (!empty($order)) {

@@ -338,9 +338,7 @@ class common
             $device->setBluetoothStatus(Device::BLUETOOTH_READY);
         }
 
-        $data = [
-            'data' => null,
-        ];
+        $data = [];
 
         if (!$proto->support(BlueToothProtocol::QOE)) {
             $device->setQoe(-1);

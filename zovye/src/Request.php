@@ -78,7 +78,7 @@ class Request
 
     public static function header($name)
     {
-        return $_SERVER[$name];
+        return $_SERVER[strtoupper($name)];
     }
 
     public static function is_ajax(): bool

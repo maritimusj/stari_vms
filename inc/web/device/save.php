@@ -390,7 +390,6 @@ if ($device) {
     }
 }
 
-
 $redirect_url = $this->createWebUrl('device', [
     'op' => 'edit',
     'id' => $device ? $device->getId() : $id,

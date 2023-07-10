@@ -287,7 +287,7 @@ function createOrder(array $params, string $order_no, array $goods): array
 
     $pull_data = Helper::preparePullData($order, $device, $user, $goods);
     if (is_error($pull_data)) {
-        return $pull_data;
+        return [$pull_data];
     }
 
     $res = $device->pull($pull_data);

@@ -58,7 +58,7 @@ class response implements IResponse
 
     function getBatteryValue(): int
     {
-        return 100;
+        return intval(hexdec($this->data) / 255 * 100);
     }
 
     function getMessage(): string
@@ -67,6 +67,7 @@ class response implements IResponse
             case 2: return '=> 开锁结果' . ($this->isOpenResultOk() ? '（成功）':'（失败）');
             case 4: return '=> 当前电量（' . $this->getBatteryValue() . '%）' ;
             case 6: return $this->data == 'a5a5a5' ? '确认回复' : '未知消息';
+            case 8: return '=> 连接成功';
             default: return '=> 未知消息';
         }
     }

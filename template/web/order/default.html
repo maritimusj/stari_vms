@@ -633,7 +633,7 @@
                             </div>
                             <div class="pay operate">
                                 {if $order['refund']}
-                                <span class="refund-title" title="{$order['refund']['title']}"> （已退款） </span>
+                                <span class="refund-title" title="{$order['refund']['title']}" data-op="refundDetail"> （已退款） </span>
                                 {/if}
                             </div>
                         </div>
@@ -859,6 +859,10 @@
             $(self).addClass('fa-clock-o');
             $(self).removeClass('fa-info-circle upload-fail');
         });
+    }
+
+    api.refundDetail = function(id) {
+        api.showResult({ op: 'refundDetail', id: id });
     }
 
     function reloadPageWithFilter(fn) {

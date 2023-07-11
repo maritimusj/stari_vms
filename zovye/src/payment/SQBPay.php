@@ -249,7 +249,7 @@ JS_CODE;
                     'result' => 'success',
                     'type' => $this->getName(),
                     'pay_way' => $data['payway_name'],
-                    'merchant_no' => $this->config['mch_id'],
+                    'sn' => $this->config['sn'],
                     'orderNO' => $data['client_sn'],
                     'transaction_id' => $data['sn'],
                     'total' => $data['total_amount'],

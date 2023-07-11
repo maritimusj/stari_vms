@@ -647,7 +647,6 @@
         }
 
         api.showMonthStats = function(id, self) {
-            const month = self.closest('tr').data('month');
             api.viewStats(id, self);
         }
 
@@ -698,10 +697,6 @@
                 }
             }
             e.preventDefault();
-        })
-
-        $("body").on("click", "[data-month] i.fa-line-chart", function(e){
-
         })
     })
 </script>

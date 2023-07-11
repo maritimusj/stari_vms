@@ -507,7 +507,10 @@ class Order extends State
                 return $res;
             }
 
-            $order->setExtraData('refund', $refund_data);
+            $order->setExtraData('refund', array_merge($refund_data, [
+                'total' => $total,
+            ]));
+
             $order->setRefund(Order::REFUND);
 
             if ($order->save()) {
@@ -657,7 +660,10 @@ class Order extends State
                     return $res;
                 }
 
-                $order->setExtraData('refund', $refund_data);
+                $order->setExtraData('refund', array_merge($refund_data, [
+                    'total' => $total_refund,
+                ]));
+
                 $order->setRefund(Order::REFUND);
 
                 if ($order->save()) {

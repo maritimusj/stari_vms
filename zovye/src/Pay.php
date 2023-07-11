@@ -345,7 +345,7 @@ class Pay
      * @param array $data
      * @return mixed
      */
-    public static function refund(string $order_no, int $total = 0, array $data = [])
+    public static function refund(string $order_no, int &$total = 0, array $data = [])
     {
         $pay_log = self::getPayLog($order_no);
         if (empty($pay_log)) {

@@ -298,7 +298,7 @@
                         </div>
                         {else}
                         {if $order['price']>0}
-                        <div class="transactionId {$order['src']}">
+                        <div class="transactionId {$order['src']}" data-op="paymentDetail">
                             <img src="{MODULE_URL}static/img/{$order['pay_name']}.svg" title="{php echo \zovye\Pay::getTitle($order['pay_name'])}">
                             {$order['transaction_id']}
                         </div>
@@ -633,7 +633,7 @@
                             </div>
                             <div class="pay operate">
                                 {if $order['refund']}
-                                <span class="refund-title" title="{$order['refund']['title']}" data-op="refundDetail"> （已退款） </span>
+                                <span class="refund-title" title="{$order['refund']['title']}"> （已退款） </span>
                                 {/if}
                             </div>
                         </div>
@@ -861,8 +861,8 @@
         });
     }
 
-    api.refundDetail = function(id) {
-        api.showResult({ op: 'refundDetail', id: id });
+    api.paymentDetail = function(id) {
+        api.showResult({ op: 'paymentDetail', id: id });
     }
 
     function reloadPageWithFilter(fn) {

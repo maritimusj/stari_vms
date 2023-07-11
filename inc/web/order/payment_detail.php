@@ -16,20 +16,19 @@ if (empty($order)) {
     JSON::fail('找不到这个订单！');
 }
 
-if (!$order->isRefund()) {
-    JSON::fail('订单没有退款！');
-}
-
 $log = Pay::getPayLog($order->getOrderNO());
 
 if (empty($log)) {
     JSON::fail('找不到支付记录！');
 }
 
-$refund = $log->getData('refund', []);
+$data = $log->getData();
 
-if (empty($refund)) {
-    JSON::fail('没有退款数据！');
-}
+$content = app()->fetchTemplate(
+    'web/order/payment',
+    [
+        'data' => $data,
+    ]
+);
 
-
+JSON::success(['title' => '支付详情', 'content' => $content]);

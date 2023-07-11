@@ -1,0 +1,85 @@
+<style>
+    #payment_detail {
+        max-height: 300px;
+        overflow: auto;
+    }
+    #payment_detail .payname {
+        display: flex;
+        align-items: center;
+    }
+    #payment_detail .payname img {
+        width: 15px;
+        height: 15px;
+        margin-right: 3px;
+    }
+    #payment_detail .refund {
+        color: red;
+    }
+</style>
+<div id="payment_detail">
+    <table class="table">
+        <tbody>
+            <tr >
+                <td>支付商</td>
+                <td>
+                    <div class="payname">
+                        <img src="{MODULE_URL}static/img/{$data['pay']['name']}.svg">
+                        {php echo \zovye\Pay::getTitle($data['pay']['name'])}
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>订单号</td>
+                <td>{$data['orderData']['orderNO']}</td>
+            </tr>
+            <tr>
+                <td>支付交易号</td>
+                <td>
+                    {if $data['payResult']}
+                    {$data['payResult']['transaction_id']}
+                    {elseif ($data['queryResult'])}
+                    {$data['queryResult']['transaction_id']}
+                    {/if}
+                </td>
+            </tr>
+            <tr>
+                <td>支付金额</td>
+                <td>{php echo number_format($data['price'] / 100, 2, '.', '')} 元</td>
+            </tr>
+            {if $data['refund']}
+            <tr>
+                <td>退款金额</td>
+                <td class="refund">
+                    {if $data['refund']['result']['data']['total_amount']}
+                    {php echo number_format($data['refund']['result']['data']['total_amount'] / 100, 2, '.', '')} 元
+                    {elseif $data['refund']['result']['refund_fee']}
+                    {php echo number_format($data['refund']['result']['refund_fee'] / 100, 2, '.', '')} 元
+                    {/if}
+                </td>
+            </tr>
+            {if $data['refund']['result']['data']['payway_name']}
+            <tr>
+                <td>退款渠道</td>
+                <td>{$data['refund']['result']['data']['payway_name']}</td>
+            </tr>
+            {/if}       
+            <tr>
+                <td>退款交易号</td>
+                <td>
+                    {if $data['refund']['result']['data']['sn']}
+                    {$data['refund']['result']['data']['sn']}
+                    {elseif $data['refund']['result']['transaction_id']}
+                    {$data['refund']['result']['transaction_id']}
+                    {elseif $data['refund']['result']['out_refund_no']}
+                    {$data['refund']['result']['out_refund_no']}
+                    {/if}
+                </td>
+            </tr>
+            <tr>
+                <td>退款时间</td>
+                <td>{php echo date('Y-m-d H:i:s', $data['refund']['createtime'])}</td>
+            </tr>
+            {/if}
+        </tbody>
+    </table>
+</div>

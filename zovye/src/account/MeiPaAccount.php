@@ -71,7 +71,7 @@ class MeiPaAccount
 
         $v = [];
         //请求API
-        $MeiPa = new static($config['apiid'], $config['appkey']);
+        $MeiPa = new self($config['apiid'], $config['appkey']);
         $params = [
             'meipaopenid' => $meipa_openid,
             'apiversion' => 'v2.1',
@@ -132,7 +132,7 @@ class MeiPaAccount
             return err('没有配置！');
         }
 
-        $MeiPa = new static($config['apiid'], $config['appkey']);
+        $MeiPa = new self($config['apiid'], $config['appkey']);
 
         if ($params['apiid'] !== $MeiPa->api_id || $MeiPa->sign($params) !== $params['sing']) {
             return err('签名检验失败！');

@@ -64,7 +64,7 @@ class SNTOAccount
             return [];
         }
 
-        $obj = new static($config['id'], $config['key'], $config['channel']);
+        $obj = new self($config['id'], $config['key'], $config['channel']);
 
         //获取token
         if (isEmptyArray($config['data']) || time() - $config['data']['last'] > $config['data']['expire_in'] - 60) {
@@ -175,7 +175,7 @@ class SNTOAccount
             return err('没有配置！');
         }
 
-        $obj = new static($config['id'], $config['key'], $config['channel']);
+        $obj = new self($config['id'], $config['key'], $config['channel']);
         if ($obj->sign($data) !== $data['sign']) {
             return err('签名校验失败！');
         }

@@ -77,7 +77,7 @@ class WxWorkAccount extends AQIInfo
                 return [];
             }
             //请求API
-            $wxWork = new static($config['key'], $config['secret']);
+            $wxWork = new self($config['key'], $config['secret']);
             $wxWork->fetchOne($device, $user, function ($request, $result) use ($acc, $device, $user, &$v) {
                 if (App::isAccountLogEnabled()) {
                     $log = Account::createQueryLog($acc, $user, $device, $request, $result);

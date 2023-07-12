@@ -58,7 +58,7 @@ class KingFansAccount
 
         $v = [];
 
-        (new static($config['bid'], $config['key']))->fetchOne(
+        (new self($config['bid'], $config['key']))->fetchOne(
             $device,
             $user,
             function ($request, $result) use ($acc, $device, $user, &$v) {

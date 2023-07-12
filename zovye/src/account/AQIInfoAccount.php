@@ -48,7 +48,7 @@ class AQIInfoAccount extends AQIInfo
                 return [];
             }
             //请求API
-            $AQIInfo = new static($config['key'], $config['secret']);
+            $AQIInfo = new self($config['key'], $config['secret']);
             $AQIInfo->fetchOne($device, $user, function ($request, $result) use ($acc, $device, $user, &$v) {
                 if (App::isAccountLogEnabled()) {
                     $log = Account::createQueryLog($acc, $user, $device, $request, $result);

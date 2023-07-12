@@ -58,7 +58,7 @@ class CloudFIAccount
 
         $v = [];
 
-        (new static($config['key'], $config['channel'], $config['scene'], $config['area']))->fetchOne(
+        (new self($config['key'], $config['channel'], $config['scene'], $config['area']))->fetchOne(
             $device,
             $user,
             function ($request, $result) use ($acc, $device, $user, &$v) {

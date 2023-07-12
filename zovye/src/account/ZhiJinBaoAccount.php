@@ -69,7 +69,7 @@ class ZhiJinBaoAccount
                 return [];
             }
             //请求API
-            $ZJBao = new static($config['key'], $config['secret']);
+            $ZJBao = new self($config['key'], $config['secret']);
             $ZJBao->fetchOne($device, $user, [], function ($request, $result) use ($acc, $device, $user, &$v) {
                 if (App::isAccountLogEnabled()) {
                     $log = Account::createQueryLog($acc, $user, $device, $request, $result);
@@ -139,7 +139,7 @@ class ZhiJinBaoAccount
             return err('没有配置！');
         }
 
-        $ZJBao = new static($config['key'], $config['secret']);
+        $ZJBao = new self($config['key'], $config['secret']);
 
         if ($params['zjbAppId'] !== $ZJBao->app_id || $ZJBao->sign($params) !== $params['sign']) {
             return err('签名校验失败！');

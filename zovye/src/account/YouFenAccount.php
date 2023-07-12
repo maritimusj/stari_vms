@@ -59,7 +59,7 @@ class YouFenAccount
         $yf_openid = $user->settings('customData.yf.openid', '');
         if ($yf_openid) {
             //请求API
-            $youFen = new static($config['app_number'], $config['app_key']);
+            $youFen = new self($config['app_number'], $config['app_key']);
             $youFen->fetchOne(
                 $device,
                 $user,

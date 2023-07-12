@@ -41,7 +41,7 @@ if (is_error($result)) {
 if (App::isTKPromotingEnabled() && $type_id == Advertising::WELCOME_PAGE) {
     $account = TKPromoting::getAccount();
     if ($account && !$account->isBanned()) {
-        $res = Util::checkAvailable($user, $account, $device, ['ignore_assigned' => true]);
+        $res = Util::checkAvailable($user, $account, $device);
         if (!is_error($res)) {
             $result[] = TKPromoting::getAd();
         }

@@ -36,7 +36,7 @@ class WxWorkAccount extends AQIInfo
         return Account::makeThirdPartyPlatformUID(Account::WxWORK, Account::WxWORK_NAME);
     }
 
-    public function fetchOne(deviceModelObj $device, userModelObj $user, callable $cb = null): array
+    public function fetchOne(deviceModelObj $device, userModelObj $user = null, callable $cb = null): array
     {
         $fans = empty($user) ? Util::fansInfo() : $user->profile();
 
@@ -77,7 +77,7 @@ class WxWorkAccount extends AQIInfo
                 return [];
             }
             //请求API
-            $wxWork = new WxWorkAccount($config['key'], $config['secret']);
+            $wxWork = new static($config['key'], $config['secret']);
             $wxWork->fetchOne($device, $user, function ($request, $result) use ($acc, $device, $user, &$v) {
                 if (App::isAccountLogEnabled()) {
                     $log = Account::createQueryLog($acc, $user, $device, $request, $result);

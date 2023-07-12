@@ -72,7 +72,7 @@ class TKPromoting
             return false;
         }
 
-        $res = (new TKPromoting($config['id'], $config['secret']))->reg($device);
+        $res = (new static($config['id'], $config['secret']))->reg($device);
 
         if (is_error($res)) {
             Log::error('tk', [
@@ -99,7 +99,7 @@ class TKPromoting
             return false;
         }
 
-        $res = (new TKPromoting($config['id'], $config['secret']))->confirm($device, $tk_order_no);
+        $res = (new static($config['id'], $config['secret']))->confirm($device, $tk_order_no);
 
         if (is_error($res)) {
             Log::error('tk', [

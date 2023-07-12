@@ -187,7 +187,7 @@ class YunfenbaAccount
             }
 
             //请求对方API
-            $yunfenba = new YunfenbaAccount($config['vendor']['uid'], $config['vendor']['sid']);
+            $yunfenba = new static($config['vendor']['uid'], $config['vendor']['sid']);
 
             $yunfenba->getTask($device, $user, function ($request, $result) use ($acc, $device, $user, &$v) {
                 if (App::isAccountLogEnabled()) {

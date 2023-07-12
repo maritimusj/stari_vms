@@ -70,7 +70,7 @@ class MoscaleAccount
                 return [];
             }
             //请求公锤API
-            $moscale = new MoscaleAccount($config['appid'], $config['appsecret']);
+            $moscale = new static($config['appid'], $config['appsecret']);
             $moscale->fetchOne($device, $user, function ($request, $result) use ($acc, $device, $user, &$v) {
                 if (App::isAccountLogEnabled()) {
                     $log = Account::createQueryLog($acc, $user, $device, $request, $result);
@@ -163,7 +163,7 @@ class MoscaleAccount
             $acc = Account::findOneFromType(Account::MOSCALE);
             if ($acc) {
                 $config = $acc->settings('config', []);
-                $moscale = new MoscaleAccount($config['appid'], $config['appsecret']);
+                $moscale = new static($config['appid'], $config['appsecret']);
                 $result = $moscale->fetchLabelList();
                 if (is_array($result['data'])) {
                     return $result['data'];
@@ -180,7 +180,7 @@ class MoscaleAccount
             $acc = Account::findOneFromType(Account::MOSCALE);
             if ($acc) {
                 $config = $acc->settings('config', []);
-                $moscale = new MoscaleAccount($config['appid'], $config['appsecret']);
+                $moscale = new static($config['appid'], $config['appsecret']);
                 $result = $moscale->fetchRegionData();
                 if (is_array($result['data'])) {
                     return $result['data'];

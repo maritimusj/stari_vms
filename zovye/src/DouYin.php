@@ -187,7 +187,7 @@ class DouYin
         static $instance = null;
         if (is_null($instance)) {
             $config = Config::douyin('client', []);
-            $instance = new DouYin($config['key'], $config['secret']);
+            $instance = new static($config['key'], $config['secret']);
         }
 
         return $instance;

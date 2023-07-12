@@ -38,7 +38,7 @@ class YiDaoAccount
         return md5(implode($arr));
     }
 
-    public static function fetch(deviceModelObj $device, userModelObj $user): array
+    public static function fetch(deviceModelObj $device, userModelObj $user = null): array
     {
         $acc = Account::findOneFromType(Account::YIDAO);
         if (empty($acc)) {

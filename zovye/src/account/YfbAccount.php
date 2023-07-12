@@ -119,7 +119,7 @@ class YfbAccount
             }
 
             //请求对方API
-            $obj = new YfbAccount($config['id'], $config['secret'], $config['key'], $config['scene']);
+            $obj = new static($config['id'], $config['secret'], $config['key'], $config['scene']);
         }
 
         return $obj;

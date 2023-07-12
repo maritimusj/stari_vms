@@ -55,12 +55,7 @@
                 <td>收款帐号</td>
                 <td>
                     <div class="merchant">
-                        {if $data['payResult']['raw']['merchant_name']}<span>{$data['payResult']['raw']['merchant_name']}</span>{/if}
-                        {if $data['payResult']['raw']['merchant_no']}<span>{$data['payResult']['raw']['merchant_no']}</span>{/if}
-                        {if $data['payResult']['merchant_no']}<span>{$data['payResult']['merchant_no']}</span>{/if}
-                        {if $data['payResult']['raw']['mch_id']}<span>{$data['payResult']['raw']['mch_id']}</span>{/if}
-                        {if $data['payResult']['raw']['sn']}<span>{$data['payResult']['raw']['sn']}</span>
-                        {elseif $data['queryResult']['sn']}<span>{$data['queryResult']['sn']}</span>{/if}
+                        <span>{$data['merchant_no']}</span>
                     </div>
                 </td>
             </tr>

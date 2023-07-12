@@ -619,6 +619,10 @@ class Device extends State
             $device->updateAppId();
 
             $device->save();
+
+            if (App::isTKPromotingEnabled()) {
+                TKPromoting::deviceReg($device);
+            }
         }
 
         return $device;

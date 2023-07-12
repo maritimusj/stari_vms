@@ -9,7 +9,7 @@
 }
 
 #orderlist .price:before {
-    content: '¥';
+    content: '\00A5';
     padding-right: 3px;
 }
 

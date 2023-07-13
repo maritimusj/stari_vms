@@ -492,7 +492,7 @@ class DeviceUtil
         ];
     }
 
-    public static function getNearByDevices(agentModelObj $agent = null): array
+    public static function getNearBy(agentModelObj $agent = null): array
     {
         //请求附近设备数据
         $query = $agent ? Device::query(['agent_id' => $agent->getId()]) : Device::query();
@@ -510,6 +510,42 @@ class DeviceUtil
                     'name' => $entry->getName(),
                     'location' => $location,
                 ];
+            }
+        }
+
+        return $result;
+    }
+
+    public static function descAssignedStatus($assign_data): string
+    {
+        if (isEmptyArray($assign_data) || (isset($assign_data['all']) && empty($assign_data['all']))) {
+            return '没有分配任何设备';
+        } elseif ($assign_data['all']) {
+            return '已分配全部设备';
+        }
+
+        return '已指定部分设备';
+    }
+
+    public static function getAds(deviceModelObj $device, $type, $max_total): array
+    {
+        $result = [];
+        foreach ($device->getAds($type) as $item) {
+            $data = [
+                'id' => $item['id'],
+                'title' => $item['title'],
+                'data' => $item['extra'],
+            ];
+            if ($data['data']['image']) {
+                $data['data']['image'] = Util::toMedia($data['data']['image']);
+            } elseif ($data['data']['images']) {
+                foreach ($data['data']['images'] as &$image) {
+                    $image = Util::toMedia($image);
+                }
+            }
+            $result[] = $data;
+            if ($max_total > 0 && count($result) > $max_total) {
+                break;
             }
         }
 

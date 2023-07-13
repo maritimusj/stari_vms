@@ -270,7 +270,7 @@ class device
     public static function deviceNearBy(): array
     {
         $agent = common::getAgent();
-        return DeviceUtil::getNearByDevices($agent);
+        return DeviceUtil::getNearBy($agent);
     }
 
     /**

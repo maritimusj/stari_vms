@@ -112,7 +112,7 @@ class GoodsVoucher
         } else {
             $assign_data = $voucher->getExtraData('assigned', []);
             $data['assigned'] = count((array)$assign_data);
-            $data['assignedStatus'] = Util::descAssignedStatus($assign_data);
+            $data['assignedStatus'] = DeviceUtil::descAssignedStatus($assign_data);
         }
         if ($data['goodsId']) {
             $goods = Goods::get($data['goodsId']);

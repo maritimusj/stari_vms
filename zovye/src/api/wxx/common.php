@@ -643,7 +643,7 @@ class common
         $type = Request::int('typeid');
         $num = Request::int('num', 10);
 
-        return Util::getDeviceAds($device, $type, $num);
+        return DeviceUtil::getAds($device, $type, $num);
     }
 
     public static function orderDefault(): array

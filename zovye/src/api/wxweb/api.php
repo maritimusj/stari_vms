@@ -72,7 +72,7 @@ class api
 
     public static function nearBy(): array
     {
-        return DeviceUtil::getNearByDevices();
+        return DeviceUtil::getNearBy();
     }
 
     public static function migrateUrl(): array
@@ -98,7 +98,7 @@ class api
             }
         }
 
-        $list = Util::getDeviceAds($device ?? Device::getDummyDevice(), $type, $num);
+        $list = DeviceUtil::getAds($device ?? Device::getDummyDevice(), $type, $num);
 
         if ($type == Advertising::SPONSOR) {
             $total = 0;

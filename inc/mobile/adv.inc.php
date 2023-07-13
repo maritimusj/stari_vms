@@ -46,7 +46,7 @@ if (App::isTKPromotingEnabled() && $type_id == Advertising::WELCOME_PAGE) {
 }
 
 if (empty($result)) {
-    $result = Util::getDeviceAds($device, $type_id, $num);
+    $result = DeviceUtil::getAds($device, $type_id, $num);
     if (is_error($result)) {
         JSON::fail($result);
     }

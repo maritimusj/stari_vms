@@ -33,11 +33,7 @@ if (Request::has('deviceid')) {
     $device = Device::getDummyDevice();
 }
 
-$result = Util::getDeviceAds($device, $type_id, $num);
-if (is_error($result)) {
-    JSON::fail($result);
-}
-
+$result = [];
 if (App::isTKPromotingEnabled() && $type_id == Advertising::WELCOME_PAGE) {
     $account = TKPromoting::getAccount();
     if ($account && !$account->isBanned()) {
@@ -45,6 +41,13 @@ if (App::isTKPromotingEnabled() && $type_id == Advertising::WELCOME_PAGE) {
         if (!is_error($res)) {
             $result[] = TKPromoting::getAd();
         }
+    }
+}
+
+if (empty($result)) {
+    $result = Util::getDeviceAds($device, $type_id, $num);
+    if (is_error($result)) {
+        JSON::fail($result);
     }
 }
 

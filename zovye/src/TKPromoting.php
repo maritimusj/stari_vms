@@ -29,7 +29,7 @@ class TKPromoting
     public static function getAd(): array
     {
         return [
-            'id' => 0,
+            'id' => 'tk',
             'title' => '泰康保险',
             'data' => [
                 'images' => [

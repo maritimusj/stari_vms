@@ -208,7 +208,7 @@ if ($op == 'default') {
     }
 
     $num = Request::trim('num');
-    $res = Util::validateIDCard($num);
+    $res = IDCardUtil::validate($num);
     if (is_error($res)) {
         JSON::fail($res);
     }
@@ -216,7 +216,7 @@ if ($op == 'default') {
     $user->setIDCardVerified(sha1("$name|$num"), [
         'num' => $num,
         'name' => $name,
-        'gender' => Util::getGender($num),
+        'gender' => IDCardUtil::getGender($num),
     ]);
 
     JSON::success('保存成功！');

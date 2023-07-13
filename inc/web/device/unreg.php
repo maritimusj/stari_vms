@@ -23,9 +23,9 @@ if ($id) {
                 CtrlServ::appNotify($app_id, 'update');
             }
 
-            Response::itoast('清除AppId成功！', $this->createWebUrl('device'), 'success');
+            Response::toast('清除AppId成功！', $this->createWebUrl('device'), 'success');
         }
     }
 }
 
-Response::itoast('清除AppId失败！', $this->createWebUrl('device'), 'error');
+Response::toast('清除AppId失败！', $this->createWebUrl('device'), 'error');

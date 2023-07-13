@@ -14,7 +14,7 @@ $id = Request::int('id');
 if ($id) {
     $qrcode = Advertising::get($id, Advertising::ACTIVE_QRCODE);
     if (empty($qrcode)) {
-        Response::itoast('找不到这个活码！', We7::referer(), 'error');
+        Response::toast('找不到这个活码！', We7::referer(), 'error');
     }
 
     $tpl_data['id'] = $id;

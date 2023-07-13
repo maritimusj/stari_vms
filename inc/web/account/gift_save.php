@@ -57,19 +57,19 @@ if ($id > 0) {
     $gift->setEnabled($data['enabled']);
 
     if ($gift->save()) {
-        Response::itoast('保存成功！', Util::url('account', ['op' => 'gift_edit', 'id' => $gift->getId()]), 'success');
+        Response::toast('保存成功！', Util::url('account', ['op' => 'gift_edit', 'id' => $gift->getId()]), 'success');
     }
 
-    Response::itoast('保存失败！', Util::url('account', ['op' => 'gift_edit', 'id' => $gift->getId()]), 'error');
+    Response::toast('保存失败！', Util::url('account', ['op' => 'gift_edit', 'id' => $gift->getId()]), 'error');
 } else {
 
     $gift = FlashEgg::createGift($data);
 
     if ($gift) {
-        Response::itoast('创建成功！', Util::url('account', ['op' => 'gift_edit', 'id' => $gift->getId()]), 'success');
+        Response::toast('创建成功！', Util::url('account', ['op' => 'gift_edit', 'id' => $gift->getId()]), 'success');
     }
 
-    Response::itoast('创建失败！', Util::url('account', ['op' => 'gift_edit']), 'error');
+    Response::toast('创建失败！', Util::url('account', ['op' => 'gift_edit']), 'error');
 }
 
 

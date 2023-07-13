@@ -9,7 +9,7 @@ $commission_enabled = App::isCommissionEnabled();
 $id = Request::int('id');
 $account = Account::get($id);
 if (empty($account)) {
-    Response::itoast('这个任务不存在！', $this->createWebUrl('account'), 'error');
+    Response::toast('这个任务不存在！', $this->createWebUrl('account'), 'error');
 }
 
 // if (App::isBalanceEnabled() && $account->getBonusType() == Account::BALANCE) {

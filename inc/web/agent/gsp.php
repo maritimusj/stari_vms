@@ -16,7 +16,7 @@ $result_msg = function ($msg, $status) {
             JSON::fail($msg);
         }
     } else {
-        Response::itoast($msg, '', $status ? 'success' : 'error');
+        Response::toast($msg, '', $status ? 'success' : 'error');
     }
 };
 

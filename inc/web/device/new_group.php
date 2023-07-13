@@ -24,7 +24,7 @@ if (Request::isset('agent_id')) {
     if ($agent_id > 0) {
         $agent = Agent::get($agent_id);
         if (empty($agent)) {
-            Response::itoast('找不到这个代理商！', '', 'error');
+            Response::toast('找不到这个代理商！', '', 'error');
         }
         $query->where(['agent_id' => $agent_id]);
     } else {

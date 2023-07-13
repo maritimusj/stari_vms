@@ -735,7 +735,7 @@ if ($page == 'device') {
                 'op' => 'notify',
                 'from' => 'wx',
             ])) {
-            Response::itoast('创建微信支付入口文件失败！');
+            Response::toast('创建微信支付入口文件失败！');
         }
     }
 
@@ -757,7 +757,7 @@ if ($page == 'device') {
                 'op' => 'notify',
                 'from' => 'lcsw',
             ])) {
-            Response::itoast('创建扫呗支付入口文件失败！');
+            Response::toast('创建扫呗支付入口文件失败！');
         }
     }
 
@@ -911,7 +911,7 @@ if ($page == 'device') {
 }
 
 if (app()->saveSettings($settings)) {
-    Response::itoast('设置保存成功！', $this->createWebUrl('settings', ['page' => $page]), 'success');
+    Response::toast('设置保存成功！', $this->createWebUrl('settings', ['page' => $page]), 'success');
 }
 
-Response::itoast('设置保存失败！', $this->createWebUrl('settings', ['page' => $page]), 'error');
+Response::toast('设置保存失败！', $this->createWebUrl('settings', ['page' => $page]), 'error');

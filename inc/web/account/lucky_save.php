@@ -42,17 +42,17 @@ if ($id > 0) {
     $lucky->setEnabled($data['enabled']);
 
     if ($lucky->save()) {
-        Response::itoast('保存成功！', Util::url('account', ['op' => 'lucky_edit', 'id' => $lucky->getId()]), 'success');
+        Response::toast('保存成功！', Util::url('account', ['op' => 'lucky_edit', 'id' => $lucky->getId()]), 'success');
     }
 
-    Response::itoast('保存失败！', Util::url('account', ['op' => 'lucky_edit', 'id' => $lucky->getId()]), 'error');
+    Response::toast('保存失败！', Util::url('account', ['op' => 'lucky_edit', 'id' => $lucky->getId()]), 'error');
 } else {
 
     $lucky = FlashEgg::createlucky($data);
 
     if ($lucky) {
-        Response::itoast('创建成功！', Util::url('account', ['op' => 'lucky_edit', 'id' => $lucky->getId()]), 'success');
+        Response::toast('创建成功！', Util::url('account', ['op' => 'lucky_edit', 'id' => $lucky->getId()]), 'success');
     }
 
-    Response::itoast('创建失败！', Util::url('account', ['op' => 'lucky_edit']), 'error');
+    Response::toast('创建失败！', Util::url('account', ['op' => 'lucky_edit']), 'error');
 }

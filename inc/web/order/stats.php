@@ -26,7 +26,7 @@ $end = empty($date_limit['end']) ? new DateTime() : DateTime::createFromFormat(
 );
 
 if (!($start && $end)) {
-    Response::itoast('时间不正确！', $this->createWebUrl('order', ['op' => 'stat']), 'error');
+    Response::toast('时间不正确！', $this->createWebUrl('order', ['op' => 'stat']), 'error');
 }
 
 $tpl_data['s_date'] = $start->format('Y-m-d');

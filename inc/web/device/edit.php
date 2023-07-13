@@ -18,7 +18,7 @@ $device_types = [];
 if ($id) {
     $device = Device::get($id);
     if (empty($device)) {
-        Response::itoast('设备不存在！', We7::referer(), 'error');
+        Response::toast('设备不存在！', We7::referer(), 'error');
     }
 
     $x = DeviceTypes::from($device);

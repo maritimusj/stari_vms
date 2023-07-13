@@ -12,23 +12,23 @@ $params = [];
 parse_str(Request::raw(), $params);
 
 if (empty($params['goodsName'])) {
-    Response::itoast('商品名称不能为空！', '', 'error');
+    Response::toast('商品名称不能为空！', '', 'error');
 }
 
 if ($params['agentId']) {
     $agent = Agent::get($params['agentId']);
     if (empty($agent)) {
-        Response::itoast('找不到这个代理商！', '', 'error');
+        Response::toast('找不到这个代理商！', '', 'error');
     }
 }
 
 if ($params['costPrice'] < 0 || $params['goodsPrice'] < 0 || $params['costPrice'] > $params['goodsPrice']) {
-    Response::itoast('成本价不能高于单价！', '', 'error');
+    Response::toast('成本价不能高于单价！', '', 'error');
 }
 
 if ($params['discountPrice'] < 0 || $params['goodsPrice'] < 0 ||
     ($params['discountPrice'] > 0 && $params['discountPrice'] >= $params['goodsPrice'])) {
-    Response::itoast('优惠价不能高于或者等于单价！', '', 'error');
+    Response::toast('优惠价不能高于或者等于单价！', '', 'error');
 }
 
 $s1 = 0;
@@ -48,7 +48,7 @@ if ($params[Goods::AllowDelivery]) {
 if (isset($params['goodsId'])) {
     $goods = Goods::get($params['goodsId']);
     if (empty($goods)) {
-        Response::itoast('找不到这个商品！', '', 'error');
+        Response::toast('找不到这个商品！', '', 'error');
     }
     if ($goods->getType() == Goods::FlashEgg) {
         $price = round(floatval($params['goodsPrice']) * 100);
@@ -223,8 +223,8 @@ if (!empty($goods)) {
         if ($params['syncAll']) {
             Job::goodsClone($goods->getId());
         }
-        Response::itoast('商品保存成功！', '', 'success');
+        Response::toast('商品保存成功！', '', 'success');
     }
 }
 
-Response::itoast('商品保存失败！', '', 'error');
+Response::toast('商品保存失败！', '', 'error');

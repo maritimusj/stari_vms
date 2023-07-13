@@ -21,11 +21,11 @@ if ($msg) {
     $from = $user->isAgent() ? 'agent' : 'partner';
 
     $msg->destroy();
-    Response::itoast(
+    Response::toast(
         '删除成功！',
         $this->createWebUrl('agent', ['op' => 'msglist', 'id' => $agent_id, 'from' => $from]),
         'success'
     );
 }
 
-Response::itoast('删除失败！', We7::referer(), 'error');
+Response::toast('删除失败！', We7::referer(), 'error');

@@ -40,7 +40,7 @@ class Response
      * @param string $type
      * @return never-return
      */
-    public static function itoast($msg, string $redirect = '', string $type = ''): void
+    public static function toast($msg, string $redirect = '', string $type = ''): void
     {
         We7::itoast($msg, $redirect, $type);
     }
@@ -51,7 +51,7 @@ class Response
             JSON::result($data);
         } else {
             if ($web) {
-                self::itoast(
+                self::toast(
                     is_string($data) ? $data : ($data['message'] ?? '未知消息'),
                     '',
                     is_error($data) ? 'error' : 'success'

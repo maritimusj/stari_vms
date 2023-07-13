@@ -15,7 +15,7 @@ $agent_id = Request::int('agent_id');
 if ($agent_id) {
     $agent = Agent::get($agent_id);
     if (!$agent) {
-        Response::itoast('找不到这个代理商！', '', 'error');
+        Response::toast('找不到这个代理商！', '', 'error');
     }
 }
 
@@ -49,7 +49,7 @@ $lat = Request::float('lat');
 if ($id) {
     $group = Group::get($id, Group::CHARGING);
     if (empty($group)) {
-        Response::itoast('找不到指定的分组！', '', 'error');
+        Response::toast('找不到指定的分组！', '', 'error');
     }
     if (isset($agent)) {
         $group->setAgentId($agent->getId());
@@ -95,20 +95,20 @@ if ($group && $group->save()) {
     $tb_name = We7::tablename(device_groupsModelObj::getTableName(modelObj::OP_WRITE));
     $sql = sprintf("UPDATE %s SET `loc` = ST_GeomFromText('POINT(%f %f)') WHERE `id`=%d", $tb_name, $lng, $lat, $group->getId());
     if (!We7::pdo_run($sql)) {
-        Response::itoast(
+        Response::toast(
             '更新位置出错！',
             Util::url('charging', ['op' => 'edit', 'id' => $group->getId()]),
             'error'
         );
     }
-    Response::itoast(
+    Response::toast(
         $id ? '保存成功！' : '创建成功！',
         Util::url('charging', ['op' => 'edit', 'id' => $group->getId()]),
         'success'
     );
 }
 
-Response::itoast(
+Response::toast(
     $id ? '保存失败！' : '创建失败！',
     Util::url('charging', $group ? ['op' => 'edit', 'id' => $group->getId()] : []),
     'error'

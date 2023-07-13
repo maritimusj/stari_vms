@@ -18,7 +18,7 @@ if ($id > 0 && $type > 0) {
     /** @var advertisingModelObj $adv */
     $adv = Advertising::query(['id' => $id, 'type' => $type])->findOne();
     if (empty($adv)) {
-        Response::itoast('找不到这个广告！', $this->createWebUrl('adv', ['type' => $from_type]), 'error');
+        Response::toast('找不到这个广告！', $this->createWebUrl('adv', ['type' => $from_type]), 'error');
     }
 
     $assign_data = $adv->settings('assigned', []);
@@ -30,8 +30,8 @@ if ($id > 0 && $type > 0) {
             Advertising::notifyAll($assign_data, []);
         }
 
-        Response::itoast('删除成功！', $this->createWebUrl('adv', ['type' => $from_type]), 'success');
+        Response::toast('删除成功！', $this->createWebUrl('adv', ['type' => $from_type]), 'success');
     }
 }
 
-Response::itoast('删除失败！', $this->createWebUrl('adv', ['type' => $from_type]), 'error');
+Response::toast('删除失败！', $this->createWebUrl('adv', ['type' => $from_type]), 'error');

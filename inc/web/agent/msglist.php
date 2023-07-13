@@ -13,7 +13,7 @@ use zovye\model\agent_msgModelObj;
 $id = Request::int('id');
 $user = User::get($id);
 if (empty($user) || !($user->isAgent() || $user->isPartner())) {
-    Response::itoast('用户不是代理商或者代理商合伙人！', We7::referer(), 'error');
+    Response::toast('用户不是代理商或者代理商合伙人！', We7::referer(), 'error');
 }
 
 $page = max(1, Request::int('page'));

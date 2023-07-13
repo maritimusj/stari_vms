@@ -38,7 +38,7 @@ $result = DBUtil::transactionDo(function () use ($id) {
 });
 
 if (is_error($result)) {
-    Response::itoast($result['message'], $this->createWebUrl('user', ['principal' => 'keeper']), 'error');
+    Response::toast($result['message'], $this->createWebUrl('user', ['principal' => 'keeper']), 'error');
 }
 
-Response::itoast('取消取消运营人员成功！', $this->createWebUrl('user', ['principal' => 'keeper']), 'success');
+Response::toast('取消取消运营人员成功！', $this->createWebUrl('user', ['principal' => 'keeper']), 'success');

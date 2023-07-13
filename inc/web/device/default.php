@@ -22,7 +22,7 @@ $agent_id = Request::int('agentId');
 if ($agent_id) {
     $agent = Agent::get($agent_id);
     if (empty($agent)) {
-        Response::itoast('找不到这个代理商！', $this->createWebUrl('device'), 'error');
+        Response::toast('找不到这个代理商！', $this->createWebUrl('device'), 'error');
     }
     $tpl_data['s_agent'] = $agent->profile();
 }
@@ -31,7 +31,7 @@ $tags_id = Request::int('tag_id');
 if ($tags_id) {
     $tag = m('tags')->findOne(['id' => $tags_id]);
     if (empty($tag)) {
-        Response::itoast('找不到这个标签！', $this->createWebUrl('device'), 'error');
+        Response::toast('找不到这个标签！', $this->createWebUrl('device'), 'error');
     }
     $tpl_data['s_tags'] = [
         [
@@ -46,7 +46,7 @@ if (Request::has('types')) {
     $type_id = Request::int('types');
     $type = DeviceTypes::get($type_id);
     if (empty($type)) {
-        Response::itoast('找不到这个型号！', $this->createWebUrl('device'), 'error');
+        Response::toast('找不到这个型号！', $this->createWebUrl('device'), 'error');
     }
     $tpl_data['s_device_type'] = [
         [

@@ -12,8 +12,8 @@ $id = Request::int('id');
 if ($id) {
     $archive = m('files')->findOne(We7::uniacid(['id' => $id]));
     if ($archive && $archive->destroy()) {
-        Response::itoast('删除成功！', $this->createWebUrl('article', ['op' => 'files']), 'sucess');
+        Response::toast('删除成功！', $this->createWebUrl('article', ['op' => 'files']), 'sucess');
     }
 }
 
-Response::itoast('删除失败！', $this->createWebUrl('article', ['op' => 'files']), 'error');
+Response::toast('删除失败！', $this->createWebUrl('article', ['op' => 'files']), 'error');

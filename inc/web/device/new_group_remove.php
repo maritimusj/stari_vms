@@ -25,7 +25,7 @@ if ($group && $group->destroy()) {
         $entry->updateAccountData();
     }
 
-    Response::itoast('删除成功！', $this->createWebUrl('device', ['op' => 'new_group']), 'success');
+    Response::toast('删除成功！', $this->createWebUrl('device', ['op' => 'new_group']), 'success');
 }
 
-Response::itoast('删除失败！', $this->createWebUrl('device', ['op' => 'new_group']), 'error');
+Response::toast('删除失败！', $this->createWebUrl('device', ['op' => 'new_group']), 'error');

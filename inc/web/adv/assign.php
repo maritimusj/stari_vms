@@ -20,7 +20,7 @@ if ($id > 0) {
 }
 
 if (empty($res)) {
-    Response::itoast('找不到这个广告！', $this->createWebUrl('adv', ['type' => $type]), 'error');
+    Response::toast('找不到这个广告！', $this->createWebUrl('adv', ['type' => $type]), 'error');
 }
 
 $adv = [

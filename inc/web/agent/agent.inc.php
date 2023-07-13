@@ -23,7 +23,7 @@ if (in_array(
         $res = User::get($id);
         if ($res) {
             if ($res->isAgent() || $res->isPartner()) {
-                Response::itoast('用户已经是代理商或者合伙人！', $this->createWebUrl('agent'), 'error');
+                Response::toast('用户已经是代理商或者合伙人！', $this->createWebUrl('agent'), 'error');
             }
             $agent = $res->agent();
         }
@@ -32,7 +32,7 @@ if (in_array(
     }
 
     if (empty($agent)) {
-        Response::itoast('找不到这个代理商！', $this->createWebUrl('agent'), 'error');
+        Response::toast('找不到这个代理商！', $this->createWebUrl('agent'), 'error');
     }
 
     $agent_data = $agent->get('agentData', []);

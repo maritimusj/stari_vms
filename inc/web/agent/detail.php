@@ -44,7 +44,7 @@ $pages = [
 $id = Request::int('id');
 $agent = Agent::get($id);
 if (empty($agent)) {
-    Response::itoast('找不到这个代理商！', 'error');
+    Response::toast('找不到这个代理商！', 'error');
 }
 
 $page_name = Request::trim('page_name', 'default');

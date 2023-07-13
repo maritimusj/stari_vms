@@ -17,8 +17,8 @@ if ($app) {
     $state = $app->getState() != AgentApp::CHECKED ? AgentApp::CHECKED : AgentApp::WAIT;
     $app->setState($state);
     if ($app->save()) {
-        Response::itoast('设置成功！', $this->createWebUrl('agent', ['op' => 'app']), 'success');
+        Response::toast('设置成功！', $this->createWebUrl('agent', ['op' => 'app']), 'success');
     }
 }
 
-Response::itoast('设置失败！', $this->createWebUrl('agent', ['op' => 'app']), 'error');
+Response::toast('设置失败！', $this->createWebUrl('agent', ['op' => 'app']), 'error');

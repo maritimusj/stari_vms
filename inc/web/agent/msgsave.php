@@ -34,7 +34,7 @@ if (empty($msg)) {
 }
 
 if ($msg && $msg->save()) {
-    Response::itoast('保存成功！', $this->createWebUrl('agent', ['op' => 'msg']), 'success');
+    Response::toast('保存成功！', $this->createWebUrl('agent', ['op' => 'msg']), 'success');
 }
 
-Response::itoast('保存失败！', $this->createWebUrl('agent', ['op' => 'msg']), 'error');
+Response::toast('保存失败！', $this->createWebUrl('agent', ['op' => 'msg']), 'error');

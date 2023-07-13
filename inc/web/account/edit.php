@@ -17,7 +17,7 @@ $agent_openid = '';
 $id = Request::int('id');
 $account = Account::get($id);
 if (empty($account)) {
-    Response::itoast('任务不存在！', $this->createWebUrl('account'), 'error');
+    Response::toast('任务不存在！', $this->createWebUrl('account'), 'error');
 }
 
 $type = $account->getType();

@@ -12,7 +12,7 @@ $account_id = Request::int('id');
 $account = Account::get($account_id);
 
 if (empty($account)) {
-    Response::itoast('找不到这个任务！', '', 'error');
+    Response::toast('找不到这个任务！', '', 'error');
 }
 
 app()->showTemplate('web/account/stats_view', [

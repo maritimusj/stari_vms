@@ -33,7 +33,7 @@ $result = DBUtil::transactionDo(function () use ($id) {
 });
 
 if (is_error($result)) {
-    Response::itoast($result['message'], Util::url('charging'), 'error');
+    Response::toast($result['message'], Util::url('charging'), 'error');
 }
 
-Response::itoast('已删除！', Util::url('charging'), 'success');
+Response::toast('已删除！', Util::url('charging'), 'success');

@@ -20,4 +20,4 @@ if ($voucher) {
     JSON::success('保存失败 ！');
 }
 
-Response::itoast('找不到指定的提货码！', Util::url('voucher'), 'error');
+Response::toast('找不到指定的提货码！', Util::url('voucher'), 'error');

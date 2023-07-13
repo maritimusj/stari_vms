@@ -14,8 +14,8 @@ $data = HttpUtil::get(UPGRADE_URL . '/?op=exec');
 $res = json_decode($data, true);
 if ($res && $res['status']) {
     if (!Migrate::detect(true)) {
-        Response::itoast('更新成功！', $back_url, 'success');
+        Response::toast('更新成功！', $back_url, 'success');
     }
 }
 
-Response::itoast('更新失败！', $back_url, 'success');
+Response::toast('更新失败！', $back_url, 'success');

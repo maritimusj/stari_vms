@@ -38,7 +38,7 @@
                 </td>
             </tr>
             <tr>
-                <td>支付交易号</td>
+                <td>交易号</td>
                 <td>
                     {if $data['payResult']}
                     {$data['payResult']['transaction_id']}
@@ -75,19 +75,7 @@
                 <td>退款渠道</td>
                 <td>{$data['refund']['result']['data']['payway_name']}</td>
             </tr>
-            {/if}       
-            <tr>
-                <td>退款交易号</td>
-                <td>
-                    {if $data['refund']['result']['data']['sn']}
-                    {$data['refund']['result']['data']['sn']}
-                    {elseif $data['refund']['result']['transaction_id']}
-                    {$data['refund']['result']['transaction_id']}
-                    {elseif $data['refund']['result']['out_refund_no']}
-                    {$data['refund']['result']['out_refund_no']}
-                    {/if}
-                </td>
-            </tr>
+            {/if}
             <tr>
                 <td>退款时间</td>
                 <td>{php echo date('Y-m-d H:i:s', $data['refund']['createtime'])}</td>

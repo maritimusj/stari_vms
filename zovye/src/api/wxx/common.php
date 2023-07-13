@@ -20,6 +20,7 @@ use zovye\Contract\bluetooth\IBlueToothProtocol;
 use zovye\Device;
 use zovye\DeviceUtil;
 use zovye\Goods;
+use zovye\LocationUtil;
 use zovye\Locker;
 use zovye\Log;
 use zovye\model\deviceModelObj;
@@ -763,7 +764,7 @@ class common
             if ($data['ip']) {
                 $info = $entry->get('ip_info', []);
                 if (empty($info)) {
-                    $info = Util::getIpInfo($data['ip']);
+                    $info = LocationUtil::getIpInfo($data['ip']);
                     if ($info) {
                         $entry->set('ip_info', $info);
                     }

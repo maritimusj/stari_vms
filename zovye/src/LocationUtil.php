@@ -13,9 +13,54 @@ use zovye\model\userModelObj;
 
 class LocationUtil
 {
+    public static function getLBSKey()
+    {
+        return settings('user.location.appkey', DEFAULT_LBS_KEY);
+    }
+
+    /**
+     * 获取ip地址定位信息.
+     *
+     * @param $ip
+     * @return mixed
+     */
+    public static function getIpInfo($ip)
+    {
+        $data = We7::cache_read($ip);
+        if ($data) {
+            return $data;
+        }
+
+        $lbs_key = self::getLBSKey();
+        $url = "https://apis.map.qq.com/ws/location/v1/ip?ip=$ip&key=$lbs_key";
+
+        $resp = ihttp::get($url);
+
+        if (!is_error($resp)) {
+            $res = json_decode($resp['content'], true);
+
+            if ($res && $res['status'] == 0 && is_array($res['result'])) {
+
+                $data = $res['result'];
+
+                $data['data'] = [
+                    'province' => $data['ad_info']['province'],
+                    'city' => $data['ad_info']['city'],
+                    'district' => $data['ad_info']['district'],
+                ];
+
+                We7::cache_write($ip, $data);
+
+                return $data;
+            }
+        }
+
+        return [];
+    }
+
     public static function getData($lng, $lat): array
     {
-        $lbs_key = settings('user.location.appkey', DEFAULT_LBS_KEY);
+        $lbs_key = self::getLBSKey();
         $url = 'https://apis.map.qq.com/ws/geocoder/v1/?';
         $params = urlencode("location=$lat,$lng&key=$lbs_key&get_poi=0");
 
@@ -40,7 +85,7 @@ class LocationUtil
 
     public static function getDistance($from, $to, $mode = 'walking')
     {
-        $lbs_key = settings('user.location.appkey', DEFAULT_LBS_KEY);
+        $lbs_key = self::getLBSKey();
         $url = "https://apis.map.qq.com/ws/distance/v1/matrix?mode=$mode&from={$from['lat']},{$from['lng']}&to={$to['lat']},{$to['lng']}&key=$lbs_key";
         $resp = ihttp::get($url);
 

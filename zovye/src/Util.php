@@ -711,7 +711,7 @@ include './index.php';
 
             if (!isEmptyArray($limits['area'])) {
                 $ip = self::getClientIp();
-                $info = Util::getIpInfo($ip);
+                $info = LocationUtil::getIpInfo($ip);
                 if ($info) {
                     if ($limits['area']['province'] && $info['data']['province'] != $limits['area']['province']) {
                         return err('区域（省）不允许！');
@@ -1581,46 +1581,6 @@ HTML_CONTENT;
         }
 
         return null;
-    }
-
-    /**
-     * 获取ip地址定位信息.
-     *
-     * @param $ip
-     * @return mixed
-     */
-    public static function getIpInfo($ip)
-    {
-        $data = We7::cache_read($ip);
-        if ($data) {
-            return $data;
-        }
-
-        $lbs_key = settings('user.location.appkey', DEFAULT_LBS_KEY);
-        $url = "https://apis.map.qq.com/ws/location/v1/ip?ip=$ip&key=$lbs_key";
-
-        $resp = ihttp::get($url);
-
-        if (!is_error($resp)) {
-            $res = json_decode($resp['content'], true);
-
-            if ($res && $res['status'] == 0 && is_array($res['result'])) {
-
-                $data = $res['result'];
-
-                $data['data'] = [
-                    'province' => $data['ad_info']['province'],
-                    'city' => $data['ad_info']['city'],
-                    'district' => $data['ad_info']['district'],
-                ];
-
-                We7::cache_write($ip, $data);
-
-                return $data;
-            }
-        }
-
-        return [];
     }
 
     /**

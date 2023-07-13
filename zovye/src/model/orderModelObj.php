@@ -9,6 +9,7 @@ namespace zovye\model;
 use zovye\Account;
 use zovye\App;
 use zovye\Balance;
+use zovye\LocationUtil;
 use zovye\Order;
 use zovye\User;
 use zovye\Util;
@@ -434,7 +435,7 @@ class orderModelObj extends modelObj
 
         $info = $this->get('ip_info', []);
         if (empty($info)) {
-            $info = Util::getIpInfo($ip);
+            $info = LocationUtil::getIpInfo($ip);
             if ($info) {
                 $this->set('ip_info', $info);
             }

@@ -2353,6 +2353,12 @@ class deviceModelObj extends modelObj
 
         $mcb_channel = isset($options['channel']) ? intval($options['channel']) : Device::CHANNEL_DEFAULT;
 
+        //zovye接口出货
+        $timeout = isset($options['timeout']) ? intval($options['timeout']) : DEFAULT_DEVICE_WAIT_TIMEOUT;
+        if ($timeout < 1) {
+            $timeout = DEFAULT_DEVICE_WAIT_TIMEOUT;
+        }
+
         //蓝牙设备
         if ($this->isBlueToothDevice()) {
             $protocol = $this->getBlueToothProtocol();
@@ -2371,6 +2377,8 @@ class deviceModelObj extends modelObj
                 $option = ['locker' => $mcb_channel];
             }
 
+            $option['timeout'] = $timeout;
+
             $msg = $protocol->open($this->getBUID(), $option);
             if ($msg) {
                 Device::createBluetoothCmdLog($this, $msg);
@@ -2379,12 +2387,6 @@ class deviceModelObj extends modelObj
         } else {
             if ($options['online'] && !$this->isMcbOnline()) {
                 return err('设备已关机！');
-            }
-
-            //zovye接口出货
-            $timeout = isset($options['timeout']) ? intval($options['timeout']) : DEFAULT_DEVICE_WAIT_TIMEOUT;
-            if ($timeout <= 0) {
-                $timeout = DEFAULT_DEVICE_WAIT_TIMEOUT;
             }
 
             $extra = $options;

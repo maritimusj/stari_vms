@@ -4,7 +4,7 @@
  * @url www.stariture.com
  */
 
-namespace bluetooth\hlb;
+namespace bluetooth\hm;
 
 use zovye\Contract\bluetooth\ICmd;
 use zovye\Contract\bluetooth\IResponse;
@@ -25,23 +25,23 @@ class response implements IResponse
 
     function getID(): int
     {
-        // 根据回复数据的长度判断是什么回复
         return strlen($this->data);
     }
 
     function isOpenResult(): bool
     {
-        return $this->getID() == 2;
+        // 长度为 12 或者 8 的回复为运行结果
+        return $this->getID() == 12 || $this->getID() == 8;
     }
 
     function isOpenResultOk(): bool
     {
-        return $this->isOpenResult() && $this->data == '01';
+        return $this->isOpenResult() && substr($this->data, -2) == '01';
     }
 
     function isOpenResultFail(): bool
     {
-        return $this->isOpenResult() && $this->data == '00';
+        return $this->isOpenResult() && substr($this->data, -2) != '01';
     }
 
     function getErrorCode()
@@ -56,6 +56,7 @@ class response implements IResponse
 
     function hasBatteryValue(): bool
     {
+        // 长度为4的回复为电压值
         return $this->getID() == 4;
     }
 
@@ -69,10 +70,9 @@ class response implements IResponse
     function getMessage(): string
     {
         switch ($this->getID()) {
-            case 2: return '=> 开锁结果' . ($this->isOpenResultOk() ? '（成功）':'（失败）');
+            case 8:
+            case 12: return '=> 启动结果' . ($this->isOpenResultOk() ? '（成功）':'（失败）');
             case 4: return '=> 当前电量（' . $this->getBatteryValue() . '%）' ;
-            case 6: return $this->data == 'a5a5a5' ? '=> 确认回复' : '=> 未知消息';
-            case 8: return '=> 连接成功';
             default: return '=> 未知消息';
         }
     }

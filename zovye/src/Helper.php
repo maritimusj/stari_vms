@@ -343,7 +343,7 @@ class Helper
             return err('找不到这个设备！');
         }
 
-        if (Util::mustValidateLocation($user, $device)) {
+        if (LocationUtil::mustValidate($user, $device)) {
             return err('设备位置不在允许的范围内！');
         }
 
@@ -658,7 +658,7 @@ class Helper
                 }
             }
 
-            $res = Util::getDistance($location, ['lng' => $lng, 'lat' => $lat]);
+            $res = LocationUtil::getDistance($location, ['lng' => $lng, 'lat' => $lat]);
             if (is_error($res)) {
                 Log::error('location', $res);
 

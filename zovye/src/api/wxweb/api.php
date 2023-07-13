@@ -14,6 +14,7 @@ use zovye\Goods;
 use zovye\Helper;
 use zovye\Job;
 use zovye\JSON;
+use zovye\LocationUtil;
 use zovye\model\balanceModelObj;
 use zovye\model\userModelObj;
 use zovye\Order;
@@ -217,7 +218,7 @@ class api
             return err('设备不在线！');
         }
 
-        if (Util::mustValidateLocation($user, $device)) {
+        if (LocationUtil::mustValidate($user, $device)) {
             return err('设备位置不在允许的范围内！');
         }
 

@@ -290,7 +290,7 @@ $result = Util::transactionDo(function () use ($id, &$device) {
     $saved_baidu_loc = $device->settings('extra.location.baidu', []);
     if (strval($saved_baidu_loc['lng']) != strval($location['lng'])
         || strval($saved_baidu_loc['lat']) != strval($location['lat'])) {
-        $address = Util::getLocation($location['lng'], $location['lat']);
+        $address = LocationUtil::getData($location['lng'], $location['lat']);
         if ($address) {
             $extra['location']['baidu']['area'] = [
                 $address['province'],

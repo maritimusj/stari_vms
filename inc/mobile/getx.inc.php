@@ -53,7 +53,7 @@ try {
     }
 
     //检查用户定位
-    if (Util::mustValidateLocation($user, $device)) {
+    if (LocationUtil::mustValidate($user, $device)) {
         throw new RuntimeException('定位超时，请重新扫描设备二维码 [605]');
     }
 

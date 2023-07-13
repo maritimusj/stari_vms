@@ -232,7 +232,7 @@ if (empty($device)) {
 }
 
 //检查用户定位
-if (Util::mustValidateLocation($user, $device)) {
+if (LocationUtil::mustValidate($user, $device)) {
 
     $user->cleanLastActiveData();
     $tpl_data = Util::getTplData(

@@ -57,7 +57,7 @@ class ZhiJinBaoAccount
             return false;
         }
 
-        return DeviceUtil::isAssigned($acc->getAssignData(), $device);
+        return DeviceUtil::isAssigned($device, $acc->getAssignData());
     }
 
     public static function fetch(deviceModelObj $device, userModelObj $user): array

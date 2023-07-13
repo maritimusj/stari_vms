@@ -500,7 +500,7 @@ include './index.php';
 
         if (empty($params['ignore_assigned'])) {
             $assign_data = $account->settings('assigned', []);
-            if (!DeviceUtil::isAssigned($assign_data, $device)) {
+            if (!DeviceUtil::isAssigned($device, $assign_data)) {
                 return err('没有允许从这个设备访问该公众号！');
             }
         }

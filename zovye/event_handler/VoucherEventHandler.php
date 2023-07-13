@@ -42,7 +42,7 @@ class VoucherEventHandler
         $res = GoodsVoucher::give($user, $vouchers, function ($voucher) use ($device) {
             $data = $voucher->getExtraData('assigned', []);
 
-            return DeviceUtil::isAssigned($data, $device);
+            return DeviceUtil::isAssigned($device, $data);
         });
 
         $res = [

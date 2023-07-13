@@ -18,7 +18,7 @@ use zovye\model\userModelObj;
 
 class DeviceUtil
 {
-    public static function isAssigned($data, deviceModelObj $device): bool
+    public static function isAssigned(deviceModelObj $device, $data): bool
     {
         if (empty($data) || !is_array($data)) {
             return false;

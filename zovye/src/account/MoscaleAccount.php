@@ -54,7 +54,7 @@ class MoscaleAccount
             return false;
         }
 
-        return DeviceUtil::isAssigned($acc->getAssignData(), $device);
+        return DeviceUtil::isAssigned($device, $acc->getAssignData());
     }
 
     public static function getUid(): string

@@ -1711,7 +1711,7 @@ class deviceModelObj extends modelObj
      */
     public function isMatched($assign_data): bool
     {
-        return DeviceUtil::isAssigned($assign_data, $this);
+        return DeviceUtil::isAssigned($this, $assign_data);
     }
 
     /**

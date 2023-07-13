@@ -9,6 +9,7 @@ namespace zovye\api\wx;
 use DateTimeImmutable;
 use zovye\Account;
 use zovye\App;
+use zovye\DBUtil;
 use zovye\model\commission_balanceModelObj;
 use zovye\CommissionBalance;
 use zovye\Device;
@@ -147,7 +148,7 @@ class balance
             return err("提现金额不能大于{$max}元");
         }
 
-        $res = Util::transactionDo(function () use ($amount, $memo, $balance, $user, $extra) {
+        $res = DBUtil::transactionDo(function () use ($amount, $memo, $balance, $user, $extra) {
                 //计算手续费
                 $fee = 0;
                 $config = settings('commission.withdraw.fee', []);

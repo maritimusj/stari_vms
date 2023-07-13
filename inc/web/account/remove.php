@@ -8,7 +8,7 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-$result = Util::transactionDo(function() {
+$result = DBUtil::transactionDo(function() {
     $id = Request::int('id');
     if ($id) {
         $account = Account::get($id);

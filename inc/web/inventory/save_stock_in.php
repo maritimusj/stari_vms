@@ -24,7 +24,7 @@ if (!$inventory->acquireLocker()) {
     JSON::fail('锁定仓库失败！');
 }
 
-$result = Util::transactionDo(function () use ($inventory) {
+$result = DBUtil::transactionDo(function () use ($inventory) {
 
     $user_ids = Request::array('user');
     $goods_ids = Request::array('goods');

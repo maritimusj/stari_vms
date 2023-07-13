@@ -12,7 +12,7 @@ $from = Request::trim('from') ?: 'user';
 $user_id = Request::int('id');
 
 if ($user_id) {
-    $res = Util::transactionDo(function () use ($user_id) {
+    $res = DBUtil::transactionDo(function () use ($user_id) {
         $user = User::get($user_id);
         if (empty($user)) {
             return err('找不到这个用户！');

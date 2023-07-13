@@ -10,6 +10,7 @@ use zovye\Advertising;
 use zovye\Agent;
 use zovye\App;
 use zovye\CtrlServ;
+use zovye\DBUtil;
 use zovye\Device;
 use zovye\Job;
 use zovye\Locker;
@@ -122,7 +123,7 @@ if ($op == 'order' && CtrlServ::checkJobSign(['id' => request('id')])) {
                     }
                 }
 
-                $log['statistics'][$order->getId()] = Util::transactionDo(function () use ($order) {
+                $log['statistics'][$order->getId()] = DBUtil::transactionDo(function () use ($order) {
                     return Util::orderStatistics($order);
                 });
 
@@ -152,7 +153,7 @@ if ($op == 'order' && CtrlServ::checkJobSign(['id' => request('id')])) {
             /** @var orderModelObj $entry */
             foreach ($other_order->findAll() as $entry) {
                 if ($entry && empty($entry->getUpdatetime())) {
-                    $result = Util::transactionDo(function () use ($entry) {
+                    $result = DBUtil::transactionDo(function () use ($entry) {
                         return Util::orderStatistics($entry);
                     });
                     $log['statistics'][$entry->getId()] = $result ?: 'success';

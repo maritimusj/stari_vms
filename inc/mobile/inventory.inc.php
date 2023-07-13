@@ -39,7 +39,7 @@ if (empty($goods)) {
     JSON::fail('找不到指定的商品！');
 }
 
-$result = Util::transactionDo(function () use ($inventory, $goods, $num) {
+$result = DBUtil::transactionDo(function () use ($inventory, $goods, $num) {
     $clr = Util::randColor();
 
     $log = $inventory->stock(null, $goods, $num, [

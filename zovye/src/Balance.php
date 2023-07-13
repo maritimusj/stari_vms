@@ -410,7 +410,7 @@ TEXT;
             return err('没有设置积分奖励！');
         }
 
-        return Util::transactionDo(function () use ($user, $account, $serial, $reason) {
+        return DBUtil::transactionDo(function () use ($user, $account, $serial, $reason) {
             if ($serial) {
                 if (BalanceLog::query()->exists(['s2' => $serial])) {
                     return err('记录已经存在！');

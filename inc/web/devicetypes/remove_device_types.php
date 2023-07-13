@@ -13,7 +13,7 @@ if (empty($device_type)) {
     JSON::fail('找不到这个设备型号！');
 }
 
-$res = Util::transactionDo(
+$res = DBUtil::transactionDo(
     function () use ($device_type) {
         $type_id = $device_type->getId();
         if ($device_type->destroy()) {

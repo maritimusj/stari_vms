@@ -15,7 +15,7 @@ if (is_error($balance_obj)) {
     JSON::fail($balance_obj);
 }
 
-$res = Util::transactionDo(
+$res = DBUtil::transactionDo(
     function () use ($balance_obj) {
         $user = User::get($balance_obj->getOpenid(), true);
         if (empty($user)) {

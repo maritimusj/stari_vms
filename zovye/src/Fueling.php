@@ -52,7 +52,7 @@ class Fueling
 
     public static function start(string $serial, ICard $card, deviceModelObj $device, $chargerID = 0, $extra = [])
     {
-        return Util::transactionDo(function () use ($serial, $card, $device, $chargerID, $extra) {
+        return DBUtil::transactionDo(function () use ($serial, $card, $device, $chargerID, $extra) {
             if (!$device->isFuelingDevice()) {
                 return err('设备类型不正确！');
             }
@@ -119,7 +119,7 @@ class Fueling
                 'goods_id' => $goods['id'],
                 'num' => 1,
                 'price' => 0,
-                'ip' => $extra['ip'] ?? Util::getClientIp(),
+                'ip' => $extra['ip'] ?? LocationUtil::getClientIp(),
                 'extra' => [
                     'device' => [
                         'imei' => $device->getImei(),
@@ -290,7 +290,7 @@ class Fueling
 
     public static function end(string $serial, int $chargerID, callable $cb)
     {
-        return Util::transactionDo(function () use ($serial, $chargerID, $cb) {
+        return DBUtil::transactionDo(function () use ($serial, $chargerID, $cb) {
 
             $order = Order::get($serial, true);
             if (empty($order)) {
@@ -431,7 +431,7 @@ class Fueling
             return err('订单锁订失败！');
         }
 
-        $result = Util::transactionDo(function () use ($serial, $device, $chargerID) {
+        $result = DBUtil::transactionDo(function () use ($serial, $device, $chargerID) {
             $order = Order::findOne(['order_id' => $serial, 'src' => Order::FUELING_UNPAID]);
             if ($order) {
                 $order->setSrc(Order::FUELING);

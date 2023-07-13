@@ -14,7 +14,7 @@ use zovye\model\keeperModelObj;
 $id = Request::int('id');
 $from = Request::str('from');
 
-$result = Util::transactionDo(function() use ($id, &$from) {
+$result = DBUtil::transactionDo(function() use ($id, &$from) {
 
     $user = User::get($id);
     if (empty($user)) {

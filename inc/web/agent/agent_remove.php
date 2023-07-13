@@ -12,7 +12,7 @@ $from = Request::trim('from') ?: 'agent';
 $user_id = Request::int('id');
 
 if ($user_id) {
-    $res = Util::transactionDo(
+    $res = DBUtil::transactionDo(
         function () use ($user_id) {
             $agent = Agent::get($user_id);
             if ($agent) {

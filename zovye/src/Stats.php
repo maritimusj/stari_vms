@@ -934,7 +934,7 @@ class Stats
         while ($begin < $end) {
             $day = $begin->format('Y-m-d');
             /** @var array $result */
-            $result = Util::transactionDo(function () use ($obj, $day) {
+            $result = DBUtil::transactionDo(function () use ($obj, $day) {
                 if (!Stats::repair($obj, $day)) {
                     return err('修复失败：{$day}！');
                 }

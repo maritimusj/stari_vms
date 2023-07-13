@@ -388,7 +388,7 @@ class Order extends State
 
     public static function refund2($order_no, $total, array $refund_data = [])
     {
-        return Util::transactionDo(function () use ($order_no, $total, $refund_data) {
+        return DBUtil::transactionDo(function () use ($order_no, $total, $refund_data) {
             $order = Order::get($order_no, true);
             if (empty($order)) {
                 //尝试订单id查找订单
@@ -530,7 +530,7 @@ class Order extends State
      */
     public static function refund($order_no, int $goods_num = 0, array $refund_data = [])
     {
-        return Util::transactionDo(
+        return DBUtil::transactionDo(
             function () use ($order_no, $refund_data, $goods_num) {
                 if (empty($order_no)) {
                     return err('订单号不正确!');

@@ -71,7 +71,7 @@ try {
         throw new RuntimeException('无法领取这个商品，请联系管理员！');
     }
 
-    $result = Util::transactionDo(function () use ($device, $user, $account, $goods_id, $ticket_data_saved) {
+    $result = DBUtil::transactionDo(function () use ($device, $user, $account, $goods_id, $ticket_data_saved) {
         //出货流程，EventBus会抛出异常
         $result = DeviceUtil::open([
             $device,

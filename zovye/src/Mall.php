@@ -106,7 +106,7 @@ class Mall
 
         $balance = $user->getBalance();
 
-        $result = Util::transactionDo(function () use ($user, $balance, $goods, $num, $phone_num, $address, $name) {
+        $result = DBUtil::transactionDo(function () use ($user, $balance, $goods, $num, $phone_num, $address, $name) {
             $total_balance = $goods->getBalance() * $num;
 
             if ($total_balance > $balance->total()) {

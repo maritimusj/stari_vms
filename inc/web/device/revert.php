@@ -18,7 +18,7 @@ if ($device->getShadowId() != $confirm_code) {
     JSON::fail('操作失败，确认码不正确！(注意大小写)');
 }
 
-$res = Util::transactionDo(
+$res = DBUtil::transactionDo(
     function () use ($device) {
         return $device->resetAllData() ? true : err('清除失败！');
     }

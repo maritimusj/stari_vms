@@ -35,7 +35,7 @@ if ($op == 'default') {
     $device_id = Request::trim('id');
     $app_id = Request::trim('appId');
 
-    $result = Util::transactionDo(
+    $result = DBUtil::transactionDo(
         function () use ($device_id, $app_id) {
             if ($device_id && $app_id) {
                 $device = Device::getFromAppId($app_id);

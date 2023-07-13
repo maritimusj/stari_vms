@@ -6,6 +6,7 @@
 
 namespace zovye\base;
 
+use zovye\DBUtil;
 use zovye\Util;
 use zovye\We7;
 use function zovye\tb;
@@ -63,7 +64,7 @@ class model
     protected function createClassFile($tb_name, $classname, $mod_filename): bool
     {
         //生成modelObj文件
-        $theme = Util::tableSchema(tb($tb_name));
+        $theme = DBUtil::tableSchema(tb($tb_name));
         if ($theme) {
             $debug = DEBUG ? 'true' : 'false';
 

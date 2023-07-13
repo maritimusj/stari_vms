@@ -36,7 +36,7 @@ class Questionnaire
             return $result;
         }
 
-        return Util::transactionDo(function () use ($account, $user, $device, $answer, $result) {
+        return DBUtil::transactionDo(function () use ($account, $user, $device, $answer, $result) {
             $res = $account->log($account->getId(), REQUEST_ID, [
                 'uid' => REQUEST_ID,
                 'user' => $user->profile(),

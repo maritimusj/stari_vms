@@ -258,7 +258,7 @@ class api
                 'account' => $account->getId(),
                 'goods' => $goods['id'],
                 'orderUID' => $orderUID,
-                'ip' => Util::getClientIp(),
+                'ip' => LocationUtil::getClientIp(),
             ])) {
                 return ['orderUID' => $orderUID];
             }
@@ -281,7 +281,7 @@ class api
                 'device' => $device->getId(),
                 'goods' => $goods['id'],
                 'num' => 1,
-                'ip' => Util::getClientIp(),
+                'ip' => LocationUtil::getClientIp(),
                 'code' => $code,
             ])) {
                 return ['orderUID' => $orderUID];

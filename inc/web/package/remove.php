@@ -10,7 +10,7 @@ defined('IN_IA') or exit('Access Denied');
 
 use RuntimeException;
 
-$result = Util::transactionDo(function () {
+$result = DBUtil::transactionDo(function () {
     $id = Request::int('id');
     $package = Package::get($id);
     if (empty($package)) {

@@ -17,7 +17,7 @@ if ($op == 'sms') {
         JSON::fail('没有启用这个功能！');
     }
 
-    $result = Util::transactionDo(function() {
+    $result = DBUtil::transactionDo(function() {
         $mobile = Request::trim('mobile');
 
         if (empty($mobile)) {
@@ -155,7 +155,7 @@ if ($op == 'sms') {
         'goods_id' => $goods['id'],
         'num' => $num,
         'price' => 0,
-        'ip' => Util::getClientIp(),
+        'ip' => LocationUtil::getClientIp(),
         'extra' => [
             'level' => LOG_GOODS_FREE,
             'goods' => $goods,

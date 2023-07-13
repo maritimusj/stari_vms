@@ -9,6 +9,7 @@ namespace zovye\job\createOrderMulti;
 use Exception;
 use zovye\App;
 use zovye\CtrlServ;
+use zovye\DBUtil;
 use zovye\Device;
 use zovye\EventBus;
 use zovye\ExceptionNeedsRefund;
@@ -138,7 +139,7 @@ function process($order_no): bool
         'user' => $user,
     ]);
 
-    $orderResult = Util::transactionDo(function () use ($order_no, $device, $user, $pay_log) {
+    $orderResult = DBUtil::transactionDo(function () use ($order_no, $device, $user, $pay_log) {
         return createOrder($order_no, $device, $user, $pay_log);
     });
 

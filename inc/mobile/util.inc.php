@@ -258,7 +258,7 @@ if ($op == 'default') {
         JSON::fail('无法锁定用户！');
     }
 
-    $result = Util::transactionDo(function () use ($user, $original) {
+    $result = DBUtil::transactionDo(function () use ($user, $original) {
 
         $total = $original->getCommissionBalance()->total();
         $balance_total = $original->getBalance()->total();

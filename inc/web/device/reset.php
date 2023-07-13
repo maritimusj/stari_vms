@@ -20,7 +20,7 @@ if (!$device->payloadLockAcquire(3)) {
     Util::itoast('设备正忙，请稍后再试！', $this->createWebUrl('device'), 'error');
 }
 
-$result = Util::transactionDo(function () use ($device) {
+$result = DBUtil::transactionDo(function () use ($device) {
     if (!Request::isset('lane') || Request::str('lane') == 'all') {
         $data = [];
     } else {

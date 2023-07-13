@@ -9,7 +9,7 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 $id = Request::int('id');
-$result = Util::transactionDo(function () use ($id) {
+$result = DBUtil::transactionDo(function () use ($id) {
     $user = User::get($id);
     if (empty($user)) {
         return err('找不到这个用户！');

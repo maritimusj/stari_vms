@@ -12,7 +12,7 @@ use zovye\model\deviceModelObj;
 
 $id = Request::int('id');
 
-$result = Util::transactionDo(function () use ($id) {
+$result = DBUtil::transactionDo(function () use ($id) {
     $group = Group::get($id, Group::CHARGING);
     if (empty($group)) {
         return err('找不到指定的分组！');

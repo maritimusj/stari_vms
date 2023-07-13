@@ -14,7 +14,7 @@ use zovye\model\packageModelObj;
 $id = Request::int('id');
 $device = null;
 
-$result = Util::transactionDo(function () use ($id, &$device) {
+$result = DBUtil::transactionDo(function () use ($id, &$device) {
     $data = [
         'agent_id' => 0,
         'name' => Request::trim('name'),

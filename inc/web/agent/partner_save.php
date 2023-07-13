@@ -52,7 +52,7 @@ if ($res) {
     );
 }
 
-$res = Util::transactionDo(
+$res = DBUtil::transactionDo(
     function () use ($agent, $user, $name, $mobile, $notice) {
         if ($agent->setPartner($user, $name, $mobile, $notice)) {
             return true;

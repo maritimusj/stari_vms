@@ -5,6 +5,7 @@ namespace zovye\api\wxweb;
 use zovye\api\wx\common;
 use zovye\App;
 use zovye\CommissionBalance;
+use zovye\DBUtil;
 use zovye\model\orderModelObj;
 use zovye\model\team_memberModelObj;
 use zovye\model\teamModelObj;
@@ -248,7 +249,7 @@ class member
             return err('锁定用户失败，请重试！');
         }
 
-        return Util::transactionDo(function () use ($user) {
+        return DBUtil::transactionDo(function () use ($user) {
             $id = Request::int('id');
             $total = Request::int('total');
             if ($total < 1) {

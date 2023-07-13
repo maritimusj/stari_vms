@@ -7,6 +7,7 @@
 namespace zovye\job\createOrderReward;
 
 use Exception;
+use zovye\DBUtil;
 use zovye\Job;
 use zovye\Log;
 use zovye\User;
@@ -147,7 +148,7 @@ if ($op == 'create_order_reward' && CtrlServ::checkJobSign([
             throw new RuntimeException($res['message']);
         }
 
-        $orderResult = Util::transactionDo(function () use ($order_no, $device, $user, $goods, $num, $ip, $code) {
+        $orderResult = DBUtil::transactionDo(function () use ($order_no, $device, $user, $goods, $num, $ip, $code) {
             return createOrder($order_no, $device, $user, $goods, $num, $ip, $code);
         });
 

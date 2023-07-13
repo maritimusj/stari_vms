@@ -101,7 +101,7 @@ class Migrate
             'begin' => time(),
         ];
 
-        $result = Util::transactionDo(function () use ($name, $filename) {
+        $result = DBUtil::transactionDo(function () use ($name, $filename) {
             try {
                 //加载文件
                 include_once $filename;

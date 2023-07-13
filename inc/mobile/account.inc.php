@@ -402,7 +402,7 @@ if ($op == 'default') {
 
     if ($v->getBonusType() == Account::BALANCE) {
 
-        $result = Util::transactionDo(function () use ($user, $device, $v, $answer) {
+        $result = DBUtil::transactionDo(function () use ($user, $device, $v, $answer) {
 
             $log = Balance::give($user, $v);
             if (is_error($log)) {

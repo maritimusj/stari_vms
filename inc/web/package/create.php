@@ -21,7 +21,7 @@ if ($device_id) {
     }
 }
 
-$result = Util::transactionDo(function () use ($device_id) {
+$result = DBUtil::transactionDo(function () use ($device_id) {
     $title = Request::trim('title');
     $price = Request::float('price', 0, 2);
 

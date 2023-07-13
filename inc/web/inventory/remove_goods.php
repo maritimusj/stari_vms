@@ -24,7 +24,7 @@ if (!$inventory->acquireLocker()) {
     JSON::fail('锁定仓库失败！');
 }
 
-$result = Util::transactionDo(function () use ($inventory, $goods) {
+$result = DBUtil::transactionDo(function () use ($inventory, $goods) {
     $clr = Util::randColor();
 
     if ($goods->getNum() != 0) {

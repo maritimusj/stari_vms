@@ -276,7 +276,7 @@ class DeviceUtil
         }
 
         //开启事务
-        $result = Util::transactionDo(
+        $result = DBUtil::transactionDo(
             function () use (&$params, $goods, &$log_data, $args) {
                 /** @var deviceModelObj $device */
                 $device = $params['device'];

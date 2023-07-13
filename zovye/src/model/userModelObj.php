@@ -15,7 +15,9 @@ use zovye\Balance;
 use zovye\CacheUtil;
 use zovye\ChargingNowData;
 use zovye\Contract\ICard;
+use zovye\DBUtil;
 use zovye\Fueling;
+use zovye\LocationUtil;
 use zovye\Locker;
 use zovye\Pay;
 use zovye\Referral;
@@ -683,7 +685,7 @@ class userModelObj extends modelObj
             return err('支付已无效!');
         }
 
-        return Util::transactionDo(function () use ($pay_log) {
+        return DBUtil::transactionDo(function () use ($pay_log) {
 
             $price = $pay_log->getPrice();
             if ($price < 1) {
@@ -876,13 +878,13 @@ class userModelObj extends modelObj
 
     public function getLastActiveIp(): string
     {
-        return $this->getLastActiveData('ip', Util::getClientIp());
+        return $this->getLastActiveData('ip', LocationUtil::getClientIp());
     }
 
     public function setLastActiveDevice(deviceModelObj $device = null): bool
     {
         if ($device) {
-            $this->setLastActiveData('ip', Util::getClientIp());
+            $this->setLastActiveData('ip', LocationUtil::getClientIp());
         }
 
         return $device ? $this->setLastActiveData($device) : $this->setLastActiveData(deviceModelObj::class);
@@ -901,7 +903,7 @@ class userModelObj extends modelObj
     public function setLastActiveAccount(accountModelObj $account = null): bool
     {
         if ($account) {
-            $this->setLastActiveData('ip', Util::getClientIp());
+            $this->setLastActiveData('ip', LocationUtil::getClientIp());
         }
 
         return $account ? $this->setLastActiveData($account) : $this->setLastActiveData(accountModelObj::class);

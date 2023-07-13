@@ -531,7 +531,7 @@ class Device extends State
      */
     public static function find($cond, $hints = null): ?deviceModelObj
     {
-        return Util::findObject('device', $cond, $hints);
+        return DBUtil::findObject('device', $cond, $hints);
     }
 
     public static function findOne($cond = []): ?deviceModelObj

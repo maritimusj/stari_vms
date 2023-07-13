@@ -11,7 +11,7 @@ defined('IN_IA') or exit('Access Denied');
 use DateTime;
 use Exception;
 
-$res = Util::transactionDo(function () {
+$res = DBUtil::transactionDo(function () {
     $goods_id = Request::int('goodsId');
     $goods = Goods::get($goods_id);
     if (empty($goods)) {

@@ -6,6 +6,7 @@
 
 namespace zovye\model;
 
+use zovye\DBUtil;
 use zovye\GSP;
 use zovye\Principal;
 use zovye\User;
@@ -198,7 +199,7 @@ class agentModelObj extends userModelObj
             return false;
         }
 
-        $result = Util::transactionDo(function () use ($user, $name, $mobile, $notice) {
+        $result = DBUtil::transactionDo(function () use ($user, $name, $mobile, $notice) {
             if (!$user->setPrincipal(Principal::Partner)) {
                 return err('设置身份失败！');
             }

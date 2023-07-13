@@ -12,6 +12,7 @@ use zovye\Account;
 use zovye\App;
 use zovye\Device;
 use zovye\HttpUtil;
+use zovye\LocationUtil;
 use zovye\Log;
 use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
@@ -67,7 +68,7 @@ class YiDaoAccount
             'key' => strval($config['device_key']),
             'develop_appid' => strval($config['appid']),
             'label' => intval($config['scene']),
-            'ip' => Util::getClientIp(),
+            'ip' => LocationUtil::getClientIp(),
             'auth_open_id' => $fans['openid'],
             'nickname' => $fans['nickname'],
             'sex' => $fans['sex'],

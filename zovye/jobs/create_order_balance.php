@@ -13,6 +13,7 @@ use zovye\Balance;
 use zovye\CommissionBalance;
 use zovye\Config;
 use zovye\CtrlServ;
+use zovye\DBUtil;
 use zovye\Device;
 use zovye\EventBus;
 use zovye\ExceptionNeedsRefund;
@@ -125,7 +126,7 @@ if ($op == 'create_order_balance' && CtrlServ::checkJobSign([
             throw new RuntimeException('对不起，商品数量不足！');
         }
 
-        $orderResult = Util::transactionDo(
+        $orderResult = DBUtil::transactionDo(
             function () use ($order_no, $device, $user, $goods, $num, &$balance_id, $ip) {
 
                 $total = $goods['balance'] * $num;
@@ -361,7 +362,7 @@ function refund(int $balance_id, int $num, string $reason)
         return err('设置不允许退款！');
     }
 
-    $result = Util::transactionDo(function () use ($balance_log, $num, $reason) {
+    $result = DBUtil::transactionDo(function () use ($balance_log, $num, $reason) {
         $users = $balance_log->getUser();
         if (empty($users)) {
             return err('找不到这个用户！');

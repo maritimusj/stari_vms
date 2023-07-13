@@ -191,7 +191,7 @@ class Task
     {
         $account = $uid instanceof accountModelObj ? $uid : Account::findOneFromUID(strval($uid));
 
-        return Util::transactionDo(function () use ($uid, $data, $user, $account) {
+        return DBUtil::transactionDo(function () use ($uid, $data, $user, $account) {
 
             $task = null;
             if (empty($account)) {

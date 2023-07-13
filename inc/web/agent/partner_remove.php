@@ -16,7 +16,7 @@ if (empty($agent)) {
     Util::itoast('找不到这个代理商！', $this->createWebUrl('agent', ['op' => 'partner', 'id' => $agent_id]), 'error');
 }
 
-$res = Util::transactionDo(
+$res = DBUtil::transactionDo(
     function () use ($agent, $partner_id) {
 
         foreach (m('agent_msg')->where(We7::uniacid(['agent_id' => $partner_id]))->findAll() as $msg) {

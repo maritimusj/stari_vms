@@ -82,7 +82,7 @@ class Charging
             return err('锁定设备失败，请稍后再试！');
         }
 
-        return Util::transactionDo(function () use (
+        return DBUtil::transactionDo(function () use (
             $card,
             $limit,
             $remark,
@@ -133,7 +133,7 @@ class Charging
                 'num' => 1,
                 'price' => 0,
                 'account' => empty($acc) ? '' : $acc->name(),
-                'ip' => $extra['ip'] ?? Util::getClientIp(),
+                'ip' => $extra['ip'] ?? LocationUtil::getClientIp(),
                 'extra' => [
                     'group' => $group->profile(),
                     'device' => [
@@ -394,7 +394,7 @@ class Charging
 
     public static function end(string $serial, int $chargerID, callable $cb)
     {
-        return Util::transactionDo(function () use ($serial, $chargerID, $cb) {
+        return DBUtil::transactionDo(function () use ($serial, $chargerID, $cb) {
 
             $order = Order::get($serial, true);
             if (empty($order)) {

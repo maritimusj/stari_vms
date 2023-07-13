@@ -14,6 +14,7 @@ use Exception;
 use zovye\Cache;
 use zovye\CacheUtil;
 use zovye\Config;
+use zovye\DBUtil;
 use zovye\DeviceUtil;
 use zovye\Fueling;
 use zovye\GDCVMachine;
@@ -1572,7 +1573,7 @@ class agent
                 $user_id = request('agent');
 
                 if ($user_id) {
-                    $res = Util::transactionDo(
+                    $res = DBUtil::transactionDo(
                         function () use ($user_id) {
                             $user = agent::getUserByGUID($user_id);
                             if ($user) {

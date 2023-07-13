@@ -12,6 +12,7 @@ use zovye\Account;
 use zovye\App;
 use zovye\Device;
 use zovye\HttpUtil;
+use zovye\LocationUtil;
 use zovye\Log;
 use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
@@ -79,7 +80,7 @@ class JfbAccount
             'nickname' => $fans['nickname'],
             'sex' => empty($fans['sex']) ? 0 : $fans['sex'],
             'headUrl' => $fans['headimgurl'],
-            'ipAddress' => Util::getClientIp(),
+            'ipAddress' => LocationUtil::getClientIp(),
             'userAgent' => $_SERVER['HTTP_USER_AGENT'],
             'countryName' => $fans['country'],
             'provinceName' => $fans['province'],

@@ -108,7 +108,7 @@ JSCODE;
 
 } elseif ($op == 'reg') {
 
-    $result = Util::transactionDo(function () use ($user) {
+    $result = DBUtil::transactionDo(function () use ($user) {
         $code = Request::trim('code');
         if (empty($code)) {
             throw new RuntimeException('输入的邀请码无效，请重新输入！');

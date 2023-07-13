@@ -13,6 +13,7 @@ use Exception;
 use zovye\App;
 use zovye\CommissionBalance;
 use zovye\Config;
+use zovye\DBUtil;
 use zovye\Device;
 use zovye\DeviceUtil;
 use zovye\GDCVMachine;
@@ -257,7 +258,7 @@ class keeper
         if ($user->isAgent() || $user->isPartner()) {
             $id = Request::int('id');
 
-            return Util::transactionDo(
+            return DBUtil::transactionDo(
                 function () use ($user, $id) {
                     /** @var keeperModelObj $keeper */
                     $keeper = \zovye\Keeper::findOne(['id' => $id, 'agent_id' => $user->getAgentId()]);
@@ -352,7 +353,7 @@ class keeper
 
         common::checkCurrentUserPrivileges('F_yy');
 
-        return Util::transactionDo(function () use ($user) {
+        return DBUtil::transactionDo(function () use ($user) {
 
             $keeper_id = Request::int('keeperid');
             $keeper = \zovye\Keeper::get($keeper_id);
@@ -395,7 +396,7 @@ class keeper
 
         common::checkCurrentUserPrivileges('F_yy');
 
-        return Util::transactionDo(function () use ($user) {
+        return DBUtil::transactionDo(function () use ($user) {
 
             if ($user->isAgent() || $user->isPartner()) {
 

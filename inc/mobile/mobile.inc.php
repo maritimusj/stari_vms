@@ -30,7 +30,7 @@ $op = Request::op('default');
 
 if ($op == 'save') {
 
-    $result = Util::transactionDo(function () use ($user) {
+    $result = DBUtil::transactionDo(function () use ($user) {
         $mobile = Request::str('mobile');
         if (empty($mobile) || !preg_match(REGULAR_TEL, $mobile)) {
             throw new RuntimeException('请输入正确的手机号码！');

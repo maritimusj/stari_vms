@@ -26,7 +26,7 @@ if (!$inventory->acquireLocker()) {
     JSON::fail('锁定仓库失败！');
 }
 
-$result = Util::transactionDo(function () use ($inventory, $goods, $num) {
+$result = DBUtil::transactionDo(function () use ($inventory, $goods, $num) {
     $clr = Util::randColor();
 
     $inventory_goods = $inventory->query(['goods_id' => $goods->getId()])->findOne();

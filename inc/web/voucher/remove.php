@@ -11,7 +11,7 @@ defined('IN_IA') or exit('Access Denied');
 $id = Request::int('id');
 $voucher = GoodsVoucher::get($id);
 if ($voucher) {
-    $res = Util::transactionDo(function () use ($voucher) {
+    $res = DBUtil::transactionDo(function () use ($voucher) {
         if ($voucher->destroy()) {
             return true;
         }

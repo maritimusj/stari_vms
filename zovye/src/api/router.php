@@ -8,6 +8,7 @@ namespace zovye\api;
 
 use zovye\api\wx\common;
 use zovye\CacheUtil;
+use zovye\DBUtil;
 use zovye\JSON;
 use zovye\Util;
 use zovye\We7;
@@ -26,7 +27,7 @@ class router
             if (We7::starts_with($fn, '@')) {
                 $fn = ltrim($fn, '@');
                 if (is_callable($fn)) {
-                    $result = Util::transactionDo($fn);
+                    $result = DBUtil::transactionDo($fn);
                 }
             } elseif (We7::starts_with($fn, '*')) {
                 $fn = ltrim($fn, '*');

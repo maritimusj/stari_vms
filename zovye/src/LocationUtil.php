@@ -13,6 +13,14 @@ use zovye\model\userModelObj;
 
 class LocationUtil
 {
+    /**
+     * @return string
+     */
+    public static function getClientIp(): string
+    {
+        return We7::getip();
+    }
+
     public static function getLBSKey()
     {
         return settings('user.location.appkey', DEFAULT_LBS_KEY);

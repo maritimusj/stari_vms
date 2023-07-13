@@ -13,7 +13,7 @@ if (is_error($balance_obj)) {
     JSON::fail($balance_obj);
 }
 
-$result = Util::transactionDo(function () use ($balance_obj) {
+$result = DBUtil::transactionDo(function () use ($balance_obj) {
     return CommissionBalance::MCHPay($balance_obj);
 });
 

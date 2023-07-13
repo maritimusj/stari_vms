@@ -11,6 +11,7 @@ use Exception;
 use zovye\App;
 use zovye\base\modelObj;
 use zovye\CtrlServ;
+use zovye\DBUtil;
 use zovye\Device;
 use zovye\EventBus;
 use zovye\ExceptionNeedsRefund;
@@ -163,7 +164,7 @@ function prepare(string $order_no)
         ],
     ];
 
-    Util::transactionDo(function () use (&$params, $order_no, $goods, &$log_data) {
+    DBUtil::transactionDo(function () use (&$params, $order_no, $goods, &$log_data) {
 
         list($result, $order) = createOrder($params, $order_no, $goods);
 

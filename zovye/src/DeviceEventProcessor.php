@@ -298,7 +298,7 @@ class DeviceEventProcessor
      */
     public static function handle(string $event, array $data)
     {
-        Util::transactionDo(function () use ($event, $data) {
+        DBUtil::transactionDo(function () use ($event, $data) {
             $e = self::$events[$event];
             if (isset($e)) {
                 self::log($e, $data);

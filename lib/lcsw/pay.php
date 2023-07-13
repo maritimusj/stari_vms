@@ -8,6 +8,7 @@ namespace lcsw;
 
 use we7\ihttp;
 use zovye\App;
+use zovye\LocationUtil;
 use zovye\Util;
 use function zovye\err;
 use function zovye\error;
@@ -97,7 +98,7 @@ class pay
             $data['notify_url'] = $params['notify_url'];
         }
 
-        $data['terminal_ip'] = Util::getClientIp();
+        $data['terminal_ip'] = LocationUtil::getClientIp();
 
         $data['attach'] = $params['deviceUID'];
         $data['order_body'] = $params['body'];
@@ -141,7 +142,7 @@ class pay
         $data['open_id'] = $params['userUID'];
         $data['attach'] = $params['deviceUID'];
         $data['order_body'] = $params['body'];
-        $data['terminal_ip'] = Util::getClientIp();
+        $data['terminal_ip'] = LocationUtil::getClientIp();
 
         $res = $this->requestApi("$this->api$path", $data);
 
@@ -180,7 +181,7 @@ class pay
         $data['open_id'] = $params['userUID'];
         $data['attach'] = $params['deviceUID'];
         $data['order_body'] = $params['body'];
-        $data['terminal_ip'] = Util::getClientIp();
+        $data['terminal_ip'] = LocationUtil::getClientIp();
 
         $res = $this->requestApi("$this->api$path", $data);
 

@@ -66,8 +66,12 @@ class DeviceUtil
      *
      * @return array
      */
-    public static function test($device, userModelObj $user = null, int $lane = Device::DEFAULT_CARGO_LANE, array $params = []): array
-    {
+    public static function test(
+        $device,
+        userModelObj $user = null,
+        int $lane = Device::DEFAULT_CARGO_LANE,
+        array $params = []
+    ): array {
         if (is_string($device)) {
             $device = Device::get($device, true);
         } elseif (is_int($device)) {
@@ -495,7 +499,11 @@ class DeviceUtil
     public static function getNearBy(agentModelObj $agent = null): array
     {
         //请求附近设备数据
-        $query = $agent ? Device::query(['agent_id' => $agent->getId()]) : Device::query();
+        $query = Device::query();
+
+        if ($agent) {
+            $query->where(['agent_id' => $agent->getId()]);
+        }
 
         $result = [];
 

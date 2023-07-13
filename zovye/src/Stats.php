@@ -713,7 +713,7 @@ class Stats
             'createtime >=' => $today->getTimestamp(),
         ])->count();
 
-        $data['yesterday']['f'] = Util::cachedCallUtil(
+        $data['yesterday']['f'] = CacheUtil::cachedCallUtil(
             new DateTime('next day 00:00:00'),
             function () use ($query, $today) {
                 $yesterday = new DateTime('-1 day 00:00');
@@ -725,7 +725,7 @@ class Stats
             }
         );
 
-        $data['last7days']['f'] = Util::cachedCallUtil(new DateTime('next day 00:00:00'), function () use ($query) {
+        $data['last7days']['f'] = CacheUtil::cachedCallUtil(new DateTime('next day 00:00:00'), function () use ($query) {
             $last7days = new DateTime('-7 days 00:00');
 
             return $query->resetAll()->where([
@@ -734,11 +734,11 @@ class Stats
         });
 
         $month = new DateTime('first day of this month 00:00');
-        $data['month']['f'] = Util::cachedCallUtil(new DateTime('next day 00:00:00'), function () use ($query, $month) {
+        $data['month']['f'] = CacheUtil::cachedCallUtil(new DateTime('next day 00:00:00'), function () use ($query, $month) {
             return $query->resetAll()->where(['createtime >=' => $month->getTimestamp()])->count();
         });
 
-        $data['lastmonth']['f'] = Util::cachedCallUtil(
+        $data['lastmonth']['f'] = CacheUtil::cachedCallUtil(
             new DateTime('first day of next month 00:00:00'),
             function () use ($query, $month) {
                 $last_month = new DateTime('first day of last month 00:00');

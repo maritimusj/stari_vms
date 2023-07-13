@@ -7,6 +7,7 @@
 namespace zovye\api;
 
 use zovye\api\wx\common;
+use zovye\CacheUtil;
 use zovye\JSON;
 use zovye\Util;
 use zovye\We7;
@@ -30,7 +31,7 @@ class router
             } elseif (We7::starts_with($fn, '*')) {
                 $fn = ltrim($fn, '*');
                 if (is_callable($fn)) {
-                    $result = Util::cachedCall(6, $fn, common::getToken());
+                    $result = CacheUtil::cachedCall(6, $fn, common::getToken());
                 }
             }
         }

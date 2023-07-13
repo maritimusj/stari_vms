@@ -10,7 +10,7 @@ defined('IN_IA') or exit('Access Denied');
 
 use DateTime;
 
-$data = Util::cachedCall(30, function () {
+$data = CacheUtil::cachedCall(30, function () {
     $rows = [
         'n' => ['title' => App::isChargingDeviceEnabled() || App::isFuelingDeviceEnabled() ? '订单数量' : '出货数量', 'unit' => ''],
         'f' => ['title' => '净增用户', 'unit' => ''],

@@ -8,6 +8,7 @@ namespace zovye\api\wx;
 
 use DateTime;
 use Exception;
+use zovye\CacheUtil;
 use zovye\GDCVMachine;
 use zovye\Inventory;
 use zovye\Locker;
@@ -461,7 +462,7 @@ class device
          * @return array
          */
         $locationFN = function (deviceModelObj $device) {
-            return Util::cachedCall(300, function () use ($device) {
+            return CacheUtil::cachedCall(300, function () use ($device) {
                 $extra = $device->get('extra', []);
                 //位置
                 if ($extra['location']['tencent']['area']) {
@@ -649,7 +650,7 @@ class device
             'w' => Request::str('w', 'goods'),
         ];
 
-        return Util::cachedCall(6, function () use ($user, $params) {
+        return CacheUtil::cachedCall(6, function () use ($user, $params) {
             return self::getStatisticsData($user, $params);
         }, $user->getId(), http_build_query($params));
     }

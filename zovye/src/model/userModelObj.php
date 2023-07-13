@@ -12,6 +12,7 @@ use DateTimeImmutable;
 use zovye\Account;
 use zovye\Balance;
 
+use zovye\CacheUtil;
 use zovye\ChargingNowData;
 use zovye\Contract\ICard;
 use zovye\Fueling;
@@ -542,7 +543,7 @@ class userModelObj extends modelObj
 
     public function isSigned(): bool
     {
-        return Util::expiredCallUtil("daily:sign_in:{$this->getId()}", new DateTime('next day 00:00'), function () {
+        return CacheUtil::expiredCallUtil("daily:sign_in:{$this->getId()}", new DateTime('next day 00:00'), function () {
             if ($this->getBalance()->log()->where([
                     'src' => Balance::SIGN_IN_BONUS,
                     'createtime >=' => (new DateTimeImmutable('00:00'))->getTimestamp(),
@@ -567,7 +568,7 @@ class userModelObj extends modelObj
             return false;
         }
 
-        Util::expire("daily:sign_in:{$this->getId()}");
+        CacheUtil::expire("daily:sign_in:{$this->getId()}");
 
         return true;
     }

@@ -30,7 +30,7 @@ $content = app()->fetchTemplate(
     [
         'chartId' => Util::random(10),
         'title' => $title,
-        'chart' => Util::cachedCall(30, function () use ($device, $month, $title) {
+        'chart' => CacheUtil::cachedCall(30, function () use ($device, $month, $title) {
             return Stats::chartDataOfMonth($device, $month, "设备：{$device->getName()}($title)", $device->isFuelingDevice() ? function ($val) {
                 return $val / 100;
             } : null);

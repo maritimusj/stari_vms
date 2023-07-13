@@ -15,7 +15,7 @@ class LogObj
         $app_name = APP_NAME;
         $this->tb_name = strtolower("{$app_name}_{$name}_logs");
 
-        Util::cachedCall(0, function () {
+        CacheUtil::cachedCall(0, function () {
             static::createDbTable($this->getTableName());
         }, $this->getTableName());
     }

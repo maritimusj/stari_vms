@@ -21,7 +21,7 @@ $content = app()->fetchTemplate(
     [
         'chartId' => Util::random(10),
         'title' => $title,
-        'chart' => Util::cachedCall(30, function () use ($device, $title) {
+        'chart' => CacheUtil::cachedCall(30, function () use ($device, $title) {
             return Stats::chartDataOfDay($device, new DateTime(), "设备：{$device->getName()}($title)", $device->isFuelingDevice() ? function ($val) {
                 return $val / 100;
             } : null);

@@ -12,7 +12,7 @@ $content = app()->fetchTemplate(
     'web/home/chart',
     [
         'chartId' => Util::random(10),
-        'data' => Util::cachedCall(30, function () {
+        'data' => CacheUtil::cachedCall(30, function () {
             $n = Request::int('n', 10);
 
             return Stats::chartDataOfAgents($n);

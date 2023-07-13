@@ -16,7 +16,7 @@ if (empty($device)) {
     JSON::fail([]);
 }
 
-$result = Util::cachedCall(60, function () use ($device) {
+$result = CacheUtil::cachedCall(60, function () use ($device) {
 
     if (Util::isSysLoadAverageOk()) {
         return $device->getPullStats();

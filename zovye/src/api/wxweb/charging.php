@@ -5,6 +5,7 @@ namespace zovye\api\wxweb;
 use zovye\api\wx\balance;
 use zovye\api\wx\common;
 use zovye\App;
+use zovye\CacheUtil;
 use zovye\Charging as IotCharging;
 use zovye\ChargingNowData;
 use zovye\Device;
@@ -92,7 +93,7 @@ class charging
 
         if ($lng > 0 && $lat > 0) {
             $distanceFN = function ($loc) use ($lng, $lat) {
-                $res = Util::cachedCall(10, function () use ($loc, $lng, $lat) {
+                $res = CacheUtil::cachedCall(10, function () use ($loc, $lng, $lat) {
                     return LocationUtil::getDistance($loc, ['lng' => $lng, 'lat' => $lat], 'driving');
                 }, $loc, $lng, $lat);
 
@@ -140,7 +141,7 @@ class charging
         $lat = Request::float('lat');
 
         if ($lng > 0 && $lat > 0) {
-            $res = Util::cachedCall(10, function () use ($group_data, $lng, $lat) {
+            $res = CacheUtil::cachedCall(10, function () use ($group_data, $lng, $lat) {
                 return LocationUtil::getDistance($group_data['loc'], ['lng' => $lng, 'lat' => $lat], 'driving');
             }, $group_data['loc'], $lng, $lat);
             $distance = is_error($res) ? 0 : $res;

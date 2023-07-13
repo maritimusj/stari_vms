@@ -10,6 +10,7 @@ use Exception;
 use RuntimeException;
 use zovye\Account;
 use zovye\App;
+use zovye\CacheUtil;
 use zovye\Device;
 use zovye\DeviceUtil;
 use zovye\HttpUtil;
@@ -161,7 +162,7 @@ class MoscaleAccount
 
     public static function getLabelList(): array
     {
-        return Util::cachedCall(30, function () {
+        return CacheUtil::cachedCall(30, function () {
             $acc = Account::findOneFromType(Account::MOSCALE);
             if ($acc) {
                 $config = $acc->settings('config', []);
@@ -178,7 +179,7 @@ class MoscaleAccount
 
     public static function getRegionData(): array
     {
-        return Util::cachedCall(30, function () {
+        return CacheUtil::cachedCall(30, function () {
             $acc = Account::findOneFromType(Account::MOSCALE);
             if ($acc) {
                 $config = $acc->settings('config', []);

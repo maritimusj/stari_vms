@@ -12,6 +12,7 @@ use DateTime;
 use DateTimeImmutable;
 use Exception;
 use zovye\Cache;
+use zovye\CacheUtil;
 use zovye\Config;
 use zovye\DeviceUtil;
 use zovye\Fueling;
@@ -1777,7 +1778,7 @@ class agent
         $e_ts,
         $cond = []
     ): array {
-        return Util::cachedCall(30, function () use ($openid, $s_ts, $e_ts, $cond) {
+        return CacheUtil::cachedCall(30, function () use ($openid, $s_ts, $e_ts, $cond) {
             $query = Order::query(
                 array_merge([
                     'createtime >=' => $s_ts,
@@ -2037,7 +2038,7 @@ class agent
             }
         }
 
-        return Util::cachedCall(30, function () use ($agent_id, $s_date, $e_date, $device_id) {
+        return CacheUtil::cachedCall(30, function () use ($agent_id, $s_date, $e_date, $device_id) {
 
             $condition = [
                 'agent_id' => $agent_id,
@@ -2125,7 +2126,7 @@ class agent
                 $format_data[] = $v;
             }
 
-            $devices = Util::cachedCall(300, function () use ($agent_id) {
+            $devices = CacheUtil::cachedCall(300, function () use ($agent_id) {
                 $devices = [];
                 $query = Device::query(['agent_id' => $agent_id]);
                 /** @var deviceModelObj $device */
@@ -2155,7 +2156,7 @@ class agent
     {
         $user = common::getAgentOrPartner();
 
-        return Util::cachedCall(30, function () use ($user) {
+        return CacheUtil::cachedCall(30, function () use ($user) {
 
             $condition = [];
             $condition['agent_id'] = $user->getAgentId();

@@ -99,7 +99,7 @@ $tpl_data['day_stats'] = app()->fetchTemplate(
     'web/common/stats',
     [
         'chartId' => Util::random(10),
-        'chart' => Util::cachedCall(30, function () use ($device) {
+        'chart' => CacheUtil::cachedCall(30, function () use ($device) {
             return Stats::chartDataOfDay($device, new DateTime());
         }, $device->getId()),
     ]
@@ -109,7 +109,7 @@ $tpl_data['month_stats'] = app()->fetchTemplate(
     'web/common/stats',
     [
         'chartId' => Util::random(10),
-        'chart' => Util::cachedCall(30, function () use ($device) {
+        'chart' => CacheUtil::cachedCall(30, function () use ($device) {
             return Stats::chartDataOfMonth($device, new DateTime());
         }, $device->getId()),
     ]

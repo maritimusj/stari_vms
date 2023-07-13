@@ -103,7 +103,7 @@ class Statistics
 
         $end->modify('next day 00:00');
 
-        return Util::cachedCall($end->getTimestamp() > time() ? 10 : 0, function () use ($device, $begin, $end) {
+        return CacheUtil::cachedCall($end->getTimestamp() > time() ? 10 : 0, function () use ($device, $begin, $end) {
             return self::calc($device, $begin, $end);
         }, $device->getId(), $begin->getTimestamp(), $end->getTimestamp());
     }
@@ -209,7 +209,7 @@ class Statistics
             }
 
             if ($obj instanceof agentModelObj) {
-                $total = (int)Util::cachedCall(0, function () use ($obj, $begin, $end) {
+                $total = (int)CacheUtil::cachedCall(0, function () use ($obj, $begin, $end) {
                     return CommissionBalance::query()->where([
                         'openid' => $obj->getOpenid(),
                         'src' => [
@@ -238,7 +238,7 @@ class Statistics
             return [];
         }
 
-        return Util::cachedCall($begin->format('Y-m') === date('Y-m') ? 10 : 0, function () use ($fn, $day, $begin) {
+        return CacheUtil::cachedCall($begin->format('Y-m') === date('Y-m') ? 10 : 0, function () use ($fn, $day, $begin) {
             $result = [
                 'summary' => $fn($begin, 'month'),
             ];

@@ -17,7 +17,7 @@ if (empty($device)) {
     JSON::fail('找不到这个设备！');
 }
 
-list($m, $total) = Util::cachedCall(30, function () use ($device) {
+list($m, $total) = CacheUtil::cachedCall(30, function () use ($device) {
     //开始 结束
     $first_order = Order::getFirstOrderOfDevice($device);
     $last_order = Order::getLastOrderOfDevice($device);

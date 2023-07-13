@@ -10,6 +10,23 @@ class Request
 {
     private static $data = [];
 
+    /**
+     * 将ajax请求中的的json数据合并到$GLOBALS['_GPC']中.
+     */
+    public static function extraAjaxJsonData()
+    {
+        if (stripos($_SERVER['CONTENT_TYPE'], 'application/json') !== false) {
+            $input = file_get_contents('php://input');
+            if (!empty($input)) {
+                $data = @json_decode($input, true);
+                if (!empty($data)) {
+                    $GLOBALS['_GPC'] = array_merge($GLOBALS['_GPC'], $data);
+                    setW('isajax', true);
+                }
+            }
+        }
+    }
+
     public static function setData($data = [])
     {
         self::$data = $data;

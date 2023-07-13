@@ -10,9 +10,8 @@ defined('IN_IA') or exit('Access Denied');
 
 use zovye\api\router;
 use zovye\Request;
-use zovye\Util;
 
-Util::extraAjaxJsonData();
+Request::extraAjaxJsonData();
 
 $op = Request::op('default');
 

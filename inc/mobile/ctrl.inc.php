@@ -8,7 +8,7 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-Util::extraAjaxJsonData();
+Request::extraAjaxJsonData();
 
 $op = 'default';
 $data = [];

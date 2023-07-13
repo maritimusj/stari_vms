@@ -12,6 +12,7 @@ use zovye\CtrlServ;
 use zovye\Device;
 use zovye\Log;
 use zovye\Request;
+use zovye\SMSUtil;
 use zovye\Util;
 use zovye\Wx;
 use function zovye\request;
@@ -35,7 +36,7 @@ if ($op == 'remain_warning' && CtrlServ::checkJobSign(['id' => request('id')])) 
             if ($reload_tp_lid) {
                 foreach ($device->getKeepers() as $keeper) {
                     if ($keeper && $keeper->getMobile()) {
-                        $log['sms'][$keeper->getName()] = Util::sendSMS(
+                        $log['sms'][$keeper->getName()] = SMSUtil::send(
                             $keeper->getMobile(),
                             $reload_tp_lid,
                             [

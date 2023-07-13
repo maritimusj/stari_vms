@@ -1077,53 +1077,6 @@ include './index.php';
     }
 
     /**
-     * 发送短信
-     *
-     * @param $mobile
-     * @param $tpl_id
-     * @param $msg
-     *
-     * @return bool|array
-     */
-    public static function sendSMS($mobile, $tpl_id, $msg)
-    {
-        $config = settings('notice.sms', []);
-
-        if ($config['url'] && $config['appkey']) {
-            $tpl_value = '';
-
-            if (is_string($msg)) {
-                $tpl_value = $msg;
-            } elseif (is_array($msg)) {
-                $arr = [];
-                foreach ($msg as $key => $value) {
-                    $arr[] = "#$key#=".urlencode($value);
-                }
-
-                $tpl_value = implode('&', $arr);
-            }
-
-            $res = ihttp::post($config['url'], [
-                'mobile' => $mobile,
-                'tpl_id' => $tpl_id,
-                'tpl_value' => urlencode($tpl_value),
-                'key' => $config['appkey'],
-            ]);
-
-            if ($res['code'] == 200) {
-                $result = json_decode($res['content'], true);
-                if ($result['error_code'] === 0) {
-                    return true;
-                }
-
-                return err($result['reason']);
-            }
-        }
-
-        return err('请先配置短信接口！');
-    }
-
-    /**
      * 返回用户还需要关注的公众号列表.
      *
      * @param deviceModelObj $device
@@ -1297,7 +1250,7 @@ include './index.php';
         return '#'.implode('', $arr);
     }
 
-    public static function buildUrl($parsed_url)
+    public static function buildUrl($parsed_url): string
     {
         $scheme = isset($parsed_url['scheme']) ? $parsed_url['scheme'].'://' : '';
         $host = $parsed_url['host'] ?? '';

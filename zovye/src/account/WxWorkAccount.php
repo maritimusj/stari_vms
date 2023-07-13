@@ -15,6 +15,7 @@ use zovye\Log;
 use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
+use zovye\QRCodeUtil;
 use zovye\Session;
 use zovye\Util;
 use function zovye\is_error;
@@ -121,7 +122,7 @@ class WxWorkAccount extends AQIInfo
                         $data['name'] = $result['data']['name'];
                     }
 
-                    $res = Util::createQrcodeFile("wxWork{$result['data']['ticket']}", $result['data']['url']);
+                    $res = QRCodeUtil::createFile("wxWork{$result['data']['ticket']}", $result['data']['url']);
                     if (is_error($res)) {
                         Log::error('wxWork', [
                             'error' => 'fail to createQrcode file',

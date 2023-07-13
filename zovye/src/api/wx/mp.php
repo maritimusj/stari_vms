@@ -11,6 +11,7 @@ use zovye\App;
 use zovye\FlashEgg;
 use zovye\Goods;
 use zovye\Log;
+use zovye\QRCodeUtil;
 use zovye\We7;
 use zovye\Util;
 use zovye\Media;
@@ -620,7 +621,7 @@ class mp
             'uid' => $account_uid,
         ]);
 
-        $result = Util::createQrcodeFile("douyin_$account_uid", DouYin::redirectToAuthorizeUrl($url, true));
+        $result = QRCodeUtil::createFile("douyin_$account_uid", DouYin::redirectToAuthorizeUrl($url, true));
 
         if (is_error($result)) {
             return err('创建二维码文件失败！');

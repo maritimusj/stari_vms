@@ -37,8 +37,8 @@ for($i = 0; $i < $num; $i++ ) {
 
     $qrcode_url = Util::murl('account', ['op' => 'lucky', 'code' => base64_encode("$id:$serial:$secret")]);
 
-    $qrcode_file = Util::createQrcodeFile("lucky.$serial", $qrcode_url, function ($filename) use($serial) {
-        Util::renderTxt($filename,  $serial);
+    $qrcode_file = QRCodeUtil::createFile("lucky.$serial", $qrcode_url, function ($filename) use($serial) {
+        QRCodeUtil::renderTxt($filename,  $serial);
     });
 
     if (is_error($qrcode_file)) {

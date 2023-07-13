@@ -14,7 +14,7 @@ $qrcode = settings('misc.qrcode', []);
 if (empty($qrcode['url'])) {
 
     $url = Util::shortMobileUrl('qrcode');
-    $qrcode = Util::createQrcodeFile('qrcode.'.time(), $url);
+    $qrcode = QRCodeUtil::createFile('qrcode.'.time(), $url);
 
     updateSettings(
         'misc.qrcode',

@@ -1120,7 +1120,7 @@ class Account extends State
         if (empty($account)) {
             $qrcode_url = getArray($profile, 'authorizer_info.qrcode_url', '');
             if ($qrcode_url) {
-                $qrcode_url = Util::toMedia(Util::downloadQRCode($qrcode_url));
+                $qrcode_url = Util::toMedia(QRCodeUtil::downloadQRCode($qrcode_url));
             }
             $data = [
                 'agent_id' => $agent_id,

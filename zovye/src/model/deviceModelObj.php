@@ -17,6 +17,7 @@ use zovye\Locker;
 use zovye\Package;
 use zovye\PayloadLogs;
 use zovye\PlaceHolder;
+use zovye\QRCodeUtil;
 use zovye\SIM;
 use zovye\Stats;
 use zovye\We7;
@@ -1161,11 +1162,11 @@ class deviceModelObj extends modelObj
                     'charger' => $chargerID,
                 ]);
 
-                $qrcode_file = Util::createQrcodeFile(
+                $qrcode_file = QRCodeUtil::createFile(
                     "device.$this->imei$chargerID",
                     $url,
                     function ($filename) use ($chargerID) {
-                        Util::renderTxt($filename, sprintf("%s%02d", $this->imei, $chargerID));
+                        QRCodeUtil::renderTxt($filename, sprintf("%s%02d", $this->imei, $chargerID));
                     }
                 );
                 if (is_error($qrcode_file)) {
@@ -1177,8 +1178,8 @@ class deviceModelObj extends modelObj
 
         $url = $this->getUrl();
 
-        $qrcode_file = Util::createQrcodeFile("device.$this->imei", $url, function ($filename) {
-            Util::renderTxt($filename, $this->imei);
+        $qrcode_file = QRCodeUtil::createFile("device.$this->imei", $url, function ($filename) {
+            QRCodeUtil::renderTxt($filename, $this->imei);
         });
 
         if (is_error($qrcode_file)) {

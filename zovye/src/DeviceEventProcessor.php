@@ -569,7 +569,7 @@ class DeviceEventProcessor
 
             //发送设备注册二维码
             $url = Util::murl('app', ['id' => $app_id]);
-            $qrcode = Util::createQrcodeFile("app.$app_id", $url);
+            $qrcode = QRCodeUtil::createFile("app.$app_id", $url);
             $result['qrcode'] = strval(Util::toMedia($qrcode));
             $result['qrcode_url'] = $url;
             $result['reginfo'] = [

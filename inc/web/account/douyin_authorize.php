@@ -22,7 +22,7 @@ $url = Util::murl('douyin', [
     'id' => $account->getId(),
 ]);
 
-$result = Util::createQrcodeFile("douyin.{$account->getId()}", DouYin::redirectToAuthorizeUrl($url, true));
+$result = QRCodeUtil::createFile("douyin.{$account->getId()}", DouYin::redirectToAuthorizeUrl($url, true));
 
 if (is_error($result)) {
     JSON::fail('创建二维码文件失败！');

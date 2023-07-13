@@ -6,7 +6,7 @@ use ZipArchive;
 $url_tmpl = "https://xxx.com/app/index.php?i=2&c=entry&app=NULL&from=device&device={uid}&do=entry&m=zy_saas";
 
 $list = [
-
+    //加入需要创建二维码的网址
 ];
 
 $zip = new ZipArchive();
@@ -16,8 +16,8 @@ $zip->open($zip_filename, ZipArchive::CREATE);
 
 foreach($list as $uid) {
     $url = str_replace("{uid}", $uid, $url_tmpl);
-    Util::createQrcodeFile("device.$uid", $url, function ($filename) use($uid, $zip) {
-        Util::renderTxt($filename, $uid);
+    QRCodeUtil::createFile("device.$uid", $url, function ($filename) use($uid, $zip) {
+        QRCodeUtil::renderTxt($filename, $uid);
         $zip->addFile($filename, "$uid.png");
     });
 }

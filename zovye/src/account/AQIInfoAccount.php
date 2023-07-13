@@ -15,6 +15,7 @@ use zovye\Log;
 use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
+use zovye\QRCodeUtil;
 use zovye\Session;
 use zovye\Util;
 use function zovye\is_error;
@@ -94,7 +95,7 @@ class AQIInfoAccount extends AQIInfo
                         $data['name'] = $result['data']['name'];
                     }
 
-                    $res = Util::createQrcodeFile("aqiinfo.{$result['data']['ticket']}", $result['data']['url']);
+                    $res = QRCodeUtil::createFile("aqiinfo.{$result['data']['ticket']}", $result['data']['url']);
                     if (is_error($res)) {
                         Log::error('AQIInfo', [
                             'error' => 'fail to createQrcode file',

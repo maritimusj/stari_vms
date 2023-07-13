@@ -446,7 +446,7 @@ $res = DBUtil::transactionDo(function () {
                 'score' => Request::int('score'),
             ]);
 
-            $qrcode_url = Util::createQrcodeFile("question.{$account->getUid()}", $account->getUrl());
+            $qrcode_url = QRCodeUtil::createFile("question.{$account->getUid()}", $account->getUrl());
             if (is_error($qrcode_url)) {
                 return err('二维码生成失败！');
             }

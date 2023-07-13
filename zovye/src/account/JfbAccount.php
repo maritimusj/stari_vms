@@ -19,6 +19,7 @@ use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 use zovye\Order;
 use zovye\PlaceHolder;
+use zovye\QRCodeUtil;
 use zovye\Session;
 use zovye\User;
 use zovye\Util;
@@ -139,7 +140,7 @@ class JfbAccount
                     $data['img'] = $item['headImgUrl'] ?: Account::JFB_HEAD_IMG;
                     $data['qrcode'] = $item['qrPicUrl'];
                 } elseif ($item['link']) {
-                    $res = Util::createQrcodeFile("jfb.".sha1($item['link']), $item['link']);
+                    $res = QRCodeUtil::createFile("jfb.".sha1($item['link']), $item['link']);
                     if (is_error($res)) {
                         Log::error('jfb', [
                             'error' => 'fail to createQrcode file',

@@ -8,7 +8,7 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-$result = Util::createQrcodeFile('testing', Util::murl('testing'));
+$result = QRCodeUtil::createFile('testing', Util::murl('testing'));
 
 if (is_error($result)) {
     JSON::fail('创建二维码文件失败！');

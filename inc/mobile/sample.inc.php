@@ -35,7 +35,7 @@ $params = [
 ];
 
 $getUserFN = function () use (&$params) {
-    $user = Util::getCurrentUser($params);
+    $user = Session::getCurrentUser($params);
     if (empty($user)) {
         Response::alert('请用微信或者支付宝扫描二维码，谢谢！', 'error');
     }

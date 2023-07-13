@@ -33,7 +33,7 @@ if ($op == 'default') {
 
 } elseif ($op == 'play') {
 
-    $user = Util::getCurrentUser();
+    $user = Session::getCurrentUser();
     if (empty($user) || $user->isBanned()) {
         JSON::fail(['text' => '领取失败', 'msg' => '找不到用户或者用户无法领取']);
     }
@@ -123,7 +123,7 @@ if ($op == 'default') {
 
 } elseif ($op == 'get') {
 
-    $user = Util::getCurrentUser();
+    $user = Session::getCurrentUser();
     if (empty($user) || $user->isBanned()) {
         Response::alert('找不到用户或者用户无法领取', 'error');
     }
@@ -166,7 +166,7 @@ if ($op == 'default') {
 
 } elseif ($op == 'get_list') {
 
-    $user = Util::getCurrentUser();
+    $user = Session::getCurrentUser();
     if (empty($user)) {
         JSON::fail('找不到这个用户！');
     }
@@ -263,7 +263,7 @@ if ($op == 'default') {
 
 } elseif ($op == 'get_url') {
 
-    $user = Util::getCurrentUser();
+    $user = Session::getCurrentUser();
     if (empty($user)) {
         JSON::fail('找不到这个用户！');
     }
@@ -310,7 +310,7 @@ if ($op == 'default') {
 
 } elseif ($op == 'get_bonus') {
 
-    $user = Util::getCurrentUser();
+    $user = Session::getCurrentUser();
     if (empty($user)) {
         JSON::fail('无法获取用户信息！');
     }
@@ -338,7 +338,7 @@ if ($op == 'default') {
 
 } elseif ($op == 'detail') {
 
-    $user = Util::getCurrentUser();
+    $user = Session::getCurrentUser();
     if (empty($user)) {
         JSON::fail('无法获取用户信息！');
     }
@@ -368,7 +368,7 @@ if ($op == 'default') {
 
 } elseif ($op == 'result') {
 
-    $user = Util::getCurrentUser();
+    $user = Session::getCurrentUser();
     if (empty($user)) {
         JSON::fail('无法获取用户信息！');
     }

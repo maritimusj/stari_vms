@@ -9,6 +9,7 @@ namespace zovye\api\wx;
 use DateTime;
 use Exception;
 use zovye\CacheUtil;
+use zovye\DeviceUtil;
 use zovye\GDCVMachine;
 use zovye\Inventory;
 use zovye\Locker;
@@ -269,7 +270,7 @@ class device
     public static function deviceNearBy(): array
     {
         $agent = common::getAgent();
-        return Util::getNearByDevices($agent);
+        return DeviceUtil::getNearByDevices($agent);
     }
 
     /**

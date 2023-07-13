@@ -14,7 +14,7 @@ if (App::isSNTOEnabled()) {
 
     $op = Request::op('default');
     if ($op == 'snto_auth') {
-        $user = Util::getCurrentUser();
+        $user = Session::getCurrentUser();
         if (empty($user)) {
             Response::alert('请用微信打开！', 'error');
         }

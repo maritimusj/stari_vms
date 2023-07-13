@@ -10,7 +10,7 @@ defined('IN_IA') or exit('Access Denied');
 
 use zovye\model\advs_statsModelObj;
 
-$user = Util::getCurrentUser();
+$user = Session::getCurrentUser();
 $adv = Advertising::get(Request::int('advsid'));
 
 if ($user && $adv) {

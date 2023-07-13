@@ -10,7 +10,7 @@ if (!App::isFlashEggEnabled()) {
     JSON::fail('这个功能没有启用！');
 }
 
-$user = Util::getCurrentUser();
+$user = Session::getCurrentUser();
 if (empty($user) || $user->isBanned()) {
     JSON::fail('找不到用户或者用户无法领取');
 }

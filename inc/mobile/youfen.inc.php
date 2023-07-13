@@ -13,7 +13,7 @@ use zovye\account\YouFenAccount;
 $op = Request::op('default');
 
 if ($op == 'yf_auth') {
-    $user = Util::getCurrentUser();
+    $user = Session::getCurrentUser();
     if (empty($user)) {
         Response::alert('请用微信打开！', 'error');
     }

@@ -15,6 +15,7 @@ use zovye\Log;
 use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
+use zovye\Session;
 use zovye\Util;
 use function zovye\is_error;
 
@@ -123,9 +124,9 @@ class AQIInfoAccount extends AQIInfo
     }
 
 
-    public function fetchOne(deviceModelObj $device, userModelObj $user, callable $cb = null): array
+    public function fetchOne(deviceModelObj $device, userModelObj $user = null, callable $cb = null): array
     {
-        $fans = empty($user) ? Util::fansInfo() : $user->profile();
+        $fans = empty($user) ? Session::fansInfo() : $user->profile();
 
         $data = [
             'appKey' => $this->app_key,

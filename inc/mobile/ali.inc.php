@@ -18,7 +18,7 @@ if ($op == 'auth') {
     if (empty($code)) {
         Response::alert('获取用户auth_code失败！', 'error');
     }
-    if (!Util::getAliUser($code)) {
+    if (!Session::getAliUser($code)) {
         Response::alert('获取用户信息失败[02]', 'error');
     }
 }
@@ -51,7 +51,7 @@ if ($device->isDown()) {
     Response::alert('设备维护中，请稍后再试！', 'error');
 }
 
-$user = Util::getCurrentUser();
+$user = Session::getCurrentUser();
 if (empty($user)) {
     Response::alert('请重新扫描二维码，谢谢！', 'error');
 }

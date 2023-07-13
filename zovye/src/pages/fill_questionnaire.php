@@ -29,7 +29,7 @@ $tpl_data = Util::getTplData([$user, $account]);
 $api_url = Util::murl('account', $tid ? ['tid' => $tid] : []);
 $jquery_url = JS_JQUERY_URL;
 
-$js_sdk = Util::fetchJSSDK();
+$js_sdk = Session::fetchJSSDK();
 $serial = REQUEST_ID;
 $device_uid = $device ? $device->getShadowId() : '';
 

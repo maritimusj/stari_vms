@@ -133,7 +133,7 @@
             {/if}
         </div>
         <script src="{php echo JS_JQUERY_URL}"></script>
-        {php echo \zovye\Util::fetchJSSDK(false);}
+        {php echo \zovye\Session::fetchJSSDK(false);}
         <script>
             wx.ready(function() {
                 function query(m) {

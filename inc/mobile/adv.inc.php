@@ -10,7 +10,7 @@ use DateTime;
 
 defined('IN_IA') or exit('Access Denied');
 
-$user = Util::getCurrentUser();
+$user = Session::getCurrentUser();
 if (empty($user) || $user->isBanned()) {
     JSON::fail('找不到用户或者用户无法领取');
 }

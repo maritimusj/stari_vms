@@ -19,6 +19,7 @@ use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 use zovye\Order;
+use zovye\Session;
 use zovye\User;
 use zovye\Util;
 use function zovye\err;
@@ -198,7 +199,7 @@ class ZhiJinBaoAccount
         $params = [],
         callable $cb = null
     ): array {
-        $profile = empty($user) ? Util::fansInfo() : $user->profile();
+        $profile = empty($user) ? Session::fansInfo() : $user->profile();
 
         $params = array_merge($params, [
             'zjbAppId' => $this->app_id,

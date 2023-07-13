@@ -11,6 +11,7 @@ use zovye\Contract\IPay;
 use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
+use zovye\Session;
 use zovye\Util;
 use zovye\We7;
 use function zovye\_W;
@@ -155,7 +156,7 @@ class WXPay implements IPay
     {
         $device_uid = $device->getImei();
 
-        $js_sdk = Util::fetchJSSDK(false);
+        $js_sdk = Session::fetchJSSDK(false);
         $jquery_url = JS_JQUERY_URL;
         $order_api_url = Util::murl('order', ['deviceUID' => $device_uid]);
         $pay_result_url = Util::murl('payresult', ['orderNO' => '__orderNO__', 'deviceid' => $device->getId()]);

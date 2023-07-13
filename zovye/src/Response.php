@@ -107,7 +107,7 @@ class Response
         }
 
         if (_W('container') == 'wechat') {
-            $jssdk = Util::fetchJSSDK();
+            $jssdk = Session::fetchJSSDK();
             $js = <<<JS1
 $jssdk
 <script type="text/javascript">
@@ -124,7 +124,7 @@ $jssdk
     }
 </script>
 JS1;
-        } elseif (Util::isAliAppContainer()) {
+        } elseif (Session::isAliAppContainer()) {
             $js = <<<JS2
 <script src="https://gw.alipayobjects.com/as/g/h5-lib/alipayjsapi/3.1.1/alipayjsapi.inc.min.js"></script>
 <script>

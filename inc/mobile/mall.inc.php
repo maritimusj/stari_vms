@@ -9,7 +9,7 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-$user = Util::getCurrentUser();
+$user = Session::getCurrentUser();
 if (empty($user) || $user->isBanned()) {
     if (Request::is_ajax()) {
         JSON::fail('找不到这个用户！');

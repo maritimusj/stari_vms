@@ -18,7 +18,7 @@ $params = [
     ],
 ];
 
-$user = Util::getCurrentUser($params);
+$user = Session::getCurrentUser($params);
 
 if (empty($user) || $user->isBanned() || !$user->isTester()) {
     Response::alert('对不起，只有测试人员才能访问！', 'error');
@@ -28,7 +28,7 @@ $op = Request::op();
 if (empty($op)) {
     app()->showTemplate('testing', [
         'api_url' => Util::murl('testing'),
-        'jssdk' => Util::fetchJSSDK(),
+        'jssdk' => Session::fetchJSSDK(),
     ]);
 } else {
     if ($op == "detail") {

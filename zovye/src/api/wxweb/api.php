@@ -10,6 +10,7 @@ namespace zovye\api\wxweb;
 use DateTime;
 use zovye\Account;
 use zovye\Advertising;
+use zovye\DeviceUtil;
 use zovye\Goods;
 use zovye\Helper;
 use zovye\Job;
@@ -71,7 +72,7 @@ class api
 
     public static function nearBy(): array
     {
-        return Util::getNearByDevices();
+        return DeviceUtil::getNearByDevices();
     }
 
     public static function migrateUrl(): array

@@ -11,7 +11,7 @@ defined('IN_IA') or exit('Access Denied');
 use Exception;
 use RuntimeException;
 
-$user = Util::getCurrentUser();
+$user = Session::getCurrentUser();
 if (empty($user) || $user->isBanned()) {
     JSON::fail(['text' => '领取失败', 'msg' => '找不到用户或者用户无法领取']);
 }

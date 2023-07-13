@@ -26,7 +26,7 @@ $user_json_str = json_encode($user_data, JSON_HEX_TAG | JSON_HEX_QUOT);
 $api_url = Util::murl('bonus');
 $jquery_url = JS_JQUERY_URL;
 
-$js_sdk = Util::fetchJSSDK();
+$js_sdk = Session::fetchJSSDK();
 
 $tpl_data['js']['code'] = <<<JSCODE
 <script src="$jquery_url"></script>

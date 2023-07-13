@@ -17,6 +17,7 @@ use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 use zovye\Order;
+use zovye\Session;
 use zovye\User;
 use zovye\Util;
 use function zovye\err;
@@ -246,7 +247,7 @@ class SNTOAccount
     {
         $url = self::API_URL.'/v3/qrcode.json';
 
-        $fans = empty($user) ? Util::fansInfo() : $user->profile();
+        $fans = empty($user) ? Session::fansInfo() : $user->profile();
         $uid = App::uid(6);
         $data = [
             'stOpenId' => $snto_openid,

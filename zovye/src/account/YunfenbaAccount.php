@@ -17,6 +17,7 @@ use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 use zovye\Order;
+use zovye\Session;
 use zovye\User;
 use zovye\Util;
 use function zovye\err;
@@ -131,7 +132,7 @@ class YunfenbaAccount
         ];
     }
 
-    public function getTask(deviceModelObj $device, userModelObj $user, callable $cb = null): array
+    public function getTask(deviceModelObj $device, userModelObj $user = null, callable $cb = null): array
     {
         $url = str_replace('{vendor_uid}', $this->vendor_uid, self::GET_TASK_URL);
         if (!empty($this->sub_uid)) {
@@ -140,7 +141,7 @@ class YunfenbaAccount
 
         $scene = $device->settings('extra.yunfenba.scene', '');
 
-        $fans = empty($user) ? Util::fansInfo() : $user->profile();
+        $fans = empty($user) ? Session::fansInfo() : $user->profile();
 
         $data = [
             'userid' => $fans['openid'],

@@ -38,7 +38,7 @@ if ($tpl['device']['id']) {
     }
 }
 
-$js_sdk = Util::fetchJSSDK();
+$js_sdk = Session::fetchJSSDK();
 
 $api_url = Util::murl('util', ['op' => 'accounts', 'id' => $tpl['device']['shadowId']]);
 

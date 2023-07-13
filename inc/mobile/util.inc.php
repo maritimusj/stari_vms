@@ -13,12 +13,12 @@ use Exception;
 $op = Request::op('default');
 if ($op == 'default') {
 
-    $js_sdk = Util::fetchJSSDK();
+    $js_sdk = Session::fetchJSSDK();
     app()->showTemplate('map', ['jssdk' => $js_sdk]);
 
 } elseif ($op == 'user') {
 
-    $user = Util::getCurrentUser();
+    $user = Session::getCurrentUser();
     if (empty($user) || $user->isBanned()) {
         Response::alert('请使用微信打开！', 'error');
     }
@@ -33,7 +33,7 @@ if ($op == 'default') {
 } elseif ($op == 'data') {
 
     //请求附近设备数据
-    $result = Util::getNearByDevices();
+    $result = DeviceUtil::getNearByDevices();
     JSON::success($result);
 
 } elseif ($op == 'location') {
@@ -47,7 +47,7 @@ if ($op == 'default') {
         JSON::fail('无效的参数！');
     }
 
-    $user = Util::getCurrentUser();
+    $user = Session::getCurrentUser();
     if (empty($user)) {
         JSON::fail('只能从微信中打开！');
     }
@@ -67,7 +67,7 @@ if ($op == 'default') {
 
 } elseif ($op == 'adv_review') {
 
-    $user = Util::getCurrentUser();
+    $user = Session::getCurrentUser();
     if (empty($user) || $user->isBanned()) {
         Response::alert('找不到这个用户或者用户已被禁用！', 'error');
     }
@@ -182,7 +182,7 @@ if ($op == 'default') {
     app()->showTemplate('review', $tpl_data);
 
 } elseif ($op == 'profile') {
-    $user = Util::getCurrentUser();
+    $user = Session::getCurrentUser();
     if ($user) {
         if (Request::has('sex')) {
             $user->updateSettings('customData.sex', Request::int('sex'));
@@ -195,7 +195,7 @@ if ($op == 'default') {
 
 } elseif ($op == 'upload_pic') {
 
-    $user = Util::getCurrentUser();
+    $user = Session::getCurrentUser();
     if (empty($user) || $user->isBanned()) {
         JSON::fail('找不到用户！');
     }
@@ -221,7 +221,7 @@ if ($op == 'default') {
 } elseif ($op == 'migrate') {
     //代理商小程序更改后，代理商数据迁移
 
-    $user = Util::getCurrentUser([
+    $user = Session::getCurrentUser([
         'create' => true,
         'update' => true,
     ]);

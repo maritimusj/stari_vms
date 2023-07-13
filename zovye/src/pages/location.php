@@ -22,7 +22,7 @@ $api_url = Util::murl('util', ['op' => 'location', 'id' => $tpl['device']['shado
 $jquery_url = JS_JQUERY_URL;
 $lbs_key = settings('user.location.appkey', DEFAULT_LBS_KEY);
 
-if (Util::isDouYinAppContainer()) {
+if (Session::isDouYinAppContainer()) {
     $tpl['js']['code'] = <<<JSCODE
 <script src="$jquery_url"></script>
 <script src="https://mapapi.qq.com/web/mapComponents/geoLocation/v/geolocation.min.js"></script>
@@ -62,7 +62,7 @@ if (Util::isDouYinAppContainer()) {
 </script>
 JSCODE;
 } else {
-    $js_sdk = Util::fetchJSSDK();
+    $js_sdk = Session::fetchJSSDK();
     $tpl['js']['code'] = <<<JSCODE
             <script src="$jquery_url"></script>
             <script src="https://mapapi.qq.com/web/mapComponents/geoLocation/v/geolocation.min.js"></script>

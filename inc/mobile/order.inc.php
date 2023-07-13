@@ -16,7 +16,7 @@ $op = Request::op('default');
 if ($op === 'create') {
 
     //确定用户身份
-    $user = Util::getCurrentUser();
+    $user = Session::getCurrentUser();
     if (empty($user) || $user->isBanned()) {
         JSON::fail('找不到用户或者用户无法购买！');
     }
@@ -158,7 +158,7 @@ if ($op === 'create') {
         
     } else {
         //查询订单状态
-        $user = Util::getCurrentUser();
+        $user = Session::getCurrentUser();
         if (empty($user) || $user->isBanned()) {
             JSON::fail(['code' => 401, 'msg' => '找不到用户或者用户无法领取！']);
         }
@@ -285,7 +285,7 @@ if ($op === 'create') {
 
 } elseif ($op == 'retry') {
     //确定用户身份
-    $user = Util::getCurrentUser();
+    $user = Session::getCurrentUser();
     if (empty($user) || $user->isBanned()) {
         JSON::fail('找不到用户或者用户已禁用！');
     }
@@ -349,7 +349,7 @@ if ($op === 'create') {
     if (Request::has('user') && App::isCZTVEnabled()) {
         $user = User::get(Request::str('user'), true);
     } else {
-        $user = Util::getCurrentUser();
+        $user = Session::getCurrentUser();
     }
     
     if (empty($user) || $user->isBanned()) {
@@ -391,7 +391,7 @@ if ($op === 'create') {
     if (Request::has('user') && App::isCZTVEnabled()) {
         $user = User::get(Request::str('user'), true);
     } else {
-        $user = Util::getCurrentUser();
+        $user = Session::getCurrentUser();
     }
     
     if (empty($user) || $user->isBanned()) {

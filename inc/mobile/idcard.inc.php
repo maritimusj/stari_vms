@@ -11,7 +11,7 @@ use zovye\model\userModelObj;
 defined('IN_IA') or exit('Access Denied');
 
 //确定用户身份
-$user = Util::getCurrentUser();
+$user = Session::getCurrentUser();
 if (empty($user) || $user->isBanned()) {
     JSON::fail('找不到用户或者用户无法购买！');
 }
@@ -112,7 +112,7 @@ if ($op == 'default') {
 
 } elseif ($op == 'verify_18') {
 
-    $user = Util::getCurrentUser();
+    $user = Session::getCurrentUser();
 
     if ($user->isIDCardVerified()) {
         JSON::success('用户已通过实名认证！');
@@ -200,7 +200,7 @@ if ($op == 'default') {
 } elseif ($op == 'save') {
 
     /** @var userModelObj $user */
-    $user = Util::getCurrentUser();
+    $user = Session::getCurrentUser();
 
     $name = Request::trim('name');
     if (empty($name)) {

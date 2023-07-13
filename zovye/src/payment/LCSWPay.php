@@ -12,6 +12,7 @@ use zovye\Contract\IPay;
 use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
+use zovye\Session;
 use zovye\Util;
 use function zovye\_W;
 use function zovye\err;
@@ -276,7 +277,7 @@ ALI_JSCODE;
 
     protected function getWxPayJs(array $params = []): string
     {
-        $js_sdk = Util::fetchJSSDK(false);
+        $js_sdk = Session::fetchJSSDK(false);
 
         return <<<JSCODE
 <script src="{$params['JQueryURL']}"></script>

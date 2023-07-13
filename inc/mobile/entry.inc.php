@@ -16,14 +16,14 @@ $account_id = Request::str('account');
 $xid = Request::str('xid');
 $tid = Request::str('tid');
 
-if (Util::isAliAppContainer()) {
+if (Session::isAliAppContainer()) {
     $ali_entry_url = Util::murl('ali', [
         'from' => $from,
         'device' => $device_id,
     ]);
 
     Response::redirect($ali_entry_url);
-} elseif (Util::isDouYinAppContainer()) {
+} elseif (Session::isDouYinAppContainer()) {
     $douyin_entry_url = Util::murl('douyin', [
         'from' => $from,
         'device' => $device_id,
@@ -179,7 +179,7 @@ if ($device_id) {
     ];
 }
 
-$user = Util::getCurrentUser($params);
+$user = Session::getCurrentUser($params);
 if (empty($user)) {
     Response::alert('请用微信或者支付宝扫描二维码，谢谢！', 'error');
 }

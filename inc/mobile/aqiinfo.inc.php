@@ -29,7 +29,7 @@ if (Request::str('appResult') == 'nomore') {
         Response::alert('请重新扫描设备二维码[02]，谢谢！', 'error');
     }
 
-    $user = Util::getCurrentUser();
+    $user = Session::getCurrentUser();
     if (empty($user)) {
         Response::alert('请重新扫描设备二维码[03]，谢谢！', 'error');
     }

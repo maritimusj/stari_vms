@@ -11,7 +11,7 @@ defined('IN_IA') or exit('Access Denied');
 if (!App::isDonatePayEnabled()) {
     JSON::fail('没有启用这个功能！');
 }
-$user = Util::getCurrentUser();
+$user = Session::getCurrentUser();
 if (empty($user) || $user->isBanned()) {
     JSON::fail('找不到用户或者用户被禁用！');
 }

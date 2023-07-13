@@ -41,7 +41,7 @@ if ($op == 'check') {
     JSON::success('Ok');
 }
 
-$user = Util::getCurrentUser([
+$user = Session::getCurrentUser([
     'create' => true,
     'update' => true,
 ]);
@@ -98,7 +98,7 @@ $user_data = [
 
 $user_json_str = json_encode($user_data, JSON_HEX_TAG | JSON_HEX_QUOT);
 
-$js_sdk = Util::fetchJSSDK();
+$js_sdk = Session::fetchJSSDK();
 $jquery_url = JS_JQUERY_URL;
 
 $api_url = Util::murl('weisure', [

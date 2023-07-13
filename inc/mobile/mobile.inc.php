@@ -21,7 +21,7 @@ $params = [
     'update' => true,
 ];
 
-$user = Util::getCurrentUser($params);
+$user = Session::getCurrentUser($params);
 if (empty($user)) {
     Response::alert('只能从微信中打开，谢谢！', 'error');
 }

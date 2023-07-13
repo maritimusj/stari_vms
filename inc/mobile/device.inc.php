@@ -34,7 +34,7 @@ if ($op == 'default') {
 
 } elseif ($op == 'feed_back') {
 
-    $user = Util::getCurrentUser();
+    $user = Session::getCurrentUser();
     if (empty($user) || $user->isBanned()) {
         JSON::fail('找不到用户！');
     }
@@ -121,7 +121,7 @@ if ($op == 'default') {
     if (Request::has('user')) {
         $user = User::get(Request::str('user'), true);
     } else {
-        $user = Util::getCurrentUser();
+        $user = Session::getCurrentUser();
     }
     
     if (empty($user) || $user->isBanned()) {
@@ -148,7 +148,7 @@ if ($op == 'default') {
         JSON::fail('找不到这个设备！');
     }
 
-    $user = Util::getCurrentUser();
+    $user = Session::getCurrentUser();
     if (empty($user) || $user->isBanned()) {
         JSON::fail('找不到用户！');
     }

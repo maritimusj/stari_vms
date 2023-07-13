@@ -19,6 +19,7 @@ use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 use zovye\Order;
 use zovye\PlaceHolder;
+use zovye\Session;
 use zovye\User;
 use zovye\Util;
 use function zovye\err;
@@ -70,7 +71,7 @@ class JfbAccount
             }
         }
 
-        $fans = empty($user) ? Util::fansInfo() : $user->profile();
+        $fans = empty($user) ? Session::fansInfo() : $user->profile();
         $area = $device->getArea();
 
         $data = [

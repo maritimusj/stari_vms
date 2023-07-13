@@ -15,6 +15,7 @@ use zovye\Device;
 use zovye\model\advertisingModelObj;
 use zovye\PlaceHolder;
 use zovye\Response;
+use zovye\Session;
 use zovye\User;
 use zovye\Util;
 use function zovye\settings;
@@ -29,13 +30,13 @@ $params = [
     ],
 ];
 
-$user = Util::getCurrentUser($params);
+$user = Session::getCurrentUser($params);
 if (empty($user)) {
     Response::alert('请用微信扫一扫打开，谢谢！', 'error');
 }
 
 $profile = $user->profile();
-$phone_os = Util::getUserPhoneOS();
+$phone_os = Session::getUserPhoneOS();
 
 $query = Advertising::query(['type' => Advertising::ACTIVE_QRCODE, 'state' => Advertising::NORMAL]);
 

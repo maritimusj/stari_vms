@@ -18,6 +18,7 @@ use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 use zovye\Order;
+use zovye\Session;
 use zovye\User;
 use zovye\Util;
 use function zovye\err;
@@ -52,7 +53,7 @@ class YiDaoAccount
             return [];
         }
 
-        $fans = empty($user) ? Util::fansInfo() : $user->profile();
+        $fans = empty($user) ? Session::fansInfo() : $user->profile();
 
         if (empty($fans['sex'])) {
             //要求用户必须提供性别

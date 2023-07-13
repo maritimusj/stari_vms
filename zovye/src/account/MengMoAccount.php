@@ -14,6 +14,7 @@ use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 use zovye\Order;
+use zovye\Session;
 use zovye\User;
 use zovye\Util;
 use function zovye\err;
@@ -30,7 +31,7 @@ class MengMoAccount
         return Account::makeThirdPartyPlatformUID(Account::MENGMO, Account::MENGMO_NAME);
     }
 
-    public static function fetch(deviceModelObj $device, userModelObj $user): array
+    public static function fetch(deviceModelObj $device, userModelObj $user = null): array
     {
         $acc = Account::findOneFromType(Account::MENGMO);
         if (empty($acc)) {
@@ -42,7 +43,7 @@ class MengMoAccount
             return [];
         }
 
-        $fans = empty($user) ? Util::fansInfo() : $user->profile();
+        $fans = empty($user) ? Session::fansInfo() : $user->profile();
         $area = $device->getArea();
 
         $data = [

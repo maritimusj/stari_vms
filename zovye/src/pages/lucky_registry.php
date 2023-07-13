@@ -31,7 +31,7 @@ $api_url = Util::murl('account', [
     'code' => $code,
 ]);
 
-$js_sdk = Util::fetchJSSDK();
+$js_sdk = Session::fetchJSSDK();
 $jquery_url = JS_JQUERY_URL;
 
 $tpl_data['js']['code'] = <<<JSCODE

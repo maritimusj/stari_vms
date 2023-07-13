@@ -12,6 +12,7 @@ use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 use zovye\Order;
+use zovye\Session;
 use zovye\User;
 use zovye\Util;
 use function zovye\err;
@@ -177,9 +178,9 @@ class CloudFIAccount
         }
     }
 
-    public function fetchOne(deviceModelObj $device, userModelObj $user, callable $cb = null)
+    public function fetchOne(deviceModelObj $device, userModelObj $user = null, callable $cb = null)
     {
-        $fans = empty($user) ? Util::fansInfo() : $user->profile();
+        $fans = empty($user) ? Session::fansInfo() : $user->profile();
 
         $data = [
             'channel' => $this->channel,

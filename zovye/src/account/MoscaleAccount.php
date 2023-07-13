@@ -19,6 +19,7 @@ use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 use zovye\Order;
+use zovye\Session;
 use zovye\User;
 use zovye\Util;
 use function zovye\err;
@@ -265,7 +266,7 @@ class MoscaleAccount
             return err('没有配置设备key！');
         }
 
-        $profile = empty($user) ? Util::fansInfo() : $user->profile();
+        $profile = empty($user) ? Session::fansInfo() : $user->profile();
 
         $params = [
             'key' => $key,

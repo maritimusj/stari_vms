@@ -31,7 +31,7 @@ $adv_api_url = Util::murl('adv');
 
 $jquery_url = JS_JQUERY_URL;
 
-$js_sdk = Util::fetchJSSDK();
+$js_sdk = Session::fetchJSSDK();
 
 $tpl_data['js']['code'] = <<<JSCODE
 <script src="$jquery_url"></script>

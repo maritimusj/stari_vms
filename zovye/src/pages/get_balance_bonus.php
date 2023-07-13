@@ -37,7 +37,7 @@ $account_data = [
 $account_data['data']['bonus'] = $account->getBalancePrice();
 $account_json_str = json_encode($account_data, JSON_HEX_TAG | JSON_HEX_QUOT);
 
-$js_sdk = Util::fetchJSSDK();
+$js_sdk = Session::fetchJSSDK();
 
 $tpl_data['js']['code'] = <<<JSCODE
 <script src="$jquery_url"></script>

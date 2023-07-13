@@ -12,7 +12,7 @@ $op = Request::op('default');
 
 if ($op == 'reg') {
 
-    $user = Util::getCurrentUser();
+    $user = Session::getCurrentUser();
     if (empty($user)) {
         JSON::fail('只能从微信中打开，谢谢！');
     }

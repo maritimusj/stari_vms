@@ -35,7 +35,7 @@ $mall_url = Util::murl('mall');
 
 $jquery_url = JS_JQUERY_URL;
 
-$js_sdk = Util::fetchJSSDK();
+$js_sdk = Session::fetchJSSDK();
 $wxapp_username = settings('agentWxapp.username', '');
 
 $tpl_data['js']['code'] = <<<JSCODE

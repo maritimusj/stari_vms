@@ -8,7 +8,7 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-$user = Util::getCurrentUser([
+$user = Session::getCurrentUser([
     'create' => true,
     'update' => true,
 ]);

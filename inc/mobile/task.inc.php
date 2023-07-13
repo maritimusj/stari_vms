@@ -12,7 +12,7 @@ defined('IN_IA') or exit('Access Denied');
 $op = Request::op('default');
 
 if ($op == 'default') {
-    $user = Util::getCurrentUser();
+    $user = Session::getCurrentUser();
     if (empty($user)) {
         Response::alert('请用微信打开！', 'error');
     }
@@ -29,7 +29,7 @@ if ($op == 'default') {
 
 } elseif ($op == 'get_list') {
 
-    $user = Util::getCurrentUser();
+    $user = Session::getCurrentUser();
     if (empty($user)) {
         JSON::fail('找不到这个用户！');
     }
@@ -42,7 +42,7 @@ if ($op == 'default') {
 
 } elseif ($op == 'detail') {
 
-    $user = Util::getCurrentUser();
+    $user = Session::getCurrentUser();
     if (empty($user)) {
         JSON::fail('找不到这个用户！');
     }
@@ -58,7 +58,7 @@ if ($op == 'default') {
 
 } elseif ($op == 'submit') {
 
-    $user = Util::getCurrentUser();
+    $user = Session::getCurrentUser();
     if (empty($user)) {
         JSON::fail('找不到这个用户！');
     }

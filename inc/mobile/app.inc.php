@@ -24,7 +24,7 @@ if ($op == 'default') {
     }
 
     app()->showTemplate('app', [
-        'js_code' => Util::fetchJSSDK(),
+        'js_code' => Session::fetchJSSDK(),
         'op' => $op,
         'appId' => $app_id,
         'device' => $device,

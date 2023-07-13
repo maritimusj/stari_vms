@@ -16,7 +16,7 @@ if ($op == 'auth' || $op == 'get_openid') {
         Response::alert('获取用户授权code失败！', 'error');
     }
 
-    $user = Util::getDouYinUser($code);
+    $user = Session::getDouYinUser($code);
     if (empty($user)) {
         Response::alert('获取用户信息失败[02]', 'error');
     }
@@ -119,7 +119,7 @@ if (!App::isDouYinUser()) {
     DouYin::redirectToAuthorizeUrl($cb_url);
 }
 
-$user = Util::getCurrentUser();
+$user = Session::getCurrentUser();
 if (empty($user)) {
     unset($_SESSION['douyin_user_id']);
     Response::alert('请重新扫描二维码，谢谢！', 'error');

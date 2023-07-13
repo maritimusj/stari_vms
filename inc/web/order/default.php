@@ -313,4 +313,4 @@ $tpl_data['pager'] = $pager;
 $tpl_data['orders'] = $orders;
 $tpl_data['accounts'] = $accounts;
 
-app()->showTemplate('web/order/default', $tpl_data);
+Response::showTemplate('web/order/default', $tpl_data);

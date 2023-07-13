@@ -7,8 +7,21 @@
 
 namespace zovye;
 
+use zovye\api\wx\fb;
+
 class Response
 {
+    public static function showTemplate(string $filename, $tpl_data = [])
+    {
+        app()->showTemplate($filename, $tpl_data);
+    }
+
+    public static function templateJSON(string $filename, $title = '', $tpl_data = [])
+    {
+        $content = app()->fetchTemplate($filename, $tpl_data); 
+        JSON::success(['title' => $title, 'content' => $content]);
+    }
+
     /**
      * 重定向客户端浏览器
      * @param string $url

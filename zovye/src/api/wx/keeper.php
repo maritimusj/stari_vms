@@ -1147,8 +1147,8 @@ class keeper
 
         //设置params['keeper']后，库存不会减少
         $res = DeviceUtil::test(
-            $keeper->getUser(),
             $device,
+            $keeper->getUser(),
             $lane,
             [
                 'from' => 'wxapp.keeper',

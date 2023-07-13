@@ -15,7 +15,7 @@ if ($id) {
     /** @var deviceModelObj $device */
     $device = Device::get($id);
     if ($device) {
-        $res = DeviceUtil::test(null, $device);
+        $res = DeviceUtil::test($device);
         if (is_error($res)) {
             JSON::fail($res);
         }

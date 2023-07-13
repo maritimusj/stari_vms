@@ -891,7 +891,7 @@ class agent
         }
 
         $lane = Request::int('lane');
-        $res = DeviceUtil::test($user, $device, $lane);
+        $res = DeviceUtil::test($device, $user, $lane);
 
         if (is_error($res)) {
             return err($res['message']);

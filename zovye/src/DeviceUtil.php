@@ -66,7 +66,7 @@ class DeviceUtil
      *
      * @return array
      */
-    public static function test($user, $device, int $lane = Device::DEFAULT_CARGO_LANE, array $params = []): array
+    public static function test($device, userModelObj $user = null, int $lane = Device::DEFAULT_CARGO_LANE, array $params = []): array
     {
         if (is_string($device)) {
             $device = Device::get($device, true);

@@ -13,7 +13,7 @@ use RuntimeException;
 $id = Request::int('id');
 $device = Device::get($id);
 if (empty($device)) {
-    JSON::fail([]);
+    JSON::fail();
 }
 
 $result = CacheUtil::cachedCall(60, function () use ($device) {

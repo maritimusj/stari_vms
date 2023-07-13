@@ -180,6 +180,8 @@ if ($op == 'create_order_account' && CtrlServ::checkJobSign($params)) {
         if ($device) {
             $device->appShowMessage($e->getMessage(), 'error');
         }
+    } catch (Exception $e) {
+        $params['error'] = $e->getMessage();
     }
 } else {
     $params['error'] = '参数签名检验失败！';

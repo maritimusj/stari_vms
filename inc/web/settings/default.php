@@ -309,7 +309,7 @@ if ($page == 'device') {
 
     $tpl_data['upgrade'] = [];
 
-    $data = Util::get(UPGRADE_URL);
+    $data = HttpUtil::get(UPGRADE_URL);
     if (empty($data)) {
         $tpl_data['upgrade']['error'] = '检查更新失败！';
     } else {

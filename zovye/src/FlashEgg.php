@@ -66,7 +66,7 @@ class FlashEgg
             'sign' => $this->sign([$uid, $no]),
         ];
 
-        $res = Util::post($url, $data);
+        $res = HttpUtil::post($url, $data);
 
         Log::debug('flash_egg', [
             'url' => $url,

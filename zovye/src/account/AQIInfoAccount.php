@@ -10,6 +10,7 @@ use Exception;
 use RuntimeException;
 use zovye\Account;
 use zovye\App;
+use zovye\HttpUtil;
 use zovye\Log;
 use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
@@ -139,7 +140,7 @@ class AQIInfoAccount extends AQIInfo
 
         $data['ufsign'] = self::sign($data, $this->app_secret);
 
-        $result = Util::post(self::API_URL, $data, false);
+        $result = HttpUtil::post(self::API_URL, $data, false);
 
         if ($cb) {
             $cb($data, $result);

@@ -8,6 +8,7 @@ namespace zovye\job\upload_device_info;
 
 use zovye\CtrlServ;
 use zovye\Device;
+use zovye\HttpUtil;
 use zovye\Job;
 use zovye\Log;
 use zovye\model\deviceModelObj;
@@ -81,7 +82,7 @@ if ($op == 'upload_device_info' && CtrlServ::checkJobSign($data)) {
 
             $data['sign'] = sign($data, strval($config['secret']));
 
-            $res = Util::post($url, $data, true, 3, [
+            $res = HttpUtil::post($url, $data, true, 3, [
                 CURLOPT_HTTPHEADER => ["APPKEY: {$config['key']}"],
             ]);
 

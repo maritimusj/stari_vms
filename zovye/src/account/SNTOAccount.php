@@ -11,6 +11,7 @@ use RuntimeException;
 use zovye\Account;
 use zovye\App;
 use zovye\Device;
+use zovye\HttpUtil;
 use zovye\Log;
 use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
@@ -238,10 +239,10 @@ class SNTOAccount
                 'app_key' => $this->key,
             ]);
 
-        return Util::getJSON($url);
+        return HttpUtil::getJSON($url);
     }
 
-    public function fetchOne(deviceModelObj $device, userModelObj $user, $snto_openid, callable $cb = null)
+    public function fetchOne(deviceModelObj $device, userModelObj $user = null, $snto_openid = '', callable $cb = null)
     {
         $url = self::API_URL.'/v3/qrcode.json';
 
@@ -257,7 +258,7 @@ class SNTOAccount
             'params' => "$uid:{$device->getShadowId()}:{$user->getOpenid()}",
         ];
 
-        $result = Util::post($url, $data, true, 3, [
+        $result = HttpUtil::post($url, $data, true, 3, [
             CURLOPT_HTTPHEADER => ["AUTH: $this->token"],
         ]);
 

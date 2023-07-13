@@ -86,7 +86,7 @@ class CZTV
                 'token' => $token,
             ]);
 
-        $response = Util::get($url, 3, [], true);
+        $response = HttpUtil::get($url, 3, [], true);
         Log::debug("cztv", [
             'url' => $url,
             'result' => $response,

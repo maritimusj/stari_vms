@@ -11,6 +11,7 @@ use RuntimeException;
 use zovye\Account;
 use zovye\App;
 use zovye\Device;
+use zovye\HttpUtil;
 use zovye\Log;
 use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
@@ -207,7 +208,7 @@ class MeiPaAccount
         ]);
 
         $params['sing'] = $this->sign($params);
-        $result = Util::post(self::API_URL, $params, false);
+        $result = HttpUtil::post(self::API_URL, $params, false);
         if ($cb) {
             $cb($params, $result);
         }

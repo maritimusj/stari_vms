@@ -53,7 +53,7 @@ class DouYin
     {
         $path = '/oauth/access_token/';
 
-        $res = Util::post(self::API_URL.$path, [
+        $res = HttpUtil::post(self::API_URL.$path, [
             'client_key' => $this->client_key,
             'client_secret' => $this->client_secret,
             'code' => $code,
@@ -81,7 +81,7 @@ class DouYin
     {
         $path = '/oauth/renew_refresh_token/';
 
-        $res = Util::post(self::API_URL.$path, [
+        $res = HttpUtil::post(self::API_URL.$path, [
             'client_key' => $this->client_key,
             'refresh_token' => $refresh_token,
         ], false);
@@ -108,7 +108,7 @@ class DouYin
                 'open_id' => $openid,
             ]);
 
-        $res = Util::get($url, 3, [
+        $res = HttpUtil::get($url, 3, [
             CURLOPT_HTTPHEADER => [
                 'access-token' => $access_token,
             ],
@@ -136,7 +136,7 @@ class DouYin
                 'follower_open_id' => $follower_openid,
             ]);
 
-        $res = Util::get($url, 3, [
+        $res = HttpUtil::get($url, 3, [
             CURLOPT_HTTPHEADER => [
                 'access-token' => $access_token,
             ],
@@ -161,7 +161,7 @@ class DouYin
                 'count' => $count,
             ]);
 
-        $res = Util::get($url, 3, [
+        $res = HttpUtil::get($url, 3, [
             CURLOPT_HTTPHEADER => [
                 'access-token' => $access_token,
             ],

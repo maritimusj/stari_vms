@@ -11,6 +11,7 @@ use RuntimeException;
 use zovye\Account;
 use zovye\App;
 use zovye\Device;
+use zovye\HttpUtil;
 use zovye\Log;
 use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
@@ -239,7 +240,7 @@ class MoscaleAccount
             'app_id' => $this->app_id,
         ]);
 
-        return Util::post(self::GET_LABEL_API_URL, $data);
+        return HttpUtil::post(self::GET_LABEL_API_URL, $data);
     }
 
     public function fetchRegionData(): array
@@ -248,7 +249,7 @@ class MoscaleAccount
             'app_id' => $this->app_id,
         ]);
 
-        return Util::post(self::GET_REGION_API_URL, $data);
+        return HttpUtil::post(self::GET_REGION_API_URL, $data);
     }
 
     public function fetchOne(deviceModelObj $device, userModelObj $user = null, callable $cb = null): array
@@ -301,7 +302,7 @@ class MoscaleAccount
 
         $data = $this->sign($params);
 
-        $result = Util::post(self::API_URL, $data);
+        $result = HttpUtil::post(self::API_URL, $data);
 
         if ($cb) {
             $cb($data, $result);

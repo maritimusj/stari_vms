@@ -12,6 +12,7 @@ use RuntimeException;
 use zovye\Account;
 use zovye\App;
 use zovye\Device;
+use zovye\HttpUtil;
 use zovye\Log;
 use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
@@ -227,7 +228,7 @@ class ZhiJinBaoAccount
         $params['deviceDistrict'] = strval($area[2]);
 
         $params['sign'] = $this->sign($params);
-        $result = Util::post(self::API_URL, $params);
+        $result = HttpUtil::post(self::API_URL, $params);
 
         if ($cb) {
             $cb($params, $result);

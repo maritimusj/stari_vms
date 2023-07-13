@@ -113,7 +113,7 @@ class Wx
             $data['action_info']['scene']['scene_str'] = strval($scene);
         }
 
-        return Util::post(self::CREATE_QRCODE_URL . $wx::token(), $data);
+        return HttpUtil::post(self::CREATE_QRCODE_URL . $wx::token(), $data);
     }
 
     public static function getTempQRCodeTicket($scene = '', $expire_seconds = 60): array

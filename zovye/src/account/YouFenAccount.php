@@ -11,6 +11,7 @@ use RuntimeException;
 use zovye\Account;
 use zovye\App;
 use zovye\Device;
+use zovye\HttpUtil;
 use zovye\Log;
 use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
@@ -148,7 +149,7 @@ class YouFenAccount
 
         $data['sign'] = $this->sign($data);
 
-        $result = Util::post(self::API_URL, $data);
+        $result = HttpUtil::post(self::API_URL, $data);
         if ($cb) {
             $cb($data, $result);
         }

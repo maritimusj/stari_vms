@@ -10,7 +10,7 @@ defined('IN_IA') or exit('Access Denied');
 
 $back_url = $this->createWebUrl('settings', ['page' => 'upgrade']);
 
-$data = Util::get(UPGRADE_URL . '/?op=exec');
+$data = HttpUtil::get(UPGRADE_URL . '/?op=exec');
 $res = json_decode($data, true);
 if ($res && $res['status']) {
     if (!Migrate::detect(true)) {

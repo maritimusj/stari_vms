@@ -170,7 +170,7 @@ class WxPlatform
             return err('无法获取component access token');
         }
 
-        $data = Util::get(
+        $data = HttpUtil::get(
             str_replace(['{APPID}', '{CODE}', '{COMPONENT_APPID}', '{COMPONENT_ACCESS_TOKEN}'], [
                 $appid,
                 $code,
@@ -197,7 +197,7 @@ class WxPlatform
 
     public static function getUserProfile($access_token, $openid): array
     {
-        $data = Util::get(
+        $data = HttpUtil::get(
             str_replace(['{ACCESS_TOKEN}', '{OPENID}'], [$access_token, $openid], self::GET_USER_PROFILE)
         );
 
@@ -215,7 +215,7 @@ class WxPlatform
 
     public static function getUserProfile2($access_token, $openid, $create_user = false)
     {
-        $data = Util::get(
+        $data = HttpUtil::get(
             str_replace(['{ACCESS_TOKEN}', '{OPENID}'], [$access_token, $openid], self::GET_USER_PROFILE2)
         );
 
@@ -437,7 +437,7 @@ class WxPlatform
             $params['expire_seconds'] = 3600;
         }
 
-        $result = Util::post($url, $params);
+        $result = HttpUtil::post($url, $params);
 
         Log::debug('wxplatform', $result);
 

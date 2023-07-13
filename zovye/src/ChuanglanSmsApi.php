@@ -32,7 +32,7 @@ class ChuanglanSmsApi
             'mobile' => self::MOBILE_PREFIX . $mobile,
         );
 
-        $res = Util::post(self::API_URL, $data);
+        $res = HttpUtil::post(self::API_URL, $data);
 
         Log::debug('sms', [
             'data' => $data,

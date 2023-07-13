@@ -7,6 +7,7 @@
 
 namespace wx;
 
+use zovye\HttpUtil;
 use zovye\Log;
 use zovye\Util;
 use zovye\We7;
@@ -73,12 +74,12 @@ class Platform
     public function startPushTicket(string $token): array
     {
         $url = str_replace('{COMPONENT_ACCESS_TOKEN}', $token, self::START_PUSH_TICKET_URL);
-        return Util::post($url, []);
+        return HttpUtil::post($url, []);
     }
 
     public function getComponentAccessToken(string $ticket): array
     {
-        return Util::post(self::GET_COMPONENT_ACCESS_URL, [
+        return HttpUtil::post(self::GET_COMPONENT_ACCESS_URL, [
             'component_appid' => $this->app_id,
             'component_appsecret' => $this->secret,
             'component_verify_ticket' => $ticket,
@@ -88,7 +89,7 @@ class Platform
     public function getPreAuthCode($token): array
     {
         $url = str_replace('{COMPONENT_ACCESS_TOKEN}', $token, self::GET_PRE_AUTH_CODE_URL);
-        return Util::post($url, [
+        return HttpUtil::post($url, [
             'component_appid' => $this->app_id,
         ]);
     }
@@ -106,7 +107,7 @@ class Platform
     public function getAuthData(string $accessToken, string $authCode): array
     {
         $url = str_replace('{COMPONENT_ACCESS_TOKEN}', $accessToken, self::GET_AUTH_DATA_URL);
-        return Util::post($url, [
+        return HttpUtil::post($url, [
             'component_appid' => $this->app_id,
             'authorization_code' => $authCode,
         ]);
@@ -116,7 +117,7 @@ class Platform
     {
         $url = str_replace('{COMPONENT_ACCESS_TOKEN}', $componentAccessToken, self::GET_ACCESS_TOKEN_URL);
 
-        return Util::post($url, [
+        return HttpUtil::post($url, [
             'component_appid' => $this->app_id,
             'authorizer_appid' => $authorizerAppId,
             'authorizer_refresh_token' => $resfreshToken,
@@ -126,7 +127,7 @@ class Platform
     public function getAuthProfile(string $appid, string $accessToken): array
     {
         $url = str_replace('{COMPONENT_ACCESS_TOKEN}', $accessToken, self::GET_AUTH_PROFILE_URL);
-        return Util::post($url, [
+        return HttpUtil::post($url, [
             'component_appid' => $this->app_id,
             'authorizer_appid' => $appid,
         ]);

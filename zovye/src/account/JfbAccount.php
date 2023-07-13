@@ -11,6 +11,7 @@ use RuntimeException;
 use zovye\Account;
 use zovye\App;
 use zovye\Device;
+use zovye\HttpUtil;
 use zovye\Log;
 use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
@@ -96,7 +97,7 @@ class JfbAccount
             $data['zhunaOpenId'] = $jfb_openid;
         }
 
-        $result = Util::post($api_url, $data);
+        $result = HttpUtil::post($api_url, $data);
 
         if (App::isAccountLogEnabled()) {
             $log = Account::createQueryLog($acc, $user, $device, $data, $result);

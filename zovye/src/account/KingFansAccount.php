@@ -11,6 +11,7 @@ use RuntimeException;
 use zovye\Account;
 use zovye\App;
 use zovye\Device;
+use zovye\HttpUtil;
 use zovye\Log;
 use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
@@ -204,7 +205,7 @@ class KingFansAccount
 
         $data['sign'] = md5($this->key.$data['uuid'].$data['t']);
 
-        $result = Util::get(self::API_URL.'?'.http_build_query($data));
+        $result = HttpUtil::get(self::API_URL.'?'.http_build_query($data));
         if (!empty($result) && is_string($result)) {
             $result = json_decode($result, true);
         }

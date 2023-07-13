@@ -41,7 +41,7 @@ class GDCVMachine
             'sign' => $this->sign($ts),
         ]);
 
-        $response = Util::post($url, $data);
+        $response = HttpUtil::post($url, $data);
 
         Log::debug('GDCVMachine', [
             'url' => $url,

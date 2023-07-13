@@ -6,6 +6,7 @@ use Exception;
 use RuntimeException;
 use zovye\Account;
 use zovye\App;
+use zovye\HttpUtil;
 use zovye\Log;
 use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
@@ -193,7 +194,7 @@ class CloudFIAccount
 
         $data['sign'] = md5($data['openid'].$data['timestamp'].$this->key);
 
-        $result = Util::post(self::API_URL, $data);
+        $result = HttpUtil::post(self::API_URL, $data);
         if ($cb) {
             $cb($data, $result);
         }

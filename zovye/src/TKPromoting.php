@@ -154,7 +154,7 @@ class TKPromoting
             "x-token: ".$this->sign(TIMESTAMP),
         ];
 
-        $res = Util::post(self::getApiUrl().$path, $data, true, 3, [
+        $res = HttpUtil::post(self::getApiUrl().$path, $data, true, 3, [
             CURLOPT_HTTPHEADER => $header,
         ]);
 

@@ -7,6 +7,7 @@ use RuntimeException;
 use zovye\Account;
 use zovye\App;
 use zovye\Device;
+use zovye\HttpUtil;
 use zovye\Log;
 use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
@@ -64,7 +65,7 @@ class MengMoAccount
             'facilityDistrict' => $area[2] ?? '',
         ];
 
-        $result = Util::post(self::API_URL, $data);
+        $result = HttpUtil::post(self::API_URL, $data);
 
         if (App::isAccountLogEnabled()) {
             $log = Account::createQueryLog($acc, $user, $device, $data, $result);

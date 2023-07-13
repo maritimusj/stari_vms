@@ -99,7 +99,7 @@ class WxAppMessagePush
             }
 
             $url = str_replace('{ACCESS_TOKEN}', $access_token, self::API_CUSTOMER_SERVICE_MESSAGE_SEND_URL);
-            $result = Util::post($url, $response_msg);
+            $result = HttpUtil::post($url, $response_msg);
 
             if (is_error($result)) {
                 return $result;

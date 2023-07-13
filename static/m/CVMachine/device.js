@@ -3,6 +3,7 @@ const app = new Vue({
     data: {
         imei: initData.imei,
         max: initData.max || 1,
+        accounts: initData.accounts.filter(e => e.qrcode),
         slides: [],
         groups: [],
         categories: {
@@ -70,6 +71,12 @@ const app = new Vue({
                 });
             })
         });
+        if (this.accounts.length > 0) {
+            this.categories.list.push({
+                title: "公众号",
+                value: 'officialAccounts'
+            })
+        }
     },
     created() {
         if (typeof zovye_fn.retryOrder === 'function') {
@@ -148,7 +155,25 @@ const app = new Vue({
         },
         categoryClick(item) {
             this.categories.value = item.value
-            this.getGoodsList()
+            if (item.value !== 'officialAccounts') {
+                this.getGoodsList()
+            } else {
+                Vue.nextTick(() => {
+                    new Swiper('#account-swiper-container', {
+                        effect: 'coverflow',
+                        grabCursor: true,
+                        centeredSlides: true,
+                        slidesPerView: 'auto',
+                        coverflowEffect: {
+                            rotate: 0,
+                            stretch: 10,
+                            depth: 250,
+                            modifier: 1,
+                            slideShadows: false
+                        }
+                    });
+                })
+            }
         },
         goodsClick(item) {
             if (item.num === 0) {

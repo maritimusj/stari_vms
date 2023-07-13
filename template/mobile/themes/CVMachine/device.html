@@ -59,7 +59,20 @@
 			<img class="loading-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABAEAYAAAD6+a2dAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAZiS0dEAAAAAAAA+UO7fwAAAAlwSFlzAAAASAAAAEgARslrPgAABBNJREFUeNrtnE9IFFEcx99bLTExzYMdPKSHMAIlUZCkgkCyk3lKEUE0T10S74LgsUMQQQhFXYrAU9ihg4YHq4MH8ypidtCTqB38k7Tv1+HrLG65ObO742939vu5fNmd2Znv7/d783bmzZsxhhBCCCGFiNU2cFqIiIiUlRkxYmRgwFhjjW1rS15rbg76+rW11lq7u6vtm2QICl9XJ06cuOVl8cXSEta/dEnbP0kTFNJaFHJ+3l/hj+DEifv61duOdjwkIChcW1vgwh/bEFpbteMJi5i2gXC5ciXjTVhjjb16VTuSsIh4A/j5Mzvb2drSjoQEBP13VRV0by+9/n93F1pZqR1P3oP/0osXkdDbt6HNzdCiotD2KyIiIyPpNYBHj7TzlrcggWVl0FevoPH48YleXUUDuXMnND9OnLihIexvff14H2tr0AcPtPOX9yCRU1PBjriDA+j166H5cuLEFRdjP/X1CT38XjtveQ8SeetWel2uHF52zcxox1EoZP8qwBpr7M2bmf4erSEW8auUk8EB0dCAfLx/n+0eMkcTLKLtILe4exfa2Qnt6tJ2lBK02Bs3MvsLmJ7WjiNXQFJKS6Hd3cjP+fPavnwa97osv/z6FfWh14IBBT13DvriBfT37+MLv7KCwre3a/suNE7tLhcKXF2dPLbuDdUuLuL+u3PaCSGEEEIIIYQQQoh3HV9ejoGb8XHo7Cx0agrL+/q0fZIskzyTZ2XF35DumzfavkmWQEHfvUvvzk5Pj7b/QgH5rq2FPnwIranJcINFRYmbNGkxOamdmELhnx7aiRO3sHDS71LPBxAjJjFZ88yZ9GyVlmonJuqg2t6TSyUliQXWWGOPfE5BygZgYzZmYwcH+PTlS3BnRozMzmonKOrgJpoI8t3RAR0dhd67l/EO0MKuXYPu7/vr+hcX0QWd3AJJnoCCNjaiwJ8+JZ8bbG1Bnz/HehUV2n4JIYQQQgghhBBCCCGEeIT+ZBCGiL0ngfr7odXV0L/fzBmPayeEZAncE+joQAM46SVNHz9C+T6AyICCfv8ebAJJb6+2b508VVXhgHn5Ep/n5qCDg9r+ggeUNIcwKE+favvXyZdX+L9xDtrcHNb+Q+pyNzeh+/vBfre+HlagOYs11tjLl1MsPDxHS7U8h0HLffLE35HvzSfIYBJjnoK4+/uTj3iPHz+gFy5o+wwe2OGMIOjjxwhkexsajyfe4u3EiWtp0farDfLS1AS9fz9vC///AK2FcrIoUQINsKcH+vkz9Ns36NgYeqSzZ7V9kiyDAnd1+TsnefZM2y/JMijshw/+GsDOTqG8OrbARt78FtQbkYz+yGTkA0wgRoy8fetv5cnJ5AdjSGRAFz88DPWGqjc2oBMT3mPw2j4JIYQQQsLkDxGHUgxHohgaAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDIwLTEwLTI1VDE0OjU4OjUyKzA4OjAw4mNAkQAAACV0RVh0ZGF0ZTptb2RpZnkAMjAyMC0xMC0yNVQxNDo1ODo1MiswODowMJM++C0AAABRdEVYdHN2ZzpiYXNlLXVyaQBmaWxlOi8vL2hvbWUvYWRtaW4vaWNvbi1mb250L3RtcC9pY29uX3IydDd6N3MzY3llL2xvYWRpbmctZG90dGVkLnN2Z2puT08AAAAASUVORK5CYII=" >
 			<span style="margin-top: 10px;font-size: 12px;">正在加载中...</span>
 		</div>
-		<div class="goods-view">
+		<div id="account-swiper-container" class="swiper-container" v-show="categories.value === 'officialAccounts'">
+			<div class="swiper-wrapper">
+				<div v-for="item in accounts" class="swiper-slide card" :style="{'border':'1px solid' + item.clr,'box-shadow':'0px 0px 5px' + item.clr}">
+					<div class="top-view" :style="{'background-color':item.clr}">
+						<img class="avatar" :src="item.img" />
+						<span class="name">{{item.title}}</span>
+					</div>
+					<img class="account-qrcode" :src="item.qrcode" />
+					<span class="tips">长按识别二维码</span>
+					<span class="desc" v-html="item.desc" @click="parseCode(item)"></span>
+				</div>
+			</div>
+		</div>
+		<div class="goods-view" v-if="categories.value !== 'officialAccounts'">
 			<div class="package-item" v-for="(item, index) in packages">
 				<span>{{item.title}}</span>
 				<div class="goods-list">
@@ -189,10 +202,22 @@
 <script type="text/javascript">
 		const initData = {
 			imei: "{$tpl['device']['imei']}",
-			max: parseInt('{php echo \zovye\App::getOrderMaxGoodsNum();}')
+			max: parseInt('{php echo \zovye\App::getOrderMaxGoodsNum();}'),
+			accounts: [
+				{loop $tpl['accounts'] $index $item}
+				{
+					id: "{$item['id']}",
+					img: "{$item['img']}",
+					title: "{$item['title']}",
+					desc:`{$item['descr']}`,
+					clr:"{$item['clr']}",
+					qrcode:"{$item['qrcode']}"
+				},
+				{/loop}
+			]
 		};
 </script>
-{php \zovye\url(true, 'static/m/CVMachine/device.js?v=20230527');}
+{php \zovye\url(true, 'static/m/CVMachine/device.js?v=20230713');}
 <script src="https://cdn.staticfile.org/video.js/4.1.0/video.js"></script>
 <script src="https://cdn.staticfile.org/vue-clipboard2/0.3.1/vue-clipboard.min.js"></script>
 {if !empty($tpl['site']['warning'])}

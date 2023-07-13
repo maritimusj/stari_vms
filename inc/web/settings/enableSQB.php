@@ -26,7 +26,7 @@ if (false === Util::createApiRedirectFile('/payment/SQB.php', 'payresult', [
         'op' => 'notify',
         'from' => 'SQB',
     ])) {
-    Util::itoast('创建收钱吧支付入口文件失败！');
+    Response::itoast('创建收钱吧支付入口文件失败！');
 }
 
 if (updateSettings('pay.SQB', [

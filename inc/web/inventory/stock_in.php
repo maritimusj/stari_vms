@@ -12,7 +12,7 @@ $id = Request::int('id');
 
 $inventory = Inventory::get(Request::int('id'));
 if (empty($inventory)) {
-    Util::itoast('找不到这个仓库！', '', 'error');
+    Response::itoast('找不到这个仓库！', '', 'error');
 }
 
 $tpl_data = [

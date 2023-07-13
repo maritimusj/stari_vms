@@ -21,7 +21,7 @@ $params = [
 
 $user = Util::getCurrentUser($params);
 if (empty($user)) {
-    Util::resultAlert('只能从微信中打开，谢谢！', 'error');
+    Response::alert('只能从微信中打开，谢谢！', 'error');
 }
 
 $op = Request::op('default');
@@ -29,7 +29,7 @@ $op = Request::op('default');
 if ($op == 'default') {
 
     if (!$user->isGSPor()) {
-        Util::resultAlert('用户未开通余额账户！', 'error');
+        Response::alert('用户未开通余额账户！', 'error');
     }
 
     $balance = $user->getCommissionBalance()->total();

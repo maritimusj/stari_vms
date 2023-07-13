@@ -15,14 +15,14 @@ $back_url = $this->createWebUrl('agent', ['op' => 'partner', 'id' => $agent_id])
 
 $agent = Agent::get($agent_id);
 if (empty($agent)) {
-    Util::itoast('找不到这个代理商！', $this->createWebUrl('agent'), 'error');
+    Response::itoast('找不到这个代理商！', $this->createWebUrl('agent'), 'error');
 }
 
 $level = $agent->getAgentLevel();
 
 $user = User::get($user_id);
 if (empty($user)) {
-    Util::itoast('找不到这个用户！', $this->createWebUrl('agent', ['op' => 'partner', 'id' => $agent_id]), 'error');
+    Response::itoast('找不到这个用户！', $this->createWebUrl('agent', ['op' => 'partner', 'id' => $agent_id]), 'error');
 }
 
 $partner_data = $user->get('partnerData', []);

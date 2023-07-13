@@ -12,7 +12,7 @@ $agent_id = Request::int('agent_id');
 if ($agent_id) {
     $agent = Agent::get($agent_id);
     if (empty($agent)) {
-        Util::resultAlert('找不到这个代理商！', 'error');
+        Response::alert('找不到这个代理商！', 'error');
     }
 }
 
@@ -34,7 +34,7 @@ $num_arr = Request::array('num');
 foreach ($goods_ids as $index => $goods_id) {
     $goods = Goods::get($goods_id);
     if (empty($goods)) {
-        Util::resultAlert('指定的商品不存在！', 'error');
+        Response::alert('指定的商品不存在！', 'error');
     }
     $data['extra']['goods'][] = [
         'id' => $goods->getId(),
@@ -46,7 +46,7 @@ $id = Request::int('id');
 if ($id > 0) {
     $gift = FlashEgg::getGift($id);
     if (empty($gift)) {
-        Util::resultAlert('找不到这个集蛋活动！', 'error');
+        Response::alert('找不到这个集蛋活动！', 'error');
     }
 
     $gift->setAgentId($data['agent_id']);
@@ -57,19 +57,19 @@ if ($id > 0) {
     $gift->setEnabled($data['enabled']);
 
     if ($gift->save()) {
-        Util::itoast('保存成功！', Util::url('account', ['op' => 'gift_edit', 'id' => $gift->getId()]), 'success');
+        Response::itoast('保存成功！', Util::url('account', ['op' => 'gift_edit', 'id' => $gift->getId()]), 'success');
     }
 
-    Util::itoast('保存失败！', Util::url('account', ['op' => 'gift_edit', 'id' => $gift->getId()]), 'error');
+    Response::itoast('保存失败！', Util::url('account', ['op' => 'gift_edit', 'id' => $gift->getId()]), 'error');
 } else {
 
     $gift = FlashEgg::createGift($data);
 
     if ($gift) {
-        Util::itoast('创建成功！', Util::url('account', ['op' => 'gift_edit', 'id' => $gift->getId()]), 'success');
+        Response::itoast('创建成功！', Util::url('account', ['op' => 'gift_edit', 'id' => $gift->getId()]), 'success');
     }
 
-    Util::itoast('创建失败！', Util::url('account', ['op' => 'gift_edit']), 'error');
+    Response::itoast('创建失败！', Util::url('account', ['op' => 'gift_edit']), 'error');
 }
 
 

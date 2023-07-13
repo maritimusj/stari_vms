@@ -15,12 +15,12 @@ $user_id = Request::int('userid');
 
 $agent = Agent::get($agent_id);
 if (empty($agent)) {
-    Util::itoast('找不到这个代理商！', $this->createWebUrl('agent'), 'error');
+    Response::itoast('找不到这个代理商！', $this->createWebUrl('agent'), 'error');
 }
 
 $user = User::get($user_id);
 if (empty($user)) {
-    Util::itoast('找不到这个用户！', $this->createWebUrl('agent', ['op' => 'partner', 'agentid' => $agent_id]), 'error');
+    Response::itoast('找不到这个用户！', $this->createWebUrl('agent', ['op' => 'partner', 'agentid' => $agent_id]), 'error');
 }
 
 $name = Request::trim('name');
@@ -36,7 +36,7 @@ $notice = [
 ];
 
 if (empty($mobile)) {
-    Util::itoast(
+    Response::itoast(
         '请填写合伙人的手机号码！',
         $this->createWebUrl('agent', ['op' => $from, 'agentid' => $agent_id, 'userid' => $user_id]),
         'error'
@@ -45,7 +45,7 @@ if (empty($mobile)) {
 
 $res = User::findOne(['id <>' => $user_id, 'mobile' => $mobile, 'app' => User::WX]);
 if ($res) {
-    Util::itoast(
+    Response::itoast(
         '手机号码已经被其它用户使用！',
         $this->createWebUrl('agent', ['op' => $from, 'agentid' => $agent_id, 'userid' => $user_id]),
         'error'
@@ -62,7 +62,7 @@ $res = DBUtil::transactionDo(
 );
 
 if (is_error($res)) {
-    Util::itoast('合伙人保存失败！', $this->createWebUrl('agent', ['op' => 'partner', 'id' => $agent_id]), 'error');
+    Response::itoast('合伙人保存失败！', $this->createWebUrl('agent', ['op' => 'partner', 'id' => $agent_id]), 'error');
 }
 
-Util::itoast('合伙人保存成功！', $this->createWebUrl('agent', ['op' => 'partner', 'id' => $agent_id]), 'success');
+Response::itoast('合伙人保存成功！', $this->createWebUrl('agent', ['op' => 'partner', 'id' => $agent_id]), 'success');

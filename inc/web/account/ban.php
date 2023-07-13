@@ -19,9 +19,9 @@ if ($id) {
         }
 
         if ($account->save() && Account::updateAccountData()) {
-            Util::itoast("{$account->getTitle()}设置成功！", $this->createWebUrl('account'), 'success');
+            Response::itoast("{$account->getTitle()}设置成功！", $this->createWebUrl('account'), 'success');
         }
     }
 }
 
-Util::itoast('操作失败！', $this->createWebUrl('account'), 'error');
+Response::itoast('操作失败！', $this->createWebUrl('account'), 'error');

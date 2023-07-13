@@ -18,7 +18,7 @@ $id = Request::int('id');
 if ($id > 0) {
     $lucky = FlashEgg::getLucky($id);
     if (empty($lucky)) {
-        Util::resultAlert('找不到这个活动！', 'error');
+        Response::alert('找不到这个活动！', 'error');
     }
 
     $tpl_data['lucky'] = $lucky->profile(true);
@@ -29,7 +29,7 @@ $user_id = Request::int('user_id');
 if ($user_id > 0) {
     $user = User::get($user_id);
     if (empty($user)) {
-        Util::resultAlert(' 找不到这个用户！', 'error');
+        Response::alert(' 找不到这个用户！', 'error');
     }
     $tpl_data['user'] = $user->profile(false);
     $query->where(['user_id' => $user->getId()]);

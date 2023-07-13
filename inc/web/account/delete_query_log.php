@@ -17,4 +17,4 @@ if (empty($acc)) {
 
 Account::logQuery($acc)->delete();
 
-Util::itoast('已清除所有请求日志！', $this->createWebUrl('account', ['op' => 'viewQueryLog', 'id' => $id]), 'success');
+Response::itoast('已清除所有请求日志！', $this->createWebUrl('account', ['op' => 'viewQueryLog', 'id' => $id]), 'success');

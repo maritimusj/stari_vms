@@ -13,29 +13,29 @@ $op = Request::op();
 if ($op == 'auth' || $op == 'get_openid') {
     $code = Request::str('code');
     if (empty($code)) {
-        Util::resultAlert('获取用户授权code失败！', 'error');
+        Response::alert('获取用户授权code失败！', 'error');
     }
 
     $user = Util::getDouYinUser($code);
     if (empty($user)) {
-        Util::resultAlert('获取用户信息失败[02]', 'error');
+        Response::alert('获取用户信息失败[02]', 'error');
     }
 
     if (Request::has('id')) {
         $account = Account::get(Request::int('id'));
         if (empty($account)) {
-            Util::resultAlert('找不到指定的吸粉广告！', 'error');
+            Response::alert('找不到指定的吸粉广告！', 'error');
         }
         $account->updateSettings('config.openid', $user->getOpenid());
-        Util::resultAlert('授权接入成功！');
+        Response::alert('授权接入成功！');
 
     } elseif (Request::has('uid')) {
         $account = Account::findOneFromUID(Request::trim('uid'));
         if (empty($account)) {
-            Util::resultAlert('找不到指定的吸粉广告！', 'error');
+            Response::alert('找不到指定的吸粉广告！', 'error');
         }
         $account->updateSettings('config.openid', $user->getOpenid());
-        Util::resultAlert('授权接入成功！');
+        Response::alert('授权接入成功！');
     }
 
 } elseif ($op == 'account') {
@@ -108,7 +108,7 @@ $device_id = Request::str('device');
 if (!App::isDouYinUser()) {
     $retries = Request::int('retries');
     if ($retries > 3) {
-        Util::resultAlert('获取用户信息失败[01]', 'error');
+        Response::alert('获取用户信息失败[01]', 'error');
     }
     $cb_url = Util::murl('douyin', [
         'op' => 'auth',
@@ -122,7 +122,7 @@ if (!App::isDouYinUser()) {
 $user = Util::getCurrentUser();
 if (empty($user)) {
     unset($_SESSION['douyin_user_id']);
-    Util::resultAlert('请重新扫描二维码，谢谢！', 'error');
+    Response::alert('请重新扫描二维码，谢谢！', 'error');
 }
 
 if (DouYin::isTokenExpired($user)) {
@@ -137,7 +137,7 @@ if (DouYin::isTokenExpired($user)) {
 }
 
 if ($user->isBanned()) {
-    Util::resultAlert('用户暂时无法使用该功能，请联系管理员！', 'error');
+    Response::alert('用户暂时无法使用该功能，请联系管理员！', 'error');
 }
 
 if (App::isUserVerify18Enabled()) {
@@ -152,16 +152,16 @@ if (App::isUserVerify18Enabled()) {
 //用户扫描设备，进入设备页面
 $device = Device::find($device_id, ['imei', 'shadow_id']);
 if (empty($device)) {
-    Util::resultAlert('请重新扫描设备上的二维码！', 'error');
+    Response::alert('请重新扫描设备上的二维码！', 'error');
 }
 
 //开启了shadowId的设备，只能通过shadowId找到
 if ($device->isActiveQrcodeEnabled() && $device->getShadowId() !== $device_id) {
-    Util::resultAlert('设备二维码不匹配！', 'error');
+    Response::alert('设备二维码不匹配！', 'error');
 }
 
 if ($device->isDown()) {
-    Util::resultAlert('设备维护中，请稍后再试！', 'error');
+    Response::alert('设备维护中，请稍后再试！', 'error');
 }
 
 //检查用户定位

@@ -13,11 +13,11 @@ use RuntimeException;
 $id = Request::int('id');
 $device = Device::get($id);
 if (empty($device)) {
-    Util::itoast('找不到这个设备！', $this->createWebUrl('device'), 'error');
+    Response::itoast('找不到这个设备！', $this->createWebUrl('device'), 'error');
 }
 
 if (!$device->payloadLockAcquire(3)) {
-    Util::itoast('设备正忙，请稍后再试！', $this->createWebUrl('device'), 'error');
+    Response::itoast('设备正忙，请稍后再试！', $this->createWebUrl('device'), 'error');
 }
 
 $result = DBUtil::transactionDo(function () use ($device) {
@@ -40,8 +40,8 @@ $result = DBUtil::transactionDo(function () use ($device) {
 });
 
 if (is_error($result)) {
-    Util::itoast($result['message'], $this->createWebUrl('device'), 'error');
+    Response::itoast($result['message'], $this->createWebUrl('device'), 'error');
 }
 
 $device->updateAppRemain();
-Util::itoast('商品数量重置成功！', $this->createWebUrl('device'), 'success');
+Response::itoast('商品数量重置成功！', $this->createWebUrl('device'), 'success');

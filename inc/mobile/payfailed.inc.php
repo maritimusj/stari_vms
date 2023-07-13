@@ -6,4 +6,4 @@
 
 namespace zovye;
 
-Util::resultAlert('支付失败！', 'error');
+Response::alert('支付失败！', 'error');

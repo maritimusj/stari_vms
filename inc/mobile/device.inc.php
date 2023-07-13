@@ -12,22 +12,22 @@ $op = Request::op('default');
 
 if ($op == 'default') {
     if (Request::bool('charging')) {
-        Util::resultAlert('请关联充电桩小程序');
+        Response::alert('请关联充电桩小程序');
     }
     //检查设备
     $device_id = request('id'); //设备ＩＤ
     if (empty($device_id)) {
-        Util::resultAlert('请扫描设备二维码，谢谢！', 'error');
+        Response::alert('请扫描设备二维码，谢谢！', 'error');
     }
 
     $device = Device::find($device_id, ['imei', 'shadow_id']);
     if (empty($device)) {
-        Util::resultAlert('设备二维码不正确！', 'error');
+        Response::alert('设备二维码不正确！', 'error');
     }
 
     //开启了shadowId的设备，只能通过shadowId找到
     if ($device->isActiveQrcodeEnabled() && $device->getShadowId() !== $device_id) {
-        Util::resultAlert('设备二维码不正确，请重新扫描！', 'error');
+        Response::alert('设备二维码不正确，请重新扫描！', 'error');
     }
 
     header('location:'.Util::murl('entry', ['from' => 'device', 'device' => $device->getShadowId()]));

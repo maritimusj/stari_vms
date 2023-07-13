@@ -49,7 +49,7 @@ if (Request::has('user_id')) {
     $user_id = Request::int('user_id');
     $user = User::get($user_id);
     if (empty($user)) {
-        Util::resultAlert('找不到这个用户！', 'error');
+        Response::alert('找不到这个用户！', 'error');
     }
 
     $query->where(['user_id' => $user->getId()]);

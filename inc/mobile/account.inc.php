@@ -21,12 +21,12 @@ if ($op == 'default') {
 
     //检查公众号信息
     if (empty($tid)) {
-        Util::resultAlert('没有指定公众号！', 'error');
+        Response::alert('没有指定公众号！', 'error');
     }
 
     $account = Account::findOneFromUID($tid);
     if (empty($account) || $account->isBanned()) {
-        Util::resultAlert('公众号没有开通免费领取！', 'error');
+        Response::alert('公众号没有开通免费领取！', 'error');
     }
 
     header('location:'.Util::murl('entry', ['from' => 'account', 'account' => $tid, 'xid' => $xid]));
@@ -125,28 +125,28 @@ if ($op == 'default') {
 
     $user = Util::getCurrentUser();
     if (empty($user) || $user->isBanned()) {
-        Util::resultAlert('找不到用户或者用户无法领取', 'error');
+        Response::alert('找不到用户或者用户无法领取', 'error');
     }
 
     $ticket_data = $user->getLastActiveData('ticket', []);
     if (empty($ticket_data)) {
-        Util::resultAlert('请重新扫描设备二维码！', 'error');
+        Response::alert('请重新扫描设备二维码！', 'error');
     }
 
     $account = Account::get($ticket_data['accountId']);
     if (empty($account)) {
-        Util::resultAlert('找不到指定的任务！', 'error');
+        Response::alert('找不到指定的任务！', 'error');
     }
 
     $device = Device::get($ticket_data['deviceId']);
     if (empty($device)) {
-        Util::resultAlert('找不到指定的设备！', 'error');
+        Response::alert('找不到指定的设备！', 'error');
     }
 
     $res = Util::checkAvailable($user, $account, $device, ['ignore_assigned' => true]);
     if (is_error($res)) {
         $user->setLastActiveData('ticket', []);
-        Util::resultAlert($res['message'], 'error');
+        Response::alert($res['message'], 'error');
     }
 
     $tpl_data = Util::getTplData(

@@ -24,4 +24,4 @@ $res = DBUtil::transactionDo(
     }
 );
 
-Util::resultJSON(!is_error($res), ['msg' => is_error($res) ? $res['message'] : '重置成功！']);
+Response::json(!is_error($res), ['msg' => is_error($res) ? $res['message'] : '重置成功！']);

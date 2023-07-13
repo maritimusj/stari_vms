@@ -22,7 +22,7 @@ if (Util::isAliAppContainer()) {
         'device' => $device_id,
     ]);
 
-    Util::redirect($ali_entry_url);
+    Response::redirect($ali_entry_url);
 } elseif (Util::isDouYinAppContainer()) {
     $douyin_entry_url = Util::murl('douyin', [
         'from' => $from,
@@ -30,7 +30,7 @@ if (Util::isAliAppContainer()) {
         'account' => $account_id,
     ]);
 
-    Util::redirect($douyin_entry_url);
+    Response::redirect($douyin_entry_url);
 }
 
 //暖心小屋定制功能
@@ -50,20 +50,20 @@ $account = null;
 if ($device_id) {
     $device = Device::find($device_id, ['imei', 'shadow_id']);
     if (empty($device)) {
-        Util::resultAlert('请重新扫描设备上的二维码！', 'error');
+        Response::alert('请重新扫描设备上的二维码！', 'error');
     }
 
     if ($device->isDown()) {
-        Util::resultAlert('设备维护中，请稍后再试！', 'error');
+        Response::alert('设备维护中，请稍后再试！', 'error');
     }
 
     //开启了shadowId的设备，只能通过shadowId找到
     if ($device->isActiveQrcodeEnabled() && $device->getShadowId() !== $device_id) {
-        Util::resultAlert('设备二维码不正确！', 'error');
+        Response::alert('设备二维码不正确！', 'error');
     }
 
     if ($device->isChargingDevice()) {
-        Util::resultAlert('请使用指定小程序扫描二维码！', 'error');
+        Response::alert('请使用指定小程序扫描二维码！', 'error');
     }
 
     if (App::isSmsPromoEnabled()) {
@@ -106,7 +106,7 @@ if ($device_id) {
 
     $account = Account::findOneFromUID($account_id);
     if (empty($account) || $account->isBanned()) {
-        Util::resultAlert('找不到这个任务或者任务已停用！', 'error');
+        Response::alert('找不到这个任务或者任务已停用！', 'error');
     }
 
     //显示问卷填写页面
@@ -181,11 +181,11 @@ if ($device_id) {
 
 $user = Util::getCurrentUser($params);
 if (empty($user)) {
-    Util::resultAlert('请用微信或者支付宝扫描二维码，谢谢！', 'error');
+    Response::alert('请用微信或者支付宝扫描二维码，谢谢！', 'error');
 }
 
 if ($user->isBanned()) {
-    Util::resultAlert('用户暂时无法使用该功能，请联系管理员！', 'error');
+    Response::alert('用户暂时无法使用该功能，请联系管理员！', 'error');
 }
 
 if (App::isUserVerify18Enabled() && !$user->isIDCardVerified()) {

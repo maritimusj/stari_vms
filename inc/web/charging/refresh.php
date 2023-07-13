@@ -13,7 +13,7 @@ if (Request::has('id')) {
     $id = Request::int('id');
     $group = Group::get($id, Group::CHARGING);
     if (!$group) {
-        Util::itoast('找不到这个分组！', Util::url('charging'), 'error');
+        Response::itoast('找不到这个分组！', Util::url('charging'), 'error');
     }
     $groups[] = $group;
 } else {
@@ -32,4 +32,4 @@ foreach ($groups as $group) {
     $group->save();
 }
 
-Util::itoast('已更新！', Util::url('charging'), 'success');
+Response::itoast('已更新！', Util::url('charging'), 'success');

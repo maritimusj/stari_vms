@@ -11,7 +11,7 @@ use zovye\api\wx\balance;
 use zovye\api\wx\common;
 
 if (!App::isPromoterEnabled()) {
-    Util::resultAlert('这个功能没有启用，谢谢！', 'error');
+    Response::alert('这个功能没有启用，谢谢！', 'error');
 }
 
 //用户参数
@@ -27,23 +27,23 @@ $params = [
 
 $user = Util::getCurrentUser($params);
 if (empty($user)) {
-    Util::resultAlert('请在微信中打开，谢谢！', 'error');
+    Response::alert('请在微信中打开，谢谢！', 'error');
 }
 
 if ($user->isBanned()) {
-    Util::resultAlert('对不起，暂时无法使用这个功能！', 'error');
+    Response::alert('对不起，暂时无法使用这个功能！', 'error');
 }
 
 if ($user->isAgent()) {
-    Util::resultAlert('对不起，代理商无法使用这个功能！', 'error');
+    Response::alert('对不起，代理商无法使用这个功能！', 'error');
 }
 
 if ($user->isPartner()) {
-    Util::resultAlert('对不起，合伙人无法使用这个功能！', 'error');
+    Response::alert('对不起，合伙人无法使用这个功能！', 'error');
 }
 
 if ($user->isKeeper()) {
-    Util::resultAlert('对不起，运营人员无法使用这个功能！', 'error');
+    Response::alert('对不起，运营人员无法使用这个功能！', 'error');
 }
 
 $op = Request::op('default');

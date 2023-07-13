@@ -521,9 +521,9 @@ $res = DBUtil::transactionDo(function () {
 });
 
 if (is_error($res)) {
-    Util::itoast($res['message'], We7::referer(), 'error');
+    Response::itoast($res['message'], We7::referer(), 'error');
 } else {
     $id = Request::int('id', $res['id']);
     $back_url = $this->createWebUrl('account', ['op' => 'edit', 'id' => $id, 'from' => Request::str('from')]);
-    Util::itoast($res['message'], $back_url, 'success');
+    Response::itoast($res['message'], $back_url, 'success');
 }

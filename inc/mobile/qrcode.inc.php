@@ -14,6 +14,7 @@ use zovye\Advertising;
 use zovye\Device;
 use zovye\model\advertisingModelObj;
 use zovye\PlaceHolder;
+use zovye\Response;
 use zovye\User;
 use zovye\Util;
 use function zovye\settings;
@@ -30,7 +31,7 @@ $params = [
 
 $user = Util::getCurrentUser($params);
 if (empty($user)) {
-    Util::resultAlert('请用微信扫一扫打开，谢谢！', 'error');
+    Response::alert('请用微信扫一扫打开，谢谢！', 'error');
 }
 
 $profile = $user->profile();
@@ -143,4 +144,4 @@ if ($default_url) {
     exit();
 }
 
-Util::resultAlert('没有设置网址！', 'error');
+Response::alert('没有设置网址！', 'error');

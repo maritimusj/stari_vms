@@ -52,7 +52,7 @@ if (Request::isset('agentId')) {
     if ($filter_agentId > 0) {
         $filter_agent = Agent::get($filter_agentId);
         if (empty($filter_agent)) {
-            Util::itoast('找不到这个代理商', $this->createWebUrl('adv', ['type' => $type]), 'error');
+            Response::itoast('找不到这个代理商', $this->createWebUrl('adv', ['type' => $type]), 'error');
         }
         $tpl_data['filter_agent'] = $filter_agent;
     }

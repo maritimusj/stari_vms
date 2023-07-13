@@ -15,7 +15,7 @@ $op = Request::op('default');
 if ($op == 'jfb_auth') {
     $user = Util::getCurrentUser();
     if (empty($user)) {
-        Util::resultAlert('请用微信打开！', 'error');
+        Response::alert('请用微信打开！', 'error');
     }
 
     $openid = Request::str('zhunaOpenId');
@@ -27,7 +27,7 @@ if ($op == 'jfb_auth') {
     $device_uid = Request::str('device');
 
     $url = Util::murl('entry', ['device' => $device_uid, 'from' => 'device']);
-    Util::redirect($url);
+    Response::redirect($url);
 } else {
     JfbAccount::cb([
         'openid' => Request::str('open_id'),

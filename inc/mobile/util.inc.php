@@ -20,7 +20,7 @@ if ($op == 'default') {
 
     $user = Util::getCurrentUser();
     if (empty($user) || $user->isBanned()) {
-        Util::resultAlert('请使用微信打开！', 'error');
+        Response::alert('请使用微信打开！', 'error');
     }
 
     $device = Device::get(Request::str('device'), true);
@@ -69,40 +69,40 @@ if ($op == 'default') {
 
     $user = Util::getCurrentUser();
     if (empty($user) || $user->isBanned()) {
-        Util::resultAlert('找不到这个用户或者用户已被禁用！', 'error');
+        Response::alert('找不到这个用户或者用户已被禁用！', 'error');
     }
 
     $adv_id = Request::int('id');
     if ($user->getId() != settings('notice.reviewAdminUserId') || Request::str('sign') !== sha1(
             App::uid().$user->getOpenid().$adv_id
         )) {
-        Util::resultAlert('无效的请求！', 'error');
+        Response::alert('无效的请求！', 'error');
     }
 
     $adv = Advertising::get($adv_id);
     if (empty($adv) || $adv->getState() == Advertising::DELETED) {
-        Util::resultAlert('找不到这个广告！', 'error');
+        Response::alert('找不到这个广告！', 'error');
     }
 
     if ($adv->getReviewResult() == ReviewResult::PASSED) {
-        Request::is_ajax() ? JSON::success('已通过审核！') : Util::resultAlert('已通过审核！');
+        Request::is_ajax() ? JSON::success('已通过审核！') : Response::alert('已通过审核！');
     }
 
     if ($adv->getReviewResult() == ReviewResult::REJECTED) {
-        Request::is_ajax() ? JSON::success('已拒绝！') : Util::resultAlert('已拒绝！', 'warning');
+        Request::is_ajax() ? JSON::success('已拒绝！') : Response::alert('已拒绝！', 'warning');
     }
 
     $fn = Request::str('fn');
     if ($fn == 'pass') {
         if (Advertising::pass($adv_id, _W('username'))) {
-            Request::is_ajax() ? JSON::success('广告已经通过审核！') : Util::resultAlert('广告已经通过审核！');
+            Request::is_ajax() ? JSON::success('广告已经通过审核！') : Response::alert('广告已经通过审核！');
         }
-        Request::is_ajax() ? JSON::fail('审核操作失败！') : Util::resultAlert('审核操作失败！', 'error');
+        Request::is_ajax() ? JSON::fail('审核操作失败！') : Response::alert('审核操作失败！', 'error');
     } elseif ($fn == 'reject') {
         if (Advertising::reject($adv_id)) {
-            Request::is_ajax() ? JSON::success('已拒绝！') : Util::resultAlert('已拒绝！');
+            Request::is_ajax() ? JSON::success('已拒绝！') : Response::alert('已拒绝！');
         }
-        Request::is_ajax() ? JSON::fail('审核操作失败！') : Util::resultAlert('审核操作失败！', 'error');
+        Request::is_ajax() ? JSON::fail('审核操作失败！') : Response::alert('审核操作失败！', 'error');
     }
 
     $tpl_data = [
@@ -116,7 +116,7 @@ if ($op == 'default') {
     if ($agent_id) {
         $agent = Agent::get($agent_id);
         if (empty($agent)) {
-            Request::is_ajax() ? JSON::fail('找不到上传广告的代理商！') : Util::resultAlert(
+            Request::is_ajax() ? JSON::fail('找不到上传广告的代理商！') : Response::alert(
                 '找不到上传广告的代理商！',
                 'error'
             );

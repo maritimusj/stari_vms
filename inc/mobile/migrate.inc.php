@@ -8,4 +8,4 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-Util::resultAlert('系统正在升级，请稍后再试！', 'warning');
+Response::alert('系统正在升级，请稍后再试！', 'warning');

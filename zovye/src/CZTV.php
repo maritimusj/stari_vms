@@ -37,11 +37,11 @@ class CZTV
 
         $device = Device::find($device_id, ['imei', 'shadow_id']);
         if (empty($device)) {
-            Util::resultAlert('请重新扫描设备上的二维码！', 'error');
+            Response::alert('请重新扫描设备上的二维码！', 'error');
         }
 
         if ($device->isDown()) {
-            Util::resultAlert('设备维护中，请稍后再试！', 'error');
+            Response::alert('设备维护中，请稍后再试！', 'error');
         }
 
         $user = self::getUser($config, $token);
@@ -65,10 +65,10 @@ class CZTV
         if ($account) {
             $res = Util::checkAvailable($user, $account,  $device);
             if (is_error($res)) {
-                Util::resultAlert($res['message'], 'error');
+                Response::alert($res['message'], 'error');
             }
         } else {
-            Util::resultAlert('没有关联公众号！', 'error');
+            Response::alert('没有关联公众号！', 'error');
         }
 
         app()->cztvPage([

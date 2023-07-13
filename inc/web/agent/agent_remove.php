@@ -24,8 +24,8 @@ if ($user_id) {
     );
 
     if (!is_error($res)) {
-        Util::itoast('已取消用户代理身份！', $this->createWebUrl($from), 'success');
+        Response::itoast('已取消用户代理身份！', $this->createWebUrl($from), 'success');
     }
 }
 
-Util::itoast(empty($res['message']) ? '操作失败！' : $res['message'], $this->createWebUrl($from), 'error');
+Response::itoast(empty($res['message']) ? '操作失败！' : $res['message'], $this->createWebUrl($from), 'error');

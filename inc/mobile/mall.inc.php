@@ -14,7 +14,7 @@ if (empty($user) || $user->isBanned()) {
     if (Request::is_ajax()) {
         JSON::fail('找不到这个用户！');
     }
-    Util::resultAlert('用户不可用！', 'error');
+    Response::alert('用户不可用！', 'error');
 }
 
 $op = Request::op('default');

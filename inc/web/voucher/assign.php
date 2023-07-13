@@ -24,4 +24,4 @@ if ($voucher) {
     ]);
 }
 
-Util::itoast('找不到指定的提货码！', Util::url('voucher'), 'error');
+Response::itoast('找不到指定的提货码！', Util::url('voucher'), 'error');

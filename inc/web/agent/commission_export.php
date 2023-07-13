@@ -53,7 +53,7 @@ $s_openid = Request::str('agent_openid');
 if ($s_openid) {
     $user = User::get($s_openid, true);
     if (empty($user)) {
-        Util::itoast('找不到这个用户！', '', 'error');
+        Response::itoast('找不到这个用户！', '', 'error');
     }
 }
 
@@ -65,7 +65,7 @@ $cond = [
 //是否导出
 if (Request::bool('is_export')) {
     if (empty($user)) {
-        Util::itoast('请指定用户！', '', 'error');
+        Response::itoast('请指定用户！', '', 'error');
     }
 
     set_time_limit(60);

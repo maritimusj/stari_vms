@@ -10,7 +10,7 @@ defined('IN_IA') or exit('Access Denied');
 
 $device = Device::get(Request::int('id'));
 if (empty($device)) {
-    Util::itoast('删除失败！', $this->createWebUrl('device'), 'error');
+    Response::itoast('删除失败！', $this->createWebUrl('device'), 'error');
 }
 
 We7::load()->func('file');
@@ -56,4 +56,4 @@ $device->appNotify('update');
 
 $device->destroy();
 
-Util::itoast('删除成功！', $this->createWebUrl('device'), 'success');
+Response::itoast('删除成功！', $this->createWebUrl('device'), 'success');

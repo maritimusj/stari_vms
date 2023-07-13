@@ -41,7 +41,7 @@ $tpl_data['timeout'] = App::getDeviceWaitTimeout();
 
 $pay_js = Pay::getPayJs($device, $user);
 if (is_error($pay_js)) {
-    Util::resultAlert($pay_js['message'], 'error');
+    Response::alert($pay_js['message'], 'error');
 }
 
 $tpl_data['js']['code'] = $pay_js;

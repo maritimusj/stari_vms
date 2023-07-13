@@ -14,7 +14,7 @@ $id = Request::int('id');
 if ($id > 0) {
     $lucky = FlashEgg::getLucky($id);
     if (empty($lucky)) {
-        Util::resultAlert('找不到这个抽奖活动！');
+        Response::alert('找不到这个抽奖活动！');
     }
 
     $tpl_data['id'] = $id;

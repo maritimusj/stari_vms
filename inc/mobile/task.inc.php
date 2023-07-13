@@ -14,7 +14,7 @@ $op = Request::op('default');
 if ($op == 'default') {
     $user = Util::getCurrentUser();
     if (empty($user)) {
-        Util::resultAlert('请用微信打开！', 'error');
+        Response::alert('请用微信打开！', 'error');
     }
 
     $device_shadow_id = Request::str('device');

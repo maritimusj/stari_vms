@@ -16,7 +16,7 @@ if (App::isSNTOEnabled()) {
     if ($op == 'snto_auth') {
         $user = Util::getCurrentUser();
         if (empty($user)) {
-            Util::resultAlert('请用微信打开！', 'error');
+            Response::alert('请用微信打开！', 'error');
         }
 
         $openid = Request::str('stOpenId');
@@ -28,7 +28,7 @@ if (App::isSNTOEnabled()) {
         $device_uid = Request::str('device');
 
         $url = Util::murl('entry', ['device' => $device_uid, 'from' => 'device']);
-        Util::redirect($url);
+        Response::redirect($url);
     }
 
     Log::debug('snto', [

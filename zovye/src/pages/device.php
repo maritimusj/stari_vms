@@ -86,7 +86,7 @@ foreach ((array)$tpl['accounts'] as $index => $account) {
     if (!empty($account['redirect_url'])) {
         //链接转跳前，先判断设备是否在线
         if ($device->isMcbOnline()) {
-            Util::redirect($account['redirect_url']);
+            Response::redirect($account['redirect_url']);
             exit('正在转跳...');
         }
         unset($tpl['accounts'][$index]);
@@ -114,7 +114,7 @@ $device_imei = $device->getImei();
 
 $pay_js = Pay::getPayJs($device, $user);
 if (is_error($pay_js)) {
-    Util::resultAlert($pay_js['message'], 'error');
+    Response::alert($pay_js['message'], 'error');
 }
 
 $requestID = REQUEST_ID;

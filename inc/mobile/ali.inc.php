@@ -16,17 +16,17 @@ $device_id = Request::str('device');
 if ($op == 'auth') {
     $code = Request::str('auth_code');
     if (empty($code)) {
-        Util::resultAlert('获取用户auth_code失败！', 'error');
+        Response::alert('获取用户auth_code失败！', 'error');
     }
     if (!Util::getAliUser($code)) {
-        Util::resultAlert('获取用户信息失败[02]', 'error');
+        Response::alert('获取用户信息失败[02]', 'error');
     }
 }
 
 if (!App::isAliUser()) {
     $retries = Request::int('retries');
     if ($retries > 3) {
-        Util::resultAlert('获取用户信息失败[01]', 'error');
+        Response::alert('获取用户信息失败[01]', 'error');
     }
     $cb_url = Util::murl('ali', [
         'op' => 'auth',
@@ -44,20 +44,20 @@ if (!App::isAliUser()) {
 
 $device = Device::find($device_id, ['imei', 'shadow_id']);
 if (empty($device)) {
-    Util::resultAlert('请重新扫描设备上的二维码！', 'error');
+    Response::alert('请重新扫描设备上的二维码！', 'error');
 }
 
 if ($device->isDown()) {
-    Util::resultAlert('设备维护中，请稍后再试！', 'error');
+    Response::alert('设备维护中，请稍后再试！', 'error');
 }
 
 $user = Util::getCurrentUser();
 if (empty($user)) {
-    Util::resultAlert('请重新扫描二维码，谢谢！', 'error');
+    Response::alert('请重新扫描二维码，谢谢！', 'error');
 }
 
 if ($user->isBanned()) {
-    Util::resultAlert('用户暂时无法使用该功能，请联系管理员！', 'error');
+    Response::alert('用户暂时无法使用该功能，请联系管理员！', 'error');
 }
 
 if (App::isUserVerify18Enabled()) {
@@ -71,7 +71,7 @@ if (App::isUserVerify18Enabled()) {
 
 //开启了shadowId的设备，只能通过shadowId找到
 if ($device->isActiveQrcodeEnabled() && $device->getShadowId() !== $device_id) {
-    Util::resultAlert('设备二维码不匹配！', 'error');
+    Response::alert('设备二维码不匹配！', 'error');
 }
 
 if ($from == 'device') {

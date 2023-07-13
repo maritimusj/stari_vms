@@ -11,7 +11,7 @@ defined('IN_IA') or exit('Access Denied');
 $task = Migrate::getNewTask();
 if (empty($task)) {
     $home = Util::url('homepage');
-    Util::redirect($home);
+    Response::redirect($home);
     exit();
 }
 

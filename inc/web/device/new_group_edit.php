@@ -16,7 +16,7 @@ $tpl_data['id'] = $id;
 /** @var device_groupsModelObj $group */
 $group = Group::get($id);
 if (empty($group)) {
-    Util::itoast('分组不存在！', $this->createWebUrl('device', ['op' => 'new_group']), 'error');
+    Response::itoast('分组不存在！', $this->createWebUrl('device', ['op' => 'new_group']), 'error');
 }
 
 $tpl_data['group'] = [

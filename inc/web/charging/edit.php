@@ -16,7 +16,7 @@ $id = Request::int('id');
 if ($id > 0) {
     $group = Group::get($id, Group::CHARGING);
     if (!$group) {
-        Util::itoast('找不到这个分组！', Util::url('charging'), 'error');
+        Response::itoast('找不到这个分组！', Util::url('charging'), 'error');
     }
     $agent = $group->getAgent();
     if ($agent) {

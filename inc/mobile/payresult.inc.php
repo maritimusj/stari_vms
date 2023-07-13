@@ -22,10 +22,10 @@ if ($op == 'default') {
 } elseif ($op == 'SQB') {
 
     if (Request::trim('is_success') == 'T' && Request::str('status') == 'SUCCESS') {
-        Util::resultAlert('支付成功！');
+        Response::alert('支付成功！');
     }
 
-    Util::resultAlert(Request::trim('error_message', '支付失败！'), 'error');
+    Response::alert(Request::trim('error_message', '支付失败！'), 'error');
 
 } elseif ($op == 'notify') {
 

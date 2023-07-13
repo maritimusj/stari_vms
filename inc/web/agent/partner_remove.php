@@ -13,7 +13,7 @@ $partner_id = Request::int('partnerid');
 
 $agent = Agent::get($agent_id);
 if (empty($agent)) {
-    Util::itoast('找不到这个代理商！', $this->createWebUrl('agent', ['op' => 'partner', 'id' => $agent_id]), 'error');
+    Response::itoast('找不到这个代理商！', $this->createWebUrl('agent', ['op' => 'partner', 'id' => $agent_id]), 'error');
 }
 
 $res = DBUtil::transactionDo(
@@ -32,7 +32,7 @@ $res = DBUtil::transactionDo(
 );
 
 if (is_error($res)) {
-    Util::itoast('合伙人删除失败！', $this->createWebUrl('agent', ['op' => 'partner', 'id' => $agent_id]), 'error');
+    Response::itoast('合伙人删除失败！', $this->createWebUrl('agent', ['op' => 'partner', 'id' => $agent_id]), 'error');
 }
 
-Util::itoast('合伙人删除成功！', $this->createWebUrl('agent', ['op' => 'partner', 'id' => $agent_id]), 'success');
+Response::itoast('合伙人删除成功！', $this->createWebUrl('agent', ['op' => 'partner', 'id' => $agent_id]), 'success');

@@ -73,7 +73,7 @@ class Migrate
                     app()->forceUnlock();
                 }
 
-                Util::redirect($url);
+                Response::redirect($url);
                 exit();
             }
 

@@ -47,35 +47,35 @@ $user = Util::getCurrentUser([
 ]);
 
 if (empty($user)) {
-    Util::resultAlert('找不到这个用户！', 'error');
+    Response::alert('找不到这个用户！', 'error');
 }
 
 if ($user->isBanned()) {
     if (Request::is_ajax()) {
         JSON::fail('用户暂时不可用！');
     }
-    Util::resultAlert('用户暂时不可用！');
+    Response::alert('用户暂时不可用！');
 }
 
 $tpl_data = Util::getTplData([$user]);
 
 $acc = Account::findOneFromType(Account::WEISURE);
 if (empty($acc)) {
-    Util::resultAlert('活动暂时不可用！');
+    Response::alert('活动暂时不可用！');
 }
 
 if (Util::checkLimit($acc, $user, [], 1)) {
-    Util::resultAlert('已经参加过活动！');
+    Response::alert('已经参加过活动！');
 }
 
 $config = $acc->get('config', []);
 if (empty($config['companyId']) || isEmptyArray($config['h5url'])) {
-    Util::resultAlert('活动没有正确配置！');
+    Response::alert('活动没有正确配置！');
 }
 
 $device = $user->getLastActiveDevice();
 if (empty($device)) {
-    Util::resultAlert('请重新扫描设备二维码！');
+    Response::alert('请重新扫描设备二维码！');
 }
 
 $params = [

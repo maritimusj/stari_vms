@@ -200,7 +200,7 @@ class DouYin
         if ($fetch_url) {
             return $res;
         }
-        Util::redirect($res);
+        Response::redirect($res);
         exit();
     }
 

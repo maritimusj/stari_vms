@@ -30,7 +30,7 @@ if ($id > 0) {
     /** @var advertisingModelObj $adv */
     $adv = Advertising::query(['type' => $type, 'id' => $id])->findOne();
     if (empty($adv)) {
-        Util::itoast('找不到这个广告！', $this->createWebUrl('adv', ['type' => $type]), 'error');
+        Response::itoast('找不到这个广告！', $this->createWebUrl('adv', ['type' => $type]), 'error');
     }
 
     $tpl_data['state'] = $adv->getState();
@@ -39,7 +39,7 @@ if ($id > 0) {
     if ($adv->getAgentId()) {
         $agent = Agent::get($adv->getAgentId());
         if (empty($agent)) {
-            Util::itoast('找不到这个广告所属的代理商！', $this->createWebUrl('adv', ['type' => $type]), 'error');
+            Response::itoast('找不到这个广告所属的代理商！', $this->createWebUrl('adv', ['type' => $type]), 'error');
         }
     }
 

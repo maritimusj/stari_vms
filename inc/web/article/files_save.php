@@ -15,7 +15,7 @@ if ($id) {
     /** @var filesModelObj $archive */
     $archive = m('files')->findOne(We7::uniacid(['id' => $id]));
     if (empty($archive)) {
-        Util::itoast('找不到这个附件！', $this->createWebUrl('article', ['op' => 'files']), 'error');
+        Response::itoast('找不到这个附件！', $this->createWebUrl('article', ['op' => 'files']), 'error');
     }
 }
 
@@ -31,7 +31,7 @@ $data = We7::uniacid(
 );
 
 if (empty($data['title']) || empty($data['url'])) {
-    Util::itoast('请填写标题和网址！', $this->createWebUrl('article', ['op' => 'files']), 'error');
+    Response::itoast('请填写标题和网址！', $this->createWebUrl('article', ['op' => 'files']), 'error');
 }
 
 if (isset($archive)) {
@@ -51,7 +51,7 @@ if (isset($archive)) {
 }
 
 if ($archive && $archive->save()) {
-    Util::itoast('保存成功！', $this->createWebUrl('article', ['op' => 'files']), 'sucess');
+    Response::itoast('保存成功！', $this->createWebUrl('article', ['op' => 'files']), 'sucess');
 }
 
-Util::itoast('保存失败！', $this->createWebUrl('article', ['op' => 'files']), 'error');
+Response::itoast('保存失败！', $this->createWebUrl('article', ['op' => 'files']), 'error');

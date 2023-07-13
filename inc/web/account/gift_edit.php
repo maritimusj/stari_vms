@@ -14,7 +14,7 @@ $id = Request::int('id');
 if ($id > 0) {
     $gift = FlashEgg::getGift($id);
     if (empty($gift)) {
-        Util::resultAlert('找不到这个活动！');
+        Response::alert('找不到这个活动！');
     }
 
     $tpl_data['id'] = $id;

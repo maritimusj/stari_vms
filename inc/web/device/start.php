@@ -18,4 +18,4 @@ $chargerID = Request::int('chargerID');
 
 $res = DeviceUtil::test(null, $device, $chargerID);
 
-Util::resultJSON(!is_error($res), ['msg' => $res['message']]);
+Response::json(!is_error($res), ['msg' => $res['message']]);

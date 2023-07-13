@@ -58,29 +58,29 @@ if ($op == 'default') {
 } elseif ($op == 'result') {
     $order_no = Request::trim('no');
     if (empty($order_no)) {
-        Util::resultAlert('不正确的调用[101]！', 'error');
+        Response::alert('不正确的调用[101]！', 'error');
     }
 
     if (!Locker::try("donate:$order_no")) {
-        Util::resultAlert('不正确的调用[102]！', 'error');
+        Response::alert('不正确的调用[102]！', 'error');
     }
 
     if (Order::exists($order_no)) {
-        Util::resultAlert('已完成爱心捐款，谢谢！');
+        Response::alert('已完成爱心捐款，谢谢！');
     }
 
     $pay_log = Pay::getPayLog($order_no);
     if (empty($pay_log)) {
-        Util::resultAlert('找不到支付记录，请联系管理员，谢谢！', 'error');
+        Response::alert('找不到支付记录，请联系管理员，谢谢！', 'error');
     }
 
     if ($pay_log->getUserOpenid() !== $user->getOpenid()) {
-        Util::resultAlert('不正确的调用[103]！', 'error');
+        Response::alert('不正确的调用[103]！', 'error');
     }
 
     $device = Device::get($pay_log->getDeviceId());
     if (empty($device)) {
-        Util::resultAlert('找不到指定的设备！', 'error');
+        Response::alert('找不到指定的设备！', 'error');
     }
 
     $payResult = [
@@ -98,13 +98,13 @@ if ($op == 'default') {
 
     $pay_log->setData('create_order.createtime', time());
     if (!$pay_log->save()) {
-        Util::resultAlert('无法保存数据！', 'error');
+        Response::alert('无法保存数据！', 'error');
     }
 
     $res = Job::createOrder($order_no);
     if (!$res) {
-        Util::resultAlert('无法启动出货任务！', 'error');
+        Response::alert('无法启动出货任务！', 'error');
     }
 
-    Util::redirect(Util::murl('payresult', ['orderNO' => $order_no]));
+    Response::redirect(Util::murl('payresult', ['orderNO' => $order_no]));
 }

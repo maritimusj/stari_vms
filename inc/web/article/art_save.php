@@ -16,7 +16,7 @@ $title = Request::str('title');
 $content = Request::str('content');
 
 if (empty($title)) {
-    Util::itoast('文章标题不能为空！', We7::referer(), 'error');
+    Response::itoast('文章标题不能为空！', We7::referer(), 'error');
 }
 
 if ($id) {
@@ -44,7 +44,7 @@ if ($id) {
 }
 
 if ($article && $article->save()) {
-    Util::itoast('保存成功！', We7::referer(), 'success');
+    Response::itoast('保存成功！', We7::referer(), 'success');
 }
 
-Util::itoast('保存失败！', We7::referer(), 'error');
+Response::itoast('保存失败！', We7::referer(), 'error');

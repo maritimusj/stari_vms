@@ -20,4 +20,4 @@ if ($device->isBlueToothDevice()) {
 $lane = max(0, Request::int('lane'));
 $res = DeviceUtil::test(null, $device, $lane);
 
-Util::resultJSON(!is_error($res), ['msg' => $res['message']]);
+Response::json(!is_error($res), ['msg' => $res['message']]);

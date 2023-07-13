@@ -15,7 +15,7 @@ $op = Request::op('default');
 if ($op == 'meipa_auth') {
     $user = Util::getCurrentUser();
     if (empty($user)) {
-        Util::resultAlert('请用微信打开！', 'error');
+        Response::alert('请用微信打开！', 'error');
     }
 
     $openid = Request::str('meipaopenid');
@@ -27,11 +27,11 @@ if ($op == 'meipa_auth') {
     $device_uid = Request::str('device');
 
     $url = Util::murl('entry', ['device' => $device_uid, 'from' => 'device']);
-    Util::redirect($url);
+    Response::redirect($url);
 }
 
 if (Request::is_get()) {
-    Util::resultAlert('出货成功，如果未领取到商品，请扫描二维码重试！');
+    Response::alert('出货成功，如果未领取到商品，请扫描二维码重试！');
 }
 
 MeiPaAccount::cb([

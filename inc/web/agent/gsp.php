@@ -16,7 +16,7 @@ $result_msg = function ($msg, $status) {
             JSON::fail($msg);
         }
     } else {
-        Util::itoast($msg, '', $status ? 'success' : 'error');
+        Response::itoast($msg, '', $status ? 'success' : 'error');
     }
 };
 
@@ -114,14 +114,14 @@ if ($fn == 'adduser' || $fn == 'edituser') {
         $content = app()->fetchTemplate('web/agent/mixed_edit_user', $tpl_data);
         JSON::success(['title' => $fn == 'adduser' ? '增加佣金分享用户' : '编辑佣金分享用户', 'content' => $content]);
     } else {
-        Util::resultAlert('不正确的操作！', 'error');
+        Response::alert('不正确的操作！', 'error');
     }
 
 } elseif ($fn == 'saveuser') {
 
     $user = User::get(Request::int('id'));
     if (empty($user)) {
-        Util::message('找不到这个用户！', $back_url, 'error');
+        Response::message('找不到这个用户！', $back_url, 'error');
     }
 
     $from = Request::trim('from', GSP::FREE);

@@ -24,5 +24,5 @@ foreach($list as $uid) {
 
 $zip->close();
 
-Util::redirect(Util::toMedia($filename));
+Response::redirect(Util::toMedia($filename));
 

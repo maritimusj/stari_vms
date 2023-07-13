@@ -37,7 +37,7 @@ if ($one) {
 }
 
 if ($one->save()) {
-    Util::itoast('保存成功！', $this->createWebUrl('device', ['op' => 'new_group']), 'success');
+    Response::itoast('保存成功！', $this->createWebUrl('device', ['op' => 'new_group']), 'success');
 }
 
-Util::itoast('保存失败！', $this->createWebUrl('device', ['op' => 'new_group']), 'error');
+Response::itoast('保存失败！', $this->createWebUrl('device', ['op' => 'new_group']), 'error');

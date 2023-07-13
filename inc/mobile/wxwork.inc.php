@@ -12,7 +12,7 @@ use zovye\account\WxWorkAccount;
 
 $raw = Request::raw();
 if (empty($raw)) {
-    Util::resultAlert('请重新扫描设备二维码，谢谢！');
+    Response::alert('请重新扫描设备二维码，谢谢！');
 }
 
 parse_str($raw, $data);

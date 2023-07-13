@@ -6,7 +6,6 @@
 
 namespace zovye;
 
-
 use Exception;
 
 class JSON
@@ -32,10 +31,10 @@ class JSON
     public static function success($data = [])
     {
         if (is_string($data)) {
-            Util::resultJSON(true, ['msg' => $data]);
+            Response::json(true, ['msg' => $data]);
         }
 
-        Util::resultJSON(true, $data);
+        Response::json(true, $data);
     }
 
     /**
@@ -46,17 +45,17 @@ class JSON
     public static function fail($data = [])
     {
         if (is_string($data)) {
-            Util::resultJSON(false, ['msg' => $data]);
+            Response::json(false, ['msg' => $data]);
         }
 
         if (is_error($data)) {
-            Util::resultJSON(false, ['code' => $data['errno'], 'msg' => empty($data['message']) ? '操作失败！' : $data['message']]);
+            Response::json(false, ['code' => $data['errno'], 'msg' => empty($data['message']) ? '操作失败！' : $data['message']]);
         }
 
         if ($data instanceof Exception) {
-            Util::resultJSON(false, ['msg' => $data->getMessage()]);
+            Response::json(false, ['msg' => $data->getMessage()]);
         }
 
-        Util::resultJSON(false, $data);
+        Response::json(false, $data);
     }
 }

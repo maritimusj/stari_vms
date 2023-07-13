@@ -14,7 +14,7 @@ $goods_id = Request::int('id');
 if ($goods_id > 0) {
     $params['goods'] = Goods::data($goods_id, ['detail' => true]);
     if (empty($params['goods'])) {
-        Util::itoast('找不到这个商品！', '', 'error');
+        Response::itoast('找不到这个商品！', '', 'error');
     }
 
     if ($params['goods']['name_original']) {

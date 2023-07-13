@@ -21,7 +21,7 @@ $params = [
 $user = Util::getCurrentUser($params);
 
 if (empty($user) || $user->isBanned() || !$user->isTester()) {
-    Util::resultAlert('对不起，只有测试人员才能访问！', 'error');
+    Response::alert('对不起，只有测试人员才能访问！', 'error');
 }
 
 $op = Request::op();
@@ -56,7 +56,7 @@ if (empty($op)) {
             $detail['data']['mcb']['percent'] = intval(max(0, min(100, $detail['data']['mcb']['RSSI'] / 31) * 100));
         }
 
-        Util::resultJSON($detail['status'], $detail['data']);
+        Response::json($detail['status'], $detail['data']);
     } else {
         if ($op == "test") {
             $imei = Request::trim('imei');
@@ -65,7 +65,7 @@ if (empty($op)) {
             if ($imei) {
                 $x = Device::find($imei, ['imei', 'shadow_id']);
                 if (empty($x)) {
-                    Util::resultJSON(false, ['lane' => $channel, 'msg' => '找不到这个设备,请重启设备！']);
+                    Response::json(false, ['lane' => $channel, 'msg' => '找不到这个设备,请重启设备！']);
                 }
                 if ($x->isVDevice()) {
                     JSON::success([

@@ -40,13 +40,13 @@ if ($fn == 'data') {
     $gift = FlashEgg::selectGiftForUser($user, $getDeviceFN());
 
     if (empty($gift)) {
-        Util::resultAlert('找不到这个活动！', 'error');
+        Response::alert('找不到这个活动！', 'error');
     }
 
     $detail = FlashEgg::getUserGiftDetail($user, $gift);
 
     if (empty($detail['all_acquired'])) {
-        Util::resultAlert('对不起，没有达到活动要求，暂时不能领取！');
+        Response::alert('对不起，没有达到活动要求，暂时不能领取！');
     }
 
     app()->giftRegistryPage([

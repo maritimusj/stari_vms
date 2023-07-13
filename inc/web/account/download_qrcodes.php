@@ -14,7 +14,7 @@ if ($id > 0) {
 }
 
 if (empty($lucky)) {
-    Util::resultAlert('找不到这个抽奖活动！');
+    Response::alert('找不到这个抽奖活动！');
 }
 
 $num = Request::int('num', 10);

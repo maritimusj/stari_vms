@@ -12,7 +12,7 @@ use zovye\model\device_logsModelObj;
 
 $device = Device::get(request('id'));
 if (empty($device)) {
-    Util::itoast('找不到这个设备！', $this->createWebUrl('device'), 'error');
+    Response::itoast('找不到这个设备！', $this->createWebUrl('device'), 'error');
 }
 
 $tpl_data['navs'] = [

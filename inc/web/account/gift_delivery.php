@@ -12,13 +12,13 @@ defined('IN_IA') or exit('Access Denied');
 
 $id = Request::int('id');
 if (empty($id)) {
-    Util::resultData(err('找不到这个记录！'));
+    Response::data(err('找不到这个记录！'));
 }
 
 /** @var gift_logModelObj $log */
 $log = FlashEgg::getGiftLog($id);
 if (empty($log)) {
-    Util::resultData(err('找不到这个记录！'));
+    Response::data(err('找不到这个记录！'));
 }
 
 $fn = Request::trim('fn');

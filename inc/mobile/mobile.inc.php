@@ -23,7 +23,7 @@ $params = [
 
 $user = Util::getCurrentUser($params);
 if (empty($user)) {
-    Util::resultAlert('只能从微信中打开，谢谢！', 'error');
+    Response::alert('只能从微信中打开，谢谢！', 'error');
 }
 
 $op = Request::op('default');

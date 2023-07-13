@@ -13,7 +13,7 @@ $cb_url = Util::getTemplateVar('cb_url');
 
 $app_id = settings('ali.appid');
 if (empty($app_id)) {
-    Util::resultAlert('暂时不支持支付宝！', 'error');
+    Response::alert('暂时不支持支付宝！', 'error');
 }
 
 $html = <<<HTML

@@ -27,7 +27,7 @@ if (Request::has('device')) {
     $device_id = Request::int('device');
     $device = Device::get($device_id);
     if (empty($device)) {
-        Util::itoast('找不到这个设备！', '', 'error');
+        Response::itoast('找不到这个设备！', '', 'error');
     }
     $tpl_data['device'] = $device->profile();
     $query->where(['device_id' => $device_id]);
@@ -37,7 +37,7 @@ if (Request::has('user')) {
     $user_id = Request::int('user');
     $user = User::get($user_id);
     if (empty($user)) {
-        Util::itoast('找不到这个用户！', '', 'error');
+        Response::itoast('找不到这个用户！', '', 'error');
     }
     $tpl_data['user'] = $user->profile();
     $query->where(['user_id' => $user_id]);

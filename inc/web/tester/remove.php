@@ -12,15 +12,15 @@ $id = Request::int('id');
 
 $user = User::get($id);
 if (empty($user)) {
-    Util::itoast('找不到这个用户！', $this->createWebUrl('user'), 'error');
+    Response::itoast('找不到这个用户！', $this->createWebUrl('user'), 'error');
 }
 
 if (!$user->isTester()) {
-    Util::itoast('用户不是测试员！', $this->createWebUrl('user'), 'error');
+    Response::itoast('用户不是测试员！', $this->createWebUrl('user'), 'error');
 }
 
 if ($user->setTester(false)) {
-    Util::itoast('成功！', $this->createWebUrl('user'), 'success');
+    Response::itoast('成功！', $this->createWebUrl('user'), 'success');
 }
 
-Util::itoast('失败！', $this->createWebUrl('user'), 'error');
+Response::itoast('失败！', $this->createWebUrl('user'), 'error');

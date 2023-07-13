@@ -11,7 +11,7 @@ defined('IN_IA') or exit('Access Denied');
 $id = Request::int('account');
 $account = Account::get($id);
 if (empty($account) || !$account->isQuestionnaire()) {
-    Util::resultAlert('找不到这个问卷！', 'error');
+    Response::alert('找不到这个问卷！', 'error');
 }
 
 $query = $account->logQuery(['level' => $account->getId()]);

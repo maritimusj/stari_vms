@@ -12,7 +12,7 @@ $agent_id = Request::int('agent_id');
 if ($agent_id) {
     $agent = Agent::get($agent_id);
     if (empty($agent)) {
-        Util::resultAlert('找不到这个代理商！', 'error');
+        Response::alert('找不到这个代理商！', 'error');
     }
 }
 
@@ -31,7 +31,7 @@ $id = Request::int('id');
 if ($id > 0) {
     $lucky = FlashEgg::getLucky($id);
     if (empty($lucky)) {
-        Util::resultAlert('找不到这个抽奖活动！', 'error');
+        Response::alert('找不到这个抽奖活动！', 'error');
     }
 
     $lucky->setAgentId($data['agent_id']);
@@ -42,17 +42,17 @@ if ($id > 0) {
     $lucky->setEnabled($data['enabled']);
 
     if ($lucky->save()) {
-        Util::itoast('保存成功！', Util::url('account', ['op' => 'lucky_edit', 'id' => $lucky->getId()]), 'success');
+        Response::itoast('保存成功！', Util::url('account', ['op' => 'lucky_edit', 'id' => $lucky->getId()]), 'success');
     }
 
-    Util::itoast('保存失败！', Util::url('account', ['op' => 'lucky_edit', 'id' => $lucky->getId()]), 'error');
+    Response::itoast('保存失败！', Util::url('account', ['op' => 'lucky_edit', 'id' => $lucky->getId()]), 'error');
 } else {
 
     $lucky = FlashEgg::createlucky($data);
 
     if ($lucky) {
-        Util::itoast('创建成功！', Util::url('account', ['op' => 'lucky_edit', 'id' => $lucky->getId()]), 'success');
+        Response::itoast('创建成功！', Util::url('account', ['op' => 'lucky_edit', 'id' => $lucky->getId()]), 'success');
     }
 
-    Util::itoast('创建失败！', Util::url('account', ['op' => 'lucky_edit']), 'error');
+    Response::itoast('创建失败！', Util::url('account', ['op' => 'lucky_edit']), 'error');
 }

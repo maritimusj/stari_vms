@@ -13,7 +13,7 @@ $params = Util::getTemplateVar();
 /** @var deviceModelObj $device */
 $device = Device::get($params['device'], true);
 if (empty($device)) {
-    Util::resultAlert('找不到这个设备！', 'error');
+    Response::alert('找不到这个设备！', 'error');
 }
 
 $tpl_data = [];

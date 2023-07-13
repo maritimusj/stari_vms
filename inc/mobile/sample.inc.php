@@ -12,7 +12,7 @@ defined('IN_IA') or exit('Access Denied');
 use zovye\model\userModelObj;
 
 if (!App::isFlashEggEnabled()) {
-    Util::resultAlert('该功能没有启用，请联系管理员，谢谢！', 'error');
+    Response::alert('该功能没有启用，请联系管理员，谢谢！', 'error');
 }
 
 $op = Request::op('default');
@@ -37,11 +37,11 @@ $params = [
 $getUserFN = function () use (&$params) {
     $user = Util::getCurrentUser($params);
     if (empty($user)) {
-        Util::resultAlert('请用微信或者支付宝扫描二维码，谢谢！', 'error');
+        Response::alert('请用微信或者支付宝扫描二维码，谢谢！', 'error');
     }
 
     if ($user->isBanned()) {
-        Util::resultAlert('用户暂时无法使用该功能，请联系管理员！', 'error');
+        Response::alert('用户暂时无法使用该功能，请联系管理员！', 'error');
     }
 
     return $user;
@@ -59,7 +59,7 @@ if (empty($device)) {
 }
 
 if (empty($device)) {
-    Util::resultAlert('请重新扫描设备二维码！', 'error');
+    Response::alert('请重新扫描设备二维码！', 'error');
 }
 
 $params['from'] = [

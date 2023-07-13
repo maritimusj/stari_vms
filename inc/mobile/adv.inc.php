@@ -34,6 +34,7 @@ if (Request::has('deviceid')) {
 }
 
 $result = [];
+
 if (App::isTKPromotingEnabled() && $type_id == Advertising::WELCOME_PAGE) {
     $account = TKPromoting::getAccount();
     if ($account && !$account->isBanned()) {

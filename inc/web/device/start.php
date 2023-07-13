@@ -16,6 +16,6 @@ if (empty($device)) {
 
 $chargerID = Request::int('chargerID');
 
-$res = Util::deviceTest(null, $device, $chargerID);
+$res = DeviceUtil::test(null, $device, $chargerID);
 
 Util::resultJSON(!is_error($res), ['msg' => $res['message']]);

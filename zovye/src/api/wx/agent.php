@@ -13,6 +13,7 @@ use DateTimeImmutable;
 use Exception;
 use zovye\Cache;
 use zovye\Config;
+use zovye\DeviceUtil;
 use zovye\Fueling;
 use zovye\GDCVMachine;
 use zovye\Inventory;
@@ -888,7 +889,7 @@ class agent
         }
 
         $lane = Request::int('lane');
-        $res = Util::deviceTest($user, $device, $lane);
+        $res = DeviceUtil::test($user, $device, $lane);
 
         if (is_error($res)) {
             return err($res['message']);

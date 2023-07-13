@@ -18,6 +18,7 @@ use zovye\Balance;
 use zovye\BlueToothProtocol;
 use zovye\Contract\bluetooth\IBlueToothProtocol;
 use zovye\Device;
+use zovye\DeviceUtil;
 use zovye\Goods;
 use zovye\Locker;
 use zovye\Log;
@@ -401,7 +402,7 @@ class common
         $user = self::getUser();
         if ($device->isBlueToothDevice()) {
             try {
-                $result = Util::openDevice(
+                $result = DeviceUtil::open(
                     ['level' => LOG_GOODS_VOUCHER, $device, $user, $v, 'goodsId' => $goods_id, 'online' => false]
                 );
             } catch (Exception $e) {

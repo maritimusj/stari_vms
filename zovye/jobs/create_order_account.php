@@ -11,6 +11,7 @@ use zovye\Account;
 use zovye\App;
 use zovye\CtrlServ;
 use zovye\Device;
+use zovye\DeviceUtil;
 use zovye\Goods;
 use zovye\Job;
 use zovye\Log;
@@ -145,7 +146,7 @@ if ($op == 'create_order_account' && CtrlServ::checkJobSign($params)) {
         }
 
         try {
-            $result = Util::openDevice($data);
+            $result = DeviceUtil::open($data);
             $params['result'] = $result;
 
             if (is_error($result)) {

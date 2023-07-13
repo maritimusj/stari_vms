@@ -10,6 +10,7 @@ namespace zovye\model;
 use Exception;
 use zovye\App;
 use zovye\Balance;
+use zovye\DeviceUtil;
 use zovye\Job;
 
 use zovye\Locker;
@@ -1709,7 +1710,7 @@ class deviceModelObj extends modelObj
      */
     public function isMatched($assign_data): bool
     {
-        return Util::isAssigned($assign_data, $this);
+        return DeviceUtil::isAssigned($assign_data, $this);
     }
 
     /**

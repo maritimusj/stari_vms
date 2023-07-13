@@ -14,6 +14,7 @@ use zovye\App;
 use zovye\CommissionBalance;
 use zovye\Config;
 use zovye\Device;
+use zovye\DeviceUtil;
 use zovye\GDCVMachine;
 use zovye\Inventory;
 use zovye\Locker;
@@ -1144,7 +1145,7 @@ class keeper
         $lane = Request::int('lane');
 
         //设置params['keeper']后，库存不会减少
-        $res = Util::deviceTest(
+        $res = DeviceUtil::test(
             $keeper->getUser(),
             $device,
             $lane,

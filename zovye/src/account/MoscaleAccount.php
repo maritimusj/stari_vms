@@ -11,6 +11,7 @@ use RuntimeException;
 use zovye\Account;
 use zovye\App;
 use zovye\Device;
+use zovye\DeviceUtil;
 use zovye\HttpUtil;
 use zovye\Log;
 use zovye\model\accountModelObj;
@@ -51,7 +52,7 @@ class MoscaleAccount
             return false;
         }
 
-        return Util::isAssigned($acc->getAssignData(), $device);
+        return DeviceUtil::isAssigned($acc->getAssignData(), $device);
     }
 
     public static function getUid(): string

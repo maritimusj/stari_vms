@@ -73,7 +73,7 @@ try {
 
     $result = Util::transactionDo(function () use ($device, $user, $account, $goods_id, $ticket_data_saved) {
         //出货流程，EventBus会抛出异常
-        $result = Util::openDevice([
+        $result = DeviceUtil::open([
             $device,
             $user,
             $account,

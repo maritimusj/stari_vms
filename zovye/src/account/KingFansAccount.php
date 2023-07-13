@@ -188,7 +188,7 @@ class KingFansAccount
         }
     }
 
-    public function fetchOne(deviceModelObj $device, userModelObj $user, callable $cb = null)
+    public function fetchOne(deviceModelObj $device, userModelObj $user = null, callable $cb = null)
     {
         $fans = empty($user) ? Util::fansInfo() : $user->profile();
 

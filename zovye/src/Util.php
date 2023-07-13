@@ -8,11 +8,8 @@ namespace zovye;
 
 use DateTime;
 use DateTimeImmutable;
-use Exception;
 use InvalidArgumentException;
-use QRcode;
 use Throwable;
-use we7\ihttp;
 use WeAccount;
 
 //框架提供

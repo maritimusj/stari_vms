@@ -70,6 +70,7 @@ class keeper
         $res = common::getDecryptedWxUserData();
         if (is_error($res)) {
             Log::error('wxapi', $res);
+
             return err('登录失败，请稍后再试！[500]');
         }
 
@@ -114,7 +115,7 @@ class keeper
 
         $query = \zovye\Keeper::query(['mobile' => $mobile]);
         if (empty($query->count())) {
-            return err('找不到相应的运营人员信息！');
+            return err('找不到相应的运营人员信息，手机号码：'.$mobile);
         }
 
         $keeper_data = [];

@@ -41,7 +41,7 @@ if ($fn == 'default') {
         'api_url' => Util::url('fueling', ['op' => 'stats']),
     ];
 
-    Response::showTemplate('web/fueling/stats', $tpl_data);
+    Response::showTemplate('web/home/ranking', $tpl_data);
 
 } elseif ($fn == 'agent') {
 
@@ -77,7 +77,8 @@ if ($fn == 'default') {
                 'devices_total' => $device_total,
                 'order_total' => intval($item['total']),
                 'price' => number_format($item['price'] / 100, 2, '.', ''),
-                'amount' => number_format($item['amount'] / 100, 2, '.', ''),
+                'amount' => App::isFuelingDeviceEnabled() ?
+                    number_format($item['amount'] / 100, 2, '.', '') : $item['amount'],
             ];
             $summary['order'] += intval($item['total']);
             $summary['price'] += $item['price'];
@@ -85,8 +86,11 @@ if ($fn == 'default') {
         }
     }
 
-    $summary['price'] = number_format($summary['price'] / 100, 2, '.', '');
-    $summary['amount'] = number_format($summary['amount'] / 100, 2, '.', '');
+    $summary['price'] = number_format($summary['price'], 2, '.', '');
+    if (App::isFuelingDeviceEnabled()) {
+        $summary['amount'] = number_format($summary['amount'], 2, '.', '');
+    }
+
 
     JSON::success([
         'begin' => isset($begin) ? $begin->format('Y-m-d') : '',
@@ -131,7 +135,8 @@ if ($fn == 'default') {
                 'device' => $device->profile(),
                 'order_total' => intval($item['total']),
                 'price' => number_format($item['price'] / 100, 2, '.', ''),
-                'amount' => number_format($item['amount'] / 100, 2, '.', ''),
+                'amount' => App::isFuelingDeviceEnabled()?
+                    number_format($item['amount'] / 100, 2, '.', '') : $item['amount'],
             ];
             $summary['order'] += intval($item['total']);
             $summary['price'] += $item['price'];
@@ -139,8 +144,10 @@ if ($fn == 'default') {
         }
     }
 
-    $summary['price'] = number_format($summary['price'] / 100, 2, '.', '');
-    $summary['amount'] = number_format($summary['amount'] / 100, 2, '.', '');
+    $summary['price'] = number_format($summary['price'], 2, '.', '');
+    if (App::isFuelingDeviceEnabled()) {
+        $summary['amount'] = number_format($summary['amount'], 2, '.', '');
+    }
 
     JSON::success([
         'begin' => isset($begin) ? $begin->format('Y-m-d') : '',

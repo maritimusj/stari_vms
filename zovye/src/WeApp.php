@@ -11,42 +11,6 @@ use we7\template;
 use zovye\base\modelObj;
 use zovye\model\weapp_configModelObj;
 
-/**
- * @method devicePage(array $params)
- * @method aliAuthPage(array $params)
- * @method bonusPage(array $params)
- * @method userPage(array $params)
- * @method userBalanceLogPage(array $params)
- * @method getBalanceBonusPage(array $params)
- * @method cztvPage(array $params)
- * @method getPage(array $params)
- * @method giftDetailPage(array $params)
- * @method devicePreparePage(array $params)
- * @method locationPage(array $params)
- * @method smsPromoPage(array $array)
- * @method jumpPage(array $params)
- * @method fillQuestionnairePage(array $array)
- * @method scanPage(array $params)
- * @method idCardPage(array $params)
- * @method mallPage(array $params)
- * @method mallOrderPage(array $params)
- * @method orderPage(array $params)
- * @method feedbackPage(array $params = [])
- * @method mobilePage(array $params)
- * @method taskPage(array $params)
- * @method payResultPage(array $params)
- * @method giftGoodsListPage(array $params)
- * @method followPage(array $params)
- * @method userInfoPage(array $params)
- * @method moreAccountsPage(array $params)
- * @method douyinPage(array $params)
- * @method keeperPage(array $params)
- * @method giftRegistryPage(array $array)
- * @method luckyRegistryPage(array $array)
- * @method giftLogsPage(array $array)
- * @method luckyLogsPage(array $array)
- * @method flashEggPage(array $array)
- */
 class WeApp extends Settings
 {
     private static $app_settings = null;
@@ -55,20 +19,6 @@ class WeApp extends Settings
     public function __construct()
     {
         parent::__construct('weapp', 'config', true);
-    }
-
-    public function __call($name, $arguments)
-    {
-        $names = explode('_', toSnakeCase($name));
-        $last = array_pop($names);
-        if ($last == 'page') {
-            $v = implode('_', $names);
-            $file = ZOVYE_SRC . 'pages' . DIRECTORY_SEPARATOR . $v . '.php';
-            if (is_file($file)) {
-                $GLOBALS['_tpl_var_'] = $arguments;
-                require $file;
-            }
-        }
     }
 
     public function createWebUrl($do, $params = []): string
@@ -140,7 +90,7 @@ class WeApp extends Settings
 
         $global = m('weapp_config')->findOne(['name' => 'settings']);
         if ($global) {
-            return Util::lockObject($global, [OBJ_LOCKED_UID => UNLOCKED], true);
+            return DBUtil::lockObject($global, [OBJ_LOCKED_UID => UNLOCKED], true);
         }
         return null;
     }

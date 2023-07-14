@@ -10,7 +10,7 @@ use Exception;
 
 class JSON
 {
-    public static function raw($data)
+    public static function data($data)
     {
         echo json_encode($data);
         exit();

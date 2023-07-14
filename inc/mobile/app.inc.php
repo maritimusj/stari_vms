@@ -111,7 +111,7 @@ if ($op == 'default') {
         if ($title) {
             $value = $title->getV();
         }
-        JSON::raw([['value' => $value]]);
+        JSON::data([['value' => $value]]);
     }
 
     //
@@ -120,7 +120,7 @@ if ($op == 'default') {
         $k_freq = 'total_sale_freq';
         $k_s1 = 'total_sale_section1';
         $k_s2 = 'total_sale_section2';
-        JSON::raw([['value' => handleFreq($k_init, $k_freq, $k_s1, $k_s2)]]);
+        JSON::data([['value' => handleFreq($k_init, $k_freq, $k_s1, $k_s2)]]);
     }
 
     if ($type == 'today_sale') {
@@ -128,27 +128,27 @@ if ($op == 'default') {
         $k_freq = 'today_sale_freq';
         $k_s1 = 'today_sale_section1';
         $k_s2 = 'today_sale_section2';
-        JSON::raw([['value' => handleFreq($k_init, $k_freq, $k_s1, $k_s2)]]);
+        JSON::data([['value' => handleFreq($k_init, $k_freq, $k_s1, $k_s2)]]);
     }
     if ($type == 'total_order') {
         $k_init = 'total_order_init';
         $k_freq = 'total_order_freq';
         $k_s1 = 'total_order_section1';
         $k_s2 = 'total_order_section2';
-        JSON::raw([['value' => handleFreq($k_init, $k_freq, $k_s1, $k_s2)]]);
+        JSON::data([['value' => handleFreq($k_init, $k_freq, $k_s1, $k_s2)]]);
     }
     if ($type == 'today_order') {
         $k_init = 'today_order_init';
         $k_freq = 'today_order_freq';
         $k_s1 = 'today_order_section1';
         $k_s2 = 'today_order_section2';
-        JSON::raw([['value' => handleFreq($k_init, $k_freq, $k_s1, $k_s2)]]);
+        JSON::data([['value' => handleFreq($k_init, $k_freq, $k_s1, $k_s2)]]);
     }
     if ($type == 'user') {
-        JSON::raw(handlePCT('user_man', 'user_woman', '男性', '女性'));
+        JSON::data(handlePCT('user_man', 'user_woman', '男性', '女性'));
     }
     if ($type == 'income') {
-        JSON::raw(handlePCT('income_wx', 'income_ali', '微信', '支付宝'));
+        JSON::data(handlePCT('income_wx', 'income_ali', '微信', '支付宝'));
     }
     //商品
     if ($type == 'goods') {
@@ -269,7 +269,7 @@ if ($op == 'default') {
             $res_arr[] = ['key1' => $arr_assoc[$item->getK()], 'value1' => $value_arr[0]];
         }
 
-        JSON::raw($res_arr);
+        JSON::data($res_arr);
     }
 
     if ($type == 'device_total') {
@@ -285,7 +285,7 @@ if ($op == 'default') {
             $total_amount += $value_arr[0];
         }
 
-        JSON::raw([['value' => $total_amount]]);
+        JSON::data([['value' => $total_amount]]);
     }
 
     if ($type == 'device_map') {
@@ -300,7 +300,7 @@ if ($op == 'default') {
             $res_arr[] = ['x' => $arr_assoc[$item->getK()], 'y' => $value_arr[0], 's' => 'thermal'];
         }
 
-        JSON::raw($res_arr);
+        JSON::data($res_arr);
     }
 }
 

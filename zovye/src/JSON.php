@@ -10,6 +10,11 @@ use Exception;
 
 class JSON
 {
+    public static function raw($data)
+    {
+        echo json_encode($data);
+        exit();
+    }
     /**
      * 向请求者返回JSON数据
      * @param $data

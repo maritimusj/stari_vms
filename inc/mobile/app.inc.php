@@ -95,7 +95,7 @@ if ($op == 'default') {
     );
 
     if (is_error($result)) {
-       JSON::fail($result);
+        JSON::fail($result);
     }
 
     JSON::success($result['message']);
@@ -111,7 +111,7 @@ if ($op == 'default') {
         if ($title) {
             $value = $title->getV();
         }
-        exit(json_encode([['value' => $value]]));
+        JSON::raw([['value' => $value]]);
     }
 
     //
@@ -120,7 +120,7 @@ if ($op == 'default') {
         $k_freq = 'total_sale_freq';
         $k_s1 = 'total_sale_section1';
         $k_s2 = 'total_sale_section2';
-        exit(json_encode([['value' => handleFreq($k_init, $k_freq, $k_s1, $k_s2)]]));
+        JSON::raw([['value' => handleFreq($k_init, $k_freq, $k_s1, $k_s2)]]);
     }
 
     if ($type == 'today_sale') {
@@ -128,27 +128,27 @@ if ($op == 'default') {
         $k_freq = 'today_sale_freq';
         $k_s1 = 'today_sale_section1';
         $k_s2 = 'today_sale_section2';
-        exit(json_encode([['value' => handleFreq($k_init, $k_freq, $k_s1, $k_s2)]]));
+        JSON::raw([['value' => handleFreq($k_init, $k_freq, $k_s1, $k_s2)]]);
     }
     if ($type == 'total_order') {
         $k_init = 'total_order_init';
         $k_freq = 'total_order_freq';
         $k_s1 = 'total_order_section1';
         $k_s2 = 'total_order_section2';
-        exit(json_encode([['value' => handleFreq($k_init, $k_freq, $k_s1, $k_s2)]]));
+        JSON::raw([['value' => handleFreq($k_init, $k_freq, $k_s1, $k_s2)]]);
     }
     if ($type == 'today_order') {
         $k_init = 'today_order_init';
         $k_freq = 'today_order_freq';
         $k_s1 = 'today_order_section1';
         $k_s2 = 'today_order_section2';
-        exit(json_encode([['value' => handleFreq($k_init, $k_freq, $k_s1, $k_s2)]]));
+        JSON::raw([['value' => handleFreq($k_init, $k_freq, $k_s1, $k_s2)]]);
     }
     if ($type == 'user') {
-        exit(json_encode(handlePCT('user_man', 'user_woman', '男性', '女性')));
+        JSON::raw(handlePCT('user_man', 'user_woman', '男性', '女性'));
     }
     if ($type == 'income') {
-        exit(json_encode(handlePCT('income_wx', 'income_ali', '微信', '支付宝')));
+        JSON::raw(handlePCT('income_wx', 'income_ali', '微信', '支付宝'));
     }
     //商品
     if ($type == 'goods') {
@@ -269,7 +269,7 @@ if ($op == 'default') {
             $res_arr[] = ['key1' => $arr_assoc[$item->getK()], 'value1' => $value_arr[0]];
         }
 
-        exit(json_encode($res_arr));
+        JSON::raw($res_arr);
     }
 
     if ($type == 'device_total') {
@@ -285,7 +285,7 @@ if ($op == 'default') {
             $total_amount += $value_arr[0];
         }
 
-        exit(json_encode([['value' => $total_amount]]));
+        JSON::raw([['value' => $total_amount]]);
     }
 
     if ($type == 'device_map') {
@@ -300,7 +300,7 @@ if ($op == 'default') {
             $res_arr[] = ['x' => $arr_assoc[$item->getK()], 'y' => $value_arr[0], 's' => 'thermal'];
         }
 
-        exit(json_encode($res_arr));
+        JSON::raw($res_arr);
     }
 }
 

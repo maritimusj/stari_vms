@@ -11,6 +11,14 @@ namespace zovye;
  * @method static devicePreparePage(array $tpl_data)
  * @method static devicePage(array $tpl_data)
  * @method static getPage(array $tpl_data)
+ * @method static jumpPage(array $tpl_data)
+ * @method static getBalanceBonusPage(array $array)
+ * @method static scanPage(array $tpl_data)
+ * @method static locationPage(array $tpl_data)
+ * @method static douyinPage(array $array)
+ * @method static moreAccountsPage(array $tpl_data)
+ * @method static fillQuestionnairePage(array $array)
+ * @method static smsPromoPage(array $array)
  */
 class Response
 {

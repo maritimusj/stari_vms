@@ -70,7 +70,7 @@ if ($device_id) {
         $theme = Helper::getTheme($device);
         if ($theme == 'promo') {
             //推广首页
-            app()->smsPromoPage([
+            Response::smsPromoPage([
                 'device' => $device->getImei(),
             ]);
         }
@@ -135,16 +135,18 @@ if ($device_id) {
                     ]
                 ]);
                 
-                app()->jumpPage($tpl_data);
+                Response::jumpPage($tpl_data);
             };
         }
         //如果公众号奖励为积分，显示获取积分页面
         elseif (App::isBalanceEnabled() && $account->getBonusType() == Account::BALANCE) {
             $cb = function (userModelObj $user) use ($account) {
-                app()->getBalanceBonusPage([
+
+                Response::getBalanceBonusPage([
                     'user' => $user,
                     'account' => $account,
                 ]);
+
             };
         } else {
             /**
@@ -189,7 +191,7 @@ if ($user->isBanned()) {
 }
 
 if (App::isUserVerify18Enabled() && !$user->isIDCardVerified()) {
-    app()->showTemplate(Theme::getThemeFile($device, 'verify_18'), [
+    Response::showTemplate(Theme::getThemeFile($device, 'verify_18'), [
         'verify18' => settings('user.verify_18', []),
         'entry_url' => Util::murl('entry', ['from' => $from, 'device' => $device_id, 'account' => $account_id]),
     ]);
@@ -209,7 +211,7 @@ if ($from == 'device') {
     if ($device->isReadyTimeout()) {
         //设备准备页面，检测设备是否在线等等
         $tpl_data = Util::getTplData([$device, $user]);
-        app()->devicePreparePage($tpl_data);
+        Response::devicePreparePage($tpl_data);
     }
 
 } else {
@@ -218,7 +220,7 @@ if ($from == 'device') {
 
     if ($account && $account->isQuestionnaire() && $account->getBonusType() == Account::BALANCE) {
         $user->cleanLastActiveData();
-        app()->fillQuestionnairePage([
+        Response::fillQuestionnairePage([
             'user' => $user,
             'account' => $account,
         ]);
@@ -228,7 +230,7 @@ if ($from == 'device') {
 if (empty($device)) {
     //设备扫描页面
     $tpl_data = Util::getTplData([$user, $account]);
-    app()->scanPage($tpl_data);
+    Response::scanPage($tpl_data);
 }
 
 //检查用户定位
@@ -247,7 +249,7 @@ if (LocationUtil::mustValidate($user, $device)) {
     );
 
     //定位页面
-    app()->locationPage($tpl_data);
+    Response::locationPage($tpl_data);
 }
 
 if ($account) {
@@ -273,9 +275,9 @@ if (empty($account)) {
     $tpl_data['from'] = $from;
 
     //设备首页
-    app()->devicePage($tpl_data);
+    Response::devicePage($tpl_data);
     //调试使用
-    //app()->douyinPage(['device' => $device, 'user' => $user]);
+    //Response::douyinPage(['device' => $device, 'user' => $user]);
 }
 
 //处理多个关注二维码
@@ -286,11 +288,11 @@ if ($more_accounts) {
     $tpl_data['accounts'] = $more_accounts;
 
     //显示更多关注页面
-    app()->moreAccountsPage($tpl_data);
+    Response::moreAccountsPage($tpl_data);
 }
 
 if ($account->isQuestionnaire()) {
-    app()->fillQuestionnairePage([
+    Response::fillQuestionnairePage([
         'user' => $user,
         'account' => $account,
         'device' => $device,
@@ -321,7 +323,6 @@ $tpl_data = Util::getTplData([
         'wx_app.username' => settings('agentWxapp.username', ''),
     ]
 ]);
-
 
 //领取页面
 Response::getPage($tpl_data);

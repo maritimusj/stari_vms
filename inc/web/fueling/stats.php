@@ -154,6 +154,8 @@ if ($fn == 'default') {
 
 function getParsedDate(): array
 {
+    $begin = null;
+    $end = null;
     try {
         $res = explode('-', Request::str('begin'), 3);
         if (count($res) == 1 && !empty($res[0])) {

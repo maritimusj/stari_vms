@@ -50,4 +50,4 @@ foreach ($query->findAll() as $entry) {
 
 $result['serial'] = Request::trim('serial') ?: microtime(true).'';
 
-Response::json(true, $result);
+JSON::success($result);

@@ -81,4 +81,4 @@ $res = DBUtil::transactionDo(
     }
 );
 
-Response::json(!is_error($res), ['msg' => $res['message']]);
+JSON::result($res);

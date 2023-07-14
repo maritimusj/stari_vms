@@ -65,7 +65,7 @@ if (empty($op)) {
             if ($imei) {
                 $x = Device::find($imei, ['imei', 'shadow_id']);
                 if (empty($x)) {
-                    Response::json(false, ['lane' => $channel, 'msg' => '找不到这个设备,请重启设备！']);
+                    JSON::fail(['lane' => $channel, 'msg' => '找不到这个设备,请重启设备！']);
                 }
                 if ($x->isVDevice()) {
                     JSON::success([

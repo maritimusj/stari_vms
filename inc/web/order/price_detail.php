@@ -47,21 +47,19 @@ if ($order->isFuelingOrder()) {
         }
     }
 
-    $content = app()->fetchTemplate(
-        'web/fueling/detail',
+    Response::templateJSON(
+        'web/fueling/detail','计费详情',
         [
             'list' => $list,
         ]
     );
 } elseif ($order->isChargingOrder()) {
-    $content = app()->fetchTemplate(
-        'web/charging/detail',
+    Response::templateJSON(
+        'web/charging/detail','计费详情',
         [
             'data' => $order->getChargingRecord(),
         ]
     );
-} else {
-    $content = '没有计费信息!';
 }
 
-JSON::success(['title' => '计费详情', 'content' => $content]);
+JSON::fail('没有计费信息!');

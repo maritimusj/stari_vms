@@ -52,16 +52,15 @@ if ($total > 0) {
 }
 
 if (Request::is_ajax()) {
-    $content = app()->fetchTemplate(
+    Response::templateJSON(
         'web/inventory/choose',
+        '库存列表',
         [
             'pager' => $pager,
             's_keywords' => $keywords,
             'list' => $inventories['list'],
         ]
     );
-
-    JSON::success(['title' => "库存列表", 'content' => $content]);
 }
 
 Response::showTemplate('web/inventory/default', [

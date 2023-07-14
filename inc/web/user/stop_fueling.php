@@ -3,7 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
- 
+
 namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
@@ -38,14 +38,13 @@ if (empty($order) || $order->isFuelingFinished()) {
 }
 
 // 暂时不做后续处理
-// $content = app()->fetchTemplate(
-//     'web/user/feuling',
-//     [
-//         'user' => $user->profile(),
-//         'device' => $device->profile(),
-//         'order' => $order->profile(),
-//         'status' => $device->getFuelingStatusData($data['chargerID']),
-//     ]
-// );
-
-// JSON::success(['title' => '加注信息', 'content' => $content]);
+//Response::fetchTemplate(
+//    'web/user/feuling',
+//    '加注信息',
+//    [
+//        'user' => $user->profile(),
+//        'device' => $device->profile(),
+//        'order' => $order->profile(),
+//        'status' => $device->getFuelingStatusData($data['chargerID']),
+//    ]
+//);

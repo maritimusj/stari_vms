@@ -3,7 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
- 
+
 namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
@@ -16,9 +16,11 @@ if (!$delivery) {
 
 $package = $delivery->getExtraData('package', []);
 
-$content = app()->fetchTemplate('web/mall/package_edit', [
-    'id' => $delivery->getId(),
-    'package' => $package,
-]);
-
-JSON::success(['title' => "发货信息[ {$delivery->getOrderNo()} ]", 'content' => $content]);
+Response::templateJSON(
+    'web/mall/package_edit',
+    "发货信息[ {$delivery->getOrderNo()} ]",
+    [
+        'id' => $delivery->getId(),
+        'package' => $package,
+    ]
+);

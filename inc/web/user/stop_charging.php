@@ -37,15 +37,13 @@ if (empty($fn)) {
         ];
     }
 
-    $content = app()->fetchTemplate(
-        'web/user/charging',
+    Response::templateJSON(
+        'web/user/charging', '充电信息',
         [
             'user' => $user->profile(),
             'list' => $list,
         ]
     );
-
-    JSON::success(['title' => '充电信息', 'content' => $content]);
 
 } elseif ($fn == 'stop') {
 

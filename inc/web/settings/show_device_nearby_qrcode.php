@@ -14,12 +14,9 @@ if (is_error($result)) {
     JSON::fail('创建二维码文件失败！');
 }
 
-$content = app()->fetchTemplate('web/common/qrcode', [
+Response::templateJSON('web/common/qrcode',
+    '附近设备',
+    [
     'title' => '用微信扫一扫，打开附近设备',
     'url' => Util::toMedia($result),
-]);
-
-JSON::success([
-    'title' => '附近设备',
-    'content' => $content,
 ]);

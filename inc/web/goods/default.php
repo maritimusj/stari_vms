@@ -57,12 +57,7 @@ $tpl_data['pager'] = We7::pagination($result['total'], $result['page'], $result[
 $tpl_data['backer'] = $keywords || $agent_id != 0;
 
 if (Request::is_ajax()) {
-    $content = app()->fetchTemplate('web/goods/choose', $tpl_data);
-
-    JSON::success([
-        'title' => '选择商品',
-        'content' => $content,
-    ]);
+    Response::templateJSON('web/goods/choose', '选择商品', $tpl_data);
 }
 
 $tpl_data['navs'] = [

@@ -34,16 +34,15 @@ if (Request::is_ajax()) {
         }
     }
 
-    $content = app()->fetchTemplate(
+    Response::templateJSON(
         'web/version/list',
+        "请选择要升级的版本(设备：$device_name)",
         [
             'lastUpgradeInfo' => $lastUpgradeInfo,
             'all' => $all,
             'device_id' => $device_id,
         ]
     );
-
-    JSON::success(['title' => "请选择要升级的版本(设备：$device_name)", 'content' => $content]);
 }
 
 Response::showTemplate('web/version/upgrade', [

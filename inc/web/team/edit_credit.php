@@ -20,12 +20,11 @@ if (empty($user)) {
     JSON::fail('找不到这个车队成员关联的用户！');
 }
 
-$content = app()->fetchTemplate(
+Response::templateJSON(
     'web/user/credit',
+    '透支额度',
     [
         'user' => $user->profile(),
         'val' => $user->getCredit(),
     ]
 );
-
-JSON::success(['title' => '透支额度', 'content' => $content]);

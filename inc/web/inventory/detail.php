@@ -71,15 +71,12 @@ if ($total > 0) {
 $tpl_data['list'] = $list;
 
 if (Request::is_ajax()) {
-    $content = app()->fetchTemplate('web/inventory/choose', [
+    Response::templateJSON('web/inventory/choose',
+        '选择商品',
+        [
         'list' => $list,
         'pager' => $tpl_data['pager'],
         'backer' => (bool)$keywords,
-    ]);
-
-    JSON::success([
-        'title' => '选择商品',
-        'content' => $content,
     ]);
 }
 

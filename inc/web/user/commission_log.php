@@ -40,13 +40,12 @@ if ($total > 0) {
     }
 }
 
-$content = app()->fetchTemplate(
+Response::templateJSON(
     'web/common/commission_log',
+    $title,
     [
         'user' => $user,
         'logs' => $logs,
         'pager' => $pager,
     ]
 );
-
-JSON::success(['title' => $title, 'content' => $content]);

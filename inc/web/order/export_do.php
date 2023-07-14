@@ -3,7 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
- 
+
 namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
@@ -28,16 +28,15 @@ $step = Request::str('step');
 if (empty($step) || $step == 'init') {
     $params['headers'] = Request::array('headers');
     $params['op'] = 'export_do';
-    $content = app()->fetchTemplate('web/common/export', [
-        'api_url' => Util::url('order', $params),
-        'total' => $query->count(),
-        'serial' => (new DateTime())->format('YmdHis'),
-    ]);
-
-    JSON::success([
-        'title' => "导出订单",
-        'content' => $content,
-    ]);
+    Response::templateJSON(
+        'web/common/export',
+        '导出订单',
+        [
+            'api_url' => Util::url('order', $params),
+            'total' => $query->count(),
+            'serial' => (new DateTime())->format('YmdHis'),
+        ]
+    );
 } else {
     $serial = Request::str('serial');
     if (empty($serial)) {

@@ -42,9 +42,4 @@ if (Request::has('id')) {
     }
 }
 
-$content = app()->fetchTemplate('web/device_types/edit', $tpl_data);
-
-JSON::success([
-    'title' => isset($device_type) ? '编辑设备型号' : '添加设备型号',
-    'content' => $content,
-]);
+Response::templateJSON('web/device_types/edit', isset($device_type) ? '编辑设备型号' : '添加设备型号', $tpl_data);

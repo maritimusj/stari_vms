@@ -43,6 +43,4 @@ $data = CacheUtil::cachedCall(30, function () {
     ];
 });
 
-$content = app()->fetchTemplate('web/home/stats', $data);
-
-JSON::success(['content' => $content]);
+Response::templateJSON('web/home/stats', '', $data);

@@ -18,13 +18,12 @@ if (empty($goods)) {
 $title = date('n月d日');
 $data = Stats::chartDataOfDay($goods, new DateTime(), "商品：{$goods->getName()}($title)");
 
-$content = app()->fetchTemplate(
+Response::templateJSON(
     'web/goods/stats',
+    '',
     [
         'chartId' => Util::random(10),
         'title' => $title,
         'chart' => $data,
     ]
 );
-
-JSON::success(['z' => date('z'), 'content' => $content]);

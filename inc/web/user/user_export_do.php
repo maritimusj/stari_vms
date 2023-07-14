@@ -3,7 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
- 
+
 namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
@@ -40,16 +40,18 @@ if ($end) {
 $step = Request::str('step');
 if (empty($step)) {
     $total = $query->count();
-    $content = app()->fetchTemplate('web/common/export', [
-        'api_url' => Util::url('user', [ 'op' => 'user_export_do', 'types' => $user_types, 'start' => $start, 'end' => $end]),
-        'total' => $total,
-        'serial' => (new DateTime())->format('YmdHis'),
-    ]);
-
-    JSON::success([
-        'title' => "导出用户信息",
-        'content' => $content,
-    ]);
+    Response::templateJSON(
+        'web/common/export',
+        '导出用户信息',
+        [
+            'api_url' => Util::url(
+                'user',
+                ['op' => 'user_export_do', 'types' => $user_types, 'start' => $start, 'end' => $end]
+            ),
+            'total' => $total,
+            'serial' => (new DateTime())->format('YmdHis'),
+        ]
+    );
 }
 
 $serial = Request::str('serial');
@@ -63,7 +65,7 @@ $full_filename = Util::getAttachmentFileName($dirname, $filename);
 
 if ($step == 'load') {
     $last_id = Request::int('last');
-    $query =  $query->where(['id >' => $last_id])->limit(10)->orderBy('id asc');
+    $query = $query->where(['id >' => $last_id])->limit(10)->orderBy('id asc');
 
     $result = [];
     $n = 0;
@@ -75,14 +77,17 @@ if ($step == 'load') {
         10 => '第三方API',
         15 => '第三方公众号',
     ];
-    $getAppTitle = function($i) use($app_titles) {
+    $getAppTitle = function ($i) use ($app_titles) {
         return $app_titles[$i] ?? '';
     };
-    $getTitle = function($i) {
-        switch($i) {
-            case 1: return '男';
-            case 2: return '女';
-            default: return '未知';
+    $getTitle = function ($i) {
+        switch ($i) {
+            case 1:
+                return '男';
+            case 2:
+                return '女';
+            default:
+                return '未知';
         }
     };
     /** @var userModelObj $user */

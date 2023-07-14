@@ -31,11 +31,10 @@ $data['merchant_no'] = $data['payResult']['raw']['merchant_no'] ??
     $data['payResult']['raw']['sn'] ??
     $data['queryResult']['sn'];
 
-$content = app()->fetchTemplate(
+Response::templateJSON(
     'web/order/payment',
+    '支付详情',
     [
         'data' => $data,
     ]
 );
-
-JSON::success(['title' => '支付详情', 'content' => $content]);

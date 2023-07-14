@@ -58,8 +58,9 @@ list($m, $total) = CacheUtil::cachedCall(30, function () use ($device) {
     return [];
 }, $device->getId());
 
-$content = app()->fetchTemplate(
+Response::templateJSON(
     'web/device/all_stats',
+    "<b>{$device->getName()}</b>的出货统计",
     [
         'device' => $device,
         'm_all' => $m,
@@ -67,5 +68,3 @@ $content = app()->fetchTemplate(
         'device_id' => $device->getId(),
     ]
 );
-
-JSON::success(['title' => "<b>{$device->getName()}</b>的出货统计", 'content' => $content]);

@@ -38,8 +38,9 @@ if ($device->getCommissionFixed() != -1) {
     $commission_type = 'percent';
 }
 
-$content = app()->fetchTemplate(
+Response::templateJSON(
     'web/user/keeper_device_edit',
+    "设备佣金[ {$device->getName()} ]",
     [
         'device' => $device->profile(),
         'val' => $commission_val,
@@ -48,5 +49,3 @@ $content = app()->fetchTemplate(
         'way' => $device->getWay(),
     ]
 );
-
-JSON::success(['title' => "设备佣金[ {$device->getName()} ]" , 'content' => $content]);

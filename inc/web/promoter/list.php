@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+use zovye\model\userModelObj;
+
 defined('IN_IA') or exit('Access Denied');
 
 if (!App::isPromoterEnabled()) {
@@ -33,12 +35,11 @@ foreach ($query->findAll() as $promoter) {
     $list[] = $data;
 }
 
-$content = app()->fetchTemplate(
+Response::templateJSON(
     'web/user/promoter_list',
+    '全部推广员',
     [
         'id' => $keeper->getId(),
         'list' => $list,
     ]
 );
-
-JSON::success(['title' => "全部推广员", 'content' => $content]);

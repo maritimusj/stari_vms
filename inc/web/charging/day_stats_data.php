@@ -28,12 +28,11 @@ $title = $group->getTitle();
 
 $chart = Stats::dayChartOfChargingGroup($group, $s_date, $e_date, $title);
 
-$content = app()->fetchTemplate(
+Response::templateJSON(
     'web/common/stats',
+    '',
     [
         'chartId' => Util::random(10),
         'chart' => $chart,
     ]
 );
-
-JSON::success(['title' => '', 'content' => $content]);

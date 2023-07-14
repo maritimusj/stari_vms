@@ -22,13 +22,12 @@ if ($res) {
     JSON::fail('找不到该记录！');
 }
 
-$content = app()->fetchTemplate(
+Response::templateJSON(
     'web/device/deal_fb',
+    '',
     [
         'chartId' => Util::random(10),
         'id' => $res->getId(),
         'text' => $res->getText(),
     ]
 );
-
-JSON::success(['content' => $content]);

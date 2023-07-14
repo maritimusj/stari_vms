@@ -25,8 +25,9 @@ try {
 
 $title = $month->format('Y年n月');
 
-$content = app()->fetchTemplate(
+Response::templateJSON(
     'web/common/stats',
+    $title,
     [
         'chartId' => Util::random(10),
         'title' => $title,
@@ -37,5 +38,3 @@ $content = app()->fetchTemplate(
         }, $device->getId(), $month),
     ]
 );
-
-JSON::success(['title' => '', 'content' => $content]);

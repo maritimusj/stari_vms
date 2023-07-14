@@ -32,12 +32,11 @@ try {
 } catch (Exception $e) {
 }
 
-$content = app()->fetchTemplate(
+Response::templateJSON(
     'web/account/stats',
+    '',
     [
         'chartId' => Util::random(10),
         'chart' => $data ?? [],
     ]
 );
-
-JSON::success(['title' => '', 'content' => $content]);

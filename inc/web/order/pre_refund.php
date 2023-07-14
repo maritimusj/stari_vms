@@ -40,9 +40,4 @@ if (!empty($user)) {
     $tpl['user'] = $user->profile();
 }
 
-$content = app()->fetchTemplate('web/order/refund', $tpl);
-
-JSON::success([
-    'title' => '订单退款',
-    'content' => $content,
-]);
+Response::templateJSON('web/order/refund', '订单退款', $tpl);

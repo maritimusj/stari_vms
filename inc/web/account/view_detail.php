@@ -20,8 +20,9 @@ $answer = $log->getData('answer', []);
 $result = $log->getData('result.stats', []);
 $account = $log->getData('account', []);
 
-$content = app()->fetchTemplate(
+Response::templateJSON(
     'web/account/questionnaire_detail',
+    '问卷提交详情',
     [
         'questions' => $questions,
         'answer' => $answer,
@@ -29,5 +30,3 @@ $content = app()->fetchTemplate(
         'account' => $account,
     ]
 );
-
-JSON::success(['title' => '问卷提交详情', 'content' => $content]);

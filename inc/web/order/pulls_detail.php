@@ -3,7 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
- 
+
 namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
@@ -17,11 +17,10 @@ if (empty($order)) {
 
 $list = Helper::getOrderPullLog($order);
 
-$content = app()->fetchTemplate(
+Response::templateJSON(
     'web/order/pulls',
+    '出货记录',
     [
         'list' => $list,
     ]
 );
-
-JSON::success(['title' => '出货记录', 'content' => $content]);

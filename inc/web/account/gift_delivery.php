@@ -23,10 +23,13 @@ if (empty($log)) {
 
 $fn = Request::trim('fn');
 if (empty($fn)) {
-    $content = app()->fetchTemplate('web/account/log_data', [
-        'log' => $log,
-    ]);
-    JSON::success(['title' => '物流信息', 'content' => $content]);
+    Response::templateJSON(
+        'web/account/log_data',
+        '物流信息',
+        [
+            'log' => $log,
+        ]
+    );
 }
 
 if ($fn == 'save') {

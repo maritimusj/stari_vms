@@ -25,8 +25,10 @@ foreach($ids as $id) {
         $devices_list[] = $data;
     }
 }
-$content = app()->fetchTemplate(
+
+Response::templateJSON(
     'web/agent/vip_devices',
+    "{$vip->getName()}的可用设备",
     [
         'vip' => [
             'id' => $vip->getId(),
@@ -35,5 +37,3 @@ $content = app()->fetchTemplate(
         'list' => $devices_list,
     ]
 );
-
-JSON::success(['title' => "{$vip->getName()}的可用设备", 'content' => $content]);

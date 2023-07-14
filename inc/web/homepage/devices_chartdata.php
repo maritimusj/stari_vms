@@ -8,8 +8,9 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-$content = app()->fetchTemplate(
+Response::templateJSON(
     'web/home/chart',
+    '',
     [
         'chartId' => Util::random(10),
         'data' => CacheUtil::cachedCall(30, function () {
@@ -19,5 +20,3 @@ $content = app()->fetchTemplate(
         }),
     ]
 );
-
-JSON::success(['content' => $content]);

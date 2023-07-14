@@ -16,8 +16,9 @@ if (empty($device)) {
 }
 
 $title = date('n月d日');
-$content = app()->fetchTemplate(
+Response::templateJSON(
     'web/common/stats',
+    '',
     [
         'chartId' => Util::random(10),
         'title' => $title,
@@ -28,5 +29,3 @@ $content = app()->fetchTemplate(
         }, $device->getId()),
     ]
 );
-
-JSON::success(['z' => date('z'), 'content' => $content]);

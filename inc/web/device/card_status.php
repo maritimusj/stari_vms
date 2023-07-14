@@ -18,11 +18,10 @@ if (is_error($result)) {
     JSON::fail($result);
 }
 
-$content = app()->fetchTemplate(
+Response::templateJSON(
     'web/device/card_status',
+    '流量卡状态',
     [
         'card' => $result,
     ]
 );
-
-JSON::success(['title' => "流量卡状态", 'content' => $content,]);

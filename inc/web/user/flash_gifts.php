@@ -23,8 +23,8 @@ if ($gift) {
     $list[] = FlashEgg::getUserGiftDetail($user, $gift);
 }
 
-$content = app()->fetchTemplate('web/account/gift_data', [
+Response::templateJSON('web/account/gift_data',
+    "{$user->getNickname()} - 正在参加的集蛋活动",
+    [
     'list' => $list,
 ]);
-
-JSON::success(['title' => "{$user->getNickname()} - 正在参加的集蛋活动", 'content' => $content]);

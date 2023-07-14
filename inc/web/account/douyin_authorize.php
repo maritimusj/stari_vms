@@ -28,12 +28,9 @@ if (is_error($result)) {
     JSON::fail('创建二维码文件失败！');
 }
 
-$content = app()->fetchTemplate('web/common/qrcode', [
+Response::templateJSON('web/common/qrcode',
+    $title,
+    [
     'title' => '请用抖音扫描二维码完成授权！',
     'url' => Util::toMedia($result),
-]);
-
-JSON::success([
-    'title' => "$title",
-    'content' => $content,
 ]);

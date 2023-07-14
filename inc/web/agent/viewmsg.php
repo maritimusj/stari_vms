@@ -42,13 +42,12 @@ if ($total > 0) {
     }
 }
 
-$content = app()->fetchTemplate(
+Response::templateJSON(
     'web/agent/agent_msg',
+    "<b>{$agent->getName()}</b>的消息",
     [
         'agent' => $agent,
         'message' => $messages,
         'pager' => $pager,
     ]
 );
-
-JSON::success(['title' => "<b>{$agent->getName()}</b>的消息", 'content' => $content]);

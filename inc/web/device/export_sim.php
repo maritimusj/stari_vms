@@ -15,15 +15,12 @@ $step = Request::str('step');
 if (empty($step)) {
     $total = Device::query()->count();
 
-    $content = app()->fetchTemplate('web/common/export', [
+    Response::templateJSON('web/common/export',
+        '导出SIM卡信息',
+        [
         'api_url' => Util::url('device', ['op' => 'export_sim']),
         'total' => $total,
         'serial' => (new DateTime())->format('YmdHis'),
-    ]);
-
-    JSON::success([
-        'title' => "导出SIM卡信息",
-        'content' => $content,
     ]);
 }
 

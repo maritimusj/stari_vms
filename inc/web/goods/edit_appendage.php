@@ -13,15 +13,11 @@ if (empty($goods)) {
     JSON::fail('找不到这个商品！');
 }
 
-$content = app()->fetchTemplate(
+Response::templateJSON(
     'web/goods/appendage',
+    '附加信息',
     [
         'goods' => Goods::format($goods),
         'appendage' => $goods->getAppendage(),
     ]
 );
-
-JSON::success([
-    'title' => '附加信息',
-    'content' => $content,
-]);

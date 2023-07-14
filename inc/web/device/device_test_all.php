@@ -30,9 +30,4 @@ if ($device->isChargingDevice()) {
     ];
 }
 
-$content = app()->fetchTemplate($tpl, $data);
-
-JSON::success([
-    'title' => $title,
-    'content' => $content,
-]);
+Response::templateJSON($tpl, $title, $data);

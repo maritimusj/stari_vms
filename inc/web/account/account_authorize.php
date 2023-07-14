@@ -13,11 +13,10 @@ if (empty($url)) {
     JSON::fail('暂时无法获取授权转跳网址！');
 }
 
-$content = app()->fetchTemplate(
+Response::templateJSON(
     'web/account/authorize',
+    '公众号接入授权',
     [
         'url' => $url,
     ]
 );
-
-JSON::success(['title' => "公众号接入授权", 'content' => $content]);

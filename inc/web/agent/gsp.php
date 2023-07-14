@@ -82,8 +82,8 @@ if ($fn == 'adduser' || $fn == 'edituser') {
             $tpl_data['val'] = number_format($data[$mode_type] / 100, 2);
         }
 
-        $content = app()->fetchTemplate('web/agent/free_edit_user', $tpl_data);
-        JSON::success(['title' => $fn == 'adduser' ? '增加佣金分享用户' : '编辑佣金分享用户', 'content' => $content]);
+        $title = $fn == 'adduser' ? '增加佣金分享用户' : '编辑佣金分享用户';
+        Response::templateJSON('web/agent/free_edit_user', $title, $tpl_data);
 
     } elseif ($from == GSP::MIXED) {
 
@@ -108,11 +108,11 @@ if ($fn == 'adduser' || $fn == 'edituser') {
         if (empty($user)) {
             $result_msg('找不到这个用户！', false);
         }
-        
+
         $tpl_data['user'] = $user;
 
-        $content = app()->fetchTemplate('web/agent/mixed_edit_user', $tpl_data);
-        JSON::success(['title' => $fn == 'adduser' ? '增加佣金分享用户' : '编辑佣金分享用户', 'content' => $content]);
+        $title = $fn == 'adduser' ? '增加佣金分享用户' : '编辑佣金分享用户';
+        Response::templateJSON('web/agent/mixed_edit_user', $title, $tpl_data);
     } else {
         Response::alert('不正确的操作！', 'error');
     }
@@ -236,11 +236,7 @@ if ($fn == 'adduser' || $fn == 'edituser') {
 
     $tpl_data['level'] = Request::trim('level');
 
-    $content = app()->fetchTemplate('web/agent/gsp_add_role', $tpl_data);
-    JSON::success([
-        'title' => '设置角色',
-        'content' => $content,
-    ]);
+    Response::templateJSON('web/agent/gsp_add_role', '设置角色', $tpl_data);
 
 } elseif ($fn == 'get_role') {
 

@@ -21,8 +21,9 @@ if (!$day) {
 }
 
 $title = $day->format('Y年n月');
-$content = app()->fetchTemplate(
+Response::templateJSON(
     'web/agent/stats',
+    '',
     [
         'chartId' => Util::random(10),
         'title' => $title,
@@ -31,5 +32,3 @@ $content = app()->fetchTemplate(
         }, $agent->getId(), $title),
     ]
 );
-
-JSON::success(['title' => '', 'content' => $content]);

@@ -20,13 +20,12 @@ if (!$group) {
 
 $title = $group->getTitle();
 
-$content = app()->fetchTemplate(
+Response::templateJSON(
     'web/common/stats',
+    '',
     [
         'chartId' => Util::random(10),
         'title' => $title,
         'chart' => Stats::monthChartOfChargingGroup($group, $title),
     ]
 );
-
-JSON::success(['title' => '', 'content' => $content]);

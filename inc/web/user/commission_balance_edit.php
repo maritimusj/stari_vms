@@ -13,8 +13,9 @@ if (empty($user)) {
     JSON::fail('没有找到这个用户！');
 }
 
-$content = app()->fetchTemplate(
+Response::templateJSON(
     'web/common/commission_balance_edit',
+    '调整用户<b>余额</b>',
     [
         'user' => [
             'id' => $user->getId(),
@@ -28,5 +29,3 @@ $content = app()->fetchTemplate(
         ],
     ]
 );
-
-JSON::success(['title' => '调整用户<b>余额</b>', 'content' => $content]);

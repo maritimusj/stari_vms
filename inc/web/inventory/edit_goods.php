@@ -3,7 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
- 
+
 namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
@@ -23,13 +23,12 @@ if (empty($res)) {
     JSON::fail('找不到这个商品！');
 }
 
-$content = app()->fetchTemplate('web/inventory/edit_goods', [
-    'title' => $inventory->getTitle(),
-    'num' => $res->getNum(),
-    'goods' => Goods::format($goods, false, true),
-]);
-
-JSON::success([
-    'title' => '编辑库存商品数量',
-    'content' => $content,
-]);
+Response::templateJSON(
+    'web/inventory/edit_goods',
+    '编辑库存商品数量',
+    [
+        'title' => $inventory->getTitle(),
+        'num' => $res->getNum(),
+        'goods' => Goods::format($goods, false, true),
+    ]
+);

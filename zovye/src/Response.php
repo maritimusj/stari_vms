@@ -27,7 +27,7 @@ class Response
         app()->showTemplate($is_theme_file ? Theme::file($filename) : $filename, $tpl_data);
     }
 
-    public static function templateJSON(string $filename, $title = '', $tpl_data = [])
+    public static function templateJSON(string $filename, string $title = '', $tpl_data = [])
     {
         $content = app()->fetchTemplate($filename, $tpl_data); 
         JSON::success(['title' => $title, 'content' => $content]);

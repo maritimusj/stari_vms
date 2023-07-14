@@ -13,15 +13,11 @@ if (empty($goods)) {
     JSON::fail('找不到这个商品！');
 }
 
-$content = app()->fetchTemplate(
+Response::templateJSON(
     'web/goods/quota',
+    '设置限额',
     [
         'goods' => Goods::format($goods),
         'quota_str' => json_encode($goods->getQuota()),
     ]
 );
-
-JSON::success([
-    'title' => '设置限额',
-    'content' => $content,
-]);

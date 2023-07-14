@@ -3,7 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
- 
+
 namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
@@ -15,8 +15,8 @@ $year = Request::str('year', (new DateTime())->format('Y'));
 
 list($years, $data) = Stats::getUserMonthCommissionStatsOfYear($user, $year);
 
-$content = app()->fetchTemplate(
-    'web/user/month_stats',
+Response::templateJSON(
+    'web/user/month_stats', "<b>{$user->getName()}</b>的收入统计",
     [
         'data' => $data,
         'years' => $years && count($years) > 1 ? $years : [],
@@ -24,5 +24,3 @@ $content = app()->fetchTemplate(
         'user_id' => $user->getId(),
     ]
 );
-
-JSON::success(['title' => "<b>{$user->getName()}</b>的收入统计", 'content' => $content]);

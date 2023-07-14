@@ -3,7 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
- 
+
 namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
@@ -20,8 +20,10 @@ if (!$group) {
 
 $title = $group->getTitle();
 
-$content = app()->fetchTemplate('web/device/select_day_stats', [
-    'id' => $group->getId(),
-]);
-
-JSON::success(['title' => $title, 'content' => $content]);
+Response::templateJSON(
+    'web/device/select_day_stats',
+    $title,
+    [
+        'id' => $group->getId(),
+    ]
+);

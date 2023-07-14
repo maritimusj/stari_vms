@@ -63,13 +63,12 @@ if ($user->isKeeper()) {
     }
 }
 
-$content = app()->fetchTemplate(
+Response::templateJSON(
     'web/user/keeper_replenish',
+    '',
     [
         'goods_assoc' => $goods_assoc,
         'reps' => $reps,
         'pager' => $pager,
     ]
 );
-
-JSON::success(['title' => '', 'content' => $content]);

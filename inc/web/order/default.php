@@ -298,12 +298,7 @@ if (Request::is_ajax()) {
         $data['device'] = $device;
     }
 
-    $content = app()->fetchTemplate('web/order/list', $data);
-
-    JSON::success([
-        'title' => isset($user) ? '<b>'.$user->getName().'</b>的订单列表' : '',
-        'content' => $content,
-    ]);
+    Response::templateJSON('web/order/list', isset($user) ? '<b>'.$user->getName().'</b>的订单列表' : '', $data);
 }
 
 $tpl_data['s_way'] = $way;

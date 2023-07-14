@@ -113,8 +113,14 @@
                     <td>代理商</td>
                     <td class="center">设备总数</td>
                     <td class="center">订单总数</td>
-                    <td class="center">金额</td>
-                    <td class="center">数量</td>
+                    <td class="center">订单金额</td>
+                    <td class="center">
+                        {if \zovye\App::isFuelingDeviceEnabled()}
+                        加注数量(升)
+                        {else}
+                        出货数量
+                        {/if}
+                    </td>
                 </tr>
                 </thead>
                 <tr v-for="(item, index) in agentList.list">
@@ -168,8 +174,14 @@
                         <td>设备</td>
                         <td>IMEI</td>
                         <td class="center">订单总数</td>
-                        <td class="center">金额</td>
-                        <td class="center">数量</td>
+                        <td class="center">订单金额</td>
+                        <td class="center">
+                            {if \zovye\App::isFuelingDeviceEnabled()}
+                            加注数量(升)
+                            {else}
+                            出货数量
+                            {/if}
+                        </td>
                     </tr>
                     </thead>
                     <tr v-for="(item, index) in deviceList.list">

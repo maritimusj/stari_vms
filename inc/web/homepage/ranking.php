@@ -38,7 +38,7 @@ if ($fn == 'default') {
         'years' => $years,
         's_start_date' => $begin->format('Y-m-d'),
         's_end_date' => $end->format('Y-m-d'),
-        'api_url' => Util::url('fueling', ['op' => 'stats']),
+        'api_url' => Util::url('homepage', ['op' => 'ranking']),
     ];
 
     Response::showTemplate('web/home/ranking', $tpl_data);

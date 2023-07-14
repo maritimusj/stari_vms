@@ -294,14 +294,14 @@ const app = new Vue({
 			}, 1000);
 		},
 		playRequest() {
-		    zovye_fn.play(this.video.data.uid, this.video.data.duration - this.video.countdown, (res) => {
+            zovye_fn.play(this.video.data.uid, this.video.data.duration - this.video.countdown, (res) => {
                 if (res) {
                     if (!res.status) {
                         this.video.player.pause();
                         clearInterval(this.video.interval);
                         this.video.visible = false;
                         this.isHidden = true;
-                        alert(res.data.msg || '播放出错！'); 
+                        alert(res.data.msg || '播放出错！');
                     }
                     if (res.data && res.data.redirect) {
                         window.location.replace(res.data.redirect)
@@ -313,7 +313,8 @@ const app = new Vue({
                         }, 1000)
                     }
                 }
-		},
+            })
+        },
         alertConfirmClick() {
             zovye_fn.closeWindow && zovye_fn.closeWindow();
         },

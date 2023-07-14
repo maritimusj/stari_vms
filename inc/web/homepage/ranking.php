@@ -88,7 +88,7 @@ if ($fn == 'default') {
 
     $summary['price'] = number_format($summary['price'], 2, '.', '');
     if (App::isFuelingDeviceEnabled()) {
-        $summary['amount'] = number_format($summary['amount'], 2, '.', '');
+        $summary['amount'] = number_format($summary['amount'] / 100, 2, '.', '');
     }
 
 
@@ -146,7 +146,7 @@ if ($fn == 'default') {
 
     $summary['price'] = number_format($summary['price'], 2, '.', '');
     if (App::isFuelingDeviceEnabled()) {
-        $summary['amount'] = number_format($summary['amount'], 2, '.', '');
+        $summary['amount'] = number_format($summary['amount'] / 100, 2, '.', '');
     }
 
     JSON::success([

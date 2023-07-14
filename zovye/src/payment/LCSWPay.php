@@ -277,7 +277,7 @@ ALI_JSCODE;
 
     protected function getWxPayJs(array $params = []): string
     {
-        $js_sdk = Session::fetchJSSDK(false);
+        $js_sdk = Session::fetchJSSDK();
 
         return <<<JSCODE
 <script src="{$params['JQueryURL']}"></script>

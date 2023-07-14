@@ -38,7 +38,7 @@ $fee = [
     ],
     'ts' => array_map(function ($e) {
         return intval($e);
-    }, Request::array('ts', [])),
+    }, Request::array('ts')),
 ];
 
 $id = Request::int('id');

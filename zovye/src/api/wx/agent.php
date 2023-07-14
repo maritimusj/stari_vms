@@ -44,7 +44,6 @@ use zovye\User;
 use zovye\model\userModelObj;
 use zovye\Util;
 use zovye\We7;
-use function zovye\_W;
 use function zovye\err;
 use function zovye\error;
 use function zovye\request;

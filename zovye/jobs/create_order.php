@@ -26,7 +26,6 @@ use zovye\Order;
 use zovye\Pay;
 use zovye\Request;
 use zovye\User;
-use zovye\Util;
 use zovye\ZovyeException;
 use function zovye\err;
 use function zovye\is_error;

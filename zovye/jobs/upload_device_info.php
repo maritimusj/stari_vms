@@ -13,7 +13,6 @@ use zovye\Job;
 use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\Request;
-use zovye\Util;
 
 use function zovye\isEmptyArray;
 use function zovye\settings;

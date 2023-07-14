@@ -172,7 +172,7 @@
     align-content: center;
     align-items: center;
     top: 36px;
-    left: 0px;
+    left: 0;
     box-shadow: 1px 1px 3px 3px rgba(0, 0, 0, 0.1);
 }
 #devicelist .tags-list:hover .tagslist {
@@ -266,7 +266,7 @@ span.card_status:active i {
     background: #8bc34a;
     color: #fff;
     font-style: normal;
-    padding: 0px 3px;
+    padding: 0 3px;
     overflow: hidden;
     cursor: pointer;
     user-select: none;

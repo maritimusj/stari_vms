@@ -14,7 +14,6 @@ use zovye\model\commission_balanceModelObj;
 use zovye\model\userModelObj;
 use zovye\model\orderModelObj;
 use zovye\model\deviceModelObj;
-use zovye\model\order_goodsModelObj;
 use zovye\model\pay_logsModelObj;
 use zovye\traits\ExtraDataGettersAndSetters;
 
@@ -160,7 +159,7 @@ class Order extends State
 
     public static function queryStatus($serialNO)
     {
-        return CtrlServ::getV2("goods/{$serialNO}", ["nostr" => microtime(true)]);
+        return CtrlServ::getV2("goods/$serialNO", ["nostr" => microtime(true)]);
     }
 
     /**

@@ -34,7 +34,7 @@ if ($w == 'mall') {
 }
 
 $tpl_data['w'] = $w;
-$tpl_data['types'] = Request::array('types', []);
+$tpl_data['types'] = Request::array('types');
 
 $agent_id = Request::int('agentId');
 if ($agent_id > 0) {

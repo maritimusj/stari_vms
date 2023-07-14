@@ -150,7 +150,7 @@ class SQBPay implements IPay
     {
         $device_uid = $device->getImei();
 
-        $js_sdk = Session::fetchJSSDK(false);
+        $js_sdk = Session::fetchJSSDK();
         $jquery_url = JS_JQUERY_URL;
         $order_api_url = Util::murl('order', ['deviceUID' => $device_uid]);
 

@@ -120,7 +120,6 @@ body {
 .content {
     width: 100%;
     margin-top: 44px;
-    padding-bottom: calc(10px + constant(safe-area-inset-bottom));
     padding-bottom: calc(10px + env(safe-area-inset-bottom));
     display: flex;
     flex-direction: column;

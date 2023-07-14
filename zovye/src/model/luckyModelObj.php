@@ -7,6 +7,7 @@ namespace zovye\model;
 
 use zovye\Agent;
 use zovye\base\modelObj;
+use zovye\traits\ExtraDataGettersAndSetters;
 use zovye\Util;
 
 use function zovye\tb;
@@ -52,7 +53,7 @@ class luckyModelObj extends modelObj
 	/** @var int */
 	protected $createtime;
 
-	use \zovye\traits\ExtraDataGettersAndSetters;
+	use ExtraDataGettersAndSetters;
 
 	public function getRemark(): string
     {

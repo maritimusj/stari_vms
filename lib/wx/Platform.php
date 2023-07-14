@@ -74,7 +74,7 @@ class Platform
     public function startPushTicket(string $token): array
     {
         $url = str_replace('{COMPONENT_ACCESS_TOKEN}', $token, self::START_PUSH_TICKET_URL);
-        return HttpUtil::post($url, []);
+        return HttpUtil::post($url);
     }
 
     public function getComponentAccessToken(string $ticket): array

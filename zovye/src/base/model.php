@@ -7,7 +7,6 @@
 namespace zovye\base;
 
 use zovye\DBUtil;
-use zovye\Util;
 use zovye\We7;
 use function zovye\tb;
 
@@ -42,7 +41,7 @@ class model
         }
 
         $class_full_name = "\\zovye\\model\\$classname";
-        if (class_exists($class_full_name, true)) {
+        if (class_exists($class_full_name)) {
             $this->cache[$name] = new modelFactory($class_full_name, $name);
 
             return $this->cache[$name];

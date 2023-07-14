@@ -15,7 +15,6 @@ use zovye\QRCodeUtil;
 use zovye\We7;
 use zovye\Util;
 use zovye\Media;
-use zovye\State;
 use zovye\Device;
 use zovye\DouYin;
 use zovye\Schema;

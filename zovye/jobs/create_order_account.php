@@ -8,7 +8,6 @@ namespace zovye\job\createOrderAccount;
 
 use Exception;
 use zovye\Account;
-use zovye\App;
 use zovye\CtrlServ;
 use zovye\Device;
 use zovye\DeviceUtil;
@@ -20,9 +19,7 @@ use zovye\model\userModelObj;
 use zovye\Order;
 use zovye\Request;
 use zovye\State;
-use zovye\TKPromoting;
 use zovye\User;
-use zovye\Util;
 use zovye\ZovyeException;
 use function zovye\is_error;
 use function zovye\settings;

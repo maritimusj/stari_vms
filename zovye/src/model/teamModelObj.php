@@ -7,7 +7,6 @@
 namespace zovye\model;
 
 use zovye\base\modelObj;
-use zovye\Contract\ICard;
 use zovye\User;
 use function zovye\tb;
 

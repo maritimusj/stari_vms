@@ -16,7 +16,7 @@ if (abs(time() - $ts) > 3600 || empty($sign) || empty($op)) {
     exit('invalid request.');
 }
 
-$secret = Config::api('app.secret', '');
+$secret = Config::api('app.secret');
 if (empty($secret)) {
     exit('invalid app secret.');
 }

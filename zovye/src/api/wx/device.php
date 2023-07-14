@@ -729,8 +729,8 @@ class device
 
         //简单信息
         $simple = Request::bool('simple');
-        $date = Request::trim('date', '');
-        $month = Request::trim('month', '');
+        $date = Request::trim('date');
+        $month = Request::trim('month');
         $keeper_id = Request::int('keeperid');
 
         if (!isset($online_status)) {

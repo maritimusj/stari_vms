@@ -298,7 +298,7 @@ class ad
         $assign_data = $adv->settings('assigned', []);
 
         if (Advertising::update($adv) && $adv->destroy()) {
-            Advertising::notifyAll($assign_data, []);
+            Advertising::notifyAll($assign_data);
 
             return ['msg' => "{$title}删除成功！"];
         }

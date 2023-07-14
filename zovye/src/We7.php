@@ -228,7 +228,7 @@ EOF;
         }
 
         //禁止引用外部xml实体
-        libxml_disable_entity_loader(true);
+        libxml_disable_entity_loader();
 
         $obj = simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
         if (empty($obj)) {

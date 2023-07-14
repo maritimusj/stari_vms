@@ -36,11 +36,11 @@ class template
     public static function load($filename, $flag = TEMPLATE_DISPLAY)
     {
         if (defined('IN_SYS')) {
-            $source = ZOVYE_ROOT . "template/{$filename}.html";
-            $compile = ZOVYE_ROOT . "data/tpl/{$filename}.tpl.php";
+            $source = ZOVYE_ROOT . "template/$filename.html";
+            $compile = ZOVYE_ROOT . "data/tpl/$filename.tpl.php";
         } else {
-            $source = ZOVYE_ROOT . "{$filename}.html";
-            $compile = ZOVYE_ROOT . "data/tpl/{$filename}.tpl.php";
+            $source = ZOVYE_ROOT . "$filename.html";
+            $compile = ZOVYE_ROOT . "data/tpl/$filename.tpl.php";
         }
        
         if (!is_file($source)) {
@@ -126,7 +126,7 @@ class template
 
     public static function addquote($matchs)
     {
-        $code = "<?php {$matchs[1]}?>";
+        $code = "<?php $matchs[1]?>";
         $code = preg_replace('/\[([a-zA-Z0-9_\-\.\x7f-\xff]+)\](?![a-zA-Z0-9_\-\.\x7f-\xff\[\]]*[\'"])/s', "['$1']", $code);
 
         return str_replace('\\\"', '\"', $code);

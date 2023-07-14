@@ -16,7 +16,6 @@ use zovye\Settings;
 use zovye\traits\DirtyChecker;
 use zovye\traits\GettersAndSetters;
 use zovye\Util;
-use zovye\We7;
 use function zovye\getArray;
 use function zovye\ifEmpty;
 use function zovye\setArray;

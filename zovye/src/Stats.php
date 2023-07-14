@@ -331,6 +331,8 @@ class Stats
     /**
      * 返回指定时间的日统计数据
      * @param device_groupsModelObj $group
+     * @param $s_date
+     * @param $e_date
      * @param string $title
      * @return array
      */
@@ -366,11 +368,19 @@ class Stats
             return $result[0] ?? 0;
         };
 
-        $begin = new DateTime($s_date);
-        $begin->modify('00:00');
+        $begin = null;
+        $end = null;
 
-        $end = new DateTime($e_date);
-        $end->modify('next day 00:00');
+        try {
+            $begin = new DateTime($s_date);
+            $begin->modify('00:00');
+
+            $end = new DateTime($e_date);
+            $end->modify('next day 00:00');
+        } catch (Exception $e) {
+            return [];
+        }
+
 
         $total = 0;
         while ($begin < $end) {

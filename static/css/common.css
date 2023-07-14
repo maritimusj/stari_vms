@@ -191,7 +191,6 @@ span.form-control {
 
 span[data-mobile] {
     cursor: grab;
-    cursor: -webkit-grab;
 }
 
 a .profile {
@@ -634,7 +633,6 @@ a .profile {
 
 .agent {
     width: fit-content;
-    width: -moz-fit-content;
     margin: 0 auto;
     user-select: none;
     -moz-user-select: none;
@@ -1380,7 +1378,6 @@ form .inputMask {
     white-space: nowrap;
     height: 2.5em;
     background-color: #3296fa;
-    border-color: #1989f9;
     border: 1px solid transparent;
     padding: 6px 12px;
     margin-bottom: 0;

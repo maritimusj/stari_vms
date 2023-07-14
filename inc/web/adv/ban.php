@@ -20,7 +20,7 @@ if ($id > 0) {
         if (in_array($adv->getType(), [Advertising::SCREEN, Advertising::SCREEN_NAV])) {
             //通知设备更新屏幕广告
             $assign_data = $adv->settings('assigned', []);
-            Advertising::notifyAll($assign_data, []);
+            Advertising::notifyAll($assign_data);
         }
 
         JSON::success([

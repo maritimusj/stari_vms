@@ -9,8 +9,6 @@ namespace zovye\job\refund;
 //设备缺货通知
 
 use zovye\CtrlServ;
-use zovye\Device;
-use zovye\Job;
 use zovye\JobException;
 use zovye\Log;
 use zovye\model\pay_logsModelObj;

@@ -10,7 +10,6 @@ use zovye\DBUtil;
 use zovye\GSP;
 use zovye\Principal;
 use zovye\User;
-use zovye\Util;
 use zovye\Device;
 
 use function zovye\err;

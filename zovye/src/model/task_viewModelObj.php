@@ -7,9 +7,7 @@
 namespace zovye\model;
 
 use zovye\Account;
-use zovye\BalanceLog;
 use zovye\base\modelObj;
-use zovye\Log;
 use zovye\traits\ExtraDataGettersAndSetters;
 use zovye\User;
 
@@ -72,7 +70,7 @@ class task_viewModelObj extends modelObj
 
     public function getUid(): string
     {
-        return strval($this->s2);
+        return $this->s2;
     }
 
     public function format(): array

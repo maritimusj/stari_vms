@@ -1271,7 +1271,7 @@ class deviceModelObj extends modelObj
                 return Group::get($this->group_id, Group::CHARGING);
             }
 
-            return Group::get($this->group_id, Group::NORMAL);
+            return Group::get($this->group_id);
         }
 
         return null;
@@ -2555,7 +2555,7 @@ class deviceModelObj extends modelObj
         if (empty($this->getAppId())) {
             $imei = $this->getImei();
             if ($imei) {
-                $res = CtrlServ::query("device/$imei", []);
+                $res = CtrlServ::query("device/$imei");
                 if (!is_error($res) && $res['appUID']) {
                     $this->setAppId($res['appUID']);
 

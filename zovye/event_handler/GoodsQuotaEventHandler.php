@@ -5,8 +5,6 @@ namespace zovye;
 use zovye\model\deviceModelObj;
 use zovye\model\orderModelObj;
 use zovye\model\userModelObj;
-use zovye\ZovyeException;
-use function zovye\isEmptyArray;
 
 class GoodsQuotaEventHandler
 {

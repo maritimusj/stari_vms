@@ -421,7 +421,7 @@ class db
      */
     public function run($sql, $stuff = 'ims_')
     {
-        if (!isset($sql) || empty($sql)) {
+        if (empty($sql)) {
             return;
         }
 

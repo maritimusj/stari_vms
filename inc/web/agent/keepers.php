@@ -38,6 +38,6 @@ Response::showTemplate(
     [
         'agent' => $agent->profile(),
         'list' => $result,
-        'back_url' => Util::url('agent', []),
+        'back_url' => Util::url('agent'),
     ]
 );

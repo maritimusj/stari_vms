@@ -7,11 +7,11 @@ use RuntimeException;
 class JobException extends RuntimeException
 {
 
-    private  $data = null;
+    private $data;
 
     public function __construct($message, $data)
     {
-        parent::__construct($message, 0, null);
+        parent::__construct($message);
         $this->data = $data;
     }
 

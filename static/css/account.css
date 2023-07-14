@@ -194,7 +194,7 @@ body {
     width: 0;
     height: 0;
     border-top: 4px solid transparent;
-    border-bottom: 0px solid transparent;
+    border-bottom: 0 solid transparent;
     border-right: 5px solid #f00;
     margin-top: -15px;
 }

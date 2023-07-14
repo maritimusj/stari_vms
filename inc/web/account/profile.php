@@ -8,10 +8,6 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-use zovye\JSON;
-use zovye\Account;
-use zovye\Request;
-
 if (Request::has('uid')) {
     $uid = Request::str('uid');
     $acc = Account::findOneFromUID($uid);

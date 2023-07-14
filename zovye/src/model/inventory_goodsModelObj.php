@@ -9,7 +9,6 @@ namespace zovye\model;
 use zovye\Goods;
 use function zovye\tb;
 use zovye\base\modelObj;
-use zovye\InventoryGoods;
 use zovye\traits\ExtraDataGettersAndSetters;
 
 /**

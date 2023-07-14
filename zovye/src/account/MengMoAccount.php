@@ -16,7 +16,6 @@ use zovye\model\userModelObj;
 use zovye\Order;
 use zovye\Session;
 use zovye\User;
-use zovye\Util;
 use function zovye\err;
 use function zovye\is_error;
 use function zovye\isEmptyArray;
@@ -163,7 +162,7 @@ class MengMoAccount
 
     public static function verifySignByMD5withRSA($publicKey, $data, $sign): bool
     {
-        $publicKey = chunk_split($publicKey, 64, "\n");
+        $publicKey = chunk_split($publicKey, 64);
         $publicKey = "-----BEGIN PUBLIC KEY-----\n$publicKey-----END PUBLIC KEY-----\n";
         $sign = base64_decode($sign, true);
 

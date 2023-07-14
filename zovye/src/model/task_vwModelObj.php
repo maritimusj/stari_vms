@@ -6,6 +6,7 @@
 namespace zovye\model;
 
 use zovye\base\modelObj;
+use zovye\traits\ExtraDataGettersAndSetters;
 use function zovye\tb;
 
 class task_vwModelObj extends modelObj
@@ -39,5 +40,5 @@ class task_vwModelObj extends modelObj
 	protected $state;
 
 
-	use \zovye\traits\ExtraDataGettersAndSetters;
+	use ExtraDataGettersAndSetters;
 }

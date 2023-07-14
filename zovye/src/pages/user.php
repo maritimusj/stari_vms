@@ -17,7 +17,7 @@ $tpl_data = Util::getTplData([$user]);
 
 $user_data = [
     'status' => true,
-    'data' => $user->profile(true),
+    'data' => $user->profile(),
 ];
 
 $user_data['data']['balance'] = $user->getBalance()->total();

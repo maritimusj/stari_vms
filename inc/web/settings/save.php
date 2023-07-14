@@ -147,7 +147,7 @@ if ($page == 'device') {
     $settings['device']['bluetooth']['enabled'] = Request::bool('bluetoothDevice') ? 1 : 0;
     $settings['goods']['voucher']['enabled'] = Request::bool('goodsVoucher') ? 1 : 0;
 
-    Config::api('enabled', Request::bool('API', false), true);
+    Config::api('enabled', Request::bool('API'), true);
 
     $settings['custom']['goodsPackage']['enabled'] = Request::bool('goodsPackage') ? 1 : 0;
     $settings['custom']['mustFollow']['enabled'] = Request::bool('mustFollow') ? 1 : 0;
@@ -305,7 +305,7 @@ if ($page == 'device') {
             [
                 'filename' => IA_ROOT.'/framework/bootstrap.inc.php',
                 'append' => true,
-                'content' => "\r\n\r\nif(\$action == 'login'){\r\n\t\$_GPC['referer'] = '{$module_url}';\r\n}",
+                'content' => "\r\n\r\nif(\$action == 'login'){\r\n\t\$_GPC['referer'] = '$module_url';\r\n}",
             ],
         ];
         foreach ($files as $file) {
@@ -891,7 +891,7 @@ if ($page == 'device') {
         Config::balance('order.as', Request::str('balanceOrderAs'), true);
         Config::balance('order.auto_rb', Request::bool('autoRollbackOrderBalance') ? 1 : 0, true);
 
-        $promote_opts = Request::array('accountPromoteBonusOption', []);
+        $promote_opts = Request::array('accountPromoteBonusOption');
         foreach (['third_platform', 'account', 'video', 'wxapp', 'douyin'] as $name) {
             Config::balance("account.promote_bonus.$name", in_array($name, $promote_opts) ? 1 : 0, true);
         }

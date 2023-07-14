@@ -27,9 +27,8 @@
 				display: flex;
 				flex-direction: column;
 				align-items: center;
-				background: url("https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1970083563,988347797&fm=26&gp=0.jpg");
 				background-size: cover;
-				background-position: center;
+				background: url("https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1970083563,988347797&fm=26&gp=0.jpg") center;
 			}
 
 			[v-cloak] {
@@ -245,13 +244,13 @@
 			    height: 40px;
 			    animation:turn 2s linear infinite;     
 			}
-			
+
 			@keyframes turn{
-			  0%{-webkit-transform:rotate(0deg);}
-			  25%{-webkit-transform:rotate(90deg);}
-			  50%{-webkit-transform:rotate(180deg);}
-			  75%{-webkit-transform:rotate(270deg);}
-			  100%{-webkit-transform:rotate(360deg);}
+				0%{transform:rotate(0deg);}
+				25%{transform:rotate(90deg);}
+				50%{transform:rotate(180deg);}
+				75%{transform:rotate(270deg);}
+				100%{transform:rotate(360deg);}
 			}
 		</style>
 	</head>

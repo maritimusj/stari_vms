@@ -105,7 +105,7 @@ class VIP
     {
         return self::create([
             'agent_id' => $agent->getId(),
-            'name' => strval($name),
+            'name' => $name,
             'mobile' => $mobile,
         ]);
     }

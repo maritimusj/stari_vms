@@ -30,7 +30,7 @@ class response implements IResponse
         0x15 => '=> 电量值(5格)',
     ];
 
-    private $data = '';
+    private $data;
 
     public function __construct($data, $base64encoded = true)
     {

@@ -15,7 +15,7 @@ $goods_id = Request::int('goods');
 $num = Request::int('num');
 $key = Request::str('key');
 
-$access_key = Config::notify('inventory.key', '');
+$access_key = Config::notify('inventory.key');
 if (empty($access_key) || $key != $access_key) {
     JSON::fail('没有权限访问！');
 }

@@ -43,7 +43,7 @@ if ($type_id) {
 
     $data = DeviceTypes::format($device_type, true);
     if (isset($device)) {
-        $payload = $device->getPayload(false);
+        $payload = $device->getPayload();
         foreach ((array)$payload['cargo_lanes'] as $index => $lane) {
             $data['cargo_lanes'][$index]['num'] = intval($lane['num']);
         }

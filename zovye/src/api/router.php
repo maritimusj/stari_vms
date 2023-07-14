@@ -10,10 +10,7 @@ use zovye\api\wx\common;
 use zovye\CacheUtil;
 use zovye\DBUtil;
 use zovye\JSON;
-use zovye\Util;
 use zovye\We7;
-use function zovye\toCamelCase;
-use function zovye\toSnakeCase;
 
 class router
 {

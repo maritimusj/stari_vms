@@ -20,7 +20,6 @@ use zovye\Util;
 use zovye\We7;
 use zovye\Wx;
 use zovye\WxApp;
-use function zovye\_W;
 use function zovye\err;
 use function zovye\is_error;
 use function zovye\settings;
@@ -344,7 +343,7 @@ class common
     public static function updateUserQRCode(userModelObj $user, $type): array
     {
         We7::load()->func('file');
-        $res = We7::file_upload($_FILES['pic'], 'image');
+        $res = We7::file_upload($_FILES['pic']);
 
         if (!is_error($res)) {
             $filename = $res['path'];

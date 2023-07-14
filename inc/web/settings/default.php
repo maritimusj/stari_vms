@@ -383,7 +383,7 @@ if ($page == 'device') {
     $tpl_data['notify_app_key'] = Config::notify('order.key', Util::random(16));
     $tpl_data['orderNotifyFree'] = Config::notify('order.f', true);
     $tpl_data['orderNotifyPay'] = Config::notify('order.p', true);
-    $tpl_data['order_notify_url'] = Config::notify('order.url', '');
+    $tpl_data['order_notify_url'] = Config::notify('order.url');
 
     $tpl_data['inventory_access_key'] = Config::notify('inventory.key', Util::random(16));
     $tpl_data['inventory_api_url'] = Util::murl('inventory');

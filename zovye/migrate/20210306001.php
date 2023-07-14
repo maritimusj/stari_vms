@@ -3,7 +3,6 @@
 namespace zovye;
 
 use zovye\model\agentModelObj;
-use zovye\We7;
 
 $tb_name = APP_NAME;
 
@@ -40,7 +39,7 @@ SQL;
             }
         } elseif ($mode == GSP::FREE) {
             $gsp_users = $agent->settings('agentData.gsp.users', []);
-            foreach ($gsp_users as $openid => &$data) {
+            foreach ($gsp_users as &$data) {
                 $data['percent'] = intval(round(floatval($data['percent']) * 100));
                 $data['amount'] = intval(round(floatval($data['amount']) * 100));
             }

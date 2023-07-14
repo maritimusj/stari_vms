@@ -27,7 +27,7 @@ if ($id > 0 && $type > 0) {
 
         if ($adv->getType() == Advertising::SCREEN) {
             //通知设备更新屏幕广告
-            Advertising::notifyAll($assign_data, []);
+            Advertising::notifyAll($assign_data);
         }
 
         Response::toast('删除成功！', $this->createWebUrl('adv', ['type' => $from_type]), 'success');

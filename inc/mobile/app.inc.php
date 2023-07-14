@@ -94,11 +94,11 @@ if ($op == 'default') {
         }
     );
 
-    if (!is_error($result)) {
-        exit(json_encode(['status' => true, 'msg' => '注册成功！']));
-    } else {
-        exit(json_encode(['status' => false, 'msg' => $result['message']]));
+    if (is_error($result)) {
+       JSON::fail($result);
     }
+
+    JSON::success($result['message']);
 
 } elseif ($op == 'data_vw') {
 

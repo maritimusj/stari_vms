@@ -121,7 +121,7 @@ class Agent
             $agent->remove('agentData') &&
             $agent->remove('keepers')) {
 
-            //删除登记会话数据
+            //删除登录会话数据
             $login_data = $agent->getLoginData();
             if ($login_data) {
                 $login_data->destroy();
@@ -178,7 +178,7 @@ class Agent
                 $adv->destroy();
             }
 
-            //删除盯关vip用户数据
+            //删除相关vip用户数据
             VIP::removeAll($agent);
 
             if ($agent->save()) {

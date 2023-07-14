@@ -88,4 +88,4 @@ $tpl_data['device'] = $device;
 $tpl_data['events'] = $events;
 $tpl_data['the_first_id'] = $the_first_id;
 
-app()->showTemplate('web/device/poll_event', $tpl_data);
+Response::showTemplate('web/device/poll_event', $tpl_data);

@@ -14,7 +14,7 @@ $op = Request::op('default');
 if ($op == 'default') {
 
     $js_sdk = Session::fetchJSSDK();
-    app()->showTemplate('map', ['jssdk' => $js_sdk]);
+    Response::showTemplate('map', ['jssdk' => $js_sdk]);
 
 } elseif ($op == 'user') {
 
@@ -179,7 +179,7 @@ if ($op == 'default') {
         }
     }
 
-    app()->showTemplate('review', $tpl_data);
+    Response::showTemplate('review', $tpl_data);
 
 } elseif ($op == 'profile') {
     $user = Session::getCurrentUser();

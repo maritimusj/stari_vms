@@ -79,4 +79,4 @@ if ($device->isChargingDevice()) {
 $tpl_data['events'] = $events;
 $tpl_data['device'] = $device;
 
-app()->showTemplate('web/device/event', $tpl_data);
+Response::showTemplate('web/device/event', $tpl_data);

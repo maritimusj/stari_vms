@@ -172,7 +172,7 @@ $navs = [
     [ 'title' => '自定义任务', 'type' => Account::TASK, 'enabled' => App::isBalanceEnabled()],
 ];
 
-app()->showTemplate('web/account/default', [
+Response::showTemplate('web/account/default', [
     'navs' => $navs,
     'agent' => $agent ?? null,
     'accounts' => $accounts,

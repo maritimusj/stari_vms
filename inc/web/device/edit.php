@@ -121,4 +121,4 @@ $tpl_data['is_vdevice'] = $model == Device::VIRTUAL_DEVICE;
 $tpl_data['is_charging_device'] = $model == Device::CHARGING_DEVICE;
 $tpl_data['is_fueling_device'] = $model == Device::FUELING_DEVICE;
 
-app()->showTemplate('web/device/edit_new', $tpl_data);
+Response::showTemplate('web/device/edit_new', $tpl_data);

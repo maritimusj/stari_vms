@@ -169,5 +169,5 @@ if (in_array(
         $tpl_data['themes'] = Theme::all();
     }
 
-    app()->showTemplate('web/agent/edit', $tpl_data);
+    Response::showTemplate('web/agent/edit', $tpl_data);
 }

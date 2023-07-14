@@ -69,4 +69,4 @@ CODE;
 
 $tpl_data = Util::getTplData();
 $tpl_data['js']['code'] = $js_code;
-app()->showTemplate(Theme::file('feedback'), ['tpl' => $tpl_data]);
+Response::showTemplate('feedback', ['tpl' => $tpl_data], true);

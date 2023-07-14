@@ -41,4 +41,4 @@ foreach ($query->findAll() as $entry) {
 
 $tpl_data['faq'] = $faq;
 
-app()->showTemplate('web/doc/faq', $tpl_data);
+Response::showTemplate('web/doc/faq', $tpl_data);

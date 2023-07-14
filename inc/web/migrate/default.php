@@ -15,6 +15,6 @@ if (empty($task)) {
     exit();
 }
 
-app()->showTemplate('web/migrate/default', [
+Response::showTemplate('web/migrate/default', [
     'total' => count($task),
 ]);

@@ -23,4 +23,4 @@ $tpl['js']['code'] = <<<JSCODE
 JSCODE;
 
 $file = Theme::getThemeFile(null, 'jump');
-app()->showTemplate($file, ['tpl' => $tpl]);
+Response::showTemplate($file, ['tpl' => $tpl]);

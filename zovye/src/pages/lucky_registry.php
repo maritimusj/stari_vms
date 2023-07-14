@@ -53,4 +53,4 @@ $js_sdk
 JSCODE;
 
 $filename = Theme::getThemeFile(null, 'reg');
-app()->showTemplate($filename, ['tpl' => $tpl_data]);
+Response::showTemplate($filename, ['tpl' => $tpl_data]);

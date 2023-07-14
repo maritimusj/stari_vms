@@ -130,4 +130,4 @@ if ($id > 0) {
 }
 
 $filename = Advertising::$names[$type];
-app()->showTemplate("web/adv/$filename", $tpl_data);
+Response::showTemplate("web/adv/$filename", $tpl_data);

@@ -119,4 +119,4 @@ JSCODE;
     }
 }
 
-app()->showTemplate(Theme::file('location'), ['tpl' => $tpl]);
+Response::showTemplate('location', ['tpl' => $tpl], true);

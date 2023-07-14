@@ -49,7 +49,7 @@ if (empty($agent)) {
 
 $page_name = Request::trim('page_name', 'default');
 
-app()->showTemplate("web/agent/detail/$page_name", [
+Response::showTemplate("web/agent/detail/$page_name", [
     'agent' => $agent,
     'pages' => $pages,
     'id' => $id,

@@ -72,4 +72,4 @@ if ($total > 0) {
     $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
 }
 
-app()->showTemplate('web/account/task_default', $tpl_data);
+Response::showTemplate('web/account/task_default', $tpl_data);

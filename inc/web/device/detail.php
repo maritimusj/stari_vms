@@ -119,4 +119,4 @@ $tpl_data['device'] = $device;
 $tpl_data['mcb_online'] = $device->isMcbOnline();
 $tpl_data['app_online'] = $device->isAppOnline();
 
-app()->showTemplate('web/device/detail', $tpl_data);
+Response::showTemplate('web/device/detail', $tpl_data);

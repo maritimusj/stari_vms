@@ -51,7 +51,7 @@ $js_sdk
         if (typeof cb === 'function') {
             return cb(zovye_fn.user)
         }
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             resolve(zovye_fn.user);
         });
     }
@@ -85,4 +85,4 @@ JSCODE;
 
 $tpl_data['js']['code'] .= "\r\n</script>";
 
-app()->showTemplate(Theme::file('user'), ['tpl' => $tpl_data]);
+Response::showTemplate('user', ['tpl' => $tpl_data], true);

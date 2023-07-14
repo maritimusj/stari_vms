@@ -104,7 +104,7 @@ JSCODE;
     if (User::isSnapshot()) {
         $tpl_data['js']['code'] .= app()->snapshotJs(['entry' => 'promoter']);
     }
-    app()->showTemplate($user->isPromoter() ? 'promoter/log' : 'promoter/reg', ['tpl' => $tpl_data]);
+    Response::showTemplate($user->isPromoter() ? 'promoter/log' : 'promoter/reg', ['tpl' => $tpl_data]);
 
 } elseif ($op == 'reg') {
 
@@ -239,7 +239,7 @@ JSCODE;
 </script>
 JSCODE;
 
-    app()->showTemplate('promoter/withdraw', ['tpl' => $tpl_data]);
+    Response::showTemplate('promoter/withdraw', ['tpl' => $tpl_data]);
 
 } elseif ($op == 'withdraw') {
     JSON::result(balance::balanceWithdraw($user, Request::float('amount', 0, 2) * 100));

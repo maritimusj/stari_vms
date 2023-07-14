@@ -33,7 +33,7 @@ foreach ($query->findAll() as $vip) {
     ];
 }
 
-app()->showTemplate(
+Response::showTemplate(
     'web/agent/vip',
     [
         'agent' => $agent->profile(),

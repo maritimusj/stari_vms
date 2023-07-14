@@ -36,4 +36,4 @@ $js_sdk
 </script>
 JSCODE;
 
-app()->showTemplate(Theme::file('mall_order'), ['tpl' => $tpl_data]);
+Response::showTemplate('mall_order', ['tpl' => $tpl_data], true);

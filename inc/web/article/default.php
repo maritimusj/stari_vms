@@ -40,4 +40,4 @@ foreach ($query->findAll() as $entry) {
 
 $tpl_data['articles'] = $articles;
 
-app()->showTemplate('web/doc/article', $tpl_data);
+Response::showTemplate('web/doc/article', $tpl_data);

@@ -76,4 +76,4 @@ if (App::isBalanceEnabled()) {
     $tpl_data['navs']['mall'] = '商城';
 }
 
-app()->showTemplate('web/goods/default', $tpl_data);
+Response::showTemplate('web/goods/default', $tpl_data);

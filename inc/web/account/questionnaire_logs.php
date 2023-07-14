@@ -44,7 +44,7 @@ if ($total > 0) {
     }
 }
 
-app()->showTemplate('web/account/questionnaire_logs', [
+Response::showTemplate('web/account/questionnaire_logs', [
     'account' => $account->profile(),
     'list' => $answers,
     'pager' => $pager,

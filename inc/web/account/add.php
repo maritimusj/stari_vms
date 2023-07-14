@@ -10,7 +10,7 @@ defined('IN_IA') or exit('Access Denied');
 
 $type = Request::int('type', Account::NORMAL);
 
-app()->showTemplate('web/account/edit_'.$type, [
+Response::showTemplate('web/account/edit_'.$type, [
     'clr' => Util::randColor(),
     'op' => 'add',
     'type' => $type,

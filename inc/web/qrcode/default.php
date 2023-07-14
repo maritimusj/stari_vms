@@ -58,4 +58,4 @@ foreach ($query->findAll() as $entry) {
 
 $tpl_data['qrcodes'] = $qr_codes;
 
-app()->showTemplate('web/qrcode/default', $tpl_data);
+Response::showTemplate('web/qrcode/default', $tpl_data);

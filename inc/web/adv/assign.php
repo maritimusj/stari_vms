@@ -42,7 +42,7 @@ if ($res->getType() == Advertising::SCREEN) {
 $assigned = $res->settings('assigned', []);
 $assigned = isEmptyArray($assigned) ? [] : $assigned;
 
-app()->showTemplate('web/adv/assign', [
+Response::showTemplate('web/adv/assign', [
     'adv' => $adv,
     'multi_mode' => settings('advs.assign.multi') ? 'true' : '',
     'assign_data' => json_encode($assigned),

@@ -31,4 +31,4 @@ $tpl_data['js']['code'] .= <<<JSCODE
 JSCODE;
 
 $filename = Theme::getThemeFile(null, 'gift_logs');
-app()->showTemplate($filename, ['tpl' => $tpl_data]);
+Response::showTemplate($filename, ['tpl' => $tpl_data]);

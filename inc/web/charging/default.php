@@ -53,4 +53,4 @@ $tpl_data['list'] = $list;
 $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
 $tpl_data['agentId'] = $agent_id ?? null;
 
-app()->showTemplate('web/charging/default', $tpl_data);
+Response::showTemplate('web/charging/default', $tpl_data);

@@ -58,4 +58,4 @@ if (User::isSnapshot()) {
 }
 
 $filename = Theme::getThemeFile($device, 'qrcode');
-app()->showTemplate($filename, ['tpl' => $tpl_data]);
+Response::showTemplate($filename, ['tpl' => $tpl_data]);

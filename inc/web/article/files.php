@@ -42,4 +42,4 @@ foreach ($query->findAll() as $entry) {
 
 $tpl_data['archives'] = $archives;
 
-app()->showTemplate('web/doc/files', $tpl_data);
+Response::showTemplate('web/doc/files', $tpl_data);

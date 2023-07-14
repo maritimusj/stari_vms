@@ -63,4 +63,4 @@ $tpl_data['first_type'] = settings('device.multi-types.first');
 $tpl_data['pager'] = $pager;
 $tpl_data['backer'] = $tpl_data['s_agent'] || $tpl_data['s_keywords'] || isset($tpl_data['s_agentId']);
 
-app()->showTemplate('web/device_types/default', $tpl_data);
+Response::showTemplate('web/device_types/default', $tpl_data);

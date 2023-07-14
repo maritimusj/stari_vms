@@ -33,7 +33,7 @@ foreach ($query->findAll() as $entry) {
     ];
 }
 
-app()->showTemplate('web/agent/msg', [
+Response::showTemplate('web/agent/msg', [
     'op' => 'msg',
     'pager' => $pager,
     'messages' => $messages,

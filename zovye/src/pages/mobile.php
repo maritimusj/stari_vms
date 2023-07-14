@@ -87,4 +87,4 @@ $js_sdk
     }
 </script>
 JSCODE;
-app()->showTemplate(Theme::file('mobile'), ['tpl' => $tpl]);
+Response::showTemplate('mobile', ['tpl' => $tpl], true);

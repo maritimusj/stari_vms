@@ -22,4 +22,4 @@ if ($id) {
     $tpl_data['archive'] = m('files')->findOne(We7::uniacid(['id' => $id]));
 }
 
-app()->showTemplate('web/doc/files_edit', $tpl_data);
+Response::showTemplate('web/doc/files_edit', $tpl_data);

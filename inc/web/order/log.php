@@ -67,4 +67,4 @@ foreach ($query->page($page, $page_size)->findAll() as $entry) {
 $tpl_data['logs'] = $logs;
 $tpl_data['way'] = 'pay';
 
-app()->showTemplate('web/order/log', $tpl_data);
+Response::showTemplate('web/order/log', $tpl_data);

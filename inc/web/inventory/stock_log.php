@@ -69,4 +69,4 @@ if ($total > 0) {
 
 $tpl_data['list'] = $list;
 
-app()->showTemplate('web/inventory/log', $tpl_data);
+Response::showTemplate('web/inventory/log', $tpl_data);

@@ -18,4 +18,4 @@ if (Request::has('id')) {
     $tpl_data['voucher_id'] = Request::int('id');
 }
 
-app()->showTemplate("web/goods_voucher/edit", $tpl_data);
+Response::showTemplate("web/goods_voucher/edit", $tpl_data);

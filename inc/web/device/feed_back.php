@@ -92,4 +92,4 @@ $tpl_data['device_id'] = $device_id;
 $tpl_data['data'] = $data;
 $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
 
-app()->showTemplate('web/device/feedback', $tpl_data);
+Response::showTemplate('web/device/feedback', $tpl_data);

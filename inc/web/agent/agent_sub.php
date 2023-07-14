@@ -86,4 +86,4 @@ $tpl_data['mobile_url'] = Util::murl('mobile');
 
 $tpl_data['sup'] = $sup_agent->profile();
 
-app()->showTemplate('web/agent/agent_sub', $tpl_data);
+Response::showTemplate('web/agent/agent_sub', $tpl_data);

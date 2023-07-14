@@ -63,4 +63,4 @@ if ($total > 0) {
 $tpl_data['list'] = $list;
 $tpl_data['search_url'] = Util::url('account', ['op' => 'gift']);
 
-app()->showTemplate('web/account/gift', $tpl_data);
+Response::showTemplate('web/account/gift', $tpl_data);

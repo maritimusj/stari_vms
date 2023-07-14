@@ -27,4 +27,4 @@ if ($id > 0) {
     $tpl_data['group'] = $group->format();
 }
 
-app()->showTemplate('web/charging/edit', $tpl_data);
+Response::showTemplate('web/charging/edit', $tpl_data);

@@ -20,4 +20,4 @@ if ($id > 0) {
     $tpl_data['inventory'] = $inventory;
 }
 
-app()->showTemplate('web/inventory/edit', $tpl_data);
+Response::showTemplate('web/inventory/edit', $tpl_data);

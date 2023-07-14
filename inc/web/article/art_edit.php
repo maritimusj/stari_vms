@@ -26,4 +26,4 @@ if ($id) {
     $tpl_data['art'] = $art;
 }
 
-app()->showTemplate('web/doc/article_edit', $tpl_data);
+Response::showTemplate('web/doc/article_edit', $tpl_data);

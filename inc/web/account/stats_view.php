@@ -15,6 +15,6 @@ if (empty($account)) {
     Response::toast('找不到这个任务！', '', 'error');
 }
 
-app()->showTemplate('web/account/stats_view', [
+Response::showTemplate('web/account/stats_view', [
     'account' => $account,
 ]);

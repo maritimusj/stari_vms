@@ -37,7 +37,7 @@ foreach ($query->findAll() as $entry) {
     ];
 }
 
-app()->showTemplate('web/agent/app', [
+Response::showTemplate('web/agent/app', [
     'op' => 'app',
     'pager' => $pager,
     'apps' => $apps,

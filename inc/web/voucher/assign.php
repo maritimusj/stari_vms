@@ -11,7 +11,7 @@ defined('IN_IA') or exit('Access Denied');
 $id = Request::int('id');
 $voucher = GoodsVoucher::get($id);
 if ($voucher) {
-    app()->showTemplate('web/goods_voucher/assign', [
+    Response::showTemplate('web/goods_voucher/assign', [
         'voucher' => GoodsVoucher::format($voucher, true),
         'multi_mode' => settings('advs.assign.multi') ? 'true' : '',
         'assign_data' => json_encode($voucher->getExtraData('assigned', [])),

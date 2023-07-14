@@ -87,4 +87,4 @@ if (App::isMoscaleEnabled() && $type == Account::MOSCALE) {
     }
 }
 
-app()->showTemplate('web/account/edit_'.$type, $tpl_data);
+Response::showTemplate('web/account/edit_'.$type, $tpl_data);

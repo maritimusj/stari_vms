@@ -73,4 +73,4 @@ $tpl_data['data'] = $data;
 $tpl_data['filter'] = $filter;
 $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
 
-app()->showTemplate('web/device/report_list', $tpl_data);
+Response::showTemplate('web/device/report_list', $tpl_data);

@@ -64,7 +64,7 @@ if (Request::is_ajax()) {
     JSON::success(['title' => "库存列表", 'content' => $content]);
 }
 
-app()->showTemplate('web/inventory/default', [
+Response::showTemplate('web/inventory/default', [
     'pager' => $pager,
     'inventories' => $inventories,
 ]);

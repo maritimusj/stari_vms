@@ -46,7 +46,7 @@ if (Request::is_ajax()) {
     JSON::success(['title' => "请选择要升级的版本(设备：$device_name)", 'content' => $content]);
 }
 
-app()->showTemplate('web/version/upgrade', [
+Response::showTemplate('web/version/upgrade', [
     'deviceid' => $device_id,
     'all' => $all,
 ]);

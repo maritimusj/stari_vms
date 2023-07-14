@@ -88,4 +88,4 @@ $tpl_data['s_date'] = $s_date->format('Y-m-d');
 $e_date->modify('-1 day');
 $tpl_data['e_date'] = $e_date->format('Y-m-d');
 
-app()->showTemplate('web/account/platform_stats', $tpl_data);
+Response::showTemplate('web/account/platform_stats', $tpl_data);

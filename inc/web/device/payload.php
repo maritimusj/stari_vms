@@ -84,4 +84,4 @@ $tpl_data['verified'] = $verified;
 $tpl_data['device'] = $device;
 $tpl_data['is_fueling'] = $device->isFuelingDevice();
 
-app()->showTemplate('web/device/payload', $tpl_data);
+Response::showTemplate('web/device/payload', $tpl_data);

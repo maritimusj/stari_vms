@@ -20,4 +20,4 @@ if ($id) {
     $tpl_data['msg'] = m('msg')->findOne(We7::uniacid(['id' => $id]));
 }
 
-app()->showTemplate('web/agent/msg_edit', $tpl_data);
+Response::showTemplate('web/agent/msg_edit', $tpl_data);

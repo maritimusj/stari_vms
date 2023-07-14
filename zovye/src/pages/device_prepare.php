@@ -69,4 +69,4 @@ JSCODE;
 $tpl['js']['code'] .= "\r\n</script>";
 
 $file = Theme::getThemeFile($device, 'prepare');
-app()->showTemplate($file, ['tpl' => $tpl]);
+Response::showTemplate($file, ['tpl' => $tpl]);

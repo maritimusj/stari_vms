@@ -147,4 +147,4 @@ $tpl_data['mobile_url'] = Util::murl('mobile');
 $tpl_data['keywords'] = $keywords;
 $tpl_data['agent_levels'] = Agent::getLevels();
 
-app()->showTemplate('web/agent/default', $tpl_data);
+Response::showTemplate('web/agent/default', $tpl_data);

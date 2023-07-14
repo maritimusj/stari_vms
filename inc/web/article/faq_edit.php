@@ -27,4 +27,4 @@ if ($id) {
     $tpl_data['faq'] = $faq;
 }
 
-app()->showTemplate('web/doc/faq_edit', $tpl_data);
+Response::showTemplate('web/doc/faq_edit', $tpl_data);

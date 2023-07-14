@@ -207,5 +207,5 @@ if ($is_export) {
 
     $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
 
-    app()->showTemplate('web/device/record', $tpl_data);
+    Response::showTemplate('web/device/record', $tpl_data);
 }

@@ -30,7 +30,7 @@ $partner_data = $user->get('partnerData', []);
 $agent_data = $agent->getAgentData();
 $notice = $agent_data['partners'][$user->getId()]['notice'] ?: [];
 
-app()->showTemplate('web/agent/partner_edit', [
+Response::showTemplate('web/agent/partner_edit', [
     'op' => 'partnerEdit',
     'agent_id' => $agent_id,
     'user_id' => $user_id,

@@ -144,4 +144,4 @@ $tpl_data['backer'] = isset($keyword) || $limit['start'] || $limit['end'] || $tp
 $tpl_data['pager'] = $pager;
 $tpl_data['orders'] = $orders;
 
-app()->showTemplate('web/mall/default', $tpl_data);
+Response::showTemplate('web/mall/default', $tpl_data);

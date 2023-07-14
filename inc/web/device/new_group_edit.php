@@ -33,4 +33,4 @@ if (!empty($agent)) {
     ];
 }
 
-app()->showTemplate('web/device/new_group_edit', $tpl_data);
+Response::showTemplate('web/device/new_group_edit', $tpl_data);

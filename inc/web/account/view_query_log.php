@@ -116,4 +116,4 @@ if ($total > 0) {
 
 $tpl_data['list'] = $list;
 
-app()->showTemplate('web/account/log', $tpl_data);
+Response::showTemplate('web/account/log', $tpl_data);

@@ -42,7 +42,7 @@ if ($fn == 'default') {
         'api_url' => Util::url('fueling', ['op' => 'stats']),
     ];
 
-    app()->showTemplate('web/fueling/stats', $tpl_data);
+    Response::showTemplate('web/fueling/stats', $tpl_data);
 
 } elseif ($fn == 'agent') {
 

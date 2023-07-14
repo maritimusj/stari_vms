@@ -44,7 +44,7 @@ $js_sdk
         if (typeof cb === 'function') {
             return cb(zovye_fn.user)
         }
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             resolve(zovye_fn.user);
         });
     }
@@ -54,4 +54,4 @@ $js_sdk
 </script>
 JSCODE;
 
-app()->showTemplate(Theme::file('balance_log'), ['tpl' => $tpl_data]);
+Response::showTemplate('balance_log', ['tpl' => $tpl_data], true);

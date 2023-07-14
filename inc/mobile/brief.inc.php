@@ -62,6 +62,6 @@ if ($op == 'data') {
     JSON::success(Stats::brief());
 }
 
-app()->showTemplate('misc/brief', [
+Response::showTemplate('misc/brief', [
     'api_url' => Util::murl('brief'),
 ]);

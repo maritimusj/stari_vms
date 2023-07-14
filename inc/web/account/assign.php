@@ -42,7 +42,7 @@ if ($data['agentId']) {
 $assigned = $account->settings('assigned', []);
 $assigned = isEmptyArray($assigned) ? [] : $assigned;
 
-app()->showTemplate('web/account/assign', [
+Response::showTemplate('web/account/assign', [
     'id' => $id,
     'commission_enabled' => $commission_enabled,
     'account' => $data,

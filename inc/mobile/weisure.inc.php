@@ -141,4 +141,4 @@ zovye_fn.redirectToGetPage = function() {
 </script>
 JSCODE;
 
-app()->showTemplate(Theme::file('weisure'), ['tpl' => $tpl_data]);
+Response::showTemplate('weisure', ['tpl' => $tpl_data], true);

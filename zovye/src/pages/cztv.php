@@ -94,4 +94,4 @@ JSCODE;
 $tpl['js']['code'] .= "\r\n</script>";
 
 $file = Theme::getThemeFile($device, 'cztv');
-app()->showTemplate($file, ['tpl' => $tpl]);
+Response::showTemplate($file, ['tpl' => $tpl]);

@@ -392,4 +392,4 @@ if ($page == 'device') {
 
 $tpl_data['page'] = $page;
 $tpl_data['settings'] = $settings;
-app()->showTemplate("web/settings/$page", $tpl_data);
+Response::showTemplate("web/settings/$page", $tpl_data);

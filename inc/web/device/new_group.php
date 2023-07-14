@@ -66,4 +66,4 @@ $tpl_data['filter'] = $filter;
 $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
 $tpl_data['agentId'] = $agent_id ?? null;
 
-app()->showTemplate('web/device/new_group', $tpl_data);
+Response::showTemplate('web/device/new_group', $tpl_data);

@@ -218,4 +218,4 @@ $tpl_data['backer'] = $s_keywords || $s_type_wx || $s_type_wxapp || $s_type_ali 
 
 $tpl_data['users'] = $users;
 
-app()->showTemplate('web//user/default', $tpl_data);
+Response::showTemplate('web//user/default', $tpl_data);

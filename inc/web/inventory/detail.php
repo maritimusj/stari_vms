@@ -83,4 +83,4 @@ if (Request::is_ajax()) {
     ]);
 }
 
-app()->showTemplate('web/inventory/detail', $tpl_data);
+Response::showTemplate('web/inventory/detail', $tpl_data);

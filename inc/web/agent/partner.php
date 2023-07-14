@@ -32,7 +32,7 @@ foreach ($partners as $partner) {
     ];
 }
 
-app()->showTemplate('web/agent/partner', [
+Response::showTemplate('web/agent/partner', [
     'op' => 'partner',
     'id' => $id,
     'agent' => $agent,

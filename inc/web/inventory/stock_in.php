@@ -21,4 +21,4 @@ $tpl_data = [
     'title' => $inventory->getTitle(),
 ];
 
-app()->showTemplate('web/inventory/stock_in', $tpl_data);
+Response::showTemplate('web/inventory/stock_in', $tpl_data);

@@ -21,4 +21,4 @@ if ($id) {
     $tpl_data['data'] = Advertising::format($qrcode);
 }
 
-app()->showTemplate('web/qrcode/edit', $tpl_data);
+Response::showTemplate('web/qrcode/edit', $tpl_data);

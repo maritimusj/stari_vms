@@ -33,7 +33,7 @@ foreach ($query->findAll() as $keeper) {
     ];
 }
 
-app()->showTemplate(
+Response::showTemplate(
     'web/agent/keepers',
     [
         'agent' => $agent->profile(),

@@ -62,4 +62,4 @@ $js_sdk
 </script>
 JSCODE;
 
-app()->showTemplate(Theme::file('questionnaire'), ['tpl' => $tpl_data]);
+Response::showTemplate('questionnaire', ['tpl' => $tpl_data], true);

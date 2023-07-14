@@ -54,4 +54,4 @@ if ($from == 'agent') {
     $tpl_data['back_url'] = $this->createWebUrl('agent', ['op' => 'partner', 'id' => $user->getAgentId()]);
 }
 
-app()->showTemplate('web/agent/agent_msg', $tpl_data);
+Response::showTemplate('web/agent/agent_msg', $tpl_data);

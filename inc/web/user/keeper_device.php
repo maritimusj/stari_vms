@@ -53,7 +53,7 @@ foreach ($query->findAll() as $item) {
     $list[] = $data;
 }
 
-app()->showTemplate(
+Response::showTemplate(
     'web/user/keeper_device',
     [
         'keeper' => $keeper,

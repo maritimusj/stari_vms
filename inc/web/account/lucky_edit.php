@@ -22,4 +22,4 @@ if ($id > 0) {
     $tpl_data['lucky'] = $lucky;
 }
 
-app()->showTemplate('web/account/lucky_edit', $tpl_data);
+Response::showTemplate('web/account/lucky_edit', $tpl_data);

@@ -77,7 +77,7 @@ CODE;
 $tpl_data['js']['code'] = $js_code;
 
 $file = Theme::getThemeFile($device, 'payresult');
-app()->showTemplate($file, [
+Response::showTemplate($file, [
     'tpl' => $tpl_data,
     'url' => Util::murl('order', $url_params),
     'idcard_url' => Util::murl('idcard', ['orderNO' => $order_no]),

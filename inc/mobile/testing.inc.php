@@ -26,7 +26,7 @@ if (empty($user) || $user->isBanned() || !$user->isTester()) {
 
 $op = Request::op();
 if (empty($op)) {
-    app()->showTemplate('testing', [
+    Response::showTemplate('testing', [
         'api_url' => Util::murl('testing'),
         'jssdk' => Session::fetchJSSDK(),
     ]);

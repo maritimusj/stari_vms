@@ -77,6 +77,6 @@ if (Request::is_ajax()) {
     JSON::success($tags);
 }
 
-app()->showTemplate('web/tags/default', [
+Response::showTemplate('web/tags/default', [
     'tags' => $tags,
 ]);

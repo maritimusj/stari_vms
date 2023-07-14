@@ -342,4 +342,4 @@ if (User::isSnapshot()) {
 }
 
 $file = Theme::getThemeFile($device, 'device');
-app()->showTemplate($file, ['tpl' => $tpl]);
+Response::showTemplate($file, ['tpl' => $tpl]);

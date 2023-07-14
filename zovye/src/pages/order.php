@@ -51,4 +51,4 @@ CODE;
 
 $tpl_data = Util::getTplData();
 $tpl_data['js']['code'] = $js_code;
-app()->showTemplate(Theme::file('order'), ['tpl' => $tpl_data]);
+Response::showTemplate('order', ['tpl' => $tpl_data], true);

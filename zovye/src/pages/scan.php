@@ -63,4 +63,4 @@ $js_sdk
 </script>
 JSCODE;
 
-app()->showTemplate(Theme::file('scan'), ['tpl' => $tpl]);
+Response::showTemplate('scan', ['tpl' => $tpl], true);

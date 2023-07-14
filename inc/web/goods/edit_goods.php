@@ -22,15 +22,15 @@ if ($goods_id > 0) {
     }
 
     if ($params['goods']['type'] == 'flash_egg') {
-        app()->showTemplate('web/goods/edit_flash_egg', $params);
+        Response::showTemplate('web/goods/edit_flash_egg', $params);
     }
 }
 
 $type = Request::str('type');
 if ($type == Goods::Lottery) {
-    app()->showTemplate('web/goods/edit_lottery', $params);
+    Response::showTemplate('web/goods/edit_lottery', $params);
 } elseif ($type == Goods::Fueling) {
-    app()->showTemplate('web/goods/edit_fueling', $params);
+    Response::showTemplate('web/goods/edit_fueling', $params);
 } else {
-    app()->showTemplate('web/goods/edit', $params);
+    Response::showTemplate('web/goods/edit', $params);
 }

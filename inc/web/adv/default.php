@@ -203,4 +203,4 @@ $url_params['type'] = $type;
 $tpl_data['search_url'] = $this->createWebUrl('adv', $url_params);
 
 $filename = Advertising::$names[$type];
-app()->showTemplate("web/adv/$filename", $tpl_data);
+Response::showTemplate("web/adv/$filename", $tpl_data);

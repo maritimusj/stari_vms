@@ -63,7 +63,7 @@ $js_sdk
         if (typeof cb === 'function') {
             return cb(zovye_fn.user)
         }
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             resolve(zovye_fn.user);
         });
     }
@@ -130,4 +130,4 @@ $tpl_data['js']['code'] .= <<<JSCODE
 JSCODE;
 
 $filename = Theme::getThemeFile($device, 'task');
-app()->showTemplate($filename, ['tpl' => $tpl_data]);
+Response::showTemplate($filename, ['tpl' => $tpl_data]);

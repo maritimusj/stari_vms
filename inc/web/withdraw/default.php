@@ -178,4 +178,4 @@ if ($total > 0) {
 
 $tpl_data['apps'] = $apps;
 
-app()->showTemplate('web/withdraw/default', $tpl_data);
+Response::showTemplate('web/withdraw/default', $tpl_data);

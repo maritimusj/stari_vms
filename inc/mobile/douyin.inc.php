@@ -142,10 +142,10 @@ if ($user->isBanned()) {
 
 if (App::isUserVerify18Enabled()) {
     if (!$user->isIDCardVerified()) {
-        app()->showTemplate(Theme::file('verify_18'), [
+        Response::showTemplate('verify_18', [
             'verify18' => settings('user.verify_18', []),
             'entry_url' => Util::murl('douyin', ['from' => $from, 'device' => $device_id]),
-        ]);
+        ], true);
     }
 }
 

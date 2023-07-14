@@ -119,4 +119,4 @@ foreach ($query->findAll() as $entry) {
 $tpl_data['logs'] = $logs;
 $tpl_data['device'] = $device;
 
-app()->showTemplate('web/device/log', $tpl_data);
+Response::showTemplate('web/device/log', $tpl_data);

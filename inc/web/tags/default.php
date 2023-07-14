@@ -73,7 +73,7 @@ if ($total > 0) {
 }
 
 if (Request::is_ajax()) {
-    $tags['serial'] = request('serial') ?: microtime(true).'';
+    $tags['serial'] = Request::str('serial') ?: microtime(true).'';
     JSON::success($tags);
 }
 

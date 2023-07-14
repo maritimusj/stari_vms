@@ -13,7 +13,7 @@ if (empty($account)) {
 }
 
 // if (App::isBalanceEnabled() && $account->getBonusType() == Account::BALANCE) {
-//     Response::itoast('积分奖励的任务无法分配到指定设备！', $this->createWebUrl('account'), 'error');
+//     Response::toast('积分奖励的任务无法分配到指定设备！', $this->createWebUrl('account'), 'error');
 // }
 
 $data = [

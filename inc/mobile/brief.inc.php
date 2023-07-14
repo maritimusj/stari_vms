@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+use zovye\model\deviceModelObj;
+
 defined('IN_IA') or exit('Access Denied');
 
 $op = Request::op('default');
@@ -35,10 +37,9 @@ if ($op == 'data') {
 
     $query->page($page, $page_size);
 
-
     $list = [];
-    $e = [app(), 'goods'];
 
+    /** @var deviceModelObj $device */
     foreach($query->findAll() as $device) {
         $data = $device->profile();
         $data['location'] = $device->settings('extra.location.tencent', $device->settings('extra.location.baidu', []));

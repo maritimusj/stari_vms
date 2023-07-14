@@ -22,7 +22,6 @@ $num = Request::int('num', 10);
 //简单的二维码导出功能
 use ZipArchive;
 
-$url_prefix = We7::attachment_set_attach_url();
 $attach_prefix = ATTACHMENT_ROOT;
 
 $zip = new ZipArchive();
@@ -30,7 +29,6 @@ $zip = new ZipArchive();
 $zip_file_name = 'zovye/' . date('YmdHis').'.zip';
 $zip->open($attach_prefix . $zip_file_name, ZipArchive::CREATE);   //打开压缩包
 
-$list = [];
 for($i = 0; $i < $num; $i++ ) {
     $serial = sprintf('%s%04d', TIMESTAMP, $i + 1);
     $secret = hash_hmac('sha256',  "$id.$serial", App::secret());

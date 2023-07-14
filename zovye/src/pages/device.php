@@ -336,7 +336,7 @@ JSCODE;
 $tpl['js']['code'] .= "\r\n</script>";
 
 if (User::isSnapshot()) {
-    $tpl['js']['code'] .= app()->snapshotJs([
+    $tpl['js']['code'] .= Response::snapshotJs([
         'device_imei' => $device_imei,
     ]);
 }

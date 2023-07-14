@@ -102,7 +102,7 @@ JSCODE;
 </script>
 JSCODE;
     if (User::isSnapshot()) {
-        $tpl_data['js']['code'] .= app()->snapshotJs(['entry' => 'promoter']);
+        $tpl_data['js']['code'] .= Response::snapshotJs(['entry' => 'promoter']);
     }
     Response::showTemplate($user->isPromoter() ? 'promoter/log' : 'promoter/reg', ['tpl' => $tpl_data]);
 

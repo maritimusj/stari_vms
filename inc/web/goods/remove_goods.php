@@ -8,7 +8,7 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-$goods = Goods::get(request('id'));
+$goods = Goods::get(Request::int('id'));
 if ($goods && $goods->getType() !== Goods::FlashEgg) {
 
     if (Goods::safeDelete($goods)) {

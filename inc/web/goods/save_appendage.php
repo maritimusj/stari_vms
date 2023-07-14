@@ -9,7 +9,7 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 $params = [];
-parse_str(request('params'), $params);
+parse_str(Request::str('params'), $params);
 
 $goods = Goods::get($params['goodsId']);
 if (empty($goods)) {

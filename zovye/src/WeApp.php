@@ -92,6 +92,7 @@ class WeApp extends Settings
         if ($global) {
             return DBUtil::lockObject($global, [OBJ_LOCKED_UID => UNLOCKED], true);
         }
+
         return null;
     }
 
@@ -99,6 +100,7 @@ class WeApp extends Settings
     {
         /** @var weapp_configModelObj $global */
         $global = m('weapp_config')->findOne(['name' => 'settings']);
+
         return $global && $global->getLockedUid() != UNLOCKED;
     }
 
@@ -124,6 +126,7 @@ class WeApp extends Settings
     public function run(): WeApp
     {
         class_alias(__NAMESPACE__.'\Site', lcfirst(APP_NAME).'ModuleSite');
+
         return $this;
     }
 
@@ -131,8 +134,10 @@ class WeApp extends Settings
     {
         if ($this->set('settings', $settings)) {
             self::$app_settings = $settings;
+
             return true;
         }
+
         return false;
     }
 
@@ -143,6 +148,7 @@ class WeApp extends Settings
         }
 
         setArray(self::$app_settings, $key, $val);
+
         return $this->set('settings', self::$app_settings);
     }
 
@@ -157,9 +163,9 @@ class WeApp extends Settings
                 }
             }
         }
+
         return getArray(self::$app_settings, $key, $default);
     }
-
 
     public function log($level = null, $title = null, $data = null)
     {
@@ -195,7 +201,7 @@ class WeApp extends Settings
 
     public function snapshotJs($params = []): string
     {
-        $gif_url = MODULE_URL . "static/img/here.gif";
+        $gif_url = MODULE_URL."static/img/here.gif";
         $html = <<<HTML
         <div style="position: fixed;width: 100vw;height:100vh;z-index: 1000;background: rgba(0,0,0,0.7);left: 0;top: 0;bottom:0">
         <div style="flex-direction: column;display: flex;align-items: center;justify-content: center;width: 100%;height: 100%;color: #fff;font-size: large;">

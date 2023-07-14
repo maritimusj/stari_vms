@@ -73,6 +73,7 @@ class Response
      * 重定向客户端浏览器
      * @param string $url
      * @param array $params
+     * @param int $response_code
      */
     public static function redirect(string $url, array $params = [], $response_code = 302)
     {

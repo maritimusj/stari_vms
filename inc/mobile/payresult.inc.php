@@ -14,7 +14,7 @@ if ($op == 'default') {
     $order_no = Request::str('orderNO');
     $device = Device::get(Request::int('deviceid'));
 
-    app()->payResultPage([
+    Response::payResultPage([
         'order_no' => $order_no,
         'device' => $device,
     ]);

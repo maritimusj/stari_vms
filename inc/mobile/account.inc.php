@@ -162,7 +162,7 @@ if ($op == 'default') {
     );
 
     //领取页面
-    app()->getPage($tpl_data);
+    Response::getPage($tpl_data);
 
 } elseif ($op == 'get_list') {
 

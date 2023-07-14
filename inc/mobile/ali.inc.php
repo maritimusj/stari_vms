@@ -35,7 +35,7 @@ if (!App::isAliUser()) {
         'retries' => $retries + 1,
     ]);
 
-    app()->aliAuthPage([
+    Response::aliAuthPage([
         'cb_url' => $cb_url,
     ]);
 }

@@ -29,7 +29,7 @@ class CZTV
 
         $token = Request::str('sessionId');
         if (empty($token)) {
-            app()->cztvPage([
+            Response::cztvPage([
                 'redirect_url' => $config['redirect_url'],
             ]);
             return false;
@@ -53,7 +53,7 @@ class CZTV
         ]);
 
         if (empty($user) || is_error($user)) {
-            app()->cztvPage([
+            Response::cztvPage([
                 'redirect_url' => $config['redirect_url'],
             ]);
             return false;
@@ -71,7 +71,7 @@ class CZTV
             Response::alert('没有关联公众号！', 'error');
         }
 
-        app()->cztvPage([
+        Response::cztvPage([
             'device' => $device,
             'user' => $user,
         ]);

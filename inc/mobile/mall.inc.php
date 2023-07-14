@@ -20,14 +20,14 @@ if (empty($user) || $user->isBanned()) {
 $op = Request::op('default');
 if ($op == 'default') {
 
-    app()->mallPage([
-        'user' => $user
+    Response::mallPage([
+        'user' => $user,
     ]);
 
 } elseif ($op == 'order') {
 
-    app()->mallOrderPage([
-        'user' => $user
+    Response::mallOrderPage([
+        'user' => $user,
     ]);
 
 } elseif ($op == 'goods_list') {

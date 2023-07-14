@@ -424,11 +424,11 @@ if ($op === 'create') {
 
 } elseif ($op == 'jump') {
 
-    app()->orderPage([
+    Response::orderPage([
         'user' => Request::str('user'),
     ]);
 
 } elseif ($op == 'feedback') {
 
-    app()->feedbackPage();
+    Response::feedbackPage();
 }

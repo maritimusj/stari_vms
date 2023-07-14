@@ -68,7 +68,7 @@ if ($op == 'save') {
     }
 }
 
-app()->keeperPage([
+Response::keeperPage([
         'user' =>
             [
                 'nickname' => $user->getNickname(),

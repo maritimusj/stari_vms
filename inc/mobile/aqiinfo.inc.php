@@ -47,7 +47,7 @@ if (Request::str('appResult') == 'nomore') {
     $tpl_data['exclude'][] = AQIInfoAccount::getUid();
 
     //设备首页
-    app()->devicePage($tpl_data);
+    Response::devicePage($tpl_data);
 }
 
 $raw = Request::raw();

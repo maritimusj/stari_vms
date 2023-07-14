@@ -22,7 +22,7 @@ if ($op == 'default') {
         $device = Device::findOne(['shadow_id' => $device_shadow_id]);
     }
 
-    app()->taskPage([
+    Response::taskPage([
         'user' => $user,
         'device' => $device ?? null,
     ]);

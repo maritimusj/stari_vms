@@ -29,7 +29,7 @@ if ($op == 'default') {
         $device_id = $data['orderData']['deviceId'];
     }
 
-    app()->idCardPage(
+    Response::idCardPage(
         [
             'deviceId' => $device_id,
             'orderNO' => $order_no,

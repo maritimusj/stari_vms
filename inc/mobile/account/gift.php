@@ -49,7 +49,7 @@ if ($fn == 'data') {
         Response::alert('对不起，没有达到活动要求，暂时不能领取！');
     }
 
-    app()->giftRegistryPage([
+    Response::giftRegistryPage([
         'user' => $user,
         'device' => $getDeviceFN(),
         'gift' => $detail,
@@ -108,7 +108,7 @@ if ($fn == 'data') {
     JSON::success(['msg' => '领取成功，请注意查收！']);
 }
 
-app()->giftDetailPage([
+Response::giftDetailPage([
     'user' => $user,
     'device' =>  $getDeviceFN()
 ]);

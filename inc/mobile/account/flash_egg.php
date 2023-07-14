@@ -22,13 +22,13 @@ $fn = Request::trim('fn');
 
 if ($fn == 'gift_logs') {
 
-    app()->giftLogsPage([
+    Response::giftLogsPage([
         'user' => $user,
     ]);
 
 } elseif ($fn == 'lucky_logs') {
 
-    app()->luckyLogsPage([
+    Response::luckyLogsPage([
         'user' => $user,
     ]);
 
@@ -85,6 +85,6 @@ if ($fn == 'gift_logs') {
     JSON::success($list);
 }
 
-app()->flashEggPage([
+Response::flashEggPage([
     'user' => $user,
 ]);

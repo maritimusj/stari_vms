@@ -183,7 +183,7 @@ if ($op == 'save') {
     }
 }
 
-app()->mobilePage([
+Response::mobilePage([
         'user' =>
             [
                 'nickname' => $user->getNickname(),

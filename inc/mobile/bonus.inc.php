@@ -35,20 +35,20 @@ if ($op == 'default') {
         $device = Device::findOne(['shadow_id' => $device_shadow_id]);
     }
 
-    app()->bonusPage([
+    Response::bonusPage([
         'user' => $user,
         'device' => $device ?? null,
     ]);
 
 } elseif ($op == 'home') {
 
-    app()->userPage([
+    Response::userPage([
         'user' => $user,
     ]);
 
 } elseif ($op == 'logsPage') {
 
-    app()->userBalanceLogPage([
+    Response::userBalanceLogPage([
         'user' => $user,
     ]);
 

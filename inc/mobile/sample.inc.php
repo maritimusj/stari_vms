@@ -86,7 +86,7 @@ if ($op == 'check') {
 }
 
 if (!User::isSubscribed($user)) {
-    app()->followPage([
+    Response::followPage([
         'user' => $user,
         'device' => $device,
     ]);
@@ -94,7 +94,7 @@ if (!User::isSubscribed($user)) {
 
 //默认显示商品列表
 if ($op == 'default') {
-    app()->giftGoodsListPage([
+    Response::giftGoodsListPage([
         'user' => $user,
         'device' => $device,
     ]);

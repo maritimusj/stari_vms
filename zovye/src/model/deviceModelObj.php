@@ -390,7 +390,7 @@ class deviceModelObj extends modelObj
 
     public function setChargerData($chargerID, array $data): bool
     {
-        $saved = $this->getChargerStatusData($chargerID, []);
+        $saved = $this->getChargerStatusData($chargerID);
         $data = array_merge($saved, $data);
 
         return $this->updateSettings("charger_$chargerID", $data);
@@ -3216,7 +3216,7 @@ class deviceModelObj extends modelObj
 
     public function generateChargingSerial(int $chargerID): string
     {
-        $locker = Locker::try("charging:serial:{$this->imei}");
+        $locker = Locker::try("charging:serial:$this->imei");
         if ($locker) {
             $chargingData = $this->settings('extra.chargingData', []);
             if (date('Ymd', $chargingData['last']) != date('Ymd')) {

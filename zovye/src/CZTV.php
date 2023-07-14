@@ -123,7 +123,7 @@ class CZTV
         return $user;
     }
 
-    public static function get(userModelObj $user, $device_uid, $goods_id, $num = 1, $order_no = '')
+    public static function get(userModelObj $user, $device_uid, $goods_id, $num = 1, $order_no = ''): array
     {
         if (!App::isCZTVEnabled()) {
             return err('这个功能没有启用！');

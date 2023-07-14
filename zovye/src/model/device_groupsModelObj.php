@@ -118,7 +118,7 @@ class device_groupsModelObj extends modelObj
 
     public function setLoc(array $loc): bool
     {
-        return $this->setExtraData('lat', $loc['lat']) && $this->setExtraData('lng', $loc['lng']);;
+        return $this->setExtraData('lat', $loc['lat']) && $this->setExtraData('lng', $loc['lng']);
     }
 
     public function setFee(array $fee)
@@ -135,7 +135,7 @@ class device_groupsModelObj extends modelObj
         return floatval($this->getExtraData('fee.l0.sf', 0.0));
     }
 
-    public function getFeeAt(DateTimeInterface $time)
+    public function getFeeAt(DateTimeInterface $time): array
     {
         $hour = $time->format('G');
 

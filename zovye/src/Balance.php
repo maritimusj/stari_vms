@@ -367,7 +367,7 @@ TEXT;
 <dt>事件</dt>
 <dd class="event">商城订单</dd>
 $order_desc
-<dt>说明</dt><dd class="event">用户在商城兑换{$goods_desc}</dd>
+<dt>说明</dt><dd class="event">用户在商城兑换$goods_desc</dd>
 </dl>
 TEXT;
         } elseif ($entry->getSrc() == Balance::USER_NEW) {

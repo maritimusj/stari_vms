@@ -56,7 +56,7 @@ class modelObjIterator implements Iterator, Countable, ArrayAccess
         return null;
     }
 
-    public function key()
+    public function key(): int
     {
         return $this->pos;
     }

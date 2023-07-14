@@ -24,7 +24,7 @@ class migrationModelObj extends modelObj
     /** @var int */
     protected $uniacid;
     /** @var string */
-    protected $name/** @var string */
+    protected $name
     ;
     protected $filename;
     /** @var  int */

@@ -73,9 +73,9 @@ class YZShop
     /**
      * 获取商城关系链中的上级信息
      * @param userModelObj $user
-     * @return mixed
+     * @return null|model\agentModelObj
      */
-    public static function getSuperior(userModelObj $user)
+    public static function getSuperior(userModelObj $user): ?model\agentModelObj
     {
         if (We7::pdo_tableexists(self::TB_MEMBER)) {
             $res = We7::pdo_get(self::TB_MEMBER, We7::uniacid(['yz_openid' => $user->getOpenid()]), ['parent_id']);
@@ -95,7 +95,7 @@ class YZShop
      * @param string $keywords
      * @return array
      */
-    public static function getGoodsList($keywords = ''): array
+    public static function getGoodsList(string $keywords = ''): array
     {
         $condition = [
             'is_deleted' => 0,

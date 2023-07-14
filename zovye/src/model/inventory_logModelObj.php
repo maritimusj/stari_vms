@@ -44,12 +44,12 @@ class inventory_logModelObj extends modelObj
 
     use ExtraDataGettersAndSetters;
 
-    public function getGoods()
+    public function getGoods(): ?goodsModelObj
     {
         return Goods::get($this->goods_id, true);
     }
 
-    public function getSrcInventory()
+    public function getSrcInventory(): ?inventoryModelObj
     {
         return Inventory::get($this->src_inventory_id);
     }

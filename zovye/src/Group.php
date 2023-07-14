@@ -90,7 +90,7 @@ class Group
             $data['loc'] = $entry->getLoc();
             $data['version'] = $entry->getVersion();
 
-            $fee =  $entry->getFee();;
+            $fee =  $entry->getFee();
             if ($detail) {
                 $data['fee'] = $fee;
             }

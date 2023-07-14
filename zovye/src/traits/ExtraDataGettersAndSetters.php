@@ -20,7 +20,7 @@ trait ExtraDataGettersAndSetters
 
     /**
      * @param $data
-     * @return mixed
+     * @return false|string
      */
     public static function serializeExtra($data)
     {

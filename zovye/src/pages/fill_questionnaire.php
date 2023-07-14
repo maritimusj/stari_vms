@@ -54,7 +54,7 @@ $js_sdk
         return $.getJSON(zovye_fn.api_url, {
             op: 'result', 
             uid: "{$account->getUid()}", 
-            device: "{$device_uid}",
+            device: "$device_uid",
             serial: "$serial",
             data: data || zovye_fn.answer,
         });

@@ -192,6 +192,10 @@ class Order extends State
         return null;
     }
 
+    /**
+     * @param $fetch_order_obj
+     * @return mixed
+     */
     public static function getLastOrder($fetch_order_obj = false)
     {
         $query = Order::query();

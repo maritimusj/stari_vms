@@ -117,8 +117,8 @@ class WxPlatform
     public static function getAuthorizationCodeRedirectUrl(
         accountModelObj $account,
         $redirect_url,
-        $scope = self::SCOPE_SNS_API_BASE,
-        $state = ''
+        string $scope = self::SCOPE_SNS_API_BASE,
+        string $state = ''
     ): string {
         $component_appid = settings('account.wx.platform.config.appid');
         $appid = $account->settings('authdata.authorization_info.authorizer_appid');

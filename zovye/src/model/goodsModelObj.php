@@ -195,7 +195,7 @@ class goodsModelObj extends modelObj
             return $res;
         }
 
-        return $this->getExtraData("quota.{$w}", [
+        return $this->getExtraData("quota.$w", [
             'day' => 0,
             'all' => 0,
         ]);

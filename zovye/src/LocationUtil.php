@@ -30,7 +30,7 @@ class LocationUtil
      * 获取ip地址定位信息.
      *
      * @param $ip
-     * @return mixed
+     * @return array
      */
     public static function getIpInfo($ip)
     {

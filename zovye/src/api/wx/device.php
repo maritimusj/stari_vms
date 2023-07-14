@@ -1067,7 +1067,7 @@ class device
             }
             /** @var deviceModelObj $device */
             foreach ($devices as $device) {
-                $data = device::formatDeviceInfo($device->getAgent(), $device, $simple, 0);
+                $data = device::formatDeviceInfo($device->getAgent(), $device, $simple);
                 if (App::isBluetoothDeviceSupported() && $device->isBlueToothDevice()) {
                     $data['status']['online'] = true;
                 } else {

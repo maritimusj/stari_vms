@@ -37,7 +37,7 @@ class modelObjIteratorLazy implements Iterator, Countable, ArrayAccess
         $this->pos = 0;
     }
 
-    public function key()
+    public function key(): int
     {
         return $this->pos;
     }

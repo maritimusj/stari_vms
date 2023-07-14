@@ -94,6 +94,9 @@ class WeiSureAccount
         return ['account' => $account];
     }
 
+    /**
+     * @throws Exception
+     */
     public static function cb(array $params = [], $throw = false)
     {
         try {

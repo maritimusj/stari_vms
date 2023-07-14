@@ -161,22 +161,6 @@ class Session
         return 'unknown';
     }
 
-    /**
-     * 获取返回js sdk字符串.
-     *
-     * @param bool $debug
-     *
-     * @return string
-     */
-    public static function fetchJSSDK(bool $debug = false): string
-    {
-        ob_start();
-
-        We7::register_jssdk($debug);
-
-        return ob_get_clean();
-    }
-
 
     /**
      * 是否在支付宝APP中

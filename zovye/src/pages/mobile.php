@@ -17,7 +17,7 @@ defined('IN_IA') or exit('Access Denied');
 $params = Util::getTemplateVar();
 $tpl = is_array($params) ? $params : [];
 
-$js_sdk = Session::fetchJSSDK();
+$js_sdk = Util::jssdk();
 
 $mobile_url = Util::murl('mobile');
 

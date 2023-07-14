@@ -62,7 +62,7 @@ if (Session::isDouYinAppContainer()) {
 </script>
 JSCODE;
 } else {
-    $js_sdk = Session::fetchJSSDK();
+    $js_sdk = Util::jssdk();
     $tpl['js']['code'] = <<<JSCODE
             <script src="$jquery_url"></script>
             <script src="https://mapapi.qq.com/web/mapComponents/geoLocation/v/geolocation.min.js"></script>

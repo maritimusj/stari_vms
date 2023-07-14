@@ -26,7 +26,7 @@ $device_url = empty($params['redirect']) ? Util::murl('entry', ['device' => $dev
 $device_api_url = Util::murl('device', ['id' => $device->getId()]);
 $jquery_url = JS_JQUERY_URL;
 
-$js_sdk = Session::fetchJSSDK();
+$js_sdk = Util::jssdk();
 $tpl['max'] = is_numeric($params['max']) ? $params['max'] : 3;
 $tpl['text'] = empty($params['text']) ? '设备连接中' : $params['text'];
 $tpl['err_msg'] = empty($params['err_msg']) ? '设备不在线，请稍后再试！' : $params['err_msg'];

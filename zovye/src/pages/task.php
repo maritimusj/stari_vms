@@ -35,7 +35,7 @@ $upload_api_url = Util::murl('util', ['op' => 'upload_pic']);
 $jquery_url = JS_JQUERY_URL;
 $axios_url = JS_AXIOS_URL;
 
-$js_sdk = Session::fetchJSSDK();
+$js_sdk = Util::jssdk();
 $wxapp_username = settings('agentWxapp.username', '');
 
 $tpl_data['js']['code'] = <<<JSCODE

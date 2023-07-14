@@ -14,7 +14,7 @@ $tpl = is_array($params) ? $params : [];
 
 $token = Util::getTokenValue();
 $redirect_url = Util::murl('entry', ['from' => 'scan', 'device' => $token]);
-$js_sdk = Session::fetchJSSDK();
+$js_sdk = Util::jssdk();
 $jquery_url = JS_JQUERY_URL;
 
 $tpl['js']['code'] = <<<JSCODE

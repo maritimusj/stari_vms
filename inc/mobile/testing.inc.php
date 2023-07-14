@@ -28,7 +28,7 @@ $op = Request::op();
 if (empty($op)) {
     Response::showTemplate('testing', [
         'api_url' => Util::murl('testing'),
-        'jssdk' => Session::fetchJSSDK(),
+        'jssdk' => Util::jssdk(),
     ]);
 } else {
     if ($op == "detail") {

@@ -23,7 +23,7 @@ if ($op == 'default') {
     }
 
     Response::showTemplate('app', [
-        'js_code' => Session::fetchJSSDK(),
+        'js_code' => Util::jssdk(),
         'op' => $op,
         'appId' => $app_id,
         'device' => $device,

@@ -98,7 +98,7 @@ $user_data = [
 
 $user_json_str = json_encode($user_data, JSON_HEX_TAG | JSON_HEX_QUOT);
 
-$js_sdk = Session::fetchJSSDK();
+$js_sdk = Util::jssdk();
 $jquery_url = JS_JQUERY_URL;
 
 $api_url = Util::murl('weisure', [

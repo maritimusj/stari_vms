@@ -13,7 +13,7 @@ use Exception;
 $op = Request::op('default');
 if ($op == 'default') {
 
-    $js_sdk = Session::fetchJSSDK();
+    $js_sdk = Util::jssdk();
     Response::showTemplate('map', ['jssdk' => $js_sdk]);
 
 } elseif ($op == 'user') {

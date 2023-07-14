@@ -37,7 +37,7 @@ $account_data = [
 $account_data['data']['bonus'] = $account->getBalancePrice();
 $account_json_str = json_encode($account_data, JSON_HEX_TAG | JSON_HEX_QUOT);
 
-$js_sdk = Session::fetchJSSDK();
+$js_sdk = Util::jssdk();
 
 $tpl_data['js']['code'] = <<<JSCODE
 <script src="$jquery_url"></script>
@@ -56,7 +56,7 @@ $js_sdk
         if (typeof cb === 'function') {
             return cb(zovye_fn.account)
         }
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             resolve(zovye_fn.account);
         });
     }
@@ -64,7 +64,7 @@ $js_sdk
         if (typeof cb === 'function') {
             return cb(zovye_fn.user)
         }
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             resolve(zovye_fn.user);
         });
     }

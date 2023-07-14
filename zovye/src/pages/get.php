@@ -53,7 +53,7 @@ if ($device) {
     }
 }
 
-$js_sdk = Session::fetchJSSDK();
+$js_sdk = Util::jssdk();
 
 $get_x_url = Util::murl('getx', ['ticket' => $params['user']['ticket']]);
 $get_goods_list_url = Util::murl('goodslist', ['free' => true, 'ticket' => $params['user']['ticket']]);

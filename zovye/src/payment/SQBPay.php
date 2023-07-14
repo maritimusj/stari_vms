@@ -13,6 +13,7 @@ use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 use zovye\Request;
+use zovye\Response;
 use zovye\Session;
 use zovye\Util;
 use function zovye\_W;
@@ -150,7 +151,7 @@ class SQBPay implements IPay
     {
         $device_uid = $device->getImei();
 
-        $js_sdk = Session::fetchJSSDK();
+        $js_sdk = Util::jssdk();
         $jquery_url = JS_JQUERY_URL;
         $order_api_url = Util::murl('order', ['deviceUID' => $device_uid]);
 

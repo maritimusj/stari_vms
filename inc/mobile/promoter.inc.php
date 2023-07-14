@@ -53,7 +53,7 @@ if ($op == 'default') {
     $api_url = Util::murl('promoter');
     $jquery_url = JS_JQUERY_URL;
     $vueJs_url = JS_VUE_URL;
-    $js_sdk = Session::fetchJSSDK();
+    $js_sdk = Util::jssdk();
     $pre_withdraw_url = Util::murl('promoter', ['op' => 'pre_withdraw']);
 
     $tpl_data['js']['code'] = <<<JSCODE
@@ -189,7 +189,7 @@ JSCODE;
     $api_url = Util::murl('promoter');
     $jquery_url = JS_JQUERY_URL;
     $vueJs_url = JS_VUE_URL;
-    $js_sdk = Session::fetchJSSDK();
+    $js_sdk = Util::jssdk();
 
     $tpl_data['js']['code'] = <<<JSCODE
     <script src="$jquery_url"></script>

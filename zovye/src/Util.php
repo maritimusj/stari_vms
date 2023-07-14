@@ -1432,4 +1432,20 @@ include './index.php';
 
         return $balance_obj;
     }
+
+    /**
+     * 获取返回js sdk字符串.
+     *
+     * @param bool $debug
+     *
+     * @return string
+     */
+    public static function jssdk(bool $debug = false): string
+    {
+        ob_start();
+
+        We7::register_jssdk($debug);
+
+        return ob_get_clean();
+    }
 }

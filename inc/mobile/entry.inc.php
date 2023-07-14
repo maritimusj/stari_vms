@@ -324,4 +324,4 @@ $tpl_data = Util::getTplData([
 
 
 //领取页面
-app()->getPage($tpl_data);
+Response::getPage($tpl_data);

@@ -48,4 +48,4 @@ foreach ($query->findAll() as $member) {
 }
 
 $tpl_data['list'] = $list;
-app()->showTemplate('web/team/default', $tpl_data);
+Response::showTemplate('web/team/default', $tpl_data);

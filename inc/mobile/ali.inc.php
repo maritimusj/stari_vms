@@ -62,10 +62,10 @@ if ($user->isBanned()) {
 
 if (App::isUserVerify18Enabled()) {
     if (!$user->isIDCardVerified()) {
-        app()->showTemplate(Theme::file('verify_18'), [
+        Response::showTemplate('verify_18', [
             'verify18' => settings('user.verify_18', []),
             'entry_url' => Util::murl('ali', ['from' => $from, 'device' => $device_id]),
-        ]);
+        ], true);
     }
 }
 
@@ -78,8 +78,9 @@ if ($from == 'device') {
     if ($device->isReadyTimeout()) {
         //设备准备页面，检测设备是否在线等等
         $tpl_data = Util::getTplData([$device, $user]);
-        app()->devicePreparePage($tpl_data);
+        Response::devicePreparePage($tpl_data);
     }
+
     $user->cleanLastActiveData();
 }
 
@@ -88,5 +89,6 @@ $user->setLastActiveDevice($device);
 
 $tpl_data = Util::getTplData([$user, $device]);
 $tpl_data['from'] = $from;
+
 //设备首页
-app()->devicePage($tpl_data);
+Response::devicePage($tpl_data);

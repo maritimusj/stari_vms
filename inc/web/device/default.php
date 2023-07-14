@@ -61,5 +61,4 @@ $tpl_data['page'] = Request::int('page', 1);
 $tpl_data['upload'] = (bool)settings('device.upload.url', '');
 $tpl_data['gate'] = CtrlServ::status();
 
-
-app()->showTemplate('web/device/default_new', $tpl_data);
+Response::showTemplate('web/device/default_new', $tpl_data);

@@ -7,19 +7,36 @@
 
 namespace zovye;
 
-use zovye\api\wx\fb;
-
+/**
+ * @method static devicePreparePage(array $tpl_data)
+ * @method static devicePage(array $tpl_data)
+ * @method static getPage(array $tpl_data)
+ */
 class Response
 {
-    public static function showTemplate(string $filename, $tpl_data = [])
+    public static function showTemplate(string $filename, $tpl_data = [], $is_theme_file = false)
     {
-        app()->showTemplate($filename, $tpl_data);
+        app()->showTemplate($is_theme_file ? Theme::file($filename) : $filename, $tpl_data);
     }
 
     public static function templateJSON(string $filename, $title = '', $tpl_data = [])
     {
         $content = app()->fetchTemplate($filename, $tpl_data); 
         JSON::success(['title' => $title, 'content' => $content]);
+    }
+
+    public static function __callStatic($name, $arguments)
+    {
+        $names = explode('_', toSnakeCase($name));
+        $last = array_pop($names);
+        if ($last == 'page') {
+            $v = implode('_', $names);
+            $file = ZOVYE_SRC . 'pages' . DIRECTORY_SEPARATOR . $v . '.php';
+            if (is_file($file)) {
+                $GLOBALS['_tpl_var_'] = $arguments;
+                require $file;
+            }
+        }
     }
 
     /**

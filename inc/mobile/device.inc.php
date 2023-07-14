@@ -30,7 +30,7 @@ if ($op == 'default') {
         Response::alert('设备二维码不正确，请重新扫描！', 'error');
     }
 
-    header('location:'.Util::murl('entry', ['from' => 'device', 'device' => $device->getShadowId()]));
+    Response::redirect(Util::murl('entry', ['from' => 'device', 'device' => $device->getShadowId()]));
 
 } elseif ($op == 'feed_back') {
 

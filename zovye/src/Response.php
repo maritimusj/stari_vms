@@ -51,7 +51,7 @@ class Response
 
     public static function templateJSON(string $filename, string $title = '', $tpl_data = [])
     {
-        $content = app()->fetchTemplate($filename, $tpl_data); 
+        $content = app()->fetchTemplate($filename, $tpl_data);
         JSON::success(['title' => $title, 'content' => $content]);
     }
 
@@ -61,7 +61,7 @@ class Response
         $last = array_pop($names);
         if ($last == 'page') {
             $v = implode('_', $names);
-            $file = ZOVYE_SRC . 'pages' . DIRECTORY_SEPARATOR . $v . '.php';
+            $file = ZOVYE_SRC.'pages'.DIRECTORY_SEPARATOR.$v.'.php';
             if (is_file($file)) {
                 $GLOBALS['_tpl_var_'] = $arguments;
                 require $file;
@@ -74,13 +74,13 @@ class Response
      * @param string $url
      * @param array $params
      */
-    public static function redirect(string $url, array $params = [])
+    public static function redirect(string $url, array $params = [], $response_code = 302)
     {
         if ($params) {
             $url = PlaceHolder::replace($url, $params);
         }
 
-        header("Location:$url", true, 302);
+        header("Location:$url", true, $response_code);
     }
 
     /**

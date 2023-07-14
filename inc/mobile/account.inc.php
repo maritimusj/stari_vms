@@ -29,7 +29,7 @@ if ($op == 'default') {
         Response::alert('公众号没有开通免费领取！', 'error');
     }
 
-    header('location:'.Util::murl('entry', ['from' => 'account', 'account' => $tid, 'xid' => $xid]));
+    Response::redirect(Util::murl('entry', ['from' => 'account', 'account' => $tid, 'xid' => $xid]));
 
 } elseif ($op == 'play') {
 

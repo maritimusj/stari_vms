@@ -19,8 +19,7 @@ if ($op == 'default') {
     $device = Device::getFromAppId($app_id);
     if ($device) {
         //设备已完成注册
-        header('location:'.Util::murl('device', ['id' => $device->getImei()]));
-        exit();
+        Response::redirect(Util::murl('device', ['id' => $device->getImei()]));
     }
 
     Response::showTemplate('app', [

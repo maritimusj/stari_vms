@@ -42,6 +42,6 @@ if ($user && $adv) {
     }
 
     if ($url) {
-        header("location:$url");
+        Response::redirect($url);
     }
 }

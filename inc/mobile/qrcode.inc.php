@@ -132,15 +132,13 @@ if ($qr_codes->count() > 0) {
 
         $entry->save();
 
-        header(sprintf('location: %s', PlaceHolder::replace($url, $params)));
-        exit();
+        Response::redirect(PlaceHolder::replace($url, $params));
     }
 }
 
 $default_url = settings('misc.qrcode.default_url');
 if ($default_url) {
-    header(sprintf('location: %s', PlaceHolder::replace($default_url, $params)));
-    exit();
+    Response::redirect(PlaceHolder::replace($default_url, $params));
 }
 
 Response::alert('没有设置网址！', 'error');

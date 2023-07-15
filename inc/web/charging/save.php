@@ -46,7 +46,7 @@ $id = Request::int('id');
 $lng = Request::float('lng');
 $lat = Request::float('lat');
 
-if ($id) {
+if ($id > 0) {
     $group = Group::get($id, Group::CHARGING);
     if (empty($group)) {
         Response::toast('找不到指定的分组！', '', 'error');

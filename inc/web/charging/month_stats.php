@@ -9,9 +9,6 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 $group_id = request::int('id');
-if (!$group_id) {
-    JSON::fail('分组不存在！');
-}
 
 $group = Group::query(Group::CHARGING)->findOne(['id' => $group_id]);
 if (!$group) {

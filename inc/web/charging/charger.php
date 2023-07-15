@@ -10,7 +10,7 @@ defined('IN_IA') or exit('Access Denied');
 
 $id = Request::int('id');
 $device = Device::get($id);
-if (!$device || !$device->isChargingDevice()) {
+if (empty($device) || !$device->isChargingDevice()) {
     JSON::fail('设备不正确！');
 }
 

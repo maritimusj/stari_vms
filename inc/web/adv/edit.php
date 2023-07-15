@@ -10,22 +10,22 @@ defined('IN_IA') or exit('Access Denied');
 
 use zovye\model\advertisingModelObj;
 
-$id = Request::int('id');
 $type = Request::int('type', Advertising::SCREEN);
 
 $tpl_data = [
     'op' => Request::op(),
     'type' => $type,
+    'media' => Request::trim('media'),
     'media_data' => Advertising::getMediaData(),
     'wx_data' => Advertising::getWxData(),
+    'from_type' => Request::trim('from_type', $type),
+    'navs' => Advertising::getNavData(),
 ];
 
-$tpl_data['navs'] = Advertising::getNavData();
+$id = Request::int('id');
 
 if ($id > 0) {
     $tpl_data['id'] = $id;
-    $tpl_data['media'] = Request::trim('media');
-    $tpl_data['from_type'] = Request::trim('from_type', $type);
 
     /** @var advertisingModelObj $ad */
     $ad = Advertising::query(['type' => $type, 'id' => $id])->findOne();

@@ -10,7 +10,7 @@ defined('IN_IA') or exit('Access Denied');
 
 use zovye\model\payload_logsModelObj;
 
-$device = Device::get(request('id'));
+$device = Device::get(Request::int('id'));
 if (empty($device)) {
     Response::toast('找不到这个设备！', $this->createWebUrl('device'), 'error');
 }

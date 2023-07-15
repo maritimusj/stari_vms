@@ -11,6 +11,7 @@ defined('IN_IA') or exit('Access Denied');
 use RuntimeException;
 
 $id = Request::int('id');
+
 $device = Device::get($id);
 if (empty($device)) {
     JSON::fail();

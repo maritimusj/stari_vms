@@ -10,14 +10,14 @@ defined('IN_IA') or exit('Access Denied');
 
 use zovye\model\device_eventsModelObj;
 
-$device = Device::get(request('id'));
+$device = Device::get(Request::int('id'));
 if (empty($device)) {
     Response::toast('找不到这个设备！', $this->createWebUrl('device'), 'error');
 }
 
 $query = $device->eventQuery();
 
-$the_first_id = request('the_first_id') ?: 0;
+$the_first_id = Request::int('the_first_id');
 
 $query->where(['event' => [14, 20]]);
 $query->where(['id >' => $the_first_id]);

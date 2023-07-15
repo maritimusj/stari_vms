@@ -11,7 +11,7 @@ defined('IN_IA') or exit('Access Denied');
 use zovye\model\deviceModelObj;
 
 $id = Request::int('id');
-if ($id) {
+if ($id > 0) {
     /** @var deviceModelObj $device */
     $device = Device::get($id);
     if ($device) {

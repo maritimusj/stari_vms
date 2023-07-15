@@ -9,7 +9,7 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 $id = Request::int('id');
-if ($id) {
+if ($id > 0) {
     $device = Device::get($id);
     if ($device && $device->confirmLAC()) {
         JSON::success('已确认！');

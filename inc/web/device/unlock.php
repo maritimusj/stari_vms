@@ -9,6 +9,7 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 $id = Request::int('id');
+
 if ($id) {
     $device = Device::get($id);
     if ($device && $device->resetLock()) {

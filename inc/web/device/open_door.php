@@ -13,6 +13,7 @@ if (!App::isDeviceWithDoorEnabled()) {
 }
 
 $id = Request::int('id');
+
 $device = Device::get($id);
 if (empty($device)) {
     JSON::fail('找不到这个设备！');

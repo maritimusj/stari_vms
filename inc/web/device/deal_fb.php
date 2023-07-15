@@ -12,6 +12,7 @@ defined('IN_IA') or exit('Access Denied');
 use zovye\model\device_feedbackModelObj;
 
 $id = Request::int('id');
+
 $remark = Request::trim('remark');
 if (empty($remark)) {
     JSON::fail('请输入处理内容！');

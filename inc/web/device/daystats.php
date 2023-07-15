@@ -10,7 +10,7 @@ defined('IN_IA') or exit('Access Denied');
 
 use DateTime;
 
-$device = Device::get(request('id'));
+$device = Device::get(Request::int('id'));
 if (empty($device)) {
     JSON::fail('找不到这个设备！');
 }

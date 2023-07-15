@@ -10,7 +10,7 @@ defined('IN_IA') or exit('Access Denied');
 
 use zovye\model\versionModelObj;
 
-$version_id = Request::int('version');
+$version_id = Request::str('version');
 
 $device = Device::find(Request::trim('id'), ['id', 'imei']);
 if (empty($device)) {

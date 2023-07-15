@@ -6,6 +6,7 @@
 
 namespace zovye\api;
 
+use Exception;
 use zovye\JSON;
 
 class router
@@ -15,8 +16,12 @@ class router
         $fn = $map[$op];
 
         if (is_callable($fn)) {
-            $result = call_user_func($fn);
-            JSON::result($result);
+            try {
+                $result = call_user_func($fn);
+                JSON::result($result);
+            } catch (Exception $e) {
+                JSON::fail($e);
+            }
         }
 
         JSON::fail('不正确的调用:'.$op);

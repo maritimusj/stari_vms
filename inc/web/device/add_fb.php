@@ -15,7 +15,7 @@ $id = Request::int('id');
 /** @var device_feedbackModelObj $res */
 $res = m('device_feedback')->findOne(['id' => $id]);
 if ($res) {
-    if ($res->getRemark() != '') {
+    if (!empty($res->getRemark())) {
         JSON::fail('已处理该反馈！');
     }
 } else {

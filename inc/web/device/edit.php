@@ -15,7 +15,7 @@ use zovye\model\device_groupsModelObj;
 $id = Request::int('id');
 $device_types = [];
 
-if ($id) {
+if ($id > 0) {
     $device = Device::get($id);
     if (empty($device)) {
         Response::toast('设备不存在！', We7::referer(), 'error');

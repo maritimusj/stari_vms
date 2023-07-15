@@ -17,7 +17,7 @@ $tpl_data = [
 ];
 
 $id = Request::int('id');
-if ($id) {
+if ($id > 0) {
     $tpl_data['id'] = $id;
     $tpl_data['archive'] = m('files')->findOne(We7::uniacid(['id' => $id]));
 }

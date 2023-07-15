@@ -19,27 +19,27 @@ if (empty($account)) {
 }
 
 $first_order = Order::getFirstOrderOfAccount($account);
-if ($first_order) {
-    try {
-        $begin = new DateTime(date('Y-m-d 00:00:00', $first_order['createtime']));
-    } catch (Exception $e) {
-        JSON::fail('订单数据不正确！');
-    }
-
-    $nextYear = new DateTime('first day of Jan next year 00:00');
-    $today = new DateTime();
-    if ($nextYear > $today) {
-        $nextYear = $today;
-    }
-
-    $result = [];
-    while ($begin < $nextYear) {
-        $year = $begin->format('Y');
-        $result[$year][] = $begin->format('m');
-        $begin->modify('first day of next month');
-    }
-
-    JSON::success($result);
+if (empty($first_order)) {
+    JSON::fail('暂时没有任务出货数据！');
 }
 
-JSON::fail('暂时没有任务出货数据！');
+try {
+    $begin = new DateTime(date('Y-m-d 00:00:00', $first_order['createtime']));
+} catch (Exception $e) {
+    JSON::fail('订单数据不正确！');
+}
+
+$nextYear = new DateTime('first day of Jan next year 00:00');
+$today = new DateTime();
+if ($nextYear > $today) {
+    $nextYear = $today;
+}
+
+$result = [];
+while ($begin < $nextYear) {
+    $year = $begin->format('Y');
+    $result[$year][] = $begin->format('m');
+    $begin->modify('first day of next month');
+}
+
+JSON::success($result);

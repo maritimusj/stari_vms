@@ -9,19 +9,16 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 $id = Request::int('id');
-if ($id > 0) {
 
-    $lucky = FlashEgg::getLucky($id);
-    if ($lucky) {
+$lucky = FlashEgg::getLucky($id);
+if ($lucky) {
+    $enabled = $lucky->isEnabled();
+    $lucky->setEnabled(!$enabled);
 
-        $enabled = $lucky->isEnabled();
-        $lucky->setEnabled(!$enabled);
-
-        if ($lucky->save()) {
-            JSON::success([
-                'enabled' => $lucky->isEnabled(),
-            ]);
-        }
+    if ($lucky->save()) {
+        JSON::success([
+            'enabled' => $lucky->isEnabled(),
+        ]);
     }
 }
 

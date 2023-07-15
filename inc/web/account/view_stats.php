@@ -13,18 +13,18 @@ use Exception;
 
 $id = Request::int('id');
 
-$acc = Account::get($id);
-if (empty($acc)) {
+$account = Account::get($id);
+if (empty($account)) {
     JSON::fail('找不到这个任务！');
 }
 
-$title = $acc->getTitle();
+$title = $account->getTitle();
 $time_str = Request::has('month') ? date('Y-').Request::int('month').date('-01 00:00:00') : 'today';
 
 try {
     $month = new DateTime($time_str);
     $caption = $month->format('Y年n月');
-    $data = Stats::chartDataOfMonth($acc, $month, "任务：$title($caption)");
+    $data = Stats::chartDataOfMonth($account, $month, "任务：$title($caption)");
 } catch (Exception $e) {
 }
 

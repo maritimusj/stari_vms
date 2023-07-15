@@ -9,18 +9,17 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 $id = Request::int('id');
-if ($id) {
-    $account = Account::get($id);
-    if ($account) {
-        if ($account->isBanned()) {
-            $account->setState(Account::NORMAL);
-        } else {
-            $account->setState(Account::BANNED);
-        }
+$account = Account::get($id);
 
-        if ($account->save() && Account::updateAccountData()) {
-            Response::toast("{$account->getTitle()}设置成功！", $this->createWebUrl('account'), 'success');
-        }
+if ($account) {
+    if ($account->isBanned()) {
+        $account->setState(Account::NORMAL);
+    } else {
+        $account->setState(Account::BANNED);
+    }
+
+    if ($account->save() && Account::updateAccountData()) {
+        Response::toast("{$account->getTitle()}设置成功！", $this->createWebUrl('account'), 'success');
     }
 }
 

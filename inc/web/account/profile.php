@@ -10,14 +10,14 @@ defined('IN_IA') or exit('Access Denied');
 
 if (Request::has('uid')) {
     $uid = Request::str('uid');
-    $acc = Account::findOneFromUID($uid);
+    $account = Account::findOneFromUID($uid);
 } else {
     $id = Request::int('id');
-    $acc = Account::get($id);
+    $account = Account::get($id);
 }
 
-if (empty($acc)) {
+if (empty($account)) {
     JSON::fail('找不到这个任务！');
 }
 
-JSON::success($acc->profile());
+JSON::success($account->profile());

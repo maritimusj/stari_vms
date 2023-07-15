@@ -12,18 +12,16 @@ use zovye\model\gift_logModelObj;
 
 $tpl_data = [];
 
-$query = FlashEgg::giftLogQuery();
-
 $id = Request::int('id');
-if ($id > 0) {
-    $gift = FlashEgg::getGift($id);
-    if (empty($gift)) {
-        Response::alert('找不到这个活动！', 'error');
-    }
-
-    $tpl_data['gift'] = $gift->profile(true);
-    $query->where(['gift_id' => $id]);
+$gift = FlashEgg::getGift($id);
+if (empty($gift)) {
+    Response::alert('找不到这个活动！', 'error');
 }
+
+$tpl_data['gift'] = $gift->profile(true);
+
+$query = FlashEgg::giftLogQuery();
+$query->where(['gift_id' => $id]);
 
 $user_id = Request::int('user_id');
 if ($user_id > 0) {

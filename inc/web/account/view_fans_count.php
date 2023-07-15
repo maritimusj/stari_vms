@@ -9,14 +9,14 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 $id = Request::int('id');
-$acc = Account::get($id);
+$account = Account::get($id);
 
-if (empty($acc)) {
+if (empty($account)) {
     JSON::fail('找不到这个任务！');
 }
 
-$query = Order::query(['account' => $acc->getName()]);
+$query = Order::query(['account' => $account->getName()]);
 
 $num = (int)$query->get('count(DISTINCT `openid`)');
 
-JSON::success("{$acc->getTitle()}，净增粉丝总数：{$num}人");
+JSON::success("{$account->getTitle()}，净增粉丝总数：{$num}人");

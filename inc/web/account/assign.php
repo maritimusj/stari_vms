@@ -4,8 +4,6 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-$commission_enabled = App::isCommissionEnabled();
-
 $id = Request::int('id');
 $account = Account::get($id);
 if (empty($account)) {
@@ -44,7 +42,7 @@ $assigned = isEmptyArray($assigned) ? [] : $assigned;
 
 Response::showTemplate('web/account/assign', [
     'id' => $id,
-    'commission_enabled' => $commission_enabled,
+    'commission_enabled' => App::isCommissionEnabled(),
     'account' => $data,
     'assign_data' => json_encode($assigned),
 ]);

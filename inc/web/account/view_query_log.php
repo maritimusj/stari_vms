@@ -13,15 +13,15 @@ use zovye\model\account_queryModelObj;
 $tpl_data = [];
 
 $id = Request::int('id');
-$acc = Account::get($id);
+$account = Account::get($id);
 
-if (empty($acc)) {
+if (empty($account)) {
     JSON::fail('找不到这个任务！');
 }
 
-$tpl_data['account'] = $acc->profile();
+$tpl_data['account'] = $account->profile();
 
-$query = Account::logQuery($acc);
+$query = Account::logQuery($account);
 
 if (Request::has('device')) {
     $device_id = Request::int('device');

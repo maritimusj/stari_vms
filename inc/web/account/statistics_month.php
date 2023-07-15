@@ -40,18 +40,19 @@ $result = [
 ];
 
 $first_order = Order::getFirstOrderOfAccount($account);
-if ($first_order) {
-    try {
-        $order_date_obj = new DateTime(date('Y-m-d', $first_order['createtime']));
-        $date = new DateTime(sprintf("%d-%02d-%02d 00:00", $year_str, $month_str, $day_str));
-        if ($date < $order_date_obj) {
-            $result['title'] .= '*';
-            JSON::success($result);
-        }
-    } catch (Exception $e) {
-    }
-} else {
+if (empty($first_order)) {
     JSON::success($result);
+
+}
+
+try {
+    $order_date_obj = new DateTime(date('Y-m-d', $first_order['createtime']));
+    $date = new DateTime(sprintf("%d-%02d-%02d 00:00", $year_str, $month_str, $day_str));
+    if ($date < $order_date_obj) {
+        $result['title'] .= '*';
+        JSON::success($result);
+    }
+} catch (Exception $e) {
 }
 
 $data = Statistics::accountMonth($account, $month, $day_str);

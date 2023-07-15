@@ -16,7 +16,6 @@ if (empty($user) || $user->isBanned()) {
     JSON::fail('找不到用户或者用户被禁用！');
 }
 
-
 $op = Request::op('default');
 if ($op == 'default') {
     //检查设备

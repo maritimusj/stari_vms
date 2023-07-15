@@ -21,9 +21,9 @@ if ($id > 0) {
         Response::toast('设备不存在！', We7::referer(), 'error');
     }
 
-    $x = DeviceTypes::from($device);
-    if ($x) {
-        $device_types[] = DeviceTypes::format($x);
+    $v = DeviceTypes::from($device);
+    if ($v) {
+        $device_types[] = DeviceTypes::format($v);
     }
 
     $tpl_data['app'] = $device->getAppId();

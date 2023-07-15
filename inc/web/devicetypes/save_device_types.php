@@ -11,7 +11,7 @@ defined('IN_IA') or exit('Access Denied');
 use zovye\model\device_typesModelObj;
 
 $params = [];
-parse_str(request('params'), $params);
+parse_str(Request::str('params'), $params);
 
 $title = trim($params['title']);
 if (empty($title)) {

@@ -13,14 +13,14 @@ $data = Request::is_string('data') ? json_decode(htmlspecialchars_decode(Request
     'data'
 );
 
-$adv = Advertising::get($id);
-if (empty($adv)) {
+$ad = Advertising::get($id);
+if (empty($ad)) {
     JSON::fail('找不到这个广告，无法保存！');
 }
 
-$origin_data = $adv->settings('assigned', []);
-if ($adv->updateSettings('assigned', $data) && Advertising::update($adv)) {
-    if (in_array($adv->getType(), [Advertising::SCREEN, Advertising::SCREEN_NAV])) {
+$origin_data = $ad->settings('assigned', []);
+if ($ad->updateSettings('assigned', $data) && Advertising::update($ad)) {
+    if (in_array($ad->getType(), [Advertising::SCREEN, Advertising::SCREEN_NAV])) {
         if (Advertising::notifyAll($origin_data, $data)) {
             JSON::success('设置已经保存成功，已通知设备更新！');
         } else {

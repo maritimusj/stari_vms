@@ -9,25 +9,24 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 $id = Request::int('id');
-if ($id > 0) {
-    $adv = Advertising::get($id);
-    if (empty($adv)) {
-        JSON::fail('找不到这个广告！');
+
+$ad = Advertising::get($id);
+if (empty($ad)) {
+    JSON::fail('找不到这个广告！');
+}
+
+$state = $ad->getState() == Advertising::NORMAL ? Advertising::BANNED : Advertising::NORMAL;
+if ($ad->setState($state) && Advertising::update($ad)) {
+    if (in_array($ad->getType(), [Advertising::SCREEN, Advertising::SCREEN_NAV])) {
+        //通知设备更新屏幕广告
+        $assign_data = $ad->settings('assigned', []);
+        Advertising::notifyAll($assign_data);
     }
 
-    $state = $adv->getState() == Advertising::NORMAL ? Advertising::BANNED : Advertising::NORMAL;
-    if ($adv->setState($state) && Advertising::update($adv)) {
-        if (in_array($adv->getType(), [Advertising::SCREEN, Advertising::SCREEN_NAV])) {
-            //通知设备更新屏幕广告
-            $assign_data = $adv->settings('assigned', []);
-            Advertising::notifyAll($assign_data);
-        }
-
-        JSON::success([
-            'msg' => $adv->getState() == Advertising::NORMAL ? '已启用' : '已禁用',
-            'state' => intval($adv->getState()),
-        ]);
-    }
+    JSON::success([
+        'msg' => $ad->getState() == Advertising::NORMAL ? '已启用' : '已禁用',
+        'state' => intval($ad->getState()),
+    ]);
 }
 
 JSON::fail('操作失败！');

@@ -33,7 +33,7 @@ class Advertising extends State
     const PASSWD = 12; //用于推广的口令
     const WX_APP_URL_CODE = 13; //微信小程序URL识别码
     const SPONSOR = 14; //赞助商轮播文字
-    
+
     public static $names = [
         self::UNKNOWN => 'default',
         self::SCREEN => 'screen',
@@ -101,9 +101,9 @@ class Advertising extends State
 
     public static function remove($id, $type = null): bool
     {
-        $entry = self::get($id, $type);
+        $ad = self::get($id, $type);
 
-        return $entry->destroy();
+        return $ad->destroy();
     }
 
     /**
@@ -118,16 +118,17 @@ class Advertising extends State
             if ($cache[$id]) {
                 return $cache[$id];
             }
+
             $cond = ['id' => $id, 'state <>' => self::DELETED];
             if ($type) {
                 $cond['type'] = $type;
             }
 
-            $res = self::query()->findOne($cond);
-            if ($res) {
-                $cache[$res->getId()] = $res;
+            $ad = self::query()->findOne($cond);
+            if ($ad) {
+                $cache[$ad->getId()] = $ad;
 
-                return $res;
+                return $ad;
             }
         }
 
@@ -264,25 +265,25 @@ class Advertising extends State
 
     /**
      * 格式化广告数据
-     * @param advertisingModelObj $adv
+     * @param advertisingModelObj $ad
      * @return array
      */
-    public static function format(advertisingModelObj $adv): array
+    public static function format(advertisingModelObj $ad): array
     {
         return [
-            'id' => $adv->getId(),
-            'title' => strval($adv->getTitle()),
-            'type' => intval($adv->getType()),
-            'state' => intval($adv->getState()),
-            'extra' => $adv->getExtra(),
-            'createtime' => intval($adv->getCreatetime()),
-            'createtime_formatted' => date('Y-m-d H:i:s', $adv->getCreatetime()),
+            'id' => $ad->getId(),
+            'title' => strval($ad->getTitle()),
+            'type' => intval($ad->getType()),
+            'state' => intval($ad->getState()),
+            'extra' => $ad->getExtra(),
+            'createtime' => intval($ad->getCreatetime()),
+            'createtime_formatted' => date('Y-m-d H:i:s', $ad->getCreatetime()),
         ];
     }
 
     public static function createOrUpdate(
         agentModelObj $agent = null,
-        advertisingModelObj $adv = null,
+        advertisingModelObj $ad = null,
         $params = []
     ): array {
         $type = intval($params['type']);
@@ -414,7 +415,7 @@ class Advertising extends State
             $extra['url'] = trim($params['url']);
         }
 
-        if (empty($adv)) {
+        if (empty($ad)) {
             $data = [
                 'state' => Advertising::NORMAL,
                 'type' => $type,
@@ -426,49 +427,49 @@ class Advertising extends State
                 $data['agent_id'] = $agent->getAgentId();
             }
 
-            $adv = Advertising::create($data);
-            if (empty($adv)) {
+            $ad = Advertising::create($data);
+            if (empty($ad)) {
                 return err('创建失败！');
             }
 
         }
 
-        $adv->setTitle($title);
+        $ad->setTitle($title);
         foreach ($extra as $key => $val) {
-            $adv->setExtraData($key, $val);
+            $ad->setExtraData($key, $val);
         }
 
-        if ($adv->save()) {
+        if ($ad->save()) {
             //广告内容已变化
             $content_md5 = md5(http_build_query($extra));
-            if (empty($adv->settings("reviewData.$content_md5"))) {
-                $adv->updateSettings(
+            if (empty($ad->settings("reviewData.$content_md5"))) {
+                $ad->updateSettings(
                     "reviewData.$content_md5",
                     [
                         'result' => ReviewResult::WAIT,
                         'adv' => [
-                            'title' => $adv->getTitle(),
-                            'type' => $adv->getType(),
-                            'url' => $adv->getExtraData('url'),
+                            'title' => $ad->getTitle(),
+                            'type' => $ad->getType(),
+                            'url' => $ad->getExtraData('url'),
                             'updatetime' => time(),
                         ],
                     ]
                 );
 
-                if ($adv->updateSettings('reviewData.current', $content_md5) && Advertising::update($adv)) {
-                    Job::advReview($adv->getId());
+                if ($ad->updateSettings('reviewData.current', $content_md5) && Advertising::update($ad)) {
+                    Job::advReview($ad->getId());
                 }
             } else {
-                if ($adv->isReviewPassed()) {
+                if ($ad->isReviewPassed()) {
                     //通知设备更新屏幕广告
-                    if (in_array($adv->getType(), [Advertising::SCREEN, Advertising::SCREEN_NAV])) {
-                        $assign_data = $adv->settings('assigned', []);
+                    if (in_array($ad->getType(), [Advertising::SCREEN, Advertising::SCREEN_NAV])) {
+                        $assign_data = $ad->settings('assigned', []);
                         Advertising::notifyAll($assign_data);
                     }
                 }
             }
 
-            return ['msg' => empty($adv) ? '创建成功！' : '保存成功！'];
+            return ['msg' => empty($ad) ? '创建成功！' : '保存成功！'];
         }
 
         return err('保存失败！');
@@ -478,15 +479,15 @@ class Advertising extends State
     {
         $slides = [];
         $ads = $device->getAds(Advertising::WELCOME_PAGE);
-        foreach ($ads as $adv) {
-            if ($adv['extra']['images']) {
-                foreach ($adv['extra']['images'] as $image) {
+        foreach ($ads as $ad) {
+            if ($ad['extra']['images']) {
+                foreach ($ad['extra']['images'] as $image) {
                     if ($image) {
                         $slides[] = [
-                            'id' => intval($adv['id']),
-                            'name' => strval($adv['name']),
+                            'id' => intval($ad['id']),
+                            'name' => strval($ad['name']),
                             'image' => strval(Util::toMedia($image)),
-                            'link' => strval($adv['extra']['link']),
+                            'link' => strval($ad['extra']['link']),
                         ];
                     }
                 }
@@ -498,31 +499,29 @@ class Advertising extends State
 
     public static function pass($id, $admin = ''): bool
     {
-        if ($id > 0) {
-            $adv = Advertising::get($id);
-            if ($adv) {
-                $current = $adv->settings('reviewData.current');
-                if ($current) {
-                    $data = $adv->settings("reviewData.$current", []);
-                    $data['result'] = ReviewResult::PASSED;
-                    $data['reviewer'] = [
-                        'username' => $admin,
-                        'ip' => CLIENT_IP,
-                        'time' => TIMESTAMP,
-                    ];
+        $ad = Advertising::get($id);
+        if ($ad) {
+            $current = $ad->settings('reviewData.current');
+            if ($current) {
+                $data = $ad->settings("reviewData.$current", []);
+                $data['result'] = ReviewResult::PASSED;
+                $data['reviewer'] = [
+                    'username' => $admin,
+                    'ip' => CLIENT_IP,
+                    'time' => TIMESTAMP,
+                ];
 
-                    if ($adv->updateSettings("reviewData.$current", $data) && Advertising::update($adv)) {
+                if ($ad->updateSettings("reviewData.$current", $data) && Advertising::update($ad)) {
 
-                        if (in_array($adv->getType(), [Advertising::SCREEN, Advertising::SCREEN_NAV])) {
-                            //通知设备更新屏幕广告
-                            $assign_data = $adv->settings('assigned', []);
-                            Advertising::notifyAll($assign_data);
-                        }
-
-                        Job::advReviewResult($adv->getId());
-
-                        return true;
+                    if (in_array($ad->getType(), [Advertising::SCREEN, Advertising::SCREEN_NAV])) {
+                        //通知设备更新屏幕广告
+                        $assign_data = $ad->settings('assigned', []);
+                        Advertising::notifyAll($assign_data);
                     }
+
+                    Job::advReviewResult($ad->getId());
+
+                    return true;
                 }
             }
         }
@@ -532,24 +531,22 @@ class Advertising extends State
 
     public static function reject($id): bool
     {
-        if ($id > 0) {
-            $adv = Advertising::get($id);
-            if ($adv) {
-                $unknown = 'unknown-hash-value';
-                $current = $adv->settings('reviewData.current', $unknown);
-                if ($current) {
-                    if ($current == $unknown) {
-                        $adv->updateSettings('reviewData.current', $unknown);
-                    }
-                    if ($adv->updateSettings(
-                            "reviewData.$current.result",
-                            ReviewResult::REJECTED
-                        ) && Advertising::update($adv)) {
-                            
-                        Job::advReviewResult($adv->getId());
+        $ad = Advertising::get($id);
+        if ($ad) {
+            $unknown = 'unknown-hash-value';
+            $current = $ad->settings('reviewData.current', $unknown);
+            if ($current) {
+                if ($current == $unknown) {
+                    $ad->updateSettings('reviewData.current', $unknown);
+                }
+                if ($ad->updateSettings(
+                        "reviewData.$current.result",
+                        ReviewResult::REJECTED
+                    ) && Advertising::update($ad)) {
 
-                        return true;
-                    }
+                    Job::advReviewResult($ad->getId());
+
+                    return true;
                 }
             }
         }

@@ -12,16 +12,16 @@ use zovye\model\advertisingModelObj;
 
 $id = Request::int('id');
 
-/** @var advertisingModelObj $adv */
-$adv = Advertising::query(['type' => Advertising::PUSH_MSG, 'id' => $id])->findOne();
-if ($adv) {
-    $msg = $adv->getExtraData('msg', []);
+/** @var advertisingModelObj $ad */
+$ad = Advertising::query(['type' => Advertising::PUSH_MSG, 'id' => $id])->findOne();
+if ($ad) {
+    $msg = $ad->getExtraData('msg', []);
 } else {
     $msg = [];
 }
 
 $typename = Request::trim('typename');
-$res = Util::getWe7Material($typename, request('page'), request('pagesize'));
+$res = Util::getWe7Material($typename, Request::int('page'), Request::int('pagesize'));
 
 Response::templateJSON(
     'web/adv/msg',

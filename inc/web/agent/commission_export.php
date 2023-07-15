@@ -254,7 +254,9 @@ if (!empty($user)) {
         }
     }
 }
+
 $e_date->modify('-1 day');
+
 Response::showTemplate(
     'web/common/commission_export',
     [

@@ -21,6 +21,7 @@ if (!$day) {
 }
 
 $title = $day->format('Y年n月');
+
 Response::templateJSON(
     'web/agent/stats',
     '',

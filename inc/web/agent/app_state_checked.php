@@ -11,6 +11,7 @@ defined('IN_IA') or exit('Access Denied');
 use zovye\model\agent_appModelObj;
 
 $id = Request::int('id');
+
 /** @var agent_appModelObj $app */
 $app = m('agent_app')->findOne(We7::uniacid(['id' => $id]));
 if ($app) {

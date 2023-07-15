@@ -21,6 +21,7 @@ if ($msg) {
     $from = $user->isAgent() ? 'agent' : 'partner';
 
     $msg->destroy();
+
     Response::toast(
         '删除成功！',
         $this->createWebUrl('agent', ['op' => 'msglist', 'id' => $agent_id, 'from' => $from]),

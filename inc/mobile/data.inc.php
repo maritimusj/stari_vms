@@ -8,9 +8,6 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-$op = Request::op('default');
-if ($op == 'default') {
-    Response::showTemplate('misc/data', [
-        'api_url' => Util::murl('app', ['op' => 'data_vw']),
-    ]);
-}
+Response::showTemplate('misc/data', [
+    'api_url' => Util::murl('app', ['op' => 'data_vw']),
+]);

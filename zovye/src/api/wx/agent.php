@@ -755,8 +755,7 @@ class agent
      *
      * @return array
      */
-    public
-    static function deviceInfo(): array
+    public static function deviceInfo(): array
     {
         $user = common::getAgentOrPartner();
 
@@ -823,8 +822,7 @@ class agent
      *
      * @return array
      */
-    public
-    static function deviceBind(): array
+    public static function deviceBind(): array
     {
         $user = common::getAgentOrPartner();
 
@@ -872,8 +870,7 @@ class agent
      *
      * @return array
      */
-    public
-    static function deviceTest()
+    public static function deviceTest()
     {
         $user = common::getAgentOrPartner();
 
@@ -915,8 +912,7 @@ class agent
      *
      * @return array
      */
-    public
-    static function deviceReset(): array
+    public static function deviceReset(): array
     {
         $user = common::getAgentOrPartner();
 
@@ -936,27 +932,31 @@ class agent
             return err('设备正忙，请稍后再试！');
         }
 
-        if (Request::isset('lane')) {
-            $num = Request::int('num');
-            $data = [
-                Request::int('lane') => $num > 0 ? '@'.$num : 0,
-            ];
-        } else {
-            $data = [];
-        }
-
-        $res = $device->resetPayload($data, '代理商补货');
-        if (is_error($res)) {
-            return err('保存库存失败！');
-        }
-
-        if (App::isInventoryEnabled()) {
-            $user = $user->isPartner() ? $user->getPartnerAgent() : $user;
-            $v = Inventory::syncDevicePayloadLog($user, $device, $res, '代理商补货');
-            if (is_error($v)) {
-                return $v;
+        DBUtil::transactionDo(function () use ($device, $user) {
+            if (Request::isset('lane')) {
+                $num = Request::int('num');
+                $data = [
+                    Request::int('lane') => $num > 0 ? '@'.$num : 0,
+                ];
+            } else {
+                $data = [];
             }
-        }
+
+            $res = $device->resetPayload($data, '代理商补货');
+            if (is_error($res)) {
+                return err('保存库存失败！');
+            }
+
+            if (App::isInventoryEnabled()) {
+                $user = $user->isPartner() ? $user->getPartnerAgent() : $user;
+                $v = Inventory::syncDevicePayloadLog($user, $device, $res, '代理商补货');
+                if (is_error($v)) {
+                    return $v;
+                }
+            }
+
+            return true;
+        });
 
         $locker->unlock();
 
@@ -971,8 +971,7 @@ class agent
      *
      * @return array
      */
-    public
-    static function deviceAssign(): array
+    public static function deviceAssign(): array
     {
         $user = common::getAgentOrPartner();
 
@@ -1023,8 +1022,7 @@ class agent
      *
      * @return array
      */
-    public
-    static function deviceLowRemain(): array
+    public static function deviceLowRemain(): array
     {
         $agent = common::getAgent();
 
@@ -1078,8 +1076,7 @@ class agent
      *
      * @return array
      */
-    public
-    static function deviceError(): array
+    public static function deviceError(): array
     {
         $user = common::getAgentOrPartner();
 
@@ -1128,8 +1125,7 @@ class agent
         return $result;
     }
 
-    public
-    static function orderRefund(): array
+    public static function orderRefund(): array
     {
         $user = common::getAgentOrPartner();
         $agent = $user->isPartner() ? $user->getPartnerAgent() : $user;
@@ -1157,10 +1153,8 @@ class agent
         return ['msg' => '退款成功！'];
     }
 
-    public
-    static function getAssociatedOrderList(
-        $condition = []
-    ): array {
+    public static function getAssociatedOrderList($condition = []): array
+    {
         $query = Order::query();
 
         $query->where($condition);
@@ -1251,8 +1245,7 @@ class agent
      *
      * @return array
      */
-    public
-    static function orders(): array
+    public static function orders(): array
     {
         common::checkCurrentUserPrivileges('F_sb');
 
@@ -1281,8 +1274,7 @@ class agent
      *
      * @return array
      */
-    public
-    static function deviceSetErrorCode(): array
+    public static function deviceSetErrorCode(): array
     {
         $user = common::getAgentOrPartner();
 
@@ -1333,8 +1325,7 @@ class agent
      *
      * @return array
      */
-    public
-    static function agentSearch(): array
+    public static function agentSearch(): array
     {
         $user = common::getAgentOrPartner();
 
@@ -1428,8 +1419,7 @@ class agent
     /**
      * 修改下级代理商名称
      */
-    public
-    static function agentUpdate(): array
+    public static function agentUpdate(): array
     {
         common::getAgentOrPartner();
 
@@ -1502,7 +1492,6 @@ class agent
         return ['data' => $data];
     }
 
-
     static function agentStatsData(agentModelObj $agent): array
     {
         $result = [];
@@ -1535,8 +1524,7 @@ class agent
         return $result;
     }
 
-    public
-    static function agentStat(): array
+    public static function agentStat(): array
     {
         $agent = common::getAgentOrPartner();
 
@@ -1562,8 +1550,7 @@ class agent
         return err('没有权限！');
     }
 
-    public
-    static function removeAgent(): array
+    public static function removeAgent(): array
     {
         $op_user = common::getAgentOrPartner();
 
@@ -1597,8 +1584,7 @@ class agent
         return err('只有代理商才能保存运营人员信息！');
     }
 
-    public
-    static function agentSub(): array
+    public static function agentSub(): array
     {
         $agent = common::getAgentOrPartner();
         if ($agent->isAgent() || $agent->isPartner()) {
@@ -1678,8 +1664,7 @@ class agent
         return err('获取列表失败！');
     }
 
-    public
-    static function setAgentProfile(): array
+    public static function setAgentProfile(): array
     {
         $user = common::getAgentOrPartner();
         $agent = $user->isAgent() ? $user->Agent() : $user->getPartnerAgent();
@@ -1697,8 +1682,7 @@ class agent
         }
     }
 
-    public
-    static function getAgentProfile(): array
+    public static function getAgentProfile(): array
     {
         $user = common::getAgentOrPartner();
         $agent = $user->isAgent() ? $user->Agent() : $user->getPartnerAgent();

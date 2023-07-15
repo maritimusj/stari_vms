@@ -8,6 +8,7 @@ namespace zovye\api\wx;
 
 use Exception;
 use zovye\App;
+use zovye\DBUtil;
 use zovye\FlashEgg;
 use zovye\Goods;
 use zovye\Log;
@@ -337,34 +338,35 @@ class mp
     public static function delete(): array
     {
         $user = common::getAgentOrPartner();
-
         common::checkCurrentUserPrivileges('F_xf');
 
-        $uid = Request::trim('uid');
-        $account = Account::findOneFromUID($uid);
-        if (empty($account)) {
-            return err('找不到指定的公众号！');
-        }
+        return DBUtil::transactionDo(function () use ($user) {
+            $uid = Request::trim('uid');
+            $account = Account::findOneFromUID($uid);
+            if (empty($account)) {
+                return err('找不到指定的公众号！');
+            }
 
-        if ($account->getAgentId() != $user->getAgentId()) {
-            return err('没有权限操作这个公众号！');
-        }
+            if ($account->getAgentId() != $user->getAgentId()) {
+                return err('没有权限操作这个公众号！');
+            }
 
-        if ($account->isFlashEgg()) {
-            $goods = $account->getGoods();
-            if ($goods) {
-                if (!Goods::safeDelete($goods)) {
-                    return err('删除关联商品失败！');
+            if ($account->isFlashEgg()) {
+                $goods = $account->getGoods();
+                if ($goods) {
+                    if (!Goods::safeDelete($goods)) {
+                        return err('删除关联商品失败！');
+                    }
                 }
             }
-        }
 
-        $account->destroy();
-        if (Account::updateAccountData()) {
-            return ['msg' => '删除成功！'];
-        }
+            $account->destroy();
+            if (Account::updateAccountData()) {
+                return ['msg' => '删除成功！'];
+            }
 
-        return ['msg' => '删除失败！'];
+            return ['msg' => '删除失败！'];
+        });
     }
 
     /**
@@ -378,169 +380,171 @@ class mp
 
         common::checkCurrentUserPrivileges('F_xf');
 
-        $data = [
-            'agent_id' => $user->getAgentId(),
-            'title' => Request::trim('title'),
-            'descr' => Request::str('descr'),
-            'group_name' => Request::str('groupname'),
-            'order_no' => min(999, Request::int('orderno')),
-            'clr' => Request::has('clr') ? Request::trim('clr') : 'gray',
-            'scname' => Request::has('scname') ? Request::trim('scname') : Schema::DAY,
-            'count' => Request::int('count'),
-            'total' => Request::int('total'),
-        ];
+        return DBUtil::transactionDo(function () use ($user) {
+            $data = [
+                'agent_id' => $user->getAgentId(),
+                'title' => Request::trim('title'),
+                'descr' => Request::str('descr'),
+                'group_name' => Request::str('groupname'),
+                'order_no' => min(999, Request::int('orderno')),
+                'clr' => Request::has('clr') ? Request::trim('clr') : 'gray',
+                'scname' => Request::has('scname') ? Request::trim('scname') : Schema::DAY,
+                'count' => Request::int('count'),
+                'total' => Request::int('total'),
+            ];
 
-        if (Request::has('uid')) {
-            $account = Account::findOneFromUID(Request::str('uid'));
-            if ($account) {
-                if ($account->getAgentId() != $user->getAgentId()) {
-                    return err('公众号帐号不能重复！');
-                }
-            }
-        }
-
-        if (!Schema::has($data['scname'])) {
-            return err('领取频率只是每天/每周/每月！');
-        }
-
-        if (Request::has('qrcode')) {
-            $type = Account::NORMAL;
-            $url = Media::strip(Request::str('qrcode'));
-            if ($url === false) {
-                return err('请上传正确的二维码文件！');
-            }
-        } elseif (Request::has('media')) {
-            $type = Account::VIDEO;
-            $url = Media::strip(Request::str('media'));
-            if ($url === false) {
-                return err('请上传正确的视频文件！');
-            }
-        } elseif (Request::has('douyinUrl')) {
-            $type = Account::DOUYIN;
-        } elseif (Request::has('username')) {
-            $type = Account::WXAPP;
-        } elseif (Request::has('mediaType')) {
-            $type = Account::FlashEgg;
-        } else {
-            return err('请指定正确的文件网址！');
-        }
-
-        $img_url = Media::strip(Request::str('img'));
-        if ($img_url === false) {
-            return err('请上传正确的头像文件！');
-        }
-
-        $data['qrcode'] = $url ?? '';
-        $data['img'] = $img_url;
-
-        $limits = [];
-        if (Request::str('sex') == 'male') {
-            $limits['male'] = 1;
-            $limits['female'] = 0;
-            $limits['unknown_sex'] = 0;
-        } elseif (Request::str('sex') == 'female') {
-            $limits['male'] = 0;
-            $limits['female'] = 1;
-            $limits['unknown_sex'] = 0;
-        } else {
-            $limits['male'] = 1;
-            $limits['female'] = 1;
-            $limits['unknown_sex'] = 1;
-        }
-
-        if (Request::str('os') == 'ios') {
-            $limits['ios'] = 1;
-            $limits['android'] = 0;
-        } elseif (Request::str('os') == 'android') {
-            $limits['ios'] = 0;
-            $limits['android'] = 1;
-        } else {
-            $limits['ios'] = 1;
-            $limits['android'] = 1;
-        }
-
-        if ($type == Account::DOUYIN) {
-            $data['total'] = 1;
-        }
-
-        $data['order_limits'] = Request::int('orderlimits');
-
-        if (isset($account)) {
-            foreach ($data as $key => $val) {
-                $key_name = 'get'.ucfirst(toCamelCase($key));
-                if ($val != $account->$key_name()) {
-                    $set_name = 'set'.ucfirst(toCamelCase($key));
-                    $account->$set_name($val);
-                }
-            }
-        } else {
-            if (empty($data['name'])) {
-                //不再要求用户填写唯一的name
-                do {
-                    $name = Util::random(16, true);
-                } while (Account::findOneFromName($name));
-                $data['name'] = $name;
-            } else {
-                $account = Account::findOneFromName($data['name']);
+            if (Request::has('uid')) {
+                $account = Account::findOneFromUID(Request::str('uid'));
                 if ($account) {
                     if ($account->getAgentId() != $user->getAgentId()) {
                         return err('公众号帐号不能重复！');
                     }
                 }
             }
-            $data['uid'] = Account::makeUID($data['name']);
-            $data['type'] = $type;
-            $data['url'] = Account::createUrl($data['uid'], ['from' => 'account']);
-            $account = Account::create($data);
-        }
 
-        if (empty($account)) {
-            return err('操作失败！');
-        }
-
-        $account->setExtraData('update', [
-            'time' => time(),
-            'user' => $user->profile(),
-        ]);
-
-        if ($account->save() && $account->set('limits', $limits) && Account::updateAccountData()) {
-            if ($account->isAuth()) {
-                $account->updateSettings('config.open', [
-                    'timing' => Request::int('OpenTiming'),
-                    'msg' => Request::str('OpenMsg'),
-                ]);
-            } elseif ($account->isVideo()) {
-                $account->set('config', [
-                    'type' => Account::VIDEO,
-                    'video' => [
-                        'duration' => Request::int('duration', 1),
-                    ],
-                ]);
-            } elseif ($account->isDouyin()) {
-                $openid = $account->settings('config.openid', '');
-                $account->set('config', [
-                    'type' => Account::DOUYIN,
-                    'url' => Request::trim('douyinUrl'),
-                    'openid' => $openid,
-                ]);
-            } elseif ($account->isWxApp()) {
-                $account->set('config', [
-                    'type' => Account::WXAPP,
-                    'username' => Request::trim('username'),
-                    'path' => Request::trim('path'),
-                    'delay' => Request::int('delay', 1),
-                ]);
-            } elseif ($account->isFlashEgg()) {
-                $res = FlashEgg::createOrUpdate($account, $GLOBALS['_GPC']);
-                if (is_error($res)) {
-                    return $res;
-                }
+            if (!Schema::has($data['scname'])) {
+                return err('领取频率只是每天/每周/每月！');
             }
 
-            return ['msg' => '保存成功！'];
-        }
+            if (Request::has('qrcode')) {
+                $type = Account::NORMAL;
+                $url = Media::strip(Request::str('qrcode'));
+                if ($url === false) {
+                    return err('请上传正确的二维码文件！');
+                }
+            } elseif (Request::has('media')) {
+                $type = Account::VIDEO;
+                $url = Media::strip(Request::str('media'));
+                if ($url === false) {
+                    return err('请上传正确的视频文件！');
+                }
+            } elseif (Request::has('douyinUrl')) {
+                $type = Account::DOUYIN;
+            } elseif (Request::has('username')) {
+                $type = Account::WXAPP;
+            } elseif (Request::has('mediaType')) {
+                $type = Account::FlashEgg;
+            } else {
+                return err('请指定正确的文件网址！');
+            }
 
-        return err('保存数据失败！');
+            $img_url = Media::strip(Request::str('img'));
+            if ($img_url === false) {
+                return err('请上传正确的头像文件！');
+            }
+
+            $data['qrcode'] = $url ?? '';
+            $data['img'] = $img_url;
+
+            $limits = [];
+            if (Request::str('sex') == 'male') {
+                $limits['male'] = 1;
+                $limits['female'] = 0;
+                $limits['unknown_sex'] = 0;
+            } elseif (Request::str('sex') == 'female') {
+                $limits['male'] = 0;
+                $limits['female'] = 1;
+                $limits['unknown_sex'] = 0;
+            } else {
+                $limits['male'] = 1;
+                $limits['female'] = 1;
+                $limits['unknown_sex'] = 1;
+            }
+
+            if (Request::str('os') == 'ios') {
+                $limits['ios'] = 1;
+                $limits['android'] = 0;
+            } elseif (Request::str('os') == 'android') {
+                $limits['ios'] = 0;
+                $limits['android'] = 1;
+            } else {
+                $limits['ios'] = 1;
+                $limits['android'] = 1;
+            }
+
+            if ($type == Account::DOUYIN) {
+                $data['total'] = 1;
+            }
+
+            $data['order_limits'] = Request::int('orderlimits');
+
+            if (isset($account)) {
+                foreach ($data as $key => $val) {
+                    $key_name = 'get'.ucfirst(toCamelCase($key));
+                    if ($val != $account->$key_name()) {
+                        $set_name = 'set'.ucfirst(toCamelCase($key));
+                        $account->$set_name($val);
+                    }
+                }
+            } else {
+                if (empty($data['name'])) {
+                    //不再要求用户填写唯一的name
+                    do {
+                        $name = Util::random(16, true);
+                    } while (Account::findOneFromName($name));
+                    $data['name'] = $name;
+                } else {
+                    $account = Account::findOneFromName($data['name']);
+                    if ($account) {
+                        if ($account->getAgentId() != $user->getAgentId()) {
+                            return err('公众号帐号不能重复！');
+                        }
+                    }
+                }
+                $data['uid'] = Account::makeUID($data['name']);
+                $data['type'] = $type;
+                $data['url'] = Account::createUrl($data['uid'], ['from' => 'account']);
+                $account = Account::create($data);
+            }
+
+            if (empty($account)) {
+                return err('操作失败！');
+            }
+
+            $account->setExtraData('update', [
+                'time' => time(),
+                'user' => $user->profile(),
+            ]);
+
+            if ($account->save() && $account->set('limits', $limits) && Account::updateAccountData()) {
+                if ($account->isAuth()) {
+                    $account->updateSettings('config.open', [
+                        'timing' => Request::int('OpenTiming'),
+                        'msg' => Request::str('OpenMsg'),
+                    ]);
+                } elseif ($account->isVideo()) {
+                    $account->set('config', [
+                        'type' => Account::VIDEO,
+                        'video' => [
+                            'duration' => Request::int('duration', 1),
+                        ],
+                    ]);
+                } elseif ($account->isDouyin()) {
+                    $openid = $account->settings('config.openid', '');
+                    $account->set('config', [
+                        'type' => Account::DOUYIN,
+                        'url' => Request::trim('douyinUrl'),
+                        'openid' => $openid,
+                    ]);
+                } elseif ($account->isWxApp()) {
+                    $account->set('config', [
+                        'type' => Account::WXAPP,
+                        'username' => Request::trim('username'),
+                        'path' => Request::trim('path'),
+                        'delay' => Request::int('delay', 1),
+                    ]);
+                } elseif ($account->isFlashEgg()) {
+                    $res = FlashEgg::createOrUpdate($account, $GLOBALS['_GPC']);
+                    if (is_error($res)) {
+                        return $res;
+                    }
+                }
+
+                return ['msg' => '保存成功！'];
+            }
+
+            return err('保存数据失败！');
+        });
     }
 
     public static function groupAssign(): array

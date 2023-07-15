@@ -216,7 +216,7 @@ class commission
         return err('未启用，请与管理员联系！[103]');
     }
 
-    public static function monthStat(): array
+    public static function monthStats(): array
     {
         $user = User::get(Request::int('id'));
         if (empty($user)) {

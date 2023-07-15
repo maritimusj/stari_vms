@@ -9,31 +9,32 @@ namespace zovye\wxxApi;
 defined('IN_IA') or exit('Access Denied');
 
 use zovye\api\router;
+use zovye\api\wxx\common;
 use zovye\Request;
 
 $op = ucfirst(Request::op('default'));
 
 router::exec($op, [
-    'Login' => '\zovye\api\wxx\common::login',
-    'VoucherList' => '\zovye\api\wxx\common::voucherList',
-    'PageInfo' => '\zovye\api\wxx\common::pageInfo',
-    'GetGoodsList' => '\zovye\api\wxx\common::getGoodsList',
-    'Advs' => '\zovye\api\wxx\common::ads',
-    'OnConnected' => '\zovye\api\wxx\common::onConnected',
-    'DeviceStatus' => '\zovye\api\wxx\common::deviceStatus',
-    'OnDeviceData' => '\zovye\api\wxx\common::onDeviceData',
-    'VoucherGet' => '\zovye\api\wxx\common::voucherGet',
-    'OrderCreate' => '\zovye\api\wxx\common::orderCreate',
-    'OrderGet' => '\zovye\api\wxx\common::orderGet',
-    'OrderStats' => '\zovye\api\wxx\common::orderStats',
-    'GetDeviceInfo' => '\zovye\api\wxx\common::getDeviceInfo',
-    'FBPic' => '\zovye\api\wxx\common::FBPic',
-    'FeedBack' => '\zovye\api\wxx\common::feedback',
-    'DeviceAdvs' => '\zovye\api\wxx\common::deviceAds',
-    'OrderDefault' => '\zovye\api\wxx\common::orderDefault',
-    'HomepageDefault' => '\zovye\api\wxx\common::homepageDefault',
-    'HomepageOrderStat' => '\zovye\api\wxx\common::homepageOrderStat',
-    'AliAuthCode' => '\zovye\api\wxx\common::aliAuthCode',
-    'AliUserInfo' => '\zovye\api\wxx\common::aliUserInfo',
-    'UserOrders' => '\zovye\api\wxx\common::userOrders',
+    'Login' => [common::class, 'login'],
+    'VoucherList' => [common::class, 'voucherList'],
+    'PageInfo' => [common::class, 'pageInfo'],
+    'GetGoodsList' => [common::class, 'getGoodsList'],
+    'Advs' => [common::class, 'ads'],
+    'OnConnected' => [common::class, 'onConnected'],
+    'DeviceStatus' => [common::class, 'deviceStatus'],
+    'OnDeviceData' => [common::class, 'onDeviceData'],
+    'VoucherGet' => [common::class, 'voucherGet'],
+    'OrderCreate' => [common::class, 'orderCreate'],
+    'OrderGet' => [common::class, 'orderGet'],
+    'OrderStats' => [common::class, 'orderStats'],
+    'GetDeviceInfo' => [common::class, 'getDeviceInfo'],
+    'FBPic' => [common::class, 'FBPic'],
+    'FeedBack' => [common::class, 'feedback'],
+    'DeviceAdvs' => [common::class, 'deviceAds'],
+    'OrderDefault' => [common::class, 'orderDefault'],
+    'HomepageDefault' => [common::class, 'homepageDefault'],
+    'HomepageOrderStat' => [common::class, 'homepageOrderStat'],
+    'AliAuthCode' => [common::class, 'aliAuthCode'],
+    'AliUserInfo' => [common::class, 'aliUserInfo'],
+    'UserOrders' => [common::class, 'userOrders'],
 ]);

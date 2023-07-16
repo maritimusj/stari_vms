@@ -95,7 +95,7 @@ class HttpUtil
 
         foreach ($params as $index => $val) {
             if ($index == CURLOPT_HTTPHEADER) {
-                if (array($val)) {
+                if (is_array($val)) {
                     $headers = array_merge($headers, $val);
                 } else {
                     $headers[] = $val;

@@ -112,7 +112,7 @@ JSCODE;
             </script>
 JSCODE;
 
-    if (User::isSnapshot()) {
+    if (Session::isSnapshot()) {
         $tpl['js']['code'] .= Response::snapshotJs([
             'device_imei' => $tpl['device']['imei'],
         ]);

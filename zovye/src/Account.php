@@ -1243,7 +1243,7 @@ class Account extends State
 
     public static function getAvailableList(deviceModelObj $device, userModelObj $user, array $params = []): array
     {
-        if (User::isSnapshot()) {
+        if (Session::isSnapshot()) {
             return [];
         }
 

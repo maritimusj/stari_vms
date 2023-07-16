@@ -50,7 +50,7 @@ $tpl_data['js']['code'] = <<<JSCODE
 </script>
 JSCODE;
 
-if (User::isSnapshot()) {
+if (Session::isSnapshot()) {
     $tpl_data['js']['code'] .= Response::snapshotJs([
         'device_imei' => $device->getImei(),
         'entry' => 'sample',

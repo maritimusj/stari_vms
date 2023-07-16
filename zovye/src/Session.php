@@ -161,6 +161,10 @@ class Session
         return 'unknown';
     }
 
+    public static function isSnapshot(): bool
+    {
+        return boolval($_SESSION['is_snapshotuser']);
+    }
 
     /**
      * 是否在支付宝APP中

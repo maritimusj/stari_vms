@@ -65,4 +65,4 @@ if ($total > 0) {
     }
 }
 
-exit(json_encode($result));
+JSON::data($result);

@@ -193,13 +193,15 @@ class Order extends State
     }
 
     /**
-     * @param $fetch_order_obj
-     * @return mixed
+     * @param bool $fetch_order_obj
+     * @return array|orderModelObj
      */
-    public static function getLastOrder($fetch_order_obj = false)
+    public static function getLastOrder(bool $fetch_order_obj = false)
     {
         $query = Order::query();
         $query->orderBy('id DESC');
+
+        /** @var orderModelObj $last_order */
         $last_order = $query->findOne();
 
         return $fetch_order_obj ? $last_order : [
@@ -208,12 +210,17 @@ class Order extends State
         ];
     }
 
-    public static function getFirstOrder($fetch_order_obj = false)
+    /**
+     * @param bool $fetch_order_obj
+     * @return array|mixed|orderModelObj|null
+     */
+    public static function getFirstOrder(bool $fetch_order_obj = false)
     {
         $data = settings('stats.first_order');
         if ($data && $data['id']) {
             return $fetch_order_obj ? Order::get($data['id']) : $data;
         }
+        /** @var orderModelObj $order */
         $order = self::query()->orderBy('id ASC')->findOne();
         if ($order) {
             $data = [
@@ -239,7 +246,9 @@ class Order extends State
         if ($data && $data['id']) {
             return $fetch_order_obj ? Order::get($data['id']) : $data;
         }
+
         $query = self::query(['device_id' => $device->getId()]);
+        /** @var orderModelObj $order */
         $order = $query->orderBy('id ASC')->findOne();
         if ($order) {
             $data = [
@@ -276,6 +285,7 @@ class Order extends State
         if ($data && $data['id']) {
             return $fetch_order_obj ? Order::get($data['id']) : $data;
         }
+
         $query = self::query(['agent_id' => $agent->getId()]);
         /** @var orderModelObj $order */
         $order = $query->orderBy('id ASC')->findOne();
@@ -291,6 +301,10 @@ class Order extends State
         return null;
     }
 
+    /**
+     * @param agentModelObj $agent
+     * @return orderModelObj|null
+     */
     public static function getLastOrderOfAgent(agentModelObj $agent): ?orderModelObj
     {
         $query = self::query(['agent_id' => $agent->getId()]);
@@ -510,9 +524,12 @@ class Order extends State
                 return $res;
             }
 
-            $order->setExtraData('refund', array_merge($refund_data, [
-                'total' => $total,
-            ]));
+            $order->setExtraData(
+                'refund',
+                array_merge($refund_data, [
+                    'total' => $total,
+                ])
+            );
 
             $order->setRefund(Order::REFUND);
 
@@ -663,9 +680,12 @@ class Order extends State
                     return $res;
                 }
 
-                $order->setExtraData('refund', array_merge($refund_data, [
-                    'total' => $total_refund,
-                ]));
+                $order->setExtraData(
+                    'refund',
+                    array_merge($refund_data, [
+                        'total' => $total_refund,
+                    ])
+                );
 
                 $order->setRefund(Order::REFUND);
 
@@ -792,7 +812,7 @@ class Order extends State
                     $data['pay'] = (array)$order->getExtraData('card', []);
                     if ($data['pay']['type'] == UserCommissionBalanceCard::getTypename()) {
                         $data['tips'] = ['text' => '余额', 'class' => 'balancex'];
-                    } elseif($data['pay']['type'] == pay_logsModelObj::getTypename()) {
+                    } elseif ($data['pay']['type'] == pay_logsModelObj::getTypename()) {
                         $data['tips'] = ['text' => '支付', 'class' => 'wxpay'];
                     } elseif ($data['pay']['type'] == VIPCard::getTypename()) {
                         $data['tips'] = ['text' => 'VIP', 'class' => 'vip'];
@@ -1074,7 +1094,7 @@ class Order extends State
         return $onlyKeys ? array_keys($headers) : $headers;
     }
 
-    public static function getExportQuery($params = []) 
+    public static function getExportQuery($params = [])
     {
         $agent_openid = $params['agent_openid'] ?? false;
         $account_id = $params['account_id'] ?? false;
@@ -1178,9 +1198,9 @@ class Order extends State
                         $pay_result = $entry->getExtraData('payResult');
                         if ($pay_result) {
                             if (isset($pay_result['uniontid'])) {
-                                $data[$header] = '\'' . $pay_result['uniontid'];
+                                $data[$header] = '\''.$pay_result['uniontid'];
                             } elseif (isset($pay_result['transaction_id'])) {
-                                $data[$header] = '\'' . $pay_result['transaction_id'];
+                                $data[$header] = '\''.$pay_result['transaction_id'];
                             } else {
                                 $data[$header] = '';
                             }
@@ -1233,8 +1253,8 @@ class Order extends State
                         }
                         break;
                     case 'goods_id':
-                            $data[$header] = str_replace('"', '', $goods['id']);
-                            break;
+                        $data[$header] = str_replace('"', '', $goods['id']);
+                        break;
                     case 'goods_name':
                         if ($device && $device->isChargingDevice()) {
                             $data[$header] = "充电";
@@ -1244,7 +1264,7 @@ class Order extends State
                         break;
                     case 'goods_num':
                         if ($device && $device->isChargingDevice()) {
-                            $data[$header] = $entry->getChargingRecord('total', 0) . '度';
+                            $data[$header] = $entry->getChargingRecord('total', 0).'度';
                         } else {
                             $data[$header] = $entry->getNum();
                         }

@@ -125,7 +125,7 @@ define(
 
 defined('DEVELOPMENT') or define('DEVELOPMENT', DEBUG);
 defined('TIMESTAMP') or define('TIMESTAMP', time());
-defined('CLIENT_IP') or define('CLIENT_IP', LocationUtil::getClientIp());
+defined('CLIENT_IP') or define('CLIENT_IP', Session::getClientIp());
 defined('MATERIAL_WEXIN') or define('MATERIAL_WEXIN', 'perm'); //微信素材类型
 define('REGULAR_EMAIL', '/\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/i');
 define('REGULAR_TEL', '/^(?:\+|\d)[\d-]{6,14}\d$/');

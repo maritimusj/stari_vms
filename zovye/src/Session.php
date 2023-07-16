@@ -161,6 +161,14 @@ class Session
         return 'unknown';
     }
 
+    /**
+     * @return string
+     */
+    public static function getClientIp(): string
+    {
+        return We7::getip();
+    }
+
     public static function isSnapshot(): bool
     {
         return boolval($_SESSION['is_snapshotuser']);

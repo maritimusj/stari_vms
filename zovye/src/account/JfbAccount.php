@@ -82,7 +82,7 @@ class JfbAccount
             'nickname' => $fans['nickname'],
             'sex' => empty($fans['sex']) ? 0 : $fans['sex'],
             'headUrl' => $fans['headimgurl'],
-            'ipAddress' => LocationUtil::getClientIp(),
+            'ipAddress' => Session::getClientIp(),
             'userAgent' => $_SERVER['HTTP_USER_AGENT'],
             'countryName' => $fans['country'],
             'provinceName' => $fans['province'],

@@ -309,7 +309,7 @@ include './index.php';
             }
 
             if (!isEmptyArray($limits['area'])) {
-                $ip = LocationUtil::getClientIp();
+                $ip = Session::getClientIp();
                 $info = LocationUtil::getIpInfo($ip);
                 if ($info) {
                     if ($limits['area']['province'] && $info['data']['province'] != $limits['area']['province']) {

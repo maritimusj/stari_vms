@@ -21,6 +21,7 @@ use zovye\LocationUtil;
 use zovye\Locker;
 use zovye\Pay;
 use zovye\Referral;
+use zovye\Session;
 use zovye\UserCommissionBalanceCard;
 use zovye\VIP;
 use zovye\VIPCard;
@@ -878,13 +879,13 @@ class userModelObj extends modelObj
 
     public function getLastActiveIp(): string
     {
-        return $this->getLastActiveData('ip', LocationUtil::getClientIp());
+        return $this->getLastActiveData('ip', Session::getClientIp());
     }
 
     public function setLastActiveDevice(deviceModelObj $device = null): bool
     {
         if ($device) {
-            $this->setLastActiveData('ip', LocationUtil::getClientIp());
+            $this->setLastActiveData('ip', Session::getClientIp());
         }
 
         return $device ? $this->setLastActiveData($device) : $this->setLastActiveData(deviceModelObj::class);
@@ -903,7 +904,7 @@ class userModelObj extends modelObj
     public function setLastActiveAccount(accountModelObj $account = null): bool
     {
         if ($account) {
-            $this->setLastActiveData('ip', LocationUtil::getClientIp());
+            $this->setLastActiveData('ip', Session::getClientIp());
         }
 
         return $account ? $this->setLastActiveData($account) : $this->setLastActiveData(accountModelObj::class);

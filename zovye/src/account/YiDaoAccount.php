@@ -69,7 +69,7 @@ class YiDaoAccount
             'key' => strval($config['device_key']),
             'develop_appid' => strval($config['appid']),
             'label' => intval($config['scene']),
-            'ip' => LocationUtil::getClientIp(),
+            'ip' => Session::getClientIp(),
             'auth_open_id' => $fans['openid'],
             'nickname' => $fans['nickname'],
             'sex' => $fans['sex'],

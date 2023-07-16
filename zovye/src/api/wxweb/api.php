@@ -19,6 +19,7 @@ use zovye\LocationUtil;
 use zovye\model\balanceModelObj;
 use zovye\model\userModelObj;
 use zovye\Order;
+use zovye\Session;
 use zovye\Task;
 use zovye\User;
 use zovye\Util;
@@ -259,7 +260,7 @@ class api
                 'account' => $account->getId(),
                 'goods' => $goods['id'],
                 'orderUID' => $orderUID,
-                'ip' => LocationUtil::getClientIp(),
+                'ip' => Session::getClientIp(),
             ])) {
                 return ['orderUID' => $orderUID];
             }
@@ -282,7 +283,7 @@ class api
                 'device' => $device->getId(),
                 'goods' => $goods['id'],
                 'num' => 1,
-                'ip' => LocationUtil::getClientIp(),
+                'ip' => Session::getClientIp(),
                 'code' => $code,
             ])) {
                 return ['orderUID' => $orderUID];

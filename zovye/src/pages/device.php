@@ -23,7 +23,7 @@ $device = $tpl['device']['_obj'];
 /** @var userModelObj $user */
 $user = $tpl['user']['_obj'];
 
-if (App::isAliUser()) {
+if (Session::isAliUser()) {
     $tpl['accounts'] = [];
 } else {
     if (Helper::needsTplAccountsData($device)) {

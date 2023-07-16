@@ -23,7 +23,7 @@ if ($op == 'auth') {
     }
 }
 
-if (!App::isAliUser()) {
+if (!Session::isAliUser()) {
     $retries = Request::int('retries');
     if ($retries > 3) {
         Response::alert('获取用户信息失败[01]', 'error');

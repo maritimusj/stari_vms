@@ -88,7 +88,7 @@ class LCSWPay implements IPay
             return $res;
         }
 
-        if (App::isAliUser()) {
+        if (Session::isAliUser()) {
             return [
                 'orderNO' => $order_no,
                 'tradeNO' => $res['ali_trade_no'],
@@ -181,7 +181,7 @@ class LCSWPay implements IPay
             'payFailed' => Util::murl('payfailed', ['msg' => '__msg__']),
         ];
 
-        if (App::isAliUser()) {
+        if (Session::isAliUser()) {
             return $this->getAliPayJs($params);
         } else {
             return $this->getWxPayJs($params);

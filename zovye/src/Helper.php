@@ -432,7 +432,7 @@ class Helper
             return err('支付金额不能为零！');
         }
 
-        App::setContainer($user);
+        Session::setContainer($user);
 
         list($order_no, $data) = Pay::createXAppPay($device, $user, $goods, [
             'level' => LOG_GOODS_PAY,
@@ -467,7 +467,7 @@ class Helper
             return err('支付金额不能为零！');
         }
 
-        App::setContainer($user);
+        Session::setContainer($user);
 
         list($order_no, $data) = Pay::createXAppPay(
             $device,
@@ -510,7 +510,7 @@ class Helper
             return err('支付金额不能小于1元！');
         }
 
-        App::setContainer($user);
+        Session::setContainer($user);
 
         list($order_no, $data) = Pay::createXAppPay(
             $device,
@@ -562,7 +562,7 @@ class Helper
             return err('支付金额不正确！');
         }
 
-        App::setContainer($user);
+        Session::setContainer($user);
 
         list($order_no, $data) = Pay::createXAppPay(
             $device,
@@ -608,7 +608,7 @@ class Helper
             return err('支付金额不能为零！');
         }
 
-        App::setContainer($user);
+        Session::setContainer($user);
 
         list($order_no, $data) = Pay::createXAppPay(
             Device::getDummyDevice(),

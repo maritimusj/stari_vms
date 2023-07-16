@@ -490,55 +490,6 @@ class App
         });
     }
 
-    public static function setContainer(userModelObj $user)
-    {
-        if ($user->isAliUser()) {
-            $_SESSION['ali_user_id'] = $user->getOpenid();
-        } elseif ($user->isWxUser()) {
-            $_SESSION['wx_user_id'] = $user->getOpenid();
-        } elseif ($user->isWXAppUser()) {
-            $_SESSION['wx_user_id'] = $user->getOpenid();
-            $_SESSION['wxapp_user_id'] = $user->getOpenid();
-        } elseif ($user->isDouYinUser()) {
-            $_SESSION['douyin_user_id'] = $user->getOpenid();
-        }
-    }
-
-    public static function getUserUID(): string
-    {
-        if (self::isAliUser()) {
-            return strval($_SESSION['ali_user_id']);
-        }
-        if (self::isWxUser()) {
-            return strval($_SESSION['wx_user_id']);
-        }
-        if (self::isDouYinUser()) {
-            return strval($_SESSION['douyin_user_id']);
-        }
-
-        return '';
-    }
-
-    public static function isAliUser(): bool
-    {
-        return !empty($_SESSION['ali_user_id']);
-    }
-
-    public static function isWxUser(): bool
-    {
-        return !empty($_SESSION['wx_user_id']);
-    }
-
-    public static function isWxAppUser(): bool
-    {
-        return !empty($_SESSION['wxapp_user_id']);
-    }
-
-    public static function isDouYinUser(): bool
-    {
-        return !empty($_SESSION['douyin_user_id']);
-    }
-
     public static function isCustomWxAppEnabled(): bool
     {
         return onceCall(function () {

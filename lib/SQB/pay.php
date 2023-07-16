@@ -7,8 +7,8 @@
 namespace SQB;
 
 use we7\ihttp;
-use zovye\App;
 use zovye\Log;
+use zovye\Session;
 use function zovye\err;
 use function zovye\is_error;
 
@@ -127,7 +127,7 @@ fwIDAQAB
         $params['client_sn'] = $order_no;                    //商户系统订单号,必须在商户系统内唯一；且长度不超过64字节
         $params['total_amount'] = "$amount";              //以分为单位,不超过10位纯数字字符串,超过1亿元的收款请使用银行转账
 
-        if (App::isAliUser()) {
+        if (Session::isAliUser()) {
             $params['payway'] = '2';
         } else {
             $params['payway'] = '3';

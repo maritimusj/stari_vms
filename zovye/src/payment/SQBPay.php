@@ -7,13 +7,11 @@
 namespace zovye\payment;
 
 use SQB\pay;
-use zovye\App;
 use zovye\Contract\IPay;
 use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 use zovye\Request;
-use zovye\Response;
 use zovye\Session;
 use zovye\Util;
 use function zovye\_W;
@@ -49,7 +47,7 @@ class SQBPay implements IPay
             $notify_url .= $path;
         }
 
-        if (App::isAliUser()) {
+        if (Session::isAliUser()) {
             $notify_url .= 'payment/SQBAlipay.php';
         } else {
             $notify_url .= 'payment/SQB.php';

@@ -7,8 +7,8 @@
 namespace lcsw;
 
 use we7\ihttp;
-use zovye\App;
 use zovye\LocationUtil;
+use zovye\Session;
 use function zovye\err;
 use function zovye\error;
 use function zovye\is_error;
@@ -27,7 +27,7 @@ class pay
     {
         $this->config = $config;
 
-        if (App::isAliUser()) {
+        if (Session::isAliUser()) {
             $this->pay_type = self::ALI_PAY;
         } else {
             $this->pay_type = self::WX_PAY;

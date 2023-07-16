@@ -489,9 +489,9 @@ class Pay
         $fn = function ($name) use ($params) {
             $data = $params[$name] ?? [];
             if ($data['enable']) {
-                if ((App::isWxAppUser() && (!isset($data['wxapp']) || $data['wxapp'])) ||
-                    (App::isWxUser() && !App::isWxAppUser() && (!isset($data['wx']) || $data['wx'])) ||
-                    (App::isAliUser() && (!isset($data['ali']) || $data['ali']))) {
+                if ((Session::isWxAppUser() && (!isset($data['wxapp']) || $data['wxapp'])) ||
+                    (Session::isWxUser() && !Session::isWxAppUser() && (!isset($data['wx']) || $data['wx'])) ||
+                    (Session::isAliUser() && (!isset($data['ali']) || $data['ali']))) {
                     $data['name'] = $name;
                     unset($data['wx'], $data['ali'], $data['wxapp']);
 

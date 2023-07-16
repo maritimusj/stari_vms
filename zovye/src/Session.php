@@ -28,8 +28,8 @@ class Session
     public static function getCurrentUser(array $params = []): ?userModelObj
     {
         $user = null;
-        if (App::isAliUser() || App::isDouYinUser()) {
-            $user = User::get(App::getUserUID(), true);
+        if (self::isAliUser() || self::isDouYinUser()) {
+            $user = User::get(self::getUserUID(), true);
         } else {
             if (empty($user)) {
                 $update = !empty($params['update']);
@@ -87,7 +87,7 @@ class Session
                             $user->set('fansData', array_merge($fans, $customData));
                             $user->save();
                         }
-                        App::setContainer($user);
+                        self::setContainer($user);
                     }
                 }
             }
@@ -164,6 +164,55 @@ class Session
     public static function isSnapshot(): bool
     {
         return boolval($_SESSION['is_snapshotuser']);
+    }
+
+    public static function setContainer(userModelObj $user)
+    {
+        if ($user->isAliUser()) {
+            $_SESSION['ali_user_id'] = $user->getOpenid();
+        } elseif ($user->isWxUser()) {
+            $_SESSION['wx_user_id'] = $user->getOpenid();
+        } elseif ($user->isWXAppUser()) {
+            $_SESSION['wx_user_id'] = $user->getOpenid();
+            $_SESSION['wxapp_user_id'] = $user->getOpenid();
+        } elseif ($user->isDouYinUser()) {
+            $_SESSION['douyin_user_id'] = $user->getOpenid();
+        }
+    }
+
+    public static function getUserUID(): string
+    {
+        if (self::isAliUser()) {
+            return strval($_SESSION['ali_user_id']);
+        }
+        if (self::isWxUser()) {
+            return strval($_SESSION['wx_user_id']);
+        }
+        if (self::isDouYinUser()) {
+            return strval($_SESSION['douyin_user_id']);
+        }
+
+        return '';
+    }
+
+    public static function isAliUser(): bool
+    {
+        return !empty($_SESSION['ali_user_id']);
+    }
+
+    public static function isWxUser(): bool
+    {
+        return !empty($_SESSION['wx_user_id']);
+    }
+
+    public static function isWxAppUser(): bool
+    {
+        return !empty($_SESSION['wxapp_user_id']);
+    }
+
+    public static function isDouYinUser(): bool
+    {
+        return !empty($_SESSION['douyin_user_id']);
     }
 
     /**
@@ -271,7 +320,7 @@ class Session
                     'sex' => self::getAliuserSex($result->alipay_user_info_share_response->gender),
                 ]);
                 $user->save();
-                App::setContainer($user);
+                self::setContainer($user);
             }
 
             return $user;
@@ -337,7 +386,7 @@ class Session
                 'sex' => $info['gender'],
             ]);
             $user->save();
-            App::setContainer($user);
+            self::setContainer($user);
         }
 
         return $user;

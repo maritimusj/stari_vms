@@ -105,7 +105,7 @@ if ($op == 'auth' || $op == 'get_openid') {
 $from = Request::str('from');
 $device_id = Request::str('device');
 
-if (!App::isDouYinUser()) {
+if (!Session::isDouYinUser()) {
     $retries = Request::int('retries');
     if ($retries > 3) {
         Response::alert('获取用户信息失败[01]', 'error');

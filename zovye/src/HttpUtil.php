@@ -19,42 +19,7 @@ class HttpUtil
      */
     public static function get(string $url, int $timeout = 3, array $params = [], bool $json_result = false)
     {
-        $ch = curl_init();
-
-        curl_setopt($ch, CURLOPT_URL, $url);
-
-        if (stripos($url, "https://") !== false) {
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        }
-
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
-
-        if (empty($params[CURLOPT_USERAGENT])) {
-            $params[CURLOPT_USERAGENT] = HTTP_USER_AGENT;
-        }
-
-        $headers = [];
-        foreach ($params as $index => $val) {
-            if ($index == CURLOPT_HTTPHEADER) {
-                if (array($val)) {
-                    $headers = array_merge($headers, $val);
-                } else {
-                    $headers[] = $val;
-                }
-                continue;
-            }
-            curl_setopt($ch, $index, $val);
-        }
-
-        if ($headers) {
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        }
-
-        $response = curl_exec($ch);
-
-        curl_close($ch);
+        $response = self::query($url, null, false, $timeout, $params);
 
         if ($response === false) {
             return null;
@@ -84,6 +49,20 @@ class HttpUtil
         int $timeout = 3,
         array $params = []
     ): array {
+
+        $response = self::query($url, $data, $json, $timeout, $params);
+
+        if (empty($response)) {
+            return err('请求失败或者返回空数据！');
+        }
+
+        $result = json_decode($response, JSON_OBJECT_AS_ARRAY);
+
+        return $result ?? err('无法解析返回的数据！');
+    }
+
+    protected static function query($url, $data, $json, $timeout, $params)
+    {
         $ch = curl_init();
 
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -93,17 +72,18 @@ class HttpUtil
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         }
 
-        curl_setopt($ch, CURLOPT_POST, true);
-
         $headers = [];
 
-        if ($json) {
-            $json_str = json_encode($data, JSON_UNESCAPED_UNICODE);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $json_str);
-            $headers[] = 'Content-Type: application/json';
-            $headers[] = 'Content-Length: '.strlen($json_str);
-        } else {
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        if (isset($data)) {
+            curl_setopt($ch, CURLOPT_POST, true);
+            if ($json) {
+                $json_str = json_encode($data, JSON_UNESCAPED_UNICODE);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $json_str);
+                $headers[] = 'Content-Type: application/json';
+                $headers[] = 'Content-Length: '.strlen($json_str);
+            } else {
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+            }
         }
 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -133,12 +113,6 @@ class HttpUtil
 
         curl_close($ch);
 
-        if (empty($response)) {
-            return err('请求失败或者返回空数据！');
-        }
-
-        $result = json_decode($response, JSON_OBJECT_AS_ARRAY);
-
-        return $result ?? err('无法解析返回的数据！');
+        return $response;
     }
 }

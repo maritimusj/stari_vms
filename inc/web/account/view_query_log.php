@@ -16,15 +16,12 @@ $query = Account::logQuery();
 
 if (Request::has('id')) {
     $id = Request::int('id');
-
     $account = Account::get($id);
-
     if (empty($account)) {
         Response::toast('找不到这个任务！', '', 'error');
     }
 
     $tpl_data['account'] = $account->profile();
-
     $query = $query->where(['account_id' => $account->getId()]);
 }
 
@@ -34,6 +31,7 @@ if (Request::has('device')) {
     if (empty($device)) {
         Response::toast('找不到这个设备！', '', 'error');
     }
+
     $tpl_data['device'] = $device->profile();
     $query->where(['device_id' => $device_id]);
 }
@@ -44,6 +42,7 @@ if (Request::has('user')) {
     if (empty($user)) {
         Response::toast('找不到这个用户！', '', 'error');
     }
+
     $tpl_data['user'] = $user->profile();
     $query->where(['user_id' => $user_id]);
 }

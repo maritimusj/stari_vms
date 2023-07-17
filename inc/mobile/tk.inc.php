@@ -94,11 +94,12 @@ try {
     ]);
 
     if (!$res) {
-        throw new RuntimeException('无法启用出货任务！');
+        throw new RuntimeException('无法创建出货任务！');
     }
 } catch (Exception $e) {
     Log::error('tk', [
         'error' => $e->getMessage(),
+        'data' => $data,
     ]);
 }
 

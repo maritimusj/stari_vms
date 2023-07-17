@@ -86,11 +86,10 @@ if ($fn == 'default') {
         }
     }
 
-    $summary['price'] = number_format($summary['price'], 2, '.', '');
+    $summary['price'] = number_format($summary['price'] / 100, 2, '.', '');
     if (App::isFuelingDeviceEnabled()) {
         $summary['amount'] = number_format($summary['amount'] / 100, 2, '.', '');
     }
-
 
     JSON::success([
         'begin' => isset($begin) ? $begin->format('Y-m-d') : '',
@@ -144,7 +143,7 @@ if ($fn == 'default') {
         }
     }
 
-    $summary['price'] = number_format($summary['price'], 2, '.', '');
+    $summary['price'] = number_format($summary['price'] / 100, 2, '.', '');
     if (App::isFuelingDeviceEnabled()) {
         $summary['amount'] = number_format($summary['amount'] / 100, 2, '.', '');
     }

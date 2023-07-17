@@ -38,6 +38,7 @@ if ($op == 'fueling_stop_timeout' && CtrlServ::checkJobSign($params)) {
                 'ch' => $chargerID,
                 'reason' => -1,
                 'solo' => Fueling::MODE_REMOTE,
+                'time' => time(),
             ]);
 
             if (is_error($result)) {

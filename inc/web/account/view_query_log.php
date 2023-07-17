@@ -12,16 +12,21 @@ use zovye\model\account_queryModelObj;
 
 $tpl_data = [];
 
-$id = Request::int('id');
-$account = Account::get($id);
+$query = Account::logQuery();
 
-if (empty($account)) {
-    JSON::fail('找不到这个任务！');
+if (Request::has('id')) {
+    $id = Request::int('id');
+
+    $account = Account::get($id);
+
+    if (empty($account)) {
+        Response::toast('找不到这个任务！', '', 'error');
+    }
+
+    $tpl_data['account'] = $account->profile();
+
+    $query = $query->where(['account_id' => $account->getId()]);
 }
-
-$tpl_data['account'] = $account->profile();
-
-$query = Account::logQuery($account);
 
 if (Request::has('device')) {
     $device_id = Request::int('device');
@@ -85,7 +90,7 @@ if ($total > 0) {
         if ($last_cb) {
             $data['last_cb'] = count($last_cb);
             if (empty($data['cb']['order_uid'])) {
-                foreach((array)$last_cb as $cb) {
+                foreach ((array)$last_cb as $cb) {
                     if (!empty($cb['order_uid'])) {
                         $data['cb']['order_uid'] = $cb['order_uid'];
                         break;
@@ -93,7 +98,7 @@ if ($total > 0) {
                 }
             }
             if (empty($data['cb']['serial'])) {
-                foreach((array)$last_cb as $cb) {
+                foreach ((array)$last_cb as $cb) {
                     if (!empty($cb['serial'])) {
                         $data['cb']['serial'] = $cb['serial'];
                         break;

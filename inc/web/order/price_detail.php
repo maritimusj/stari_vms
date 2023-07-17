@@ -32,18 +32,24 @@ function formatTimeTotalF($ts): string
 }
 
 if ($order->isFuelingOrder()) {
+    if (!$order->isFuelingFinished()) {
+        JSON::fail('订单还没有结束，无法查看！');
+    }
+
     $list = [];
 
     $data = $order->getFuelingRecord();
 
-    $data['time_total_formatted'] = formatTimeTotalF($data['time_total']);
-    $list[] = $data;
+    if ($data) {
+        $data['time_total_formatted'] = formatTimeTotalF($data['time_total']);
+        $list[] = $data;
 
-    foreach ($data as $i => $v) {
-        if (is_array($v) && $v['ser']) {
-            $v['time_total_formatted'] = formatTimeTotalF($v['time_total']);
-            $list[] = $v;
-            unset($data[$i]);
+        foreach ($data as $i => $v) {
+            if (is_array($v) && $v['ser']) {
+                $v['time_total_formatted'] = formatTimeTotalF($v['time_total']);
+                $list[] = $v;
+                unset($data[$i]);
+            }
         }
     }
 

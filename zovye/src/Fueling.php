@@ -6,6 +6,7 @@
 
 namespace zovye;
 
+use Exception;
 use zovye\Contract\ICard;
 use zovye\model\deviceModelObj;
 use zovye\model\orderModelObj;
@@ -456,12 +457,23 @@ class Fueling
                 $card_type = $order->getExtraData('card.type', '');
 
                 if ($card_type != VIPCard::getTypename()) {
-                    //事件：订单已经创建
-                    EventBus::on('device.orderCreated', [
-                        'device' => $device,
-                        'user' => $user,
-                        'order' => $order,
-                    ]);
+                    try {
+                        //事件：订单已经创建
+                        EventBus::on('device.orderCreated', [
+                            'device' => $device,
+                            'user' => $user,
+                            'order' => $order,
+                        ]);
+                    } catch (Exception $e) {
+                        Log::error('fueling', [
+                            'event' => '处理订单创建事发生错误！',
+                            'error' => $e->getMessage(),
+                            'data' => [
+                                'order' => $order->profile(),
+                                'user' => $user->profile(),
+                            ]
+                        ]);
+                    }
                 }
 
                 $pay_log = Pay::getPayLog($serial);

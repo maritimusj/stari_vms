@@ -645,8 +645,12 @@
                             <i class="fa fa-tag"></i>
                             {/if}
                             已支付{php echo number_format($order['pay']['balance'] / 100, 2, '.', '')}元
-                            {if $order['fueling']['refund']['total']>0}，已退回{php echo number_format($order['fueling']['refund']['total'] / 100, 2, '.', '')}元{/if}
-                            {if $order['charging']['refund']['total']>0}，已退回{php echo number_format($order['charging']['refund']['total'] / 100, 2, '.', '')}元{/if}
+                            {if $order['src'] ==  \zovye\Order::FUELING}
+                            {if $order['fueling']['refund']['total']>0}，已退回{php echo number_format($order['fueling']['refund']['total'] / 100, 2, '.', '')}元{else}，已用完{/if}
+                            {/if}
+                            {if $order['src'] ==  \zovye\Order::CHARGING}
+                            {if $order['charging']['refund']['total']>0}，已退回{php echo number_format($order['charging']['refund']['total'] / 100, 2, '.', '')}元{else}，已用完{/if}
+                            {/if}
                         </div>
                         {/if}
                 </td>

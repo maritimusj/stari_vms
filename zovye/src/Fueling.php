@@ -423,12 +423,13 @@ class Fueling
             $order->setFuelingRecord($data);
         });
 
-        if (!Locker::try("settle:".$serial, REQUEST_ID, 3)) {
+        if (!Locker::try("settle:$serial", REQUEST_ID, 3)) {
             Log::error("fueling", [
                 'error' => '结算订单时，锁定失败！',
                 'data' => $data,
                 'device' => $device->profile(),
             ]);
+
             return err('订单锁订失败！');
         }
 
@@ -471,7 +472,7 @@ class Fueling
                             'data' => [
                                 'order' => $order->profile(),
                                 'user' => $user->profile(),
-                            ]
+                            ],
                         ]);
                     }
                 }

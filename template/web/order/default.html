@@ -652,9 +652,9 @@
                             {if $order['src'] ==  \zovye\Order::FUELING}
                                 {if $order['fueling']['refund']['total']>0}
                                     {if $order['fueling']['refund']['total'] == $order['pay']['balance']}
-                                    ，已全额退款
+                                    ，已退款
                                     {else}
-                                    ，已退回 {php echo number_format($order['fueling']['refund']['total'] / 100, 2, '.', '')}元
+                                    ，退回 {php echo number_format($order['fueling']['refund']['total'] / 100, 2, '.', '')}元
                                     {/if}
                                 {else}，已用完{/if}
                             {/if}
@@ -662,9 +662,9 @@
                             {if $order['src'] ==  \zovye\Order::CHARGING}
                                 {if $order['charging']['refund']['total']>0}
                                     {if $order['charging']['refund']['total'] == $order['pay']['balance']}
-                                    ，已全额退款
+                                    ，已退款
                                     {else}
-                                    ，已退回 {php echo number_format($order['charging']['refund']['total'] / 100, 2, '.', '')}元
+                                    ，退回 {php echo number_format($order['charging']['refund']['total'] / 100, 2, '.', '')}元
                                     {/if}
                                 {else}，已用完{/if}
                             {/if}

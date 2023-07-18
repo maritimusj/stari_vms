@@ -265,17 +265,17 @@ class keeper
                     $keeper = \zovye\Keeper::findOne(['id' => $id, 'agent_id' => $user->getAgentId()]);
                     if ($keeper) {
                         $query = Device::keeper($keeper)->where(['agent_id' => $user->getAgentId()]);
+
                         /** @var deviceModelObj $entry */
                         foreach ($query->findAll() as $entry) {
                             if (!$entry->removeKeeper($keeper)) {
                                 return err('删除失败！');
                             }
                         }
+
                         $keeper_user = $keeper->getUser();
                         if ($keeper_user) {
-                            if (!$keeper_user->setKeeper(false)) {
-                                return err('删除运营人员出错！');
-                            }
+                            $keeper_user->setKeeper(false);
                         }
 
                         if ($keeper->destroy()) {

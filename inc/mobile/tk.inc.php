@@ -44,7 +44,7 @@ try {
     }
 
     $order_no = strval($data['order_no']);
-    $user_uid = strval($data['extra']);
+    $user_uid = trim($data['extra'], TKPromoting::getUserPrefix());
 
     if (empty($order_no) || empty($user_uid)) {
         throw new RuntimeException('缺少必要信息！');

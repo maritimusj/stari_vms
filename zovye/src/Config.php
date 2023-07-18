@@ -23,8 +23,8 @@ namespace zovye;
  * @method static mixed notify(string $key, $v = '', $update = false)
  * @method static mixed donatePay(string $key, $v = '', $update = false)
  * @method static mixed GDCVMachine(string $key, $v = '', $update = false)
- * @method static mixed api(string $string, $bool = '', $update=false)
- * @method static mixed tk(string $string, $bool = '', $update=false)
+ * @method static mixed api(string $string, $v = '', $update=false)
+ * @method static mixed tk(string $string, $v = '', $update=false)
  */
 class Config
 {

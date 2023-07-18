@@ -35,12 +35,15 @@ if (Request::has('deviceid')) {
 
 $result = [];
 
+$params = [$user, $device, new DateTime()];
+
 if (App::isTKPromotingEnabled() && $type_id == Advertising::WELCOME_PAGE) {
     $account = TKPromoting::getAccount();
     if ($account && !$account->isBanned()) {
         $res = Util::checkAvailable($user, $account, $device);
         if (!is_error($res)) {
             $result[] = TKPromoting::getAd();
+            $params['tk_user_uid'] = TKPromoting::getUserPrefix() . $user->getOpenid();
         }
     }
 }
@@ -51,8 +54,6 @@ if (empty($result)) {
         JSON::fail($result);
     }
 }
-
-$params = [$user, $device, new DateTime()];
 
 foreach ($result as $index => $ad) {
     if ($ad['data']) {

@@ -54,13 +54,13 @@ if (empty($result)) {
 
 $params = [$user, $device, new DateTime()];
 
-foreach ($result as $index => $adv) {
-    if ($adv['data']) {
-        if ($adv['data']['url']) {
-            $result[$index]['data']['url'] = PlaceHolder::replace($adv['data']['url'], $params);
+foreach ($result as $index => $ad) {
+    if ($ad['data']) {
+        if ($ad['data']['url']) {
+            $result[$index]['data']['url'] = PlaceHolder::replace($ad['data']['url'], $params);
         }
-        if ($adv['data']['link']) {
-            $result[$index]['data']['link'] = PlaceHolder::replace($adv['data']['link'], $params);
+        if ($ad['data']['link']) {
+            $result[$index]['data']['link'] = PlaceHolder::replace($ad['data']['link'], $params);
         }
     }
 }

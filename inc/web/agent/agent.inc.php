@@ -40,8 +40,10 @@ if (in_array(
     $superior_data = $superior ? $superior->get('agentData') : null;
 
     if (!isset($agent_data['location']['validate']['enabled'])) {
-        $agent_data['location']['validate']['enabled'] = App::isLocationValidateEnabled();
-        $agent_data['location']['validate']['distance'] = App::getUserLocationValidateDistance(1);
+        setArray($agent_data, 'location.validate', [
+            'enabled' =>  App::isLocationValidateEnabled(),
+            'distance' => App::getUserLocationValidateDistance(1),
+        ]);
     }
     if (!isset($agent_data['gsp.order'])) {
         $agent_data['gsp.order'] = [

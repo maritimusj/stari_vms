@@ -71,7 +71,7 @@ if ($op == 'remain_warning' && CtrlServ::checkJobSign(['id' => request('id')])) 
 
                 $notify_data = [
                     'first' => ['value' => '注意，设备商品数量不足！'],
-                    'keyword1' => ['value' => "{$device->getName()}"],
+                    'keyword1' => ['value' => $device->getName()],
                     'keyword2' => ['value' => $lanes_title],
                     'keyword3' => ['value' => $device->getRemainNum()],
                     'keyword4' => ['value' => $address],

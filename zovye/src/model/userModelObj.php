@@ -523,7 +523,6 @@ class userModelObj extends modelObj
         return null;
     }
 
-
     /**
      * 获取用户名佣金账户
      *

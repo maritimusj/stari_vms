@@ -9,6 +9,7 @@ namespace zovye;
 use DateTime;
 use DateTimeImmutable;
 use InvalidArgumentException;
+use RuntimeException;
 use Throwable;
 use WeAccount;
 
@@ -183,66 +184,71 @@ include './index.php';
         array $params = [],
         int $limit = 0
     ): bool {
-        $arr = [];
-        if ($account->isTask()) {
-            $cond = array_merge($params, [
-                'account_id' => $account->getId(),
-            ]);
-            if ($user) {
-                $cond['user_id'] = $user->getId();
-            }
-            $arr[] = [
-                BalanceLog::query($cond),
-                'count',
-            ];
-        } elseif ($account->isQuestionnaire()) {
-            $cond = array_merge($params, [
-                'level' => $account->getId(),
-            ]);
-            if ($user) {
-                $cond['title'] = $user->getOpenid();
-            }
-            $arr[] = [
-                Questionnaire::log($cond),
-                'count',
-            ];
-        } else {
-            $cond = array_merge($params, [
-                'account_id' => $account->getId(),
-            ]);
-            if ($user) {
-                $cond['user_id'] = $user->getId();
-            }
-            $arr[] = [
-                BalanceLog::query($cond),
-                'count',
-            ];
-            $cond2 = array_merge($params, [
-                'account' => $account->getName(),
-            ]);
-            if ($user) {
-                $cond2['openid'] = $user->getOpenid();
-            }
-            $arr[] = [
-                Order::query($cond2),
-                'sum',
-            ];
-        }
-
-        foreach ($arr as $e) {
-            list($query, $m) = $e;
-
-            $query->limit($limit);
-            $total = $m == 'sum' ? $query->sum('num') : $query->count();
-
-            if ($total >= $limit) {
-                return true;
+        $result =  CacheUtil::cachedCall(0, function() use ($account, $user, $params, $limit) {
+            $arr = [];
+            if ($account->isTask()) {
+                $cond = array_merge($params, [
+                    'account_id' => $account->getId(),
+                ]);
+                if ($user) {
+                    $cond['user_id'] = $user->getId();
+                }
+                $arr[] = [
+                    BalanceLog::query($cond),
+                    'count',
+                ];
+            } elseif ($account->isQuestionnaire()) {
+                $cond = array_merge($params, [
+                    'level' => $account->getId(),
+                ]);
+                if ($user) {
+                    $cond['title'] = $user->getOpenid();
+                }
+                $arr[] = [
+                    Questionnaire::log($cond),
+                    'count',
+                ];
+            } else {
+                $cond = array_merge($params, [
+                    'account_id' => $account->getId(),
+                ]);
+                if ($user) {
+                    $cond['user_id'] = $user->getId();
+                }
+                $arr[] = [
+                    BalanceLog::query($cond),
+                    'count',
+                ];
+                $cond2 = array_merge($params, [
+                    'account' => $account->getName(),
+                ]);
+                if ($user) {
+                    $cond2['openid'] = $user->getOpenid();
+                }
+                $arr[] = [
+                    Order::query($cond2),
+                    'sum',
+                ];
             }
 
-            $limit -= $total;
-        }
+            foreach ($arr as $e) {
+                list($query, $m) = $e;
 
-        return false;
+                $query->limit($limit);
+                $total = $m == 'sum' ? $query->sum('num') : $query->count();
+
+                if ($total >= $limit) {
+                    return true;
+                }
+
+                $limit -= $total;
+            }
+
+            // 条件不满足时，抛出异常，抑制缓存
+            throw new RuntimeException();
+        }, 'checkLimit', $account->getId(), $user ? $user->getId() : 0, $params, $limit);
+
+        return !is_error($result);
     }
 
     /**

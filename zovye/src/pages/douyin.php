@@ -44,4 +44,5 @@ $tpl_data['js']['code'] = <<<JSCODE
     }
 </script>
 JSCODE;
-$this->showTemplate(Theme::file('douyin'), ['tpl' => $tpl_data]);
+
+Response::showTemplate('douyin', ['tpl' => $tpl_data], true);

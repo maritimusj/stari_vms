@@ -56,4 +56,5 @@ $js_sdk
     }
 </script>
 JSCODE;
-$this->showTemplate(Theme::file('keeper'), ['tpl' => $tpl]);
+
+Response::showTemplate('keeper', ['tpl' => $tpl], true);

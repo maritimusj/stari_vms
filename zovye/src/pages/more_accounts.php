@@ -52,4 +52,5 @@ $js_sdk
 <script>
 </script>
 JSCODE;
-$this->showTemplate(Theme::file('accounts'), ['tpl' => $tpl, 'url' => $api_url]);
+
+Response::showTemplate('accounts', ['tpl' => $tpl, 'url' => $api_url], true);

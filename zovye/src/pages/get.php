@@ -94,4 +94,4 @@ $js_sdk
 JSCODE;
 
 $file = Theme::getThemeFile($device, 'get');
-$this->showTemplate($file, ['tpl' => $tpl]);
+Response::showTemplate($file, ['tpl' => $tpl]);

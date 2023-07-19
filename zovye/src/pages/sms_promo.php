@@ -44,5 +44,6 @@ $tpl_data['js']['code'] = <<<JSCODE
 
 </script>
 JSCODE;
+
 $filename = Theme::getThemeFile($device, 'device');
-$this->showTemplate($filename, ['tpl' => $tpl_data]);
+Response::showTemplate($filename, ['tpl' => $tpl_data]);

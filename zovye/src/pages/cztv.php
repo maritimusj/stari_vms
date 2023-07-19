@@ -52,7 +52,7 @@ if (empty($user)) {
 </script>
 JSCODE;
     $file = Theme::getThemeFile($device, 'cztv');
-    $this->showTemplate($file, ['tpl' => $tpl]);
+    Response::showTemplate($file, ['tpl' => $tpl]);
 }
 
 $user_json_str = json_encode($user->profile(), JSON_HEX_TAG | JSON_HEX_QUOT);

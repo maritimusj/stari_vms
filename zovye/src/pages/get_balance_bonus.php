@@ -112,4 +112,4 @@ $tpl_data['js']['code'] .= <<<JSCODE
 \r\n</script>
 JSCODE;
 
-$this->showTemplate(Theme::file('balance'), ['tpl' => $tpl_data]);
+Response::showTemplate('balance', ['tpl' => $tpl_data], true);

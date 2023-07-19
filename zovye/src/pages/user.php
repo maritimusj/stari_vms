@@ -84,5 +84,4 @@ JSCODE;
 }
 
 $tpl_data['js']['code'] .= "\r\n</script>";
-
 Response::showTemplate('user', ['tpl' => $tpl_data], true);

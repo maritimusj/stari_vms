@@ -59,4 +59,4 @@ $js_sdk
 </script>
 JSCODE;
 
-$this->showTemplate(Theme::file('idcard'), ['tpl' => $tpl]);
+Response::showTemplate('idcard', ['tpl' => $tpl], true);

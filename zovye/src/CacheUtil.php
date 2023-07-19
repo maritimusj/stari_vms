@@ -20,6 +20,7 @@ class CacheUtil
     public static function expiredCall(string $uid, $interval_seconds, callable $fn)
     {
         $key = App::uid(6).$uid;
+
         $data = We7::cache_read($key);
         if ($data && is_array($data) && ($interval_seconds === 0 || time() - intval(
                     $data['time']
@@ -56,6 +57,7 @@ class CacheUtil
     public static function cachedCallWhen($interval_seconds, callable $fn, ...$params)
     {
         $key = 'delay'.hashFN($fn, ...$params);
+
         $data = We7::cache_read($key);
         if ($data && is_array($data) && ($interval_seconds === 0 || time() - intval(
                     $data['time']
@@ -77,6 +79,7 @@ class CacheUtil
     public static function expiredCallUtil($uid, $expired, $fn)
     {
         $key = App::uid(6).$uid;
+
         $data = We7::cache_read($key);
         if ($data && is_array($data) && time() <= intval($data['time'])) {
             return $data['v'];

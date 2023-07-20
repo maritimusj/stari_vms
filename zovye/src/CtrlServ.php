@@ -514,4 +514,31 @@ class CtrlServ
 
         return self::query("job/queue/$uid", [], $body);
     }
+
+    /**
+     * 在队列中加入一个回调任务
+     * @param $level
+     * @param $url
+     * @param string $data
+     * @return mixed
+     */
+    public static function httpCallback(string $url, $type = 'normal', int $delay = 0, int $freq = 0, string $data = '')
+    {
+        $body = [
+            'type' => $type,
+            'url' => $url,
+            'data' => $data,
+            'content-type' => 'application/json',
+        ];
+
+        if ($delay > 0) {
+            $body['delay'] = $delay;
+        }
+
+        if ($freq > 0) {
+            $body['freq'] = $freq;
+        }
+
+        return self::postV2("job", $body);
+    }
 }

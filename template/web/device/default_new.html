@@ -286,7 +286,7 @@
                             </div>
                         </td>
                         <td>
-                            <div class="devicename operate">
+                            <div class="devicename">
                                 {{o.name}}
                                 <template v-if="o.isCharging">
                                     <sup class="charging" title="充电桩">
@@ -308,12 +308,14 @@
                                         <img src="{MODULE_URL}static/img/bluetooth.svg" class="icon">
                                     </sup>
                                 </template>
-                                <template v-if="o.isDown">
-                                    <img src="{MODULE_URL}static/img/wrench.svg" data-op="setNormal" title="设备维护中，点击取消" class="icon">
-                                </template>
-                                <template v-if="o.schedule && o.schedule.delay > 0">
-                                    <img src="{MODULE_URL}static/img/schedule.svg" data-op="deviceSchedule" title="定时出货" class="icon">
-                                </template>
+                                <span class="operate">
+                                    <template v-if="o.isDown">
+                                        <img src="{MODULE_URL}static/img/wrench.svg" data-op="setNormal" title="设备维护中，点击取消" class="icon">
+                                    </template>
+                                    <template v-if="o.schedule && o.schedule.delay > 0">
+                                        <img src="{MODULE_URL}static/img/schedule.svg" data-op="deviceSchedule" title="定时出货" class="icon">
+                                    </template>
+                                </span>
                                 <div class="address" v-if="o.address && (o.address.web || o.address.agent)">
                                     <div class="li" v-if="o.address.web">
                                         <span class="web title">后台位置</span>

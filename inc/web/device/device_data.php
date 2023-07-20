@@ -157,6 +157,8 @@ if (is_array($ids)) {
 
         $data['device_type'] = $device->getDeviceType();
 
+        $data['schedule'] = $device->settings('schedule', []);
+
         $statistic = $device->get('firstMsgStatistic', []);
         if ($statistic) {
             $data['firstMsgTotal'] = intval($statistic[date('Ym')][date('d')]['total']);

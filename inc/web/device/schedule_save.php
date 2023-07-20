@@ -22,17 +22,19 @@ $device->updateSettings('schedule', [
     'serial' => $serial,
 ]);
 
-$url = Util::murl('device', [
-    'op' => 'schedule',
-]);
+if ($delay > 0) {
+    $url = Util::murl('device', [
+        'op' => 'schedule',
+    ]);
 
-$result = CtrlServ::httpCallback($url, 'normal', Request::bool('now') ? 0 : $delay, $delay, json_encode([
-    'serial' => $serial,
-    'device' => $device->getId(),
-]));
+    $result = CtrlServ::httpCallback($url, 'normal', Request::bool('now') ? 0 : $delay, $delay, json_encode([
+        'serial' => $serial,
+        'device' => $device->getId(),
+    ]));
 
-if (is_error($result)) {
-    JSON::fail($result);
+    if (is_error($result)) {
+        JSON::fail($result);
+    }
 }
 
 JSON::success('保存成功！');

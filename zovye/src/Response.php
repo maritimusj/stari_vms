@@ -41,6 +41,7 @@ namespace zovye;
  * @method static taskPage(array $array)
  * @method static userInfoPage(array $array)
  * @method static cztvPage(array $array)
+ * @method static luckyRegistryPage(array $array)
  */
 class Response
 {

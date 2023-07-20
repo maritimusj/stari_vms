@@ -212,10 +212,6 @@ if ($op == 'default') {
             throw new RuntimeException('找不到可用商品！');
         }
 
-        if ($goods['num'] < 1) {
-            throw new RuntimeException('对不起，商品数量不足！');
-        }
-
         if (empty($order_no)) {
             $order_no = Order::makeUID($user, $device, sha1(REQUEST_ID));
         }
@@ -231,6 +227,7 @@ if ($op == 'default') {
             'user' => $user->getId(),
             'goods' => $goods['id'],
             'orderUID' => $order_no,
+            'ignoreGoodsNum' => 1,
         ])) {
             throw new RuntimeException('创建任务失败！');
         }

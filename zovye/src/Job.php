@@ -234,6 +234,7 @@ class Job
             'user' => '',
             'goods' => '',
             'orderUID' => '',
+            'ignoreGoodsNum' => 0,
             'ip' => '',
         ], $params);
 

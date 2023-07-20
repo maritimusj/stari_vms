@@ -31,6 +31,7 @@ $device_id = Request::str('device');
 $user_id = Request::str('user');
 $goods_id = Request::str('goods');
 $order_uid = Request::str('orderUID');
+$ignore_goods_num = Request::int('ignoreGoodsNum');
 $ip = Request::str('ip');
 
 $params = [
@@ -39,6 +40,7 @@ $params = [
     'user' => $user_id,
     'goods' => $goods_id,
     'orderUID' => $order_uid,
+    'ignoreGoodsNum' => $ignore_goods_num,
     'ip' => $ip,
 ];
 
@@ -118,7 +120,7 @@ if ($op == 'create_order_account' && CtrlServ::checkJobSign($params)) {
             ZovyeException::throwWith('找不到商品！', -1, $device);
         }
 
-        if ($goods['num'] < 1) {
+        if (empty($ignore_goods_num) && $goods['num'] < 1) {
             ZovyeException::throwWith('商品数量不足！', -1, $device);
         }
 

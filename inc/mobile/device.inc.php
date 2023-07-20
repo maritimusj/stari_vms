@@ -197,6 +197,8 @@ if ($op == 'default') {
         JSON::fail('找不到这个设备！');
     }
 
+    $device->updateSettings('schedule.last', time());
+
     $serial = Request::json('serial', '');
     if (empty($serial) || $device->settings('schedule.serial', '') !== $serial) {
         Response::echo('abort');
@@ -233,13 +235,12 @@ if ($op == 'default') {
             throw new RuntimeException('创建任务失败！');
         }
 
-        Response::echo('Ok');
-
     } catch (RuntimeException $e) {
-        Log::error('device_schedule', [
+        Log::error('schedule', [
             'request' => Request::json(),
             'error' => $e->getMessage(),
         ]);
     }
-
+    
+    Response::echo('Ok');
 }

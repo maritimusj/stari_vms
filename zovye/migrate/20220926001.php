@@ -25,8 +25,8 @@ CREATE TABLE `ims_zovye_vms_team_member` (
     `remark` VARCHAR(128) NOT NULL , 
     `createtime` INT NOT NULL , 
     PRIMARY KEY (`id`), 
-    INDEX (`uniacid`, `team_id`, `user_id`), 
-    INDEX (`uniacid`,`mobile`)) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4;
+    INDEX (`team_id`, `user_id`), 
+    INDEX (`mobile`)) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4;
 SQL;
     Migrate::execSQL($sql);
 }

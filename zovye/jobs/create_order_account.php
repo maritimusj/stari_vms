@@ -142,6 +142,10 @@ if ($op == 'create_order_account' && CtrlServ::checkJobSign($params)) {
             $data['tk_order_no'] = $params['tk_order_no'];
         }
 
+        if ($ignore_goods_num) {
+            $data['ignoreGoodsNum'] = true;
+        }
+
         if (!empty($order)) {
             $data[] = $order;
         }

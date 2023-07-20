@@ -256,7 +256,7 @@ class DeviceUtil
             return err('找不到对应的商品');
         }
 
-        if ($goods['num'] < 1) {
+        if (empty($args['ignoreGoodsNum']) && $goods['num'] < 1) {
             return err('对不起，已经被领完了');
         }
 

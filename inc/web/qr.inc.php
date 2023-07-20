@@ -1,6 +1,8 @@
 <?php
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 use ZipArchive;
 
 $template_url = "https://xxx.com/app/index.php?i=2&c=entry&app=NULL&from=device&device={uid}&do=entry&m=zy_saas";

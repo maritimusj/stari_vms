@@ -6,9 +6,9 @@
 
 namespace zovye;
 
-use zovye\model\charging_now_dataModelObj;
-
 defined('IN_IA') or exit('Access Denied');
+
+use zovye\model\charging_now_dataModelObj;
 
 $user = User::get(Request::int('id'));
 if (empty($user)) {

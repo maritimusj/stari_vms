@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 if (!App::isFlashEggEnabled()) {
     JSON::fail('这个功能没有启用！');
 }
@@ -50,7 +52,7 @@ if (FlashEgg::isLuckyLogExists($serial)) {
 
 $fn = Request::trim('fn');
 if (empty($fn)) {
-    App()->luckyRegistryPage([
+    Response::luckyRegistryPage([
         'user' => $user,
         'lucky' => $lucky,
         'code' => $code,

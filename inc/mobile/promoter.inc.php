@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 use RuntimeException;
 use zovye\api\wx\balance;
 use zovye\api\wx\common;

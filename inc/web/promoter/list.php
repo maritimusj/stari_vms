@@ -6,9 +6,9 @@
  
 namespace zovye;
 
-use zovye\model\userModelObj;
-
 defined('IN_IA') or exit('Access Denied');
+
+use zovye\model\userModelObj;
 
 if (!App::isPromoterEnabled()) {
     JSON::fail('这个功能没有启用！');

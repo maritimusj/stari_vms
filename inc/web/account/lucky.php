@@ -6,9 +6,9 @@
 
 namespace zovye;
 
-use zovye\model\luckyModelObj;
-
 defined('IN_IA') or exit('Access Denied');
+
+use zovye\model\luckyModelObj;
 
 $tpl_data = [
     'navs' => [

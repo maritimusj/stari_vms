@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 if (!App::isFlashEggEnabled()) {
     JSON::fail('这个功能没有启用！');
 }

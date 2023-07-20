@@ -6,9 +6,9 @@
 
 namespace zovye;
 
-use zovye\model\giftModelObj;
-
 defined('IN_IA') or exit('Access Denied');
+
+use zovye\model\giftModelObj;
 
 $user = User::get(Request::int('id'));
 if (empty($user)) {

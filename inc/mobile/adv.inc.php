@@ -6,9 +6,9 @@
 
 namespace zovye;
 
-use DateTime;
-
 defined('IN_IA') or exit('Access Denied');
+
+use DateTime;
 
 $user = Session::getCurrentUser();
 if (empty($user) || $user->isBanned()) {

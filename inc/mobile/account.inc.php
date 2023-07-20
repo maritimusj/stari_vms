@@ -6,9 +6,9 @@
 
 namespace zovye;
 
-use zovye\model\balanceModelObj;
-
 defined('IN_IA') or exit('Access Denied');
+
+use zovye\model\balanceModelObj;
 
 $op = Request::op('default');
 

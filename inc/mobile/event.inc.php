@@ -6,4 +6,6 @@
 
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 Log::debug('event', Request::raw());

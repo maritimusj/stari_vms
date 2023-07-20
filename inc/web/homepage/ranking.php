@@ -7,10 +7,10 @@
 
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 use DateTime;
 use Exception;
-
-defined('IN_IA') or exit('Access Denied');
 
 $fn = Request::str('fn', 'default');
 

@@ -8,7 +8,6 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-
 $id = Request::int('id');
 $voucher = GoodsVoucher::get($id);
 $limitGoodsIds = $voucher->getExtraData('limitGoods', []);

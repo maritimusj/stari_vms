@@ -6,9 +6,9 @@
 
 namespace zovye;
 
-use zovye\model\userModelObj;
-
 defined('IN_IA') or exit('Access Denied');
+
+use zovye\model\userModelObj;
 
 //确定用户身份
 $user = Session::getCurrentUser();

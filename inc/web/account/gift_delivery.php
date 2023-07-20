@@ -6,9 +6,9 @@
 
 namespace zovye;
 
-use zovye\model\gift_logModelObj;
-
 defined('IN_IA') or exit('Access Denied');
+
+use zovye\model\gift_logModelObj;
 
 $id = Request::int('id');
 if (empty($id)) {

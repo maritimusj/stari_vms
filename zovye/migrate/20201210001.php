@@ -82,19 +82,6 @@ SQL;
     Migrate::execSQL($sql);
 }
 
-if (!We7::pdo_tableexists($tb_name.'_referal')) {
-    $sql = <<<SQL
-CREATE TABLE IF NOT EXISTS `ims_zovye_vms_referal` ( 
-`id` INT NOT NULL AUTO_INCREMENT , 
-`agent_id` INT NOT NULL DEFAULT '0' , 
-`code` VARCHAR(32) NOT NULL , 
-`createtime` INT NOT NULL DEFAULT '0' , 
-PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 ;
-SQL;
-    Migrate::execSQL($sql);
-}
-
 if (!We7::pdo_tableexists($tb_name.'_device_log')) {
     $sql = <<<SQL
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_device_events` (
@@ -110,6 +97,7 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_device_events` (
 SQL;
     Migrate::execSQL($sql);
 }
+
 
 if (!We7::pdo_fieldexists($tb_name.'_user', 'locked_uid')) {
     $sql = <<<SQL
@@ -129,20 +117,6 @@ SQL;
 if (!We7::pdo_fieldexists($tb_name.'_device', 'rank')) {
     $sql = <<<SQL
 ALTER TABLE `ims_zovye_vms_device` ADD `rank` INT NULL AFTER `agentId`;
-SQL;
-    Migrate::execSQL($sql);
-}
-
-if (!We7::pdo_fieldexists($tb_name.'_weapp_config', 'locked_uid')) {
-    $sql = <<<SQL
-ALTER TABLE `ims_zovye_vms_weapp_config` CHANGE `__lockedGUID` `locked_uid` VARCHAR(64) NOT NULL DEFAULT 'n/a';
-SQL;
-    Migrate::execSQL($sql);
-}
-
-if (!We7::pdo_fieldexists($tb_name.'_settings_order', 'locked_uid')) {
-    $sql = <<<SQL
-ALTER TABLE `ims_zovye_vms_settings_order` CHANGE `__lockedGUID` `locked_uid` VARCHAR(64) NOT NULL DEFAULT 'n/a';
 SQL;
     Migrate::execSQL($sql);
 }

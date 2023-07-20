@@ -29,7 +29,7 @@ class AccountEventHandler
         accountModelObj $account = null,
         orderModelObj $order = null
     ) {
-        if ($account && empty($order)) {
+        if ($account && !$account->isPseudo() && empty($order)) {
             //检查用户是否允许
             $params = [];
             if ($account->isFlashEgg() || settings('api.account', 'n/a') == $account->getUid()) {

@@ -519,6 +519,11 @@ class accountModelObj extends modelObj
         return $questions;
     }
 
+    public function isPseudo(): bool
+    {
+        return $this->getType() == Account::PSEUDO;
+    }
+
     public function isVideo(): bool
     {
         return $this->getType() == Account::VIDEO;

@@ -43,6 +43,8 @@ class Account extends State
 
     const BANNED = 1;
 
+    const PSEUDO = 2;      //虚拟
+
     //视频
     const VIDEO = 10;
 
@@ -159,6 +161,9 @@ class Account extends State
     const CloudFI_NAME = '中科在线';
     const CloudFI_HEAD_IMG = MODULE_URL.'static/img/cloudfi.png';
 
+    const PSEUDO_NAME = '虚拟公众号';
+    const PSEUDO_HEAD_IMG = MODULE_URL.'static/img/pseudo.png';
+
     protected static $title = [
         self::BANNED => '已禁用',
         self::NORMAL => '正常',
@@ -207,6 +212,35 @@ class Account extends State
     public static function query(array $condition = []): modelObjFinder
     {
         return m('account')->where(We7::uniacid([]))->where($condition);
+    }
+
+    public static function getPseudoAccount(): ?accountModelObj
+    {
+        $uid = sha1(App::uid());
+        $account = self::findOneFromUID($uid);
+        if ($account) {
+            return $account;
+        }
+
+        $data = [
+            'agent_id' => 0,
+            'type' => Account::PSEUDO,
+            'state' => Account::NORMAL,
+            'uid' => $uid,
+            'name' => Util::random(16),
+            'title' => self::PSEUDO_NAME,
+            'descr' => '系统内部使用的虚拟公众号',
+            'img' => self::PSEUDO_HEAD_IMG,
+            'qrcode' => '',
+            'clr' => Util::randColor(),
+            'scname' => Schema::DAY,
+            'count' => 0,
+            'total' => 0,
+            'group_name' => '',
+            'url' => Account::createUrl($uid, ['from' => 'account']),
+        ];
+
+        return self::create($data);
     }
 
     public static function findOneFromType($type): ?accountModelObj
@@ -353,7 +387,7 @@ class Account extends State
             }
             $list[$index] = function () use ($getter_fn, $acc, $device, $user) {
                 if ($acc->getBonusType() == Account::BALANCE) {
-                        $res = Util::checkBalanceAvailable($user, $acc);
+                    $res = Util::checkBalanceAvailable($user, $acc);
                 } else {
                     //检查用户是否允许
                     $res = Util::checkAvailable($user, $acc, $device);
@@ -361,6 +395,7 @@ class Account extends State
                 if (is_error($res)) {
                     return $res;
                 }
+
                 return $getter_fn($acc);
             };
 
@@ -371,30 +406,30 @@ class Account extends State
         $groups = [];
 
         $include = $params['type'] ?? [
-                Account::NORMAL,
-                Account::VIDEO,
-                Account::AUTH,
-                Account::WXAPP,
-                Account::QUESTIONNAIRE,
-            ];
+            Account::NORMAL,
+            Account::VIDEO,
+            Account::AUTH,
+            Account::WXAPP,
+            Account::QUESTIONNAIRE,
+        ];
 
         $third_party_platform_includes = $params['s_type'] ?? [
-                Account::JFB,
-                Account::MOSCALE,
-                Account::YUNFENBA,
-                Account::AQIINFO,
-                Account::ZJBAO,
-                Account::MEIPA,
-                Account::KINGFANS,
-                Account::SNTO,
-                Account::YFB,
-                Account::WxWORK,
-                Account::YOUFEN,
-                Account::MENGMO,
-                Account::YIDAO,
-                Account::WEISURE,
-                Account::CloudFI,
-            ];
+            Account::JFB,
+            Account::MOSCALE,
+            Account::YUNFENBA,
+            Account::AQIINFO,
+            Account::ZJBAO,
+            Account::MEIPA,
+            Account::KINGFANS,
+            Account::SNTO,
+            Account::YFB,
+            Account::WxWORK,
+            Account::YOUFEN,
+            Account::MENGMO,
+            Account::YIDAO,
+            Account::WEISURE,
+            Account::CloudFI,
+        ];
 
         $include = is_array($include) ? $include : [$include];
         $third_party_platform_includes = is_array(
@@ -431,7 +466,7 @@ class Account extends State
                 return [$acc->format()];
             });
         }
- 
+
         $exclude = is_array($params['exclude']) ? $params['exclude'] : [];
         $third_party_platform = [
             //准粉吧
@@ -636,7 +671,7 @@ class Account extends State
         $result = [];
 
         //如果所有公众号的排序值一样，则打乱排序
-        $shuffle_accounts = function ($result) use ($params){
+        $shuffle_accounts = function ($result) use ($params) {
             if ($params['shuffle'] !== false) {
                 if (count($result) > 1) {
                     $first = current($result);
@@ -655,6 +690,7 @@ class Account extends State
                     }
                 }
             }
+
             return $result;
         };
 
@@ -675,6 +711,7 @@ class Account extends State
                 return $shuffle_accounts($result);
             }
         }
+
         return $shuffle_accounts($result);
     }
 
@@ -909,7 +946,7 @@ class Account extends State
         return $result;
     }
 
-    public static function makeThirdPartyPlatformUID(int $type, String $name): string
+    public static function makeThirdPartyPlatformUID(int $type, string $name): string
     {
         return self::makeUID("$type:$name");
     }
@@ -1415,6 +1452,7 @@ class Account extends State
         if ($account) {
             $query->where(['account_id' => $account->getId()]);
         }
+
         return $query;
     }
 

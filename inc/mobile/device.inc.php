@@ -125,7 +125,7 @@ if ($op == 'default') {
     } else {
         $user = Session::getCurrentUser();
     }
-    
+
     if (empty($user) || $user->isBanned()) {
         JSON::fail('找不到用户！');
     }
@@ -181,12 +181,12 @@ if ($op == 'default') {
         if (empty($user) || $user->isBanned()) {
             JSON::fail('找不到用户！');
         }
-    
+
         $device = $user->getLastActiveDevice();
         if (empty($device)) {
             JSON::fail('请重新扫描设备二维码！');
         }
-    
+
         $result = CZTV::get($user, $device->getUid(), Request::int('goods'));
         JSON::result($result);
     }
@@ -207,22 +207,22 @@ if ($op == 'default') {
     try {
         $goods = $device->getGoodsByLane(0);
         if (empty($goods)) {
-            throw new RuntimeException('无法找不到这个商品！');
+            throw new RuntimeException('找不到可用商品！');
         }
-    
+
         if ($goods['num'] < 1) {
             throw new RuntimeException('对不起，商品数量不足！');
         }
-    
+
         if (empty($order_no)) {
             $order_no = Order::makeUID($user, $device, sha1(REQUEST_ID));
         }
-    
-        $account = Account::findOneFromUID($device->settings('schedule.account_uid', ''));
+
+        $account = Account::getPseudoAccount();
         if (empty($account)) {
-            throw new RuntimeException('没有关联公众号！');
+            throw new RuntimeException('找不到可用的公众号！');
         }
-    
+
         if (!Job::createAccountOrder([
             'account' => $account->getId(),
             'device' => $device->getId(),
@@ -230,12 +230,12 @@ if ($op == 'default') {
             'goods' => $goods['id'],
             'orderUID' => $order_no,
         ])) {
-            throw new RuntimeException('失败，请稍后再试！');
+            throw new RuntimeException('创建任务失败！');
         }
 
         Response::echo('Ok');
-        
-    } catch(RuntimeException $e) {
+
+    } catch (RuntimeException $e) {
         Log::error('device_schedule', [
             'request' => Request::json(),
             'error' => $e->getMessage(),

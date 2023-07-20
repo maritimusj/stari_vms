@@ -96,6 +96,17 @@ class Response
         We7::message($msg, $redirect ? We7::referer() : $redirect, $type);
     }
 
+    public static function echo($msg): void
+    {
+        if (is_scalar($msg)) {
+            exit($msg);
+        }
+
+        print_r($msg);
+
+        exit();
+    }
+
     /**
      * @param $msg
      * @param string $redirect

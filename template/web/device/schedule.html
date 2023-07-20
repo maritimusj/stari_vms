@@ -1,0 +1,16 @@
+<form class="form-horizontal" id="editScheduleForm">
+    <div class="form-group">
+        <label for="delaySeconds" class="col-md-2 control-label">出货间隔（秒）</label>
+        <div class="col-md-10">
+            <input type="text" class="form-control" id="delaySeconds" name="delaySeconds" value="{$config['delay']}">
+            <span class="help-block">* 0 设置为零则表示不启用这个功能</span>
+        </div>
+    </div>
+    <div class="form-group">
+         <div class="col-md-offset-2 col-md-10">
+            <input type="hidden" name="deviceId" value="{php echo $device->getId()}">
+            <button type="button" class="btn btn-primary" onclick="api.saveSchedule()">确定</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">退出</button>
+        </div>
+    </div>
+</form>

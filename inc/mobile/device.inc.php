@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+use RuntimeException;
+
 defined('IN_IA') or exit('Access Denied');
 
 $op = Request::op('default');
@@ -188,4 +190,56 @@ if ($op == 'default') {
         $result = CZTV::get($user, $device->getUid(), Request::int('goods'));
         JSON::result($result);
     }
+} elseif ($op == 'schedule') {
+
+    $device = Device::get(Request::json('device', 0));
+    if (empty($device)) {
+        JSON::fail('找不到这个设备！');
+    }
+
+    $serial = Request::json('serial', '');
+    if (empty($serial) || $device->settings('schedule.serial', '') !== $serial) {
+        Response::echo('abort');
+    }
+
+    $user = User::getPseudoUser();
+
+    try {
+        $goods = $device->getGoodsByLane(0);
+        if (empty($goods)) {
+            throw new RuntimeException('无法找不到这个商品！');
+        }
+    
+        if ($goods['num'] < 1) {
+            throw new RuntimeException('对不起，商品数量不足！');
+        }
+    
+        if (empty($order_no)) {
+            $order_no = Order::makeUID($user, $device, sha1(REQUEST_ID));
+        }
+    
+        $account = Account::findOneFromUID($device->settings('schedule.account_uid', ''));
+        if (empty($account)) {
+            throw new RuntimeException('没有关联公众号！');
+        }
+    
+        if (!Job::createAccountOrder([
+            'account' => $account->getId(),
+            'device' => $device->getId(),
+            'user' => $user->getId(),
+            'goods' => $goods['id'],
+            'orderUID' => $order_no,
+        ])) {
+            throw new RuntimeException('失败，请稍后再试！');
+        }
+
+        Response::echo('Ok');
+        
+    } catch(RuntimeException $e) {
+        Log::error('device_schedule', [
+            'request' => Request::json(),
+            'error' => $e->getMessage(),
+        ]);
+    }
+
 }

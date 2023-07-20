@@ -1,6 +1,6 @@
 {template 'common/header'}
 {php \zovye\url(true, 'static/css/common.css?v=20230710');}
-{php \zovye\url(true, 'static/css/device.css?v=20220516');}
+{php \zovye\url(true, 'static/css/device.css?v=20230710');}
 <div id="appx" v-cloak>
     <div class="init-loading" v-if="device.list === undefined">
         <i class="fa fa-spinner fa-spin"></i>&nbsp;加载中...
@@ -515,14 +515,14 @@
                                     <template v-if="o.isBluetooth">
                                         <li role="separator" class="divider"></li>
                                         <li><a href="#" data-op="showMaintainRec"><i class="fa fa-cogs"></i> 维护记录</a></li>
-                                        <li role="separator" class="divider"></li>
                                     </template>                                    
                                     <template v-if="!o.isCharging">
                                         <li role="separator" class="divider"></li>
                                         <li><a href="#" data-op="deviceReset" data-params="all"><i class="fa fa-undo fa-fw"></i> 重置全部{{o.isFueling?'枪位':'货道'}}商品数量</a></li>
-                                        <li role="separator" class="divider"></li>
                                     </template>
                                     <li><a href="#" data-op="deviceConfig"><i class="fa fa-exchange fa-fw"></i> 刷新设备状态和配置</a></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="#" data-op="deviceSchedule"><i class="fa fa-cogs"></i> 定时出货</a></li>
                                     <li role="separator" class="divider"></li>
                                     <template v-if="o.appId">
                                         <li ><a href="#" data-op="showVersions"><i class="fa fa-cloud-download fa-fw"></i> 推送版本更新</a></li>

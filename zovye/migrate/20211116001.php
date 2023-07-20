@@ -2,6 +2,8 @@
 
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $tb_name = APP_NAME;
 
 $sql = <<<SQL

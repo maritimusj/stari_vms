@@ -2,6 +2,8 @@
 
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $tb_name = APP_NAME;
 
 if (!We7::pdo_fieldexists($tb_name.'_balance_logs', 's1')) {

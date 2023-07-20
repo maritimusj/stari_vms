@@ -2,6 +2,8 @@
 
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $sql = <<<SQL
 CREATE OR REPLACE VIEW `ims_zovye_vms_admin_vw` AS
 SELECT u.*,p.name as `name`,p.createtime as `updatetime`

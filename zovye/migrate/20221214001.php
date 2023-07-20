@@ -19,7 +19,7 @@ CREATE TABLE `ims_zovye_vms_vip` (
     `createtime` INT NOT NULL , 
     PRIMARY KEY (`id`), 
     INDEX (`uniacid`, `agent_id`, `user_id`),
-    INDEX (`mobile`)) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4;
+    INDEX (`uniacid`,`mobile`)) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4;
 SQL;
     Migrate::execSQL($sql);
 }

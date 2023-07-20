@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_device_events` (
   `extra` text,
   `createtime` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `deviceUID` (`deviceUID`(8),`uniacid`,`event`)
+  KEY `deviceUID` (`uniacid`,`deviceUID`(8),`event`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 SQL;
     Migrate::execSQL($sql);
@@ -158,7 +158,7 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_device_groups` (
   `agentId` int(11) NOT NULL DEFAULT '0',
   `createtime` INT NOT NULL DEFAULT '0' , 
   PRIMARY KEY (`id`),
-  KEY `agentId` (`agentId`, `uniacid`)
+  KEY `agentId` (`uniacid`,`agentId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 SQL;
     Migrate::execSQL($sql);

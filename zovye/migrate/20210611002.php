@@ -17,9 +17,9 @@ CREATE TABLE `ims_zovye_vms_component_user` (
     `extra` TEXT , 
     `createtime` INT NOT NULL , 
     PRIMARY KEY (`id`), 
-    INDEX (`user_id`),
-    INDEX (`appid`),
-    INDEX (`openid`)
+    INDEX (`uniacid`,`user_id`),
+    INDEX (`uniacid`,`appid`),
+    INDEX (`uniacid`,`openid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 SQL;
     Migrate::execSQL($sql);

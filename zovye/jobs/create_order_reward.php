@@ -6,6 +6,8 @@
 
 namespace zovye\job\createOrderReward;
 
+defined('IN_IA') or exit('Access Denied');
+
 use Exception;
 use zovye\DBUtil;
 use zovye\Job;

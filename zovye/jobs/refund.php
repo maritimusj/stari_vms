@@ -6,6 +6,8 @@
 
 namespace zovye\job\refund;
 
+defined('IN_IA') or exit('Access Denied');
+
 //订单退款
 
 use Exception;

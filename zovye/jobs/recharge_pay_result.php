@@ -7,6 +7,8 @@
 
 namespace zovye\job\orderPayResult;
 
+defined('IN_IA') or exit('Access Denied');
+
 //充值支付结果检查
 
 use zovye\CtrlServ;

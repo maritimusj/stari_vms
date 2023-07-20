@@ -6,6 +6,8 @@
 
 namespace zovye\job\orderTimeout;
 
+defined('IN_IA') or exit('Access Denied');
+
 //订单支付超时处理
 
 use zovye\CtrlServ;

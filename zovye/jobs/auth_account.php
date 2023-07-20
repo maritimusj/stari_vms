@@ -6,6 +6,8 @@
 
 namespace zovye\job\authAccount;
 
+defined('IN_IA') or exit('Access Denied');
+
 use zovye\Account;
 use zovye\Agent;
 use zovye\CtrlServ;

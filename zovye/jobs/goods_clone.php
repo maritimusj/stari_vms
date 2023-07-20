@@ -6,6 +6,8 @@
 
 namespace zovye\job\goodsClone;
 
+defined('IN_IA') or exit('Access Denied');
+
 //复制指定商品到所有代理商
 
 use zovye\Agent;

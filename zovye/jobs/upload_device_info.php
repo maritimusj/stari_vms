@@ -6,6 +6,8 @@
 
 namespace zovye\job\upload_device_info;
 
+defined('IN_IA') or exit('Access Denied');
+
 use zovye\CtrlServ;
 use zovye\Device;
 use zovye\HttpUtil;

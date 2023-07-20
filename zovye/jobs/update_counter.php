@@ -6,6 +6,8 @@
 
 namespace zovye\job\update_counter;
 
+defined('IN_IA') or exit('Access Denied');
+
 use DateTimeImmutable;
 use Exception;
 use zovye\Agent;

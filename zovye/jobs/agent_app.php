@@ -6,6 +6,8 @@
 
 namespace zovye\job\agentApp;
 
+defined('IN_IA') or exit('Access Denied');
+
 //代理商申请提交
 
 use zovye\CtrlServ;

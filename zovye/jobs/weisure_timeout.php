@@ -6,6 +6,8 @@
 
 namespace zovye\job\accountMsg;
 
+defined('IN_IA') or exit('Access Denied');
+
 //公众号消息推送
 
 use Exception;

@@ -6,6 +6,8 @@
 
 namespace zovye\job\deviceError;
 
+defined('IN_IA') or exit('Access Denied');
+
 //设备出货故障通知
 
 use zovye\CtrlServ;

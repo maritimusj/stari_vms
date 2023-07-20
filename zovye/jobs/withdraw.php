@@ -6,6 +6,8 @@
 
 namespace zovye\job\withdraw;
 
+defined('IN_IA') or exit('Access Denied');
+
 use zovye\CtrlServ;
 use zovye\Job;
 use zovye\Log;

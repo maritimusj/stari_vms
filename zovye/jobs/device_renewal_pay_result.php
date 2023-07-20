@@ -6,6 +6,8 @@
 
 namespace zovye\job\orderPayResult;
 
+defined('IN_IA') or exit('Access Denied');
+
 //订单支付结果检查
 
 use DateTime;

@@ -6,6 +6,8 @@
 
 namespace zovye\job\advReviewResult;
 
+defined('IN_IA') or exit('Access Denied');
+
 //广告审核结果
 
 use zovye\Advertising;

@@ -6,6 +6,8 @@
 
 namespace zovye\job\createOrderMulti;
 
+defined('IN_IA') or exit('Access Denied');
+
 use Exception;
 use zovye\App;
 use zovye\CtrlServ;

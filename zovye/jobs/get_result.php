@@ -6,6 +6,8 @@
 
 namespace zovye\job\getResult;
 
+defined('IN_IA') or exit('Access Denied');
+
 //出货
 
 use zovye\CtrlServ;

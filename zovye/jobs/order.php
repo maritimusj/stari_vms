@@ -6,6 +6,8 @@
 
 namespace zovye\job\order;
 
+defined('IN_IA') or exit('Access Denied');
+
 use zovye\Advertising;
 use zovye\Agent;
 use zovye\App;

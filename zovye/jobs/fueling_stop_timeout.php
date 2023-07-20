@@ -8,6 +8,8 @@
 
 namespace zovye\job\fuelingTimeout;
 
+defined('IN_IA') or exit('Access Denied');
+
 use zovye\CtrlServ;
 use zovye\Fueling;
 use zovye\Log;

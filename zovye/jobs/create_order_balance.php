@@ -6,6 +6,8 @@
 
 namespace zovye\job\createOrderBalance;
 
+defined('IN_IA') or exit('Access Denied');
+
 use Exception;
 use RuntimeException;
 use zovye\App;

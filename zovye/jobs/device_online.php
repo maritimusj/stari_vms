@@ -6,6 +6,8 @@
 
 namespace zovye\job\DeviceOnline;
 
+defined('IN_IA') or exit('Access Denied');
+
 //设备上线通知
 
 use zovye\CtrlServ;

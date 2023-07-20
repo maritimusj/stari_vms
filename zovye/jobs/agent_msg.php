@@ -6,6 +6,8 @@
 
 namespace zovye\job\agentMsg;
 
+defined('IN_IA') or exit('Access Denied');
+
 //转发代理商申请到指定代理商
 
 use zovye\Agent;

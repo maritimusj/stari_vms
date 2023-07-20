@@ -6,6 +6,8 @@
 
 namespace zovye\job\refresh_settings;
 
+defined('IN_IA') or exit('Access Denied');
+
 use zovye\Account;
 use zovye\CtrlServ;
 use zovye\Device;

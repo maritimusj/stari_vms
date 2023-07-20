@@ -6,6 +6,8 @@
 
 namespace zovye\job\createOrderAccount;
 
+defined('IN_IA') or exit('Access Denied');
+
 use Exception;
 use zovye\Account;
 use zovye\CtrlServ;

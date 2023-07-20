@@ -6,6 +6,8 @@
 
 namespace zovye\job\repair;
 
+defined('IN_IA') or exit('Access Denied');
+
 use zovye\Agent;
 use zovye\CtrlServ;
 use zovye\Job;

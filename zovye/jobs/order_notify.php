@@ -6,6 +6,8 @@
 
 namespace zovye\job\refund;
 
+defined('IN_IA') or exit('Access Denied');
+
 //设备缺货通知
 
 use zovye\CtrlServ;

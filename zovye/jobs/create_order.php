@@ -6,6 +6,8 @@
 
 namespace zovye\job\createOrder;
 
+defined('IN_IA') or exit('Access Denied');
+
 //创建订单
 use Exception;
 use zovye\App;

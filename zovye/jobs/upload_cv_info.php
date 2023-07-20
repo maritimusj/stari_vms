@@ -6,6 +6,8 @@
 
 namespace zovye\job\upload_cv_info;
 
+defined('IN_IA') or exit('Access Denied');
+
 use zovye\Config;
 use zovye\CtrlServ;
 use zovye\GDCVMachine;

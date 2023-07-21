@@ -219,7 +219,7 @@ class User
 
     public static function getPseudoUser($openid = null, $nickname = '虚拟用户'): ?userModelObj
     {
-        return User::getOrCreate($openid ?? App::uid(16), User::PSEUDO, [
+        return User::getOrCreate($openid ?? sha1(App::uid()), User::PSEUDO, [
             'nickname' => $nickname,
             'avatar' => MODULE_URL . 'static/img/unknown.svg',
         ]);

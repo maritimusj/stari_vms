@@ -187,8 +187,8 @@ class device
             $result['extra']['limit'] = $device->settings('extra.limit', []);
         }
 
-        if (App::isDeviceScheduleEnabled()) {
-            $status = \zovye\Device::getScheduleStatus($device);
+        if (App::isDeviceScheduleTaskEnabled()) {
+            $status = \zovye\Device::getScheduleTaskStatus($device);
             if ($status) {
                 $result['device']['schedule'] = $status;
             }

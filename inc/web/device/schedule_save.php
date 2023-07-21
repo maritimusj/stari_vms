@@ -8,7 +8,7 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-if (!App::isDeviceScheduleEnabled()) {
+if (!App::isDeviceScheduleTaskEnabled()) {
     JSON::fail('功能没有启用！');
 }
 
@@ -19,7 +19,7 @@ if (empty($device)) {
 
 $delay = Request::int('delay');
 
-$result = Device::setSchedule($device, Request::bool('now') ? 0 : $delay, $delay);
+$result = Device::setScheduleTask($device, Request::bool('now') ? 0 : $delay, $delay);
 if (is_error($result)) {
     JSON::fail($result);
 }

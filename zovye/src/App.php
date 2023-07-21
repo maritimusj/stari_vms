@@ -643,7 +643,7 @@ class App
         });
     }
 
-    public static function isDeviceScheduleEnabled(): bool
+    public static function isDeviceScheduleTaskEnabled(): bool
     {
         return onceCall(function () {
             return boolval(Config::device('schedule.enabled'));

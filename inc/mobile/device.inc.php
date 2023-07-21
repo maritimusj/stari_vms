@@ -192,7 +192,7 @@ if ($op == 'default') {
     }
 } elseif ($op == 'schedule') {
 
-    if (!App::isDeviceScheduleEnabled()) {
+    if (!App::isDeviceScheduleTaskEnabled()) {
         Response::echo(CtrlServ::ABORT);
     }
 

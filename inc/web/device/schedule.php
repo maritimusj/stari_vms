@@ -8,7 +8,7 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-if (!App::isDeviceScheduleEnabled()) {
+if (!App::isDeviceScheduleTaskEnabled()) {
     JSON::fail('功能没有启用！');
 }
 

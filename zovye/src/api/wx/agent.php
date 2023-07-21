@@ -233,7 +233,7 @@ class agent
                 'charging' => App::isChargingDeviceEnabled(),
                 'fueling' => App::isFuelingDeviceEnabled(),
                 'flash_egg' => App::isFlashEggEnabled(),
-                'device_schedule' => App::isDeviceScheduleEnabled(),
+                'device_schedule' => App::isDeviceScheduleTaskEnabled(),
             ],
             'wxapp' => [
                 'debug' => false,
@@ -1138,7 +1138,7 @@ class agent
 
         $delay = Request::int('delay');
 
-        $result = Device::setSchedule($device, Request::bool('now') ? 0 : $delay, $delay);
+        $result = Device::setScheduleTask($device, Request::bool('now') ? 0 : $delay, $delay);
         if (is_error($result)) {
             JSON::fail($result);
         }

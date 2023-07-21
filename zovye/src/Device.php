@@ -1074,7 +1074,7 @@ class Device extends State
         }
     }
 
-    public static function getScheduleStatus(deviceModelObj $device): array
+    public static function getScheduleTaskStatus(deviceModelObj $device): array
     {
         $data = $device->settings('schedule', []);
         if ($data['job']['uid']) {
@@ -1086,7 +1086,7 @@ class Device extends State
         return $data;
     }
 
-    public static function setSchedule(deviceModelObj $device, int $delay, int $freq)
+    public static function setScheduleTask(deviceModelObj $device, int $delay, int $freq)
     {
         $serial = Util::random(16, true);
 

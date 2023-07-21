@@ -530,8 +530,10 @@
                                     </template>
                                     <li><a href="#" data-op="deviceConfig"><i class="fa fa-exchange fa-fw"></i> 刷新设备状态和配置</a></li>
                                     <li role="separator" class="divider"></li>
+                                    {if \zovye\App::isDeviceScheduleEnabled()}
                                     <li><a href="#" data-op="deviceSchedule"><i class="fa fa-retweet"></i> 定时出货</a></li>
                                     <li role="separator" class="divider"></li>
+                                    {/if}
                                     <template v-if="o.appId">
                                         <li ><a href="#" data-op="showVersions"><i class="fa fa-cloud-download fa-fw"></i> 推送版本更新</a></li>
                                         <li role="separator" class="divider"></li>

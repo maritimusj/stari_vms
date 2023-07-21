@@ -187,6 +187,10 @@ class device
             $result['extra']['limit'] = $device->settings('extra.limit', []);
         }
 
+        if (App::isDeviceScheduleEnabled()) {
+            $result['device']['schedule'] = \zovye\Device::getScheduleStatus($device);
+        }
+
         $payload = $device->getPayload(true);
         if ($payload && is_array($payload['cargo_lanes'])) {
             $result['status']['cargo_lanes'] = array_map(function ($lane) {
@@ -819,10 +823,6 @@ class device
 
                 if ($month) {
                     $data['stats']['month'] = Stats::getMonthTotal($device, $month)['total'];
-                }
-
-                if (App::isDeviceScheduleEnabled()) {
-                    $data['schedule'] = \zovye\Device::getScheduleStatus($device);
                 }
 
                 $result['list'][] = $data;

@@ -162,7 +162,7 @@ class Account extends State
     const CloudFI_HEAD_IMG = MODULE_URL.'static/img/cloudfi.png';
 
     const PSEUDO_NAME = '虚拟公众号';
-    const PSEUDO_HEAD_IMG = MODULE_URL.'static/img/pseudo.png';
+    const PSEUDO_HEAD_IMG = MODULE_URL.'static/img/pseudo.svg';
 
     protected static $title = [
         self::BANNED => '已禁用',

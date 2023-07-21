@@ -1,6 +1,6 @@
 {template 'common/header'}
 {php \zovye\url(true, 'static/css/common.css?v=20230710');}
-{php \zovye\url(true, 'static/css/device.css?v=20230710');}
+{php \zovye\url(true, 'static/css/device.css?v=20230721');}
 <div id="appx" v-cloak>
     <div class="init-loading" v-if="device.list === undefined">
         <i class="fa fa-spinner fa-spin"></i>&nbsp;加载中...
@@ -313,7 +313,10 @@
                                         <img src="{MODULE_URL}static/img/wrench.svg" data-op="setNormal" title="设备维护中，点击取消" class="icon">
                                     </template>
                                     <template v-if="o.schedule && o.schedule.delay > 0">
-                                        <img src="{MODULE_URL}static/img/schedule.svg" data-op="deviceSchedule" title="定时出货" class="icon">
+                                        <img src="{MODULE_URL}static/img/schedule.svg" 
+                                        data-op="deviceSchedule" 
+                                        :title="o.schedule.job && o.schedule.job.next ? o.schedule.job.next : '定时出货'"
+                                        class="icon">
                                     </template>
                                 </span>
                                 <div class="address" v-if="o.address && (o.address.web || o.address.agent)">

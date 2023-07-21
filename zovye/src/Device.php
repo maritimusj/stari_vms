@@ -1083,6 +1083,7 @@ class Device extends State
                 $data['job']['next'] = date('Y-m-d H:i:s', $res['data']['next']);
             }
         }
+
         return $data;
     }
 
@@ -1100,18 +1101,58 @@ class Device extends State
                 'op' => 'schedule',
             ]);
 
-            $result = CtrlServ::httpCallback($url, 'normal', $delay, $freq, json_encode([
+            $result = CtrlServ::httpCallback($url, 'normal', $delay, $freq, [
                 'serial' => $serial,
                 'device' => $device->getId(),
-            ]));
+            ]);
 
             if (is_error($result)) {
                 return $result;
             }
 
-            $device->updateSettings('schedule.job.uid', $result['data']['jobUID']);
+            $device->updateSettings('schedule.job.uid', $result['data']['uid']);
         }
 
         return true;
+    }
+
+    public static function setCronTask(deviceModelObj $device, int $h, int $m, int $s)
+    {
+        $serial = Util::random(16, true);
+
+        $device->updateSettings('schedule', [
+            'serial' => $serial,
+        ]);
+
+        $url = Util::murl('device', [
+            'op' => 'schedule',
+        ]);
+
+        $result = CtrlServ::httpCallbackCron($url, 'normal', "$s $m $h * * *", [
+            'serial' => $serial,
+            'device' => $device->getId(),
+        ]);
+
+        if (is_error($result)) {
+            return $result;
+        }
+
+        $device->updateSettings('schedule.cron.uid', $result['data']['uid']);
+
+        return true;
+    }
+
+    public static function getCronTaskStatus(deviceModelObj $device)
+    {
+
+        $data = $device->settings('schedule', []);
+        if ($data['job']['uid']) {
+            $res = CtrlServ::getV2("cron/{$data['cron']['uid']}");
+            if (!is_error($res) && $res['status'] && $res['data']) {
+                $data['job']['next'] = date('Y-m-d H:i:s', $res['data']['next']);
+            }
+        }
+
+        return $data;
     }
 }

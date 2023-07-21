@@ -134,7 +134,7 @@ class CtrlServ
         if (empty($params['nostr'])) {
             $params['nostr'] = TIMESTAMP;
         }
-        
+
         $api_url .= '?'.http_build_query($params);
 
         $headers = [];
@@ -518,17 +518,24 @@ class CtrlServ
 
     /**
      * 在队列中加入一个回调任务
-     * @param $level
-     * @param $url
-     * @param string $data
+     * @param string $url
+     * @param string $type
+     * @param int $delay
+     * @param int $freq
+     * @param mixed $data
      * @return mixed
      */
-    public static function httpCallback(string $url, $type = 'normal', int $delay = 0, int $freq = 0, string $data = '')
-    {
+    public static function httpCallback(
+        string $url,
+        string $type = 'normal',
+        int $delay = 0,
+        int $freq = 0,
+        $data = ''
+    ) {
         $body = [
             'type' => $type,
             'url' => $url,
-            'data' => $data,
+            'data' => is_string($data) ? $data : json_encode($data),
             'content-type' => 'application/json',
         ];
 
@@ -541,5 +548,26 @@ class CtrlServ
         }
 
         return self::postV2("job", $body);
+    }
+
+    /**
+     * 在队列中加入一个回调任务
+     * @param string $url
+     * @param string $type
+     * @param string $spec
+     * @param mixed $data
+     * @return mixed
+     */
+    public static function httpCallbackCron(string $url, string $type, string $spec = '', $data = '')
+    {
+        $body = [
+            'url' => $url,
+            'type' => $type,
+            'spec' => $spec,
+            'data' => is_string($data) ? $data : json_encode($data),
+            'content-type' => 'application/json',
+        ];
+
+        return self::postV2("cron", $body);
     }
 }

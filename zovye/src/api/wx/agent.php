@@ -746,6 +746,8 @@ class agent
                 if (is_error($res)) {
                     $msg .= '，发生错误：'.$res['message'];
                 }
+            } else {
+                $device->updateSettings('schedule', []);
             }
 
             if ($device->isFuelingDevice() && $device->isMcbOnline()) {

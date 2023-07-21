@@ -388,6 +388,10 @@ if ($device) {
     if (App::isTKPromotingEnabled()) {
         TKPromoting::deviceReg($device);
     }
+
+    if (!App::isDeviceScheduleTaskEnabled()) {
+        $device->updateSettings('schedule', []);
+    }
 }
 
 $redirect_url = $this->createWebUrl('device', [

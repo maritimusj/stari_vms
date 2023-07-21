@@ -735,6 +735,19 @@ class agent
         }
 
         if ($device->set('extra', $extra) && $device->save()) {
+            if (App::isGDCVMachineEnabled()) {
+                GDCVMachine::scheduleUploadDeviceJob($device);
+            }
+
+            if (App::isDeviceScheduleTaskEnabled()) {
+                $delay = Request::int('delay');
+
+                $res = Device::setScheduleTask($device, Request::bool('now') ? 0 : $delay, $delay);
+                if (is_error($res)) {
+                    $msg .= '，发生错误：'.$res['message'];
+                }
+            }
+
             if ($device->isFuelingDevice() && $device->isMcbOnline()) {
                 $res = Fueling::config($device);
                 if (is_error($res)) {
@@ -743,10 +756,6 @@ class agent
             }
 
             return ['msg' => $msg];
-        }
-
-        if (App::isGDCVMachineEnabled()) {
-            GDCVMachine::scheduleUploadDeviceJob($device);
         }
 
         return err('保存失败！');
@@ -1125,25 +1134,6 @@ class agent
         }
 
         return $result;
-    }
-
-    public static function deviceSchedule(): array
-    {
-        $agent = common::getAgent();
-
-        $device = \zovye\api\wx\device::getDevice(request('id'), $agent);
-        if (is_error($device)) {
-            return $device;
-        }
-
-        $delay = Request::int('delay');
-
-        $result = Device::setScheduleTask($device, Request::bool('now') ? 0 : $delay, $delay);
-        if (is_error($result)) {
-            JSON::fail($result);
-        }
-
-        JSON::success('保存成功！');
     }
 
     public static function orderRefund(): array

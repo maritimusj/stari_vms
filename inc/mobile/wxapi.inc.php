@@ -62,6 +62,7 @@ router::exec($op, [
     'DeviceAssign' => [agent::class, 'deviceAssign'],
     'DeviceLowRemain' => [agent::class, 'deviceLowRemain'],
     'DeviceError' => [agent::class, 'deviceError'],
+    'DeviceSchedule' => [agent::class, 'deviceSchedule'],
     'OrderRefund' => [agent::class, 'orderRefund'],
     'Orders' => [agent::class, 'orders'],
     'DeviceSetErrorCode' => [agent::class, 'deviceSetErrorCode'],

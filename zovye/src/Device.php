@@ -1073,4 +1073,45 @@ class Device extends State
             return err($e->getMessage());
         }
     }
+
+    public static function getScheduleStatus(deviceModelObj $device): array
+    {
+        $data = $device->settings('schedule', []);
+        if ($data['job']['uid']) {
+            $res = CtrlServ::getV2("job/{$data['schedule']['job']['uid']}");
+            if (!is_error($res) && $res['status'] && $res['data']) {
+                $data['job']['next'] = date('Y-m-d H:i:s', $res['data']['next']);
+            }
+        }
+        return $data;
+    }
+
+    public static function setSchedule(deviceModelObj $device, int $delay, int $freq)
+    {
+        $serial = Util::random(16, true);
+
+        $device->updateSettings('schedule', [
+            'delay' => $delay,
+            'serial' => $serial,
+        ]);
+
+        if ($delay > 0) {
+            $url = Util::murl('device', [
+                'op' => 'schedule',
+            ]);
+
+            $result = CtrlServ::httpCallback($url, 'normal', $delay, $freq, json_encode([
+                'serial' => $serial,
+                'device' => $device->getId(),
+            ]));
+
+            if (is_error($result)) {
+                return $result;
+            }
+
+            $device->updateSettings('schedule.job.uid', $result['data']['jobUID']);
+        }
+
+        return true;
+    }
 }

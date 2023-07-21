@@ -812,12 +812,19 @@ class device
                         }
                     }
                 }
+
                 if ($date) {
                     $data['stats']['day'] = Stats::getDayTotal($device, $date)['total'];
                 }
+
                 if ($month) {
                     $data['stats']['month'] = Stats::getMonthTotal($device, $month)['total'];
                 }
+
+                if (App::isDeviceScheduleEnabled()) {
+                    $data['schedule'] = \zovye\Device::getScheduleStatus($device);
+                }
+
                 $result['list'][] = $data;
             }
         }

@@ -14,6 +14,7 @@ use Exception;
 use zovye\Cache;
 use zovye\CacheUtil;
 use zovye\Config;
+use zovye\CtrlServ;
 use zovye\DBUtil;
 use zovye\DeviceUtil;
 use zovye\Fueling;
@@ -232,6 +233,7 @@ class agent
                 'charging' => App::isChargingDeviceEnabled(),
                 'fueling' => App::isFuelingDeviceEnabled(),
                 'flash_egg' => App::isFlashEggEnabled(),
+                'device_schedule' => App::isDeviceScheduleEnabled(),
             ],
             'wxapp' => [
                 'debug' => false,
@@ -1123,6 +1125,25 @@ class agent
         }
 
         return $result;
+    }
+
+    public static function deviceSchedule(): array
+    {
+        $agent = common::getAgent();
+
+        $device = \zovye\api\wx\device::getDevice(request('id'), $agent);
+        if (is_error($device)) {
+            return $device;
+        }
+
+        $delay = Request::int('delay');
+
+        $result = Device::setSchedule($device, Request::bool('now') ? 0 : $delay, $delay);
+        if (is_error($result)) {
+            JSON::fail($result);
+        }
+
+        JSON::success('保存成功！');
     }
 
     public static function orderRefund(): array

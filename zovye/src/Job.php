@@ -19,7 +19,7 @@ class Job
         if ($fn != null) {
             $fn();
         }
-        exit(CtrlServ::HANDLE_OK);
+        exit(CtrlServ::OK);
     }
 
     /**

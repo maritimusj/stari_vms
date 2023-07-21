@@ -157,12 +157,8 @@ if (is_array($ids)) {
 
         $data['device_type'] = $device->getDeviceType();
 
-        $data['schedule'] = $device->settings('schedule', []);
-        if ($data['schedule']['job']['uid']) {
-            $res = CtrlServ::getV2("job/{$data['schedule']['job']['uid']}");
-            if (!is_error($res) && $res['status'] && $res['data']) {
-                $data['schedule']['job']['next'] = date('Y-m-d H:i:s', $res['data']['next']);
-            }
+        if (App::isDeviceScheduleEnabled()) {
+            $data['schedule'] = Device::getScheduleStatus($device);
         }
 
         $statistic = $device->get('firstMsgStatistic', []);

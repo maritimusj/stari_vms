@@ -8,6 +8,10 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+if (!App::isDeviceScheduleEnabled()) {
+    JSON::fail('功能没有启用！');
+}
+
 $device = Device::get(Request::int('id'));
 if (empty($device)) {
     JSON::fail('找不到这个设备！');

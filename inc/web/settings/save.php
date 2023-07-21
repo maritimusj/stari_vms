@@ -273,6 +273,7 @@ if ($page == 'device') {
     }
 
     Config::device('door.enabled', Request::bool('DeviceWithDoor') ? 1 : 0, true);
+    Config::device('schedule.enabled', Request::bool('DeviceScheduleEnabled') ? 1 : 0, true);
     Config::charging('enabled', Request::bool('ChargingDeviceEnabled') ? 1 : 0, true);
     Config::fueling('enabled', Request::bool('FuelingDeviceEnabled') ? 1 : 0, true);
 

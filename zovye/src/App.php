@@ -642,4 +642,11 @@ class App
             return boolval(settings('custom.TKPromoting.enabled'));
         });
     }
+
+    public static function isDeviceScheduleEnabled(): bool
+    {
+        return onceCall(function () {
+            return boolval(Config::device('schedule.enabled'));
+        });
+    }
 }

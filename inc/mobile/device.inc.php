@@ -192,16 +192,20 @@ if ($op == 'default') {
     }
 } elseif ($op == 'schedule') {
 
+    if (!App::isDeviceScheduleEnabled()) {
+        Response::echo(CtrlServ::ABORT);
+    }
+
     $device = Device::get(Request::json('device', 0));
     if (empty($device)) {
-        JSON::fail('找不到这个设备！');
+        Response::echo(CtrlServ::ABORT);
     }
 
     $device->updateSettings('schedule.last', time());
 
     $serial = Request::json('serial', '');
     if (empty($serial) || $device->settings('schedule.serial', '') !== $serial) {
-        Response::echo('abort');
+        Response::echo(CtrlServ::ABORT);
     }
 
     $user = User::getPseudoUser();
@@ -238,6 +242,6 @@ if ($op == 'default') {
             'error' => $e->getMessage(),
         ]);
     }
-    
-    Response::echo('Ok');
+
+    Response::echo(CtrlServ::OK);
 }

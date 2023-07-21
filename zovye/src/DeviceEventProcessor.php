@@ -324,7 +324,7 @@ class DeviceEventProcessor
             }
         });
 
-        exit(CtrlServ::HANDLE_OK);
+        exit(CtrlServ::OK);
     }
 
     /**

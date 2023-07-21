@@ -10,7 +10,8 @@ use zovye\Contract\IHttpClient;
 
 class CtrlServ
 {
-    const HANDLE_OK = 'Ok';
+    const OK = 'Ok';
+    const ABORT = 'abort';
 
     /**
      * @var $http_client IHttpClient

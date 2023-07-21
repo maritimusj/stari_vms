@@ -192,19 +192,46 @@ if ($op == 'default') {
     }
 } elseif ($op == 'schedule') {
 
+    Log::debug('schedule', [
+        'cron' => Request::bool('cron'),
+        'data' =>  Request::raw(),
+    ]);
+
     if (!App::isDeviceScheduleTaskEnabled()) {
         Response::echo(CtrlServ::ABORT);
     }
 
-    $device = Device::get(Request::json('device', 0));
+    $device_id = Request::json('device', 0);
+
+    $device = Device::get($device_id);
     if (empty($device)) {
+        Log::error('schedule', '找不到这个设备：' . $device_id);
         Response::echo(CtrlServ::ABORT);
     }
 
     $device->updateSettings('schedule.last', time());
 
     $serial = Request::json('serial', '');
-    if (empty($serial) || $device->settings('schedule.serial', '') !== $serial) {
+    if (empty($serial)) {
+        Log::error('schedule', 'serial 为空！');
+        Response::echo(CtrlServ::ABORT);
+    }
+
+    if (Request::bool('cron')) {
+        if ($device->settings('cron.serial', '') !== $serial) {
+            Log::error('schedule', [
+                'error' => 'serial 不匹配',
+                'serial' => $serial,
+                'cron old' =>  $device->settings('cron.serial', ''),
+            ]);
+            Response::echo(CtrlServ::ABORT);
+        }
+    } elseif ($device->settings('schedule.serial', '') !== $serial) {
+        Log::error('schedule', [
+            'error' => 'serial 不匹配',
+            'serial' => $serial,
+            'schedule old' =>  $device->settings('schedule.serial', ''),
+        ]);
         Response::echo(CtrlServ::ABORT);
     }
 

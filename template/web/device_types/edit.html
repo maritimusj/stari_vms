@@ -45,7 +45,7 @@
     }
 </style>
 
-<form class="form-horizontal" id="editDeviceTypesForm">
+<form class="form-horizontal" id="editDeviceTypesForm"  onkeydown="if(event.keyCode===13){saveDeviceTypes();return false;}">
     <div class="form-group">
         <label for="select_agent" class="col-md-2 control-label">所属代理商</label>
         <div class="col-md-5">

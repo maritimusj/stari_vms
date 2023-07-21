@@ -1078,7 +1078,7 @@ class Device extends State
     {
         $data = $device->settings('schedule', []);
         if ($data['job']['uid']) {
-            $res = CtrlServ::getV2("job/{$data['schedule']['job']['uid']}");
+            $res = CtrlServ::getV2("job/{$data['job']['uid']}");
             if (!is_error($res) && $res['status'] && $res['data']) {
                 $data['job']['next'] = date('Y-m-d H:i:s', $res['data']['next']);
             }

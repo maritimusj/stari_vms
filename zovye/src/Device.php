@@ -1144,7 +1144,6 @@ class Device extends State
 
     public static function getCronTaskStatus(deviceModelObj $device)
     {
-
         $data = $device->settings('schedule', []);
         if ($data['cron']['uid']) {
             $res = CtrlServ::getV2("cron/{$data['cron']['uid']}");

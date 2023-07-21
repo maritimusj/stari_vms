@@ -158,7 +158,10 @@ if (is_array($ids)) {
         $data['device_type'] = $device->getDeviceType();
 
         if (App::isDeviceScheduleEnabled()) {
-            $data['schedule'] = Device::getScheduleStatus($device);
+            $status = Device::getScheduleStatus($device);
+            if ($status) {
+                $data['schedule'] = $status;
+            }
         }
 
         $statistic = $device->get('firstMsgStatistic', []);

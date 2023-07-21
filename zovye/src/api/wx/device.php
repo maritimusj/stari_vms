@@ -188,7 +188,10 @@ class device
         }
 
         if (App::isDeviceScheduleEnabled()) {
-            $result['device']['schedule'] = \zovye\Device::getScheduleStatus($device);
+            $status = \zovye\Device::getScheduleStatus($device);
+            if ($status) {
+                $result['device']['schedule'] = $status;
+            }
         }
 
         $payload = $device->getPayload(true);

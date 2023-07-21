@@ -35,6 +35,8 @@ if ($delay > 0) {
     if (is_error($result)) {
         JSON::fail($result);
     }
+
+    $device->updateSettings('schedule.job.uid', $result['data']['jobUID']);
 }
 
 JSON::success('保存成功！');

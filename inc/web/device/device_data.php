@@ -158,6 +158,9 @@ if (is_array($ids)) {
         $data['device_type'] = $device->getDeviceType();
 
         $data['schedule'] = $device->settings('schedule', []);
+        if ($data['schedule']['job']['uid']) {
+            $data['schedule']['job']['status'] = CtrlServ::getV2("job/{$data['schedule']['job']['uid']}");
+        }
 
         $statistic = $device->get('firstMsgStatistic', []);
         if ($statistic) {

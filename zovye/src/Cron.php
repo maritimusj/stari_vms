@@ -41,7 +41,7 @@ class Cron
         try {
             if (file_exists(MODULE_ROOT.'vendor/autoload.php')) {
                 require MODULE_ROOT.'vendor/autoload.php';
-                return (new \Panlatent\CronExpressionDescriptor\ExpressionDescriptor($expression, 'zh-Hans'))->getDescription();   
+                return (new \Panlatent\CronExpressionDescriptor\ExpressionDescriptor($expression, 'zh-Hans', true))->getDescription();   
             }
         } catch(Exception $e) {
         }

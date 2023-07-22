@@ -1,4 +1,4 @@
-<form class="form-horizontal" id="editScheduleForm" onkeydown="if(event.keyCode===13){api.saveSchedule();return false;}">
+<form class="form-horizontal" id="editScheduleForm" onkeydown="if(event.keyCode===13) return false;}">
     <div class="form-group">
         <label for="delaySeconds" class="col-md-2 control-label">出货间隔（秒）</label>
         <div class="col-md-10">
@@ -14,3 +14,13 @@
         </div>
     </div>
 </form>
+
+<script>
+    const api_url = "{$api_url}";
+    require(['jquery', 'util', vuejsUrl], function ($, util, Vue) {
+        const app = new Vue({
+            el: '#editScheduleForm',
+            data: {}
+        })
+    })
+</script>

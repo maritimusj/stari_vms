@@ -740,10 +740,11 @@ class agent
             }
 
             if (App::isDeviceScheduleTaskEnabled()) {
-                $date_str = Request::trim('date');
-                $time_str = Request::trim('time');
+                $h = min(23, max(0, Request::trim('h')));
+                $i = min(59, max(0, Request::trim('m')));
+                $s = min(59, max(0, Request::trim('s')));
 
-                $res = Device::setScheduleTask($device, $date_str, $time_str);
+                $res = Device::createScheduleTask($device, "", "$s $i $h");
                 if (is_error($res)) {
                     $msg .= '，发生错误：'.$res['message'];
                 }

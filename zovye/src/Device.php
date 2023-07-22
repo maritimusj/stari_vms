@@ -1081,38 +1081,8 @@ class Device extends State
         return Cron::getList("device:{$device->getId()}");
     }
 
-    public static function setScheduleTask(deviceModelObj $device, string $date_str, string $time_str)
+    public static function createScheduleTask(deviceModelObj $device, string $spec)
     {
-        if (!empty($time_str)) {
-            try {
-                $time = new DateTime($time_str);
-            } catch (Exception $e) {
-                return err('时间参数不正确！');
-            }
-            $s = intval($time->format('s'));
-            $s = $s == 0 ? '*' : $s;
-            $i = intval($time->format('i'));
-            $i = $i == 0 ? '*' : $i;
-            $h = intval($time->format('h'));
-            $h = $h == 0 ? '*' : $h;
-        } else {
-            $s = $i = $h = '*';
-        }
-
-        if (!empty($date_str)) {
-            try {
-                $date = new DateTime($date_str);
-                $d = $date->format('j');
-                $m = $date->format('n');
-            } catch (Exception $e) {
-                return err('日期参数不正确！');
-            }
-        } else {
-            $d = $m = '*';
-        }
-
-        $spec = "$s $i $h $d $m *";
-
         $url = Util::murl('device', [
             'op' => 'schedule',
             'cron' => true,
@@ -1157,10 +1127,24 @@ class Device extends State
         return '';
     }
 
-    public static function deleteScheduleTask($uid): bool
+    public static function deleteScheduleTask($id)
     {
-        $res = CtrlServ::deleteV2("cron/$uid");
+        $cron = Cron::query()->findOne(['id' => $id]);
+        if ($cron) {
+            $job_uid = $cron->getJobUid();
+            if ($job_uid) {
+                $res = CtrlServ::deleteV2("cron/$job_uid");
+                if (is_error($res)) {
+                    return $res;
+                }
+                if (!$res['status']) {
+                    return err($res['data']['message'] ?? '请求失败！');
+                }
+            }
 
-        return !is_error($res) && $res['status'];
+            return $cron->destroy();
+        }
+
+        return err('找不到这个任务！');
     }
 }

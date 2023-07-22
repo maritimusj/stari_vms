@@ -62,7 +62,7 @@ if (empty($fn)) {
         'device' => $device,
     ];
 
-    Response::templateJSON('web/device/schedule_new', "创建定时出货 [ {$device->getName()} ]", $tpl_data);
+    Response::templateJSON('web/device/schedule_new', "创建定时任务 [ {$device->getName()} ]", $tpl_data);
 
 } elseif ($fn == 'save') {
 
@@ -70,7 +70,7 @@ if (empty($fn)) {
         $spec = Request::trim('spec');
 
         if (empty($spec)) {
-            JSON::fail('指定的计划任务不正确！');
+            JSON::fail('指定的定时任务表达式不正确！');
         }    
     } else {
         $hour = Request::isset('hour') ? min(23, max(0, Request::int('hour'))) : '*';

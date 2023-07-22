@@ -1099,20 +1099,19 @@ class Device extends State
             $s = $i = $h = '*';
         }
 
-        if (!empty($date)) {
+        if (!empty($date_str)) {
             try {
                 $date = new DateTime($date_str);
                 $d = $date->format('j');
                 $m = $date->format('n');
-                $y = $date->format('Y');
             } catch (Exception $e) {
                 return err('日期参数不正确！');
             }
         } else {
-            $d = $m = $y = '*';
+            $d = $m = '*';
         }
 
-        $spec = "$s $i $h $d $m $y";
+        $spec = "$s $i $h $d $m *";
 
         $url = Util::murl('device', [
             'op' => 'schedule',

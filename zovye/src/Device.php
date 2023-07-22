@@ -1161,4 +1161,14 @@ class Device extends State
 
         return $data;
     }
+
+    public static function deleteCronTask(deviceModelObj $device)
+    {
+        $uid = $device->settings('cron.job.uid', '');
+        if (!empty($uid)) {
+            $res = CtrlServ::deleteV2("cron/$uid");
+            return !is_error($res) && $res['status'];
+        }
+        return false;
+    }
 }

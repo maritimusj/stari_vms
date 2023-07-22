@@ -13,7 +13,8 @@
       "ext-gd": "*",
       "ext-simplexml": "*",
       "ext-openssl": "*",
-        "wechatpay/wechatpay": "^1.4"
+        "wechatpay/wechatpay": "^1.4",
+        "panlatent/cron-expression-descriptor": "^1.1"
     },
     "config": {
       "platform-check": false

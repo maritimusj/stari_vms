@@ -8,6 +8,9 @@ namespace zovye\model;
 use zovye\base\modelObj;
 use function zovye\tb;
 
+/**
+ * @method setJobUid(mixed $uid)
+ */
 class cronModelObj extends modelObj
 {
     public static function getTableName($readOrWrite): string
@@ -23,6 +26,9 @@ class cronModelObj extends modelObj
 
 	/** @var varchar */
 	protected $uid;
+
+    /** @var varchar */
+    protected $job_uid;
 
 	/** @var varchar */
 	protected $spec;

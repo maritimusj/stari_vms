@@ -6,8 +6,10 @@
 
 namespace zovye;
 
+use DateTime;
 use DateTimeImmutable;
 use Exception;
+use zovye\model\cronModelObj;
 use zovye\model\userModelObj;
 use zovye\base\modelObjFinder;
 use zovye\model\agentModelObj;
@@ -1074,101 +1076,92 @@ class Device extends State
         }
     }
 
-    public static function getScheduleTaskStatus(deviceModelObj $device): array
+    public static function getAllScheduleTask(deviceModelObj $device)
     {
-        $data = $device->settings('schedule', []);
-        if ($data['job']['uid']) {
-            $res = CtrlServ::getV2("job/{$data['job']['uid']}");
-            if (!is_error($res) && $res['status'] && $res['data']) {
-                $data['job']['next'] = date('Y-m-d H:i:s', $res['data']['next']);
-            }
-        }
-
-        return $data;
+        return Cron::getList("device:{$device->getId()}");
     }
 
-    public static function setScheduleTask(deviceModelObj $device, int $delay, int $freq)
+    public static function setScheduleTask(deviceModelObj $device, string $date_str, string $time_str)
     {
-        $serial = Util::random(16, true);
-
-        $device->updateSettings('schedule', [
-            'delay' => $delay,
-            'serial' => $serial,
-        ]);
-
-        if ($delay > 0) {
-            $url = Util::murl('device', [
-                'op' => 'schedule',
-            ]);
-
-            $result = CtrlServ::httpCallback($url, 'normal', $delay, $freq, [
-                'serial' => $serial,
-                'device' => $device->getId(),
-            ]);
-
-            if (is_error($result)) {
-                return $result;
+        if (!empty($time_str)) {
+            try {
+                $time = new DateTime($time_str);
+            } catch (Exception $e) {
+                return err('时间参数不正确！');
             }
-
-            if (!$result['status']) {
-                return err($result['data']['message'] ?? '创建任务失败！');
-            }
-
-            $device->updateSettings('schedule.job.uid', $result['data']['uid']);
+            $s = intval($time->format('s'));
+            $s = $s == 0 ? '*' : $s;
+            $i = intval($time->format('i'));
+            $i = $i == 0 ? '*' : $i;
+            $h = intval($time->format('h'));
+            $h = $h == 0 ? '*' : $h;
+        } else {
+            $s = $i = $h = '*';
         }
 
-        return true;
-    }
+        if (!empty($date)) {
+            try {
+                $date = new DateTime($date_str);
+                $d = $date->format('j');
+                $m = $date->format('n');
+                $y = $date->format('Y');
+            } catch (Exception $e) {
+                return err('日期参数不正确！');
+            }
+        } else {
+            $d = $m = $y = '*';
+        }
 
-    public static function setCronTask(deviceModelObj $device, $s, $m = '*', $h = '*')
-    {
-        $serial = Util::random(16, true);
-
-        $device->updateSettings('cron.serial', $serial);
+        $spec = "$s $i $h $d $m $y";
 
         $url = Util::murl('device', [
             'op' => 'schedule',
             'cron' => true,
         ]);
 
-        $result = CtrlServ::httpCallbackCron($url, 'normal', "$s $m $h * * *", [
-            'serial' => $serial,
+        /** @var cronModelObj $cron */
+        $cron = Cron::create("device:{$device->getId()}", $url, $spec);
+        if (empty($cron)) {
+            return err('保存数据失败！');
+        }
+
+        $result = CtrlServ::httpCallbackCron($url, 'normal', $spec, [
+            'cron' => $cron->getId(),
             'device' => $device->getId(),
         ]);
 
         if (is_error($result)) {
+            $cron->destroy();
+
             return $result;
         }
 
         if (!$result['status']) {
+            $cron->destroy();
+
             return err($result['data']['message'] ?? '创建任务失败！');
         }
 
-        $device->updateSettings('cron.job.uid', $result['data']['uid']);
+        $cron->setJobUid($result['data']['uid']);
+        $cron->save();
 
         return true;
     }
 
-    public static function getCronTaskStatus(deviceModelObj $device)
+    public static function getScheduleTaskNext($uid)
     {
-        $data = $device->settings('cron', []);
-        if ($data['job']['uid']) {
-            $res = CtrlServ::getV2("cron/{$data['job']['uid']}");
-            if (!is_error($res) && $res['status'] && $res['data']) {
-                $data['job']['next'] = date('Y-m-d H:i:s', $res['data']['next']);
-            }
+        $res = CtrlServ::getV2("cron/$uid");
+        if (!is_error($res) && $res['status'] && $res['data']) {
+            return date('Y-m-d H:i:s', $res['data']['next']);
         }
 
-        return $data;
+        return '';
     }
 
-    public static function deleteCronTask(deviceModelObj $device)
+    public static function deleteScheduleTask($uid): bool
     {
-        $uid = $device->settings('cron.job.uid', '');
-        if (!empty($uid)) {
-            $res = CtrlServ::deleteV2("cron/$uid");
-            return !is_error($res) && $res['status'];
-        }
-        return false;
+        $res = CtrlServ::deleteV2("cron/$uid");
+
+        return !is_error($res) && $res['status'];
     }
 }

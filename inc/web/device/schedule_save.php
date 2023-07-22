@@ -17,9 +17,10 @@ if (empty($device)) {
     JSON::fail('找不到这个设备！');
 }
 
-$delay = Request::int('delay');
+$date = Request::trim('date');
+$time = Request::trim('time');
 
-$result = Device::setScheduleTask($device, Request::bool('now') ? 0 : $delay, $delay);
+$result = Device::setScheduleTask($device, $date, $time);
 if (is_error($result)) {
     JSON::fail($result);
 }

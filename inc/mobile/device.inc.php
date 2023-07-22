@@ -194,7 +194,7 @@ if ($op == 'default') {
 
     Log::debug('schedule', [
         'cron' => Request::bool('cron'),
-        'data' =>  Request::raw(),
+        'data' => Request::raw(),
     ]);
 
     if (!App::isDeviceScheduleTaskEnabled()) {
@@ -205,14 +205,22 @@ if ($op == 'default') {
 
     $device = Device::get($device_id);
     if (empty($device)) {
-        Log::error('schedule', '找不到这个设备：' . $device_id);
+        Log::error('schedule', '找不到这个设备：'.$device_id);
         Response::echo(CtrlServ::ABORT);
     }
 
     $cron_id = Request::json('cron', 0);
     $cron = Cron::query(['id' => $cron_id])->findOne();
     if (empty($cron)) {
-        Log::error('schedule', '找不到这个任务：' . $cron_id);
+        Log::error('schedule', '找不到这个任务：'.$cron_id);
+        Response::echo(CtrlServ::ABORT);
+    }
+
+    if (sha1(App::uid().$cron->getUid()) !== Request::json('sign')) {
+        Log::error('schedule', [
+            'data' => Request::raw(),
+            'error' => '签名不正确！',
+        ]);
         Response::echo(CtrlServ::ABORT);
     }
 

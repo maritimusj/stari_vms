@@ -14,6 +14,8 @@ use function zovye\tb;
  * @method setJobUid(mixed $uid)
  * @method getSpec()
  * @method getJobUid()
+ * @method getUid()
+ * @method getTotal()
  */
 class cronModelObj extends modelObj
 {

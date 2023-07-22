@@ -1096,6 +1096,7 @@ class Device extends State
         $result = CtrlServ::httpCallbackCron($url, 'normal', $spec, [
             'cron' => $cron->getId(),
             'device' => $device->getId(),
+            'sign' => sha1(App::uid().$cron->getUid()),
         ]);
 
         if (is_error($result)) {
@@ -1116,7 +1117,7 @@ class Device extends State
         return true;
     }
 
-    public static function getScheduleTaskTotal(deviceModelObj $device)
+    public static function getScheduleTaskTotal(deviceModelObj $device): int
     {
         return Cron::query(['uid' => "device:{$device->getId()}"])->count();
     }
@@ -1140,6 +1141,7 @@ class Device extends State
                 CtrlServ::deleteV2("cron/$job_uid");
             }
             $cron->destroy();
+
             return true;
         }
 

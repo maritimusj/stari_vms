@@ -14,6 +14,7 @@ use Exception;
 use zovye\Cache;
 use zovye\CacheUtil;
 use zovye\Config;
+use zovye\Cron;
 use zovye\CtrlServ;
 use zovye\DBUtil;
 use zovye\DeviceUtil;
@@ -26,6 +27,7 @@ use zovye\model\agentModelObj;
 use zovye\App;
 use zovye\CommissionBalance;
 use zovye\Device;
+use zovye\model\cronModelObj;
 use zovye\model\device_groupsModelObj;
 use zovye\model\deviceModelObj;
 use zovye\DeviceTypes;
@@ -739,19 +741,6 @@ class agent
                 GDCVMachine::scheduleUploadDeviceJob($device);
             }
 
-            if (App::isDeviceScheduleTaskEnabled()) {
-                $h = min(23, max(0, Request::trim('h')));
-                $i = min(59, max(0, Request::trim('m')));
-                $s = min(59, max(0, Request::trim('s')));
-
-                $res = Device::createScheduleTask($device, "", "$s $i $h");
-                if (is_error($res)) {
-                    $msg .= '，发生错误：'.$res['message'];
-                }
-            } else {
-                $device->updateSettings('schedule', []);
-            }
-
             if ($device->isFuelingDevice() && $device->isMcbOnline()) {
                 $res = Fueling::config($device);
                 if (is_error($res)) {
@@ -1138,6 +1127,84 @@ class agent
         }
 
         return $result;
+    }
+
+    public static function DeviceScheduleList()
+    {
+        $agent = common::getAgent();
+
+        common::checkCurrentUserPrivileges('F_sb');
+
+        $device = \zovye\api\wx\device::getDevice(request('id'), $agent);
+        if (is_error($device)) {
+            return $device;
+        }
+
+        $list = [];
+
+        /** @var cronModelObj $entry */
+        foreach (Device::getAllScheduleTask($device) as $entry) {
+            $spec = $entry->getSpec();
+
+            $data = [
+                'id' => $entry->getId(),
+                'spec' => $spec,
+                'desc' => Cron::describe($spec),
+                'total' => $entry->getTotal(),
+                'job_uid' => $entry->getJobUid(),
+                'next' => Device::getScheduleTaskNext($entry->getJobUid()),
+                'formatted_createtime' => date('Y-m-d H:i:s', $entry->getCreatetime()),
+            ];
+
+            $list[] = $data;
+        }
+
+        return $list;
+    }
+
+
+    public static function deviceScheduleCreate()
+    {
+        $agent = common::getAgent();
+
+        common::checkCurrentUserPrivileges('F_sb');
+
+        $device = \zovye\api\wx\device::getDevice(request('id'), $agent);
+        if (is_error($device)) {
+            return $device;
+        }
+
+        if (Request::has('spec')) {
+            $spec = Request::trim('spec');
+
+            if (empty($spec)) {
+                return err('指定的计划任务不正确！');
+            }
+        } else {
+            $hour = Request::isset('hour') ? min(23, max(0, Request::int('hour'))) : '*';
+            $minute = Request::isset('minute') ? min(59, max(0, Request::int('minute'))) : '*';
+            $second = Request::isset('second') ? min(59, max(0, Request::int('second'))) : '*';
+            $spec = "$second $minute $hour * * *";
+        }
+
+        $result = Device::createScheduleTask($device, $spec);
+        if (is_error($result)) {
+            return $result;
+        }
+
+        return ['msg' => '创建成功！'];
+    }
+
+    public static function deviceScheduleRemove()
+    {
+        $id = Request::int('id');
+
+        $result = Device::deleteScheduleTask($id);
+        if (is_error($result)) {
+            return $result;
+        }
+
+        return ['msg' => '删除成功！'];
     }
 
     public static function orderRefund(): array

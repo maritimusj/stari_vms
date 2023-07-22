@@ -188,10 +188,7 @@ class device
         }
 
         if (App::isDeviceScheduleTaskEnabled()) {
-            $status = \zovye\Device::getScheduleTaskStatus($device);
-            if ($status) {
-                $result['device']['schedule'] = $status;
-            }
+            $result['device']['schedule'] = \zovye\Device::getScheduleTaskTotal($device);
         }
 
         $payload = $device->getPayload(true);

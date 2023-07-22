@@ -1,0 +1,30 @@
+<?php
+/**
+ * @author jin@stariture.com
+ * @url www.stariture.com
+ */
+
+
+namespace zovye;
+
+class Cron
+{
+    public static function query($condition = []): base\modelObjFinder
+    {
+        return m('cron')->query(We7::uniacid([]))->where($condition);
+    }
+
+    public static function create($uid, $url, $spec)
+    {
+        return m('cron')->create(We7::uniacid([
+            'uid' => $uid,
+            'url' => $url,
+            'spec' => $spec,
+        ]));
+    }
+
+    public static function getList($uid)
+    {
+        return self::query(['uid' => $uid])->findAll();
+    }
+}

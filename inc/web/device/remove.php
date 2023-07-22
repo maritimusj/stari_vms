@@ -44,6 +44,7 @@ if ($device->isNormalDevice()) {
         $res = Device::release($imei);
         if (is_error($res)) {
             Log::error('device', [
+                'imei' => $imei,
                 'message' => '释放设备失败！',
                 'result' => $res,
             ]);

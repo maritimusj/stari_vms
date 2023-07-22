@@ -39,10 +39,12 @@ class Cron
     public static function describe($expression): string
     {
         try {
-            require MODULE_ROOT.'vendor/autoload.php';
-            return (new \Panlatent\CronExpressionDescriptor\ExpressionDescriptor($expression, 'zh-Hans'))->getDescription();            
+            if (file_exists(MODULE_ROOT.'vendor/autoload.php')) {
+                require MODULE_ROOT.'vendor/autoload.php';
+                return (new \Panlatent\CronExpressionDescriptor\ExpressionDescriptor($expression, 'zh-Hans'))->getDescription();   
+            }
         } catch(Exception $e) {
-            return "";
         }
+        return "";
     }
 }

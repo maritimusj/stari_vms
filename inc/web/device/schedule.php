@@ -25,7 +25,10 @@ if (empty($fn)) {
 
     $tpl_data = [
         'device' => $device,
-        'payload' => $device->getPayload(true),
+        'api_url' => Util::url('device', [
+            'op' => 'schedule',
+            'id' => $device->getId(),
+        ]),
     ];
 
     Response::templateJSON('web/device/schedule', "定时出货 [ {$device->getName()} ]", $tpl_data);
@@ -36,12 +39,16 @@ if (empty($fn)) {
 
     /** @var cronModelObj $entry */
     foreach (Device::getAllScheduleTask($device) as $entry) {
+        $spec = $entry->getSpec();
+        
         $data = [
             'id' => $entry->getId(),
+            'spec' => $spec,
+            'desc' => Cron::describe($spec),
+            'total' => $entry->getTotal(),
             'job_uid' => $entry->getJobUid(),
             'next' => Device::getScheduleTaskNext($entry->getJobUid()),
-            'spec' => $entry->getSpec(),
-            'createtime' => $entry->getCreatetime(),
+            'formatted_createtime' => date('Y-m-d H:i:s', $entry->getCreatetime()),
         ];
         
         $list[] = $data;
@@ -51,10 +58,25 @@ if (empty($fn)) {
 
 } elseif ($fn == 'create') {
 
-    $spec = Request::trim('spec');
+    $tpl_data = [
+        'device' => $device,
+    ];
 
-    if (empty($spec)) {
-        JSON::fail('指定的计划任务不正确！');
+    Response::templateJSON('web/device/schedule_new', "创建定时出货 [ {$device->getName()} ]", $tpl_data);
+
+} elseif ($fn == 'save') {
+
+    if (Request::has('spec')) {
+        $spec = Request::trim('spec');
+
+        if (empty($spec)) {
+            JSON::fail('指定的计划任务不正确！');
+        }    
+    } else {
+        $hour = Request::isset('hour') ? min(23, max(0, Request::int('hour'))) : '*';
+        $minute = Request::isset('minute') ? min(59, max(0, Request::int('minute'))) : '*';
+        $second = Request::isset('second') ? min(59, max(0, Request::int('second'))) : '*';
+        $spec = "$second $minute $hour * * *";
     }
 
     $result = Device::createScheduleTask($device, $spec);
@@ -66,7 +88,7 @@ if (empty($fn)) {
 
 } elseif ($fn == 'remove') {
 
-    $id = Request::int('id');
+    $id = Request::int('tid');
 
     $result = Device::deleteScheduleTask($id);
     if (is_error($result)) {

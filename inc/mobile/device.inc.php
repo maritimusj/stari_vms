@@ -209,31 +209,15 @@ if ($op == 'default') {
         Response::echo(CtrlServ::ABORT);
     }
 
-    $device->updateSettings('schedule.last', time());
-
-    $serial = Request::json('serial', '');
-    if (empty($serial)) {
-        Log::error('schedule', 'serial 为空！');
+    $cron_id = Request::json('cron', 0);
+    $cron = Cron::query(['id' => $cron_id])->findOne();
+    if (empty($cron)) {
+        Log::error('schedule', '找不到这个任务：' . $cron_id);
         Response::echo(CtrlServ::ABORT);
     }
 
-    if (Request::bool('cron')) {
-        if ($device->settings('cron.serial', '') !== $serial) {
-            Log::error('schedule', [
-                'error' => 'serial 不匹配',
-                'serial' => $serial,
-                'cron old' =>  $device->settings('cron.serial', ''),
-            ]);
-            Response::echo(CtrlServ::ABORT);
-        }
-    } elseif ($device->settings('schedule.serial', '') !== $serial) {
-        Log::error('schedule', [
-            'error' => 'serial 不匹配',
-            'serial' => $serial,
-            'schedule old' =>  $device->settings('schedule.serial', ''),
-        ]);
-        Response::echo(CtrlServ::ABORT);
-    }
+    $cron->setTotal($cron->getTotal() + 1);
+    $cron->save();
 
     $user = User::getPseudoUser();
 

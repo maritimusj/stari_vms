@@ -156,14 +156,10 @@ if (is_array($ids)) {
         }
 
         $data['device_type'] = $device->getDeviceType();
-
+        
         if (App::isDeviceScheduleTaskEnabled()) {
-            $status = Device::getScheduleTaskStatus($device);
-            if ($status) {
-                $data['schedule'] = $status;
-            }
+            $data['schedule'] = Device::getScheduleTaskTotal($device);
         }
-
         $statistic = $device->get('firstMsgStatistic', []);
         if ($statistic) {
             $data['firstMsgTotal'] = intval($statistic[date('Ym')][date('d')]['total']);

@@ -312,10 +312,10 @@
                                     <template v-if="o.isDown">
                                         <img src="{MODULE_URL}static/img/wrench.svg" data-op="setNormal" title="设备维护中，点击取消" class="icon">
                                     </template>
-                                    <template v-if="o.schedule && o.schedule.delay > 0">
+                                    <template v-if="o.schedule && o.schedule > 0">
                                         <img src="{MODULE_URL}static/img/schedule.svg" 
-                                        data-op="deviceSchedule" 
-                                        :title="o.schedule.job && o.schedule.job.next ? o.schedule.job.next : '定时出货'"
+                                        data-op="getScheduleTaskList"
+                                        :title="o.schedule + '个定时出货任务'"
                                         class="icon">
                                     </template>
                                 </span>
@@ -531,7 +531,8 @@
                                     <li><a href="#" data-op="deviceConfig"><i class="fa fa-exchange fa-fw"></i> 刷新设备状态和配置</a></li>
                                     <li role="separator" class="divider"></li>
                                     {if \zovye\App::isDeviceScheduleTaskEnabled()}
-                                    <li><a href="#" data-op="deviceSchedule"><i class="fa fa-retweet"></i> 定时出货</a></li>
+                                    <li><a href="#" data-op="createScheduleTask"><i class="fa fa-retweet"></i> 创建任务</a></li>
+                                    <li><a href="#" data-op="getScheduleTaskList"><i class="fa fa-retweet"></i> 查看定时任务</a></li>
                                     <li role="separator" class="divider"></li>
                                     {/if}
                                     <template v-if="o.appId">

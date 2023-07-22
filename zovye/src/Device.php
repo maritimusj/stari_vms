@@ -1085,7 +1085,6 @@ class Device extends State
     {
         $url = Util::murl('device', [
             'op' => 'schedule',
-            'cron' => true,
         ]);
 
         /** @var cronModelObj $cron */
@@ -1117,6 +1116,11 @@ class Device extends State
         return true;
     }
 
+    public static function getScheduleTaskTotal(deviceModelObj $device)
+    {
+        return Cron::query(['uid' => "device:{$device->getId()}"])->count();
+    }
+
     public static function getScheduleTaskNext($uid)
     {
         $res = CtrlServ::getV2("cron/$uid");
@@ -1133,16 +1137,10 @@ class Device extends State
         if ($cron) {
             $job_uid = $cron->getJobUid();
             if ($job_uid) {
-                $res = CtrlServ::deleteV2("cron/$job_uid");
-                if (is_error($res)) {
-                    return $res;
-                }
-                if (!$res['status']) {
-                    return err($res['data']['message'] ?? '请求失败！');
-                }
+                CtrlServ::deleteV2("cron/$job_uid");
             }
-
-            return $cron->destroy();
+            $cron->destroy();
+            return true;
         }
 
         return err('找不到这个任务！');

@@ -5,6 +5,7 @@
  */
 namespace zovye\model;
 
+use zovye\base\model;
 use zovye\base\modelObj;
 use zovye\traits\ExtraDataGettersAndSetters;
 use function zovye\tb;
@@ -16,7 +17,7 @@ use function zovye\tb;
  */
 class cronModelObj extends modelObj
 {
-    public static function getTableName($readOrWrite): string
+    public static function getTableName($readOrWrite = modelObj::OP_WRITE): string
     {
         return tb('cron');
     }
@@ -35,6 +36,9 @@ class cronModelObj extends modelObj
 
 	/** @var varchar */
 	protected $spec;
+
+	/** @var int */
+	protected $total;
 
 	/** @var varchar */
 	protected $url;

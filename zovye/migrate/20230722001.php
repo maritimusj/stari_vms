@@ -16,6 +16,7 @@ CREATE TABLE `ims_zovye_vms_cron` (
     `spec` VARCHAR(32) NOT NULL , 
     `url` VARCHAR(255) NOT NULL , 
     `extra` TEXT,
+    `total` INT NOT NULL DEFAULT '0', 
     `createtime` INT NOT NULL , 
     PRIMARY KEY (`id`), 
     INDEX (`uniacid`), 

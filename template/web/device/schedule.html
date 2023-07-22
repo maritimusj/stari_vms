@@ -1,17 +1,35 @@
-<form class="form-horizontal" id="editScheduleForm" onkeydown="if(event.keyCode===13) return false;}">
-    <div class="form-group">
-        <label for="delaySeconds" class="col-md-2 control-label">出货间隔（秒）</label>
-        <div class="col-md-10">
-            <input type="number" class="form-control" id="delaySeconds" name="delaySeconds" value="{$config['delay']}">
-            <span class="help-block">* 设置为0则表示不启用这个功能</span>
-        </div>
-    </div>
-    <div class="form-group">
-         <div class="col-md-offset-2 col-md-10">
-            <input type="hidden" name="deviceId" value="{php echo $device->getId()}">
-            <button type="button" class="btn btn-primary" onclick="api.saveSchedule()">确定</button>
-            <button type="button" class="btn btn-default" data-dismiss="modal">退出</button>
-        </div>
+<div id="scheduleTaskList">
+    <table class="table" v-if="list.length > 0">
+        <thead>
+            <th>#</th>
+            <th>计划任务</th>
+            <th class="center">已执行次数</th>
+            <th>下次执行时间</th>
+            <th>创建时间</th>
+            <th>操作</th>
+        </thead>
+        <tbody>
+            <tr v-for="(e,index) in list">
+                <td>{{index + 1}}</td>
+                <td>
+                    <span :title="e.desc">
+                         {{e.spec}}
+                    </span>
+                </td>
+                <td class="center">{{e.total}}</td>
+                <td>
+                    <span v-if="e.next">{{e.next}}</span>
+                    <span v-else class="text-muted">&lt;已取消&gt;</span>
+                </td>
+                <td>{{e.formatted_createtime}}</td>
+                <td class="operate">
+                    <i class="fa fa-trash" @click="remove(e)"></i>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="text-center text-muted" v-else>
+        <i class="fa fa-question-circle"></i> 暂时还没有任何任务！
     </div>
 </form>
 
@@ -19,8 +37,35 @@
     const api_url = "{$api_url}";
     require(['jquery', 'util', vuejsUrl], function ($, util, Vue) {
         const app = new Vue({
-            el: '#editScheduleForm',
-            data: {}
+            el: '#scheduleTaskList',
+            data: {
+                list: [],
+            },
+            mounted() {
+                this.getList();
+            },
+            methods: {
+                getList() {
+                    const self = this;
+                    $.getJSON(api_url, {fn: "list"}).then(res => {
+                        if (res && res.status) {
+                            self.list = res.data;
+                        }
+                    })
+                },
+                remove({id}) {
+                    const self = this;
+                    $.getJSON(api_url, {fn: "remove", tid: id}).then(res => {
+                        if (res && res.status) {
+                            const index = self.list.findIndex(e => e.id === id);
+                            if (index !== undefined) {
+                                self.list.splice(index, 1);
+                            }
+                        }
+                        util.message(res.data.msg, '', res.status ? 'success' : 'error');
+                    })
+                }
+            }
         })
     })
 </script>

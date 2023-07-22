@@ -15,7 +15,7 @@ CREATE TABLE `ims_zovye_vms_vip` (
     `user_id` INT NOT NULL , 
     `name` VARCHAR(32) NOT NULL DEFAULT '', 
     `mobile` VARCHAR(32) NOT NULL DEFAULT '', 
-    `extra` JSON NOT NULL , 
+    `extra` TEXT , 
     `createtime` INT NOT NULL , 
     PRIMARY KEY (`id`), 
     INDEX (`uniacid`, `agent_id`, `user_id`),

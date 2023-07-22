@@ -15,6 +15,7 @@ CREATE TABLE `ims_zovye_vms_cron` (
     `job_uid` VARCHAR(64) NOT NULL , 
     `spec` VARCHAR(32) NOT NULL , 
     `url` VARCHAR(255) NOT NULL , 
+    `extra` TEXT,
     `createtime` INT NOT NULL , 
     PRIMARY KEY (`id`), 
     INDEX (`uniacid`), 

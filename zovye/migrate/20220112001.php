@@ -21,7 +21,7 @@ CREATE TABLE `ims_zovye_vms_delivery` (
     `phone_num` VARCHAR(32) NOT NULL , 
     `address` TEXT NOT NULL , 
     `status` INT NOT NULL , 
-    `extra` JSON NOT NULL , 
+    `extra` TEXT , 
     `createtime` INT NOT NULL , 
     PRIMARY KEY (`id`), 
     UNIQUE (`order_no`), 

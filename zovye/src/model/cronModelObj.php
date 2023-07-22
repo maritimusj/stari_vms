@@ -6,6 +6,7 @@
 namespace zovye\model;
 
 use zovye\base\modelObj;
+use zovye\traits\ExtraDataGettersAndSetters;
 use function zovye\tb;
 
 /**
@@ -36,6 +37,11 @@ class cronModelObj extends modelObj
 	/** @var varchar */
 	protected $url;
 
+    /** @var varchar */
+    protected $extra;
+
 	/** @var int */
 	protected $createtime;
+
+    use ExtraDataGettersAndSetters;
 }

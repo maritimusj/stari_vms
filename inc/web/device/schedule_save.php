@@ -17,10 +17,10 @@ if (empty($device)) {
     JSON::fail('找不到这个设备！');
 }
 
-$date = Request::trim('date');
-$time = Request::trim('time');
+$date_str = Request::trim('date');
+$time_str = Request::trim('time');
 
-$result = Device::setScheduleTask($device, $date, $time);
+$result = Device::setScheduleTask($device, $date_str, $time_str);
 if (is_error($result)) {
     JSON::fail($result);
 }

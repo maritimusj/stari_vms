@@ -184,7 +184,7 @@ include './index.php';
         array $params = [],
         int $limit = 0
     ): bool {
-        $result =  CacheUtil::cachedCall(0, function() use ($account, $user, $params, $limit) {
+        $result = CacheUtil::cachedCall(0, function () use ($account, $user, $params, $limit) {
             $arr = [];
             if ($account->isTask()) {
                 $cond = array_merge($params, [
@@ -329,8 +329,10 @@ include './index.php';
             }
         }
 
+        $is_new_user = empty(Order::getFirstOrderOfUser($user));
+
         if ($params['unfollow'] || in_array('unfollow', $params, true)) {
-            if (self::checkLimit($account, $user, [], 1)) {
+            if (!$is_new_user && self::checkLimit($account, $user, [], 1)) {
                 return err('您已经完成了该任务！');
             }
         }
@@ -356,9 +358,12 @@ include './index.php';
                 Schema::MONTH => '这个月的免费额度已经用完啦！',
             ];
 
-            if (self::checkLimit($account, $user, [
-                'createtime >=' => $time->getTimestamp(),
-            ], $count)) {
+            if (!$is_new_user && self::checkLimit(
+                    $account,
+                    $user,
+                    ['createtime >=' => $time->getTimestamp(),],
+                    $count
+                )) {
                 return err($desc[$sc_name]);
             }
         }
@@ -366,7 +371,7 @@ include './index.php';
         //scCount, 所有用户在每个周期内总数量
         $sc_count = $account->getSccount();
         if ($sc_count > 0) {
-            if (self::checkLimit($account, null, [
+            if (!$is_new_user && self::checkLimit($account, null, [
                 'createtime >=' => $time->getTimestamp(),
             ], $sc_count)) {
                 return err('任务免费额度已用完！');
@@ -376,7 +381,7 @@ include './index.php';
         //total，单个用户累计可领取数量
         $total = $account->getTotal();
         if ($total > 0) {
-            if (self::checkLimit($account, $user, [], $total)) {
+            if (!$is_new_user && self::checkLimit($account, $user, [], $total)) {
                 return err('您已经完成这个任务了！');
             }
         }
@@ -384,7 +389,7 @@ include './index.php';
         //$orderLimits，最大订单数量
         $order_limits = $account->getOrderLimits();
         if ($order_limits > 0) {
-            if (self::checkLimit($account, null, [], $order_limits)) {
+            if (!$is_new_user && self::checkLimit($account, null, [], $order_limits)) {
                 return err('公众号免费额度已用完！！');
             }
         }

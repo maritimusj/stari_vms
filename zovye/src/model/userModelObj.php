@@ -621,6 +621,10 @@ class userModelObj extends modelObj
      */
     public function getTodayFreeTotal(int $goods_id = 0): int
     {
+        if (empty(Order::getFirstOrderOfUser($this))) {
+            return 0;
+        }
+
         return $this->getOrderGoodsTotal(
             (new DateTimeImmutable('00:00'))->getTimestamp(),
             0,
@@ -637,6 +641,10 @@ class userModelObj extends modelObj
      */
     public function getFreeTotal(int $goods_id = 0): int
     {
+        if (empty(Order::getFirstOrderOfUser($this))) {
+            return 0;
+        }
+
         return $this->getOrderGoodsTotal(0, 0, Order::FREE_STR, $goods_id);
     }
 
@@ -648,6 +656,10 @@ class userModelObj extends modelObj
      */
     public function getTodayPayTotal(int $goods_id = 0): int
     {
+        if (empty(Order::getFirstOrderOfUser($this))) {
+            return 0;
+        }
+
         return $this->getOrderGoodsTotal(
             (new DateTimeImmutable('00:00'))->getTimestamp(),
             0,
@@ -658,6 +670,10 @@ class userModelObj extends modelObj
 
     public function getPayTotal(int $goods_id = 0): int
     {
+        if (empty(Order::getFirstOrderOfUser($this))) {
+            return 0;
+        }
+
         return $this->getOrderGoodsTotal(0, 0, Order::PAY_STR, $goods_id);
     }
 

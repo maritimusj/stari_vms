@@ -126,7 +126,7 @@ class Device extends State
 
     public static function cleanAllErrorCode(): bool
     {
-        $tb_name = We7::tablename(m('device')->getTableName());
+        $tb_name = We7::tb(m('device')->getTableName());
         $res = We7::pdo_query(
             'update '.$tb_name.' SET error_code=0 WHERE uniacid=:uniacid',
             [':uniacid' => We7::uniacid()]
@@ -139,7 +139,7 @@ class Device extends State
     {
         $tb_name = m('device')->getTableName();
         $res = We7::pdo_query(
-            'UPDATE '.We7::tablename($tb_name).' SET `device_type`=:unknown WHERE `device_type`=:type',
+            'UPDATE '.We7::tb($tb_name).' SET `device_type`=:unknown WHERE `device_type`=:type',
             [
                 ':type' => $type_id,
                 ':unknown' => DeviceTypes::UNKNOWN_TYPE,

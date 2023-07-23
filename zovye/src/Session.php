@@ -166,7 +166,7 @@ class Session
      */
     public static function getClientIp(): string
     {
-        return We7::getip();
+        return We7::get_ip();
     }
 
     public static function isSnapshot(): bool

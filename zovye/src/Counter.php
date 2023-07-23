@@ -53,7 +53,7 @@ class Counter
         }
 
         $result = DBUtil::transactionDo(function () use ($uid, $delta, $initFN, $force) {
-            $tb = We7::tablename(counterModelObj::getTableName(true));
+            $tb = We7::tb(counterModelObj::getTableName(true));
 
             if ($initFN && $force) {
                 $v = $initFN();

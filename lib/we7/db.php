@@ -256,7 +256,7 @@ class db
             }
         }
         $sql = "{$select} FROM " . $this->tablename($tablename) . (!empty($condition['fields']) ? " WHERE {$condition['fields']}" : '') . (!empty($orderbysql) ? " ORDER BY $orderbysql " : '') . $limitsql;
-        $total = We7::pdo_fetchcolumn('SELECT COUNT(*) FROM ' . $this->tablename($tablename) . (!empty($condition['fields']) ? " WHERE {$condition['fields']}" : ''), $condition['params']);
+        $total = We7::pdo_fetch_column('SELECT COUNT(*) FROM ' . $this->tablename($tablename) . (!empty($condition['fields']) ? " WHERE {$condition['fields']}" : ''), $condition['params']);
 
         return $this->fetchall($sql, $condition['params'], $keyfield);
     }
@@ -265,7 +265,7 @@ class db
     {
         $result = $this->get($tablename, $params, $field);
         if (!empty($result)) {
-            if (We7::strexists($field, '(')) {
+            if (We7::str_exists($field, '(')) {
                 return array_shift($result);
             } else {
                 return $result[$field];
@@ -383,7 +383,7 @@ class db
      */
     public function count($tablename, $params = array())
     {
-        $total = We7::pdo_getcolumn($tablename, $params, 'count(*)');
+        $total = We7::pdo_get_column($tablename, $params, 'count(*)');
 
         return intval($total);
     }
@@ -490,7 +490,7 @@ class db
             return false;
         }
         if (!empty($datatype)) {
-            $find = We7::strexists($field_info['Type'], '(');
+            $find = We7::str_exists($field_info['Type'], '(');
             if (empty($find)) {
                 $length = '';
             }

@@ -55,7 +55,7 @@ class commission_balanceModelObj extends modelObj
     {
         if ($data) {
             if (We7::is_serialized($this->extra)) {
-                $this->extra = We7::iunserializer($this->extra);
+                $this->extra = We7::deserialize($this->extra);
                 if (!is_array($this->extra)) {
                     $this->extra = [];
                 }
@@ -74,7 +74,7 @@ class commission_balanceModelObj extends modelObj
     public function getExtraData($name = null, $default = null)
     {
         if (We7::is_serialized($this->extra)) {
-            $this->extra = We7::iunserializer($this->extra);
+            $this->extra = We7::deserialize($this->extra);
         }
 
         if (empty($name)) {

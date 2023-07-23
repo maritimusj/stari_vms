@@ -6,7 +6,7 @@ defined('IN_IA') or exit('Access Denied');
 
 $tb_name = APP_NAME;
 
-if (!We7::pdo_tableexists($tb_name.'_charging_now_data')) {
+if (!We7::pdo_table_exists($tb_name.'_charging_now_data')) {
     $sql = <<<SQL
 CREATE TABLE `ims_zovye_vms_charging_now_data` ( 
     `id` INT NOT NULL AUTO_INCREMENT , 

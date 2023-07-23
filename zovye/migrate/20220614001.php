@@ -6,7 +6,7 @@ defined('IN_IA') or exit('Access Denied');
 
 $tb_name = APP_NAME;
 
-if (!We7::pdo_fieldexists($tb_name.'_device_groups', 'extra')) {
+if (!We7::pdo_field_exists($tb_name.'_device_groups', 'extra')) {
     $sql = <<<SQL
     ALTER TABLE `ims_zovye_vms_device_groups` ADD `type_id` INT NOT NULL DEFAULT '0' AFTER `uniacid`, ADD INDEX (`type_id`);
     ALTER TABLE `ims_zovye_vms_device_groups` ADD `extra` TEXT AFTER `agent_id`;
@@ -15,7 +15,7 @@ SQL;
     Migrate::execSQL($sql);
 }
 
-if (!We7::pdo_fieldexists($tb_name.'_user', 's1')) {
+if (!We7::pdo_field_exists($tb_name.'_user', 's1')) {
     $sql = <<<SQL
     ALTER TABLE `ims_zovye_vms_user` ADD `s1` VARCHAR(32) NULL AFTER `mobile`, ADD INDEX (`s1`);
 SQL;

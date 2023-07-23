@@ -25,7 +25,7 @@ class YZShop
      */
     public static function isInstalled(): bool
     {
-        return We7::pdo_tableexists(self::TB_MEMBER) && We7::pdo_tableexists(self::TB_GOODS);
+        return We7::pdo_table_exists(self::TB_MEMBER) && We7::pdo_table_exists(self::TB_GOODS);
     }
 
     /**
@@ -77,7 +77,7 @@ class YZShop
      */
     public static function getSuperior(userModelObj $user): ?model\agentModelObj
     {
-        if (We7::pdo_tableexists(self::TB_MEMBER)) {
+        if (We7::pdo_table_exists(self::TB_MEMBER)) {
             $res = We7::pdo_get(self::TB_MEMBER, We7::uniacid(['yz_openid' => $user->getOpenid()]), ['parent_id']);
             if ($res && $res['parent_id']) {
                 $res = We7::pdo_get(self::TB_MEMBER, We7::uniacid(['member_id' => $res['parent_id']]), ['yz_openid']);
@@ -104,7 +104,7 @@ class YZShop
             $condition['title LIKE'] = "%$keywords%";
         }
 
-        $res = We7::pdo_getall(self::TB_GOODS, We7::uniacid($condition), ['id', 'title']);
+        $res = We7::pdo_get_all(self::TB_GOODS, We7::uniacid($condition), ['id', 'title']);
         if ($res && is_array($res)) {
             return $res;
         }
@@ -160,9 +160,9 @@ class YZShop
             if ($res && $res['member_id']) {
                 $status = settings('agent.yzshop.goods_limits.order_status', []);
                 if ($status) {
-                    $sql = 'SELECT SUM(g.total) AS total FROM '.We7::tablename(
+                    $sql = 'SELECT SUM(g.total) AS total FROM '.We7::tb(
                             self::TB_ORDER_GOODS
-                        ).' g LEFT JOIN '.We7::tablename(
+                        ).' g LEFT JOIN '.We7::tb(
                             self::TB_ORDER
                         ).' o ON g.order_id=o.id WHERE g.goods_id=:goods_id AND g.uid=:uid AND o.is_deleted=0 AND o.status IN ('.implode(
                             ',',

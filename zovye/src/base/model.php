@@ -31,7 +31,7 @@ class model
             //加载已生成的modelObj文件
             $mod_filename = MOD_CACHE_DIR."{$name}_auto_.mod.php";
             if (DEBUG || !is_file($mod_filename)) {
-                We7::mkDirs(MOD_CACHE_DIR);
+                We7::make_dirs(MOD_CACHE_DIR);
                 if ($this->createClassFile($name, $classname, $mod_filename)) {
                     require_once $mod_filename;
                 }

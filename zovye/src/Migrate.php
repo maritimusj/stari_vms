@@ -41,7 +41,7 @@ class Migrate
 
     public static function getNewTask(): array
     {
-        if (!We7::pdo_tableexists(APP_NAME.'_migration')) {
+        if (!We7::pdo_table_exists(APP_NAME.'_migration')) {
             return [];
         }
 

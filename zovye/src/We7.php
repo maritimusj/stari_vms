@@ -162,10 +162,10 @@ EOF;
      *
      * @return bool
      */
-    public static function mkDirs(string $path): bool
+    public static function make_dirs(string $path): bool
     {
         if (!is_dir($path)) {
-            self::mkDirs(dirname($path));
+            self::make_dirs(dirname($path));
             mkdir($path);
         }
 
@@ -181,6 +181,7 @@ EOF;
     {
         if (is_array($data)) {
             $data['uniacid'] = _W('uniacid');
+
             return $data;
         }
 
@@ -270,7 +271,7 @@ EOF;
      *
      * @return string
      */
-    public static function getip(): string
+    public static function get_ip(): string
     {
         static $ip = '';
         if (isset($_SERVER['REMOTE_ADDR'])) {
@@ -318,7 +319,7 @@ EOF;
      *
      * @return boolean
      */
-    public static function strexists(string $string, string $find): bool
+    public static function str_exists(string $string, string $find): bool
     {
         return !(false === strpos($string, $find));
     }
@@ -347,8 +348,8 @@ EOF;
             return false;
         }
         if ($strict) {
-            $lastc = substr($data, -1);
-            if (';' !== $lastc && '}' !== $lastc) {
+            $last_char = substr($data, -1);
+            if (';' !== $last_char && '}' !== $last_char) {
                 return false;
             }
         } else {
@@ -401,7 +402,7 @@ EOF;
      *
      * @return string
      */
-    public static function iserializer($value): string
+    public static function serialize($value): string
     {
         return serialize($value);
     }
@@ -413,7 +414,7 @@ EOF;
      *
      * @return mixed
      */
-    public static function iunserializer(string $value)
+    public static function deserialize(string $value)
     {
         if (empty($value)) {
             return array();
@@ -456,7 +457,7 @@ EOF;
      *
      * @return string
      */
-    public static function tablename(string $table): string
+    public static function tb(string $table): string
     {
         if (empty(Util::config('db.master'))) {
             return "`".Util::config('db.tablepre').$table."`";
@@ -498,9 +499,9 @@ EOF;
         self::pdo()->rollback();
     }
 
-    public static function pdo_tableexists($tabname): bool
+    public static function pdo_table_exists($tb): bool
     {
-        return self::pdo()->tableexists($tabname);
+        return self::pdo()->tableexists($tb);
     }
 
     public static function pdo_query($sql, array $params = array())
@@ -508,20 +509,20 @@ EOF;
         return self::pdo()->query($sql, $params);
     }
 
-    public static function pdo_get($tablename, $condition = array(), $fields = array())
+    public static function pdo_get($tb, $condition = array(), $fields = array())
     {
-        return self::pdo()->get($tablename, $condition, $fields);
+        return self::pdo()->get($tb, $condition, $fields);
     }
 
-    public static function pdo_getall(
-        $tablename,
+    public static function pdo_get_all(
+        $tb,
         $condition = array(),
         $fields = array(),
-        $keyfield = '',
-        $orderby = array(),
+        $key_field = '',
+        $order_by = array(),
         $limit = array()
     ) {
-        return self::pdo()->getall($tablename, $condition, $fields, $keyfield, $orderby, $limit);
+        return self::pdo()->getall($tb, $condition, $fields, $key_field, $order_by, $limit);
     }
 
     public static function pdo_fetch($sql, $params = array())
@@ -529,53 +530,53 @@ EOF;
         return self::pdo()->fetch($sql, $params);
     }
 
-    public static function pdo_update($table, $data = array(), $params = array(), $glue = 'AND')
+    public static function pdo_update($tb, $data = array(), $params = array(), $glue = 'AND')
     {
-        return self::pdo()->update($table, $data, $params, $glue);
+        return self::pdo()->update($tb, $data, $params, $glue);
     }
 
-    public static function pdo_insert($table, $data = array(), $replace = false)
+    public static function pdo_insert($tb, $data = array(), $replace = false)
     {
-        return self::pdo()->insert($table, $data, $replace);
+        return self::pdo()->insert($tb, $data, $replace);
     }
 
-    public static function pdo_run($sql)
+    public static function pdo_run($sql): ?bool
     {
         return self::pdo()->run($sql);
     }
 
-    public static function pdo_delete($table, $params = array(), $glue = 'AND')
+    public static function pdo_delete($tb, $params = array(), $glue = 'AND')
     {
-        return self::pdo()->delete($table, $params, $glue);
+        return self::pdo()->delete($tb, $params, $glue);
     }
 
-    public static function pdo_insertid()
+    public static function pdo_insert_id()
     {
         return self::pdo()->insertid();
     }
 
-    public static function pdo_fetchcolumn($makeSQL, array $params, $column = '')
+    public static function pdo_fetch_column($sql, array $params, $column = '')
     {
-        return self::pdo()->fetchcolumn($makeSQL, $params, $column);
+        return self::pdo()->fetchcolumn($sql, $params, $column);
     }
 
-    public static function pdo_fetchAll($makeSQL, array $params)
+    public static function pdo_fetchAll($sql, array $params)
     {
-        return self::pdo()->fetchall($makeSQL, $params);
+        return self::pdo()->fetchall($sql, $params);
     }
 
-    public static function pdo_getcolumn($tbname, array $array, $string)
+    public static function pdo_get_column($tb, array $array, $string)
     {
-        return self::pdo()->getcolumn($tbname, $array, $string);
+        return self::pdo()->getcolumn($tb, $array, $string);
     }
 
-    public static function pdo_fieldexists($tbname, $field)
+    public static function pdo_field_exists($tb, $field): bool
     {
-        return self::pdo()->fieldexists($tbname, $field);
+        return self::pdo()->fieldexists($tb, $field);
     }
 
-    public static function pdo_indexexists($tbname, $indexname)
+    public static function pdo_index_exists($tb, $index_name): bool
     {
-        return self::pdo()->indexexists($tbname, $indexname);
+        return self::pdo()->indexexists($tb, $index_name);
     }
 }

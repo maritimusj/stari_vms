@@ -76,7 +76,7 @@ class Locker
     public static function flock($uid, callable $callback)
     {
         $dir = ATTACHMENT_ROOT.'lock'.DIRECTORY_SEPARATOR;
-        We7::mkDirs($dir);
+        We7::make_dirs($dir);
 
         $fp = fopen($dir.sha1($uid).'.lock', 'w+');
         if ($fp) {

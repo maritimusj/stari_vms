@@ -8,7 +8,7 @@ use zovye\model\agentModelObj;
 
 $tb_name = APP_NAME;
 
-if (!We7::pdo_tableexists($tb_name.'_gsp_user')) {
+if (!We7::pdo_table_exists($tb_name.'_gsp_user')) {
     $sql = <<<SQL
 CREATE TABLE `ims_zovye_vms_gsp_user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,

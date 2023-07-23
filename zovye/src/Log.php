@@ -69,7 +69,7 @@ class Log
     {
         $log_dir = LOG_DIR.App::uid(8).DIRECTORY_SEPARATOR.$name;
 
-        We7::mkDirs($log_dir);
+        We7::make_dirs($log_dir);
 
         return $log_dir;
     }

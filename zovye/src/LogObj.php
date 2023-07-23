@@ -22,8 +22,8 @@ class LogObj
 
     protected static function createDbTable($tb_name): bool
     {
-        if (!We7::pdo_tableexists($tb_name)) {
-            $we7tb_name = We7::tablename($tb_name);
+        if (!We7::pdo_table_exists($tb_name)) {
+            $we7tb_name = We7::tb($tb_name);
             $sql = <<<SQL_STATEMENT
 CREATE TABLE IF NOT EXISTS $we7tb_name (
     `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -41,7 +41,7 @@ SQL_STATEMENT;
             We7::pdo_run($sql);
         }
 
-        return We7::pdo_tableexists($tb_name);
+        return We7::pdo_table_exists($tb_name);
     }
 
     public function getTableName(): string

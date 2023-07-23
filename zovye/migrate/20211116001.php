@@ -15,7 +15,7 @@ DROP TABLE `ims_zovye_vms_referal`;
 SQL;
 Migrate::execSQL($sql);
 
-if (!We7::pdo_fieldexists($tb_name.'_balance', 'extra')) {
+if (!We7::pdo_field_exists($tb_name.'_balance', 'extra')) {
     $sql = <<<SQL
 ALTER TABLE `ims_zovye_vms_balance` ADD INDEX(`src`);
 ALTER TABLE `ims_zovye_vms_balance` ADD INDEX(`createtime`);
@@ -24,7 +24,7 @@ SQL;
     Migrate::execSQL($sql);
 }
 
-if (!We7::pdo_tableexists($tb_name.'_balance_logs')) {
+if (!We7::pdo_table_exists($tb_name.'_balance_logs')) {
     $sql = <<<SQL
 CREATE TABLE `ims_zovye_vms_balance_logs` (
     `id` INT NOT NULL AUTO_INCREMENT ,
@@ -38,21 +38,21 @@ SQL;
     Migrate::execSQL($sql);
 }
 
-if (!We7::pdo_indexexists($tb_name.'_order', 'src')) {
+if (!We7::pdo_index_exists($tb_name.'_order', 'src')) {
     $sql = <<<SQL
     ALTER TABLE `ims_zovye_vms_order` ADD INDEX(`uniacid`, `src`);
 SQL;
     Migrate::execSQL($sql);
 }
 
-if (!We7::pdo_indexexists($tb_name.'_order', 'refund')) {
+if (!We7::pdo_index_exists($tb_name.'_order', 'refund')) {
     $sql = <<<SQL
     ALTER TABLE `ims_zovye_vms_order` ADD INDEX(`uniacid`, `refund`);
 SQL;
     Migrate::execSQL($sql);
 }
 
-if (!We7::pdo_indexexists($tb_name.'_order', 'result_code')) {
+if (!We7::pdo_index_exists($tb_name.'_order', 'result_code')) {
     $sql = <<<SQL
     ALTER TABLE `ims_zovye_vms_order` ADD INDEX(`uniacid`, `result_code`);
 SQL;

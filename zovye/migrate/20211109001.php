@@ -8,7 +8,7 @@ use zovye\model\accountModelObj;
 
 $tb_name = APP_NAME;
 
-if (!We7::pdo_fieldexists($tb_name.'_account', 'type')) {
+if (!We7::pdo_field_exists($tb_name.'_account', 'type')) {
     $sql = <<<SQL
 ALTER TABLE `ims_zovye_vms_account` ADD `type` INT NOT NULL DEFAULT '0' AFTER `order_no`, ADD INDEX (`type`);
 SQL;

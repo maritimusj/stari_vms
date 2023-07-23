@@ -190,14 +190,14 @@ class modelObjFinder extends SqlParser
         $objClassname = $this->factory->objClassname();
 
         if ($delete) {
-            $sql = 'DELETE FROM '.We7::tablename($objClassname::getTableName(modelObj::OP_WRITE));
+            $sql = 'DELETE FROM '.We7::tb($objClassname::getTableName(modelObj::OP_WRITE));
         } else {
             $select = parent::parseSelect($fields);
-            $count_select = We7::strexists($select, "COUNT(");
+            $count_select = We7::str_exists($select, "COUNT(");
             if ($count_select && $this->limit) {
-                $sql = "$select FROM (SELECT * FROM ".We7::tablename($objClassname::getTableName(modelObj::OP_READ));
+                $sql = "$select FROM (SELECT * FROM ".We7::tb($objClassname::getTableName(modelObj::OP_READ));
             } else {
-                $sql = "$select FROM ".We7::tablename($objClassname::getTableName(modelObj::OP_READ));
+                $sql = "$select FROM ".We7::tb($objClassname::getTableName(modelObj::OP_READ));
             }
         }
 

@@ -79,10 +79,9 @@ class template
      */
     public static function compile($from, $to, $inmodule = false)
     {
-        global $_W;
         $path = dirname($to);
         if (!is_dir($path)) {
-            We7::mkDirs($path);
+            We7::make_dirs($path);
         }
         $content = self::parse(file_get_contents($from), $inmodule);
         file_put_contents($to, $content);

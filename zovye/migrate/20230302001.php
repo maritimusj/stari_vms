@@ -6,7 +6,7 @@ defined('IN_IA') or exit('Access Denied');
 
 $tb_name = APP_NAME;
 
-if (!We7::pdo_tableexists($tb_name.'_gift')) {
+if (!We7::pdo_table_exists($tb_name.'_gift')) {
     $sql = <<<SQL
 CREATE TABLE `ims_zovye_vms_gift`(
     `id` INT NOT NULL AUTO_INCREMENT,
@@ -42,7 +42,7 @@ SQL;
     Migrate::execSQL($sql);
 }
 
-if (!We7::pdo_tableexists($tb_name.'_lucky')) {
+if (!We7::pdo_table_exists($tb_name.'_lucky')) {
     $sql = <<<SQL
 CREATE TABLE `ims_zovye_vms_lucky`(
     `id` INT NOT NULL AUTO_INCREMENT,

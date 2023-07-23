@@ -289,7 +289,7 @@ class ihttp
         if (!empty($urlset['query'])) {
             $urlset['query'] = "?{$urlset['query']}";
         }
-        if (We7::strexists($url, 'https://') && !extension_loaded('openssl')) {
+        if (We7::str_exists($url, 'https://') && !extension_loaded('openssl')) {
             if (!extension_loaded('openssl')) {
                 return error(1, '请开启您PHP环境的openssl', '');
             }
@@ -321,7 +321,7 @@ class ihttp
     static function allow_host($host)
     {
         global $_W;
-        if (We7::strexists($host, '@')) {
+        if (We7::str_exists($host, '@')) {
             return false;
         }
         $pattern = '/^(10|172|192|127)/';
@@ -417,7 +417,7 @@ class ihttp
         if (!empty($extra) && is_array($extra)) {
             $headers = array();
             foreach ($extra as $opt => $value) {
-                if (We7::strexists($opt, 'CURLOPT_')) {
+                if (We7::str_exists($opt, 'CURLOPT_')) {
                     curl_setopt($ch, constant($opt), $value);
                 } elseif (is_numeric($opt)) {
                     curl_setopt($ch, $opt, $value);
@@ -484,7 +484,7 @@ class ihttp
         $fdata .= "Connection: close\r\n";
         if (!empty($extra) && is_array($extra)) {
             foreach ($extra as $opt => $value) {
-                if (!We7::strexists($opt, 'CURLOPT_')) {
+                if (!We7::str_exists($opt, 'CURLOPT_')) {
                     $fdata .= "{$opt}: {$value}\r\n";
                 }
             }

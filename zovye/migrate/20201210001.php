@@ -6,7 +6,7 @@ defined('IN_IA') or exit('Access Denied');
 
 $tb_name = APP_NAME;
 
-if (!We7::pdo_fieldexists($tb_name.'_keeper_devices', 'commission_fixed')) {
+if (!We7::pdo_field_exists($tb_name.'_keeper_devices', 'commission_fixed')) {
     $sql = <<<SQL
 ALTER TABLE `ims_zovye_vms_keeper_devices` ADD `commission_fixed` int(11) NOT NULL DEFAULT -1 AFTER `keeper_id`;
 SQL;
@@ -18,7 +18,7 @@ SQL;
 }
 Migrate::execSQL($sql);
 
-if (!We7::pdo_fieldexists($tb_name.'_keepers', 'extra')) {
+if (!We7::pdo_field_exists($tb_name.'_keepers', 'extra')) {
     $sql = <<<SQL
 ALTER TABLE `ims_zovye_vms_keepers` ADD `extra` TEXT NULL AFTER `agentId`;
 SQL;
@@ -26,7 +26,7 @@ SQL;
     Migrate::execSQL($sql);
 }
 
-if (!We7::pdo_fieldexists($tb_name.'_goods', 'sync')) {
+if (!We7::pdo_field_exists($tb_name.'_goods', 'sync')) {
     $sql = <<<SQL
 ALTER TABLE `ims_zovye_vms_goods` ADD `sync` TINYINT NOT NULL DEFAULT '0' AFTER `price`;
 SQL;
@@ -34,7 +34,7 @@ SQL;
     Migrate::execSQL($sql);
 }
 
-if (!We7::pdo_fieldexists($tb_name.'_keeper_devices', 'way')) {
+if (!We7::pdo_field_exists($tb_name.'_keeper_devices', 'way')) {
     $sql = <<<SQL
 ALTER TABLE `ims_zovye_vms_keeper_devices` ADD `way` TINYINT NOT NULL DEFAULT '0' AFTER `kind`;
 SQL;
@@ -42,7 +42,7 @@ SQL;
     Migrate::execSQL($sql);
 }
 
-if (!We7::pdo_tableexists($tb_name.'_keeper_devices')) {
+if (!We7::pdo_table_exists($tb_name.'_keeper_devices')) {
     $sql = <<<SQL
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_keeper_devices` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -60,7 +60,7 @@ SQL;
     Migrate::execSQL($sql);
 }
 
-if (!We7::pdo_tableexists($tb_name.'_referral')) {
+if (!We7::pdo_table_exists($tb_name.'_referral')) {
     $sql = <<<SQL
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_referral` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -75,14 +75,14 @@ SQL;
     Migrate::execSQL($sql);
 }
 
-if (!We7::pdo_tableexists($tb_name.'_commission_balance')) {
+if (!We7::pdo_table_exists($tb_name.'_commission_balance')) {
     $sql = <<<SQL
 RENAME TABLE ims_zovye_vms_commision_balance TO ims_zovye_vms_commission_balance;
 SQL;
     Migrate::execSQL($sql);
 }
 
-if (!We7::pdo_tableexists($tb_name.'_device_log')) {
+if (!We7::pdo_table_exists($tb_name.'_device_log')) {
     $sql = <<<SQL
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_device_events` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -99,14 +99,14 @@ SQL;
 }
 
 
-if (!We7::pdo_fieldexists($tb_name.'_user', 'locked_uid')) {
+if (!We7::pdo_field_exists($tb_name.'_user', 'locked_uid')) {
     $sql = <<<SQL
 ALTER TABLE `ims_zovye_vms_user` CHANGE `lockedGUID` `locked_uid` VARCHAR(64) NOT NULL DEFAULT 'n/a';
 SQL;
     Migrate::execSQL($sql);
 }
 
-if (!We7::pdo_fieldexists($tb_name.'_device', 'locked_uid')) {
+if (!We7::pdo_field_exists($tb_name.'_device', 'locked_uid')) {
     $sql = <<<SQL
 ALTER TABLE `ims_zovye_vms_device` CHANGE `lockedGUID` `locked_uid` VARCHAR(64) NOT NULL DEFAULT 'n/a';
 SQL;
@@ -114,7 +114,7 @@ SQL;
 }
 
 //排序值
-if (!We7::pdo_fieldexists($tb_name.'_device', 'rank')) {
+if (!We7::pdo_field_exists($tb_name.'_device', 'rank')) {
     $sql = <<<SQL
 ALTER TABLE `ims_zovye_vms_device` ADD `rank` INT NULL AFTER `agentId`;
 SQL;
@@ -122,7 +122,7 @@ SQL;
 }
 
 //设备分组表
-if (!We7::pdo_tableexists($tb_name.'_device_groups')) {
+if (!We7::pdo_table_exists($tb_name.'_device_groups')) {
     $sql = <<<SQL
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_device_groups` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -137,7 +137,7 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_device_groups` (
 SQL;
     Migrate::execSQL($sql);
 }
-if (!We7::pdo_tableexists($tb_name.'_goods_voucher')) {
+if (!We7::pdo_table_exists($tb_name.'_goods_voucher')) {
     $sql = <<<SQL
 CREATE TABLE `ims_zovye_vms_goods_voucher` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -157,7 +157,7 @@ SQL;
     Migrate::execSQL($sql);
 }
 
-if (!We7::pdo_tableexists($tb_name.'_goods_voucher_logs')) {
+if (!We7::pdo_table_exists($tb_name.'_goods_voucher_logs')) {
     $sql = <<<SQL
 CREATE TABLE `ims_zovye_vms_goods_voucher_logs` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -179,7 +179,7 @@ SQL;
     Migrate::execSQL($sql);
 }
 
-if (!We7::pdo_tableexists($tb_name.'_device_record')) {
+if (!We7::pdo_table_exists($tb_name.'_device_record')) {
     $sql = <<<SQL
 CREATE TABLE `ims_zovye_vms_device_record` (
 `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -195,7 +195,7 @@ SQL;
     Migrate::execSQL($sql);
 }
 
-if (!We7::pdo_tableexists($tb_name.'_device_feedback')) {
+if (!We7::pdo_table_exists($tb_name.'_device_feedback')) {
     $sql = <<<SQL
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_device_feedback` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -212,7 +212,7 @@ SQL;
     Migrate::execSQL($sql);
 }
 
-if (!We7::pdo_tableexists($tb_name.'_data_vw')) {
+if (!We7::pdo_table_exists($tb_name.'_data_vw')) {
     $sql = <<<SQL
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_data_vw` (
 `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,

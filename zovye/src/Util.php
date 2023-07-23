@@ -113,7 +113,7 @@ class Util
 
     public static function createApiRedirectFile(string $filename, string $do, array $params = [], callable $fn = null)
     {
-        We7::mkDirs(dirname(ZOVYE_ROOT.$filename));
+        We7::make_dirs(dirname(ZOVYE_ROOT.$filename));
 
         $headers = is_array($params['headers']) ? $params['headers'] : [];
         unset($params['headers']);
@@ -938,7 +938,7 @@ include './index.php';
         $full_path = ATTACHMENT_ROOT.$dirname.$filename;
 
         if (!is_dir(ATTACHMENT_ROOT.$dirname)) {
-            We7::mkDirs(ATTACHMENT_ROOT.$dirname);
+            We7::make_dirs(ATTACHMENT_ROOT.$dirname);
         }
 
         return $full_path;
@@ -1198,7 +1198,7 @@ include './index.php';
 
     public static function exportExcelFile($filename, array $header = [], array $data = [])
     {
-        We7::mkdirs(dirname($filename));
+        We7::make_dirs(dirname($filename));
 
         $str_export = '';
 

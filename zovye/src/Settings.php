@@ -37,8 +37,8 @@ class Settings implements ISettings
     {
         $tb_name = strtolower($tb_name);
 
-        if (!We7::pdo_tableexists($tb_name)) {
-            $we7tb_name = We7::tablename($tb_name);
+        if (!We7::pdo_table_exists($tb_name)) {
+            $we7tb_name = We7::tb($tb_name);
 
             $sql = <<<CODE
 CREATE TABLE IF NOT EXISTS $we7tb_name (
@@ -56,7 +56,7 @@ CODE;
             We7::pdo_run($sql);
         }
 
-        return We7::pdo_tableexists($tb_name) != false;
+        return We7::pdo_table_exists($tb_name) != false;
     }
 
     protected function getTableName(): string
@@ -112,7 +112,7 @@ CODE;
 
     protected function name2id($key): int
     {
-        return (int)We7::pdo_getcolumn(
+        return (int)We7::pdo_get_column(
             $this->getTableName(),
             [
                 'uniacid' => We7::uniacid(),

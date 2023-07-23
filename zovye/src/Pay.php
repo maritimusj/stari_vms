@@ -607,7 +607,7 @@ class Pay
                 return $pem_file;
             }
 
-            We7::mkDirs($dir);
+            We7::make_dirs($dir);
 
             if (
                 file_put_contents($pem_file['cert_filename'], $pem['cert']) !== false &&

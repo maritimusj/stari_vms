@@ -57,8 +57,8 @@ class lockerModelObj extends modelObj
     public function release(): bool
     {
         if (--$this->used > 0) {
-            $tbname = We7::tablename(lockerModelObj::getTableName(true));
-            $res = We7::pdo_query('UPDATE '.$tbname.' SET used=used-1 WHERE id=:id', [
+            $tb_name = We7::tb(lockerModelObj::getTableName(true));
+            $res = We7::pdo_query('UPDATE '.$tb_name.' SET used=used-1 WHERE id=:id', [
                 ':id' => $this->id,
             ]);
             if ($res > 0) {

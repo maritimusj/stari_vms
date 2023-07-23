@@ -8,6 +8,7 @@ namespace zovye;
 
 use DateTime;
 use zovye\base\modelObj;
+use zovye\base\modelObjFinder;
 use zovye\model\accountModelObj;
 use zovye\model\agentModelObj;
 use zovye\model\commission_balanceModelObj;
@@ -65,13 +66,11 @@ class Order extends State
 
     /**
      * @param mixed $condition
-     * @return ModelObjFinderProxy
+     * @return modelObjFinder
      */
-    public static function query($condition = []): ModelObjFinderProxy
+    public static function query($condition = []): modelObjFinder
     {
-        $finder = m('order')->where(We7::uniacid([]))->where($condition);
-
-        return new ModelObjFinderProxy($finder);
+        return m('order')->where(We7::uniacid([]))->where($condition);
     }
 
     /**

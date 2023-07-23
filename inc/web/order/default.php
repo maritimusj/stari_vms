@@ -11,17 +11,17 @@ defined('IN_IA') or exit('Access Denied');
 use DateTime;
 use zovye\model\orderModelObj;
 
-$query = Order::query();
-
 $tpl_data = [
     'commission_balance' => App::isCommissionEnabled(),
 ];
+
+$condition = [];
 
 $agent_openid = Request::str('agent_openid');
 if (!empty($agent_openid)) {
     $agent = Agent::get($agent_openid, true);
     if ($agent) {
-        $query->where($agent);
+        $condition['agent_id'] = $agent->getId();
 
         $tpl_data['s_open_id'] = $agent_openid;
         $tpl_data['ag_res'][] = [
@@ -36,7 +36,7 @@ $device_id = Request::int('device_id');
 if ($device_id) {
     $device = Device::get($device_id);
     if ($device) {
-        $query->where($device);
+        $condition['device_id'] = $device->getId();
 
         $tpl_data['s_device_id'] = $device_id;
         $tpl_data['de_res'][] = [
@@ -51,7 +51,7 @@ $user_id = Request::int('user_id');
 if ($user_id) {
     $user = User::get($user_id);
     if ($user) {
-        $query->where($user);
+        $condition['openid'] = $user->getOpenid();
 
         $tpl_data['s_user_id'] = $user->getId();
         $tpl_data['user_res'] = $user->profile();
@@ -61,59 +61,46 @@ if ($user_id) {
 if (Request::has('account_id')) {
     $account = Account::get(Request::int('account_id'));
     if ($account) {
-        $query->where(['account' => $account->getName()]);
+        $condition['account'] = $account->getName();
     }
 }
 
 $way = Request::str('way');
 if ($way == 'free') {
     if (App::isFuelingDeviceEnabled()) {
-        $query->where(['src' => [Order::FREE, Order::ACCOUNT, Order::FUELING_SOLO]]);
+        $condition['src'] = [Order::FREE, Order::ACCOUNT, Order::FUELING_SOLO];
     } else {
-        $query->where(['src' => [Order::FREE, Order::ACCOUNT]]);
+        $condition['src'] = [Order::FREE, Order::ACCOUNT];
     }
 } elseif ($way == 'pay') {
     if (App::isFuelingDeviceEnabled()) {
-        $query->where(['src' => [Order::PAY, Order::FUELING, Order::FUELING_UNPAID]]);
+        $condition['src'] = [Order::PAY, Order::FUELING, Order::FUELING_UNPAID];
     } else {
-        $query->where(['src' => Order::PAY]);
+        $condition['src'] = Order::PAY;
     }
 } elseif ($way == 'balance') {
-    $query->where(['src' => Order::BALANCE]);
+    $condition['src'] = Order::BALANCE;
 } elseif ($way == 'charging') {
-    $query->where(['src' => [Order::CHARGING, Order::CHARGING_UNPAID]]);
+    $condition['src'] = [Order::CHARGING, Order::CHARGING_UNPAID];
 } elseif ($way == 'fueling') {
-    $query->where(['src' => [Order::FUELING, Order::FUELING_UNPAID, Order::FUELING_SOLO]]);
+    $condition['src'] = [Order::FUELING, Order::FUELING_UNPAID, Order::FUELING_SOLO];
 } elseif ($way == 'refund') {
-    $query->where(['refund' => 1]);
+    $condition['refund'] = 1;
     if (App::isBalanceEnabled() && Balance::isFreeOrder()) {
-        $query->where(['src' => Order::PAY]);
+        $condition['src'] = Order::PAY;
     }
 } elseif ($way == 'unexpected') {
-    $query->where(['result_code >' => 0]);
-}
-
-$keyword = Request::str('keyword');
-if ($keyword) {
-    $query->whereOr([
-        'nickname LIKE' => "%$keyword%",
-        'account LIKE' => "%$keyword%",
-    ]);
-
-    $tpl_data['s_keyword'] = $keyword;
+    $condition['result_code >'] = 0;
 }
 
 $order_no = Request::str('order');
 if ($order_no) {
-    $query->whereOr([
-        'order_id LIKE' => "%$order_no%",
-        'extra REGEXP' => "\"transaction_id\":\"[0-9]*{$order_no}[0-9]*\"",
-    ]);
+    $condition['order_id LIKE'] = "%$order_no%";
     $tpl_data['s_order'] = $order_no;
 } else {
     $order_no = Request::str('orderNO');
     if ($order_no) {
-        $query->where(['order_id' => $order_no]);
+        $condition['order_id'] = $order_no;
         $tpl_data['s_order'] = $order_no;
     }
 }
@@ -123,7 +110,7 @@ if ($limit['start']) {
     $start = DateTime::createFromFormat('Y-m-d H:i:s', $limit['start'].' 00:00:00');
     if ($start) {
         $tpl_data['s_start_date'] = $start->format('Y-m-d');
-        $query->where(['createtime >=' => $start->getTimestamp()]);
+        $condition['createtime >='] = $start->getTimestamp();
     }
 }
 
@@ -132,11 +119,17 @@ if ($limit['end']) {
     if ($end) {
         $tpl_data['s_end_date'] = $end->format('Y-m-d');
         $end->modify('next day');
-        $query->where(['createtime <' => $end->getTimestamp()]);
+        $condition['createtime <'] = $end->getTimestamp();
     }
 }
 
-$total = $query->count();
+$query = Order::query($condition);
+
+if (empty($condition)) {
+    $total = Order::getLastOrder()['id'] ?? 0;
+} else {
+    $total = $query->count();
+}
 
 $page = max(1, Request::int('page'));
 $page_size = Request::is_ajax() ? 10 : Request::int('pagesize', DEFAULT_PAGE_SIZE);
@@ -303,7 +296,7 @@ if (Request::is_ajax()) {
 
 $tpl_data['s_way'] = $way;
 $tpl_data['url'] = Util::url('order', ['way' => $way]);
-$tpl_data['backer'] = $keyword || $agent_openid || $user_id || $device_id || $order_no || $limit['start'] || $limit['end'];
+$tpl_data['backer'] = $agent_openid || $user_id || $device_id || $order_no || $limit['start'] || $limit['end'];
 $tpl_data['pager'] = $pager;
 $tpl_data['orders'] = $orders;
 $tpl_data['accounts'] = $accounts;

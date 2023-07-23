@@ -76,7 +76,7 @@ class Response
      * @param array $params
      * @param int $response_code
      */
-    public static function redirect(string $url, array $params = [], $response_code = 302)
+    public static function redirect(string $url, array $params = [], int $response_code = 302)
     {
         if ($params) {
             $url = PlaceHolder::replace($url, $params);

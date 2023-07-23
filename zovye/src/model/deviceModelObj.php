@@ -985,7 +985,7 @@ class deviceModelObj extends modelObj
         }
 
         $result = Device::resetPayload($this, $data);
-        
+
         if (is_error($result)) {
             return $result;
         }
@@ -1968,7 +1968,7 @@ class deviceModelObj extends modelObj
                 'mcb' => true,
             ];
         }
-        
+
         $res = CtrlServ::getV2("device/$this->imei/online", ['nocache' => $use_cache ? 'false' : 'true']);
         if (is_error($res)) {
             return $res;
@@ -2972,50 +2972,51 @@ class deviceModelObj extends modelObj
         $goods = Goods::get($goodsData['id']);
         if ($goods) {
             $quota = $goods->getQuota();
+            if (isEmptyArray($quota)) {
+                return;
+            }
 
-            if (!isEmptyArray($quota)) {
-                if ($goods->allowFree() || (($goods->allowBalance() || $goods->allowDelivery()) && Balance::isFreeOrder(
-                        ))) {
-                    $day_limit = $quota['free']['day'];
-                    if ($day_limit > 0) {
-                        $day_total = $user->getTodayFreeTotal($goods->getId());
-                        if ($day_total >= $day_limit) {
-                            self::disableFree($goodsData);
-                        } elseif (!empty($params[Goods::AllowFree]) || in_array(Goods::AllowFree, $params)) {
-                            $goodsData['num'] = min($goodsData['num'], $day_limit - $day_total);
-                        }
-                    }
-
-                    $all_limit = $quota['free']['all'];
-                    if ($all_limit > 0) {
-                        $all_total = $user->getFreeTotal($goods->getId());
-                        if ($all_total >= $all_limit) {
-                            self::disableFree($goodsData);
-                        } elseif (!empty($params[Goods::AllowFree]) || in_array(Goods::AllowFree, $params)) {
-                            $goodsData['num'] = min($goodsData['num'], $all_limit - $all_total);
-                        }
+            if ($goods->allowFree() || (($goods->allowBalance() || $goods->allowDelivery()) && Balance::isFreeOrder(
+                    ))) {
+                $day_limit = getArray($quota, 'free.day', 0);
+                if ($day_limit > 0) {
+                    $day_total = $user->getTodayFreeTotal($goods->getId());
+                    if ($day_total >= $day_limit) {
+                        self::disableFree($goodsData);
+                    } elseif (!empty($params[Goods::AllowFree]) || in_array(Goods::AllowFree, $params)) {
+                        $goodsData['num'] = min($goodsData['num'], $day_limit - $day_total);
                     }
                 }
 
-                if ($goods->allowPay()) {
-                    $day_limit = $quota['pay']['day'];
-                    if ($day_limit > 0) {
-                        $day_total = $user->getTodayPayTotal($goods->getId());
-                        if ($day_total >= $day_limit) {
-                            self::disablePay($goodsData);
-                        } elseif (!empty($params[Goods::AllowPay]) || in_array(Goods::AllowPay, $params)) {
-                            $goodsData['num'] = min($goodsData['num'], $day_limit - $day_total);
-                        }
+                $all_limit = getArray($quota, 'free.all', 0);
+                if ($all_limit > 0) {
+                    $all_total = $user->getFreeTotal($goods->getId());
+                    if ($all_total >= $all_limit) {
+                        self::disableFree($goodsData);
+                    } elseif (!empty($params[Goods::AllowFree]) || in_array(Goods::AllowFree, $params)) {
+                        $goodsData['num'] = min($goodsData['num'], $all_limit - $all_total);
                     }
+                }
+            }
 
-                    $all_limit = $quota['pay']['all'];
-                    if ($all_limit > 0) {
-                        $all_total = $user->getPayTotal($goods->getId());
-                        if ($all_total >= $all_limit) {
-                            self::disablePay($goodsData);
-                        } elseif (!empty($params[Goods::AllowPay]) || in_array(Goods::AllowPay, $params)) {
-                            $goodsData['num'] = min($goodsData['num'], $all_limit - $all_total);
-                        }
+            if ($goods->allowPay()) {
+                $day_limit = getArray($quota, 'pay.day', 0);
+                if ($day_limit > 0) {
+                    $day_total = $user->getTodayPayTotal($goods->getId());
+                    if ($day_total >= $day_limit) {
+                        self::disablePay($goodsData);
+                    } elseif (!empty($params[Goods::AllowPay]) || in_array(Goods::AllowPay, $params)) {
+                        $goodsData['num'] = min($goodsData['num'], $day_limit - $day_total);
+                    }
+                }
+
+                $all_limit = getArray($quota, 'pay.all', 0);
+                if ($all_limit > 0) {
+                    $all_total = $user->getPayTotal($goods->getId());
+                    if ($all_total >= $all_limit) {
+                        self::disablePay($goodsData);
+                    } elseif (!empty($params[Goods::AllowPay]) || in_array(Goods::AllowPay, $params)) {
+                        $goodsData['num'] = min($goodsData['num'], $all_limit - $all_total);
                     }
                 }
             }

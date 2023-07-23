@@ -287,7 +287,7 @@ class order
             'orders' => $orders,
             'page' => $page,
             'pagesize' => $page_size,
-            'total' => $total ?? 0,
+            'total' => $total,
         ];
     }
 

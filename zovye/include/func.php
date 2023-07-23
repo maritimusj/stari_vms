@@ -358,7 +358,8 @@ if (!function_exists('array_key_first')) {
 }
 
 if (!function_exists('strexists')) {
-    function strexists($str, $search) {
+    function strexists($str, $search): bool
+    {
         return !(false === strpos($str, $search));
     }
 }

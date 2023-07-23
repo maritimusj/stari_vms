@@ -163,6 +163,7 @@ class Order extends State
     }
 
     /**
+     * 支持 deviceModelObj,agentModelObj,userModelObj,accountModelObj和全局WeApp
      * @param $obj
      * @param bool $fetch_order_obj
      * @return array|orderModelObj|null

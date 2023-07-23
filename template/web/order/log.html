@@ -107,7 +107,7 @@
                 </td>
                 <td>￥{php echo round($log['data']['orderData']['price'] / 100, 2)}</td>
                 <td>
-                    <div class="profile">
+                    <div class="profile" title="{$log['user']['openid']}" data-id="{$log['user']['id']}">
                         <img src="{$log['user']['headimgurl']}" />
                         <span class="nickname">
                                 {php echo $log['user']['nickname'] ?: '&lt;匿名用户&gt;'}

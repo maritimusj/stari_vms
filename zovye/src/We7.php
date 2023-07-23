@@ -442,7 +442,7 @@ EOF;
     }
 
     //修正微擎没有记录支付类型的BUG
-    public static function fixPayLog($order_no)
+    public static function fix_pay_log($order_no)
     {
         $core_pay_log = We7::pdo_get('core_paylog', We7::uniacid(['tid' => $order_no]), ['plid', 'type']);
         if (empty($core_pay_log['type'])) {

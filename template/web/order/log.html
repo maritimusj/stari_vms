@@ -14,6 +14,35 @@
     .query.success {
         color: #0f8c47;
     }
+    .pay_name {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+    }
+    .pay_name img {
+        width: 19px;
+        height: 19px;
+        margin-right: 3px;
+    }
+    .pay_status {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
+    .refund_status {
+        display: flex;
+        align-items: flex-start;
+        justify-content: flex-start;
+        flex-direction: column;
+        flex-wrap: nowrap;
+    }
+    #orderlist .refund_status .title {
+        color: #f44336;
+    }
+    #orderlist .refund_status .memo {
+        color: #9E9E9E;
+        font-size: x-small;
+    }
 </style>
 <ul class="nav nav-tabs" id="navbar">
     <li role="presentation"><a href="{php echo $this->createWebUrl('order');}">全部</a></li>
@@ -35,10 +64,11 @@
             <tr>
                 <th>#</th>
                 <th>订单号</th>
-                <th>状态</th>
                 <th>
                     金额
                 </th>
+                <th>支付状态</th>
+                <th>退款状态</th>
                 <th>用户</th>
                 <th>设备</th>
                 <th>
@@ -51,24 +81,14 @@
             </thead>
             <tbody>
             {loop $logs $index $log}
-            <tr>
+            <tr data-id="{$log['id']}">
                 <td>{$log['id']}</td>
                 <td>
-                    <div>
-                        <i class="wi wi-money color-gray" title="{php echo strval($log['data']['pay']['name'])}"></i>
-                        {if isset($log['data']['payResult'])}
-                        {if isset($log['data']['payResult']['transaction_id'])}
-                        {$log['data']['payResult']['transaction_id']}
-                        {elseif isset($log['data']['payResult']['uniontid'])}
-                        {$log['data']['payResult']['uniontid']}
-                        {/if}
-                        {elseif isset($log['data']['queryResult'])}
-                        {$log['data']['queryResult']['transaction_id']}
-                        {/if}
-                        {if $log['data']['pay']['name'] == 'api'}
-                        第三方API完成支付
-                        {/if}
+                    {if $log['transaction_id']}
+                    <div class="pay_name">
+                        <img src="{MODULE_URL}static/img/{$log['data']['pay']['name']}.svg" title="{php echo \zovye\Pay::getTitle($log['data']['pay']['name'])}">{$log['transaction_id']}
                     </div>
+                    {/if}
                     <div class="orderNO">
                         {if $log['orderNO']}
                         <a href="{php echo $this->createWebUrl('order', array('order'=>$log['orderNO']));}">{$log['orderNO']}</a>
@@ -79,33 +99,54 @@
                         {/if}
                     </div>
                 </td>
-                <td>
-                    {php $payResult = $log['data']['payResult'];}
-                    {if !empty($payResult)}
-                    {if $log['data']['cancelled']}
-                    支付取消
-                    {elseif $log['data']['timeout']}
-                    支付超时
-                    {elseif !is_error($log['data']['payResult'])}
-                    支付成功
-                    {/if}
-                    {else}
-                    {if $log['data']['queryResult']}
-                    {if $log['data']['queryResult']['result'] == 'success'}
-                    支付成功(<span class="query success" title="查询结果">*</span>)
-                    {else}
-                    {$log['data']['queryResult']['message']}(<span class="query fail" title="查询结果">*</span>)
-                    {/if}
-                    {/if}
-                    {/if}
-                    {if $log['data']['refund']}
-                    （已退款）<i class="fa fa-exclamation-circle" title="{$log['data']['refund']['message']}"></i>
-                    {/if}
-                    {if  $log['data']['refund_fail']}
-                    （退款失败）<i class="fa fa-exclamation-circle" title="{$log['data']['refund_fail']['result']['message']}"></i>
-                    {/if}
-                </td>
                 <td>￥{php echo round($log['data']['orderData']['price'] / 100, 2)}</td>
+                <td>
+                    <div class="pay_status">
+                        {php $payResult = $log['data']['payResult'];}
+                        {if !empty($payResult)}
+                        {if $log['data']['cancelled']}
+                        支付取消
+                        {elseif $log['data']['timeout']}
+                        支付超时
+                        {elseif !is_error($log['data']['payResult'])}
+                        支付成功
+                        {/if}
+                        {else}
+                        {if $log['data']['queryResult']}
+                        {if $log['data']['queryResult']['result'] == 'success'}
+                        支付成功(<span class="query success" title="查询结果">*</span>)
+                        {else}
+                        {$log['data']['queryResult']['message']}(<span class="query fail" title="查询结果">*</span>)
+                        {/if}
+                        {/if}
+                        {/if}                     
+                    </div>
+                </td>
+                <td>
+                    <div class="refund_status">
+                        {if $log['transaction_id']}
+                        {if $log['data']['refund']}
+                        <span class="title">
+                            已退款
+                        </span>
+                        <span class="memo">
+                            {$log['data']['refund']['message']}
+                        </span>
+                        {elseif $log['data']['refund_fail']}
+                        <span class="title">
+                            退款失败
+                        </span>
+                        <span class="memo">
+                            {$log['data']['refund_fail']['result']['message']}
+                        </span>
+                        {else}
+                        <div class="operate">
+                            <i class="fa fa-reply" data-op="refundByLog"></i>
+                        </div>
+                        {/if}
+                        {/if}
+                    </div>
+                </td>
                 <td>
                     <div class="profile" title="{$log['user']['openid']}" data-id="{$log['user']['id']}">
                         <img src="{$log['user']['headimgurl']}" />
@@ -142,4 +183,11 @@
     </div>
     {/if}
 </div>
+<script>
+    require(["{php \zovye\url(false, 'static/js/zovye.min.js')}"], function (zovye) {
+        zovye.enableCopy();
+        zovye.enableOp();
+        zovye.setApiUrl("{php echo $this->createWebUrl('order');}");
+    })
+</script>
 {template 'common/footer'}

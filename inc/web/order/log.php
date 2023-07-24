@@ -61,10 +61,13 @@ foreach ($query->page($page, $page_size)->findAll() as $entry) {
         $log['data']['queryResult'] = Pay::query($log['orderNO']);
     }
 
+    $log['transaction_id'] = $log['data']['payResult']['transaction_id'] ?? $log['data']['queryResult']['transaction_id'];
+    $log['refund'] = $log['transaction_id'] && empty($log['data']['refund']);
     $logs[] = $log;
 }
 
 $tpl_data['logs'] = $logs;
 $tpl_data['way'] = 'pay';
 
+// print_r($logs);exit();
 Response::showTemplate('web/order/log', $tpl_data);

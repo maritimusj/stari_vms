@@ -12,8 +12,8 @@ use zovye\model\user_logsModelObj;
 
 $query = m('user_logs')->query();
 
-if (Request::has('orderNo')) {
-    $query->where(['orderNO' => Request::str('orderNo')]);
+if (Request::has('orderNO')) {
+    $query->where(['title' => Request::str('orderNO')]);
     $total = 1;
     $page = 1;
     $page_size = 1;

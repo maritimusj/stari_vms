@@ -188,6 +188,14 @@
         zovye.enableCopy();
         zovye.enableOp();
         zovye.setApiUrl("{php echo $this->createWebUrl('order');}");
+        zovye.op('refundByLog', function(self, next) {
+            if (!confirm('确定提交退款申请吗？注意：此操作不会影响佣金、库存或用户余额！')) {
+                return;
+            }
+            const tr = self.closest('tr');
+            const id = tr.data('id');
+            next({id});
+        });
     })
 </script>
 {template 'common/footer'}

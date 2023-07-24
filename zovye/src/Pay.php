@@ -173,7 +173,7 @@ class Pay
                 'user' => $user->profile(),
                 'res' => $res,
             ]);
-            
+
         } else {
             Log::debug('pay', [
                 'result' => $result,
@@ -291,6 +291,7 @@ class Pay
                     if (is_error($res) && $res['errno'] < 0) {
                         throw new Exception($res['message']);
                     }
+
                     return $pay->getResponse();
                 }
                 throw new Exception('处理充值失败！');
@@ -310,7 +311,7 @@ class Pay
                 if (is_error($res)) {
                     throw new Exception($res['message']);
                 }
-                
+
                 return $pay->getResponse(false);
             }
 
@@ -352,6 +353,11 @@ class Pay
             return err('找不到支付记录！');
         }
 
+        return self::refundByLog($pay_log, $total, $data);
+    }
+
+    public static function refundByLog(pay_logsModelObj $pay_log, int &$total = 0, array $data = [])
+    {
         $device_id = $pay_log->getDeviceId();
 
         if ($device_id == 0) {
@@ -373,10 +379,11 @@ class Pay
             $total = $price_total;
         }
 
-        $res = $pay->refund($order_no, $total);
+        $res = $pay->refund($pay_log->getOrderNO(), $total);
         if (is_error($res)) {
             $pay_log->setData('refund_fail', ['result' => $res]);
             $pay_log->save();
+
             return $res;
         }
 
@@ -410,6 +417,7 @@ class Pay
         }
 
         $order_no = $pay_log->getOrderNO();
+
         return $pay->query($order_no);
     }
 
@@ -424,6 +432,7 @@ class Pay
         if (empty($pay_log)) {
             return err('找不到支付记录！');
         }
+
         return self::queryFor($pay_log);
     }
 
@@ -683,6 +692,7 @@ class Pay
     public static function isWxPayQrcode($code): bool
     {
         $str = substr($code, 0, 2);
-        return in_array($str, ['10', '11', '12','13', '14', '15']);
+
+        return in_array($str, ['10', '11', '12', '13', '14', '15']);
     }
 }

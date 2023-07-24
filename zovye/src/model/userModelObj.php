@@ -125,6 +125,11 @@ class userModelObj extends modelObj
         return 'user';
     }
 
+    public function isAccessible(): bool
+    {
+        return $this->uniacid == We7::uniacid();
+    }
+
     public function isAliUser(): bool
     {
         return $this->app == User::ALI;

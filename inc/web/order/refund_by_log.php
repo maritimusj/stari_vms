@@ -15,4 +15,14 @@ if (empty($log)) {
     JSON::fail('找不到这个支付记录！');
 }
 
-var_dump($log->getData());
+$user = $log->getOwner();
+if (empty($user) || !$user->isAccessible()) {
+    JSON::fail('没有权限管理！');
+}
+
+$result = Pay::refundByLog($log);
+if (is_error($result)) {
+    JSON::fail($result);
+}
+
+JSON::success('已提交退款请求！');

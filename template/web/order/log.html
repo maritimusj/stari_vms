@@ -43,6 +43,12 @@
         color: #9E9E9E;
         font-size: x-small;
     }
+    #orderlist .orderNO a.operate {
+        visibility: hidden;
+    }
+    #orderlist .orderNO:hover a.operate{
+        visibility: visible;
+    }
 </style>
 <ul class="nav nav-tabs" id="navbar">
     <li role="presentation"><a href="{php echo $this->createWebUrl('order');}">订单列表</a></li>
@@ -87,10 +93,11 @@
                     </div>
                     {/if}
                     <div class="orderNO">
-                        {if $log['orderNO']}
-                        <a href="{php echo $this->createWebUrl('order', array('order'=>$log['orderNO']));}">{$log['orderNO']}</a>
-                        {elseif $log['orderUID']}
-                        <a href="{php echo $this->createWebUrl('order', array('order'=>$log['orderUID']));}">{$log['orderUID']}</a>
+                        {if $log['orderNO'] || $log['orderUID']}
+                            {php echo $log['orderNO'] ?? $log['orderUID']}
+                            <a href="{php echo $this->createWebUrl('order', array('order'=>$log['orderNO']));}" class="operate">
+                                <i class="fa fa-search" title="查看订单"></i>
+                            </a>
                         {else}
                         n/a
                         {/if}

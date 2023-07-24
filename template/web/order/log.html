@@ -46,13 +46,7 @@
 </style>
 <ul class="nav nav-tabs" id="navbar">
     <li role="presentation"><a href="{php echo $this->createWebUrl('order');}">全部</a></li>
-    <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'free'));}">免费</a></li>
-    {if $op=='log'}
-    <li role="presentation"><a href="#">支付</a></li>
-    <li role="presentation" class="active"><a href="#">支付记录</a></li>
-    {else}
-    <li role="presentation" class="active"><a href="#">支付</a></li>
-    {/if}
+    <li role="presentation"><a href="#">支付记录</a></li>
 </ul>
 <div class="panel panel-default nav-tab-item">
     <div class="panel-heading">

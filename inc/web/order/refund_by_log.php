@@ -3,7 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
- 
+
 namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
@@ -27,4 +27,17 @@ if (is_error($result)) {
     JSON::fail($result);
 }
 
-JSON::success('退款成功， 退款金额：'. number_format($total / 100, 2, '.', '') . '元');
+$order = Order::get($log->getOrderNO(), true);
+if ($order) {
+    $order->setExtraData(
+        'refund',
+        array_merge($result, [
+            'total' => $total,
+        ])
+    );
+
+    $order->setRefund(Order::REFUND);
+    $order->save();
+}
+
+JSON::success('退款成功， 退款金额：'.number_format($total / 100, 2, '.', '').'元');

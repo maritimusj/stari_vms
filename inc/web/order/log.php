@@ -3,33 +3,43 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
- 
+
 namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
 use zovye\model\user_logsModelObj;
 
-$page = max(1, Request::str('page'));
-$page_size = Request::is_ajax() ? 10 : max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
+$query = m('user_logs')->query();
 
-$query = m('user_logs')->where([
-    'level' => [
-        LOG_GOODS_PAY,
-        LOG_CHARGING_PAY,
-        LOG_FUELING_PAY,
-        LOG_RECHARGE,
-    ],
-])->orderBy('id DESC');
-
-//使用自增长id做为总数，数据量大时使用$query->count()效率太低，
-//注意：需要先调用$query->orderBy('id desc');
-$last = $query->findOne();
-$total = $last ? $last->getId() : 0;
-
-if (ceil($total / $page_size) < $page) {
+if (Request::has('orderNo')) {
+    $query->where(['orderNO' => Request::str('orderNo')]);
+    $total = 1;
     $page = 1;
+    $page_size = 1;
+} else {
+    $query->where([
+        'level' => [
+            LOG_GOODS_PAY,
+            LOG_CHARGING_PAY,
+            LOG_FUELING_PAY,
+            LOG_RECHARGE,
+        ],
+    ])->orderBy('id DESC');
+
+    //使用自增长id做为总数，数据量大时使用$query->count()效率太低，
+    //注意：需要先调用$query->orderBy('id desc');
+    $last = $query->findOne();
+    $total = $last ? $last->getId() : 0;
+
+    $page = max(1, Request::str('page'));
+    $page_size = Request::is_ajax() ? 10 : max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
+
+    if (ceil($total / $page_size) < $page) {
+        $page = 1;
+    }
 }
+
 
 $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
 
@@ -72,5 +82,4 @@ foreach ($query->page($page, $page_size)->findAll() as $entry) {
 $tpl_data['logs'] = $logs;
 $tpl_data['way'] = 'pay';
 
-// print_r($logs);exit();
 Response::showTemplate('web/order/log', $tpl_data);

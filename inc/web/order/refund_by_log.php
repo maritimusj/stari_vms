@@ -27,4 +27,4 @@ if (is_error($result)) {
     JSON::fail($result);
 }
 
-JSON::success('退款成功， 退款金额：'. number_format($total / 100, 2, '.', '')) . '元';
+JSON::success('退款成功， 退款金额：'. number_format($total / 100, 2, '.', '') . '元');

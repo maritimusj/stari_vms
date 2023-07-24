@@ -17,6 +17,7 @@ $query = m('user_logs')->where([
     'level' => [
         LOG_GOODS_PAY,
         LOG_CHARGING_PAY,
+        LOG_FUELING_PAY,
         LOG_RECHARGE,
     ],
 ])->orderBy('id DESC');

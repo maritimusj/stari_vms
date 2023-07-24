@@ -127,7 +127,7 @@
                         {if $log['transaction_id']}
                         {if $log['data']['refund']}
                         <span class="title">
-                            已退款{if $log['refund_total']}{php echo number_format($log['refund_total'] / 100, 2, '.', '') . '元';}
+                            已退款{if $log['refund_total']}({php echo number_format($log['refund_total'] / 100, 2, '.', '') . '元';}){/if}
                         </span>
                         <span class="memo">
                             {$log['data']['refund']['message']}

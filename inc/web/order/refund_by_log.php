@@ -22,7 +22,7 @@ if (empty($user) || !$user->isAccessible()) {
 
 $total = 0;
 
-$result = Pay::refundByLog($log, $total, ['message' => '管理员']);
+$result = Pay::refundByLog($log, $total, ['message' => '管理员退款[003]']);
 if (is_error($result)) {
     JSON::fail($result);
 }

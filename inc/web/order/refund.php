@@ -15,7 +15,7 @@ if (Request::has('num')) {
     $res = Order::refund($id, $num, [
         'admin' => _W('username'),
         'ip' => CLIENT_IP,
-        'message' => '管理员退款',
+        'message' => '管理员退款[001]',
     ]);
 } elseif (Request::has('price')) {
     $price = Request::int('price');
@@ -23,7 +23,7 @@ if (Request::has('num')) {
     $res = Order::refund2($id, $price, [
         'admin' => _W('username'),
         'ip' => CLIENT_IP,
-        'message' => '管理员退款',
+        'message' => '管理员退款[002]',
     ]);
 } else {
     JSON::fail('参数不正确！');

@@ -20,9 +20,11 @@ if (empty($user) || !$user->isAccessible()) {
     JSON::fail('没有权限管理！');
 }
 
-$result = Pay::refundByLog($log);
+$total = 0;
+
+$result = Pay::refundByLog($log, $total, ['message' => '管理员']);
 if (is_error($result)) {
     JSON::fail($result);
 }
 
-JSON::success('已提交退款请求！');
+JSON::success('退款成功， 退款金额：'. number_format($total / 100, 2, '.', '')) . '元';

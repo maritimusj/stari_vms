@@ -46,10 +46,13 @@
 </style>
 <ul class="nav nav-tabs" id="navbar">
     <li role="presentation"><a href="{php echo $this->createWebUrl('order');}">订单列表</a></li>
-    <li role="presentation"><a href="#">支付记录</a></li>
+    <li role="presentation" class="active"><a href="#">支付记录</a></li>
 </ul>
 <div class="panel panel-default nav-tab-item">
-    <div class="panel-heading">
+    <div class="heading">
+        <span class="operate">
+            <a href="{php echo $this->createWebUrl('order');}"><i class="fa fa-reply" title="返回"></i></a>
+        </span>
     </div>
     <div class="panel-body">
         {if $logs}

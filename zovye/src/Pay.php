@@ -360,13 +360,12 @@ class Pay
     {
         $device_id = $pay_log->getDeviceId();
 
-        if ($device_id == 0) {
-            $device = Device::getDummyDevice();
-        } else {
+        if ($device_id != 0) {
             $device = Device::get($device_id);
-            if (empty($device)) {
-                return err('找不到这个设备！');
-            }
+        }
+
+        if (!isset($device)) {
+            $device = Device::getDummyDevice();
         }
 
         $pay = self::getActivePayObj($device, $pay_log->getPayName());

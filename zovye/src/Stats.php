@@ -763,7 +763,7 @@ class Stats
         $total = [
             'device' => Device::query()->count(),
             'agent' => Agent::query()->count(),
-            'advs' => Account::query(['state' => 1])->count() + Advertising::query(['state <>' => Advertising::DELETED]
+            'advs' => Account::query(['state' => Account::NORMAL])->count() + Advertising::query(['state <>' => Advertising::DELETED]
                 )->count(),
             'user' => $data['all']['f'],
         ];

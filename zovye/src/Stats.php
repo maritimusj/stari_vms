@@ -735,18 +735,24 @@ class Stats
             }
         );
 
-        $data['last7days']['f'] = CacheUtil::cachedCallUtil(new DateTime('next day 00:00:00'), function () use ($query) {
-            $last7days = new DateTime('-7 days 00:00');
+        $data['last7days']['f'] = CacheUtil::cachedCallUtil(
+            new DateTime('next day 00:00:00'),
+            function () use ($query) {
+                $last7days = new DateTime('-7 days 00:00');
 
-            return $query->resetAll()->where([
-                'createtime >=' => $last7days->getTimestamp(),
-            ])->count();
-        });
+                return $query->resetAll()->where([
+                    'createtime >=' => $last7days->getTimestamp(),
+                ])->count();
+            }
+        );
 
         $month = new DateTime('first day of this month 00:00');
-        $data['month']['f'] = CacheUtil::cachedCallUtil(new DateTime('next day 00:00:00'), function () use ($query, $month) {
-            return $query->resetAll()->where(['createtime >=' => $month->getTimestamp()])->count();
-        });
+        $data['month']['f'] = CacheUtil::cachedCallUtil(
+            new DateTime('next day 00:00:00'),
+            function () use ($query, $month) {
+                return $query->resetAll()->where(['createtime >=' => $month->getTimestamp()])->count();
+            }
+        );
 
         $data['lastmonth']['f'] = CacheUtil::cachedCallUtil(
             new DateTime('first day of next month 00:00:00'),
@@ -763,8 +769,8 @@ class Stats
         $total = [
             'device' => Device::query()->count(),
             'agent' => Agent::query()->count(),
-            'advs' => Account::query(['state' => Account::NORMAL])->count() + Advertising::query(['state <>' => Advertising::DELETED]
-                )->count(),
+            'advs' => Account::query(['state' => Account::NORMAL])->count() +
+                Advertising::query(['state' => Advertising::NORMAL])->count(),
             'user' => $data['all']['f'],
         ];
 

@@ -300,28 +300,25 @@ class common
         Device::createBluetoothEventLog($device, $response);
 
         if ($response->isOpenResult()) {
-
             $order = Order::getLastOrderOfDevice($device);
 
             if ($order) {
-                if (Locker::try("order:{$order->getOrderNO()}")) {
-                    if (empty($order->getExtraData('bluetooth.raw'))) {
-                        $order->setExtraData('bluetooth.raw', $response->getEncodeData());
-                        if ($response->isOpenResultOk()) {
-                            $order->setBluetoothResultOk();
-                        } elseif ($response->isOpenResultFail()) {
-                            $order->setBluetoothResultFail($response->getMessage());
-                            if (Helper::NeedAutoRefund($device)) {
-                                //启动退款
-                                Job::refund($order->getOrderNO(), $response->getMessage());
-                            }
+                if (empty($order->getExtraData('bluetooth.raw'))) {
+                    $order->setExtraData('bluetooth.raw', $response->getEncodeData());
+                    if ($response->isOpenResultOk()) {
+                        $order->setBluetoothResultOk();
+                    } elseif ($response->isOpenResultFail()) {
+                        $order->setBluetoothResultFail($response->getMessage());
+                        if (Helper::NeedAutoRefund($device)) {
+                            //启动退款
+                            Job::refund($order->getOrderNO(), $response->getMessage());
                         }
-                        if (!$order->save()) {
-                            Log::error('order', [
-                                'order' => $order->profile(),
-                                'error' => 'save order failed',
-                            ]);
-                        }
+                    }
+                    if (!$order->save()) {
+                        Log::error('order', [
+                            'order' => $order->profile(),
+                            'error' => 'save order failed',
+                        ]);
                     }
                 }
             }

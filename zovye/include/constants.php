@@ -85,7 +85,7 @@ define('DEFAULT_SITE_TITLE', '新零售SaaS平台');
 define('DEFAULT_COPYRIGHTS', '© 版权所有，侵权必究');
 
 define('WITHDRAW_ADMIN', 0); //手动打款
-define('WITHDRAW_SYS', 1); //自动打款
+define('WITHDRAW_AUTO', 1); //自动打款
 define('MCH_PAY_MIN_MONEY', 100); //微信提现最低金额（分）
 
 define('DEFAULT_IMAGE_DURATION', 10); //图片广告默认停留时间（秒）

@@ -238,7 +238,7 @@ class balance
                 Job::withdraw($user->getId(), $amount);
 
                 //自动打款
-                if (settings('commission.withdraw.pay_type') == WITHDRAW_SYS) {
+                if (settings('commission.withdraw.pay_type') == WITHDRAW_AUTO) {
                     $result = CommissionBalance::MCHPay($r);
                     if (is_error($result)) {
                         return err('自动打款失败，请联系管理员！');

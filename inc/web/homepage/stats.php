@@ -26,20 +26,20 @@ $data = CacheUtil::cachedCall(30, function () {
     ];
 
     $data = Stats::brief();
-    $device_stat = [];
+    $device_stats = [];
 
     $all_device = Device::query()->count();
     $time_less_15 = new DateTime('-15 min');
     $ts = $time_less_15->getTimestamp();
 
-    $device_stat['on'] = Device::query('last_online IS NOT NULL AND last_online > '.$ts)->count();
-    $device_stat['off'] = $all_device - $device_stat['on'];
+    $device_stats['on'] = Device::query('last_online IS NOT NULL AND last_online > '.$ts)->count();
+    $device_stats['off'] = $all_device - $device_stats['on'];
 
     return [
         'stats_titles' => $stats_titles,
         'rows' => $rows,
         'data' => $data,
-        'device_stat' => $device_stat,
+        'device_stat' => $device_stats,
     ];
 });
 

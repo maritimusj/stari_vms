@@ -39,7 +39,7 @@ $data = CacheUtil::cachedCall(30, function () {
         'stats_titles' => $stats_titles,
         'rows' => $rows,
         'data' => $data,
-        'device_stat' => $device_stats,
+        'device_stats' => $device_stats,
     ];
 });
 

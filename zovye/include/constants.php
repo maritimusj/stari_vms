@@ -79,7 +79,7 @@ define('PAY_TIMEOUT', 180); //支付超时，秒
 
 define('DEFAULT_ACCOUNT_DESC', '长按识别公众号，免费领取');
 
-define('DEFAULT_BALANCE_TITLE', '卓币');
+define('DEFAULT_BALANCE_TITLE', '币');
 define('DEFAULT_BALANCE_UNIT_NAME', '个');
 define('DEFAULT_SITE_TITLE', '新零售SaaS平台');
 define('DEFAULT_COPYRIGHTS', '© 版权所有，侵权必究');

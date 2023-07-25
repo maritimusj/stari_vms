@@ -102,7 +102,7 @@ if ($op == 'default') {
     $result = $user->getBalance()->change($val, Balance::API_UPDATE, [
         'appkey' => $app_key,
         'reason' => Request::str('reason', '', true),
-        'ip' => Session::getClientIp(),
+        'ip' => CLIENT_IP,
     ]);
 
     if (!$result) {

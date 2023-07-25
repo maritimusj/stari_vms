@@ -120,7 +120,7 @@ class Fueling
                 'goods_id' => $goods['id'],
                 'num' => 1,
                 'price' => 0,
-                'ip' => $extra['ip'] ?? Session::getClientIp(),
+                'ip' => $extra['ip'] ?? CLIENT_IP,
                 'extra' => [
                     'device' => [
                         'imei' => $device->getImei(),

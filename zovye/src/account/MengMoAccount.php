@@ -53,7 +53,7 @@ class MengMoAccount
             'nickname' => $fans['nickname'],
             'sex' => empty($fans['sex']) ? 0 : $fans['sex'],
             'headUrl' => $fans['headimgurl'],
-            'ipAddress' => Session::getClientIp(),
+            'ipAddress' => CLIENT_IP,
             'userAgent' => $_SERVER['HTTP_USER_AGENT'],
             'countryName' => $fans['country'],
             'provinceName' => $fans['province'],

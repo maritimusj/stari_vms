@@ -260,7 +260,7 @@ class api
                 'account' => $account->getId(),
                 'goods' => $goods['id'],
                 'orderUID' => $orderUID,
-                'ip' => Session::getClientIp(),
+                'ip' => CLIENT_IP,
             ])) {
                 return ['orderUID' => $orderUID];
             }
@@ -283,7 +283,7 @@ class api
                 'device' => $device->getId(),
                 'goods' => $goods['id'],
                 'num' => 1,
-                'ip' => Session::getClientIp(),
+                'ip' => CLIENT_IP,
                 'code' => $code,
             ])) {
                 return ['orderUID' => $orderUID];

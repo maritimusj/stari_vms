@@ -576,7 +576,7 @@ class Helper
                 'price' => $total_price,
                 'order_no' => $serial,
                 'chargerID' => $chargerID,
-                'ip' => Session::getClientIp(),
+                'ip' => CLIENT_IP,
             ]
         );
 

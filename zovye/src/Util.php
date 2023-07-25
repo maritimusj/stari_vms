@@ -315,8 +315,7 @@ include './index.php';
             }
 
             if (!isEmptyArray($limits['area'])) {
-                $ip = Session::getClientIp();
-                $info = LocationUtil::getIpInfo($ip);
+                $info = LocationUtil::getIpInfo(CLIENT_IP);
                 if ($info) {
                     if ($limits['area']['province'] && $info['data']['province'] != $limits['area']['province']) {
                         return err('区域（省）不允许！');

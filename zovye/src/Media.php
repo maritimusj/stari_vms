@@ -23,19 +23,19 @@ class Media extends State
 
     public static function sign($url): string
     {
-        return sha1(App::uid().Session::getClientIp().$url).'@'.$url;
+        return sha1(App::uid().CLIENT_IP.$url).'@'.$url;
     }
 
     public static function verify($signature_url): bool
     {
         list($sha1val, $url) = explode('@', $signature_url, 2);
-        return !empty($sha1val) && !empty($url) && sha1(App::uid().Session::getClientIp().$url) == $sha1val;
+        return !empty($sha1val) && !empty($url) && sha1(App::uid().CLIENT_IP.$url) == $sha1val;
     }
 
     public static function strip($signature_url)
     {
         list($sha1val, $url) = explode('@', $signature_url, 2);
-        if (!empty($sha1val) && !empty($url) && sha1(App::uid().Session::getClientIp().$url) == $sha1val) {
+        if (!empty($sha1val) && !empty($url) && sha1(App::uid().CLIENT_IP.$url) == $sha1val) {
             return $url;
         }
         return false;

@@ -133,7 +133,7 @@ class Charging
                 'num' => 1,
                 'price' => 0,
                 'account' => empty($acc) ? '' : $acc->name(),
-                'ip' => $extra['ip'] ?? Session::getClientIp(),
+                'ip' => $extra['ip'] ?? CLIENT_IP,
                 'extra' => [
                     'group' => $group->profile(),
                     'device' => [

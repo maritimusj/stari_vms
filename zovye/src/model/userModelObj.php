@@ -899,13 +899,13 @@ class userModelObj extends modelObj
 
     public function getLastActiveIp(): string
     {
-        return $this->getLastActiveData('ip', Session::getClientIp());
+        return $this->getLastActiveData('ip', CLIENT_IP);
     }
 
     public function setLastActiveDevice(deviceModelObj $device = null): bool
     {
         if ($device) {
-            $this->setLastActiveData('ip', Session::getClientIp());
+            $this->setLastActiveData('ip', CLIENT_IP);
         }
 
         return $device ? $this->setLastActiveData($device) : $this->setLastActiveData(deviceModelObj::class);
@@ -924,7 +924,7 @@ class userModelObj extends modelObj
     public function setLastActiveAccount(accountModelObj $account = null): bool
     {
         if ($account) {
-            $this->setLastActiveData('ip', Session::getClientIp());
+            $this->setLastActiveData('ip', CLIENT_IP);
         }
 
         return $account ? $this->setLastActiveData($account) : $this->setLastActiveData(accountModelObj::class);

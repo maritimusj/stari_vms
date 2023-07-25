@@ -97,7 +97,7 @@ class pay
             $data['notify_url'] = $params['notify_url'];
         }
 
-        $data['terminal_ip'] = Session::getClientIp();
+        $data['terminal_ip'] = CLIENT_IP;
 
         $data['attach'] = $params['deviceUID'];
         $data['order_body'] = $params['body'];
@@ -141,7 +141,7 @@ class pay
         $data['open_id'] = $params['userUID'];
         $data['attach'] = $params['deviceUID'];
         $data['order_body'] = $params['body'];
-        $data['terminal_ip'] = Session::getClientIp();
+        $data['terminal_ip'] = CLIENT_IP;
 
         $res = $this->requestApi("$this->api$path", $data);
 
@@ -180,7 +180,7 @@ class pay
         $data['open_id'] = $params['userUID'];
         $data['attach'] = $params['deviceUID'];
         $data['order_body'] = $params['body'];
-        $data['terminal_ip'] = Session::getClientIp();
+        $data['terminal_ip'] = CLIENT_IP;
 
         $res = $this->requestApi("$this->api$path", $data);
 

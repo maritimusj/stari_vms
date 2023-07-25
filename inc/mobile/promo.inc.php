@@ -155,7 +155,7 @@ if ($op == 'sms') {
         'goods_id' => $goods['id'],
         'num' => $num,
         'price' => 0,
-        'ip' => Session::getClientIp(),
+        'ip' => CLIENT_IP,
         'extra' => [
             'level' => LOG_GOODS_FREE,
             'goods' => $goods,

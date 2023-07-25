@@ -126,7 +126,8 @@ if ($limit['end']) {
 $query = Order::query($condition);
 
 if (empty($condition)) {
-    $total = Order::getLastOrder()['id'] ?? 0;
+    $last_order = Order::getLastOrder();
+    $total = $last_order ? $last_order['id'] : 0;
 } else {
     $total = $query->count();
 }

@@ -204,6 +204,10 @@ class Order extends State
         /** @var orderModelObj $last_order */
         $last_order = $query->findOne();
 
+        if (empty($last_order)) {
+            return null;
+        }
+
         return $fetch_order_obj ? $last_order : [
             'id' => $last_order->getId(),
             'createtime' => $last_order->getCreatetime(),

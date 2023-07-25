@@ -730,6 +730,7 @@ class Order extends State
     public static function format(orderModelObj $order, bool $detail = false): array
     {
         $userCharacter = User::getUserCharacter($order->getOpenid());
+
         $data = [
             'id' => $order->getId(),
             'src' => $order->getSrc(),
@@ -760,6 +761,7 @@ class Order extends State
             $data['device'] = [];
 
             if ($order->isChargingOrder()) {
+
                 $group = $order->getExtraData('group');
                 if ($group) {
                     $data['group'] = $group;
@@ -781,9 +783,12 @@ class Order extends State
                         }
                     }
                 }
+
                 $data['pay'] = (array)$order->getExtraData('card', []);
                 $data['BMS']['timeout'] = $order->isChargingBMSReportTimeout();
+
             } elseif ($order->isFuelingOrder()) {
+
                 $data['num'] = number_format($data['num'], 2, '.', '');
                 $data['goods'] = $order->getExtraData('goods');
                 $data['goods']['img'] = Util::toMedia($data['goods']['img'], true);

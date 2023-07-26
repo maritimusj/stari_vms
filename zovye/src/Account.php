@@ -1569,14 +1569,14 @@ class Account extends State
         return $titles[$type] ?? '未知';
     }
 
-    public static function replaceCode($desc, $placeholder, $code)
+    public static function replaceCode($desc, $placeholder, $code, bool $must_replace = true)
     {
         if (strpos($desc, '{'.$placeholder.'}') !== false) {
             $desc = PlaceHolder::replace($desc, [
                 $placeholder => $code ? "<span data-key=\"$code\">$code</span>" : '',
             ]);
         } else {
-            if ($code) {
+            if ($code && $must_replace) {
                 $desc = "回复<span data-key=\"$code\">$code</span>免费领取！";
             }
         }

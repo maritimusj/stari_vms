@@ -1284,7 +1284,7 @@ class Stats
         $now_str = $now->format('m月d日');
 
         $data = [
-            'month' => $now->format('Y年m月'),
+            'month' => $begin->format('Y年m月'),
         ];
 
         $list = [];

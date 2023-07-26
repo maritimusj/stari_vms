@@ -127,6 +127,7 @@ router::exec($op, [
     'ViewKeeperStats' => [keeper::class, 'viewKeeperStats'],
     'KeeperOrderRefund' => [keeper::class, 'orderRefund'],
     'KeeperUserStats' => [keeper::class, 'userStats'],
+    'KeeperUserCommissionStats' => [keeper::class, 'commissionStats'],
     'MpDetail' => [mp::class, 'detail'],
     'MpAssign' => [mp::class, 'assign'],
     'Mpupload' => [mp::class, 'upload'],

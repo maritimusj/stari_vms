@@ -29,6 +29,7 @@ use zovye\JSON;
 use zovye\model\keeperModelObj;
 use zovye\LoginData;
 use zovye\model\replenishModelObj;
+use zovye\Stats;
 use zovye\User;
 use zovye\Util;
 use zovye\We7;
@@ -1399,5 +1400,25 @@ class keeper
         }
 
         return agent::getUserStats($user->getOpenid(), $begin->getTimestamp(), $end->getTimestamp(), $cond);
+    }
+
+    public static function commissionStats(): array
+    {
+        $keeper = keeper::getKeeper();
+
+        $user = $keeper->getUser();
+        if (empty($user)) {
+            return [];
+        }
+
+        $year = Request::str('year', (new DateTime())->format('Y'));
+
+        list($years, $data) = Stats::getUserMonthCommissionStatsOfYear($user, $year);
+
+        return [
+            'data' => $data,
+            'years' => $years && count($years) > 1 ? $years : [],
+            'current' => $year,
+        ];
     }
 }

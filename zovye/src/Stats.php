@@ -1284,8 +1284,7 @@ class Stats
         $now_str = $now->format('m月d日');
 
         $data = [
-            'day' => $now->format('Y年m月'),
-            'list' => [],
+            'month' => $now->format('Y年m月'),
         ];
 
         $list = [];
@@ -1323,7 +1322,7 @@ class Stats
 
         krsort($list);
 
-        $data['list'] = $list;
+        $data['data'] = $list;
 
         return $data;
     }

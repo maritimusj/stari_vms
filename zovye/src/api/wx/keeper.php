@@ -1411,8 +1411,14 @@ class keeper
             return [];
         }
 
+        if (Request::has('month')) {
+            //获取指定月份每天的收入统计
+            return Stats::getDayOfMonthCommissionStatsData($user, Request::str('month'));
+        }
+
         $year = Request::str('year', (new DateTime())->format('Y'));
 
+        //获取指定年份每月收入统计
         list($years, $data) = Stats::getUserMonthCommissionStatsOfYear($user, $year);
 
         return [

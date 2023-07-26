@@ -1234,8 +1234,13 @@ class Stats
                 $params[] = Cache::resultExpiredAfter(10);
             }
 
-            $res = Cache::fetch($uid, function () use ($user, $begin) {
-                return Stats::getMonthCommissionStatsData($user, $begin);
+            $begin_ts = $begin->getTimestamp();
+            $begin->modify('next month');
+
+            $end_ts = $begin->getTimestamp();
+
+            $res = Cache::fetch($uid, function () use ($user, $begin_ts, $end_ts) {
+                return Stats::getCommissionData($user, $begin_ts, $end_ts);
             }, ...$params);
 
             if (is_error($res)) {
@@ -1243,8 +1248,6 @@ class Stats
             }
 
             $data[$month_str] = $res;
-
-            $begin->modify('next month');
         }
 
         krsort($data);
@@ -1255,29 +1258,81 @@ class Stats
         return $result;
     }
 
-    public static function getMonthCommissionStatsData(userModelObj $user, $month): array
+    public static function getDayOfMonthCommissionStatsData(userModelObj $user, string $month): array
+    {
+        try {
+            $time = new DateTime($month);
+
+            $time->modify('first day of this month 00:00');
+            $begin = new DateTime($time->format('Y-m-d'));
+
+            $time->modify('first day of next month 00:00');
+            $end = new DateTime($time->format('Y-m-d'));
+
+        } catch (Exception $e) {
+            return err('时间不正确！');
+        }
+
+        $now = new DateTime();
+        if ($end > $now) {
+            $end = $now;
+        }
+
+        $now_str = $now->format('m月d日');
+
+        $data = [
+            'day' => $now->format('Y年m月'),
+            'list' => [],
+        ];
+
+        $list = [];
+
+        while ($begin < $end) {
+            $day_str = $begin->format('m月d日');
+
+            $uid = Cache::makeUID([
+                'api' => 'dayStats',
+                'user' => $user->getOpenid(),
+                'day' => $day_str,
+            ]);
+
+            $params = [];
+
+            if ($day_str == $now_str) {
+                $params[] = Cache::resultExpiredAfter(10);
+            }
+
+            $begin_ts = $begin->getTimestamp();
+            $begin->modify('next day 00:00');
+
+            $end_ts = $begin->getTimestamp();
+
+            $res = Cache::fetch($uid, function () use ($user, $begin_ts, $end_ts) {
+                return Stats::getCommissionData($user, $begin_ts, $end_ts);
+            }, ...$params);
+
+            if (is_error($res)) {
+                return $res;
+            }
+
+            $list[$day_str] = $res;
+        }
+
+        krsort($list);
+
+        $data['list'] = $list;
+
+        return $data;
+    }
+
+
+    public static function getCommissionData(userModelObj $user, int $begin, int $end): array
     {
         $cond = [
             'openid' => $user->getOpenid(),
+            'createtime >=' => $begin,
+            'createtime <' => $end,
         ];
-
-        try {
-            if (is_string($month)) {
-                $time = new DateTime($month);
-            } elseif ($month instanceof DateTimeInterface) {
-                $time = new DateTime($month->format('Y-m-d 00:00'));
-            } else {
-                $time = new DateTime();
-            }
-            $time->modify('first day of this month 00:00');
-            $cond['createtime >='] = $time->getTimestamp();
-
-            $time->modify('first day of next month 00:00');
-            $cond['createtime <'] = $time->getTimestamp();
-
-        } catch (Exception $e) {
-            return [];
-        }
 
         $res = CommissionBalance::query($cond)->findAll();
 

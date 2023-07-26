@@ -1611,7 +1611,7 @@ class agent
         return $result;
     }
 
-    public static function agentStat(): array
+    public static function agentStats(): array
     {
         $agent = common::getAgentOrPartner();
 
@@ -2084,7 +2084,7 @@ class agent
         }
     }
 
-    public static function homepageOrderStat(): array
+    public static function homepageOrderStats(): array
     {
         $user = common::getAgentOrPartner();
         $agent_id = $user->getAgentId();

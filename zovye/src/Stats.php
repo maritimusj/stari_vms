@@ -1217,10 +1217,11 @@ class Stats
             $first_datetime->modify('next year');
         }
 
-        $now_str = $now->format('Y年m月');
+        $now_str = $now->format('Y-m');
 
         while ($begin < $end) {
-            $month_str = $begin->format('Y年m月');
+            $month_str = $begin->format('Y-m');
+            $month_title = $begin->format('Y年m月');
 
             $uid = Cache::makeUID([
                 'api' => 'monthStats',
@@ -1247,7 +1248,9 @@ class Stats
                 return $res;
             }
 
-            $data[$month_str] = $res;
+            $res['month'] = $month_str;
+
+            $data[$month_title] = $res;
         }
 
         krsort($data);

@@ -1327,7 +1327,7 @@ class agent
      *
      * @return array
      */
-    public static function orders(): array
+    public static function orderList(): array
     {
         common::checkCurrentUserPrivileges('F_sb');
 
@@ -1346,6 +1346,11 @@ class agent
         $user_id = Request::int('userid');
         if ($user_id) {
             $condition['user_id'] = $user_id;
+        }
+
+        if (empty($condition)) {
+            $agent = self::getAgent();
+            $condition['agent_id'] = $agent->getId();
         }
 
         return self::getAssociatedOrderList($condition);

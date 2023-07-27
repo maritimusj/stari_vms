@@ -99,7 +99,7 @@ if ($fn == 'default') {
             'title' => $title,
             'summary' => $summary,
         ];
-    }, $begin->getTimestamp(), $end->getTimestamp());
+    }, $begin ? $begin->getTimestamp() : 0, $end ? $end->getTimestamp() : 0);
 
     JSON::success($result);
 
@@ -160,7 +160,7 @@ if ($fn == 'default') {
             'title' => $title,
             'summary' => $summary,
         ];
-    }, $begin->getTimestamp(), $end->getTimestamp(), $agent->getId());
+    }, $begin ? $begin->getTimestamp() : 0, $end ? $end->getTimestamp() : 0, $agent->getId());
 
     JSON::success($result);
 }

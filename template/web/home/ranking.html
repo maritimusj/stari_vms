@@ -256,6 +256,15 @@
                 year: null,
                 agent: null,
             },
+            watch: {
+                loading(v) {
+                    if (v) {
+                        util.loading();
+                    } else {
+                        util.loaded();
+                    }
+                }
+            },
             mounted() {
                 this.initDateCtrl();
                 this.getAgentList(this.start, this.end);

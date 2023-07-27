@@ -47,57 +47,61 @@ if ($fn == 'default') {
 
     extract(getParsedDate());
 
-    $query = Order::query();
+    $result = CacheUtil::cachedCall(30, function () use ($begin, $end, $title) {
+        $query = Order::query();
 
-    if ($begin) {
-        $query->where(['createtime >=' => $begin->getTimestamp()]);
-    }
-   
-    if ($end) {
-        $query->where(['createtime <' => $end->getTimestamp()]);
-    }
-    
-    $query->groupBy('agent_id');
-    $query->orderBy('price DESC');
-
-    $list = [];
-    $summary = [
-        'order' => 0,
-        'price' => 0,
-        'amount' => 0,
-    ];
-
-    $all = $query->getAll(['agent_id', 'COUNT(*) AS total', 'SUM(price) AS price', 'SUM(num) AS amount']);
-    foreach ((array)$all as $item) {
-        $agent = Agent::get($item['agent_id']);
-        if ($agent) {
-            $device_total = Device::query(['agent_id' => $agent->getId()])->count();
-            $list[] = [
-                'agent' => $agent->profile(false),
-                'devices_total' => $device_total,
-                'order_total' => intval($item['total']),
-                'price' => number_format($item['price'] / 100, 2, '.', ''),
-                'amount' => App::isFuelingDeviceEnabled() ?
-                    number_format($item['amount'] / 100, 2, '.', '') : $item['amount'],
-            ];
-            $summary['order'] += intval($item['total']);
-            $summary['price'] += $item['price'];
-            $summary['amount'] += $item['amount'];
+        if ($begin) {
+            $query->where(['createtime >=' => $begin->getTimestamp()]);
         }
-    }
 
-    $summary['price'] = number_format($summary['price'] / 100, 2, '.', '');
-    if (App::isFuelingDeviceEnabled()) {
-        $summary['amount'] = number_format($summary['amount'] / 100, 2, '.', '');
-    }
+        if ($end) {
+            $query->where(['createtime <' => $end->getTimestamp()]);
+        }
 
-    JSON::success([
-        'begin' => isset($begin) ? $begin->format('Y-m-d') : '',
-        'end' => isset($end) ? $end->modify('-1 day')->format('Y-m-d') : '',
-        'list' => $list,
-        'title' => $title,
-        'summary' => $summary,
-    ]);
+        $query->groupBy('agent_id');
+        $query->orderBy('price DESC');
+
+        $list = [];
+        $summary = [
+            'order' => 0,
+            'price' => 0,
+            'amount' => 0,
+        ];
+
+        $all = $query->getAll(['agent_id', 'COUNT(*) AS total', 'SUM(price) AS price', 'SUM(num) AS amount']);
+        foreach ((array)$all as $item) {
+            $agent = Agent::get($item['agent_id']);
+            if ($agent) {
+                $device_total = Device::query(['agent_id' => $agent->getId()])->count();
+                $list[] = [
+                    'agent' => $agent->profile(false),
+                    'devices_total' => $device_total,
+                    'order_total' => intval($item['total']),
+                    'price' => number_format($item['price'] / 100, 2, '.', ''),
+                    'amount' => App::isFuelingDeviceEnabled() ?
+                        number_format($item['amount'] / 100, 2, '.', '') : $item['amount'],
+                ];
+                $summary['order'] += intval($item['total']);
+                $summary['price'] += $item['price'];
+                $summary['amount'] += $item['amount'];
+            }
+        }
+
+        $summary['price'] = number_format($summary['price'] / 100, 2, '.', '');
+        if (App::isFuelingDeviceEnabled()) {
+            $summary['amount'] = number_format($summary['amount'] / 100, 2, '.', '');
+        }
+
+        return [
+            'begin' => isset($begin) ? $begin->format('Y-m-d') : '',
+            'end' => isset($end) ? $end->modify('-1 day')->format('Y-m-d') : '',
+            'list' => $list,
+            'title' => $title,
+            'summary' => $summary,
+        ];
+    }, $begin, $end);
+
+    JSON::success($result);
 
 } elseif ($fn == 'device') {
     extract(getParsedDate());
@@ -107,54 +111,58 @@ if ($fn == 'default') {
         JSON::fail('找不到这个代理商！');
     }
 
-    $query = Order::query(['agent_id' => $agent->getId()]);
+    $result = CacheUtil::cachedCall(30, function() use($begin, $end, $agent, $title) {
+        $query = Order::query(['agent_id' => $agent->getId()]);
 
-    if ($begin) {
-        $query->where(['createtime >=' => $begin->getTimestamp()]);
-    }
-   
-    if ($end) {
-        $query->where(['createtime <' => $end->getTimestamp()]);
-    }
-
-    $query->groupBy('device_id');
-    $query->orderBy('price DESC');
-
-    $list = [];
-    $summary = [
-        'order' => 0,
-        'price' => 0,
-        'amount' => 0,
-    ];
-    $all = $query->getAll(['device_id', 'COUNT(*) AS total', 'SUM(price) AS price', 'SUM(num) AS amount']);
-    foreach ((array)$all as $item) {
-        $device = Device::get($item['device_id']);
-        if ($device) {
-            $list[] = [
-                'device' => $device->profile(),
-                'order_total' => intval($item['total']),
-                'price' => number_format($item['price'] / 100, 2, '.', ''),
-                'amount' => App::isFuelingDeviceEnabled()?
-                    number_format($item['amount'] / 100, 2, '.', '') : $item['amount'],
-            ];
-            $summary['order'] += intval($item['total']);
-            $summary['price'] += $item['price'];
-            $summary['amount'] += $item['amount'];
+        if ($begin) {
+            $query->where(['createtime >=' => $begin->getTimestamp()]);
         }
-    }
 
-    $summary['price'] = number_format($summary['price'] / 100, 2, '.', '');
-    if (App::isFuelingDeviceEnabled()) {
-        $summary['amount'] = number_format($summary['amount'] / 100, 2, '.', '');
-    }
+        if ($end) {
+            $query->where(['createtime <' => $end->getTimestamp()]);
+        }
 
-    JSON::success([
-        'begin' => isset($begin) ? $begin->format('Y-m-d') : '',
-        'end' => isset($end) ? $end->modify('-1 day')->format('Y-m-d') : '',
-        'list' => $list,
-        'title' => $title,
-        'summary' => $summary,
-    ]);
+        $query->groupBy('device_id');
+        $query->orderBy('price DESC');
+
+        $list = [];
+        $summary = [
+            'order' => 0,
+            'price' => 0,
+            'amount' => 0,
+        ];
+        $all = $query->getAll(['device_id', 'COUNT(*) AS total', 'SUM(price) AS price', 'SUM(num) AS amount']);
+        foreach ((array)$all as $item) {
+            $device = Device::get($item['device_id']);
+            if ($device) {
+                $list[] = [
+                    'device' => $device->profile(),
+                    'order_total' => intval($item['total']),
+                    'price' => number_format($item['price'] / 100, 2, '.', ''),
+                    'amount' => App::isFuelingDeviceEnabled() ?
+                        number_format($item['amount'] / 100, 2, '.', '') : $item['amount'],
+                ];
+                $summary['order'] += intval($item['total']);
+                $summary['price'] += $item['price'];
+                $summary['amount'] += $item['amount'];
+            }
+        }
+
+        $summary['price'] = number_format($summary['price'] / 100, 2, '.', '');
+        if (App::isFuelingDeviceEnabled()) {
+            $summary['amount'] = number_format($summary['amount'] / 100, 2, '.', '');
+        }
+
+        return [
+            'begin' => isset($begin) ? $begin->format('Y-m-d') : '',
+            'end' => isset($end) ? $end->modify('-1 day')->format('Y-m-d') : '',
+            'list' => $list,
+            'title' => $title,
+            'summary' => $summary,
+        ];
+    }, $begin, $end, $agent->getId());
+
+    JSON::success($result);
 }
 
 function getParsedDate(): array

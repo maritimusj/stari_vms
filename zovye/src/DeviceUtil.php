@@ -134,11 +134,9 @@ class DeviceUtil
             return $pull_result;
         }
 
-        $locker = $device->payloadLockAcquire(3);
-
         //如果是运营人员测试，则不减少库存
         if (empty($params['keeper'])) {
-
+            $locker = $device->payloadLockAcquire(3);
             if (empty($locker)) {
                 return err('设备正忙，请重试！');
             }
@@ -146,34 +144,9 @@ class DeviceUtil
             if (is_error($payload)) {
                 return err('保存库存失败！');
             }
+            $locker->unlock();
             $device->updateAppRemain();
-        } else {
-            //保存库存记录
-            $code = $device->getPayloadCode(TIMESTAMP);
-            if (!PayloadLogs::create([
-                'device_id' => $device->getId(),
-                'lane_id' => $lane,
-                'goods_id' => $goods['id'],
-                'org' => $goods['num'],
-                'num' => $goods['num'],
-                'extra' => [
-                    'reason' => "运营人员设备测试，用户：{$data['userid']}",
-                    'code' => $code,
-                    'clr' => Util::randColor(),
-                ],
-                'createtime' => TIMESTAMP,
-            ])) {
-                return err('保存库存记录失败！');
-            }
-            if (!$device->updateSettings('last', [
-                'code' => $code,
-                'time' => TIMESTAMP,
-            ])) {
-                return err('保存流水记录失败！');
-            }
         }
-
-        $locker->unlock();
 
         $device->cleanError();
         $device->save();

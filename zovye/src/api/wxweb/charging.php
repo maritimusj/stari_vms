@@ -92,9 +92,9 @@ class charging
 
         if ($lng > 0 && $lat > 0) {
             $distanceFN = function ($loc) use ($lng, $lat) {
-                $res = CacheUtil::cachedCall(10, function () use ($loc, $lng, $lat) {
+                $res = CacheUtil::cachedCall(30, function () use ($loc, $lng, $lat) {
                     return LocationUtil::getDistance($loc, ['lng' => $lng, 'lat' => $lat], 'driving');
-                }, $loc, $lng, $lat);
+                }, $loc, intval($lng * 1000), intval($lat * 1000));
 
                 return is_error($res) ? 0 : $res;
             };
@@ -104,8 +104,7 @@ class charging
             };
         }
 
-        $order_by = sprintf("st_distance_sphere(POINT(%f,%f),loc) asc", $lng, $lat);
-        $query->orderBy($order_by);
+        $query->orderBy(sprintf('st_distance_sphere(POINT(%f,%f),loc) asc', $lng, $lat));
 
         //列表数据
         $query->page($page, $page_size);
@@ -310,6 +309,7 @@ class charging
             if ($charging_now_data->getUserId() != $user->getId()) {
                 return err('设备正在使用中！');
             }
+
             return [
                 'serial' => $charging_now_data->getSerial(),
                 'createtime' => date('Y-m-d H:is', $charging_now_data->getCreatetime()),

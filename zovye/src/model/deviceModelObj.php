@@ -1002,7 +1002,6 @@ class deviceModelObj extends modelObj
                 'org' => $entry['org'],
                 'num' => $entry['num'],
                 'extra' => [
-                    'lane' => $entry['laneIndex'],
                     'reason' => $reason,
                     'code' => $code,
                     'clr' => $clr,

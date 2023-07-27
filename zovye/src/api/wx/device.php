@@ -273,7 +273,7 @@ class device
 
     public static function deviceNearBy(): array
     {
-        return DeviceUtil::getNearBy(Request::bool('all') ? null : common::getAgent());
+        return DeviceUtil::getNearBy(common::getAgent());
     }
 
     /**

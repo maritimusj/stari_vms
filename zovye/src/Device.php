@@ -456,6 +456,11 @@ class Device extends State
         return boolval(preg_match('/^'.Device::DUMMY_DEVICE_PREFIX.'/', $imei));
     }
 
+    public static function exists($condition): bool
+    {
+        return self::query()->exists($condition);
+    }
+
     /**
      * @param mixed $id
      * @param bool $is_imei

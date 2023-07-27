@@ -171,6 +171,10 @@ $result = DBUtil::transactionDo(function () use ($id, &$device) {
         }
 
     } else {
+        if (Device::exists(['imei' => $data['imei']])) {
+            throw new RuntimeException('设备IMEI已经存在！');
+        }
+
         //创建新设备
         $device = Device::create($data);
         if (empty($device)) {

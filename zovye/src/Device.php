@@ -234,6 +234,7 @@ class Device extends State
                 $changed = $lanes_data[$lane_id]['num'] - $old;
                 if ($changed != 0) {
                     $result[$goods] = [
+                        'laneIndex' => $index,
                         'goodsId' => $goods,
                         'org' => intval($result[$goods]['org']) + $old,
                         'num' => intval($result[$goods]['num']) + $changed,

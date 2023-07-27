@@ -3,8 +3,8 @@
 {template 'web/common/header'}
 <style>
     .goods img {
-        width: 100px;
-        height: 100px;
+        width: 60px;
+        height: 60px;
     }
     .inc {
         color: #4caf50;
@@ -28,6 +28,9 @@
     .code.error i {
         color: #ff5722;
     } 
+    .lane {
+        color: gray;
+    }
 </style>
 <ul class="nav nav-tabs" id="navbar">
     {loop $navs $nav_op $nav_title}
@@ -46,10 +49,10 @@
                 <tr>
                     <td>#</td>
                     <td>商品</td>
-                    <td>名称</td>
-                    <td>原库存</td>
-                    <td>变动</td>
-                    <td>剩余</td>
+                    <td class="center">货道</td>
+                    <td class="center">原库存</td>
+                    <td class="center">变动</td>
+                    <td class="center">剩余</td>
                     <td>原因</td>
                     <td>流水号</td>
                     <td>时间</td>
@@ -62,16 +65,17 @@
                 <td>
                     <div class="goods">
                         <img src="{$item['goods']['img']}">
+                        {$item['goods']['name']}
+                        <sup class="id" title="商品ID">{$item['goods']['id']}</sup>
                     </div>                    
                 </td>
-                <td>
-                    {$item['goods']['name']}
-                    <sup class="id" title="商品ID">{$item['goods']['id']}</sup>
+                <td class="center">
+                    <span class="lane">[ {php echo $item['lane']} ]</span>
                 </td>
-                <td>
+                <td class="center">
                     {php echo $is_fueling ? number_format($item['org']/100, 2, '.', '') : $item['org']}
                 </td>
-                <td>
+                <td class="center">
                     {if $item['num']>0}
                     <span class="inc">
                         +{php echo $is_fueling ? number_format($item['num']/100, 2, '.', '') : $item['num']}
@@ -82,7 +86,7 @@
                     </span>                    
                     {/if}
                 </td>
-                <td>
+                <td class="center"  >
                     {php echo $is_fueling ? number_format($item['new']/100, 2, '.', '') : $item['new']}
                 </td>
                 <td>

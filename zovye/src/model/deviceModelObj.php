@@ -997,10 +997,12 @@ class deviceModelObj extends modelObj
             }
             if (!PayloadLogs::create([
                 'device_id' => $this->id,
+                'lane_id' => $entry['laneIndex'],
                 'goods_id' => $entry['goodsId'],
                 'org' => $entry['org'],
                 'num' => $entry['num'],
                 'extra' => [
+                    'lane' => $entry['laneIndex'],
                     'reason' => $reason,
                     'code' => $code,
                     'clr' => $clr,

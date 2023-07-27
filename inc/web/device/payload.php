@@ -42,11 +42,13 @@ $logs = [];
 
 /** @var payload_logsModelObj $entry */
 foreach ($query->findAll() as $entry) {
+    $lane = $entry->getLaneId(); 
     $data = [
         'id' => $entry->getId(),
         'org' => $entry->getOrg(),
         'num' => $entry->getNum(),
         'new' => $entry->getOrg() + $entry->getNum(),
+        'lane' => $lane != -1 ? $lane + 1 : 'N/A',
         'reason' => strval($entry->getExtraData('reason', '')),
         'code' => strval($entry->getExtraData('code', '')),
         'clr' => strval($entry->getExtraData('clr', '#9e9e9e')),

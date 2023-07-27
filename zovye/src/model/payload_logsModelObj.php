@@ -32,6 +32,9 @@ class payload_logsModelObj extends modelObj
     protected $device_id;
 
     /** @var int */
+    protected $lane_id;
+
+    /** @var int */
     protected $goods_id;
 
     /** @var int */

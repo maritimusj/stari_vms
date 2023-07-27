@@ -1,37 +1,63 @@
 <form class="form-horizontal" id="editOrderRefundNumForm">
     <div class="form-group">
-        <label for="num" class="col-md-2 control-label">订单编号：</label>
+        <label for="orderNO" class="col-md-2 control-label">订单编号：</label>
         <div class="col-md-10">
-          <div class="orderUID">
+          <div class="form-control" id="orderNO">
               {$order['orderId']}
+              
           </div>
+          <span class="help-block">* 注意：每个订单只能执行一次退款操作</span>
         </div>
     </div>
-    {if $order['way'] == 'money'}
-    <div class="form-group">
+
+    <div class="form-group" v-if="mode === 'money'">
         <label for="price" class="col-md-2 control-label">退款金额（元）：</label>
         <div class="col-md-10">
-          <input type="number" class="form-control" id="price" name="price"  value="{$order['price']}" min="0.01" max="{$order['price']}" step="0.01" required>
-          <span class="help-block">* 请输入要退款的金额，范围：0.01 ~ {$order['price']} 元</span>
+          <input type="number" class="form-control" id="price" name="price"  :value="price" min="0.01" :max="price" step="0.01" required :readonly="price < 0.02">
+          <span class="help-block" v-show="price > 0.01">* 请输入要退款的金额，范围：0.01 ~ <span v-text="price"></span> 元</span>
         </div>
     </div>
-    {else}
-    <div class="form-group">
+
+    <div class="form-group" v-if="mode === 'num'">
         <label for="num" class="col-md-2 control-label">商品数量：</label>
         <div class="col-md-10">
-          <input type="number" class="form-control" id="num" name="num"  value="{$order['num']}" min="1" max="{$order['num']}" required>
-          <span class="help-block">* 请输入要退款的商品数量，范围：1 ~ {$order['num']}</span>
+          <input type="number" class="form-control" id="num" name="num"  :value="total" min="1" :max="total" required :readonly="total === 1">
+          <span class="help-block" v-show="total > 1">* 请输入要退款的商品数量 ，范围：1 ~ <span v-text="total"></span></span>
         </div>
     </div>
-    {/if}
+    <div class="operate">
+        <i class="fa fa-exchange" :title="title" @click="change"></i>
+    </div>
     <div class="form-group">
         <div class="col-md-offset-2 col-md-10" style="text-align: right;">
-            {if $order['way'] == 'money'}
-            <button type="button" class="btn btn-primary" onclick="api.orderRefund2({$order['id']})">确定</button>
-            {else}
-            <button type="button" class="btn btn-primary" onclick="api.orderRefund({$order['id']})">确定</button>
-            {/if}
+            <button type="button" class="btn btn-primary" onclick="api.orderRefund2({$order['id']})" v-if="mode === 'money'">确定</button>
+            <button type="button" class="btn btn-primary" onclick="api.orderRefund({$order['id']})" v-if="mode === 'num'">确定</button>
             <button type="button" class="btn btn-default" data-dismiss="modal">退出</button>
         </div>
     </div>
 </form>
+<script>
+    require(['jquery', '{php \zovye\url(false, JS_VUE_URL);}'], function($, Vue) {
+        new Vue({
+            el: "#editOrderRefundNumForm",
+            data: {
+                mode: 'num',
+                price: parseFloat(`{$order['price']}`).toFixed(2),
+                total: parseInt(`{$order['num']}`),
+            },
+            computed: {
+                title: function() {
+                    if (this.mode === 'money') {
+                        return '切换到数量模式';
+                    }
+                    return '切换到金额模式';
+                }
+            },
+            methods: {
+                change: function() {
+                    this.mode = this.mode === 'money' ? 'num' : 'money';
+                }
+            }
+        })
+    })
+</script>

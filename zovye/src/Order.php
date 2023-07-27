@@ -576,10 +576,6 @@ class Order extends State
                     return err('找不到支付信息!');
                 }
 
-                if ($pay_log->getData('refund')) {
-                    return err('此订单已退款!');
-                }
-
                 $percent = 1;
                 $total_refund = $pay_log->getPrice();
 

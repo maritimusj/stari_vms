@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-Hans">
 <head>
     <meta charset="UTF-8">
     <title>称重柜</title>
@@ -230,12 +230,11 @@
 
 {php \zovye\url(true, JS_JQUERY_URL);}
 <script type="text/javascript">
-    var the14thId = "{$the_14th_id}" || 0;
-    var the20thId = "{$the_20th_id}" || 0;
-    var the21thId = "{$the_21th_id}" || 0;
+    let the14thId = "{$the_14th_id}" || 0;
+    let the20thId = "{$the_20th_id}" || 0;
+    const the21thId = "{$the_21th_id}" || 0;
 
     $(function () {
-
 
         setInterval(function () {
             $.post(

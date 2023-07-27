@@ -1,6 +1,5 @@
 <!doctype html>
 <html lang="zh-CN">
-
 <head>
 	<meta charset="UTF-8" />
 	<title>{$tpl['site']['title']}</title>
@@ -213,7 +212,7 @@
 	const intervalid = setInterval("tick()", 1000); //启动1秒定时
 
 	const fail_redirect_url = "{$tpl['redirect']['fail']}";
-	const sucess_redirect_url = "{$tpl['redirect']['success']}";
+	const success_redirect_url = "{$tpl['redirect']['success']}";
 
 	getResult();
 
@@ -265,9 +264,9 @@
 			waiting.style.display = "none";
 			error.style.display = "none";
 			
-			// if (sucess_redirect_url && sucess_redirect_url.length > 0) {
+			// if (success_redirect_url && success_redirect_url.length > 0) {
 			// 	setTimeout(function () {
-			// 		window.location.href = sucess_redirect_url;
+			// 		window.location.href = success_redirect_url;
 			// 	}, 2000);
 			// }
 

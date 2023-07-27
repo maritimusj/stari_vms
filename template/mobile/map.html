@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-Hans">
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<title>附近售卖机</title>
@@ -130,7 +130,7 @@
 		</div>
 		<script src="https://map.qq.com/api/js?v=2.exp&key=54UBZ-33UWG-XMHQP-I6JPI-AEOBE-6CBBI"></script>
 		<script src="https://3gimg.qq.com/lightmap/components/geolocation/geolocation.min.js"></script>
-		<script src="https://cdn.staticfile.org/zepto/1.0rc1/zepto.min.js"></script>
+		{php \zovye\url(true, JS_JQUERY_URL);}
 		{php \zovye\url(true, JS_VUE_URL);}
 		{$jssdk}
 		<script type="text/javascript">
@@ -153,29 +153,29 @@
 				},
 				methods: {
 					init() {
-						var that = this;
-						var geolocation = new qq.maps.Geolocation("54UBZ-33UWG-XMHQP-I6JPI-AEOBE-6CBBI", "myapp");
-						var options = {
+						const that = this;
+						const geolocation = new qq.maps.Geolocation("54UBZ-33UWG-XMHQP-I6JPI-AEOBE-6CBBI", "myapp");
+						const options = {
 							timeout: 8000,
 							failTipFlag: true
 						};
 						geolocation.getLocation(
 							function success(res) {
 								//console.log(res)
-								var center = new qq.maps.LatLng(res.lat, res.lng);
+								const center = new qq.maps.LatLng(res.lat, res.lng);
 								//定义map变量 调用 qq.maps.Map() 构造函数   获取地图显示容器
-								var map = new qq.maps.Map(document.getElementById("container"), {
+								const map = new qq.maps.Map(document.getElementById("container"), {
 									center: center, // 地图的中心地理坐标。
 									zoom: 13 // 地图的中心地理坐标。
 								});
 								//创建marker
-								var marker = new qq.maps.Marker({
+								const marker = new qq.maps.Marker({
 									position: center,
 									map: map
 								});
 								marker.setIcon(new qq.maps.MarkerImage("{MODULE_URL}static/img/my_position.svg"));
 								//添加到提示窗
-								var info = new qq.maps.InfoWindow({
+								const info = new qq.maps.InfoWindow({
 									map: map
 								});
 								//获取标记的点击事件
@@ -226,8 +226,8 @@
 					},
 					createListBtn(map) {
 						//创建定位按钮
-						var listBtn = document.createElement("div");
-						var listIcon = document.createElement('img');
+						const listBtn = document.createElement("div");
+						const listIcon = document.createElement('img');
 						listIcon.src = "{MODULE_URL}static/img/open_icon.png";
 						listIcon.style.width = "18px";
 						listIcon.style.height = "18px";
@@ -257,11 +257,11 @@
 						};
 					},
 					closeTap() {
-						var list = document.querySelector(".list-content");
+						const list = document.querySelector(".list-content");
 						list.style.display = "none";
 					},
 					getNearbyMachines(map, lat, lng) {
-						var that = this;
+						const that = this;
 						$.ajax({
 							url: "{php echo $this->createMobileUrl('util', array('op'=>'data'));}",
 							type: 'get',
@@ -270,11 +270,11 @@
 							jsonp: "callback",
 							jsonpCallback: "success_jsonpCallback",
 							success: function(res) {
-								var machines = res.data || [];
+								const machines = res.data || [];
 								//console.log(machines)
-								for(var i = 0; i < machines.length; i++) {
+								for(let i = 0; i < machines.length; i++) {
 									(function(machine) {
-										var center = new qq.maps.LatLng(machine.location.lat, machine.location.lng);
+										const center = new qq.maps.LatLng(machine.location.lat, machine.location.lng);
 										//创建marker
 										var marker = new qq.maps.Marker({
 											position: center,
@@ -282,7 +282,7 @@
 										});
 										marker.setIcon(new qq.maps.MarkerImage("{MODULE_URL}static/img/machine_position.svg"));
 										//添加到提示窗
-										var info = new qq.maps.InfoWindow({
+										const info = new qq.maps.InfoWindow({
 											map: map
 										});
 										//获取标记的点击事件
@@ -299,9 +299,9 @@
 					},
 					initList(machines, lat, lng) {
 
-						for(var i = 0; i < machines.length; i++) {
-							var machine = machines[i];
-							var dst = this.getFlatternDistance(lat, lng, machine.location.lat, machine.location.lng)
+						for(let i = 0; i < machines.length; i++) {
+							const machine = machines[i];
+							const dst = this.getFlatDistance(lat, lng, machine.location.lat, machine.location.lng);
 							machine["distance"] = {
 							    'org': dst,
 							    'n' : dst < 1000 ? dst.toFixed(0) : (dst / 1000).toFixed(2),
@@ -325,26 +325,26 @@
 					},
 					compare(property) {
 						return function(a, b) {
-							var value1 = a[property]['org'];
-							var value2 = b[property]['org'];
+							const value1 = a[property]['org'];
+							const value2 = b[property]['org'];
 							return value1 - value2;
 						}
 					},
 					getRad(d) {
 						return d * this.pi / 180.0;
 					},
-					getFlatternDistance(lat1, lng1, lat2, lng2) {
-						var f = this.getRad((lat1 + lat2) / 2);
-						var g = this.getRad((lat1 - lat2) / 2);
-						var l = this.getRad((lng1 - lng2) / 2);
+					getFlatDistance(lat1, lng1, lat2, lng2) {
+						const f = this.getRad((lat1 + lat2) / 2);
+						const g = this.getRad((lat1 - lat2) / 2);
+						const l = this.getRad((lng1 - lng2) / 2);
 
-						var sg = Math.sin(g);
-						var sl = Math.sin(l);
-						var sf = Math.sin(f);
+						let sg = Math.sin(g);
+						let sl = Math.sin(l);
+						let sf = Math.sin(f);
 
-						var s, c, w, r, d, h1, h2;
-						var a = this.earth_radius;
-						var fl = 1 / 298.257;
+						let s, c, w, r, d, h1, h2;
+						const a = this.earth_radius;
+						const fl = 1 / 298.257;
 
 						sg = sg * sg;
 						sl = sl * sl;

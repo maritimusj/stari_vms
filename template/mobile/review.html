@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-Hans">
 	<head>
 		<meta charset="UTF-8">
 		<title>广告审核</title>
@@ -61,7 +61,6 @@
             }
             span.title {
                 margin-bottom: 20px;
-                display: block;
                 border-left: 6px solid #9E9E9E;
                 padding-left: 10px;
                 display: none;
@@ -132,7 +131,7 @@
             </div>
             {/if}
         </div>
-        <script src="{php echo JS_JQUERY_URL}"></script>
+        {php \zovye\url(true, JS_JQUERY_URL);}
         {php echo \zovye\Session::fetchJSSDK(false);}
         <script>
             wx.ready(function() {

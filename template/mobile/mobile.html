@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html>
-    
+<html lang="zh-Hans">
     <head>
         <meta charset="UTF-8">
         <title>{$tpl['page']['title']}</title>
@@ -135,8 +134,8 @@
         {$tpl['js']['code']}
         <script type="text/javascript">
         function submitClick() {
-            var mobile = document.querySelector(".mobile-input.mobile").value;
-            var code = document.querySelector(".mobile-input.code").value;
+            const mobile = document.querySelector(".mobile-input.mobile").value;
+            const code = document.querySelector(".mobile-input.code").value;
             zovye_fn.checkReferral(code, function() {
                 zovye_fn.save(mobile, code, function(data){
                     alert(data.msg);

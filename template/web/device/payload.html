@@ -70,7 +70,13 @@
                     </div>                    
                 </td>
                 <td class="center">
-                    <span class="lane">[ {php echo $item['lane']} ]</span>
+                    <span class="lane">
+                    {if $item['lane'] == -1}
+                    N/A
+                    {else}
+                    [ {php echo $item['lane'] + 1} ]
+                    {/if}
+                    </span>
                 </td>
                 <td class="center">
                     {php echo $is_fueling ? number_format($item['org']/100, 2, '.', '') : $item['org']}

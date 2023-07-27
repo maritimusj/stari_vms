@@ -57,23 +57,31 @@ if (empty($query)) {
     $query = User::query(['app <>' => User::PSEUDO]);
 }
 
-//搜索用户名
-$s_keywords = urldecode(Request::trim('s_keywords'));
-if ($s_keywords) {
-    if (in_array($s_principal, ['agent', 'partner', 'keeper', 'tester', 'gspor'])) {
-        $query->whereOr([
-            'name LIKE' => "%$s_keywords%",
-            'nickname LIKE' => "%$s_keywords%",
-            'mobile LIKE' => "%$s_keywords%",
-            'openid LIKE' => "%$s_keywords%",
-        ]);
-    } else {
-        $query->whereOr([
-            'nickname LIKE' => "%$s_keywords%",
-            'mobile LIKE' => "%$s_keywords%",
-            'openid LIKE' => "%$s_keywords%",
-        ]);
-    }
+if (Request::has('openid')) {
+    $s_keywords = Request::str('openid');
+    $query->whereOr(['openid' => $s_keywords]);
+} elseif (Request::has('mobile')) {
+    $s_keywords = Request::str('mobile');
+    $query->whereOr(['mobile' => $s_keywords]);
+} else {
+    //搜索用户名
+    $s_keywords = urldecode(Request::trim('s_keywords'));
+    if ($s_keywords) {
+        if (in_array($s_principal, ['agent', 'partner', 'keeper', 'tester', 'gspor'])) {
+            $query->whereOr([
+                'name LIKE' => "%$s_keywords%",
+                'nickname LIKE' => "%$s_keywords%",
+                'mobile LIKE' => "%$s_keywords%",
+                'openid LIKE' => "%$s_keywords%",
+            ]);
+        } else {
+            $query->whereOr([
+                'nickname LIKE' => "%$s_keywords%",
+                'mobile LIKE' => "%$s_keywords%",
+                'openid LIKE' => "%$s_keywords%",
+            ]);
+        }
+    }    
 }
 
 $types = [];

@@ -49,6 +49,12 @@
     #orderlist .orderNO:hover a.operate{
         visibility: visible;
     }
+    #orderlist .profile .fa-search {
+        visibility: hidden;
+    }
+    #orderlist .profile:hover .fa-search {
+        visibility: visible;
+    }
 </style>
 <ul class="nav nav-tabs" id="navbar">
     <li role="presentation"><a href="{php echo $this->createWebUrl('order');}">订单列表</a></li>
@@ -152,11 +158,12 @@
                     </div>
                 </td>
                 <td>
-                    <div class="profile" title="{$log['user']['openid']}" data-id="{$log['user']['id']}">
+                    <div class="profile operate" data-id="{$log['user']['id']}">
                         <img src="{$log['user']['headimgurl']}" />
                         <span class="nickname">
                                 {php echo $log['user']['nickname'] ?: '&lt;匿名用户&gt;'}
-                            </span>
+                                <i class="fa fa-search" data-openid="{$log['user']['openid']}" title="查找用户" data-op="searchUser"></i>
+                        </span>
                     </div>
                 </td>
                 <td>
@@ -200,6 +207,10 @@
             const id = tr.data('id');
             next({id});
         });
+        zovye.op("searchUser", function(self) {
+            const openid = self.data('openid');
+            window.location.href="{php echo $this->createWebUrl('user', ['openid'=>'__openid__'])}".replace('__openid__', openid);
+        })
     })
 </script>
 {template 'common/footer'}

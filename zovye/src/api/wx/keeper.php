@@ -62,7 +62,7 @@ class keeper
     }
 
     /**
-     * 运营人员登陆.
+     * 运营人员登录.
      *
      * @return array
      */

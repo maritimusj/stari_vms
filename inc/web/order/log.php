@@ -72,9 +72,14 @@ foreach ($query->page($page, $page_size)->findAll() as $entry) {
         $log['data']['queryResult'] = Pay::query($log['orderNO']);
     }
 
-    $log['transaction_id'] = $log['data']['payResult']['transaction_id'] ?? $log['data']['queryResult']['transaction_id'];
+    $log['transaction_id'] = $log['data']['payResult']['transaction_id']
+        ?? $log['data']['queryResult']['transaction_id'];
+
     $log['refund'] = $log['transaction_id'] && empty($log['data']['refund']);
-    $log['refund_total'] = $log['data']['refund']['result']['data']['total_amount'] ?? $log['data']['refund']['result']['refund_fee'];
+
+    $log['refund_total'] = $log['data']['refund']['total']
+        ?? $log['data']['refund']['result']['data']['total_amount']
+        ?? $log['data']['refund']['result']['refund_fee'];
 
     $logs[] = $log;
 }

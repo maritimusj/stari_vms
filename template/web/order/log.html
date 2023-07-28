@@ -109,7 +109,7 @@
                         {/if}
                     </div>
                 </td>
-                <td>￥{php echo round($log['data']['orderData']['price'] / 100, 2)}</td>
+                <td>￥{php echo number_format($log['data']['orderData']['price'] / 100, 2, '.', '')}</td>
                 <td>
                     <div class="pay_status">
                         {php $payResult = $log['data']['payResult'];}
@@ -174,6 +174,8 @@
                     充值
                     {elseif $log['data']['level'] == LOG_CHARGING_PAY}
                     充电
+                    {elseif $log['data']['level'] == LOG_FUELING_PAY}
+                    加注
                     {else}
                     {php $goods = $log['data']['orderData']['extra']['goods'];}
                     {$goods['name']}({$goods['price_formatted']})

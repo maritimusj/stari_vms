@@ -397,7 +397,7 @@ class mp
                 $account = Account::findOneFromUID(Request::str('uid'));
                 if ($account) {
                     if ($account->getAgentId() != $user->getAgentId()) {
-                        return err('公众号帐号不能重复！');
+                        return err('公众号账号不能重复！');
                     }
                 }
             }
@@ -487,7 +487,7 @@ class mp
                     $account = Account::findOneFromName($data['name']);
                     if ($account) {
                         if ($account->getAgentId() != $user->getAgentId()) {
-                            return err('公众号帐号不能重复！');
+                            return err('公众号账号不能重复！');
                         }
                     }
                 }

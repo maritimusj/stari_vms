@@ -314,7 +314,7 @@ $res = DBUtil::transactionDo(function () {
         }
 
         if (Account::findOneFromName($name)) {
-            return err('任务帐号已经存在！');
+            return err('任务账号已经存在！');
         }
 
         $uid = Account::makeUID($name);

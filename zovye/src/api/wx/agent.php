@@ -855,7 +855,7 @@ class agent
                 return ['op' => 'bind', 'result' => true];
             }
 
-            return err('只能绑定到代理商帐号！');
+            return err('只能绑定到代理商账号！');
         }
 
         if (!$user->hasFactoryPermission() && $device->getAgentId() != $user->getAgentId()) {

@@ -548,10 +548,12 @@ class Fueling
             }
         }
 
-        Log::error('fueling', [
-            'op' => 'settleTimeoutOrder',
-            'result' => $result,
-        ]);
+        if ($result) {
+            Log::error('fueling', [
+                'op' => 'settleTimeoutOrder',
+                'result' => $result,
+            ]);
+        }
 
         return $result;
     }

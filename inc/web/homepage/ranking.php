@@ -154,14 +154,14 @@ if ($fn == 'default') {
             'list' => $list,
             'title' => $title,
             'summary' => $summary,
-            'years' => getYears(Order::getFirstOrderOfAgent($agent, true)),
+            'years' => getYears(Order::getFirstOrderOfAgent($agent)),
         ];
     }, $begin ? $begin->getTimestamp() : 0, $end ? $end->getTimestamp() : 0, $agent->getId());
 
     JSON::success($result);
 }
 
-function getYears(orderModelObj $first_order = null): array
+function getYears(array $first_order): array
 {
     $years = [];
 

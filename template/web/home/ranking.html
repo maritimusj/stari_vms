@@ -73,6 +73,11 @@
     #app .date-title.active {
         color: #3f51b5;
     }
+
+    #app .sort:not(.desc) {
+        cursor: pointer;
+    }
+
     #app .desc::after {
         content: "\f0d7";
         color: #FF5722;
@@ -132,14 +137,20 @@
                     <td class="center">#</td>
                     <td>代理商</td>
                     <td class="center" >设备总数</td>
-                    <td class="center" :class="{'desc': sortBy === 'total'}" @click="sort='total'">订单总数</td>
-                    <td class="center" :class="{'desc': sortBy === 'price'}" @click="sort='price'">订单金额 </td>
-                    <td class="center" :class="{'desc': sortBy === 'amount'}" @click="sort='amount'">
-                        {if \zovye\App::isFuelingDeviceEnabled()}
-                        加注数量(升)
-                        {else}
-                        出货数量
-                        {/if}
+                    <td class="center">
+                        <span :class="{'sort': true, 'fa desc': sortBy === 'total'}" @click="sort='total'">订单总数</span>
+                    </td>
+                    <td class="center">
+                        <span :class="{'sort': true, 'fa desc': sortBy === 'price'}" @click="sort='price'">订单金额</span>
+                    </td>
+                    <td class="center">
+                        <span :class="{'sort': true, 'fa desc': sortBy === 'amount'}" @click="sort='amount'">
+                            {if \zovye\App::isFuelingDeviceEnabled()}
+                            加注数量(升)
+                            {else}
+                            出货数量
+                            {/if}
+                        </span>
                     </td>
                 </tr>
                 </thead>
@@ -193,14 +204,24 @@
                         <td class="center">#</td>
                         <td>设备</td>
                         <td>IMEI</td>
-                        <td class="center" :class="{'desc': sortBy === 'total'}" @click="sort='total'">订单总数</td>
-                        <td class="center" :class="{'desc': sortBy === 'price'}" @click="sort='price'">订单金额</td>
-                        <td class="center" :class="{'desc': sortBy === 'amount'}" @click="sort='amount'">
-                            {if \zovye\App::isFuelingDeviceEnabled()}
-                            加注数量(升)
-                            {else}
-                            出货数量
-                            {/if}
+                        <td class="center">
+                            <span :class="{'sort': true, 'fa desc': sortBy === 'total'}" @click="sort='total'">
+                                订单总数
+                            </span>
+                        </td>
+                        <td class="center">
+                            <span :class="{'sort': true, 'fa desc': sortBy === 'price'}" @click="sort='price'">
+                                订单金额
+                            </span>
+                        </td>
+                        <td class="center">
+                            <span  :class="{'sort': true, 'fa desc': sortBy === 'amount'}" @click="sort='amount'">
+                                {if \zovye\App::isFuelingDeviceEnabled()}
+                                加注数量(升)
+                                {else}
+                                出货数量
+                                {/if}
+                            </span>
                         </td>
                     </tr>
                     </thead>
@@ -286,15 +307,15 @@
                     }
                 },
                 sort() {
-
+                    this.reload();
                 }
             },
             computed: {
                 sortBy() {
                     if (this.agent) {
-                        return this.agentList.sort  || this.sort;
+                        return this.deviceList.sort || this.sort;
                     }
-                    return this.deviceList.sort || this.sort;
+                    return this.agentList.sort || this.sort;
                 },
                 yearList() {
                     if (this.deviceList.years.length > 0) {

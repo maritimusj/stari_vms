@@ -397,7 +397,7 @@ class CommissionEventHandler
             $user = $keeper->getUser();
             if (empty($user)) {
                 Log::error('keeper', [
-                    'err' => '营运人员对应的用户不存在，已忽略佣金分配！',
+                    'err' => '运营人员对应的用户不存在，已忽略佣金分配！',
                     'order' => $order->profile(),
                     'keeper' => [
                         'name' => $keeper->getName(),

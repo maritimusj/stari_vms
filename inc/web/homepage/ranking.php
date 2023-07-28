@@ -42,7 +42,12 @@ if ($fn == 'default') {
 
     extract(getParsedDate());
 
-    $result = CacheUtil::cachedCall(30, function () use ($begin, $end, $title) {
+    $sort = Request::trim('sort', 'price');
+    if (!in_array($sort, ['total', 'price', 'amount'])) {
+        $sort = 'price';
+    }
+
+    $result = CacheUtil::cachedCall(30, function () use ($begin, $end, $sort, $title) {
         $query = Order::query();
 
         if ($begin) {
@@ -54,7 +59,7 @@ if ($fn == 'default') {
         }
 
         $query->groupBy('agent_id');
-        $query->orderBy('price DESC');
+        $query->orderBy("$sort DESC");
 
         $list = [];
         $summary = [
@@ -90,11 +95,12 @@ if ($fn == 'default') {
         return [
             'begin' => isset($begin) ? $begin->format('Y-m-d') : '',
             'end' => isset($end) ? $end->modify('-1 day')->format('Y-m-d') : '',
+            'sort' => $sort,
             'list' => $list,
             'title' => $title,
             'summary' => $summary,
         ];
-    }, $begin ? $begin->getTimestamp() : 0, $end ? $end->getTimestamp() : 0);
+    }, $begin ? $begin->getTimestamp() : 0, $end ? $end->getTimestamp() : 0, $sort);
 
     JSON::success($result);
 
@@ -106,7 +112,12 @@ if ($fn == 'default') {
         JSON::fail('找不到这个代理商！');
     }
 
-    $result = CacheUtil::cachedCall(30, function () use ($begin, $end, $agent, $title) {
+    $sort = Request::trim('sort', 'price');
+    if (!in_array($sort, ['total', 'price', 'amount'])) {
+        $sort = 'price';
+    }
+
+    $result = CacheUtil::cachedCall(30, function () use ($begin, $end, $sort, $agent, $title) {
         $query = Order::query(['agent_id' => $agent->getId()]);
 
         if ($begin) {
@@ -118,7 +129,7 @@ if ($fn == 'default') {
         }
 
         $query->groupBy('device_id');
-        $query->orderBy('price DESC');
+        $query->orderBy("$sort DESC");
 
         $list = [];
         $summary = [
@@ -151,12 +162,13 @@ if ($fn == 'default') {
         return [
             'begin' => isset($begin) ? $begin->format('Y-m-d') : '',
             'end' => isset($end) ? $end->modify('-1 day')->format('Y-m-d') : '',
+            'sort' => $sort,
             'list' => $list,
             'title' => $title,
             'summary' => $summary,
             'years' => getYears(Order::getFirstOrderOfAgent($agent)),
         ];
-    }, $begin ? $begin->getTimestamp() : 0, $end ? $end->getTimestamp() : 0, $agent->getId());
+    }, $begin ? $begin->getTimestamp() : 0, $end ? $end->getTimestamp() : 0, $sort, $agent->getId());
 
     JSON::success($result);
 }

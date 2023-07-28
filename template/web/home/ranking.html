@@ -73,6 +73,11 @@
     #app .date-title.active {
         color: #3f51b5;
     }
+    #app .desc::after {
+        content: "\f0d7";
+        color: #FF5722;
+        margin-left: 3px;
+    }
 </style>
 <ul class="nav nav-tabs" id="navbar">
     <li role="presentation"><a href="{php echo $this->createWebUrl('homepage', array('op'=>'default'));}">首页</a></li>
@@ -126,10 +131,10 @@
                 <tr class="active">
                     <td class="center">#</td>
                     <td>代理商</td>
-                    <td class="center">设备总数</td>
-                    <td class="center">订单总数</td>
-                    <td class="center">订单金额</td>
-                    <td class="center">
+                    <td class="center" >设备总数</td>
+                    <td class="center" :class="{'desc': sortBy === 'total'}" @click="sort='total'">订单总数</td>
+                    <td class="center" :class="{'desc': sortBy === 'price'}" @click="sort='price'">订单金额 </td>
+                    <td class="center" :class="{'desc': sortBy === 'amount'}" @click="sort='amount'">
                         {if \zovye\App::isFuelingDeviceEnabled()}
                         加注数量(升)
                         {else}
@@ -188,9 +193,9 @@
                         <td class="center">#</td>
                         <td>设备</td>
                         <td>IMEI</td>
-                        <td class="center">订单总数</td>
-                        <td class="center">订单金额</td>
-                        <td class="center">
+                        <td class="center" :class="{'desc': sortBy === 'total'}" @click="sort='total'">订单总数</td>
+                        <td class="center" :class="{'desc': sortBy === 'price'}" @click="sort='price'">订单金额</td>
+                        <td class="center" :class="{'desc': sortBy === 'amount'}" @click="sort='amount'">
                             {if \zovye\App::isFuelingDeviceEnabled()}
                             加注数量(升)
                             {else}
@@ -263,6 +268,7 @@
                 loading: false,
                 start: '{$s_start_date}',
                 end: '{$s_end_date}',
+                sort: 'price',
                 years: JSON.parse(`{php echo json_encode($years)}`),
                 agentList: {},
                 deviceList: {
@@ -278,9 +284,18 @@
                     } else {
                         util.loaded();
                     }
+                },
+                sort() {
+
                 }
             },
             computed: {
+                sortBy() {
+                    if (this.agent) {
+                        return this.agentList.sort  || this.sort;
+                    }
+                    return this.deviceList.sort || this.sort;
+                },
                 yearList() {
                     if (this.deviceList.years.length > 0) {
                         return this.deviceList.years;
@@ -301,13 +316,28 @@
                         this.getAgentList(this.start, this.end);
                     }
                 },
+                reload() {
+                    if (this.agent) {
+                        if (this.year) {
+                            this.getDeviceList(this.agent.id, this.year, this.year);
+                        } else {
+                            this.getDeviceList(this.agent.id, this.start, this.end);
+                        }
+                    } else {
+                        if (this.year) {
+                            this.getAgentList(this.year, this.year);
+                        } else {
+                            this.getAgentList(this.start, this.end);
+                        }
+                    }
+                },
                 getAgentList(begin, end) {
                     const self = this;
                     self.loading = true;
 
                     self.agentList = {};
                     self.deviceList = { years:[]};
-                    $.getJSON(apiUrl, {fn: 'agent', begin, end}).then(res => {
+                    $.getJSON(apiUrl, {fn: 'agent', begin, end, sort: self.sort}).then(res => {
                         if (res && res.status) {
                             self.agentList = res.data;
                             self.begin = res.data.begin;
@@ -345,7 +375,7 @@
                     self.deviceList = {
                         years: [],
                     };
-                    $.getJSON(apiUrl, {fn: 'device', id, begin, end}).then(res => {
+                    $.getJSON(apiUrl, {fn: 'device', id, begin, end, sort: this.sort}).then(res => {
                         if (res && res.status) {
                             self.deviceList = res.data;
                         }

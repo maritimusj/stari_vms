@@ -83,7 +83,7 @@
                     <i class="fa fa-reply" title="返回"></i> 
                 </div>
                 <div>
-                    <span v-for="y in years" class="year" :class="{'active': year == y}" :title="y+'年'"
+                    <span v-for="y in yearList" class="year" :class="{'active': year == y}" :title="y+'年'"
                     @click="changeYear(y)">
                         {{y}}
                     </span>
@@ -265,6 +265,14 @@
                     }
                 }
             },
+            computed: {
+                yearList() {
+                    if (this.deviceList.years.length() > 0) {
+                        return this.deviceList.years;
+                    }
+                    return this.years;
+                }
+            },
             mounted() {
                 this.initDateCtrl();
                 this.getAgentList(this.start, this.end);
@@ -304,7 +312,6 @@
                     } else {
                         this.getAgentList(year, year);
                     }
-                    
                 },
                 view(agent) {
                     if (agent) {

@@ -5,37 +5,32 @@
  */
 
 
-namespace zovye;
+namespace zovye\ranking;
 
 defined('IN_IA') or exit('Access Denied');
 
 use DateTime;
 use Exception;
+use zovye\Agent;
+use zovye\App;
+use zovye\CacheUtil;
+use zovye\Device;
+use zovye\JSON;
+use zovye\model\orderModelObj;
+use zovye\Order;
+use zovye\Request;
+use zovye\Response;
+use zovye\Util;
 
 $fn = Request::str('fn', 'default');
 
 if ($fn == 'default') {
 
-    $years = [];
-    $first_order = Order::getFirstOrder();
-    if ($first_order) {
-        $begin = new DateTime();
-
-        $begin->setTimestamp($first_order['createtime']);
-        $begin->modify('first day of jan 00:00 this year');
-
-        $now = new DateTime();
-        while ($begin < $now) {
-            $years[] = $begin->format('Y');
-            $begin->modify('next year');
-        }
-    }
-
     $begin = new DateTime('first day of this month');
     $end = new DateTime();
 
     $tpl_data = [
-        'years' => $years,
+        'years' => getYears(Order::getFirstOrder()),
         's_start_date' => $begin->format('Y-m-d'),
         's_end_date' => $end->format('Y-m-d'),
         'api_url' => Util::url('homepage', ['op' => 'ranking']),
@@ -111,7 +106,7 @@ if ($fn == 'default') {
         JSON::fail('找不到这个代理商！');
     }
 
-    $result = CacheUtil::cachedCall(30, function() use($begin, $end, $agent, $title) {
+    $result = CacheUtil::cachedCall(30, function () use ($begin, $end, $agent, $title) {
         $query = Order::query(['agent_id' => $agent->getId()]);
 
         if ($begin) {
@@ -159,10 +154,31 @@ if ($fn == 'default') {
             'list' => $list,
             'title' => $title,
             'summary' => $summary,
+            'years' => getYears(Order::getFirstOrderOfAgent($agent, true)),
         ];
     }, $begin ? $begin->getTimestamp() : 0, $end ? $end->getTimestamp() : 0, $agent->getId());
 
     JSON::success($result);
+}
+
+function getYears(orderModelObj $first_order = null): array
+{
+    $years = [];
+
+    if ($first_order) {
+        $begin = new DateTime();
+
+        $begin->setTimestamp($first_order['createtime']);
+        $begin->modify('first day of jan 00:00 this year');
+
+        $now = new DateTime();
+        while ($begin < $now) {
+            $years[] = $begin->format('Y');
+            $begin->modify('next year');
+        }
+    }
+
+    return $years;
 }
 
 function getParsedDate(): array

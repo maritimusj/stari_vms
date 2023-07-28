@@ -282,7 +282,7 @@
             },
             computed: {
                 yearList() {
-                    if (this.deviceList.years.length() > 0) {
+                    if (this.deviceList.years.length > 0) {
                         return this.deviceList.years;
                     }
                     return this.years;
@@ -306,6 +306,7 @@
                     self.loading = true;
 
                     self.agentList = {};
+                    self.deviceList = { years:[]};
                     $.getJSON(apiUrl, {fn: 'agent', begin, end}).then(res => {
                         if (res && res.status) {
                             self.agentList = res.data;
@@ -341,7 +342,9 @@
                 getDeviceList(id, begin, end) {
                     const self = this;
                     self.loading = true;
-                    self.deviceList = {};
+                    self.deviceList = {
+                        years: [],
+                    };
                     $.getJSON(apiUrl, {fn: 'device', id, begin, end}).then(res => {
                         if (res && res.status) {
                             self.deviceList = res.data;

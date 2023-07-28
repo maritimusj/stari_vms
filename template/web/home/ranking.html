@@ -4,57 +4,72 @@
     [v-cloak] {
         display: none;
     }
+
     .device-list {
         position: relative;
     }
+
     .year.active {
         font-weight: bolder;
     }
+
     .operate .btn {
         padding: 0;
         border: 0;
     }
+
     .toolbar {
         display: flex;
         align-items: center;
     }
+
     .toolbar .year {
         cursor: pointer;
         text-decoration: underline;
         margin-left: 3px;
         color: #ccc;
     }
+
     .toolbar .year:hover {
         color: #3f51b5;
     }
+
     .toolbar .year.active {
         color: #3f51b5;
     }
+
     #app .toolbar .agent {
         float: right;
         width: unset;
         overflow: hidden;
     }
+
     #app .toolbar .agent img {
         width: 30px;
         height: 30px;
         left: 0;
     }
-    #app  .agent {
+
+    #app .agent {
         cursor: pointer;
     }
+
     #app .device-total {
         cursor: pointer;
     }
+
     #app .device-total:hover {
         color: #3f51b5;
     }
+
     #app .summary {
         float: right;
     }
+
     #app .date-title {
         color: #ccc;
     }
+
     #app .date-title.active {
         color: #3f51b5;
     }
@@ -62,7 +77,7 @@
 <ul class="nav nav-tabs" id="navbar">
     <li role="presentation"><a href="{php echo $this->createWebUrl('homepage', array('op'=>'default'));}">首页</a></li>
     <li role="presentation" class="active"><a href="#">排行榜</a></li>
-    <li role="presentation" ><a href="{php echo $this->createWebUrl('order', array('op'=>'stats'));}">营收统计</a></li>
+    <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('op'=>'stats'));}">营收统计</a></li>
     <li role="presentation"><a href="{php echo $this->createWebUrl('withdraw', array('op'=>'stats'));}">提现统计</a>
     </li>
     <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('op'=>'export'));}">订单导出</a></li>
@@ -84,7 +99,7 @@
                 </div>
                 <div>
                     <span v-for="y in yearList" class="year" :class="{'active': year == y}" :title="y+'年'"
-                    @click="changeYear(y)">
+                          @click="changeYear(y)">
                         {{y}}
                     </span>
                 </div>
@@ -100,7 +115,7 @@
                     </span> <i class="fa fa-calendar"></i>
                     </button>
                 </div>
-            </span>        
+            </span>
         </div>
         <div class="panel-body">
             <div class="text-center text-muted" v-show="loading">
@@ -130,7 +145,7 @@
                             <div class="profile agent selected" style="position:relative" @click="view(item.agent)">
                                 <img :src="item.agent.avatar">
                                 <span v-text="item.agent.name"></span>
-                            </div> 
+                            </div>
                         </div>
                     </td>
                     <td class="center">
@@ -142,7 +157,7 @@
                         <span class="order-total">
                             {{item.order_total}}
                         </span>
-                        </td>
+                    </td>
                     <td class="center">
                         {{item.price}}
                     </td>
@@ -200,7 +215,7 @@
                             <span class="order-total">
                                 {{item.order_total}}
                             </span>
-                            </td>
+                        </td>
                         <td class="center">
                             {{item.price}}
                         </td>
@@ -249,9 +264,9 @@
                 start: '{$s_start_date}',
                 end: '{$s_end_date}',
                 years: JSON.parse(`{php echo json_encode($years)}`),
-                agentList: {
-                },
+                agentList: {},
                 deviceList: {
+                    years: [],
                 },
                 year: null,
                 agent: null,
@@ -279,7 +294,7 @@
             },
             methods: {
                 back() {
-                    this.agent=null;
+                    this.agent = null;
                     if (this.year) {
                         this.getAgentList(this.year, this.year);
                     } else {
@@ -339,7 +354,7 @@
                     if (this.agent) {
                         this.getDeviceList(this.agent.id, this.start, this.end);
                     } else {
-                         this.getAgentList(this.start, this.end);
+                        this.getAgentList(this.start, this.end);
                     }
                 },
                 initDateCtrl() {

@@ -83,8 +83,9 @@ if ($op == 'refund' && CtrlServ::checkJobSign([
             $log['result'] = is_error($res) ? $res : '退款成功！';
             Log::debug('refund', $log);
             Job::exit();
+        }
 
-        } elseif ($device->isChargingDevice()) {
+        if ($device->isChargingDevice()) {
             if ($order->isChargingFinished()) {
                 try {
                     $res = Order::refundBy($order_no, 0 - $order->getPrice());
@@ -101,9 +102,12 @@ if ($op == 'refund' && CtrlServ::checkJobSign([
             } else {
                 $log['err'] = '充电订单未结束！';
             }
+
             Log::debug('refund', $log);
             Job::exit();
-        } elseif ($device->isFuelingDevice()) {
+        }
+
+        if ($device->isFuelingDevice()) {
             if ($order->isFuelingFinished()) {
                 try {
                     $res = Order::refundBy($order_no, 0 - $order->getPrice());

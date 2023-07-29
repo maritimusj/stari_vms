@@ -117,9 +117,8 @@ class Goods
             if ($cache[$id]) {
                 return $cache[$id];
             }
-            $goods = $deleted ? m('goods')->where(We7::uniacid([]))->findOne(['id' => $id]) : self::query()->findOne(
-                ['id' => $id]
-            );
+            $goods = $deleted ? m('goods')->findOne(['id' => $id])
+                : self::query()->findOne(['id' => $id]);
             if ($goods) {
                 $cache[$goods->getId()] = $goods;
 
@@ -356,6 +355,9 @@ class Goods
      */
     public static function query(array $condition = []): modelObjFinder
     {
+        if ($condition['id']) {
+            return m('goods')->where(['deleted' => 0])->where($condition);
+        }
         return m('goods')->where(We7::uniacid(['deleted' => 0]))->where($condition);
     }
 

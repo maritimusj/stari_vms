@@ -35,6 +35,10 @@ class Delivery
 
     public static function query($condition = []): modelObjFinder
     {
+        if ($condition['id']) {
+            return m('delivery')->where($condition);
+        }
+
         return m('delivery')->query(We7::uniacid([]))->where($condition);
     }
 

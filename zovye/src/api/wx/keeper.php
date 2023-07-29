@@ -1208,12 +1208,10 @@ class keeper
         ];
 
         $query = m('replenish')->where(
-            We7::uniacid(
-                [
-                    'keeper_id' => $keeper->getId(),
-                    'agent_id' => $keeper->getAgentId(),
-                ]
-            )
+            We7::uniacid([
+                'keeper_id' => $keeper->getId(),
+                'agent_id' => $keeper->getAgentId(),
+            ])
         );
 
         if ($d) {

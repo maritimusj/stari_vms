@@ -42,6 +42,10 @@ class Group
             $condition = ['type_id' => $condition];
         }
 
+        if ($condition['id']) {
+            return m('device_groups')->where($condition);
+        }
+
         return m('device_groups')->where(We7::uniacid([]))->where($condition);
     }
 

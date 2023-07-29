@@ -159,6 +159,9 @@ class DeviceTypes
      */
     public static function query($condition = []): modelObjFinder
     {
+        if ($condition['id']) {
+            return m('device_types')->where($condition);
+        }
         return m('device_types')->where(We7::uniacid([]))->where($condition);
     }
 

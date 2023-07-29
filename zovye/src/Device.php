@@ -99,7 +99,11 @@ class Device extends State
     public static function query($condition = []): modelObjFinder
     {
         if (isset($condition['keeper_id'])) {
-            return m('device_keeper_vw')->where(We7::uniacid([]))->where($condition);
+            return m('device_keeper_vw')->where($condition);
+        }
+
+        if ($condition['id']) {
+            return m('device')->where($condition);
         }
 
         return m('device')->where(We7::uniacid([]))->where($condition);

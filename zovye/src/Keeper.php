@@ -28,6 +28,10 @@ class Keeper
 
     public static function query($cond = []): modelObjFinder
     {
+        if ($cond['id']) {
+            return m('keeper')->where($cond);
+        }
+
         return m('keeper')->query(We7::uniacid([]))->where($cond);
     }
 

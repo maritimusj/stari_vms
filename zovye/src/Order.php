@@ -70,6 +70,10 @@ class Order extends State
      */
     public static function query($condition = []): modelObjFinder
     {
+        if ($condition['id']) {
+            return m('order')->where($condition);
+        }
+
         return m('order')->where(We7::uniacid([]))->where($condition);
     }
 

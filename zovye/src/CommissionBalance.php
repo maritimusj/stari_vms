@@ -594,6 +594,10 @@ ORDER;
 
     public static function query($condition = []): base\modelObjFinder
     {
+        if ($condition['id']) {
+            return m('commission_balance')->where($condition);
+        }
+
         return m('commission_balance')->where(We7::uniacid([]))->where($condition);
     }
 

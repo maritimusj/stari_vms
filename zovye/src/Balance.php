@@ -45,6 +45,10 @@ class Balance
 
     public static function query($condition = []): base\modelObjFinder
     {
+        if ($condition['id']) {
+            return m('balance')->where($condition);
+        }
+
         return m('balance')->where(We7::uniacid([]))->where($condition);
     }
 

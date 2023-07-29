@@ -87,6 +87,10 @@ class Advertising extends State
      */
     public static function query($condition = []): modelObjFinder
     {
+        if ($condition['id']) {
+            return m('advertising')->where($condition);
+        }
+
         return m('advertising')->where(We7::uniacid([]))->where($condition);
     }
 

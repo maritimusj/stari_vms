@@ -623,9 +623,10 @@ class device
             $result['low'] = $low_query->count();
             $result['error'] = $error_query->count();
 
-            $result['msg'] = m('agent_msg')->findOne(
-                We7::uniacid(['agent_id' => $agent->getId(), 'updatetime' => 0])
-            ) ? 1 : 0; //是否有未读消息
+            $result['msg'] = m('agent_msg')->findOne([
+                'agent_id' => $agent->getId(),
+                'updatetime' => 0,
+            ]) ? 1 : 0; //是否有未读消息
 
             //今日出货
             $data = Stats::getDayTotal($agent, null, $params['w']);

@@ -293,6 +293,10 @@ class User
      */
     public static function query($condition = []): modelObjFinder
     {
+        if ($condition['id']) {
+            return m('user')->where($condition);
+        }
+
         return m('user')->where(We7::uniacid([]))->where($condition);
     }
 

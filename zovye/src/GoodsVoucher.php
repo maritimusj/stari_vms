@@ -17,6 +17,10 @@ class GoodsVoucher
 {
     public static function query($condition = []): base\modelObjFinder
     {
+        if ($condition['id']) {
+            return m('goods_voucher')->where($condition);
+        }
+
         return m('goods_voucher')->where(We7::uniacid([]))->where($condition);
     }
 
@@ -320,6 +324,6 @@ class GoodsVoucher
      */
     public static function getLogById(int $id): ?goods_voucher_logsModelObj
     {
-        return m('goods_voucher_logs')->findOne(We7::uniacid(['id' => $id]));
+        return m('goods_voucher_logs')->findOne(['id' => $id]);
     }
 }

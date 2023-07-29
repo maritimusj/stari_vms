@@ -211,6 +211,10 @@ class Account extends State
      */
     public static function query(array $condition = []): modelObjFinder
     {
+        if ($condition['id']) {
+            return m('account')->where($condition);
+        }
+
         return m('account')->where(We7::uniacid([]))->where($condition);
     }
 

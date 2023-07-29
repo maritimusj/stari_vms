@@ -398,7 +398,7 @@ class agent
         $page = max(1, Request::int('page'));
         $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
-        $query = m('agent_msg')->where(We7::uniacid(['agent_id' => $user->getAgentId()]));
+        $query = m('agent_msg')->where(['agent_id' => $user->getAgentId()]);
 
         $total = $query->count();
 
@@ -440,7 +440,7 @@ class agent
         $id = Request::int('id');
         if ($id) {
             /** @var agent_msgModelObj $msg */
-            $msg = m('agent_msg')->findOne(We7::uniacid(['agent_id' => $user->getAgentId(), 'id' => $id]));
+            $msg = m('agent_msg')->findOne(['agent_id' => $user->getAgentId(), 'id' => $id]);
             if ($msg) {
                 $msg->setUpdatetime(time());
                 $msg->save();
@@ -463,7 +463,7 @@ class agent
 
         $id = Request::int('id');
         if ($id) {
-            $msg = m('agent_msg')->findOne(We7::uniacid(['agent_id' => $user->getAgentId(), 'id' => $id]));
+            $msg = m('agent_msg')->findOne(['agent_id' => $user->getAgentId(), 'id' => $id]);
             if ($msg) {
                 $msg->destroy();
 
@@ -1385,16 +1385,14 @@ class agent
             $device->cleanError();
         }
 
-        $data = We7::uniacid(
-            [
-                'device_id' => $device->getImei(),
-                'error_code' => $device->getErrorCode(),
-                'result_code' => $resultCode,
-                'result' => $resultDesc,
-                'mobile' => $user->getMobile(),
-                'name' => $user->getName(),
-            ]
-        );
+        $data = We7::uniacid([
+            'device_id' => $device->getImei(),
+            'error_code' => $device->getErrorCode(),
+            'result_code' => $resultCode,
+            'result' => $resultDesc,
+            'mobile' => $user->getMobile(),
+            'name' => $user->getName(),
+        ]);
 
         if (m('maintenance')->create($data) && $device->save()) {
             $device->remove('lastErrorData');

@@ -55,6 +55,10 @@ class Agent
      */
     public static function query($condition = []): modelObjFinder
     {
+        if ($condition['id']) {
+            return m('agent_vw')->where($condition);
+        }
+
         return m('agent_vw')->where(We7::uniacid([]))->where($condition);
     }
 
@@ -128,7 +132,7 @@ class Agent
             }
 
             //清空代理商和合伙人的历史消息
-            $query = m('agent_msg')->where(We7::uniacid(['agent_id' => $msg_owners]));
+            $query = m('agent_msg')->where(['agent_id' => $msg_owners]);
             foreach ($query->findAll() as $msg) {
                 $msg->destroy();
             }

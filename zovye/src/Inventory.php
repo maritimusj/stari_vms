@@ -34,6 +34,10 @@ class Inventory
      */
     public static function query(array $condition = []): modelObjFinder
     {
+        if ($condition['id']) {
+            return m('inventory')->where($condition);
+        }
+
         return m('inventory')->where(We7::uniacid([]))->where($condition);
     }
 

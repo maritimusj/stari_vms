@@ -53,36 +53,64 @@ class Principal
     }
     public static function admin($condition = []): base\modelObjFinder
     {
+        if ($condition['id']) {
+            return m('admin_vw')->where($condition);
+        }
+
         return m('admin_vw')->where(We7::uniacid([]))->where($condition);
     }
 
     public static function agent($condition = []): base\modelObjFinder
     {
+        if ($condition['id']) {
+            return m('agent_vw')->where($condition);
+        }
+
         return m('agent_vw')->where(We7::uniacid([]))->where($condition);
     }
 
     public static function partner($condition = []): base\modelObjFinder
     {
+        if ($condition['id']) {
+            return m('partner_vw')->where($condition);
+        }
+
         return m('partner_vw')->where(We7::uniacid([]))->where($condition);
     }
 
     public static function keeper($condition = []): base\modelObjFinder
     {
+        if ($condition['id']) {
+            return m('keeper_vw')->where($condition);
+        }
+
         return m('keeper_vw')->where(We7::uniacid([]))->where($condition);
     }
 
     public static function gspor($condition = []): base\modelObjFinder
     {
+        if ($condition['id']) {
+            return m('gspor_vw')->where($condition);
+        }
+
         return m('gspor_vw')->where(We7::uniacid([]))->where($condition);
     }
 
     public static function tester($condition = []): base\modelObjFinder
     {
+        if ($condition['id']) {
+            return m('tester_vw')->where($condition);
+        }
+
         return m('tester_vw')->where(We7::uniacid([]))->where($condition);
     }
 
     public static function promoter($condition = []): base\modelObjFinder
     {
+        if ($condition['id']) {
+            return m('promoter_vw')->where($condition);
+        }
+
         return m('promoter_vw')->where(We7::uniacid([]))->where($condition);
     }
 }

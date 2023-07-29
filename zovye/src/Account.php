@@ -418,23 +418,7 @@ class Account extends State
             Account::QUESTIONNAIRE,
         ];
 
-        $third_party_platform_includes = $params['s_type'] ?? [
-            Account::JFB,
-            Account::MOSCALE,
-            Account::YUNFENBA,
-            Account::AQIINFO,
-            Account::ZJBAO,
-            Account::MEIPA,
-            Account::KINGFANS,
-            Account::SNTO,
-            Account::YFB,
-            Account::WxWORK,
-            Account::YOUFEN,
-            Account::MENGMO,
-            Account::YIDAO,
-            Account::WEISURE,
-            Account::CloudFI,
-        ];
+        $third_party_platform_includes = $params['s_type'] ?? self::getAllEnabledThirdPartyPlatform();
 
         $include = is_array($include) ? $include : [$include];
         $third_party_platform_includes = is_array(

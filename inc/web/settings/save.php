@@ -171,66 +171,21 @@ if ($page == 'device') {
     $settings['account']['douyin']['enabled'] = Request::bool('douyin') ? 1 : 0;
 
     $third_party_platform = [
-        'jfbFAN' => [
-            [Account::class, 'createJFBAccount'],
-            'jfb.fan.enabled',
-        ],
-        'moscalesFAN' => [
-            [Account::class, 'createMoscaleAccount'],
-            'moscale.fan.enabled',
-        ],
-        'yunfenbaFAN' => [
-            [Account::class, 'createYunFenBaAccount'],
-            'yunfenba.fan.enabled',
-        ],
-        'ZJBaoFAN' => [
-            [Account::class, 'createZJBaoAccount'],
-            'zjbao.fan.enabled',
-        ],
-        'AQiinfoFAN' => [
-            [Account::class, 'createAQiinfoAccount'],
-            'AQiinfo.fan.enabled',
-        ],
-        'MeiPaFAN' => [
-            [Account::class, 'createMeiPaAccount'],
-            'meipa.fan.enabled',
-        ],
-        'kingFAN' => [
-            [Account::class, 'createKingFansAccount'],
-            'king.fan.enabled',
-        ],
-        'sntoFAN' => [
-            [Account::class, 'createSNTOAccount'],
-            'snto.fan.enabled',
-        ],
-        'yfbFAN' => [
-            [Account::class, 'createYFBAccount'],
-            'yfb.fan.enabled',
-        ],
-        'wxWorkFAN' => [
-            [Account::class, 'createWxWorkAccount'],
-            'wxWork.fan.enabled',
-        ],
-        'youFenFAN' => [
-            [Account::class, 'createYouFenAccount'],
-            'YouFen.fan.enabled',
-        ],
-        'mengMoFenFAN' => [
-            [Account::class, 'createMengMoAccount'],
-            'MengMo.fan.enabled',
-        ],
-        'yiDaoFAN' => [
-            [Account::class, 'createYiDaoAccount'],
-            'YiDao.fan.enabled',
-        ],
-        'weiSureFAN' => [
-            [Account::class, 'createWeiSureAccount'],
-            'weiSure.fan.enabled',
-        ],
-        'cloudFIFAN' => [
-            [Account::class, 'createCloudFIAccount'],
-            'cloudFI.fan.enabled',
-        ],
+        'jfbFAN' => [[Account::class, 'createJFBAccount'], 'jfb.fan.enabled'],
+        'moscalesFAN' => [[Account::class, 'createMoscaleAccount'], 'moscale.fan.enabled'],
+        'yunfenbaFAN' => [[Account::class, 'createYunFenBaAccount'], 'yunfenba.fan.enabled'],
+        'ZJBaoFAN' => [[Account::class, 'createZJBaoAccount'], 'zjbao.fan.enabled'],
+        'AQiinfoFAN' => [[Account::class, 'createAQiinfoAccount'], 'AQiinfo.fan.enabled'],
+        'MeiPaFAN' => [[Account::class, 'createMeiPaAccount'], 'meipa.fan.enabled'],
+        'kingFAN' => [[Account::class, 'createKingFansAccount'], 'king.fan.enabled'],
+        'sntoFAN' => [[Account::class, 'createSNTOAccount'], 'snto.fan.enabled'],
+        'yfbFAN' => [[Account::class, 'createYFBAccount'], 'yfb.fan.enabled'],
+        'wxWorkFAN' => [[Account::class, 'createWxWorkAccount'], 'wxWork.fan.enabled'],
+        'youFenFAN' => [[Account::class, 'createYouFenAccount'], 'YouFen.fan.enabled'],
+        'mengMoFenFAN' => [[Account::class, 'createMengMoAccount'], 'MengMo.fan.enabled'],
+        'yiDaoFAN' => [[Account::class, 'createYiDaoAccount'], 'YiDao.fan.enabled'],
+        'weiSureFAN' => [[Account::class, 'createWeiSureAccount'], 'weiSure.fan.enabled'],
+        'cloudFIFAN' => [[Account::class, 'createCloudFIAccount'], 'cloudFI.fan.enabled'],
     ];
 
     $accounts_updated = false;

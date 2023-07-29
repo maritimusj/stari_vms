@@ -497,12 +497,12 @@ class Account extends State
          * @var IAccountProvider $obj
          */
         foreach ($third_party_platform as list($type, $obj)) {
-
             if (!in_array($type, $third_party_platform_includes)) {
                 continue;
             }
 
             $uid = $obj::getUid();
+
             if (in_array($uid, $exclude)) {
                 continue;
             }

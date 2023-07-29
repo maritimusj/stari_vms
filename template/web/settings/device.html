@@ -338,6 +338,20 @@
                     </div>
                 </div>
                 <div class="form-group">
+                    <label for="deviceEventLogEnabled" class="col-md-2 control-label">设备主板消息</label>
+                    <div class="col-md-10">
+                        <div class="row">
+                            <div class="checkbox col-md-7">
+                                <label>
+                                    <input type="checkbox" name="deviceEventLogEnabled" id="deviceEventLogEnabled" value="1" {if $settings['device']['eventLog']['enabled']}checked{/if}>
+                                    记录设备主板消息
+                                </label>
+                                <span class="help-block">* 默认开启主板消息的记录功能（在设备详情 > 消息页面可以单独开启该功能）</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
                     <label for="lacConfirm" class="col-md-2 control-label">设备位置</label>
                     <div class="col-md-10">
                         <div class="row">

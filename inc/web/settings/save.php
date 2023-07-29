@@ -94,6 +94,7 @@ if ($page == 'device') {
 
     $settings['device']['v-device']['enabled'] = Request::bool('vDevice') ? 1 : 0;
     $settings['device']['lac']['enabled'] = Request::bool('lacConfirm') ? 1 : 0;
+    $settings['device']['eventLog']['enabled'] = Request::bool('deviceEventLogEnabled') ? 1 : 0;
 
 } elseif ($page == 'user') {
 

@@ -306,6 +306,7 @@ class common
                 if (empty($order->getExtraData('bluetooth.raw'))) {
                     $order->setExtraData('bluetooth.raw', $response->getEncodeData());
                     if ($response->isOpenResultOk()) {
+                        $order->setResultCode(0);
                         $order->setBluetoothResultOk();
                     } elseif ($response->isOpenResultFail()) {
                         $order->setResultCode($response->getErrorCode());

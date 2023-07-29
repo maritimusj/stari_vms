@@ -496,7 +496,7 @@ class Account extends State
          * @var int $type
          * @var IAccountProvider $obj
          */
-        foreach ($third_party_platform as list($type, $obj)) {
+        foreach ($third_party_platform as $type => $obj) {
             if (!in_array($type, $third_party_platform_includes)) {
                 continue;
             }

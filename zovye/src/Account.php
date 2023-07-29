@@ -455,29 +455,30 @@ class Account extends State
 
         $exclude = is_array($params['exclude']) ? $params['exclude'] : [];
 
-        $third_party_platform = array_intersect_key([
-            Account::JFB => JfbAccount::class,
-            Account::MOSCALE => MoscaleAccount::class,
-            Account::YUNFENBA => YunfenbaAccount::class,
-            Account::AQIINFO => AQIInfoAccount::class,
-            Account::ZJBAO => ZhiJinBaoAccount::class,
-            Account::MEIPA => MeiPaAccount::class,
-            Account::KINGFANS => KingFansAccount::class,
-            Account::SNTO => SNTOAccount::class,
-            Account::YFB => YfbAccount::class,
-            Account::WxWORK => WxWorkAccount::class,
-            Account::YOUFEN => YouFenAccount::class,
-            Account::MENGMO => MengMoAccount::class,
-            Account::YIDAO => YiDaoAccount::class,
-            Account::WEISURE => WeiSureAccount::class,
-            Account::CloudFI => CloudFIAccount::class,
-        ], array_flip(self::getAllEnabledThirdPartyPlatform()));
+        $third_party_platform = array_intersect([
+              JfbAccount::class =>Account::JFB,
+              MoscaleAccount::class =>Account::MOSCALE,
+              YunfenbaAccount::class =>Account::YUNFENBA,
+              AQIInfoAccount::class =>Account::AQIINFO,
+              ZhiJinBaoAccount::class =>Account::ZJBAO,
+              MeiPaAccount::class =>Account::MEIPA,
+              KingFansAccount::class =>Account::KINGFANS,
+              SNTOAccount::class =>Account::SNTO,
+              YfbAccount::class =>Account::YFB,
+              WxWorkAccount::class =>Account::WxWORK,
+              YouFenAccount::class =>Account::YOUFEN,
+              MengMoAccount::class =>Account::MENGMO,
+              YiDaoAccount::class =>Account::YIDAO,
+              WeiSureAccount::class =>Account::WEISURE,
+              CloudFIAccount::class =>Account::CloudFI,
+        ], self::getAllEnabledThirdPartyPlatform());
+
 
         /**
-         * @var int $type
          * @var IAccountProvider $obj
+         * @var int $type
          */
-        foreach ($third_party_platform as $type => $obj) {
+        foreach ($third_party_platform as $obj => $type) {
             if (!in_array($type, $third_party_platform_includes)) {
                 continue;
             }

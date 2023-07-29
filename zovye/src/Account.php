@@ -351,9 +351,9 @@ class Account extends State
         ];
 
         $result = [];
-        foreach ($arr as $name => $enabled) {
+        foreach ($arr as $type => $enabled) {
             if ($enabled) {
-                $result[] = $name;
+                $result[] = $type;
             }
         }
 
@@ -474,44 +474,40 @@ class Account extends State
 
         $exclude = is_array($params['exclude']) ? $params['exclude'] : [];
 
-        $third_party_platform = [
-            [App::isJfbEnabled(), Account::JFB, JfbAccount::class],
-            [App::isMoscaleEnabled(), Account::MOSCALE, MoscaleAccount::class],
-            [App::isYunfenbaEnabled(), Account::YUNFENBA, YunfenbaAccount::class],
-            [App::isAQiinfoEnabled(), Account::AQIINFO, AQIInfoAccount::class],
-            [App::isZJBaoEnabled(), Account::ZJBAO, ZhiJinBaoAccount::class],
-            [App::isMeiPaEnabled(), Account::MEIPA, MeiPaAccount::class],
-            [App::isKingFansEnabled(), Account::KINGFANS, KingFansAccount::class],
-            [App::isSNTOEnabled(), Account::SNTO, SNTOAccount::class],
-            [App::isYFBEnabled(), Account::YFB, YfbAccount::class],
-            [App::isWxWorkEnabled(), Account::WxWORK, WxWorkAccount::class],
-            [App::isYouFenEnabled(), Account::YOUFEN, YouFenAccount::class],
-            [App::isMengMoEnabled(), Account::MENGMO, MengMoAccount::class],
-            [App::isYiDaoEnabled(), Account::YIDAO, YiDaoAccount::class],
-            [App::isWeiSureEnabled(), Account::WEISURE, WeiSureAccount::class],
-            [App::isCloudFIEnabled(), Account::CloudFI, CloudFIAccount::class],
-        ];
+        $third_party_platform = array_intersect_key([
+            Account::JFB => JfbAccount::class,
+            Account::MOSCALE => MoscaleAccount::class,
+            Account::YUNFENBA => YunfenbaAccount::class,
+            Account::AQIINFO => AQIInfoAccount::class,
+            Account::ZJBAO => ZhiJinBaoAccount::class,
+            Account::MEIPA => MeiPaAccount::class,
+            Account::KINGFANS => KingFansAccount::class,
+            Account::SNTO => SNTOAccount::class,
+            Account::YFB => YfbAccount::class,
+            Account::WxWORK => WxWorkAccount::class,
+            Account::YOUFEN => YouFenAccount::class,
+            Account::MENGMO => MengMoAccount::class,
+            Account::YIDAO => YiDaoAccount::class,
+            Account::WEISURE => WeiSureAccount::class,
+            Account::CloudFI => CloudFIAccount::class,
+        ], array_flip(self::getAllEnabledThirdPartyPlatform()));
 
         /**
-         * @var bool $enabled
-         * @var string $uid
+         * @var int $type
          * @var IAccountProvider $obj
          */
-        foreach ($third_party_platform as list($enabled, $uid, $obj)) {
+        foreach ($third_party_platform as list($type, $obj)) {
 
-            if (!$enabled) {
+            if (!in_array($type, $third_party_platform_includes)) {
                 continue;
             }
 
-            if (!in_array($uid, $third_party_platform_includes)) {
+            $uid = $obj::getUid();
+            if (in_array($uid, $exclude)) {
                 continue;
             }
 
-            if (in_array($obj::getUid(), $exclude)) {
-                continue;
-            }
-
-            $join(['type' => $uid], function () use ($obj, $device, $user) {
+            $join(['uid' => $uid], function () use ($obj, $device, $user) {
                 return $obj::fetch($device, $user);
             });
         }

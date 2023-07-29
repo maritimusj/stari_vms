@@ -13,7 +13,7 @@ WHERE p.principal_id=100;
 
 CREATE OR REPLACE VIEW `ims_zovye_vms_agent_vw` AS
 SELECT u.*,p.name as `name`,p.createtime as `updatetime`,
-(SELECT count(*) FROM `ims_zovye_vms_device` WHERE agent_id=u.id) AS device_total
+(SELECT count(*) FROM `ims_zovye_vms_device` WHERE agent_id=p.user_id) AS device_total
 FROM 
 `ims_zovye_vms_principal` p INNER JOIN `ims_zovye_vms_user` u ON p.user_id=u.id
 WHERE p.principal_id=1;

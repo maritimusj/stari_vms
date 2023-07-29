@@ -308,6 +308,7 @@ class common
                     if ($response->isOpenResultOk()) {
                         $order->setBluetoothResultOk();
                     } elseif ($response->isOpenResultFail()) {
+                        $order->setResultCode($response->getErrorCode());
                         $order->setBluetoothResultFail($response->getMessage());
                         if (Helper::NeedAutoRefund($device)) {
                             //启动退款

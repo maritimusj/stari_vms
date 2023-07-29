@@ -11,6 +11,7 @@ use Exception;
 use zovye\App;
 use zovye\Balance;
 use zovye\DeviceUtil;
+use zovye\Helper;
 use zovye\Job;
 
 use zovye\Locker;
@@ -2381,10 +2382,18 @@ class deviceModelObj extends modelObj
 
             $option['timeout'] = $timeout;
 
-            $msg = $protocol->open($this->getBUID(), $option);
-            if ($msg) {
-                Device::createBluetoothCmdLog($this, $msg);
-                $result = $msg->getEncoded(IBlueToothProtocol::BASE64);
+            $cmd = $protocol->open($this->getBUID(), $option);
+            if ($cmd) {
+                Device::createBluetoothCmdLog($this, $cmd);
+                $result = $cmd->getEncoded(IBlueToothProtocol::BASE64);
+
+                if (Helper::NeedAutoRefund($this)) {
+                    $order = Order::getLastOrderOfDevice($this);
+                    if ($order) {
+                        //超时后检查订单是否成功，否则退款
+                        Job::refund($order->getOrderNO(), '设备响应超时', 0, true, $timeout);
+                    }
+                }
             }
         } else {
             if ($options['online'] && !$this->isMcbOnline()) {

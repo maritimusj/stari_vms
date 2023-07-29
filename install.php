@@ -254,6 +254,7 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_device` (
   UNIQUE KEY `imei` (`uniacid`, `imei`),
   KEY `app_id` (`uniacid`, `app_id`),
   KEY `agent_id` (`uniacid`, `agent_id`),
+  KEY `agent_id2` (`agent_id`),
   KEY `shadow_id` (`uniacid`, `shadow_id`),
   KEY `createtime` (`createtime`),
   KEY `s3` (`uniacid`, `s3`),

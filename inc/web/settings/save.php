@@ -172,64 +172,63 @@ if ($page == 'device') {
 
     $third_party_platform = [
         'jfbFAN' => [
-            __NAMESPACE__.'\Account::createJFBAccount',
+            [Account::class, 'createJFBAccount'],
             'jfb.fan.enabled',
         ],
-
         'moscalesFAN' => [
-            __NAMESPACE__.'\Account::createMoscaleAccount',
+            [Account::class, 'createMoscaleAccount'],
             'moscale.fan.enabled',
         ],
         'yunfenbaFAN' => [
-            __NAMESPACE__.'\Account::createYunFenBaAccount',
+            [Account::class, 'createYunFenBaAccount'],
             'yunfenba.fan.enabled',
         ],
         'ZJBaoFAN' => [
-            __NAMESPACE__.'\Account::createZJBaoAccount',
+            [Account::class, 'createZJBaoAccount'],
             'zjbao.fan.enabled',
         ],
         'AQiinfoFAN' => [
-            __NAMESPACE__.'\Account::createAQiinfoAccount',
+            [Account::class, 'createAQiinfoAccount'],
             'AQiinfo.fan.enabled',
         ],
         'MeiPaFAN' => [
-            __NAMESPACE__.'\Account::createMeiPaAccount',
+            [Account::class, 'createMeiPaAccount'],
             'meipa.fan.enabled',
         ],
         'kingFAN' => [
-            __NAMESPACE__.'\Account::createKingFansAccount',
+            [Account::class, 'createKingFansAccount'],
             'king.fan.enabled',
         ],
         'sntoFAN' => [
-            __NAMESPACE__.'\Account::createSNTOAccount',
+            [Account::class, 'createSNTOAccount'],
             'snto.fan.enabled',
         ],
         'yfbFAN' => [
-            __NAMESPACE__.'\Account::createYFBAccount',
+            [Account::class, 'createYFBAccount'],
             'yfb.fan.enabled',
         ],
         'wxWorkFAN' => [
-            __NAMESPACE__.'\Account::createWxWorkAccount',
+            [Account::class, 'createWxWorkAccount'],
             'wxWork.fan.enabled',
         ],
         'youFenFAN' => [
-            __NAMESPACE__.'\Account::createYouFenAccount',
+            [Account::class, 'createYouFenAccount'],
             'YouFen.fan.enabled',
         ],
         'mengMoFenFAN' => [
-            __NAMESPACE__.'\Account::createMengMoAccount',
+            [Account::class, 'createMengMoAccount'],
             'MengMo.fan.enabled',
         ],
         'yiDaoFAN' => [
-            __NAMESPACE__.'\Account::createYiDaoAccount',
+            [Account::class, 'createYiDaoAccount'],
             'YiDao.fan.enabled',
         ],
         'weiSureFAN' => [
-            __NAMESPACE__.'\Account::createWeiSureAccount',
+            [Account::class, 'createWeiSureAccount'],
             'weiSure.fan.enabled',
         ],
         'cloudFIFAN' => [
-            __NAMESPACE__.'\Account::createCloudFIAccount',
+            [Account::class, 'createCloudFIAccount'],
             'cloudFI.fan.enabled',
         ],
     ];

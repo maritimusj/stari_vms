@@ -456,23 +456,22 @@ class Account extends State
         $exclude = is_array($params['exclude']) ? $params['exclude'] : [];
 
         $third_party_platform = array_intersect([
-              JfbAccount::class =>Account::JFB,
-              MoscaleAccount::class =>Account::MOSCALE,
-              YunfenbaAccount::class =>Account::YUNFENBA,
-              AQIInfoAccount::class =>Account::AQIINFO,
-              ZhiJinBaoAccount::class =>Account::ZJBAO,
-              MeiPaAccount::class =>Account::MEIPA,
-              KingFansAccount::class =>Account::KINGFANS,
-              SNTOAccount::class =>Account::SNTO,
-              YfbAccount::class =>Account::YFB,
-              WxWorkAccount::class =>Account::WxWORK,
-              YouFenAccount::class =>Account::YOUFEN,
-              MengMoAccount::class =>Account::MENGMO,
-              YiDaoAccount::class =>Account::YIDAO,
-              WeiSureAccount::class =>Account::WEISURE,
-              CloudFIAccount::class =>Account::CloudFI,
+            JfbAccount::class => Account::JFB,
+            MoscaleAccount::class => Account::MOSCALE,
+            YunfenbaAccount::class => Account::YUNFENBA,
+            AQIInfoAccount::class => Account::AQIINFO,
+            ZhiJinBaoAccount::class => Account::ZJBAO,
+            MeiPaAccount::class => Account::MEIPA,
+            KingFansAccount::class => Account::KINGFANS,
+            SNTOAccount::class => Account::SNTO,
+            YfbAccount::class => Account::YFB,
+            WxWorkAccount::class => Account::WxWORK,
+            YouFenAccount::class => Account::YOUFEN,
+            MengMoAccount::class => Account::MENGMO,
+            YiDaoAccount::class => Account::YIDAO,
+            WeiSureAccount::class => Account::WEISURE,
+            CloudFIAccount::class => Account::CloudFI,
         ], self::getAllEnabledThirdPartyPlatform());
-
 
         /**
          * @var IAccountProvider $obj
@@ -565,6 +564,7 @@ class Account extends State
         if (count($cond) == 1 && $cond['id']) {
             return self::get($cond['id']);
         }
+
         $cond = $cond['id'] || $cond['uid'] ? $cond : We7::uniacid($cond);
         $query = self::query($cond);
 
@@ -590,6 +590,7 @@ class Account extends State
         $assign_data = $account->settings('assigned', []);
         $assign_data['agents'] = [];
         $assign_data = isEmptyArray($assign_data) ? [] : $assign_data;
+
         if ($account->updateSettings('assigned', $assign_data)) {
             return self::updateAccountData();
         }

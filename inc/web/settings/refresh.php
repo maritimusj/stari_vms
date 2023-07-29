@@ -12,4 +12,4 @@ if (Job::refreshSettings()) {
     JSON::success('启动刷新任务成功！');
 }
 
-JSON::success('启动刷新任务失败！');
+JSON::fail('启动刷新任务失败！');

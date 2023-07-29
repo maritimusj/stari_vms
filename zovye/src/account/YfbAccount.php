@@ -10,6 +10,7 @@ use Exception;
 use RuntimeException;
 use zovye\Account;
 use zovye\App;
+use zovye\Contract\IAccountProvider;
 use zovye\Device;
 use zovye\HttpUtil;
 use zovye\Log;
@@ -22,7 +23,7 @@ use function zovye\err;
 use function zovye\is_error;
 use function zovye\isEmptyArray;
 
-class YfbAccount
+class YfbAccount implements IAccountProvider
 {
     const API_URL = 'http://plwxmp.ybaokj.cn/mache/getQrCode';
     //const API_URL = 'http://plwxmp.ybaokj.cn/mache/getQrCodes';

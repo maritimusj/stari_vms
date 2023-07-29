@@ -10,6 +10,7 @@ use Exception;
 use RuntimeException;
 use zovye\Account;
 use zovye\App;
+use zovye\Contract\IAccountProvider;
 use zovye\HttpUtil;
 use zovye\Log;
 use zovye\model\accountModelObj;
@@ -20,7 +21,7 @@ use zovye\Session;
 use zovye\Util;
 use function zovye\is_error;
 
-class AQIInfoAccount extends AQIInfo
+class AQIInfoAccount extends AQIInfo implements IAccountProvider
 {
     const API_URL = 'https://c.api.aqiinfo.com/ChannelApi/UfansTicket';
     const CB_RESPONSE = '{"code":200}';

@@ -11,6 +11,7 @@ use RuntimeException;
 use zovye\Account;
 use zovye\App;
 use zovye\CacheUtil;
+use zovye\Contract\IAccountProvider;
 use zovye\Device;
 use zovye\DeviceUtil;
 use zovye\HttpUtil;
@@ -27,7 +28,7 @@ use function zovye\is_error;
 use function zovye\isEmptyArray;
 use function zovye\settings;
 
-class MoscaleAccount
+class MoscaleAccount implements IAccountProvider
 {
     const API_URL = 'https://gc.goco123.com/commercial/open/getQrCode';
     const GET_LABEL_API_URL = 'https://gc.goco123.com/commercial/open/getLabel';
@@ -62,7 +63,7 @@ class MoscaleAccount
         return Account::makeThirdPartyPlatformUID(Account::MOSCALE, Account::MOSCALE_NAME);
     }
 
-    public static function fetch(deviceModelObj $device, userModelObj $user): array
+    public static function fetch(deviceModelObj $device, userModelObj $user = null): array
     {
         $v = [];
 

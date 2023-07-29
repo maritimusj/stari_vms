@@ -10,6 +10,7 @@ use Exception;
 use RuntimeException;
 use zovye\Account;
 use zovye\App;
+use zovye\Contract\IAccountProvider;
 use zovye\Device;
 use zovye\HttpUtil;
 use zovye\LocationUtil;
@@ -25,7 +26,7 @@ use function zovye\err;
 use function zovye\is_error;
 use function zovye\isEmptyArray;
 
-class YiDaoAccount
+class YiDaoAccount implements IAccountProvider
 {
     const API_URL = 'https://api.yidaogz.cn/open/commercial/get_qrcode';
 

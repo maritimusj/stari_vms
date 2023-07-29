@@ -10,6 +10,7 @@ use Exception;
 use RuntimeException;
 use zovye\Account;
 use zovye\App;
+use zovye\Contract\IAccountProvider;
 use zovye\Device;
 use zovye\HttpUtil;
 use zovye\Log;
@@ -24,7 +25,7 @@ use function zovye\err;
 use function zovye\is_error;
 use function zovye\isEmptyArray;
 
-class SNTOAccount
+class SNTOAccount implements IAccountProvider
 {
     const API_URL = 'https://xf.snto.com';
     const RESPONSE_STR = 'Ok';

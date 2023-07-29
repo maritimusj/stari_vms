@@ -10,6 +10,7 @@ use Exception;
 use RuntimeException;
 use zovye\Account;
 use zovye\App;
+use zovye\Contract\IAccountProvider;
 use zovye\Device;
 use zovye\HttpUtil;
 use zovye\Log;
@@ -22,7 +23,7 @@ use zovye\User;
 use function zovye\err;
 use function zovye\is_error;
 
-class KingFansAccount
+class KingFansAccount implements IAccountProvider
 {
     const API_URL = 'https://api.wxyes.cn/pool';
 
@@ -45,7 +46,7 @@ class KingFansAccount
         return Account::makeThirdPartyPlatformUID(Account::KINGFANS, Account::KINGFANS_NAME);
     }
 
-    public static function fetch(deviceModelObj $device, userModelObj $user): array
+    public static function fetch(deviceModelObj $device, userModelObj $user = null): array
     {
         $acc = Account::findOneFromType(Account::KINGFANS);
         if (empty($acc)) {

@@ -24,6 +24,7 @@ use zovye\account\YouFenAccount;
 use zovye\account\YunfenbaAccount;
 use zovye\account\ZhiJinBaoAccount;
 use zovye\base\modelObjFinder;
+use zovye\Contract\IAccountProvider;
 use zovye\model\account_queryModelObj;
 use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
@@ -472,189 +473,47 @@ class Account extends State
         }
 
         $exclude = is_array($params['exclude']) ? $params['exclude'] : [];
+
         $third_party_platform = [
-            //准粉吧
-            Account::JFB => [
-                function () use ($third_party_platform_includes, $exclude) {
-                    return App::isJfbEnabled()
-                        && in_array(Account::JFB, $third_party_platform_includes)
-                        && !in_array(JfbAccount::getUid(), $exclude);
-                },
-                function () use ($device, $user) {
-                    return JfbAccount::fetch($device, $user);
-                },
-            ],
-            //公锤
-            Account::MOSCALE => [
-                function () use ($third_party_platform_includes, $exclude) {
-                    return App::isMoscaleEnabled()
-                        && in_array(Account::MOSCALE, $third_party_platform_includes)
-                        && !in_array(MoscaleAccount::getUid(), $exclude);
-                },
-                function () use ($device, $user) {
-                    return MoscaleAccount::fetch($device, $user);
-                },
-            ],
-            //云粉
-            Account::YUNFENBA => [
-                function () use ($third_party_platform_includes, $exclude) {
-                    return App::isYunfenbaEnabled()
-                        && in_array(Account::YUNFENBA, $third_party_platform_includes)
-                        && !in_array(YunfenbaAccount::getUid(), $exclude);
-                },
-                function () use ($device, $user) {
-                    return YunfenbaAccount::fetch($device, $user);
-                },
-            ],
-            //阿旗
-            Account::AQIINFO => [
-                function () use ($third_party_platform_includes, $exclude) {
-                    return App::isAQiinfoEnabled()
-                        && in_array(Account::AQIINFO, $third_party_platform_includes)
-                        && !in_array(AQIInfoAccount::getUid(), $exclude);
-                },
-                function () use ($device, $user) {
-                    return AQIInfoAccount::fetch($device, $user);
-                },
-            ],
-
-            //纸巾宝
-            Account::ZJBAO => [
-                function () use ($third_party_platform_includes, $exclude) {
-                    return App::isZJBaoEnabled()
-                        && in_array(Account::ZJBAO, $third_party_platform_includes)
-                        && !in_array(ZhiJinBaoAccount::getUid(), $exclude);
-                },
-                function () use ($device, $user) {
-                    return ZhiJinBaoAccount::fetch($device, $user);
-                },
-            ],
-
-            //美葩
-            Account::MEIPA => [
-                function () use ($third_party_platform_includes, $exclude) {
-                    return App::isMeiPaEnabled()
-                        && in_array(Account::MEIPA, $third_party_platform_includes)
-                        && !in_array(MeiPaAccount::getUid(), $exclude);
-                },
-                function () use ($device, $user) {
-                    return MeiPaAccount::fetch($device, $user);
-                },
-            ],
-
-            //金粉吧
-            Account::KINGFANS => [
-                function () use ($third_party_platform_includes, $exclude) {
-                    return App::isKingFansEnabled()
-                        && in_array(Account::KINGFANS, $third_party_platform_includes)
-                        && !in_array(KingFansAccount::getUid(), $exclude);
-                },
-                function () use ($device, $user) {
-                    return KingFansAccount::fetch($device, $user);
-                },
-            ],
-
-            //史莱姆
-            Account::SNTO => [
-                function () use ($third_party_platform_includes, $exclude) {
-                    return App::isSNTOEnabled()
-                        && in_array(Account::SNTO, $third_party_platform_includes)
-                        && !in_array(SNTOAccount::getUid(), $exclude);
-                },
-                function () use ($device, $user) {
-                    return SNTOAccount::fetch($device, $user);
-                },
-            ],
-
-            //粉丝宝
-            Account::YFB => [
-                function () use ($third_party_platform_includes, $exclude) {
-                    return App::isYFBEnabled()
-                        && in_array(Account::YFB, $third_party_platform_includes)
-                        && !in_array(YfbAccount::getUid(), $exclude);
-                },
-                function () use ($device, $user) {
-                    return YfbAccount::fetch($device, $user);
-                },
-            ],
-
-            //企业微信拉新（阿旗）
-            Account::WxWORK => [
-                function () use ($third_party_platform_includes, $exclude) {
-                    return App::isWxWorkEnabled()
-                        && in_array(Account::WxWORK, $third_party_platform_includes)
-                        && !in_array(WxWorkAccount::getUid(), $exclude);
-                },
-                function () use ($device, $user) {
-                    return WxWorkAccount::fetch($device, $user);
-                },
-            ],
-
-            //友粉
-            Account::YOUFEN => [
-                function () use ($third_party_platform_includes, $exclude) {
-                    return App::isYouFenEnabled()
-                        && in_array(Account::YOUFEN, $third_party_platform_includes)
-                        && !in_array(YouFenAccount::getUid(), $exclude);
-                },
-                function () use ($device, $user) {
-                    return YouFenAccount::fetch($device, $user);
-                },
-            ],
-
-            //涨啊
-            Account::MENGMO => [
-                function () use ($third_party_platform_includes, $exclude) {
-                    return App::isMengMoEnabled()
-                        && in_array(Account::MENGMO, $third_party_platform_includes)
-                        && !in_array(MengMoAccount::getUid(), $exclude);
-                },
-                function () use ($device, $user) {
-                    return MengMoAccount::fetch($device, $user);
-                },
-            ],
-
-            //壹道
-            Account::YIDAO => [
-                function () use ($third_party_platform_includes, $exclude) {
-                    return App::isYiDaoEnabled()
-                        && in_array(Account::YIDAO, $third_party_platform_includes)
-                        && !in_array(YiDaoAccount::getUid(), $exclude);
-                },
-                function () use ($device, $user) {
-                    return YiDaoAccount::fetch($device, $user);
-                },
-            ],
-
-            //微保
-            Account::WEISURE => [
-                function () use ($third_party_platform_includes, $exclude) {
-                    return App::isWeiSureEnabled()
-                        && in_array(Account::WEISURE, $third_party_platform_includes)
-                        && !in_array(WeiSureAccount::getUid(), $exclude);
-                },
-                function () use ($device, $user) {
-                    return WeiSureAccount::fetch($device, $user);
-                },
-            ],
-
-            //中科
-            Account::CloudFI => [
-                function () use ($third_party_platform_includes, $exclude) {
-                    return App::isCloudFIEnabled()
-                        && in_array(Account::CloudFI, $third_party_platform_includes)
-                        && !in_array(CloudFIAccount::getUid(), $exclude);
-                },
-                function () use ($device, $user) {
-                    return CloudFIAccount::fetch($device, $user);
-                },
-            ],
+            [App::isJfbEnabled(), Account::JFB, JfbAccount::class],
+            [App::isMoscaleEnabled(), Account::MOSCALE, MoscaleAccount::class],
+            [App::isYunfenbaEnabled(), Account::YUNFENBA, YunfenbaAccount::class],
+            [App::isAQiinfoEnabled(), Account::AQIINFO, AQIInfoAccount::class],
+            [App::isZJBaoEnabled(), Account::ZJBAO, ZhiJinBaoAccount::class],
+            [App::isMeiPaEnabled(), Account::MEIPA, MeiPaAccount::class],
+            [App::isKingFansEnabled(), Account::KINGFANS, KingFansAccount::class],
+            [App::isSNTOEnabled(), Account::SNTO, SNTOAccount::class],
+            [App::isYFBEnabled(), Account::YFB, YfbAccount::class],
+            [App::isWxWorkEnabled(), Account::WxWORK, WxWorkAccount::class],
+            [App::isYouFenEnabled(), Account::YOUFEN, YouFenAccount::class],
+            [App::isMengMoEnabled(), Account::MENGMO, MengMoAccount::class],
+            [App::isYiDaoEnabled(), Account::YIDAO, YiDaoAccount::class],
+            [App::isWeiSureEnabled(), Account::WEISURE, WeiSureAccount::class],
+            [App::isCloudFIEnabled(), Account::CloudFI, CloudFIAccount::class],
         ];
 
-        foreach ($third_party_platform as $uid => $entry) {
-            if ($entry[0]()) {
-                $join(['type' => $uid], $entry[1]);
+        /**
+         * @var bool $enabled
+         * @var string $uid
+         * @var IAccountProvider $obj
+         */
+        foreach ($third_party_platform as list($enabled, $uid, $obj)) {
+
+            if (!$enabled) {
+                continue;
             }
+
+            if (!in_array($uid, $third_party_platform_includes)) {
+                continue;
+            }
+
+            if (in_array($obj::getUid(), $exclude)) {
+                continue;
+            }
+
+            $join(['type' => $uid], function () use ($obj, $device, $user) {
+                return $obj::fetch($device, $user);
+            });
         }
 
         if (empty($list)) {

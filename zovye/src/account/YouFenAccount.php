@@ -10,6 +10,7 @@ use Exception;
 use RuntimeException;
 use zovye\Account;
 use zovye\App;
+use zovye\Contract\IAccountProvider;
 use zovye\Device;
 use zovye\HttpUtil;
 use zovye\Log;
@@ -23,7 +24,7 @@ use function zovye\err;
 use function zovye\is_error;
 use function zovye\isEmptyArray;
 
-class YouFenAccount
+class YouFenAccount implements IAccountProvider
 {
     const REDIRECT_URL = 'https://dsp.of.youfen.cc/auth.html';
     const API_URL = 'https://dsp.api.youfen.cc/api/channel/ad/get';

@@ -6,6 +6,7 @@ use Exception;
 use RuntimeException;
 use zovye\Account;
 use zovye\App;
+use zovye\Contract\IAccountProvider;
 use zovye\HttpUtil;
 use zovye\Log;
 use zovye\model\accountModelObj;
@@ -17,7 +18,7 @@ use zovye\User;
 use function zovye\err;
 use function zovye\is_error;
 
-class CloudFIAccount
+class CloudFIAccount implements IAccountProvider
 {
     const API_URL = "https://www.cloudfi.cn/index.php/Interface/zk/getZkOrder";
 

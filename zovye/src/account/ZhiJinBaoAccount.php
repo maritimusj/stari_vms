@@ -11,6 +11,7 @@ use Exception;
 use RuntimeException;
 use zovye\Account;
 use zovye\App;
+use zovye\Contract\IAccountProvider;
 use zovye\Device;
 use zovye\DeviceUtil;
 use zovye\HttpUtil;
@@ -26,7 +27,7 @@ use function zovye\err;
 use function zovye\is_error;
 use function zovye\isEmptyArray;
 
-class ZhiJinBaoAccount
+class ZhiJinBaoAccount implements IAccountProvider
 {
     const API_URL = 'https://api.zhijinbao.net/gzh/api/v1/getGzhInfo';
     const RESPONSE = '{"msg":"success","code":0}';

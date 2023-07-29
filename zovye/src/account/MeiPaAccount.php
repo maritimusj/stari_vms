@@ -10,6 +10,7 @@ use Exception;
 use RuntimeException;
 use zovye\Account;
 use zovye\App;
+use zovye\Contract\IAccountProvider;
 use zovye\Device;
 use zovye\HttpUtil;
 use zovye\Log;
@@ -24,7 +25,7 @@ use zovye\We7;
 use function zovye\err;
 use function zovye\is_error;
 
-class MeiPaAccount
+class MeiPaAccount implements IAccountProvider
 {
     const API_URL = 'http://hz.web.meipa.net/api/qrcode/getqrcode';
     const AUTH_URL = 'http://hz.api.meipa.net/wechat/api.other/authopenid?callbackurl=';
@@ -48,7 +49,7 @@ class MeiPaAccount
         return Account::makeThirdPartyPlatformUID(Account::MEIPA, Account::MEIPA_NAME);
     }
 
-    public static function fetch(deviceModelObj $device, userModelObj $user): array
+    public static function fetch(deviceModelObj $device, userModelObj $user = null): array
     {
         /** @var accountModelObj $acc */
         $acc = Account::findOneFromType(Account::MEIPA);

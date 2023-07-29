@@ -10,6 +10,7 @@ use Exception;
 use RuntimeException;
 use zovye\Account;
 use zovye\App;
+use zovye\Contract\IAccountProvider;
 use zovye\Device;
 use zovye\HttpUtil;
 use zovye\Log;
@@ -22,7 +23,7 @@ use zovye\User;
 use function zovye\err;
 use function zovye\is_error;
 
-class YunfenbaAccount
+class YunfenbaAccount implements IAccountProvider
 {
     const GET_TASK_URL = 'http://api.goluodi.com/{vendor_uid}/gettask';
     //const GET_TASK_URL = 'http://testapi.goluodi.com/{vendor_uid}/gettask';

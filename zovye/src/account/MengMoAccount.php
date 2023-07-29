@@ -6,6 +6,7 @@ use Exception;
 use RuntimeException;
 use zovye\Account;
 use zovye\App;
+use zovye\Contract\IAccountProvider;
 use zovye\Device;
 use zovye\HttpUtil;
 use zovye\LocationUtil;
@@ -20,7 +21,7 @@ use function zovye\err;
 use function zovye\is_error;
 use function zovye\isEmptyArray;
 
-class MengMoAccount
+class MengMoAccount implements IAccountProvider
 {
     const API_URL = 'https://search-api.shenghuoq.com/dmp-search-api/v4/ad/noauth';
     const PUBLIC_KEY = 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCQrNccDHWDJdXg2j13y8wNjf2de/ELKztcbLstpZfRm89GUHx9taCShli4bEVfxRDNiKvGVM20GbmKb/d2s9DSAPH5YlLtT0axZBdtTfENIUXzPZh9KhR2+owHX4O0sR41vqYjT7SGTyQhZKN13P/OcEAsLdq9r8ulycla0QMzyQIDAQAB';

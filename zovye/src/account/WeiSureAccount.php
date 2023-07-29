@@ -11,6 +11,7 @@ use Exception;
 use RuntimeException;
 use zovye\Account;
 use zovye\App;
+use zovye\Contract\IAccountProvider;
 use zovye\Device;
 use zovye\Log;
 use zovye\model\accountModelObj;
@@ -23,7 +24,7 @@ use function zovye\err;
 use function zovye\is_error;
 use function zovye\isEmptyArray;
 
-class WeiSureAccount
+class WeiSureAccount implements IAccountProvider
 {
 
     const ResponseOk = '{"code":"0", "msg":"成功","returnData":{}}';

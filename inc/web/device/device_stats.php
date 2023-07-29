@@ -27,4 +27,4 @@ $result = CacheUtil::cachedCall(60, function () use ($device) {
 
 }, $device->getId());
 
-JSON::success($result);
+JSON::result($result);

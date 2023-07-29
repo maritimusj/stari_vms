@@ -26,6 +26,6 @@ if ($res) {
     $res->save();
 
     JSON::success(['id' => $id, 'remark' => $remark]);
-} else {
-    JSON::fail('error');
 }
+
+JSON::fail('error');

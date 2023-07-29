@@ -26,6 +26,6 @@ if (empty($version) || empty($version->getUrl())) {
 $res = $device->upgradeApk($version->getTitle(), $version->getVersion(), $version->getUrl());
 if ($res) {
     JSON::success("已通知设备下载更新！\r\n版本：{$version->getVersion()}\r\n网址：{$version->getUrl()}");
-} else {
-    JSON::fail('通知更新失败！');
 }
+
+JSON::fail('通知更新失败！');

@@ -36,6 +36,7 @@ if ($nextYear > $today) {
 }
 
 $result = [];
+
 while ($begin < $nextYear) {
     $year = $begin->format('Y');
     $result[$year][] = $begin->format('m');

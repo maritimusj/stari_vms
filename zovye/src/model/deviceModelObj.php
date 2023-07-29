@@ -243,7 +243,7 @@ class deviceModelObj extends modelObj
 
     public function isEventLogEnabled()
     {
-        return $this->settings('extra.event.log.enabled', false);
+        return $this->settings('extra.event.log.enabled', settings('device.eventLog.enabled'));
     }
 
     /**

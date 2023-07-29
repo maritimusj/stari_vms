@@ -350,14 +350,11 @@ class Account extends State
             Account::CloudFI => App::isCloudFIEnabled(),
         ];
 
-        $result = [];
-        foreach ($arr as $type => $enabled) {
-            if ($enabled) {
-                $result[] = $type;
-            }
-        }
-
-        return $result;
+        return array_keys(
+            array_filter($arr, function ($enabled) {
+                return $enabled;
+            })
+        );
     }
 
     /**

@@ -292,18 +292,19 @@ function createOrder(array $params, string $order_no, array $goods): array
         return [$pull_data];
     }
 
-    $res = $device->pull($pull_data);
-
     $order->setExtraData('device.ch', $pull_data['channel']);
 
-    if (is_error($res)) {
-        $order->setResultCode($res['errno']);
+    //请求出货
+    $result = $device->pull($pull_data);
+
+    if (is_error($result)) {
+        $order->setResultCode($result['errno']);
     } else {
         $order->setResultCode(0);
     }
 
     //记录出货结果
-    $order->setExtraData('pull.result', $res);
+    $order->setExtraData('pull.result', $result);
 
     if ($device->isBlueToothDevice()) {
         $order->setBluetoothDeviceBUID($device->getBUID());
@@ -313,7 +314,7 @@ function createOrder(array $params, string $order_no, array $goods): array
         return [err('无法保存订单数据！')];
     }
 
-    if (is_error($res)) {
+    if (is_error($result)) {
         try {
             //事件：出货失败
             EventBus::on('device.openFail', $params);
@@ -325,8 +326,8 @@ function createOrder(array $params, string $order_no, array $goods): array
             if (empty($locker)) {
                 return [err('设备正忙，请重试！')];
             }
-            $res = $device->resetPayload([$goods['cargo_lane'] => -1], "订单：$order_no");
-            if (is_error($res)) {
+            $result = $device->resetPayload([$goods['cargo_lane'] => -1], "订单：$order_no");
+            if (is_error($result)) {
                 return [err('保存库存变动失败！')];
             }
             $locker->unlock();
@@ -347,7 +348,7 @@ function createOrder(array $params, string $order_no, array $goods): array
     /**
      * 始终返回 true，是为了即使失败，仍然创建订单
      */
-    return [$res, $order];
+    return [$result, $order];
 }
 
 

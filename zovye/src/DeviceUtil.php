@@ -123,6 +123,7 @@ class DeviceUtil
             'payload' => $device->getPayload(),
         ];
 
+        //请求出货
         $pull_result = $device->pull($pull_data);
 
         $log_data['result'] = $pull_result;
@@ -408,17 +409,18 @@ class DeviceUtil
                     return $pull_data;
                 }
 
-                $res = $device->pull($pull_data);
-
-                $log_data['params'] = $pull_data;
-                $log_data['result'] = $res;
-                $log_data['order'] = $order->getId();
-                $log_data['result'] = $res;
-
                 $order->setExtraData('device.ch', $pull_data['channel']);
 
-                if (is_error($res)) {
-                    $order->setResultCode($res['errno']);
+                //请求出货
+                $result = $device->pull($pull_data);
+
+                $log_data['params'] = $pull_data;
+                $log_data['result'] = $result;
+                $log_data['order'] = $order->getId();
+                $log_data['result'] = $result;
+
+                if (is_error($result)) {
+                    $order->setResultCode($result['errno']);
 
                     try {
                         //事件：出货失败
@@ -428,7 +430,7 @@ class DeviceUtil
                     }
                     if (Helper::NeedAutoRefund($device)) {
                         //退款任务
-                        Job::refund($order->getOrderNO(), $res['message']);
+                        Job::refund($order->getOrderNO(), $result['message']);
                     }
                 } else {
                     $order->setResultCode(0);
@@ -455,7 +457,7 @@ class DeviceUtil
                 }
 
                 //出货失败后，只记录错误，不回退数据
-                $order->setExtraData('pull.result', $res);
+                $order->setExtraData('pull.result', $result);
 
                 if (!$order->save()) {
                     return err('无法保存订单数据！');
@@ -466,7 +468,7 @@ class DeviceUtil
                 /**
                  * 始终返回 true，是为了即使失败，仍然创建订单
                  */
-                return is_error($res) ? true : $res;
+                return is_error($result) ? true : $result;
             }
         );
 

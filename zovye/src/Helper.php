@@ -292,12 +292,12 @@ class Helper
             return $pull_data;
         }
 
-        $result = $device->pull($pull_data);
-
         //保存货道
         $order->setExtraData('device.ch', $pull_data['channel']);
 
-        //v1版本新版本返回数据包含在json的data下
+        //请求出货
+        $result = $device->pull($pull_data);
+
         if (!is_error($result)) {
             $locker = $device->payloadLockAcquire(3);
             if (empty($locker)) {

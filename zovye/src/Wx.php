@@ -9,6 +9,8 @@ namespace zovye;
 use WeAccount;
 use WeiXinAccount;
 use WxappAccount;
+use function cache_delete;
+use function cache_system_key;
 
 class Wx
 {
@@ -19,8 +21,8 @@ class Wx
 
     public static function deleteAccessTokenCache()
     {
-        $key = \cache_system_key('accesstoken', array('uniacid' => We7::uniacid()));
-        \cache_delete($key);
+        $key = cache_system_key('accesstoken', array('uniacid' => We7::uniacid()));
+        cache_delete($key);
     }
 
     public static function checkAccessTokenExpired($result)
@@ -28,6 +30,7 @@ class Wx
         if ($result['errcode'] === 40001) {
             self::deleteAccessTokenCache();
         }
+
         return $result;
     }
 
@@ -47,19 +50,31 @@ class Wx
         return $wx_account;
     }
 
-    public static function addTemplate($template_id, $keyword_name_list = []): array
+    public static function addTemplate($template_id, $keyword_name_list = [])
     {
-        $api_url = self::ADD_TEMPLATE_URL.self::getWxAccount()->getAccessToken();
+        $token = self::getWxAccount()->getAccessToken();
+        if (is_error($token)) {
+            return $token;
+        }
 
-        return self::checkAccessTokenExpired(HttpUtil::post($api_url, [
-            'template_id_short' => $template_id,
-            'keyword_name_list' => $keyword_name_list,
-        ]));
+        $api_url = self::ADD_TEMPLATE_URL.$token;
+
+        return self::checkAccessTokenExpired(
+            HttpUtil::post($api_url, [
+                'template_id_short' => $template_id,
+                'keyword_name_list' => $keyword_name_list,
+            ])
+        );
     }
 
-    public static function sendTemplateMsg($data): array
+    public static function sendTemplateMsg($data)
     {
-        $api_url = self::SEND_TEMPLATE_MSG_URL.self::getWxAccount()->getAccessToken();
+        $token = self::getWxAccount()->getAccessToken();
+        if (is_error($token)) {
+            return $token;
+        }
+
+        $api_url = self::SEND_TEMPLATE_MSG_URL.$token;
 
         return self::checkAccessTokenExpired(HttpUtil::post($api_url, $data));
     }

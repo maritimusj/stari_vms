@@ -14,11 +14,22 @@ class Wx
 {
     const CREATE_QRCODE_URL = 'https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=';
     const SHOW_QRCODE_URL = 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=';
-    const SET_INDUSTRY_URL = 'https://api.weixin.qq.com/cgi-bin/template/api_set_industry?access_token=';
-    const GET_INDUSTRY_URL = 'https://api.weixin.qq.com/cgi-bin/template/get_industry?access_token=';
     const ADD_TEMPLATE_URL = 'https://api.weixin.qq.com/cgi-bin/template/api_add_template?access_token=';
-    const GET_ALL_TEMPLATE_URL = 'https://api.weixin.qq.com/cgi-bin/template/get_all_private_template?access_token=';
     const SEND_TEMPLATE_MSG_URL = 'https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=';
+
+    public static function deleteAccessTokenCache()
+    {
+        $key = \cache_system_key('accesstoken', array('uniacid' => We7::uniacid()));
+        \cache_delete($key);
+    }
+
+    public static function checkAccessTokenExpired($result)
+    {
+        if ($result['errcode'] === 40001) {
+            self::deleteAccessTokenCache();
+        }
+        return $result;
+    }
 
     public static function getWxAccount(): WeiXinAccount
     {
@@ -36,45 +47,21 @@ class Wx
         return $wx_account;
     }
 
-    public static function setIndustry($industry_id1, $industry_id2): array
-    {
-        $api_url = self::SET_INDUSTRY_URL.self::getWxAccount()->getAccessToken();
-
-        return HttpUtil::post($api_url, [
-            'industry_id1' => $industry_id1,
-            'industry_id2' => $industry_id2,
-        ]);
-    }
-
-    public static function getIndustry()
-    {
-        $api_url = self::GET_INDUSTRY_URL.self::getWxAccount()->getAccessToken();
-
-        return HttpUtil::get($api_url);
-    }
-
     public static function addTemplate($template_id, $keyword_name_list = []): array
     {
         $api_url = self::ADD_TEMPLATE_URL.self::getWxAccount()->getAccessToken();
 
-        return HttpUtil::post($api_url, [
+        return self::checkAccessTokenExpired(HttpUtil::post($api_url, [
             'template_id_short' => $template_id,
             'keyword_name_list' => $keyword_name_list,
-        ]);
-    }
-
-    public static function getAllTemplate($template_id, $keyword_name_list = []): array
-    {
-        $api_url = self::GET_ALL_TEMPLATE_URL.self::getWxAccount()->getAccessToken();
-
-        return HttpUtil::get($api_url);
+        ]));
     }
 
     public static function sendTemplateMsg($data): array
     {
         $api_url = self::SEND_TEMPLATE_MSG_URL.self::getWxAccount()->getAccessToken();
 
-        return HttpUtil::post($api_url, $data);
+        return self::checkAccessTokenExpired(HttpUtil::post($api_url, $data));
     }
 
     /**
@@ -87,7 +74,7 @@ class Wx
      */
     public static function sendTplNotice($openid, $tpl_id, $content, string $url = '')
     {
-        return self::getWxAccount()->sendTplNotice($openid, $tpl_id, $content, $url);
+        return self::checkAccessTokenExpired(self::getWxAccount()->sendTplNotice($openid, $tpl_id, $content, $url));
     }
 
     /**
@@ -164,12 +151,12 @@ class Wx
 
     public static function getTempQRCodeTicket($scene = '', $expire_seconds = 60): array
     {
-        return self::getQRCodeTicket('QR_SCENE', $scene, $expire_seconds);
+        return self::checkAccessTokenExpired(self::getQRCodeTicket('QR_SCENE', $scene, $expire_seconds));
     }
 
     public static function getLimitQRCodeTicket($scene = '', $expire_seconds = 60): array
     {
-        return self::getQRCodeTicket('QR_LIMIT_STR_SCENE', $scene, $expire_seconds);
+        return self::checkAccessTokenExpired(self::getQRCodeTicket('QR_LIMIT_STR_SCENE', $scene, $expire_seconds));
     }
 
     public static function getTempQRCodeUrl($scene = '', $expire_seconds = 60): string

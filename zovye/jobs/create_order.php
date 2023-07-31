@@ -321,18 +321,6 @@ function createOrder(array $params, string $order_no, array $goods): array
         } catch (Exception $e) {
         }
     } else {
-        if (isset($goods['cargo_lane'])) {
-            $locker = $device->payloadLockAcquire(3);
-            if (empty($locker)) {
-                return [err('设备正忙，请重试！')];
-            }
-            $result = $device->resetPayload([$goods['cargo_lane'] => -1], "订单：$order_no");
-            if (is_error($result)) {
-                return [err('保存库存变动失败！')];
-            }
-            $locker->unlock();
-        }
-
         //使用取货码
         if ($voucher) {
             $voucher->setUsedUserId($user->getId());
@@ -341,6 +329,19 @@ function createOrder(array $params, string $order_no, array $goods): array
                 return [err('使用取货码失败！')];
             }
         }
+    }
+
+    //处理库存
+    if ((settings('device.errorInventoryOp') || !is_error($result)) && isset($goods['cargo_lane'])) {
+        $locker = $device->payloadLockAcquire(3);
+        if (empty($locker)) {
+            return [err('设备正忙，请重试！')];
+        }
+        $result = $device->resetPayload([$goods['cargo_lane'] => -1], "订单：$order_no");
+        if (is_error($result)) {
+            return [err('保存库存变动失败！')];
+        }
+        $locker->unlock();
     }
 
     $device->save();

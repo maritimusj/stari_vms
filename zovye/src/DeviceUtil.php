@@ -435,18 +435,6 @@ class DeviceUtil
                 } else {
                     $order->setResultCode(0);
 
-                    if (isset($goods['cargo_lane'])) {
-                        $locker = $device->payloadLockAcquire(3);
-                        if (empty($locker)) {
-                            return err('设备正忙，请重试！');
-                        }
-                        $v = $device->resetPayload([$goods['cargo_lane'] => -1], "设备出货：{$order->getOrderNO()}");
-                        if (is_error($v)) {
-                            return err('保存库存失败！');
-                        }
-                        $locker->unlock();
-                    }
-
                     if ($voucher) {
                         $voucher->setUsedUserId($user->getId());
                         $voucher->setUsedtime(time());
@@ -454,6 +442,19 @@ class DeviceUtil
                             return err('出货失败：使用取货码失败！');
                         }
                     }
+                }
+
+                //处理库存
+                if ((settings('device.errorInventoryOp') || !is_error($result)) && isset($goods['cargo_lane'])) {
+                    $locker = $device->payloadLockAcquire(3);
+                    if (empty($locker)) {
+                        return err('设备正忙，请重试！');
+                    }
+                    $v = $device->resetPayload([$goods['cargo_lane'] => -1], "设备出货：{$order->getOrderNO()}");
+                    if (is_error($v)) {
+                        return err('保存库存失败！');
+                    }
+                    $locker->unlock();
                 }
 
                 //出货失败后，只记录错误，不回退数据

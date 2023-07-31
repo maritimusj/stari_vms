@@ -298,7 +298,8 @@ class Helper
         //请求出货
         $result = $device->pull($pull_data);
 
-        if (!is_error($result)) {
+        //处理库存
+        if ((settings('device.errorInventoryOp') || !is_error($result)) && isset($goods['cargo_lane'])) {
             $locker = $device->payloadLockAcquire(3);
             if (empty($locker)) {
                 return err('设备正忙，请重试！');

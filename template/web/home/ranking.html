@@ -157,14 +157,14 @@
                     <td class="center">{{index + 1}}</td>
                     <td>
                         <div v-if="item.agent" title="查看代理商设备统计">
-                            <div class="profile agent selected" style="position:relative" @click="search(item.agent)">
+                            <div class="profile agent selected" style="position:relative">
                                 <img :src="item.agent.avatar">
                                 <span v-text="item.agent.name"></span>
                             </div>
                         </div>
                     </td>
                     <td class="center">
-                        <span class="device-total" @click="search(item.agent)">
+                        <span class="device-total" @click="search(item.agent)" title="查看该代理商的设备排序榜">
                         {{item.devices_total}}
                         </span>
                     </td>

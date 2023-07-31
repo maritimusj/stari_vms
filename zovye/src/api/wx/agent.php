@@ -981,7 +981,7 @@ class agent
 
         common::checkCurrentUserPrivileges('F_sb');
 
-        $target = agent::getUserByGUID(request('guid'));
+        $target = agent::getUserByGUID(request::str('guid'));
         if (empty($target)) {
             return err('用户不存在！');
         }

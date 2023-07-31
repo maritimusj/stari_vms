@@ -53,7 +53,7 @@
     #app .agent {
         cursor: pointer;
     }
-
+    
     #app .device-total {
         cursor: pointer;
     }
@@ -100,12 +100,15 @@
 <div id="app" v-cloak>
     <div class="panel panel-default nav-tab-item">
         <div class="heading">
-            <span class="operate toolbar">
+            <div class="operate toolbar">
                 <div class="profile agent selected" style="position:relative" v-if="agent" @click="back()" title="返回">
                     <img :src="agent.avatar">
                     <span v-text="agent.name"></span>
                     &nbsp;
                     <i class="fa fa-reply" title="返回"></i> 
+                </div>
+                <div>
+                    
                 </div>
                 <div>
                     <span v-for="y in yearList" class="year" :class="{'active': year == y}" :title="y+'年'"
@@ -125,26 +128,29 @@
                     </span> <i class="fa fa-calendar"></i>
                     </button>
                 </div>
-            </span>
+                <div v-if="agent === null">
+                    <i class="fa fa-exchange" :title="view === 'agent' ? '查看设备排行榜':'查看代理商排行榜'" @click="view = view === 'agent'?'device':'agent'"></i>
+                </div>
+            </div>
         </div>
         <div class="panel-body">
             <div class="text-center text-muted" v-show="loading">
                 <i class="fa fa-question-circle"></i> 正在加载中...
             </div>
-            <table class="table table-bordered" id="list" v-if="!agent && !loading">
+            <table class="table table-bordered" id="list" v-if="(view === 'agent') && !loading">
                 <thead>
                 <tr class="active">
                     <td class="center">#</td>
                     <td>代理商</td>
                     <td class="center" >设备总数</td>
                     <td class="center">
-                        <span :class="{'sort': true, 'fa desc': sortBy === 'total'}" @click="sort='total'">订单总数</span>
+                        <span :class="{'sort': true, 'fa desc': sort === 'total'}" @click="sort='total'">订单总数</span>
                     </td>
                     <td class="center">
-                        <span :class="{'sort': true, 'fa desc': sortBy === 'price'}" @click="sort='price'">订单金额</span>
+                        <span :class="{'sort': true, 'fa desc': sort === 'price'}" @click="sort='price'">订单金额</span>
                     </td>
                     <td class="center">
-                        <span :class="{'sort': true, 'fa desc': sortBy === 'amount'}" @click="sort='amount'">
+                        <span :class="{'sort': true, 'fa desc': sort === 'amount'}" @click="sort='amount'">
                             {if \zovye\App::isFuelingDeviceEnabled()}
                             加注数量(升)
                             {else}
@@ -158,14 +164,14 @@
                     <td class="center">{{index + 1}}</td>
                     <td>
                         <div v-if="item.agent" title="查看代理商设备统计">
-                            <div class="profile agent selected" style="position:relative" @click="view(item.agent)">
+                            <div class="profile agent selected" style="position:relative" @click="search(item.agent)">
                                 <img :src="item.agent.avatar">
                                 <span v-text="item.agent.name"></span>
                             </div>
                         </div>
                     </td>
                     <td class="center">
-                        <span class="device-total" @click="view(item.agent)">
+                        <span class="device-total" @click="search(item.agent)">
                         {{item.devices_total}}
                         </span>
                     </td>
@@ -197,7 +203,7 @@
                     </td>
                 </tr>
             </table>
-            <div class="device-list" v-if="agent && !loading">
+            <div class="device-list" v-if="(agent || view === 'device') && !loading">
                 <table class="table table-bordered" id="list">
                     <thead>
                     <tr class="active">
@@ -205,17 +211,17 @@
                         <td>设备</td>
                         <td>IMEI</td>
                         <td class="center">
-                            <span :class="{'sort': true, 'fa desc': sortBy === 'total'}" @click="sort='total'">
+                            <span :class="{'sort': true, 'fa desc': sort === 'total'}" @click="sort='total'">
                                 订单总数
                             </span>
                         </td>
                         <td class="center">
-                            <span :class="{'sort': true, 'fa desc': sortBy === 'price'}" @click="sort='price'">
+                            <span :class="{'sort': true, 'fa desc': sort === 'price'}" @click="sort='price'">
                                 订单金额
                             </span>
                         </td>
                         <td class="center">
-                            <span  :class="{'sort': true, 'fa desc': sortBy === 'amount'}" @click="sort='amount'">
+                            <span  :class="{'sort': true, 'fa desc': sort === 'amount'}" @click="sort='amount'">
                                 {if \zovye\App::isFuelingDeviceEnabled()}
                                 加注数量(升)
                                 {else}
@@ -297,6 +303,7 @@
                 },
                 year: null,
                 agent: null,
+                view: 'agent',
             },
             watch: {
                 loading(v) {
@@ -308,15 +315,15 @@
                 },
                 sort() {
                     this.reload();
-                }
+                },
+                view() {
+                    this.reload();
+                },
+                year() {
+                    this.reload();
+                },
             },
             computed: {
-                sortBy() {
-                    if (this.agent) {
-                        return this.deviceList.sort || this.sort;
-                    }
-                    return this.agentList.sort || this.sort;
-                },
                 yearList() {
                     if (this.deviceList.years.length > 0) {
                         return this.deviceList.years;
@@ -331,6 +338,7 @@
             methods: {
                 back() {
                     this.agent = null;
+                    this.view = 'agent';
                     if (this.year) {
                         this.getAgentList(this.year, this.year);
                     } else {
@@ -345,10 +353,18 @@
                             this.getDeviceList(this.agent.id, this.start, this.end);
                         }
                     } else {
-                        if (this.year) {
-                            this.getAgentList(this.year, this.year);
+                        if (this.view === 'agent') {
+                            if (this.year) {
+                                this.getAgentList(this.year, this.year);
+                            } else {
+                                this.getAgentList(this.start, this.end);
+                            }                            
                         } else {
-                            this.getAgentList(this.start, this.end);
+                            if (this.year) {
+                                this.getDeviceList(0, this.year, this.year);
+                            } else {
+                                this.getDeviceList(0, this.start, this.end);
+                            }
                         }
                     }
                 },
@@ -363,6 +379,7 @@
                             self.agentList = res.data;
                             self.begin = res.data.begin;
                             self.end = res.data.end;
+                            self.sort = res.data.sort;
                             if (self.begin && self.end) {
                                 $('.date-title').text(self.begin + ' 至 ' + self.end)
                             } else {
@@ -374,15 +391,12 @@
                 },
                 changeYear(year) {
                     this.year = year;
-                    if (this.agent) {
-                        this.getDeviceList(this.agent.id, this.year, this.year);
-                    } else {
-                        this.getAgentList(year, year);
-                    }
+                    $('.daterangepicker .ranges .active').removeClass('active');
                 },
-                view(agent) {
+                search(agent) {
                     if (agent) {
                         this.agent = agent;
+                        this.view = 'device';
                         if (this.year) {
                             this.getDeviceList(agent.id, this.year, this.year);
                         } else {
@@ -399,17 +413,10 @@
                     $.getJSON(apiUrl, {fn: 'device', id, begin, end, sort: this.sort}).then(res => {
                         if (res && res.status) {
                             self.deviceList = res.data;
+                            self.sort = res.data.sort;
                         }
                         self.loading = false;
                     })
-                },
-                getData() {
-                    this.year = null;
-                    if (this.agent) {
-                        this.getDeviceList(this.agent.id, this.start, this.end);
-                    } else {
-                        this.getAgentList(this.start, this.end);
-                    }
                 },
                 initDateCtrl() {
                     const self = this;
@@ -421,6 +428,7 @@
                             format: "YYYY-MM-DD",
                             clear: 1
                         }, function (start, end) {
+                            self.year = null;
                             start = start.toDateStr().indexOf("0000-01-01") != -1 ? "" : start.toDateStr();
                             end = end.toDateStr().indexOf("0000-01-01") != -1 ? "" : end.toDateStr();
                             const html = (start === "" ? "" : start) + (start === "" && end === "" ? "" : (" 至 " + end))
@@ -429,7 +437,7 @@
                             $(elm).prev().val(end);
                             self.start = start;
                             self.end = end;
-                            self.getData();
+                            self.reload();
                         })
                     })
                 }

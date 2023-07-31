@@ -107,9 +107,13 @@ if ($fn == 'default') {
 } elseif ($fn == 'device') {
     extract(getParsedDate());
 
-    $agent = Agent::get(Request::int('id'));
-    if (empty($agent)) {
-        JSON::fail('找不到这个代理商！');
+
+    $agent_id = Request::int('id');
+    if ($agent_id) {
+        $agent = Agent::get($agent_id);
+        if (empty($agent)) {
+            JSON::fail('找不到这个代理商！');
+        }
     }
 
     $sort = Request::trim('sort', 'price');
@@ -118,7 +122,11 @@ if ($fn == 'default') {
     }
 
     $result = CacheUtil::cachedCall(30, function () use ($begin, $end, $sort, $agent, $title) {
-        $query = Order::query(['agent_id' => $agent->getId()]);
+        $query = Order::query();
+
+        if ($agent) {
+            $query->where(['agent_id' => $agent->getId()]);
+        }
 
         if ($begin) {
             $query->where(['createtime >=' => $begin->getTimestamp()]);
@@ -166,9 +174,9 @@ if ($fn == 'default') {
             'list' => $list,
             'title' => $title,
             'summary' => $summary,
-            'years' => getYears(Order::getFirstOrderOfAgent($agent)),
+            'years' => getYears($agent ? Order::getFirstOrderOfAgent($agent) : Order::getFirstOrder()),
         ];
-    }, $begin ? $begin->getTimestamp() : 0, $end ? $end->getTimestamp() : 0, $sort, $agent->getId());
+    }, $begin ? $begin->getTimestamp() : 0, $end ? $end->getTimestamp() : 0, $sort, $agent ? $agent->getId() : 0);
 
     JSON::success($result);
 }

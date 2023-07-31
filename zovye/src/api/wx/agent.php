@@ -85,18 +85,15 @@ class agent
      */
     public static function getUserByGUID($guid)
     {
-        $login_data = LoginData::get(common::getToken());
-        if ($login_data) {
-            $secret_key = common::getSecretKey();
-            /** @var userModelObj $res */
-            $res = User::findOne("SHA1(CONCAT('$secret_key', id))='$guid'");
-            if ($res) {
-                if ($res->isAgent()) {
-                    return $res->agent();
-                }
-
-                return $res;
+        $secret_key = common::getSecretKey();
+        /** @var userModelObj $res */
+        $res = User::findOne("SHA1(CONCAT('$secret_key', id))='$guid'");
+        if ($res) {
+            if ($res->isAgent()) {
+                return $res->agent();
             }
+
+            return $res;
         }
 
         return null;

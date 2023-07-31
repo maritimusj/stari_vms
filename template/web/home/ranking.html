@@ -50,10 +50,6 @@
         left: 0;
     }
 
-    #app .agent {
-        cursor: pointer;
-    }
-    
     #app .device-total {
         cursor: pointer;
     }
@@ -101,14 +97,10 @@
     <div class="panel panel-default nav-tab-item">
         <div class="heading">
             <div class="operate toolbar">
-                <div class="profile agent selected" style="position:relative" v-if="agent" @click="back()" title="返回">
+                <div class="profile agent selected" style="position:relative" v-if="agent">
                     <img :src="agent.avatar">
                     <span v-text="agent.name"></span>
                     &nbsp;
-                    <i class="fa fa-reply" title="返回"></i> 
-                </div>
-                <div>
-                    
                 </div>
                 <div>
                     <span v-for="y in yearList" class="year" :class="{'active': year == y}" :title="y+'年'"
@@ -128,8 +120,9 @@
                     </span> <i class="fa fa-calendar"></i>
                     </button>
                 </div>
-                <div v-if="agent === null">
-                    <i class="fa fa-exchange" :title="view === 'agent' ? '查看设备排行榜':'查看代理商排行榜'" @click="view = view === 'agent'?'device':'agent'"></i>
+                <div>
+                    <i class="fa fa-reply" title="返回" @click="back()" v-if="agent"></i> 
+                    <i class="fa fa-exchange" :title="view === 'agent' ? '查看设备排行榜':'查看代理商排行榜'" @click="change" v-else></i>
                 </div>
             </div>
         </div>
@@ -344,6 +337,13 @@
                     } else {
                         this.getAgentList(this.start, this.end);
                     }
+                },
+                change() {
+                    if (this.agent) {
+                        this.back();
+                        return;
+                    }
+                    this.view = this.view === 'agent' ? 'device' : 'agent';
                 },
                 reload() {
                     if (this.agent) {

@@ -45,6 +45,7 @@ if ($page == 'device') {
     $settings['device']['autoJoin'] = Request::bool('newDeviceAutoJoin') ? 1 : 0;
     $settings['device']['errorDown'] = Request::bool('errorDown') ? 1 : 0;
     $settings['device']['clearErrorCode'] = Request::bool('clearErrorCode') ? 1 : 0;
+    $settings['device']['errorInventoryOp'] = Request::bool('errorInventoryOp') ? 1 : 0;
     $settings['device']['remainWarning'] = Request::int('remainWarning');
     $settings['device']['waitTimeout'] = max(10, Request::int('waitTimeout'));
     $settings['device']['lockRetries'] = Request::int('lockRetries');

@@ -65,10 +65,12 @@ if ($op == 'adv_review' && CtrlServ::checkJobSign(['id' => request('id')])) {
                         'sign' => sha1(App::uid().$user->getOpenid().$adv->getId()),
                     ]
                 );
-                if (!is_error(Wx::sendTplNotice($user->getOpenid(), $tpl_id, $notify_data, $url))) {
-                    $res[] = "[ {$user->getNickname()} ]=> Ok".PHP_EOL;
-                } else {
-                    $res[] = "[ {$user->getNickname()} ]=> fail".PHP_EOL;
+                $res = Wx::sendTplNotice($user->getOpenid(), $tpl_id, $notify_data, $url);
+                if (is_error($res)) {
+                    $res[] = [
+                        'user' => $user->profile(),
+                        'err' => $res,
+                    ];
                 }
             } else {
                 $res = '找不到指定用户！';

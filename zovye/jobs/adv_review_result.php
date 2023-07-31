@@ -17,6 +17,7 @@ use zovye\Request;
 use zovye\ReviewResult;
 use zovye\Util;
 use zovye\Wx;
+use function zovye\is_error;
 use function zovye\request;
 use function zovye\settings;
 
@@ -56,7 +57,13 @@ if ($op == 'adv_review_result' && CtrlServ::checkJobSign(['id' => request('id')]
                         'remark' => ['value' => '有任何问题，请与我们取得联系，谢谢！'],
                     ]
                 );
-                $log['notice']['openid'] = $res;
+                if (is_error($res)) {
+                    $log['notice'][] = [
+                        'user' => $openid,
+                        'err' => $res,
+                    ];
+                }
+
             }
         }
     }

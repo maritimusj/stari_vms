@@ -19,6 +19,7 @@ use zovye\Request;
 use zovye\Util;
 use zovye\We7;
 use zovye\Wx;
+use function zovye\is_error;
 use function zovye\m;
 use function zovye\request;
 use function zovye\settings;
@@ -55,6 +56,7 @@ if ($op == 'agent_msg' && CtrlServ::checkJobSign(['id' => request('id')])) {
                     $exists = m('agent_msg')->findOne(
                         We7::uniacid(['agent_id' => $agent->getId(), 'msg_id' => $msg->getId()])
                     );
+
                     if ($exists) {
                         continue;
                     }
@@ -62,7 +64,13 @@ if ($op == 'agent_msg' && CtrlServ::checkJobSign(['id' => request('id')])) {
                     foreach (Util::getNotifyOpenIds($agent, 'agentMsg') as $id => $openid) {
                         $data['agent_id'] = $id;
                         if (m('agent_msg')->create($data)) {
-                            $log['result'][$openid] = Wx::sendTplNotice($openid, $tpl_id, $notify_data);
+                            $res = Wx::sendTplNotice($openid, $tpl_id, $notify_data);;
+                            if (is_error($res)) {
+                                $log['result'][] = [
+                                    'user' => $openid,
+                                    'err' => $res,
+                                ];
+                            }
                         }
                     }
                 }

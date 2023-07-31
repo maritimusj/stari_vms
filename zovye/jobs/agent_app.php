@@ -14,6 +14,7 @@ use zovye\CtrlServ;
 use zovye\Job;
 use zovye\Log;
 use zovye\model\agent_appModelObj;
+use zovye\model\userModelObj;
 use zovye\Request;
 use zovye\User;
 use zovye\We7;
@@ -36,12 +37,15 @@ if ($op == 'agent_app' && CtrlServ::checkJobSign(['id' => request('id')])) {
             $notify_data = $app->getTplMsgData();
             if (settings('notice.authorizedAdminUserId')) {
                 $query = User::query(['id' => settings('notice.authorizedAdminUserId')]);
+                /** @var userModelObj $user */
                 $user = $query->findOne();
                 if ($user) {
-                    if (!is_error(Wx::sendTplNotice($user->getOpenid(), $tpl_id, $notify_data))) {
-                        $log['result'][$user->getOpenid()] = "[ {$user->getNickname()} ]=> Ok ".PHP_EOL;
-                    } else {
-                        $log['result'][$user->getOpenid()] = "[ {$user->getNickname()} ]=> fail ".PHP_EOL;
+                    $res = Wx::sendTplNotice($user->getOpenid(), $tpl_id, $notify_data);
+                    if (is_error($res)) {
+                        $log['result'][] = [
+                            'user' => $user->profile(),
+                            'error' => $res,
+                        ];
                     }
                 } else {
                     $log['result']['error'] = '找不到指定的用户！';

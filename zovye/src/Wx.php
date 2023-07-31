@@ -14,19 +14,67 @@ class Wx
 {
     const CREATE_QRCODE_URL = 'https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=';
     const SHOW_QRCODE_URL = 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=';
+    const SET_INDUSTRY_URL = 'https://api.weixin.qq.com/cgi-bin/template/api_set_industry?access_token=';
+    const GET_INDUSTRY_URL = 'https://api.weixin.qq.com/cgi-bin/template/get_industry?access_token=';
+    const ADD_TEMPLATE_URL = 'https://api.weixin.qq.com/cgi-bin/template/api_add_template?access_token=';
+    const GET_ALL_TEMPLATE_URL = 'https://api.weixin.qq.com/cgi-bin/template/get_all_private_template?access_token=';
+    const SEND_TEMPLATE_MSG_URL = 'https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=';
 
     public static function getWxAccount(): WeiXinAccount
     {
-        static $wx = null;
-        if (empty($wx)) {
+        static $wx_account = null;
+
+        if (empty($wx_account)) {
             if ($GLOBALS['_W']['account'] instanceof WeiXinAccount) {
-                $wx = $GLOBALS['_W']['account'];
+                $wx_account = $GLOBALS['_W']['account'];
             } else {
                 We7::load()->classs('weixin.account');
-                $wx = WeAccount::create(We7::uniacid());
+                $wx_account = WeAccount::create(We7::uniacid());
             }
         }
-        return $wx;
+
+        return $wx_account;
+    }
+
+    public static function setIndustry($industry_id1, $industry_id2): array
+    {
+        $api_url = self::SET_INDUSTRY_URL.self::getWxAccount()->getAccessToken();
+
+        return HttpUtil::post($api_url, [
+            'industry_id1' => $industry_id1,
+            'industry_id2' => $industry_id2,
+        ]);
+    }
+
+    public static function getIndustry()
+    {
+        $api_url = self::GET_INDUSTRY_URL.self::getWxAccount()->getAccessToken();
+
+        return HttpUtil::get($api_url);
+    }
+
+    public static function addTemplate($template_id, $keyword_name_list = []): array
+    {
+        $api_url = self::ADD_TEMPLATE_URL.self::getWxAccount()->getAccessToken();
+
+        return HttpUtil::post($api_url, [
+            'template_id_short' => $template_id,
+            'keyword_name_list' => $keyword_name_list,
+        ]);
+    }
+
+    public static function getAllTemplate($template_id, $keyword_name_list = []): array
+    {
+        $api_url = self::GET_ALL_TEMPLATE_URL.self::getWxAccount()->getAccessToken();
+
+        return HttpUtil::get($api_url);
+    }
+
+    public static function sendTemplateMsg($data): array
+    {
+        $api_url = self::SEND_TEMPLATE_MSG_URL.self::getWxAccount()->getAccessToken();
+
+        return HttpUtil::post($api_url, $data);
     }
 
     /**
@@ -39,8 +87,7 @@ class Wx
      */
     public static function sendTplNotice($openid, $tpl_id, $content, string $url = '')
     {
-        $wx = self::getWxAccount();
-        return $wx->sendTplNotice($openid, $tpl_id, $content, $url);
+        return self::getWxAccount()->sendTplNotice($openid, $tpl_id, $content, $url);
     }
 
     /**
@@ -50,27 +97,28 @@ class Wx
      */
     public static function sendCustomNotice($msg): bool
     {
-        $wx = self::getWxAccount();
-        $result = $wx->sendCustomNotice($msg);
+        $result = self::getWxAccount()->sendCustomNotice($msg);
 
         return !is_error($result);
     }
 
     public static function getWxApp($config = []): WxappAccount
     {
-        static $wxApp = null;
-        if (empty($wxApp)) {
+        static $wx_app = null;
+
+        if (empty($wx_app)) {
             We7::load()->classs('wxapp.account');
-            $wxApp = new WxappAccount($config);
+            $wx_app = new WxappAccount($config);
         }
 
-        return $wxApp;
+        return $wx_app;
     }
 
     public static function decodeWxAppData($code, $iv, $encryptedData, $config = [])
     {
-        $wxApp = self::getWxApp($config);
-        $auth_data = $wxApp->getOauthInfo($code);
+        $wx_app = self::getWxApp($config);
+
+        $auth_data = $wx_app->getOauthInfo($code);
         if (is_error($auth_data)) {
             return $auth_data;
         }
@@ -78,7 +126,7 @@ class Wx
         if ($iv && $encryptedData) {
             //微擎的pkcs7Encode()解密函数需要从$_SESSION中读取session_key
             $_SESSION['session_key'] = $auth_data['session_key'];
-            $res = $wxApp->pkcs7Encode($encryptedData, $iv);
+            $res = $wx_app->pkcs7Encode($encryptedData, $iv);
             if (is_error($res)) {
                 return $res;
             }
@@ -97,14 +145,12 @@ class Wx
 
     private static function getQRCodeTicket($action = '', $scene = '', $expire_seconds = 60): array
     {
-        $wx = self::getWxAccount();
-
         $data = [
             'expire_seconds' => $expire_seconds,
             'action_name' => $action,
             'action_info' => [
-                'scene' => []
-            ]
+                'scene' => [],
+            ],
         ];
 
         if (is_int($scene)) {
@@ -113,7 +159,7 @@ class Wx
             $data['action_info']['scene']['scene_str'] = strval($scene);
         }
 
-        return HttpUtil::post(self::CREATE_QRCODE_URL . $wx::token(), $data);
+        return HttpUtil::post(self::CREATE_QRCODE_URL.self::getWxAccount()->getAccessToken(), $data);
     }
 
     public static function getTempQRCodeTicket($scene = '', $expire_seconds = 60): array
@@ -130,8 +176,9 @@ class Wx
     {
         $res = self::getTempQRCodeTicket($scene, $expire_seconds);
         if ($res && $res['ticket']) {
-            return self::SHOW_QRCODE_URL . $res['ticket'];
+            return self::SHOW_QRCODE_URL.$res['ticket'];
         }
+
         return '';
     }
 }

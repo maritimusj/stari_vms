@@ -16,6 +16,7 @@ use zovye\CtrlServ;
 use zovye\Job;
 use zovye\Log;
 use zovye\Media;
+use zovye\model\userModelObj;
 use zovye\Request;
 use zovye\User;
 use zovye\Util;
@@ -56,9 +57,11 @@ if ($op == 'adv_review' && CtrlServ::checkJobSign(['id' => request('id')])) {
         ];
 
         if (settings('notice.reviewAdminUserId')) {
+            /** @var userModelObj $user */
             $user = User::findOne(['id' => settings('notice.reviewAdminUserId')]);
             if ($user) {
-                $url = Util::murl('util',
+                $url = Util::murl(
+                    'util',
                     [
                         'op' => 'adv_review',
                         'id' => $adv->getId(),
@@ -67,9 +70,9 @@ if ($op == 'adv_review' && CtrlServ::checkJobSign(['id' => request('id')])) {
                 );
                 $res = Wx::sendTplNotice($user->getOpenid(), $tpl_id, $notify_data, $url);
                 if (is_error($res)) {
-                    $res[] = [
+                    $res = [
                         'user' => $user->profile(),
-                        'err' => $res,
+                        'err' => $res['message'],
                     ];
                 }
             } else {

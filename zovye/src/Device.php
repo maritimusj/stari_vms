@@ -1183,14 +1183,14 @@ class Device extends State
                 $data['character_string9'] = ['value' => Wx::trim_character($device->getImei())];
                 $location = $device->getLocation();
                 $data['thing11'] = ['value' => Wx::trim_thing($location['address']) ?: '<没有位置信息>'];
-                $data['time4'] = ['value' => date('Y-m-d H:is')];
+                $data['time4'] = ['value' => date('Y-m-d H:i:s')];
                 break;
             case 'offline':
                 $data['thing2'] = ['value' => Wx::trim_thing($device->getName())];
                 $data['thing6'] = ['value' => Wx::trim_thing($device->getImei())];
                 $location = $device->getLocation();
                 $data['thing17'] = ['value' => Wx::trim_thing($location['address'] ?: '<没有位置信息>')];
-                $data['time4'] = ['value' => date('Y-m-d H:is')];
+                $data['time4'] = ['value' => date('Y-m-d H:i:s')];
                 break;
             case 'error':
                 $data['thing9'] = ['value' => Wx::trim_thing($device->getName())];
@@ -1199,7 +1199,7 @@ class Device extends State
                 $data['thing27'] = ['value' => Wx::trim_thing($location['address'] ?: '<没有位置信息>')];
                 $err = $device->getLastError();
                 $data['thing5'] = ['value' => Wx::trim_thing($err['msg'] ?? '<未知故障>')];
-                $data['time2'] = ['value' => date('Y-m-d H:is')];
+                $data['time2'] = ['value' => date('Y-m-d H:i:s')];
                 break;
             case 'low_battery':
                 $data['thing1'] = ['value' => Wx::trim_thing($device->getName())];

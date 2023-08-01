@@ -1198,7 +1198,7 @@ class Device extends State
                 $location = $device->getLocation();
                 $data['thing27'] = ['value' => Wx::trim_thing($location['address'] ?: '<没有位置信息>')];
                 $err = $device->getLastError();
-                $data['thing5'] = ['value' => Wx::trim_thing($err['msg'] ?? '未知故障')];
+                $data['thing5'] = ['value' => Wx::trim_thing($err['msg'] ?? '<未知故障>')];
                 $data['time2'] = ['value' => date('Y-m-d H:is')];
                 break;
             case 'low_battery':
@@ -1207,7 +1207,7 @@ class Device extends State
                 $location = $device->getLocation();
                 $data['thing6'] = ['value' => Wx::trim_thing($location['address'] ?: '<没有位置信息>')];
                 $qoe = $device->getQoe();
-                $data['thing2'] = ['value' => $qoe == -1 ? '未知' : "$qoe%"];
+                $data['thing2'] = ['value' => $qoe == -1 ? '<未知>' : "$qoe%"];
                 break;
             case 'low_remain':
 
@@ -1231,6 +1231,7 @@ class Device extends State
                     'param' => $param,
                     'result' => $result,
                 ]);
+                return $result;
             }
         }
 

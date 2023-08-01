@@ -30,7 +30,7 @@ class Wx
     public static function trim($str, $max_len)
     {
         if (mb_strlen($str) > $max_len) {
-            return mb_substr($str, 0, $max_len - 1) . '……';
+            return mb_substr($str, 0, $max_len - 1) . '…';
         }
         return $str;
     }

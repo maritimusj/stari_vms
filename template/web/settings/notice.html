@@ -14,97 +14,74 @@
 <form action="{php echo $this->createWebUrl('settings');}" method="post">
     <div class="panel panel-default nav-tab-item">
         <div class="panel-body">
-            {if \zovye\App::isFuelingDeviceEnabled()}
             <div class="seg">
                 <div class="title">订单通知</div>
                 <div class="form-group">
-                    <label for="order_tplid" class="col-md-2 control-label">微信消息模板ID</label>
+                    <label class="col-md-2 control-label">选择事件</label>
                     <div class="col-md-10">
-                        <input type="text" class="form-control" name="order_tplid" id="order_tplid" value="{$settings['notice']['order_tplid']}">
-                        <span class="help-block">* 新订单结算后，通过微信公众号给<b>代理商</b>推送通知</span>
-                    </div>
-                </div>          
-            </div>
-            {/if}
-            <div class="seg">
-                <div class="title">缺货通知</div>
-                <div class="form-group">
-                    <label for="remainWarningDelay" class="col-md-2 control-label">通知间隔（小时）</label>
-                    <div class="col-md-10">
-                        <input type="number" class="form-control" name="remainWarningDelay" id="remainWarningDelay" value="{$settings['notice']['delay']['order']}">
-                        <span class="help-block">* 默认一小时之内不重复通知</span>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="orderSucceed" value="1" {if $config['order']['type']['succeed']}checked{/if}> 成功订单
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="orderFailed" value="1" {if $config['order']['type']['failed']}checked{/if}> 异常订单
+                        </label>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="reload_tplid" class="col-md-2 control-label">微信消息模板ID</label>
+                    <label class="col-md-2 control-label">通知对象</label>
                     <div class="col-md-10">
-                        <input type="text" class="form-control" name="reload_tplid" id="reload_tplid" value="{$settings['notice']['reload_tplid']}">
-                        <span class="help-block">* 当设备需要补货时，通过微信公众号给<b>代理商</b>推送通知</span>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="agentForOrder" value="1" {if $config['order']['target']['agent']}checked{/if}> 代理商
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="keeperForOrder" value="1" {if $config['order']['target']['keeper']}checked{/if}> 运营人员
+                        </label>
+                        <span class="help-block">* 订单创建后，通过微信公众号给指定人员推送通知</span>
                     </div>
-                </div>                 
-                <div class="form-group">
-                    <label for="reloadSMSTplid" class="col-md-2 control-label">短信通知模板ID</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" name="reloadSMSTplid" id="reloadSMSTplid" value="{$settings['notice']['reload_smstplid']}">
-                        <span class="help-block">* 当设备需要补货时，通过短信给<b>运营人员</b>发送短信通知</span>
-                    </div>
-                </div>               
+                </div>     
             </div>
             <div class="seg">
-                <div class="title">设备故障</div>
+                <div class="title">设备事件</div>
                 <div class="form-group">
-                    <label for="deviceErrorDelay" class="col-md-2 control-label">通知间隔（小时）</label>
+                    <label class="col-md-2 control-label">选择事件</label>
                     <div class="col-md-10">
-                        <input type="number" class="form-control" name="deviceErrorDelay" id="deviceErrorDelay" value="{$settings['notice']['delay']['deviceerr']}">
-                        <span class="help-block">* 默认一小时之内不重复通知</span>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="deviceOnline" value="1" {if $config['device']['event']['online']}checked{/if}> 上线
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="deviceOffline" value="1" {if $config['device']['event']['offline']}checked{/if}> 下线
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="deviceError" value="1" {if $config['device']['event']['error']}checked{/if}> 故障
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="deviceLowBattery" value="1" {if $config['device']['event']['low_battery']}checked{/if}> 电量低
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="deviceLowReamin" value="1" {if $config['device']['event']['low_remain']}checked{/if}> 缺货
+                        </label>
                     </div>
-                </div>                
+                </div>
                 <div class="form-group">
-                    <label for="deviceErrorTplid" class="col-md-2 control-label">微信消息模板ID</label>
+                    <label class="col-md-2 control-label">通知对象</label>
                     <div class="col-md-10">
-                        <input type="text" class="form-control" name="deviceErrorTplid" id="deviceErrorTplid" value="{$settings['notice']['deviceerr_tplid']}">
-                        <span class="help-block">* 当设备发生异常时，通过微信公众号给<b>代理商</b>推送通知</span>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="agentForDevice" value="1" {if $config['device']['target']['agent']}checked{/if}> 代理商
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="keeperForDevice" value="1" {if $config['device']['target']['keeper']}checked{/if}> 运营人员
+                        </label>
+                        <span class="help-block">* 当设备发生特定事件时，通过微信公众号给指定人员推送通知</span>
                     </div>
-                </div>                 
-            </div>
-            <div class="seg">
-                <div class="title">设备上线下线</div>
-                <div class="form-group">
-                    <label for="deviceOnlineDelay" class="col-md-2 control-label">通知间隔（分）</label>
-                    <div class="col-md-10">
-                        <input type="number" class="form-control" name="deviceOnlineDelay" id="deviceOnlineDelay" value="{$settings['notice']['delay']['deviceOnline']}">
-                        <span class="help-block">* 默认一秒之内不重复通知</span>
-                    </div>
-                </div>                
-                <div class="form-group">
-                    <label for="deviceErrorTplid" class="col-md-2 control-label">微信消息模板ID</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" name="deviceOnlineTplid" id="deviceOnlineTplid" value="{$settings['notice']['deviceOnline_tplid']}">
-                        <span class="help-block">* 当设备上下线时，通过微信公众号给<b>代理商</b>推送通知</span>
-                    </div>
-                </div>                 
+                </div>
             </div>
             <div class="seg">
                 <div class="title">代理申请</div>
                 <div class="form-group">
-                    <label for="agentReqTplid" class="col-md-2 control-label">代理申请通知<br/>微信消息模板ID</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" name="agentReqTplid" id="agentReqTplid" value="{$settings['notice']['agentReq_tplid']}">
-                        <span class="help-block">* 用户提交代理申请后，通过微信公众号给<b>管理员</b>推送通知</span>
-                    </div>
-                </div>                
-                <div class="form-group">
-                    <label for="agentResultTplid" class="col-md-2 control-label">代理申请结果<br/>微信消息模板ID</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" name="agentResultTplid" id="agentResultTplid" value="{$settings['notice']['agentresult_tplid']}">
-                        <span class="help-block">* 当代理商申请通过后，通过微信公众号给<b>用户</b>推送通知</span>
-                    </div>
-                </div>
-                <div class="form-group">
                     <label for="authorizedAdminUser" class="col-md-2 control-label">审核管理员</label>
                     <div class="col-md-8">
-                        <input type="hidden" name="authorizedAdminUser" value="{$settings['notice']['authorizedAdminUser']['id']}">
-                        <input type="text" class="form-control" id="authorizedAdminUser" value="{$settings['notice']['authorizedAdminUser']['nickname']}" readonly>
+                        <input type="hidden" name="authorizedAdminUser" value="{$config['auth']['user']['id']}">
+                        <input type="text" class="form-control" id="authorizedAdminUser" value="{$config['auth']['user']['name']}" readonly>
                     </div>
                     <div class="col-2">
                         <button type="button" class="btn btn-success" onclick="showAuthUserDlg()" title="搜索管理员"><i class="fa fa-user"></i></button>
@@ -116,17 +93,10 @@
             <div class="seg">
                 <div class="title">提现审核</div>
                 <div class="form-group">
-                    <label for="withdrawTplid" class="col-md-2 control-label">提现审核申请<br/>微信消息模板ID</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" name="withdrawTplid" id="withdrawTplid" value="{$settings['notice']['withdraw_tplid']}">
-                        <span class="help-block">* 代理商申请提现，通过微信公众号给<b>管理员</b>推送通知</span>
-                    </div>
-                </div>
-                <div class="form-group">
                     <label for="withdrawAdminUser" class="col-md-2 control-label">指定用户</label>
                     <div class="col-md-8">
-                        <input type="hidden" name="withdrawAdminUser" value="{$settings['notice']['withdrawAdminUser']['id']}">
-                        <input type="text" class="form-control" id="withdrawAdminUser" value="{$settings['notice']['withdrawAdminUser']['nickname']}" readonly>
+                        <input type="hidden" name="withdrawAdminUser" value="{$config['withdraw']['user']['id']}">
+                        <input type="text" class="form-control" id="withdrawAdminUser" value="{$config['withdraw']['user']['name']}" readonly>
                     </div>
                     <div class="col-2">
                         <button type="button" class="btn btn-success" onclick="showWithdrawDlg()" title="搜索用户"><i class="fa fa-user"></i></button>
@@ -137,31 +107,17 @@
             <div class="seg">
                 <div class="title">广告审核</div>
                 <div class="form-group">
-                    <label for="advReviewTplid" class="col-md-2 control-label">广告审核申请<br/>微信消息模板ID</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" name="advReviewTplid" id="advReviewTplid" value="{$settings['notice']['advReviewTplid']}">
-                        <span class="help-block">* 代理商上传或修改广告后，通过微信公众号给<b>管理员</b>推送通知</span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="advReviewResultTplid" class="col-md-2 control-label">广告审核结果<br/>微信消息模板ID</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" name="advReviewResultTplid" id="advReviewResultTplid" value="{$settings['notice']['advReviewResultTplid']}">
-                        <span class="help-block">* 管理员审核广告结果，通过微信公众号给<b>代理商</b>推送通知</span>
-                    </div>
-                </div>
-                <div class="form-group">
                     <label for="reviewAdminUser" class="col-md-2 control-label">审核管理员</label>
                     <div class="col-md-8">
-                        <input type="hidden" name="reviewAdminUser" value="{$settings['notice']['reviewAdminUser']['id']}">
-                        <input type="text" class="form-control" id="reviewAdminUser" value="{$settings['notice']['reviewAdminUser']['nickname']}" readonly>
+                        <input type="hidden" name="reviewAdminUser" value="{$config['review']['user']['id']}">
+                        <input type="text" class="form-control" id="reviewAdminUser" value="{$config['review']['user']['name']}" readonly>
                     </div>
                     <div class="col-2">
                         <button type="button" class="btn btn-success" onclick="showUserDlg()" title="搜索管理员"><i class="fa fa-user"></i></button>
                         <button type="button" class="btn btn-danger" onclick="setAdmin()" title="清除管理员"><i class="fa fa-times"></i></button>
                     </div>
                 </div>                
-            </div>            
+            </div>    
         </div>
     </div>
     <div class="form-btn">

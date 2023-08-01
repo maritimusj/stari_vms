@@ -285,26 +285,8 @@ if ($page == 'device') {
 
 } elseif ($page == 'notice') {
 
-    if ($settings['notice']['reviewAdminUserId']) {
-        $user = User::get($settings['notice']['reviewAdminUserId']);
-        if ($user) {
-            $settings['notice']['reviewAdminUser'] = ['id' => $user->getId(), 'nickname' => $user->getName()];
-        }
-    }
+    $tpl_data['config'] = Config::WxPushMessage('config', []);
 
-    if ($settings['notice']['authorizedAdminUserId']) {
-        $user = User::get($settings['notice']['authorizedAdminUserId']);
-        if ($user) {
-            $settings['notice']['authorizedAdminUser'] = ['id' => $user->getId(), 'nickname' => $user->getName()];
-        }
-    }
-
-    if ($settings['notice']['withdrawAdminUserId']) {
-        $user = User::get($settings['notice']['withdrawAdminUserId']);
-        if ($user) {
-            $settings['notice']['withdrawAdminUser'] = ['id' => $user->getId(), 'nickname' => $user->getName()];
-        }
-    }
 } elseif ($page == 'upgrade') {
 
     $tpl_data['upgrade'] = [];

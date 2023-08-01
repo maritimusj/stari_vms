@@ -525,50 +525,65 @@ if ($page == 'device') {
     $settings['order']['retry']['max'] = Request::int('orderRetryMaxCount');
 
 } elseif ($page == 'notice') {
-    $settings['notice'] = [
-        'reload_smstplid' => Request::trim('reloadSMSTplid'),
-        'order_tplid' => Request::trim('order_tplid'),
-        'reload_tplid' => Request::trim('reload_tplid'),
-        'agentReq_tplid' => Request::trim('agentReqTplid'),
-        'deviceerr_tplid' => Request::trim('deviceErrorTplid'),
-        'deviceOnline_tplid' => Request::trim('deviceOnlineTplid'),
-        'agentresult_tplid' => Request::trim('agentResultTplid'),
-        'withdraw_tplid' => Request::trim('withdrawTplid'),
-        'advReviewTplid' => Request::trim('advReviewTplid'),
-        'advReviewResultTplid' => Request::trim('advReviewResultTplid'),
-        'delay' => [
-            'remainWarning' => Request::int('remainWarningDelay') ?: 1,
-            'deviceerr' => Request::int('deviceErrorDelay') ?: 1,
-            'deviceOnline' => Request::int('deviceOnlineDelay') ?: 1,
+
+    $auth_user_id = Request::int('authorizedAdminUser');
+    if ($auth_user_id) {
+        $auth_user = User::get($auth_user_id);
+    }
+
+    $withdraw_user_id = Request::int('withdrawAdminUser');
+    if ($withdraw_user_id) {
+        $withdraw_user = User::get($withdraw_user_id);
+    }
+
+    $review_user_id = Request::int('reviewAdminUser');
+    if ($review_user_id) {
+        $review_user = User::get($review_user_id);
+    }
+
+    Config::WxPushMessage('config', [
+        'order' => [
+            'type' => [
+                'succeed' => Request::bool('orderSucceed') ? 1 : 0,
+                'failed' => Request::bool('orderFailed') ? 1 : 0,
+            ],
+            'target' => [
+                'agent' => Request::bool('agentForOrder') ? 1 : 0,
+                'keeper' => Request::bool('keeperForOrder') ? 1 : 0,
+            ],
         ],
-    ];
-
-    $reviewAdminUserId = Request::int('reviewAdminUser');
-
-    if ($reviewAdminUserId) {
-        $user = User::get($reviewAdminUserId);
-        if ($user) {
-            $settings['notice']['reviewAdminUserId'] = $reviewAdminUserId;
-        }
-    }
-
-    $authorizedAdminUserId = Request::int('authorizedAdminUser');
-
-    if ($authorizedAdminUserId) {
-        $user = User::get($authorizedAdminUserId);
-        if ($user) {
-            $settings['notice']['authorizedAdminUserId'] = $authorizedAdminUserId;
-        }
-    }
-
-    $withdrawAdminUserId = Request::int('withdrawAdminUser');
-
-    if ($withdrawAdminUserId) {
-        $user = User::get($withdrawAdminUserId);
-        if ($user) {
-            $settings['notice']['withdrawAdminUserId'] = $withdrawAdminUserId;
-        }
-    }
+        'device' => [
+            'event' => [
+                'online' => Request::bool('deviceOnline') ? 1 : 0,
+                'offline' => Request::bool('deviceOffline') ? 1 : 0,
+                'error' => Request::bool('deviceError') ? 1 : 0,
+                'low_battery' => Request::bool('deviceLowBattery') ? 1 : 0,
+                'low_remain' => Request::bool('deviceLowReamin') ? 1 : 0,
+            ],
+            'target' => [
+                'agent' => Request::bool('agentForDevice') ? 1 : 0,
+                'keeper' => Request::bool('keeperForDevice') ? 1 : 0,
+            ],
+        ],
+        'auth' => [
+            'user' => [
+                'id' => $auth_user ? $auth_user->getId() : 0,
+                'name' => $auth_user ? $auth_user->getName() : '',
+            ],
+        ],
+        'withdraw' => [
+            'user' => [
+                'id' => $withdraw_user ? $withdraw_user->getId() : 0,
+                'name' => $withdraw_user ? $withdraw_user->getName() : '',
+            ],
+        ],
+        'review' => [
+            'user' => [
+                'id' => $review_user ? $review_user->getId() : 0,
+                'name' => $review_user ? $review_user->getName() : '',
+            ],
+        ],
+    ], true);
 
 } elseif ($page == 'misc') {
     $settings['misc']['redirect'] = [

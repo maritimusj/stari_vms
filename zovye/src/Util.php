@@ -371,8 +371,8 @@ include './index.php';
         $sc_count = $account->getSccount();
         if ($sc_count > 0) {
             if (!$is_new_user && self::checkLimit($account, null, [
-                'createtime >=' => $time->getTimestamp(),
-            ], $sc_count)) {
+                    'createtime >=' => $time->getTimestamp(),
+                ], $sc_count)) {
                 return err('任务免费额度已用完！');
             }
         }
@@ -835,19 +835,19 @@ include './index.php';
         $result = [];
 
         if ($event) {
-            $agent_data = $agent->getAgentData();
-            if ($agent_data['notice'][$event]) {
+            if ($agent->getAgentData("notice.$event")) {
                 $result[$agent->getId()] = $agent->getOpenid();
             }
 
-            foreach ($agent_data['partners'] ?: [] as $partner_id => $data) {
-                if ($data['notice'][$event]) {
-                    $result[$partner_id] = $data['openid'];
+            foreach ((array)$agent->getAgentData('partners') as $user_id => $data) {
+                $user = User::get($user_id);
+                if ($user && $user->settings("partnerData.notice.$event")) {
+                    $result[$user_id] = $data['openid'];
                 }
             }
         }
 
-        return $result;
+        return array_values($result);
     }
 
     /**

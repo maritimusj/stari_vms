@@ -1246,7 +1246,7 @@ class Device extends State
         if ($target['agent']) {
             $agent = $device->getAgent();
             if ($agent) {
-                foreach (Util::getNotifyOpenIds($agent, $event) as $openid) {
+                foreach (Util::getNotifyOpenIds($agent, "device.$event") as $openid) {
                     $param['touser'] = $openid;
                     $result = Wx::sendTemplateMsg($param);
                     if (is_error($result)) {

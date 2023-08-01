@@ -526,11 +526,6 @@ if ($page == 'device') {
 
 } elseif ($page == 'notice') {
     $settings['notice'] = [
-        'sms' => [
-            'url' => 'https://v.juhe.cn/sms/send?',
-            'appkey' => Request::trim('smsAppkey'),
-            'verify' => Request::trim('smsVerify'),
-        ],
         'reload_smstplid' => Request::trim('reloadSMSTplid'),
         'order_tplid' => Request::trim('order_tplid'),
         'reload_tplid' => Request::trim('reload_tplid'),

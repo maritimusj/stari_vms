@@ -14,28 +14,6 @@
 <form action="{php echo $this->createWebUrl('settings');}" method="post">
     <div class="panel panel-default nav-tab-item">
         <div class="panel-body">
-            <div class="seg">
-                <div class="title">短信接口设置</div>
-                   <div class="form-group">
-                        <label for="smsAppkey" class="col-md-2 control-label">AppKey</label>
-                        <div class="col-md-10">
-                            <input type="text" class="form-control inputMask" name="smsAppkey" id="smsAppkey" value="{$settings['notice']['sms']['appkey']}">
-                            <span class="help-block">* 默认使用聚合短信服务</span>
-                        </div>
-                    </div> 
-                    <div class="form-group">
-                        <label class="col-md-2 control-label">短信API接口</label>
-                        <div class="col-md-10" style="color:gray;">
-                           <span>{$settings['notice']['sms']['url']}</span>
-                        </div>
-                    </div>
-                <div class="form-group">
-                    <label for="smsAppkey" class="col-md-2 control-label">短信验证码模板ID</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control inputMask" name="smsVerify" id="smsVerify" value="{$settings['notice']['sms']['verify']}">
-                    </div>
-                </div>
-            </div>
             {if \zovye\App::isFuelingDeviceEnabled()}
             <div class="seg">
                 <div class="title">订单通知</div>

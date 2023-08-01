@@ -2609,7 +2609,19 @@ class deviceModelObj extends modelObj
 
     public function getLocation()
     {
-        return $this->settings('extra.location.tencent', $this->settings('extra.location.baidu', []));
+        $location = $this->settings('extra.location.tencent', []);
+        if (!isEmptyArray($location)) {
+            return $location;
+        }
+
+        $location = $this->settings('extra.location.baidu', []);
+        if (!isEmptyArray($location)) {
+            return $location;
+        }
+        
+        return [
+            'address' => $this->settings('extra.address', ''),
+        ];
     }
 
     /**

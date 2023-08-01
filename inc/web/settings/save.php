@@ -541,49 +541,59 @@ if ($page == 'device') {
         $review_user = User::get($review_user_id);
     }
 
-    Config::WxPushMessage('config', [
-        'order' => [
-            'type' => [
-                'succeed' => Request::bool('orderSucceed') ? 1 : 0,
-                'failed' => Request::bool('orderFailed') ? 1 : 0,
-            ],
-            'target' => [
-                'agent' => Request::bool('agentForOrder') ? 1 : 0,
-                'keeper' => Request::bool('keeperForOrder') ? 1 : 0,
-            ],
+    $data = [
+        [
+            'title' => '设备上线',
+            'event' => 'deviceOnline',
+            'key' => 'device.event.online',
+            'tpl_short_id' => '43264',
+            'tpl_params' => ['设备名称', '设备编号', '设备位置', '上线时间'],
         ],
-        'device' => [
-            'event' => [
-                'online' => Request::bool('deviceOnline') ? 1 : 0,
-                'offline' => Request::bool('deviceOffline') ? 1 : 0,
-                'error' => Request::bool('deviceError') ? 1 : 0,
-                'low_battery' => Request::bool('deviceLowBattery') ? 1 : 0,
-                'low_remain' => Request::bool('deviceLowReamin') ? 1 : 0,
-            ],
-            'target' => [
-                'agent' => Request::bool('agentForDevice') ? 1 : 0,
-                'keeper' => Request::bool('keeperForDevice') ? 1 : 0,
-            ],
+        [
+            'title' => '设备离线',
+            'event' => 'deviceOffline',
+            'key' => 'device.event.offline',
+            'tpl_short_id' => '43110',
+            'tpl_params' => ['设备名称', '设备编号', '设备位置', '离线时间' ],
         ],
-        'auth' => [
-            'user' => [
-                'id' => $auth_user ? $auth_user->getId() : 0,
-                'name' => $auth_user ? $auth_user->getName() : '',
-            ],
+        [
+            'title' => '设备故障',
+            'event' => 'deviceError',
+            'key' => 'device.event.error',
+            'tpl_short_id' => '43716',
+            'tpl_params' => ['设备名称', 'IMEI号', '设备位置', '故障类型', '故障时间' ],
         ],
-        'withdraw' => [
-            'user' => [
-                'id' => $withdraw_user ? $withdraw_user->getId() : 0,
-                'name' => $withdraw_user ? $withdraw_user->getName() : '',
-            ],
+        [
+            'title' => '设备电量低',
+            'event' => 'deviceLowBattery',
+            'key' => 'device.event.low_battery',
+            'tpl_short_id' => '47059',
+            'tpl_params' => ['设备名称', '设备编号', '设备位置', '设备状态' ],
         ],
-        'review' => [
-            'user' => [
-                'id' => $review_user ? $review_user->getId() : 0,
-                'name' => $review_user ? $review_user->getName() : '',
-            ],
-        ],
-    ], true);
+    ];
+
+    $config = Config::WxPushMessage('config', []);
+
+    foreach ($data as $item) {
+        $conf = getArray($config, $item['key'], []);
+        $conf['enabled'] = Request::bool($item['event']);
+        if ($conf['enabled']) {
+            if (empty($conf['tpl_id'])) {
+                $res = Wx::addTemplate($item['tpl_short_id'], $item['tpl_params']);
+                if (!is_error($res)) {
+                    $conf['tpl_id'] = $res['template_id'];
+                } else {
+                    Log::error('settings', [
+                        'item' => $item,
+                        'result' => $res,
+                    ]);
+                }
+            }
+        }
+        setArray($config, $item['key'], $conf);
+    }
+
+    Config::WxPushMessage('config', $config, true);
 
 } elseif ($page == 'misc') {
     $settings['misc']['redirect'] = [

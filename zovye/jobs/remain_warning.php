@@ -14,46 +14,25 @@ use zovye\CtrlServ;
 use zovye\Device;
 use zovye\Log;
 use zovye\Request;
-use zovye\SMSUtil;
 use zovye\Util;
 use zovye\Wx;
-use function zovye\request;
 use function zovye\settings;
 
 $op = Request::op('default');
 $log = [
-    'id' => request('id'),
+    'id' => request::int('id'),
 ];
-if ($op == 'remain_warning' && CtrlServ::checkJobSign(['id' => request('id')])) {
+if ($op == 'remain_warning' && CtrlServ::checkJobSign($log)) {
     $device = Device::get(Request::int('id'));
     if ($device) {
         $agent = $device->getAgent();
         if ($agent) {
-            $extra = $device->get('extra', []);
-
-            //是否短信通知运营人员
-            $reload_tp_lid = settings('notice.reload_smstplid');
             $warningRemain = settings('device.remainWarning', 1);
-
-            if ($reload_tp_lid) {
-                foreach ($device->getKeepers() as $keeper) {
-                    if ($keeper && $keeper->getMobile()) {
-                        $log['sms'][$keeper->getName()] = SMSUtil::send(
-                            $keeper->getMobile(),
-                            $reload_tp_lid,
-                            [
-                                'name' => $device->getName(),
-                                'num' => "{$warningRemain}，剩余{$device->getRemainNum()}",
-                            ]
-                        );
-                    }
-                }
-            }
 
             //通过微信模板消息给代理商推送消息
             $tpl_id = settings('notice.reload_tplid');
             if (!empty($tpl_id)) {
-
+                $extra = $device->get('extra', []);
                 $address = $extra['location']['address'] ?: '<未填写>';
 
                 $payload = $device->getPayload();

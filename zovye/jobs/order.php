@@ -88,7 +88,7 @@ if ($op == 'order' && CtrlServ::checkJobSign(['id' => request('id')])) {
                 if ($device && time() - $order->getCreatetime() < 30) {
                     //是否自动清除错误代码
                     if (settings('device.clearErrorCode')) {
-                        $device->cleanError();
+                        $device->cleanLastError();
                         $device->save();
                     }
 

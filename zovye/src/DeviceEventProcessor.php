@@ -413,9 +413,7 @@ class DeviceEventProcessor
                 $device->resetLock();
                 $device->firstMsgStatistic();
 
-                if ($device->isLastOnlineNotifyTimeout()) {
-                    Job::deviceOnlineNotify($device);
-                }
+                Job::deviceEventNotify($device, 'online');
             }
         }
     }
@@ -613,15 +611,13 @@ class DeviceEventProcessor
 
             $device->firstMsgStatistic();
 
-            if ($device->isLastOnlineNotifyTimeout()) {
-                Job::deviceOnlineNotify($device);
-            }
-
             $device->save();
 
             if ($device->isFuelingDevice()) {
                 Fueling::onEventOnline($device);
             }
+
+            Job::deviceEventNotify($device, 'online');
         }
     }
 
@@ -645,9 +641,7 @@ class DeviceEventProcessor
 
             $device->save();
 
-            if ($device->isLastOnlineNotifyTimeout()) {
-                Job::deviceOnlineNotify($device, '下线');
-            }
+            Job::deviceEventNotify($device, 'offline');
         }
     }
 
@@ -853,10 +847,9 @@ class DeviceEventProcessor
             $device->setMcbOnline(Device::ONLINE);
             $device->setLastOnline(TIMESTAMP);
             $device->setLastPing(TIMESTAMP);
-            if ($device->isLastOnlineNotifyTimeout()) {
-                Job::deviceOnlineNotify($device);
-            }
             $device->save();
+
+            Job::deviceEventNotify($device, 'online');
         }
     }
 

@@ -50,9 +50,13 @@ class Job
         ]);
     }
 
-    public static function deviceOnlineNotify(deviceModelObj $device, $msg = '上线'): bool
+    public static function deviceEventNotify(deviceModelObj $device, string $event): bool
     {
-        return CtrlServ::scheduleJob('device_online', ['id' => $device->getId(), 'event' => $msg]);
+        if (Config::WxPushMessage("config.device.event.$event.enabled")) {
+            return CtrlServ::scheduleJob('device_event', ['id' => $device->getId(), 'event' => $event]);
+        }
+
+        return false;
     }
 
     public static function createBalanceOrder(
@@ -209,11 +213,6 @@ class Job
     public static function devicePayloadWarning($device_id): bool
     {
         return CtrlServ::scheduleJob('remain_warning', ['id' => $device_id]);
-    }
-
-    public static function deviceErrorNotice($device_id, $errno, $err_msg): bool
-    {
-        return CtrlServ::scheduleJob('device_err', ['id' => $device_id, 'errno' => $errno, 'message' => $err_msg]);
     }
 
     public static function withdraw($user_id, $amount): bool
@@ -434,6 +433,7 @@ class Job
             ]) !== false) {
             return true;
         }
+
         return false;
     }
 }

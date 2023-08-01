@@ -328,10 +328,10 @@ class common
             if ($response->isOpenResultFail()) {
                 $code = intval($response->getErrorCode());
                 $message = strval($response->getMessage());
-                $device->setError($code, $message);
-                $device->scheduleErrorNotifyJob($code, $message);
+                $device->setLastError($code, $message);
+                $device->scheduleErrorNotifyJob();
             } else {
-                $device->cleanError();
+                $device->cleanLastError();
             }
         }
 
@@ -349,8 +349,8 @@ class common
 
                 $device->setQoe($battery);
                 if ($device->isLowBattery()) {
-                    $device->setError(Device::ERROR_LOW_BATTERY, Device::desc(Device::ERROR_LOW_BATTERY));
-                    $device->scheduleErrorNotifyJob(Device::ERROR_LOW_BATTERY, Device::desc(Device::ERROR_LOW_BATTERY));
+                    $device->setLastError(Device::ERROR_LOW_BATTERY, Device::desc(Device::ERROR_LOW_BATTERY));
+                    Job::deviceEventNotify($device, 'low_battery');
                 }
 
                 $data['battery'] = $battery;

@@ -149,7 +149,7 @@ class DeviceUtil
             $device->updateAppRemain();
         }
 
-        $device->cleanError();
+        $device->cleanLastError();
         $device->save();
 
         $result = ['message' => '出货成功！'];

@@ -1158,7 +1158,7 @@ class Device extends State
         return err('找不到这个任务！');
     }
 
-    public static function sendEventTemplateMsg(deviceModelObj $device, string $event, userModelObj ...$user_list)
+    public static function sendEventTemplateMsg(deviceModelObj $device, string $event)
     {
         if (!in_array($event, ['online', 'offline', 'error', 'low_battery', 'low_remain'])) {
             return err('不支持的事件通知！');
@@ -1172,6 +1172,11 @@ class Device extends State
 
         if (empty($config['tpl_id'])) {
             return err('没有模板id！');
+        }
+
+        $target = Config::WxPushMessage('config.device.target', []);
+        if (isEmptyArray($target)) {
+            return err('没有指定接收对象！');
         }
 
         $data = [];
@@ -1198,7 +1203,7 @@ class Device extends State
                 $location = $device->getLocation();
                 $data['thing27'] = ['value' => Wx::trim_thing($location['address'] ?: '<没有位置信息>')];
                 $err = $device->getLastError();
-                $data['thing5'] = ['value' => Wx::trim_thing($err['msg'] ?? '<未知故障>')];
+                $data['thing5'] = ['value' => Wx::trim_thing($err['message'] ?? '<未知故障>')];
                 $data['time2'] = ['value' => date('Y-m-d H:i:s')];
                 break;
             case 'low_battery':
@@ -1223,15 +1228,35 @@ class Device extends State
             'data' => $data,
         ];
 
-        foreach ($user_list as $user) {
-            $param['touser'] = $user->getOpenid();
-            $result = Wx::sendTemplateMsg($param);
-            if (is_error($result)) {
-                Log::error('notice', [
-                    'param' => $param,
-                    'result' => $result,
-                ]);
-                return $result;
+        if ($target['agent']) {
+            $agent = $device->getAgent();
+            if ($agent) {
+                foreach (Util::getNotifyOpenIds($agent, $event) as $openid) {
+                    $param['touser'] = $openid;
+                    $result = Wx::sendTemplateMsg($param);
+                    if (is_error($result)) {
+                        Log::error('notice', [
+                            'data' => $param,
+                            'result' => $result,
+                        ]);
+                    }
+                }
+            }
+        }
+
+        if ($target['keeper']) {
+            foreach ($device->getKeepers() as $keeper) {
+                $user = $keeper->getUser();
+                if ($user) {
+                    $param['touser'] = $user->getOpenid();
+                    $result = Wx::sendTemplateMsg($param);
+                    if (is_error($result)) {
+                        Log::error('notice', [
+                            'data' => $param,
+                            'result' => $result,
+                        ]);
+                    }
+                }
             }
         }
 

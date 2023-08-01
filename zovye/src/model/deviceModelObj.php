@@ -877,12 +877,12 @@ class deviceModelObj extends modelObj
         return $data;
     }
 
-    public function cleanError()
+    public function cleanLastError()
     {
         $this->setErrorCode(0);
     }
 
-    public function setError(int $code, string $desc = '')
+    public function setLastError(int $code, string $message = '')
     {
         $this->setErrorCode($code);
         if ($code !== 0) {
@@ -891,7 +891,7 @@ class deviceModelObj extends modelObj
                 [
                     'createtime' => time(),
                     'code' => $code,
-                    'message' => $desc,
+                    'message' => $message,
                 ]
             );
         } else {
@@ -2416,14 +2416,14 @@ class deviceModelObj extends modelObj
             $result = $this->open($mcb_channel, $num, $timeout, $extra);
 
             if (is_error($result)) {
-                $this->setError($result['errno'], $result['message']);
+                $this->setLastError($result['errno'], $result['message']);
                 if (empty($options['test'])) {
-                    $this->scheduleErrorNotifyJob($result['errno'], $result['message']);
+                    $this->scheduleErrorNotifyJob();
                 }
             } elseif (is_error($result['data'])) {
-                $this->setError($result['data']['errno'], $result['data']['message']);
+                $this->setLastError($result['data']['errno'], $result['data']['message']);
                 if (empty($options['test'])) {
-                    $this->scheduleErrorNotifyJob($result['data']['errno'], $result['data']['message']);
+                    $this->scheduleErrorNotifyJob();
                 }
                 $result = $result['data'];
             }
@@ -2434,12 +2434,10 @@ class deviceModelObj extends modelObj
         return $result;
     }
 
-    public function scheduleErrorNotifyJob($errno, $err_msg)
+    public function scheduleErrorNotifyJob(): bool
     {
         //使用控制中心推送通知
-        if ($this->isDeviceNotifyTimeout()) {
-            Job::deviceErrorNotice($this->getId(), $errno, $err_msg);
-        }
+        return Job::deviceEventNotify($this, 'error');
     }
 
     /**

@@ -827,22 +827,21 @@ include './index.php';
      * 获取需要通知的openid list.
      *
      * @param agentModelObj $agent
-     * @param string $type
-     *
+     * @param string $event
      * @return array
      */
-    public static function getNotifyOpenIds(agentModelObj $agent, string $type): array
+    public static function getNotifyOpenIds(agentModelObj $agent, string $event): array
     {
         $result = [];
 
-        if ($type) {
+        if ($event) {
             $agent_data = $agent->getAgentData();
-            if ($agent_data['notice'][$type]) {
+            if ($agent_data['notice'][$event]) {
                 $result[$agent->getId()] = $agent->getOpenid();
             }
 
             foreach ($agent_data['partners'] ?: [] as $partner_id => $data) {
-                if ($data['notice'][$type]) {
+                if ($data['notice'][$event]) {
                     $result[$partner_id] = $data['openid'];
                 }
             }

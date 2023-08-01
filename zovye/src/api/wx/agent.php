@@ -1377,9 +1377,9 @@ class agent
         $resultCode = Request::int('code');
 
         if ($resultCode !== 0) {
-            $device->setError($resultCode, $resultDesc);
+            $device->setLastError($resultCode, $resultDesc);
         } else {
-            $device->cleanError();
+            $device->cleanLastError();
         }
 
         $data = We7::uniacid([

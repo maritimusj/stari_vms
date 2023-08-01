@@ -1375,59 +1375,6 @@ class deviceModelObj extends modelObj
     }
 
     /**
-     * 设备剩余不足通知是否已超时
-     * @return bool
-     */
-    public function isLastOnlineNotifyTimeout(): bool
-    {
-        $lastNotify = $this->get('lastOnlineNotify');
-        if (empty($lastNotify) || time() - $lastNotify['createtime'] > settings(
-                'notice.delay.deviceOnlineDelay',
-                1
-            ) * 60) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * 更新设备上下线通知时间
-     * @param null $time
-     * @return bool
-     */
-    public function updateLastDeviceOnlineNotify($time = null): bool
-    {
-        $now = $time ?: time();
-
-        return $this->set('lastOnlineNotify', ['createtime' => $now]);
-    }
-
-    /**
-     * 更新设备最后故障通知时间
-     * @param null $time
-     * @return bool
-     */
-    public function updateLastDeviceNotify($time = null): bool
-    {
-        $now = $time ?: time();
-
-        return $this->set('lastErrorNotify', ['createtime' => $now]);
-    }
-
-    /**
-     * 更新设备剩余通知时间
-     * @param null $time
-     * @return bool
-     */
-    public function updateLastRemainWarning($time = null): bool
-    {
-        $now = $time ?: time();
-
-        return $this->set('lastRemainWarning', ['createtime' => $now]);
-    }
-
-    /**
      *  检查设备剩余，如果设置允许，会推送通知
      */
     public function checkRemain()
@@ -1437,44 +1384,12 @@ class deviceModelObj extends modelObj
         $set_s2_flag = false;
 
         if ($remainWarning > 0 && $this->remain < $remainWarning) {
-            $tpl_id = settings('notice.reload_tplid');
-            if ($tpl_id) {
-                if ($this->isLastRemainWarningTimeout()) {
-                    //使用控制中心推送通知
-                    Job::devicePayloadWarning($this->getId());
-                }
-            }
             $set_s2_flag = true;
+            Job::deviceEventNotify($this, 'low_remain');
         }
 
         $this->setS2($this->remain < 1 || $set_s2_flag ? 1 : 0);
         $this->save();
-    }
-
-    /**
-     * 设备剩余不足通知是否已超时
-     * @return bool
-     */
-    public function isLastRemainWarningTimeout(): bool
-    {
-        $lastNotify = $this->getLastRemainWarning();
-        if (empty($lastNotify) || time() - $lastNotify['createtime'] > settings(
-                'notice.delay.remainWarning',
-                1
-            ) * 3600) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * 上次设备剩余不足通知
-     * @return array
-     */
-    public function getLastRemainWarning(): array
-    {
-        return (array)$this->get('lastRemainWarning', []);
     }
 
     /**

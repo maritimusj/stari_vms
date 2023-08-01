@@ -311,27 +311,6 @@
                 </div>
             </div>
             {/if}
-            {if $last_error_notify}
-            <div class="seg">
-                <div class="title">上次故障通知</div>
-                <div class="advlist">
-                    <div class="adv_title"><i class="fa fa-clock-o"></i> 通知时间</div>
-                    <div class="adv_type">{php echo $is_device_notify_timeout?'已超时':'冷却中'}</div>
-                    <div class="adv_url">{php echo date('Y-m-d H:i:s', $last_error_notify['createtime']);}</div>
-                </div>
-            </div>
-            {/if}
-            {if $last_remain_warning}
-            <div class="seg">
-                <div class="title">上次设备缺货通知</div>
-                <div class="advlist">
-                    <div class="adv_title"><i class="fa fa-clock-o"></i> 通知时间</div>
-                    <div class="adv_type">{php echo $is_last_remain_warning_timeout?'已超时':'冷却中'}</div>
-                    <div class="adv_url">{php echo date('Y-m-d H:i:s', $last_remain_warning['createtime']);}</div>
-                </div>
-            </div>
-            {/if}
-            
             {if $last_apk_update}
             <div class="seg">
                 <div class="title">上次app更新推送</div>

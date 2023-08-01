@@ -1215,7 +1215,22 @@ class Device extends State
                 $data['thing2'] = ['value' => $qoe == -1 ? '<未知>' : "$qoe%"];
                 break;
             case 'low_remain':
+                $warningRemain = App::getRemainWarningNum($device->getAgent());
 
+                $payload = $device->getPayload();
+
+                $lanes = [];
+                foreach ($payload['cargo_lanes'] as $index => $lane) {
+                    if ($lane['num'] < $warningRemain) {
+                        $lanes[] = $index + 1;
+                    }
+                }
+
+                if (empty($lanes)) {
+                    $lanes_title = '全部货道';
+                } else {
+                    $lanes_title = '货道：'.implode(',', $lanes);
+                }
         }
 
         if (empty($data)) {

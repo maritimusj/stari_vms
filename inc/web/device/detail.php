@@ -84,13 +84,6 @@ if (is_error($res)) {
     $tpl_data['config'] = $res;
 }
 
-$tpl_data['is_device_notify_timeout'] = $device->isDeviceNotifyTimeout();
-$tpl_data['last_error_notify'] = $device->settings('lastErrorNotify');
-$tpl_data['last_error_data'] = $device->settings('lastErrorData');
-
-$tpl_data['is_last_remain_warning_timeout'] = $device->isLastRemainWarningTimeout();
-$tpl_data['last_remain_warning'] = $device->settings('lastRemainWarning');
-
 $tpl_data['last_apk_update'] = $device->settings('lastApkUpdate');
 $tpl_data['first_msg_statistic'] = $device->settings('firstMsgStatistic');
 $tpl_data['first_total'] = intval($tpl_data['firstMsgStatistic'][date('Ym')][date('d')]['total']);

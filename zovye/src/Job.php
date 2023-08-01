@@ -210,11 +210,6 @@ class Job
         return CtrlServ::scheduleJob('get_result', ['openid' => $openid, 'orderNO' => $order_no]);
     }
 
-    public static function devicePayloadWarning($device_id): bool
-    {
-        return CtrlServ::scheduleJob('remain_warning', ['id' => $device_id]);
-    }
-
     public static function withdraw($user_id, $amount): bool
     {
         return CtrlServ::scheduleJob('withdraw', ['id' => $user_id, 'amount' => $amount]);

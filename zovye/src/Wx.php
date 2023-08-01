@@ -55,7 +55,7 @@ class Wx
         return $wx_account;
     }
 
-    public static function getAllTemplate($template_id, $keyword_name_list = [])
+    public static function getAllTemplate()
     {
         $token = self::getWxAccount()->getAccessToken();
         if (is_error($token)) {

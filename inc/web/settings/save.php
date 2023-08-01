@@ -554,46 +554,66 @@ if ($page == 'device') {
             'event' => 'deviceOffline',
             'key' => 'device.event.offline',
             'tpl_short_id' => '43110',
-            'tpl_params' => ['设备名称', '设备编号', '设备位置', '离线时间' ],
+            'tpl_params' => ['设备名称', '设备编号', '设备位置', '离线时间'],
         ],
         [
             'title' => '设备故障',
             'event' => 'deviceError',
             'key' => 'device.event.error',
             'tpl_short_id' => '43716',
-            'tpl_params' => ['设备名称', 'IMEI号', '设备位置', '故障类型', '故障时间' ],
+            'tpl_params' => ['设备名称', 'IMEI号', '设备位置', '故障类型', '故障时间'],
         ],
         [
             'title' => '设备电量低',
             'event' => 'deviceLowBattery',
             'key' => 'device.event.low_battery',
             'tpl_short_id' => '47059',
-            'tpl_params' => ['设备名称', '设备编号', '设备位置', '设备状态' ],
+            'tpl_params' => ['设备名称', '设备编号', '设备位置', '设备状态'],
         ],
     ];
 
-    $config = Config::WxPushMessage('config', []);
+    $result = Wx::getAllTemplate();
+    if (is_error($result)) {
+        Log::error('settings', [
+            'error' => '获取模板列表失败',
+            'result' => $result,
+        ]);
+    } else {
+        $template_list = $result['template_list'];
 
-    foreach ($data as $item) {
-        $conf = getArray($config, $item['key'], []);
-        $conf['enabled'] = Request::bool($item['event']);
-        if ($conf['enabled']) {
-            if (empty($conf['tpl_id'])) {
-                $res = Wx::addTemplate($item['tpl_short_id'], $item['tpl_params']);
-                if (!is_error($res)) {
-                    $conf['tpl_id'] = $res['template_id'];
-                } else {
-                    Log::error('settings', [
-                        'item' => $item,
-                        'result' => $res,
-                    ]);
+        $existsFN = function ($template_id) use ($template_list) {
+            foreach ($template_list as $template) {
+                if ($template['template_id'] == $template_id) {
+                    return true;
                 }
             }
-        }
-        setArray($config, $item['key'], $conf);
-    }
 
-    Config::WxPushMessage('config', $config, true);
+            return false;
+        };
+
+        $config = Config::WxPushMessage('config', []);
+
+        foreach ($data as $item) {
+            $conf = getArray($config, $item['key'], []);
+            $conf['enabled'] = Request::bool($item['event']);
+            if ($conf['enabled']) {
+                if (empty($conf['tpl_id']) || !$existsFN($conf['tpl_id'])) {
+                    $res = Wx::addTemplate($item['tpl_short_id'], $item['tpl_params']);
+                    if (!is_error($res)) {
+                        $conf['tpl_id'] = $res['template_id'];
+                    } else {
+                        Log::error('settings', [
+                            'item' => $item,
+                            'result' => $res,
+                        ]);
+                    }
+                }
+            }
+            setArray($config, $item['key'], $conf);
+        }
+
+        Config::WxPushMessage('config', $config, true);
+    }
 
 } elseif ($page == 'misc') {
     $settings['misc']['redirect'] = [

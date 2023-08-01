@@ -26,9 +26,7 @@ if (empty($user)) {
 }
 
 $partner_data = $user->get('partnerData', []);
-
 $agent_data = $agent->getAgentData();
-$notice = $agent_data['partners'][$user->getId()]['notice'] ?: [];
 
 Response::showTemplate('web/agent/partner_edit', [
     'op' => 'partnerEdit',

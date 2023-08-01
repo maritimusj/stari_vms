@@ -27,12 +27,17 @@ $name = Request::trim('name');
 $mobile = Request::trim('mobile');
 
 $notice = [
-    'agentApp' => request('agentApp') ? 1 : 0,
-    'order' => request('orderNotify') ? 1 : 0,
-    'remainWarning' => request('remainWarning') ? 1 : 0,
-    'deviceError' => request('deviceError') ? 1 : 0,
-    'reviewResult' => request('reviewResult') ? 1 : 0,
-    'agentMsg' => request('agentMsg') ? 1 : 0,
+    'device' => [
+        'online' => Request::bool('deviceOnline') ? 1 : 0,
+        'offline' => Request::bool('deviceOffline') ? 1 : 0,
+        'error' => Request::bool('deviceError') ? 1 : 0,
+        'low_battery' => Request::bool('deviceLowBattery') ? 1 : 0,
+        'low_remain' => Request::bool('deviceLowRemain') ? 1 : 0,
+    ],
+    'order' =>  [
+        'succeed' => Request::bool('orderSucceed') ? 1 : 0,
+        'failed' => Request::bool('orderFailed') ? 1 : 0,
+    ]
 ];
 
 if (empty($mobile)) {
@@ -61,8 +66,10 @@ $res = DBUtil::transactionDo(
     }
 );
 
+$url = $this->createWebUrl('agent', ['op' => 'partner_edit', 'agentid' => $agent_id, 'userid' => $user->getId()]);
+
 if (is_error($res)) {
-    Response::toast('合伙人保存失败！', $this->createWebUrl('agent', ['op' => 'partner', 'id' => $agent_id]), 'error');
+    Response::toast('合伙人保存失败！', $url, 'error');
 }
 
-Response::toast('合伙人保存成功！', $this->createWebUrl('agent', ['op' => 'partner', 'id' => $agent_id]), 'success');
+Response::toast('合伙人保存成功！', $url, 'success');

@@ -118,13 +118,17 @@ $result = DBUtil::transactionDo(function() use ($id, &$from) {
             $user->updateSettings(
                 'agentData.notice',
                 [
-                    'agentApp' => Request::bool('agentApp') ? 1 : 0,
-                    'order' => Request::bool('orderNotify') ? 1 : 0,
-                    'remainWarning' => Request::bool('remainWarning') ? 1 : 0,
-                    'deviceError' => Request::bool('deviceError') ? 1 : 0,
-                    'deviceOnline' => Request::bool('deviceOnline') ? 1 : 0,
-                    'reviewResult' => Request::bool('reviewResult') ? 1 : 0,
-                    'agentMsg' => Request::bool('agentMsg') ? 1 : 0,
+                    'device' => [
+                        'online' => Request::bool('deviceOnline') ? 1 : 0,
+                        'offline' => Request::bool('deviceOffline') ? 1 : 0,
+                        'error' => Request::bool('deviceError') ? 1 : 0,
+                        'low_battery' => Request::bool('deviceLowBattery') ? 1 : 0,
+                        'low_remain' => Request::bool('deviceLowRemain') ? 1 : 0,
+                    ],
+                    'order' =>  [
+                        'succeed' => Request::bool('orderSucceed') ? 1 : 0,
+                        'failed' => Request::bool('orderFailed') ? 1 : 0,
+                    ]
                 ]
             );
         }

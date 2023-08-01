@@ -51,42 +51,39 @@
             </div>        
         </div>
         <div class="seg">
-            <div class="title">通知设置</div>
-            <div class="form-group">
-                <div class="col-md-10">
-                    <div class="checkbox">
-                      <label>
-                        <input type="checkbox" name="remainWarning" value="1" {if !isset($notice) || $notice['remainWarning']}checked{/if}>
-                        接收 <big>设备缺货</big> 微信推送通知
-                      </label>
-                    </div>
-                    <div class="checkbox">
-                      <label>
-                        <input type="checkbox" name="deviceError" value="1" {if !isset($notice) || $notice['deviceError']}checked{/if}>
-                        接收 <big>设备故障</big> 微信推送通知
-                      </label>
-                    </div>
-                    <div class="checkbox">
-                      <label>
-                        <input type="checkbox" name="reviewResult" value="1" {if !isset($notice) || $notice['reviewResult']}checked{/if}>
-                        接收 <big>广告审核结果</big> 微信推送通知
-                      </label>
-                    </div>      
-                    <div class="checkbox">
-                      <label>
-                        <input type="checkbox" name="agentApp" value="1" {if !isset($notice) || $notice['agentApp']}checked{/if}>
-                        接收 <big>代理商申请</big> 微信推送通知
-                      </label>
-                    </div>
-                    <div class="checkbox">
-                      <label>
-                        <input type="checkbox" name="agentMsg" value="1" {if !isset($notice) || $notice['agentMsg']}checked{/if}>
-                        接收 <big>消息提醒</big> 微信推送通知
-                      </label>
-                    </div>
-                </div>
+          <div class="title">消息通知</div>
+          <div class="form-group">
+              <label class="col-md-2 control-label">订单事件</label>
+              <div class="col-md-10">
+                  <label class="checkbox-inline">
+                      <input type="checkbox" name="orderSucceed" value="1" {if !isset($partnerData['notice']) ||$partnerData['notice']['order']['succeed']}checked{/if}> 成功订单
+                  </label>
+                  <label class="checkbox-inline">
+                      <input type="checkbox" name="orderFailed" value="1" {if !isset($partnerData['notice']) ||$partnerData['notice']['order']['failed']}checked{/if}> 异常订单
+                  </label>
+              </div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-2 control-label">设备事件</label>
+            <div class="col-md-10">
+                <label class="checkbox-inline">
+                    <input type="checkbox" name="deviceOnline" value="1" {if !isset($partnerData['notice']) ||$partnerData['notice']['device']['online']}checked{/if}> 上线
+                </label>
+                <label class="checkbox-inline">
+                    <input type="checkbox" name="deviceOffline" value="1" {if !isset($partnerData['notice']) ||$partnerData['notice']['device']['offline']}checked{/if}> 下线
+                </label>
+                <label class="checkbox-inline">
+                    <input type="checkbox" name="deviceError" value="1" {if !isset($partnerData['notice']) ||$partnerData['notice']['device']['error']}checked{/if}> 故障
+                </label>
+                <label class="checkbox-inline">
+                    <input type="checkbox" name="deviceLowBattery" value="1" {if !isset($partnerData['notice']) ||$partnerData['notice']['device']['low_battery']}checked{/if}> 电量低
+                </label>
+                <label class="checkbox-inline">
+                    <input type="checkbox" name="deviceLowRemain" value="1" {if !isset($partnerData['notice']) ||$partnerData['notice']['device']['low_remain']}checked{/if}> 缺货
+                </label>
             </div>
         </div>
+      </div>
     </div>
 </div>
 <div class="form-btn">

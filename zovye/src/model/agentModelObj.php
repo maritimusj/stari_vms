@@ -207,6 +207,7 @@ class agentModelObj extends userModelObj
                 'name' => $name,
                 'mobile' => $mobile,
                 'agent' => $this->getId(),
+                'notice' => $notice,
                 'createtime' => TIMESTAMP,
             ])) {
                 return err('保存数据失败！');
@@ -222,7 +223,6 @@ class agentModelObj extends userModelObj
                 'openid' => $user->getOpenid(),
                 'name' => $name,
                 'mobile' => $mobile,
-                'notice' => $notice,
                 'createtime' => TIMESTAMP,
             ])) {
                 return err('保存数据失败！');

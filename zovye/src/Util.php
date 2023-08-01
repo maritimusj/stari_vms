@@ -841,8 +841,11 @@ include './index.php';
 
             foreach ((array)$agent->getAgentData('partners') as $user_id => $data) {
                 $user = User::get($user_id);
-                if ($user && $user->settings("partnerData.notice.$event")) {
-                    $result[$user_id] = $data['openid'];
+                if ($user) {
+                    $enabled = $user->settings("partnerData.notice.$event");
+                    if (!isset($enabled) || $enabled) {
+                        $result[$user_id] = $data['openid'];
+                    }
                 }
             }
         }

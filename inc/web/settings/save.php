@@ -609,6 +609,7 @@ if ($page == 'device') {
                     }
                 }
             }
+
             setArray($config, $item['key'], $conf);
         }
 

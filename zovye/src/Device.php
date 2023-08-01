@@ -1157,4 +1157,82 @@ class Device extends State
 
         return err('找不到这个任务！');
     }
+
+    public static function sendEventTemplateMsg(deviceModelObj $device, string $event, userModelObj ...$user_list)
+    {
+        if (!in_array($event, ['online', 'offline', 'error', 'low_battery', 'low_remain'])) {
+            return err('不支持的事件通知！');
+        }
+
+        $config = Config::WxPushMessage("config.$event", []);
+        if (empty($config['enabled'])) {
+            return err('未启用这个事件通知！');
+        }
+
+        if (empty($config['tpl_id'])) {
+            return err('没有模板id！');
+        }
+
+        $data = [];
+        $url = '';
+
+        switch ($event) {
+            case 'online':
+                $data['thing2.DATA'] = ['value' => $device->getName()];
+                $data['character_string9.DATA'] = ['value' => $device->getImei()];
+                $location = $device->getLocation();
+                $data['thing11.DATA'] = ['value' => $location['address'] ?: '没有位置信息'];
+                $data['time4.DATA'] = ['value' => date('Y-m-d H:is')];
+                break;
+            case 'offline':
+                $data['thing2.DATA'] = ['value' => $device->getName()];
+                $data['thing6.DATA'] = ['value' => $device->getImei()];
+                $location = $device->getLocation();
+                $data['thing17.DATA'] = ['value' => $location['address'] ?: '没有位置信息'];
+                $data['time4.DATA'] = ['value' => date('Y-m-d H:is')];
+                break;
+            case 'error':
+                $data['thing9.DATA'] = ['value' => $device->getName()];
+                $data['character_string17.DATA'] = ['value' => $device->getImei()];
+                $location = $device->getLocation();
+                $data['thing27.DATA'] = ['value' => $location['address'] ?: '没有位置信息'];
+                $err = $device->getLastError();
+                $data['thing5.DATA'] = ['value' => $err['msg'] ?? '未知故障'];
+                $data['time2.DATA'] = ['value' => date('Y-m-d H:is')];
+                break;
+            case 'low_battery':
+                $data['thing1.DATA'] = ['value' => $device->getName()];
+                $data['character_string4.DATA'] = ['value' => $device->getImei()];
+                $location = $device->getLocation();
+                $data['thing6.DATA'] = ['value' => $location['address'] ?: '没有位置信息'];
+                $qoe = $device->getQoe();
+                $data['thing2.DATA'] = ['value' => $qoe == -1 ? '未知' : "$qoe%"];
+                break;
+            case 'low_remain':
+
+        }
+
+        if (empty($data)) {
+            return err('错误的事件类型！');
+        }
+
+        $param = [
+            'template_id' => $config['tpl_id'],
+            'url' => $url,
+            'data' => $data,
+        ];
+
+        foreach ($user_list as $user) {
+            $param['touser'] = $user->getOpenid();
+            $result = Wx::sendTemplateMsg($param);
+            if (is_error($result)) {
+                Log::error('notice', [
+                    'param' => $param,
+                    'result' => $result,
+                ]);
+            }
+        }
+
+        return true;
+    }
 }

@@ -17,6 +17,7 @@ class Wx
     const CREATE_QRCODE_URL = 'https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=';
     const SHOW_QRCODE_URL = 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=';
     const ADD_TEMPLATE_URL = 'https://api.weixin.qq.com/cgi-bin/template/api_add_template?access_token=';
+    const DELETE_TEMPLATE_URL = 'https://api.weixin.qq.com/cgi-bin/template/del_private_template?access_token=';
     const GET_ALL_TEMPLATE_URL = 'https://api.weixin.qq.com/cgi-bin/template/get_all_private_template?access_token=';
     const SEND_TEMPLATE_MSG_URL = 'https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=';
 
@@ -82,6 +83,22 @@ class Wx
             HttpUtil::post($api_url, [
                 'template_id_short' => $template_id,
                 'keyword_name_list' => $keyword_name_list,
+            ])
+        );
+    }
+
+    public static function deleteTemplate($template_id)
+    {
+        $token = self::getWxAccount()->getAccessToken();
+        if (is_error($token)) {
+            return $token;
+        }
+
+        $api_url = self::DELETE_TEMPLATE_URL.$token;
+
+        return self::checkResult(
+            HttpUtil::post($api_url, [
+                'template_id' => $template_id,
             ])
         );
     }

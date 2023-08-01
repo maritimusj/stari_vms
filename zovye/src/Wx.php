@@ -27,6 +27,24 @@ class Wx
         cache_delete($key);
     }
 
+    public static function trim($str, $max_len)
+    {
+        if (mb_strlen($str) > $max_len) {
+            return mb_substr($str, 0, $max_len - 1) . '……';
+        }
+        return $str;
+    }
+
+    public static function trim_thing($str)
+    {
+        return self::trim($str, 20);
+    }
+
+    public static function trim_character($str)
+    {
+        return self::trim($str, 32);
+    }
+
     public static function checkResult($result)
     {
         if ($result['errcode'] === 40001) {

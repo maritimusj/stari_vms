@@ -1165,7 +1165,7 @@ class Device extends State
         }
 
         $config = Config::WxPushMessage("config.device.event.$event", []);
-        
+
         if (empty($config['enabled'])) {
             return err('未启用这个事件通知！');
         }
@@ -1179,33 +1179,33 @@ class Device extends State
 
         switch ($event) {
             case 'online':
-                $data['thing2'] = ['value' => mb_substr($device->getName(), 0, 20)];
-                $data['character_string9'] = ['value' => $device->getImei()];
+                $data['thing2'] = ['value' => Wx::trim_thing($device->getName())];
+                $data['character_string9'] = ['value' => Wx::trim_character($device->getImei())];
                 $location = $device->getLocation();
-                $data['thing11'] = ['value' => mb_substr($location['address'], 0, 20) ?: '<没有位置信息>'];
+                $data['thing11'] = ['value' => Wx::trim_thing($location['address']) ?: '<没有位置信息>'];
                 $data['time4'] = ['value' => date('Y-m-d H:is')];
                 break;
             case 'offline':
-                $data['thing2'] = ['value' => $device->getName()];
-                $data['thing6'] = ['value' => $device->getImei()];
+                $data['thing2'] = ['value' => Wx::trim_thing($device->getName())];
+                $data['thing6'] = ['value' => Wx::trim_thing($device->getImei())];
                 $location = $device->getLocation();
-                $data['thing17'] = ['value' => $location['address'] ?: '<没有位置信息>'];
+                $data['thing17'] = ['value' => Wx::trim_thing($location['address'] ?: '<没有位置信息>')];
                 $data['time4'] = ['value' => date('Y-m-d H:is')];
                 break;
             case 'error':
-                $data['thing9'] = ['value' => $device->getName()];
-                $data['character_string17'] = ['value' => $device->getImei()];
+                $data['thing9'] = ['value' => Wx::trim_thing($device->getName())];
+                $data['character_string17'] = ['value' => Wx::trim_character($device->getImei())];
                 $location = $device->getLocation();
-                $data['thing27'] = ['value' => $location['address'] ?: '<没有位置信息>'];
+                $data['thing27'] = ['value' => Wx::trim_thing($location['address'] ?: '<没有位置信息>')];
                 $err = $device->getLastError();
-                $data['thing5'] = ['value' => $err['msg'] ?? '未知故障'];
+                $data['thing5'] = ['value' => Wx::trim_thing($err['msg'] ?? '未知故障')];
                 $data['time2'] = ['value' => date('Y-m-d H:is')];
                 break;
             case 'low_battery':
-                $data['thing1'] = ['value' => $device->getName()];
-                $data['character_string4'] = ['value' => $device->getImei()];
+                $data['thing1'] = ['value' => Wx::trim_thing($device->getName())];
+                $data['character_string4'] = ['value' => Wx::trim_character($device->getImei())];
                 $location = $device->getLocation();
-                $data['thing6'] = ['value' => $location['address'] ?: '<没有位置信息>'];
+                $data['thing6'] = ['value' => Wx::trim_thing($location['address'] ?: '<没有位置信息>')];
                 $qoe = $device->getQoe();
                 $data['thing2'] = ['value' => $qoe == -1 ? '未知' : "$qoe%"];
                 break;

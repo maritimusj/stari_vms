@@ -38,7 +38,7 @@ class DeviceEventProcessor
     protected static $events = [
         self::EVENT_V0_PING => [
             'title' => '[v0]心跳',
-            'handler' => __NAMESPACE__.'\DeviceEventProcessor::onPingMsg',
+            'handler' => [self::class, 'onPingMsg'],
             'params' => [
                 'log' => [
                     'enable' => false,
@@ -48,7 +48,7 @@ class DeviceEventProcessor
         ],
         self::EVENT_V0_FIRST => [
             'title' => '[v0]上线，主板网络连接成功',
-            'handler' => __NAMESPACE__.'\DeviceEventProcessor::onFirstMsg',
+            'handler' => [self::class, 'onFirstMsg'],
             'params' => [
                 'log' => [
                     'enable' => true,
@@ -58,7 +58,7 @@ class DeviceEventProcessor
         ],
         self::EVENT_V0_RESET => [
             'title' => '[v0]补货信号',
-            'handler' => __NAMESPACE__.'\DeviceEventProcessor::onResetMsg',
+            'handler' => [self::class, 'onResetMsg'],
             'params' => [
                 'log' => [
                     'enable' => true,
@@ -68,7 +68,7 @@ class DeviceEventProcessor
         ],
         self::EVENT_V0_RESULT => [
             'title' => '出货结果v0',
-            'handler' => __NAMESPACE__.'\DeviceEventProcessor::onResultMsg',
+            'handler' => [self::class, 'onResultMsg'],
             'params' => [
                 'log' => [
                     'enable' => true,
@@ -78,7 +78,7 @@ class DeviceEventProcessor
         ],
         self::EVENT_V0_INIT => [
             'title' => '[v0]App上线',
-            'handler' => __NAMESPACE__.'\DeviceEventProcessor::onAppInitMsg',
+            'handler' => [self::class, 'onAppInitMsg'],
             'params' => [
                 'log' => [
                     'enable' => true,
@@ -88,7 +88,7 @@ class DeviceEventProcessor
         ],
         self::EVENT_V0_UPDATE => [
             'title' => '[v0]App更新配置',
-            'handler' => __NAMESPACE__.'\DeviceEventProcessor::onAppConfigMsg',
+            'handler' => [self::class, 'onAppConfigMsg'],
             'params' => [
                 'log' => [
                     'enable' => true,
@@ -98,7 +98,7 @@ class DeviceEventProcessor
         ],
         self::EVENT_V0_INFO => [
             'title' => '[v0]App上报信息',
-            'handler' => __NAMESPACE__.'\DeviceEventProcessor::onAppInfoMsg',
+            'handler' => [self::class, 'onAppInfoMsg'],
             'params' => [
                 'log' => [
                     'enable' => true,
@@ -108,7 +108,7 @@ class DeviceEventProcessor
         ],
         self::EVENT_V0_ADV => [
             'title' => '[v0]App报告广告状态',
-            'handler' => __NAMESPACE__.'\DeviceEventProcessor::onAppAdvMsg',
+            'handler' => [self::class, 'onAppAdvMsg'],
             'params' => [
                 'log' => [
                     'enable' => true,
@@ -118,7 +118,7 @@ class DeviceEventProcessor
         ],
         self::EVENT_V0_QRCODE => [
             'title' => '[v0]App请求更新二维码',
-            'handler' => __NAMESPACE__.'\DeviceEventProcessor::onAppQrcodeMsg',
+            'handler' => [self::class, 'onAppQrcodeMsg'],
             'params' => [
                 'log' => [
                     'enable' => true,
@@ -128,7 +128,7 @@ class DeviceEventProcessor
         ],
         self::EVENT_V0_CONFIG => [
             'title' => '[v0]App请求配置',
-            'handler' => __NAMESPACE__.'\DeviceEventProcessor::onAppConfigMsg',
+            'handler' => [self::class, 'onAppConfigMsg'],
             'params' => [
                 'log' => [
                     'enable' => true,
@@ -138,7 +138,7 @@ class DeviceEventProcessor
         ],
         self::EVENT_V1_ONLINE => [
             'title' => '[v1]上线，主板网络连接成功',
-            'handler' => __NAMESPACE__.'\DeviceEventProcessor::onMcbOnline',
+            'handler' => [self::class, 'onMcbOnline'],
             'params' => [
                 'log' => [
                     'enable' => true,
@@ -148,7 +148,7 @@ class DeviceEventProcessor
         ],
         self::EVENT_V1_OFFLINE => [
             'title' => '[v1]下线，主板离线',
-            'handler' => __NAMESPACE__.'\DeviceEventProcessor::onMcbOffline',
+            'handler' => [self::class, 'onMcbOffline'],
             'params' => [
                 'log' => [
                     'enable' => true,
@@ -158,7 +158,7 @@ class DeviceEventProcessor
         ],
         self::EVENT_V1_RESULT => [
             'title' => '[v1]出货结果',
-            'handler' => __NAMESPACE__.'\DeviceEventProcessor::onMcbResult',
+            'handler' => [self::class, 'onMcbResult'],
             'params' => [
                 'log' => [
                     'enable' => true,
@@ -168,7 +168,7 @@ class DeviceEventProcessor
         ],
         self::EVENT_V1_REPORT => [
             'title' => '[v1]主板上报设备状态',
-            'handler' => __NAMESPACE__.'\DeviceEventProcessor::onMcbReport',
+            'handler' => [self::class, 'onMcbReport'],
             'params' => [
                 'log' => [
                     'enable' => true,
@@ -178,7 +178,7 @@ class DeviceEventProcessor
         ],
         self::EVENT_V1_RELOAD => [
             'title' => '[v1]主板补货信号',
-            'handler' => __NAMESPACE__.'\DeviceEventProcessor::onMcbReload',
+            'handler' => [self::class, 'onMcbReload'],
             'params' => [
                 'log' => [
                     'enable' => true,
@@ -188,7 +188,7 @@ class DeviceEventProcessor
         ],
         self::EVENT_V1_RECORD => [
             'title' => '[v1]出货结果',
-            'handler' => __NAMESPACE__.'\DeviceEventProcessor::onMcbRecord',
+            'handler' => [self::class, 'onMcbRecord'],
             'params' => [
                 'log' => [
                     'enable' => true,
@@ -198,7 +198,7 @@ class DeviceEventProcessor
         ],
         self::EVENT_V1_RESET => [
             'title' => '[v1]设备重启',
-            'handler' => __NAMESPACE__.'\DeviceEventProcessor::onMcbReset',
+            'handler' => [self::class, 'onMcbReset'],
             'params' => [
                 'log' => [
                     'enable' => true,
@@ -208,7 +208,7 @@ class DeviceEventProcessor
         ],
         self::EVENT_V1_PING => [
             'title' => '[v1]心跳',
-            'handler' => __NAMESPACE__.'\DeviceEventProcessor::onMcbPing',
+            'handler' => [self::class, 'onMcbPing'],
             'params' => [
                 'log' => [
                     'enable' => false,
@@ -218,7 +218,7 @@ class DeviceEventProcessor
         ],
         self::EVENT_V2_STARTUP => [
             'title' => '[v2]主板启动',
-            'handler' => __NAMESPACE__.'\DeviceEventProcessor::onMcbStartup',
+            'handler' => [self::class, 'onMcbStartup'],
             'params' => [
                 'log' => [
                     'enable' => true,
@@ -228,7 +228,7 @@ class DeviceEventProcessor
         ],
         self::EVENT_V1_M_REPORT => [
             'title' => '[v1]主板上报设备状态(m-report)',
-            'handler' => __NAMESPACE__.'\DeviceEventProcessor::onMcbMReport',
+            'handler' => [self::class, 'onMcbMReport'],
             'params' => [
                 'log' => [
                     'enable' => true,
@@ -238,7 +238,7 @@ class DeviceEventProcessor
         ],
         self::EVENT_V1_NEW_CARD => [
             'title' => '[v1]客户刷卡',
-            'handler' => __NAMESPACE__.'\DeviceEventProcessor::onMcbNewCard',
+            'handler' => [self::class, 'onMcbNewCard'],
             'params' => [
                 'log' => [
                     'enable' => true,
@@ -257,7 +257,7 @@ class DeviceEventProcessor
         ],
         self::EVENT_V1_FEE => [
             'title' => '[v1]计费信息',
-            'handler' => __NAMESPACE__.'\DeviceEventProcessor::onMcbFee',
+            'handler' => [self::class, 'onMcbFee'],
             'params' => [
                 'log' => [
                     'enable' => true,

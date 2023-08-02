@@ -212,7 +212,7 @@ class Account extends State
      */
     public static function query(array $condition = []): modelObjFinder
     {
-        if ($condition['id']) {
+        if (is_array($condition) && isset($condition['id'])) {
             return m('account')->where($condition);
         }
 

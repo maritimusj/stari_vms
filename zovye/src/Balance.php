@@ -45,7 +45,7 @@ class Balance
 
     public static function query($condition = []): base\modelObjFinder
     {
-        if ($condition['id']) {
+        if (is_array($condition) && isset($condition['id'])) {
             return m('balance')->where($condition);
         }
 

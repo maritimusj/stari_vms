@@ -55,7 +55,7 @@ class Agent
      */
     public static function query($condition = []): modelObjFinder
     {
-        if ($condition['id']) {
+        if (is_array($condition) && isset($condition['id'])) {
             return m('agent_vw')->where($condition);
         }
 

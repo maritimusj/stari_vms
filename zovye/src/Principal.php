@@ -53,7 +53,7 @@ class Principal
     }
     public static function admin($condition = []): base\modelObjFinder
     {
-        if ($condition['id']) {
+        if (is_array($condition) && isset($condition['id'])) {
             return m('admin_vw')->where($condition);
         }
 
@@ -62,7 +62,7 @@ class Principal
 
     public static function agent($condition = []): base\modelObjFinder
     {
-        if ($condition['id']) {
+        if (is_array($condition) && isset($condition['id'])) {
             return m('agent_vw')->where($condition);
         }
 
@@ -71,7 +71,7 @@ class Principal
 
     public static function partner($condition = []): base\modelObjFinder
     {
-        if ($condition['id']) {
+        if (is_array($condition) && isset($condition['id'])) {
             return m('partner_vw')->where($condition);
         }
 
@@ -80,7 +80,7 @@ class Principal
 
     public static function keeper($condition = []): base\modelObjFinder
     {
-        if ($condition['id']) {
+        if (is_array($condition) && isset($condition['id'])) {
             return m('keeper_vw')->where($condition);
         }
 
@@ -89,7 +89,7 @@ class Principal
 
     public static function gspor($condition = []): base\modelObjFinder
     {
-        if ($condition['id']) {
+        if (is_array($condition) && isset($condition['id'])) {
             return m('gspor_vw')->where($condition);
         }
 
@@ -98,7 +98,7 @@ class Principal
 
     public static function tester($condition = []): base\modelObjFinder
     {
-        if ($condition['id']) {
+        if (is_array($condition) && isset($condition['id'])) {
             return m('tester_vw')->where($condition);
         }
 
@@ -107,7 +107,7 @@ class Principal
 
     public static function promoter($condition = []): base\modelObjFinder
     {
-        if ($condition['id']) {
+        if (is_array($condition) && isset($condition['id'])) {
             return m('promoter_vw')->where($condition);
         }
 

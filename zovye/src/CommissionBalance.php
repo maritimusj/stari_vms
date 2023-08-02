@@ -594,7 +594,7 @@ ORDER;
 
     public static function query($condition = []): base\modelObjFinder
     {
-        if ($condition['id']) {
+        if (is_array($condition) && isset($condition['id'])) {
             return m('commission_balance')->where($condition);
         }
 

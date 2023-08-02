@@ -70,7 +70,7 @@ class Order extends State
      */
     public static function query($condition = []): modelObjFinder
     {
-        if ($condition['id']) {
+        if (is_array($condition) && isset($condition['id'])) {
             return m('order')->where($condition);
         }
 

@@ -42,7 +42,7 @@ class Group
             $condition = ['type_id' => $condition];
         }
 
-        if ($condition['id']) {
+        if (is_array($condition) && isset($condition['id'])) {
             return m('device_groups')->where($condition);
         }
 

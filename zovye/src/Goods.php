@@ -355,7 +355,7 @@ class Goods
      */
     public static function query(array $condition = []): modelObjFinder
     {
-        if ($condition['id']) {
+        if (is_array($condition) && isset($condition['id'])) {
             return m('goods')->where(['deleted' => 0])->where($condition);
         }
         return m('goods')->where(We7::uniacid(['deleted' => 0]))->where($condition);

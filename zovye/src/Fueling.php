@@ -500,11 +500,11 @@ class Fueling
                     }
                 }
 
-                Job::orderNotify($order);
-
                 if (!$order->save()) {
                     return err('保存订单失败！');
                 }
+
+                Job::orderNotify($order);
             }
 
             return true;

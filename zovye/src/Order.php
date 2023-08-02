@@ -64,6 +64,9 @@ class Order extends State
     const FREE_STR = 'free';
     const BALANCE_STR = 'balance';
 
+    const EVENT_SUCCEED = 'order.succeed';
+    const EVENT_FAILED = 'order.failed';
+
     /**
      * @param mixed $condition
      * @return modelObjFinder
@@ -1339,5 +1342,84 @@ class Order extends State
         Util::exportExcelFile($filename, $column, $result);
 
         return $last_id;
+    }
+
+    public static function sendTemplateMsg(orderModelObj $order)
+    {
+        $device = $order->getDevice();
+        if (empty($device)) {
+            return err('找不到订单关联的设备！');
+        }
+
+        if ($order->isFuelingOrder()) {
+            $event = $order->isFuelingResultOk() ? self::EVENT_SUCCEED : self::EVENT_FAILED;
+        } elseif ($order->isChargingOrder()) {
+            $event = $order->isChargingResultOk() ? self:: EVENT_SUCCEED : self::EVENT_FAILED;
+        } else {
+            if ($device->isBlueToothDevice()) {
+                if ($order->isBluetoothResultOk()) {
+                    $event = self::EVENT_SUCCEED;
+                }
+                if ($order->isBluetoothResultFail()) {
+                    $event = self::EVENT_FAILED;
+                }
+            } else {
+                $event = $order->isPullOk() ? self::EVENT_SUCCEED : self::EVENT_FAILED;
+            }
+        }
+
+        if (empty($event)) {
+            return err('订单出货状态未知！');
+        }
+
+        $config = Config::WxPushMessage("config.$event", []);
+
+        if (empty($config['enabled'])) {
+            return err('未启用这个事件通知！');
+        }
+
+        if (empty($config['tpl_id'])) {
+            return err('公众号没有添加指定的消息模板！');
+        }
+
+        $goods = $order->getGoodsData();
+        $goods_name = $goods['name'] ? "{$goods['name']}x{$order->getNum()}" : '<没有商品信息>';
+
+        $data = [];
+        $url = '';
+
+        switch ($event) {
+            case self::EVENT_SUCCEED:
+                $data['character_string6'] = ['value' => Wx::trim_character($order->getOrderNO())];
+                $data['character_string1'] = [
+                    'value' => Wx::trim_character($device->getImei()),
+                ];
+                $data['thing3'] = ['value' => Wx::trim_thing($goods_name)];
+                $data['amount4'] = ['value' => number_format($order->getPrice() / 100, 2, '.', '')];
+                $data['time5'] = ['value' => date('Y-m-d H:i:s', $order->getCreatetime())];
+                break;
+            case self::EVENT_FAILED:
+                $data['character_string2'] = ['value' => Wx::trim_character($order->getOrderNO())];
+                $data['character_string1'] = [
+                    'value' => Wx::trim_character($device->getImei()),
+                ];
+                $data['thing3'] = ['value' => Wx::trim_thing($goods_name)];
+                $data['time4'] = ['value' => date('Y-m-d H:i:s', $order->getCreatetime())];
+                break;
+        }
+
+        if (empty($data)) {
+            return err('错误的事件类型！');
+        }
+
+        $params = [
+            'template_id' => $config['tpl_id'],
+            'url' => $url,
+            'data' => $data,
+        ];
+
+        Helper::sendWxPushMessageTo($device, $event, $params);
+
+        return true;
     }
 }

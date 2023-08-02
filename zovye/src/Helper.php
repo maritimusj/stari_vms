@@ -794,6 +794,44 @@ class Helper
         return $result;
     }
 
+    public static function sendWxPushMessageTo(deviceModelObj $device, string $event, array $params)
+    {
+        $agent = $device->getAgent();
+
+        if ($agent && !$agent->isBanned()) {
+            foreach (Util::getNotifyOpenIds($agent, $event) as $openid) {
+                $params['touser'] = $openid;
+                $result = Wx::sendTemplateMsg($params);
+                if (is_error($result)) {
+                    Log::error('sendEventTemplateMsg', [
+                        'agent' => $agent->profile(),
+                        'data' => $params,
+                        'result' => $result,
+                    ]);
+                }
+            }
+        }
+
+        foreach ($device->getKeepers() as $keeper) {
+            if ($keeper->settings("notice.$event")) {
+                $user = $keeper->getUser();
+                if ($user && !$user->isBanned()) {
+                    $params['touser'] = $user->getOpenid();
+                    $result = Wx::sendTemplateMsg($params);
+                    if (is_error($result)) {
+                        Log::error('sendEventTemplateMsg', [
+                            'keeper' => $user->profile(),
+                            'data' => $params,
+                            'result' => $result,
+                        ]);
+                    }
+                }
+            }
+        }
+
+        $device->setLastNotify($event);
+    }
+
     public static function getWxPushMessageConfig($data = [])
     {
         $config = Config::WxPushMessage('config', []);
@@ -826,6 +864,7 @@ class Helper
             'enabled' => $data['order']['failed'],
             'tpl_id' => getArray($config, 'order.failed.tpl_id', ''),
         ];
+
         return $data;
     }
 }

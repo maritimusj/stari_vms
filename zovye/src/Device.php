@@ -1245,45 +1245,13 @@ class Device extends State
             return err('错误的事件类型！');
         }
 
-        $param = [
+        $params = [
             'template_id' => $config['tpl_id'],
             'url' => $url,
             'data' => $data,
         ];
 
-        $agent = $device->getAgent();
-        if ($agent) {
-            foreach (Util::getNotifyOpenIds($agent, $event) as $openid) {
-                $param['touser'] = $openid;
-                $result = Wx::sendTemplateMsg($param);
-                if (is_error($result)) {
-                    Log::error('sendEventTemplateMsg', [
-                        'agent' => $agent->profile(),
-                        'data' => $param,
-                        'result' => $result,
-                    ]);
-                }
-            }
-        }
-
-        foreach ($device->getKeepers() as $keeper) {
-            if ($keeper->settings("notice.$event")) {
-                $user = $keeper->getUser();
-                if ($user && !$user->isBanned()) {
-                    $param['touser'] = $user->getOpenid();
-                    $result = Wx::sendTemplateMsg($param);
-                    if (is_error($result)) {
-                        Log::error('sendEventTemplateMsg', [
-                            'keeper' => $user->profile(),
-                            'data' => $param,
-                            'result' => $result,
-                        ]);
-                    }
-                }
-            }
-        }
-
-        $device->setLastNotify($event);
+        Helper::sendWxPushMessageTo($device, $event, $params);
 
         return true;
     }

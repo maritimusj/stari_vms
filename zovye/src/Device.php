@@ -1162,11 +1162,11 @@ class Device extends State
 
     public static function sendEventTemplateMsg(deviceModelObj $device, string $event)
     {
-        if (!in_array($event, ['online', 'offline', 'error', 'low_battery', 'low_remain'])) {
+        if (!in_array($event, ['device.online', 'device.offline', 'device.error', 'device.low_battery', 'device.low_remain'])) {
             return err('不支持的事件通知！');
         }
 
-        $config = Config::WxPushMessage("config.device.event.$event", []);
+        $config = Config::WxPushMessage("config.$event", []);
 
         if (empty($config['enabled'])) {
             return err('未启用这个事件通知！');
@@ -1180,21 +1180,21 @@ class Device extends State
         $url = '';
 
         switch ($event) {
-            case 'online':
+            case 'device.online':
                 $data['thing2'] = ['value' => Wx::trim_thing($device->getName())];
                 $data['character_string9'] = ['value' => Wx::trim_character($device->getImei())];
                 $location = $device->getLocation();
                 $data['thing11'] = ['value' => Wx::trim_thing($location['address']) ?: '<没有位置信息>'];
                 $data['time4'] = ['value' => date('Y-m-d H:i:s')];
                 break;
-            case 'offline':
+            case 'device.offline':
                 $data['thing2'] = ['value' => Wx::trim_thing($device->getName())];
                 $data['thing6'] = ['value' => Wx::trim_thing($device->getImei())];
                 $location = $device->getLocation();
                 $data['thing17'] = ['value' => Wx::trim_thing($location['address'] ?: '<没有位置信息>')];
                 $data['time4'] = ['value' => date('Y-m-d H:i:s')];
                 break;
-            case 'error':
+            case 'device.error':
                 $data['thing9'] = ['value' => Wx::trim_thing($device->getName())];
                 $data['character_string17'] = ['value' => Wx::trim_character($device->getImei())];
                 $location = $device->getLocation();
@@ -1203,15 +1203,15 @@ class Device extends State
                 $data['thing5'] = ['value' => Wx::trim_thing($err['message'] ?? '<未知故障>')];
                 $data['time2'] = ['value' => date('Y-m-d H:i:s')];
                 break;
-            case 'low_battery':
+            case 'device.low_battery':
                 $data['thing1'] = ['value' => Wx::trim_thing($device->getName())];
                 $data['character_string4'] = ['value' => Wx::trim_character($device->getImei())];
                 $location = $device->getLocation();
                 $data['thing6'] = ['value' => Wx::trim_thing($location['address'] ?: '<没有位置信息>')];
                 $qoe = $device->getQoe();
-                $data['thing2'] = ['value' => $qoe == -1 ? '<未知>' : "$qoe%"];
+                $data['thing2'] = ['value' => $qoe == -1 ? '剩余电量：<未知>' : "剩余电量：$qoe%"];
                 break;
-            case 'low_remain':
+            case 'device.low_remain':
                 $warningRemain = App::getRemainWarningNum($device->getAgent());
 
                 $payload = $device->getPayload();
@@ -1226,7 +1226,7 @@ class Device extends State
                 if (empty($lanes)) {
                     $lanes_title = '商品库存不足，请及时补货';
                 } else {
-                    $lanes_title = '商品库存不足，货道：'.implode(',', $lanes);
+                    $lanes_title = '库存不足，货道['.implode(',', $lanes).']';
                 }
 
                 $data['thing2'] = ['value' => Wx::trim_thing($device->getName())];
@@ -1249,11 +1249,11 @@ class Device extends State
 
         $agent = $device->getAgent();
         if ($agent) {
-            foreach (Util::getNotifyOpenIds($agent, "device.$event") as $openid) {
+            foreach (Util::getNotifyOpenIds($agent, $event) as $openid) {
                 $param['touser'] = $openid;
                 $result = Wx::sendTemplateMsg($param);
                 if (is_error($result)) {
-                    Log::error('notice', [
+                    Log::error('sendEventTemplateMsg', [
                         'agent' => $agent->profile(),
                         'data' => $param,
                         'result' => $result,
@@ -1269,7 +1269,7 @@ class Device extends State
                     $param['touser'] = $user->getOpenid();
                     $result = Wx::sendTemplateMsg($param);
                     if (is_error($result)) {
-                        Log::error('notice', [
+                        Log::error('sendEventTemplateMsg', [
                             'keeper' => $user->profile(),
                             'data' => $param,
                             'result' => $result,

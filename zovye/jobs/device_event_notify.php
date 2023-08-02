@@ -25,11 +25,13 @@ $log = [
     'data' => $data,
 ];
 
-if ($op == 'device_event' && CtrlServ::checkJobSign($data)) {
+if ($op == 'device_event_notify' && CtrlServ::checkJobSign($data)) {
     $device = Device::get($data['id']);
     if ($device) {
-        $log['send template msg'] = Device::sendEventTemplateMsg($device, $data['event']);
+        $log['result'] = Device::sendEventTemplateMsg($device, $data['event']);
+    } else {
+        $log['error'] = '找不到这个设备！';
     }
 }
 
-Log::debug('device_event', $log);
+Log::debug('device_event_notify', $log);

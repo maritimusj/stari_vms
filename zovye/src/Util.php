@@ -835,16 +835,16 @@ include './index.php';
         $result = [];
 
         if ($event) {
-            if ($agent->getAgentData("notice.$event")) {
+            if ($agent->getAgentData("notice.$event") && !$agent->isBanned()) {
                 $result[$agent->getId()] = $agent->getOpenid();
             }
 
             foreach ((array)$agent->getAgentData('partners') as $user_id => $data) {
                 $user = User::get($user_id);
-                if ($user) {
+                if ($user && !$user->isBanned()) {
                     $enabled = $user->settings("partnerData.notice.$event");
                     if (!isset($enabled) || $enabled) {
-                        $result[$user_id] = $data['openid'];
+                        $result[$user->getId()] = $user->getOpenid();
                     }
                 }
             }

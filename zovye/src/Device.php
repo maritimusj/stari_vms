@@ -1171,12 +1171,7 @@ class Device extends State
         }
 
         if (empty($config['tpl_id'])) {
-            return err('没有模板id！');
-        }
-
-        $target = Config::WxPushMessage('config.device.target', []);
-        if (isEmptyArray($target)) {
-            return err('没有指定接收对象！');
+            return err('公众号没有添加指定的消息模板！');
         }
 
         $data = [];
@@ -1243,30 +1238,30 @@ class Device extends State
             'data' => $data,
         ];
 
-        if ($target['agent']) {
-            $agent = $device->getAgent();
-            if ($agent) {
-                foreach (Util::getNotifyOpenIds($agent, "device.$event") as $openid) {
-                    $param['touser'] = $openid;
-                    $result = Wx::sendTemplateMsg($param);
-                    if (is_error($result)) {
-                        Log::error('notice', [
-                            'data' => $param,
-                            'result' => $result,
-                        ]);
-                    }
+        $agent = $device->getAgent();
+        if ($agent) {
+            foreach (Util::getNotifyOpenIds($agent, "device.$event") as $openid) {
+                $param['touser'] = $openid;
+                $result = Wx::sendTemplateMsg($param);
+                if (is_error($result)) {
+                    Log::error('notice', [
+                        'agent' => $agent->profile(),
+                        'data' => $param,
+                        'result' => $result,
+                    ]);
                 }
             }
         }
 
-        if ($target['keeper']) {
-            foreach ($device->getKeepers() as $keeper) {
+        foreach ($device->getKeepers() as $keeper) {
+            if ($keeper->settings("notice.$event")) {
                 $user = $keeper->getUser();
-                if ($user) {
+                if ($user && !$user->isBanned()) {
                     $param['touser'] = $user->getOpenid();
                     $result = Wx::sendTemplateMsg($param);
                     if (is_error($result)) {
                         Log::error('notice', [
+                            'keeper' => $user->profile(),
                             'data' => $param,
                             'result' => $result,
                         ]);

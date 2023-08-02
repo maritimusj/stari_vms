@@ -210,63 +210,36 @@
         </div>
         <div class="panel-body">
             <div class="seg">
-                <div class="title">订单通知</div>
+                <div class="title">事件通知</div>
                 <div class="form-group">
-                    <label class="col-md-2 control-label">选择事件</label>
+                    <label class="col-md-2 control-label">订单事件</label>
                     <div class="col-md-10">
                         <label class="checkbox-inline">
-                            <input type="checkbox" name="orderSucceed" value="1" {if $agent_data['notice']['order']['type']['succeed']}checked{/if}> 成功订单
+                            <input type="checkbox" name="orderSucceed" value="1" {if $agent_data['notice']['order']['succeed']}checked{/if}> 成功订单
                         </label>
                         <label class="checkbox-inline">
-                            <input type="checkbox" name="orderFailed" value="1" {if $agent_data['notice']['order']['type']['failed']}checked{/if}> 异常订单
+                            <input type="checkbox" name="orderFailed" value="1" {if $agent_data['notice']['order']['failed']}checked{/if}> 异常订单
                         </label>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-md-2 control-label">通知对象</label>
+                    <label class="col-md-2 control-label">设备事件</label>
                     <div class="col-md-10">
                         <label class="checkbox-inline">
-                            <input type="checkbox" name="agentForOrder" value="1" {if $agent_data['notice']['order']['target']['agent']}checked{/if}> 合伙人
+                            <input type="checkbox" name="deviceOnline" value="1" {if $agent_data['notice']['device']['online']}checked{/if}> 上线
                         </label>
                         <label class="checkbox-inline">
-                            <input type="checkbox" name="keeperForOrder" value="1" {if $agent_data['notice']['order']['target']['keeper']}checked{/if}> 运营人员
-                        </label>
-                        <span class="help-block">* 订单创建后，通过微信公众号给指定人员推送通知</span>
-                    </div>
-                </div>     
-            </div>
-            <div class="seg">
-                <div class="title">设备事件</div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">选择事件</label>
-                    <div class="col-md-10">
-                        <label class="checkbox-inline">
-                            <input type="checkbox" name="deviceOnline" value="1" {if $agent_data['notice']['device']['event']['online']}checked{/if}> 上线
+                            <input type="checkbox" name="deviceOffline" value="1" {if $agent_data['notice']['device']['offline']}checked{/if}> 下线
                         </label>
                         <label class="checkbox-inline">
-                            <input type="checkbox" name="deviceOffline" value="1" {if $agent_data['notice']['device']['event']['offline']}checked{/if}> 下线
+                            <input type="checkbox" name="deviceError" value="1" {if $agent_data['notice']['device']['error']}checked{/if}> 故障
                         </label>
                         <label class="checkbox-inline">
-                            <input type="checkbox" name="deviceError" value="1" {if $agent_data['notice']['device']['event']['error']}checked{/if}> 故障
+                            <input type="checkbox" name="deviceLowBattery" value="1" {if $agent_data['notice']['device']['low_battery']}checked{/if}> 电量低
                         </label>
                         <label class="checkbox-inline">
-                            <input type="checkbox" name="deviceLowBattery" value="1" {if $agent_data['notice']['device']['event']['low_battery']}checked{/if}> 电量低
+                            <input type="checkbox" name="deviceLowRemain" value="1" {if $agent_data['notice']['device']['low_remain']}checked{/if}> 缺货
                         </label>
-                        <label class="checkbox-inline">
-                            <input type="checkbox" name="deviceLowRemain" value="1" {if $$agent_data['notice']['device']['event']['low_remain']}checked{/if}> 缺货
-                        </label>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">通知对象</label>
-                    <div class="col-md-10">
-                        <label class="checkbox-inline">
-                            <input type="checkbox" name="agentForDevice" value="1" {if $agent_data['notice']['device']['target']['agent']}checked{/if}> 合伙人
-                        </label>
-                        <label class="checkbox-inline">
-                            <input type="checkbox" name="keeperForDevice" value="1" {if $agent_data['notice']['device']['target']['keeper']}checked{/if}> 运营人员
-                        </label>
-                        <span class="help-block">* 当设备发生特定事件时，通过微信公众号给指定人员推送通知</span>
                     </div>
                 </div>
             </div>

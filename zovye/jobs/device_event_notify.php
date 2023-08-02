@@ -4,7 +4,7 @@
  * @url www.stariture.com
  */
 
-namespace zovye\job\DeviceOnline;
+namespace zovye\job\deviceEventNotify;
 
 defined('IN_IA') or exit('Access Denied');
 

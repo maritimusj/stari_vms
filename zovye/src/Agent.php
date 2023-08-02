@@ -131,12 +131,6 @@ class Agent
                 $login_data->destroy();
             }
 
-            //清空代理商和合伙人的历史消息
-            $query = m('agent_msg')->where(['agent_id' => $msg_owners]);
-            foreach ($query->findAll() as $msg) {
-                $msg->destroy();
-            }
-
             //删除相关的运营人员
             $keepers = Keeper::query(['agent_id' => $agent->getId()]);
             /** @var keeperModelObj $keeper */

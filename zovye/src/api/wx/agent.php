@@ -15,14 +15,12 @@ use zovye\Cache;
 use zovye\CacheUtil;
 use zovye\Config;
 use zovye\Cron;
-use zovye\CtrlServ;
 use zovye\DBUtil;
 use zovye\DeviceUtil;
 use zovye\Fueling;
 use zovye\GDCVMachine;
 use zovye\Inventory;
 use zovye\Log;
-use zovye\model\agent_msgModelObj;
 use zovye\model\agentModelObj;
 use zovye\App;
 use zovye\CommissionBalance;
@@ -381,94 +379,6 @@ class agent
         }
 
         return $result;
-    }
-
-    /**
-     * 代理商消息列表.
-     *
-     * @return array
-     */
-    public static function agentMsg(): array
-    {
-        $user = common::getAgentOrPartner();
-
-        $page = max(1, Request::int('page'));
-        $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
-
-        $query = m('agent_msg')->where(['agent_id' => $user->getAgentId()]);
-
-        $total = $query->count();
-
-        $result = [
-            'page' => $page,
-            'pagesize' => $page_size,
-            'total' => $total,
-            'totalpage' => ceil($total / $page_size),
-            'list' => [],
-        ];
-
-        if ($total > 0) {
-            $query->page($page, $page_size);
-            $query->orderBy('id desc');
-
-            /** @var agent_msgModelObj $entry */
-            foreach ($query->findAll() as $entry) {
-                $result['list'][] = [
-                    'id' => $entry->getId(),
-                    'title' => $entry->getTitle(),
-                    'createtime' => date('Y-m-d H:i:s', $entry->getCreatetime()),
-                    'isReaded' => $entry->getUpdatetime() ? 1 : 0,
-                ];
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * 读取消息详细内容.
-     *
-     * @return array
-     */
-    public static function msgDetail(): array
-    {
-        $user = common::getAgentOrPartner();
-
-        $id = Request::int('id');
-        if ($id) {
-            /** @var agent_msgModelObj $msg */
-            $msg = m('agent_msg')->findOne(['agent_id' => $user->getAgentId(), 'id' => $id]);
-            if ($msg) {
-                $msg->setUpdatetime(time());
-                $msg->save();
-
-                return ['id' => $msg->getId(), 'title' => $msg->getTitle(), 'content' => $msg->getContent()];
-            }
-        }
-
-        return err('出错了，读取消息失败！');
-    }
-
-    /**
-     * 删除消息.
-     *
-     * @return array
-     */
-    public static function msgRemove(): array
-    {
-        $user = common::getAgentOrPartner();
-
-        $id = Request::int('id');
-        if ($id) {
-            $msg = m('agent_msg')->findOne(['agent_id' => $user->getAgentId(), 'id' => $id]);
-            if ($msg) {
-                $msg->destroy();
-
-                return ['id' => $id, 'msg' => '删除成功！'];
-            }
-        }
-
-        return err('出错了，删除消息出错！');
     }
 
     /**

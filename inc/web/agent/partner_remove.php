@@ -18,11 +18,6 @@ if (empty($agent)) {
 
 $res = DBUtil::transactionDo(
     function () use ($agent, $partner_id) {
-
-        foreach (m('agent_msg')->where(We7::uniacid(['agent_id' => $partner_id]))->findAll() as $msg) {
-            $msg->destroy();
-        }
-
         if ($agent->removePartner($partner_id)) {
             return true;
         }

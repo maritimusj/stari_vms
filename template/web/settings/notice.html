@@ -28,6 +28,7 @@
                         <label class="checkbox-inline {if $config['order']['failed']['tpl_id']}active{else}fail{/if}" {if empty($config['order']['failed']['tpl_id'])}title="公众号模板添加失败！"{/if}>
                             <input type="checkbox" name="orderFailed" value="1" {if $config['order']['failed']['enabled']}checked{/if}> 异常订单
                         </label>
+                        <span class="help-block">* 在订单成功或者失败时，通知相关人员。</span>
                     </div>
                 </div>
                 <div class="form-group">

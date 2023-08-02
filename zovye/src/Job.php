@@ -156,11 +156,6 @@ class Job
         return CtrlServ::scheduleJob('new_agent', ['id' => $user_id]);
     }
 
-    public static function agentMsgNotice($msgId): bool
-    {
-        return CtrlServ::scheduleJob('agent_msg', ['id' => $msgId]);
-    }
-
     public static function agentApplyNotice($id): bool
     {
         return CtrlServ::scheduleJob('agent_app', ['id' => $id]);

@@ -168,8 +168,6 @@
                             <span class="fa fa-caret-down"></span></a>
                             <ul class="dropdown-menu">
                                 <li><a href="#" data-op="config"> <i class="fa fa-gear"></i> 设置</a></li>
-                                <li role="separator" class="divider"></li>
-                                <li><a href="#" data-op="viewMsg"> <i class="fa fa-envelope fa-fw"></i> 他的消息</a></li>
                                 <li role="separator" class="divider"></li>                                
                                 <li><a href="{php echo $this->createWebUrl('device', array('agentId'=>$agent['id']));}"> <i class="fa fa-cube fa-fw"></i> 他的设备</a></li>
                                 {if \zovye\App::isInventoryEnabled()}
@@ -384,9 +382,6 @@
                 });
             }
         })
-    }
-    api.viewMsg = function (id) {
-        api.showResult({ op: 'viewmsg', id });
     }
     api.viewStatsChart = function (id) {
         api.showResult({ op: 'viewStatsChart', id });

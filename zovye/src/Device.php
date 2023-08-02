@@ -1176,7 +1176,7 @@ class Device extends State
             return err('公众号没有添加指定的消息模板！');
         }
 
-        if (!$device->isNotifyTimeout($event)) {
+        if (!$device->isNotificationTimeout($event)) {
             return err('设备通知过于频繁，稍后再试！');
         }
 

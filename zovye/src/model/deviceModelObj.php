@@ -2450,9 +2450,9 @@ class deviceModelObj extends modelObj
      * @param string $event
      * @return bool
      */
-    public function isNotifyTimeout(string $event): bool
+    public function isNotificationTimeout(string $event): bool
     {
-        $lastNotify = $this->getLastNotify($event);
+        $lastNotify = $this->getLastNotification($event);
 
         return empty($lastNotify) || time() - $lastNotify['time'] > 600;
     }
@@ -2462,9 +2462,9 @@ class deviceModelObj extends modelObj
      * @param string $event
      * @return bool
      */
-    public function setLastNotify(string $event): bool
+    public function setLastNotification(string $event): bool
     {
-        return $this->updateSettings("last_notify.$event.time", TIMESTAMP);
+        return $this->updateSettings("notification.$event.time", TIMESTAMP);
     }
 
     /**
@@ -2472,9 +2472,9 @@ class deviceModelObj extends modelObj
      * @param string $event
      * @return array
      */
-    public function getLastNotify(string $event): array
+    public function getLastNotification(string $event): array
     {
-        return (array)$this->settings("last_notify.$event", []);
+        return (array)$this->settings("notification.$event", []);
     }
 
     /**

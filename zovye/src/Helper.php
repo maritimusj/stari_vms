@@ -829,7 +829,7 @@ class Helper
             }
         }
 
-        $device->setLastNotify($event);
+        $device->setLastNotification($event);
     }
 
     public static function getWxPushMessageConfig($data = [])

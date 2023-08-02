@@ -22,27 +22,27 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label">订单事件</label>
                     <div class="col-md-10">
-                        <label class="checkbox-inline">
-                            <input type="checkbox" name="orderSucceed" value="1" {if $config['order']['succeed']}checked{/if}> 成功订单
+                        <label class="checkbox-inline {if $config['order']['succeed']['tpl_id']}active{else}fail{/if}" {if empty($config['order']['succeed']['tpl_id'])}title="公众号模板添加失败！"{/if}>
+                            <input type="checkbox" name="orderSucceed" value="1" {if $config['order']['succeed']['enabled']}checked{/if}> 成功订单
                         </label>
-                        <label class="checkbox-inline">
-                            <input type="checkbox" name="orderFailed" value="1" {if $config['order']['failed']}checked{/if}> 异常订单
+                        <label class="checkbox-inline {if $config['order']['failed']['tpl_id']}active{else}fail{/if}" {if empty($config['order']['failed']['tpl_id'])}title="公众号模板添加失败！"{/if}>
+                            <input type="checkbox" name="orderFailed" value="1" {if $config['order']['failed']['enabled']}checked{/if}> 异常订单
                         </label>
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-md-2 control-label">设备事件</label>
                     <div class="col-md-10">
-                        <label class="checkbox-inline{if $config['device']['online']['tpl_id']} active{else} fail{/if}">
+                        <label class="checkbox-inline{if $config['device']['online']['tpl_id']} active{else} fail{/if}" {if empty($config['device']['online']['tpl_id'])}title="公众号模板添加失败！"{/if}>
                             <input type="checkbox" name="deviceOnline" value="1" {if $config['device']['online']['enabled']}checked{/if}> 上线
                         </label>
-                        <label class="checkbox-inline{if $config['device']['offline']['tpl_id']} active{else} fail{/if}">
+                        <label class="checkbox-inline{if $config['device']['offline']['tpl_id']} active{else} fail{/if}" {if empty($config['device']['offline']['tpl_id'])}title="公众号模板添加失败！"{/if}>
                             <input type="checkbox" name="deviceOffline" value="1" {if $config['device']['offline']['enabled']}checked{/if}> 下线
                         </label>
-                        <label class="checkbox-inline{if $config['device']['error']['tpl_id']} active{else} fail{/if}">
+                        <label class="checkbox-inline{if $config['device']['error']['tpl_id']} active{else} fail{/if}" {if empty($config['device']['error']['tpl_id'])}title="公众号模板添加失败！"{/if}>
                             <input type="checkbox" name="deviceError" value="1" {if $config['device']['error']['enabled']}checked{/if}> 故障
                         </label>
-                        <label class="checkbox-inline{if $config['device']['low_battery']['tpl_id']} active{else} fail{/if}">
+                        <label class="checkbox-inline{if $config['device']['low_battery']['tpl_id']} active{else} fail{/if}" {if empty($config['device']['low_battery']['tpl_id'])}title="公众号模板添加失败！"{/if}>
                             <input type="checkbox" name="deviceLowBattery" value="1" {if $config['device']['low_battery']['enabled']}checked{/if}> 电量低
                         </label>
                         <label class="checkbox-inline{if $config['device']['low_remain']['tpl_id']} active{else} fail{/if}" {if empty($config['device']['low_remain']['tpl_id'])}title="公众号模板添加失败！"{/if}>

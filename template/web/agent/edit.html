@@ -47,6 +47,9 @@
     .rel {
         cursor: pointer;
     }
+    .checkbox-inline.fail {
+        color: #9e9e9e;
+    }
 </style>
 
 <div style="margin-bottom: 1em;display: block;">
@@ -214,10 +217,10 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label">订单事件</label>
                     <div class="col-md-10">
-                        <label class="checkbox-inline {if $agent_data['notice']['order']['succeed']['tpl_id']}active{/if}">
+                        <label class="checkbox-inline {if $agent_data['notice']['order']['succeed']['tpl_id']}active{else}fail{/if}">
                             <input type="checkbox" name="orderSucceed" value="1" {if $agent_data['notice']['order']['succeed']['enabled']}checked{/if}> 成功订单
                         </label>
-                        <label class="checkbox-inline {if $agent_data['notice']['order']['succeed']['tpl_id']}active{/if}">
+                        <label class="checkbox-inline {if $agent_data['notice']['order']['failed']['tpl_id']}active{else}fail{/if}">
                             <input type="checkbox" name="orderFailed" value="1" {if $agent_data['notice']['order']['failed']['enabled']}checked{/if}> 异常订单
                         </label>
                     </div>
@@ -225,19 +228,19 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label">设备事件</label>
                     <div class="col-md-10">
-                        <label class="checkbox-inline {if $agent_data['notice']['device']['online']['tpl_id']}active{/if}">
+                        <label class="checkbox-inline {if $agent_data['notice']['device']['online']['tpl_id']}active{else}fail{/if}">
                             <input type="checkbox" name="deviceOnline" value="1" {if $agent_data['notice']['device']['online']['enabled']}checked{/if}> 上线
                         </label>
-                        <label class="checkbox-inline {if $agent_data['notice']['device']['offline']['tpl_id']}active{/if}">
+                        <label class="checkbox-inline {if $agent_data['notice']['device']['offline']['tpl_id']}active{else}fail{/if}">
                             <input type="checkbox" name="deviceOffline" value="1" {if $agent_data['notice']['device']['offline']['enabled']}checked{/if}> 下线
                         </label>
-                        <label class="checkbox-inline {if $agent_data['notice']['device']['error']['tpl_id']}active{/if}">
+                        <label class="checkbox-inline {if $agent_data['notice']['device']['error']['tpl_id']}active{else}fail{/if}">
                             <input type="checkbox" name="deviceError" value="1" {if $agent_data['notice']['device']['error']['enabled']}checked{/if}> 故障
                         </label>
-                        <label class="checkbox-inline {if $agent_data['notice']['device']['low_battery']['tpl_id']}active{/if}">
+                        <label class="checkbox-inline {if $agent_data['notice']['device']['low_battery']['tpl_id']}active{else}fail{/if}">
                             <input type="checkbox" name="deviceLowBattery" value="1" {if $agent_data['notice']['device']['low_battery']['enabled']}checked{/if}> 电量低
                         </label>
-                        <label class="checkbox-inline {if $agent_data['notice']['device']['low_remain']['tpl_id']}active{/if}">
+                        <label class="checkbox-inline {if $agent_data['notice']['device']['low_remain']['tpl_id']}active{else}fail{/if}">
                             <input type="checkbox" name="deviceLowRemain" value="1" {if $agent_data['notice']['device']['low_remain']['enabled']}checked{/if}> 缺货
                         </label>
                     </div>

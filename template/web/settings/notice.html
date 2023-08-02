@@ -34,6 +34,9 @@
                             <input type="checkbox" name="agentForOrder" value="1" {if $config['order']['target']['agent']}checked{/if}> 代理商
                         </label>
                         <label class="checkbox-inline">
+                            <input type="checkbox" name="partnerForOrder" value="1" {if $config['order']['target']['partner']}checked{/if}> 合伙人
+                        </label>
+                        <label class="checkbox-inline">
                             <input type="checkbox" name="keeperForOrder" value="1" {if $config['order']['target']['keeper']}checked{/if}> 运营人员
                         </label>
                         <span class="help-block">* 订单创建后，通过微信公众号给指定人员推送通知</span>
@@ -67,6 +70,9 @@
                     <div class="col-md-10">
                         <label class="checkbox-inline">
                             <input type="checkbox" name="agentForDevice" value="1" {if $config['device']['target']['agent']}checked{/if}> 代理商
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="partnerForDevice" value="1" {if $config['device']['target']['partner']}checked{/if}> 合伙人
                         </label>
                         <label class="checkbox-inline">
                             <input type="checkbox" name="keeperForDevice" value="1" {if $config['device']['target']['keeper']}checked{/if}> 运营人员

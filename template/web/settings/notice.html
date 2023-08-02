@@ -48,6 +48,7 @@
                         <label class="checkbox-inline{if $config['device']['low_remain']['tpl_id']} active{else} fail{/if}" {if empty($config['device']['low_remain']['tpl_id'])}title="公众号模板添加失败！"{/if}>
                             <input type="checkbox" name="deviceLowRemain" value="1" {if $config['device']['low_remain']['enabled']}checked{/if}> 缺货
                         </label>
+                        <span class="help-block">* 在指定事件发生时，通知相关人员，注意：相同事件10分钟之后只会通知一次。</span>
                     </div>
                 </div>
             </div>

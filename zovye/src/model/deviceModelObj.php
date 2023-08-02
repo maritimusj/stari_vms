@@ -2447,25 +2447,34 @@ class deviceModelObj extends modelObj
 
     /**
      * 设备上次故障通知是否已经超时
+     * @param string $event
      * @return bool
      */
-    public function isDeviceNotifyTimeout(): bool
+    public function isNotifyTimeout(string $event): bool
     {
-        $lastNotify = $this->getLastDeviceErrorNotify();
-        if (empty($lastNotify) || time() - $lastNotify['createtime'] > settings('notice.delay.device_err', 1) * 3600) {
-            return true;
-        }
+        $lastNotify = $this->getLastNotify($event);
 
-        return false;
+        return empty($lastNotify) || time() - $lastNotify['time'] > 600;
     }
 
     /**
      * 设备上次故障通知
+     * @param string $event
+     * @return bool
+     */
+    public function setLastNotify(string $event): bool
+    {
+        return $this->updateSettings("last_notify.$event.time", TIMESTAMP);
+    }
+
+    /**
+     * 设备上次故障通知
+     * @param string $event
      * @return array
      */
-    public function getLastDeviceErrorNotify(): array
+    public function getLastNotify(string $event): array
     {
-        return (array)$this->get('lastErrorNotify', []);
+        return (array)$this->settings("last_notify.$event", []);
     }
 
     /**
@@ -2531,7 +2540,7 @@ class deviceModelObj extends modelObj
         if (!isEmptyArray($location)) {
             return $location;
         }
-        
+
         return [
             'address' => $this->settings('extra.address', ''),
         ];

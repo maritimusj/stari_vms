@@ -570,6 +570,27 @@ if ($page == 'device') {
             'tpl_short_id' => '47059',
             'tpl_params' => ['设备名称', '设备编号', '设备位置', '设备状态'],
         ],
+        [
+            'title' => '设备缺货',
+            'event' => 'deviceLowRemain',
+            'key' => 'device.low_remain',
+            'tpl_short_id' => '44162',
+            'tpl_params' => ['设备名称', '设备编号', '设备位置', '设备状态'],
+        ],        
+        [
+            'title' => '设备自动售卖成功通知',
+            'event' => 'orderSucceed',
+            'key' => 'order.succeed',
+            'tpl_short_id' => '51278',
+            'tpl_params' => ['订单编号', '设备编号', '商品名称', '价格', '时间'],
+        ],
+        [
+            'title' => '售货机出货失败通知',
+            'event' => 'orderFailed',
+            'key' => 'order.failed',
+            'tpl_short_id' => '51500',
+            'tpl_params' => ['订单编号', '设备编号', '商品名称', '出货时间'],
+        ],
     ];
 
     $result = Wx::getAllTemplate();

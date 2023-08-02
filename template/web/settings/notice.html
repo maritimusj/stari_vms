@@ -8,7 +8,10 @@
     .btn-danger {
         background-color: #9E9E9E;
         border-color: #9E9E9E;
-    }    
+    }
+    .checkbox-inline.fail {
+        color:#9E9E9E;
+    }
 </style>
 {template "web/settings/nav"}
 <form action="{php echo $this->createWebUrl('settings');}" method="post">
@@ -30,20 +33,20 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label">设备事件</label>
                     <div class="col-md-10">
-                        <label class="checkbox-inline">
-                            <input type="checkbox" name="deviceOnline" value="1" {if $config['device']['online']}checked{/if}> 上线
+                        <label class="checkbox-inline{if $config['device']['online']['tpl_id']} active{else} fail{/if}">
+                            <input type="checkbox" name="deviceOnline" value="1" {if $config['device']['online']['enabled']}checked{/if}> 上线
                         </label>
-                        <label class="checkbox-inline">
-                            <input type="checkbox" name="deviceOffline" value="1" {if $config['device']['offline']}checked{/if}> 下线
+                        <label class="checkbox-inline{if $config['device']['offline']['tpl_id']} active{else} fail{/if}">
+                            <input type="checkbox" name="deviceOffline" value="1" {if $config['device']['offline']['enabled']}checked{/if}> 下线
                         </label>
-                        <label class="checkbox-inline">
-                            <input type="checkbox" name="deviceError" value="1" {if $config['device']['error']}checked{/if}> 故障
+                        <label class="checkbox-inline{if $config['device']['error']['tpl_id']} active{else} fail{/if}">
+                            <input type="checkbox" name="deviceError" value="1" {if $config['device']['error']['enabled']}checked{/if}> 故障
                         </label>
-                        <label class="checkbox-inline">
-                            <input type="checkbox" name="deviceLowBattery" value="1" {if $config['device']['low_battery']}checked{/if}> 电量低
+                        <label class="checkbox-inline{if $config['device']['low_battery']['tpl_id']} active{else} fail{/if}">
+                            <input type="checkbox" name="deviceLowBattery" value="1" {if $config['device']['low_battery']['enabled']}checked{/if}> 电量低
                         </label>
-                        <label class="checkbox-inline">
-                            <input type="checkbox" name="deviceLowRemain" value="1" {if $config['device']['low_remain']}checked{/if}> 缺货
+                        <label class="checkbox-inline{if $config['device']['low_remain']['tpl_id']} active{else} fail{/if}" {if empty($config['device']['low_remain']['tpl_id'])}title="公众号模板添加失败！"{/if}>
+                            <input type="checkbox" name="deviceLowRemain" value="1" {if $config['device']['low_remain']['enabled']}checked{/if}> 缺货
                         </label>
                     </div>
                 </div>

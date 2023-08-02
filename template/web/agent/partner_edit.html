@@ -61,6 +61,7 @@
                   <label class="checkbox-inline">
                       <input type="checkbox" name="orderFailed" value="1" {if !isset($partnerData['notice']) ||$partnerData['notice']['order']['failed']}checked{/if}> 异常订单
                   </label>
+                  <span class="help-block">* 在订单成功或者失败时，通知合伙人。</span>
               </div>
           </div>
           <div class="form-group">
@@ -81,6 +82,7 @@
                 <label class="checkbox-inline">
                     <input type="checkbox" name="deviceLowRemain" value="1" {if !isset($partnerData['notice']) ||$partnerData['notice']['device']['low_remain']}checked{/if}> 缺货
                 </label>
+                <span class="help-block">* 在指定事件发生时，通知合伙人，注意：相同事件10分钟之内只会通知一次。</span>
             </div>
         </div>
       </div>

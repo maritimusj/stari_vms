@@ -8,6 +8,7 @@
             <label class="checkbox-inline {if $config['order']['failed']['tpl_id']}active{else}fail{/if}">
                 <input type="checkbox" name="orderFailed" value="1" {if $config['order']['failed']['enabled']}checked{/if}> 异常订单
             </label>
+            <span class="help-block">* 在订单成功或者失败时，通知运营人员。</span>
         </div>
     </div>
     <div class="form-group">
@@ -28,6 +29,7 @@
             <label class="checkbox-inline {if $config['device']['low_remain']['tpl_id']}active{else}fail{/if}">
                 <input type="checkbox" name="deviceLowRemain" value="1" {if $config['device']['low_remain']['enabled']}checked{/if}> 缺货
             </label>
+            <span class="help-block">* 在指定事件发生时，通知运营人员，注意：相同事件10分钟之内只会通知一次。</span>
         </div>
     </div>
     <div class="form-group">

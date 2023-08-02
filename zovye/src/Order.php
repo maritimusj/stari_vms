@@ -1359,7 +1359,7 @@ class Order extends State
             if ($device->isBlueToothDevice()) {
                 if ($order->isBluetoothResultOk()) {
                     $event = self::EVENT_SUCCEED;
-                }elseif ($order->isBluetoothResultFail()) {
+                } elseif ($order->isBluetoothResultFail()) {
                     $event = self::EVENT_FAILED;
                 }
             } else {
@@ -1405,10 +1405,8 @@ class Order extends State
                 $data['thing3'] = ['value' => Wx::trim_thing($goods_name)];
                 $data['time4'] = ['value' => date('Y-m-d H:i:s', $order->getCreatetime())];
                 break;
-        }
-
-        if (empty($data)) {
-            return err('错误的事件类型！');
+            default:
+                return err('错误的事件类型！');
         }
 
         $params = [

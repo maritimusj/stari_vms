@@ -102,7 +102,7 @@ class Device extends State
             if (isset($condition['keeper_id'])) {
                 return m('device_keeper_vw')->where($condition);
             }
-            
+
             if (isset($condition['id'])) {
                 return m('device')->where($condition);
             }
@@ -1162,7 +1162,10 @@ class Device extends State
 
     public static function sendEventTemplateMsg(deviceModelObj $device, string $event)
     {
-        if (!in_array($event, ['device.online', 'device.offline', 'device.error', 'device.low_battery', 'device.low_remain'])) {
+        if (!in_array(
+            $event,
+            ['device.online', 'device.offline', 'device.error', 'device.low_battery', 'device.low_remain']
+        )) {
             return err('不支持的事件通知！');
         }
 
@@ -1239,10 +1242,8 @@ class Device extends State
                 $data['thing3'] = ['value' => Wx::trim_thing($location['address'] ?: '<没有位置信息>')];
                 $data['thing44'] = ['value' => Wx::trim_thing($lanes_title)];
                 break;
-        }
-
-        if (empty($data)) {
-            return err('错误的事件类型！');
+            default:
+                return err('错误的事件类型！');
         }
 
         $params = [

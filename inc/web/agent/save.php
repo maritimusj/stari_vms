@@ -91,7 +91,6 @@ $result = DBUtil::transactionDo(function() use ($id, &$from) {
                     'remainWarning' => 1,
                     'deviceError' => 1,
                     'reviewResult' => 1,
-                    'agentMsg' => 1,
                 ],
                 'funcs' => Util::getAgentFNs(),
                 'superior' => $superior_data,

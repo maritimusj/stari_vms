@@ -76,7 +76,7 @@ if ($op == 'save') {
                     'remainWarning' => 1,
                     'deviceError' => 1,
                     'reviewResult' => 1,
-                    'agentMsg' => 1,
+
                     'deviceOnline' => 1,
                 ],
                 'funcs' => App::getAgentDefaultFuncs(),

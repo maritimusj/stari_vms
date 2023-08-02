@@ -280,7 +280,6 @@ if ($page == 'device') {
         $settings['inventory']['goods']['mode'] = Request::bool('inventoryGoodsLack') ? 1 : 0;
     }
 
-    $settings['agent']['msg_tplid'] = Request::trim('agentMsg');
     $settings['agent']['levels'] = [
         'level0' => ['clr' => Request::trim('clr0'), 'title' => Request::trim('level0')],
         'level1' => ['clr' => Request::trim('clr1'), 'title' => Request::trim('level1')],

@@ -117,18 +117,6 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_agent_app` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zovye_vms_agent_msg` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `uniacid` int(11) DEFAULT NULL,
-  `agent_id` int(11) DEFAULT NULL,
-  `msg_id` int(11) DEFAULT NULL,
-  `title` varchar(255) DEFAULT NULL,
-  `content` text,
-  `updatetime` int(11) DEFAULT '0',
-  `createtime` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_app_logs` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) DEFAULT NULL,

@@ -1,0 +1,39 @@
+<form class="form-horizontal" id="editKeeperConfig" data-id="{$id}">
+    <div class="form-group">
+        <label class="col-md-2 control-label">订单事件</label>
+        <div class="col-md-10">
+            <label class="checkbox-inline">
+                <input type="checkbox" name="orderSucceed" value="1" {if $config['order']['succeed']}checked{/if}> 成功订单
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" name="orderFailed" value="1" {if $config['order']['failed']}checked{/if}> 异常订单
+            </label>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label">设备事件</label>
+        <div class="col-md-10">
+            <label class="checkbox-inline">
+                <input type="checkbox" name="deviceOnline" value="1" {if $config['device']['online']}checked{/if}> 上线
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" name="deviceOffline" value="1" {if $config['device']['offline']}checked{/if}> 下线
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" name="deviceError" value="1" {if $config['device']['error']}checked{/if}> 故障
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" name="deviceLowBattery" value="1" {if $config['device']['low_battery']}checked{/if}> 电量低
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" name="deviceLowRemain" value="1" {if $config['device']['low_remain']}checked{/if}> 缺货
+            </label>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10" style="text-align: right;">
+            <button type="button" class="btn btn-primary" data-op="saveKeeperConfig">保存</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">退出</button>
+        </div>
+    </div>
+</form>

@@ -40,15 +40,13 @@
                     <th>用户</th>
                     <th>姓名</th>
                     <th>手机号码</th>
-                    <th style="text-align: center;">设备数量</th>
+                    <th class="center">设备数量</th>
                     <th style="text-align: center;width: 10em;">
                         <div>创建时间</div>
                     </th>
-                    {if \zovye\App::isPromoterEnabled()}
-                    <th>
+                    <th class="center">
                         操作
                     </th>
-                    {/if}
                 </tr>
                 </thead>
                 <tbody>
@@ -69,7 +67,7 @@
                     <td>
                         {$item['mobile']}
                     </td>
-                    <td style="text-align: center;">
+                    <td class="center">
                         <a href="{php echo $this->createWebUrl('user', ['op' => 'keeper_device', 'id' => $item['user']['id']])}" title="查看设备列表">
                             {$item['devices_total']}
                         </a>
@@ -77,14 +75,15 @@
                     <td>
                         <div style="color:#9E9E9E;font-size:12px;">{$item['createtime']}</div>
                     </td>
-                    {if \zovye\App::isPromoterEnabled()}
-                    <td>
+                    <td class="center">
                         <div class="operate">
-                            <i class="fa fa-gear fa-fw" data-op="config" title="推广员佣金设置"></i>
+                            <i class="fa fa-gear fa-fw" data-op="keeper_config" title="设置"></i>
+                            {if \zovye\App::isPromoterEnabled()}
+                            <i class="fa fa-users fa-fw" data-op="config" title="推广员佣金设置"></i>
                             <i class="fa fa-list fa-fw" data-op="list" title="查看推广员列表"></i>
+                            {/if}
                         </div>
                     </td>
-                    {/if}
                 </tr>
                 {/loop}
                 </tbody>
@@ -106,6 +105,20 @@
         zovye.enableOp();
         zovye.setApiUrl("{php echo $this->createWebUrl('promoter');}");
 
+        zovye.op('saveKeeperConfig', function(self, next) {
+            const e = self.closest('[data-id]');
+            const id = e.data('id');
+            const orderSucceed = $('#editKeeperConfig input[name=orderSucceed]:checked').val();
+            const orderFailed = $('#editKeeperConfig input[name=orderFailed]:checked').val();
+            const deviceOnline = $('#editKeeperConfig input[name=deviceOnline]:checked').val();
+            const deviceOffline = $('#editKeeperConfig input[name=deviceOffline]:checked').val();
+            const deviceError = $('#editKeeperConfig input[name=deviceError]:checked').val();
+            const deviceLowBattery = $('#editKeeperConfig input[name=deviceLowBattery]:checked').val();
+            const deviceLowRemain = $('#editKeeperConfig input[name=deviceLowRemain]:checked').val();
+            next({id, orderSucceed, orderFailed, deviceOnline, deviceOffline, deviceError, deviceLowBattery, deviceLowRemain}, function(res) {
+               $('#modal-message').modal('hide');
+            });
+        })
         zovye.op('saveConfig', function(self, next) {
             const e = self.closest('[data-id]');
             const id = e.data('id');
@@ -115,7 +128,6 @@
                $('#modal-message').modal('hide');
             });
         })
-
         zovye.op('remove', function(self, next) {
             const e = self.closest('[data-id]');
             next({id: e.data('id')}, function(res) {

@@ -86,11 +86,6 @@ $result = DBUtil::transactionDo(function() use ($id, &$from) {
                 'level' => $level,
                 'area' => $area,
                 'notice' => [
-                    'order' => 1,
-                    'agentApp' => 1,
-                    'remainWarning' => 1,
-                    'deviceError' => 1,
-                    'reviewResult' => 1,
                 ],
                 'funcs' => Util::getAgentFNs(),
                 'superior' => $superior_data,

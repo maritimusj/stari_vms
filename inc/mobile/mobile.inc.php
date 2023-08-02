@@ -72,12 +72,6 @@ if ($op == 'save') {
                 'level' => $level,
                 'area' => [],
                 'notice' => [
-                    'agentApp' => 1,
-                    'remainWarning' => 1,
-                    'deviceError' => 1,
-                    'reviewResult' => 1,
-
-                    'deviceOnline' => 1,
                 ],
                 'funcs' => App::getAgentDefaultFuncs(),
                 'superior' => [],

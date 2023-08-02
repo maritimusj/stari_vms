@@ -1359,8 +1359,7 @@ class Order extends State
             if ($device->isBlueToothDevice()) {
                 if ($order->isBluetoothResultOk()) {
                     $event = self::EVENT_SUCCEED;
-                }
-                if ($order->isBluetoothResultFail()) {
+                }elseif ($order->isBluetoothResultFail()) {
                     $event = self::EVENT_FAILED;
                 }
             } else {
@@ -1383,7 +1382,7 @@ class Order extends State
         }
 
         $goods = $order->getGoodsData();
-        $goods_name = $goods['name'] ? "{$goods['name']}x{$order->getNum()}" : '<没有商品信息>';
+        $goods_name = $goods['name'] ? "{$goods['name']} x {$order->getNum()}{$goods['unit_title']}" : '<没有商品信息>';
 
         $data = [];
         $url = '';

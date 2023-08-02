@@ -250,9 +250,9 @@ class orderModelObj extends modelObj
 
     public function isBluetoothResultFail(): bool
     {
-        $code = $this->getExtraData('bluetooth.result', 0);
+        $code = $this->getExtraData('bluetooth.result', -99);
 
-        return $code === 2 || ($code === 0 && time() - $this->getCreatetime() > App::getDeviceWaitTimeout());
+        return $code === 2 || ($code === -99 && time() - $this->getCreatetime() > App::getDeviceWaitTimeout());
     }
 
     /**

@@ -793,4 +793,39 @@ class Helper
 
         return $result;
     }
+
+    public static function getWxPushMessageConfig($data = [])
+    {
+        $config = Config::WxPushMessage('config', []);
+
+        $data['device']['online'] = [
+            'enabled' => $data['device']['online'],
+            'tpl_id' => getArray($config, 'device.online.tpl_id', ''),
+        ];
+        $data['device']['offline'] = [
+            'enabled' => $data['device']['offline'],
+            'tpl_id' => getArray($config, 'device.offline.tpl_id', ''),
+        ];
+        $data['device']['error'] = [
+            'enabled' => $data['device']['error'],
+            'tpl_id' => getArray($config, 'device.error.tpl_id', ''),
+        ];
+        $data['device']['low_battery'] = [
+            'enabled' => $data['device']['low_battery'],
+            'tpl_id' => getArray($config, 'device.low_battery.tpl_id', ''),
+        ];
+        $data['device']['low_remain'] = [
+            'enabled' => $data['device']['low_remain'],
+            'tpl_id' => getArray($config, 'device.low_remain.tpl_id', ''),
+        ];
+        $data['order']['succeed'] = [
+            'enabled' => $data['order']['succeed'],
+            'tpl_id' => getArray($config, 'order.succeed.tpl_id', ''),
+        ];
+        $data['order']['failed'] = [
+            'enabled' => $data['order']['failed'],
+            'tpl_id' => getArray($config, 'order.failed.tpl_id', ''),
+        ];
+        return $data;
+    }
 }

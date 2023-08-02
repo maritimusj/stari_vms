@@ -36,6 +36,9 @@ if (in_array(
     }
 
     $agent_data = $agent->get('agentData', []);
+
+    $agent_data['notice'] = Helper::getWxPushMessageConfig($agent_data['notice']);
+
     $superior = $agent->getSuperior();
     $superior_data = $superior ? $superior->get('agentData') : null;
 

@@ -22,6 +22,6 @@ Response::templateJSON(
     '配置',
     [
         'id' => $keeper->getId(),
-        'config' => $config,
+        'config' => Helper::getWxPushMessageConfig($config),
     ]
 );

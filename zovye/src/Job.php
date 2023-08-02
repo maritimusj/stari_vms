@@ -421,6 +421,25 @@ class Job
     {
         if (CtrlServ::scheduleJob('order_notify', [
                 'id' => $order->getId(),
+                'device_id' => '',
+                'order' => '',
+                'goods' => '',
+                'time' => '',
+            ]) !== false) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static function orderErrorNotify(deviceModelObj $device, array $data = []): bool
+    {
+        if (CtrlServ::scheduleJob('order_notify', [
+                'id' => '',
+                'device_id' => $device->getId(),
+                'order' => $data['order_no'] ?? '',
+                'goods' => $data['goods_name'] ?? '<未指定商品>',
+                'time' => $data['time'] ?? date('Y-m-d H:i:s', TIMESTAMP),
             ]) !== false) {
             return true;
         }

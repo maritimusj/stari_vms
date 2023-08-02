@@ -1222,10 +1222,17 @@ class Device extends State
                 }
 
                 if (empty($lanes)) {
-                    $lanes_title = '全部货道';
+                    $lanes_title = '商品库存不足，请及时补货';
                 } else {
-                    $lanes_title = '货道：'.implode(',', $lanes);
+                    $lanes_title = '商品库存不足，货道：'.implode(',', $lanes);
                 }
+
+                $data['thing2'] = ['value' => Wx::trim_thing($device->getName())];
+                $data['character_string20'] = ['value' => Wx::trim_character($device->getImei())];
+                $location = $device->getLocation();
+                $data['thing3'] = ['value' => Wx::trim_thing($location['address'] ?: '<没有位置信息>')];
+                $data['thing44'] = ['value' => Wx::trim_thing($lanes_title)];
+                break;
         }
 
         if (empty($data)) {

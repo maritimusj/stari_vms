@@ -2225,47 +2225,9 @@ class agent
         }, $user->getId());
     }
 
-    public static function repair()
+    public static function repair(): array
     {
-        $user = common::getAgentOrPartner();
-        $agent = $user->isPartner() ? $user->getPartnerAgent() : $user;
-
-        $repairData = $agent->settings('repair', []);
-
-        $cleanFN = function () use ($agent) {
-            $agent->updateSettings('repair', []);
-            $agent->save();
-        };
-
-        if (is_error($repairData['error'])) {
-            $cleanFN();
-
-            return $repairData['error'];
-        }
-
-        if ($repairData['status'] == 'finished') {
-            $cleanFN();
-
-            return ['state' => '', 'msg' => '刷新已完成！'];
-        }
-
-        if ($repairData['status'] == 'busy') {
-            return [
-                'state' => 'busy',
-                'msg' => '正在刷新缓存中，请稍等！',
-            ];
-        }
-
-        if (Job::repairAgentMonthStats($agent->getId(), Request::str('month'))) {
-            $agent->updateSettings('repair', [
-                'status' => 'busy',
-            ]);
-            $agent->save();
-
-            return ['state' => 'busy', 'msg' => '已启动后台刷新任务，请耐心等待完成！'];
-        }
-
-        return err('无法启动刷新任务，请联系管理员！');
+        return ['msg' => '缓存已经刷新！'];
     }
 
     public static function stats(): array

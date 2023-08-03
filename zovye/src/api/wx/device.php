@@ -28,7 +28,6 @@ use zovye\model\userModelObj;
 use zovye\Order;
 use zovye\TKPromoting;
 use zovye\Util;
-use zovye\We7;
 use function zovye\err;
 use function zovye\request;
 use function zovye\is_error;

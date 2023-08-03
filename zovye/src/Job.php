@@ -245,21 +245,6 @@ class Job
         );
     }
 
-    public static function repairAgentMonthStats($agent_id, $month): bool
-    {
-        $key = "repair.$agent_id.month:$month";
-        if (time() - Config::agent($key) < 300) {
-            return false;
-        }
-        if (CtrlServ::scheduleJob('repair', ['agent' => $agent_id, 'month' => $month]) !== false) {
-            Config::agent($key, time(), true);
-
-            return true;
-        }
-
-        return false;
-    }
-
     public static function douyinOrder(userModelObj $user, deviceModelObj $device, $account_uid, $time = null)
     {
         return CtrlServ::scheduleJob('douyin', [

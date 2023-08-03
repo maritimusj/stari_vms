@@ -21,7 +21,6 @@ use zovye\Device;
 use zovye\DeviceUtil;
 use zovye\Goods;
 use zovye\LocationUtil;
-use zovye\Locker;
 use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\GoodsVoucher;

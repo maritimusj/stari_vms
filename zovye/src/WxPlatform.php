@@ -718,7 +718,7 @@ class WxPlatform
                 'user' => $user->profile(),
             ]);
 
-            list($qr_app, $qr_user_id, $qr_device_id) = explode(':', $profile['qr_scene_str'] ?? '');
+            list($qr_app, $qr_user_id,) = explode(':', $profile['qr_scene_str'] ?? '');
             if ($qr_app != App::uid(6)) {
                 throw new RuntimeException('AppUID不匹配！');
             }

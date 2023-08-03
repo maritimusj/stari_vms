@@ -13,7 +13,6 @@ use zovye\App;
 use zovye\Contract\IAccountProvider;
 use zovye\Device;
 use zovye\HttpUtil;
-use zovye\LocationUtil;
 use zovye\Log;
 use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;

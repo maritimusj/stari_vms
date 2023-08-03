@@ -11,7 +11,6 @@ use DateTimeImmutable;
 use InvalidArgumentException;
 use RuntimeException;
 use Throwable;
-use WeAccount;
 
 //框架提供
 use zovye\model\accountModelObj;
@@ -761,59 +760,21 @@ include './index.php';
         $locker = DBUtil::lockObject($order, ['updatetime' => 0]);
 
         if ($locker && $locker->isLocked()) {
-
-            //更新统计
-            $stats_objs = [app()];
-
-            if (!$order->isZeroBonus()) {
-                $device = $order->getDevice();
-                if ($device) {
-                    $stats_objs[] = $device;
-                }
-
-                $agent = $order->getAgent();
-                if ($agent) {
-                    $stats_objs[] = $agent;
-                }
-
-                $goods = $order->getGoods();
-                if ($goods) {
-                    $stats_objs[] = $goods;
-                }
-            }
-
-            Stats::update($order, $stats_objs);
-
             $name = $order->getAccount();
             if ($name) {
                 $account = Account::findOneFromName($name);
                 if ($account) {
                     $order_limits = $account->getOrderLimits();
-
-                    //更新公众号统计，并检查吸粉总量
-                    Stats::update(
-                        $order,
-                        $account,
-                        function ($entry, $stats) use ($order_limits, $account, &$result) {
-                            unset($entry);
-                            if ($order_limits > 0) {
-                                $total = $stats['total']['p'] + $stats['total']['f'];
-                                if ($total >= $order_limits) {
-                                    $account->setState(Account::BANNED);
-                                    Account::updateAccountData();
-
-                                    $result['account.banned'] = [
-                                        'title' => $account->getTitle(),
-                                        'total' => $total,
-                                    ];
-                                }
-                            }
+                    if ($order_limits > 0) {
+                        //更新公众号统计，并检查吸粉总量
+                        if (Order::query(['account' => $account->getName()])->limit($order_limits + 1)->count() >= $order_limits) {
+                            $account->setState(Account::BANNED);
+                            Account::updateAccountData();
                         }
-                    );
+                    }
                 }
             }
-            //暂时禁用，客户数据过多的情况下，该函数很难完成
-            //$result['counter'] = self::updateOrderCounters($order);
+
             $result['order'] = $order->getId().' Ok!';
         } else {
             $result[] = $order->getId().' lock failed!';

@@ -11,69 +11,12 @@ use Exception;
 use DateTimeImmutable;
 use DateTimeInterface;
 use zovye\base\modelObj;
-use zovye\Contract\ISettings;
-use zovye\model\accountModelObj;
-use zovye\model\agentModelObj;
 use zovye\model\commission_balanceModelObj;
 use zovye\model\device_groupsModelObj;
-use zovye\model\orderModelObj;
-use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 
 class Stats
 {
-    /**
-     * 更新统计信息
-     * @param orderModelObj $order
-     * @param ISettings|ISettings[] $objs
-     * @param callable|null $fn
-     */
-    public static function update(orderModelObj $order, $objs, callable $fn = null)
-    {
-        if ($objs) {
-            $num = $order->getNum();
-
-            if ($num > 0) {
-                $objs = is_array($objs) ? $objs : [$objs];
-
-                $way = $order->getPrice() > 0 ? 'p' : 'f';
-                $createtime = $order->getCreatetime();
-
-                $y = date('Y', $createtime); //年
-                $n = date('n', $createtime); //月
-                $z = date('z', $createtime); //一年中的第几天
-                $j = date('j', $createtime); //月份中的第几天
-                $G = date('G', $createtime); //小时
-
-                foreach ($objs as $entry) {
-                    if ($entry instanceof ISettings) {
-                        $stats = $entry->get('statsData', []);
-
-                        if (empty($stats['start']) || $createtime < $stats['start']) {
-                            $stats['start'] = $createtime;
-                        }
-                        if ($createtime > $stats['end']) {
-                            $stats['end'] = $createtime;
-                        }
-
-                        $stats['total'][$way] += $num;
-                        $stats['data'][$y]['total'][$way] += $num;
-                        $stats['data'][$y]['total'][$n][$way] += $num;
-
-                        $stats['data'][$y]['days'][$n][$j][$way] += $num;
-                        $stats['data'][$y]['hours'][$z][$G][$way] += $num;
-
-                        if (is_callable($fn)) {
-                            $fn($entry, $stats);
-                        }
-
-                        $entry->set('statsData', $stats);
-                    }
-                }
-            }
-        }
-    }
-
     /**
      * 获取对象某天的统计数据
      * @param modelObj $obj
@@ -162,29 +105,6 @@ class Stats
 
         return $result;
     }
-
-    /**
-     * 某取对象的总计数据
-     * @param ISettings $obj
-     * @return array
-     */
-    public static function total(ISettings $obj): array
-    {
-        $stats = $obj->get('statsData', []);
-        $result = [
-            'start' => $stats['start'],
-            'end' => $stats['end'],
-            'free' => intval($stats['total']['f']),
-            'pay' => intval($stats['total']['p']),
-        ];
-
-        self::calcBalanceOrder($result);
-
-        $result['total'] = $result['free'] + $result['pay'];
-
-        return $result;
-    }
-
 
     /**
      * 返回指定日期的日统计数据
@@ -367,9 +287,6 @@ class Stats
 
             return $result[0] ?? 0;
         };
-
-        $begin = null;
-        $end = null;
 
         try {
             $begin = new DateTime($s_date);
@@ -778,192 +695,6 @@ class Stats
             'stats' => $data,
             'total' => $total,
         ];
-    }
-
-
-    public static function calc(orderModelObj $order, array &$stats)
-    {
-        $num = $order->getNum();
-        if ($num > 0) {
-            if ($order->isPay() || $order->getSrc() == Order::CHARGING) {
-                $way = 'p';
-            } elseif ($order->isFree()) {
-                $way = 'f';
-            } elseif ($order->getSrc() == Order::BALANCE) {
-                $way = 'b';
-            } else {
-                $way = 'p';
-            }
-
-            $createtime = $order->getCreatetime();
-
-            $G = date('G', $createtime); //小时
-            $j = date('j', $createtime); //月份中的第几天
-            $n = date('n', $createtime); //月
-            $z = date('z', $createtime); //一年中的第几天
-            $y = date('Y', $createtime); //年
-
-            $stats['data'][$y]['days'][$n][$j][$way] += $num;
-            $stats['data'][$y]['hours'][$z][$G][$way] += $num;
-        }
-    }
-
-    /**
-     * 修复 agentModelObj 或 deviceModelObj的某一天的统计数据
-     * @param $obj
-     * @param null $day
-     * @return bool
-     */
-    public static function repair($obj, $day = null): bool
-    {
-        try {
-            if (empty($day)) {
-                $day = new DateTimeImmutable();
-            } elseif (is_string($day)) {
-                $day = new DateTimeImmutable($day);
-            } elseif ($day instanceof DateTimeInterface) {
-                $day = new DateTimeImmutable($day);
-            } else {
-                return false;
-            }
-
-            $begin = $day->modify('00:00');
-            $end = $begin->modify('+1 day');
-
-            $query = Order::query([
-                'createtime >=' => $begin->getTimestamp(),
-                'createtime <' => $end->getTimestamp(),
-            ]);
-
-            if ($obj instanceof agentModelObj) {
-                $query->where(['agent_id' => $obj->getId()]);
-            } elseif ($obj instanceof deviceModelObj) {
-                $query->where(['device_id' => $obj->getId()]);
-            } elseif ($obj instanceof accountModelObj) {
-                $query->where(['account' => $obj->getName()]);
-            } else {
-                return false;
-            }
-
-            $stats = $obj->get('statsData', []);
-
-            $y = $day->format('Y'); //年
-            $n = $day->format('n'); //月
-            $z = $day->format('z'); //一年中的第几天
-            $j = $day->format('j'); //月份中的第几天
-
-            unset($stats['data'][$y]['days'][$n][$j]);
-            unset($stats['data'][$y]['hours'][$z]);
-
-            foreach ($query->findAll() as $order) {
-                self::calc($order, $stats);
-            }
-
-            unset($stats['data'][$y]['total'][$n]['p']);
-            unset($stats['data'][$y]['total'][$n]['f']);
-            unset($stats['data'][$y]['total'][$n]['b']);
-
-            $p = 0;
-            $f = 0;
-            $b = 0;
-
-            foreach ((array)$stats['data'][$y]['days'][$n] as $val) {
-                $p += intval($val['p']);
-                $f += intval($val['f']);
-                $b += intval($val['b']);
-            }
-
-            $stats['data'][$y]['total'][$n]['p'] = $p;
-            $stats['data'][$y]['total'][$n]['f'] = $f;
-            $stats['data'][$y]['total'][$n]['b'] = $b;
-
-            unset($stats['data'][$y]['total']['p']);
-            unset($stats['data'][$y]['total']['f']);
-            unset($stats['data'][$y]['total']['b']);
-
-            $p = 0;
-            $f = 0;
-            $b = 0;
-
-            foreach ((array)$stats['data'][$y]['total'] as $val) {
-                $p += intval($val['p']);
-                $f += intval($val['f']);
-                $b += intval($val['b']);
-            }
-
-            $stats['data'][$y]['total']['p'] = $p;
-            $stats['data'][$y]['total']['f'] = $f;
-            $stats['data'][$y]['total']['b'] = $b;
-
-            unset($stats['total']);
-
-            $p = 0;
-            $f = 0;
-            $b = 0;
-
-            foreach ((array)$stats['data'] as $val) {
-                $p += intval($val['total']['p']);
-                $f += intval($val['total']['f']);
-                $b += intval($val['total']['b']);
-            }
-
-            $stats['total'] = [
-                'p' => $p,
-                'f' => $f,
-                'b' => $b,
-            ];
-
-            return $obj->set('statsData', $stats);
-
-        } catch (Exception $e) {
-            Log::error('stats', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTrace(),
-            ]);
-        }
-
-        return false;
-    }
-
-    public static function repairMonthData($obj, $datetime = '')
-    {
-        $date = null;
-        if (is_string($datetime)) {
-            try {
-                $date = new DateTimeImmutable($datetime);
-            } catch (Exception $e) {
-                return false;
-            }
-        } elseif ($datetime instanceof DateTimeInterface) {
-            $date = $datetime;
-        } elseif (is_int($datetime)) {
-            $date = (new DateTimeImmutable())->setTimestamp($datetime);
-        }
-
-        if (!$date) {
-            $date = new DateTimeImmutable();
-        }
-
-        $begin = $date->modify('first day of this month');
-        $end = $date->modify('first day of next month');
-
-        while ($begin < $end) {
-            $day = $begin->format('Y-m-d');
-            /** @var array $result */
-            $result = DBUtil::transactionDo(function () use ($obj, $day) {
-                if (!Stats::repair($obj, $day)) {
-                    return err('修复失败：{$day}！');
-                }
-
-                return true;
-            });
-            if (is_error($result)) {
-                return $result;
-            }
-            $begin = $begin->modify('next day');
-        }
-
-        return true;
     }
 
     /**

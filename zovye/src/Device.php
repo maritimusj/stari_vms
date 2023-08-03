@@ -6,7 +6,6 @@
 
 namespace zovye;
 
-use DateTime;
 use DateTimeImmutable;
 use Exception;
 use zovye\model\cronModelObj;

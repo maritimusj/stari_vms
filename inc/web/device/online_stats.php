@@ -3,7 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
- 
+
 namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
@@ -32,6 +32,10 @@ if (is_array($ids)) {
             continue;
         }
         $online_ids['uid'][] = $entry->getImei();
+    }
+
+    if (empty($online_ids)) {
+        JSON::success($result);
     }
 
     $ids_str = json_encode($online_ids);

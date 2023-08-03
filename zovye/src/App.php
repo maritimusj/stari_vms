@@ -33,13 +33,6 @@ class App
         return _W('config.setting.authkey');
     }
 
-    public static function isApiEnabled(): bool
-    {
-        return onceCall(function () {
-            return Config::api('enabled', false);
-        });
-    }
-
     public static function isLocationValidateEnabled(): bool
     {
         return onceCall(function () {
@@ -553,11 +546,6 @@ class App
     public static function isMultiQRCodesEnabled(): bool
     {
         return false;
-    }
-
-    public static function isDeviceBriefPageEnabled(): bool
-    {
-        return settings('custom.device.brief-page.enabled', false);
     }
 
     public static function isChargingDeviceEnabled(): bool

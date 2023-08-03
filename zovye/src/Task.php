@@ -7,7 +7,7 @@
 namespace zovye;
 
 use zovye\model\accountModelObj;
-use zovye\model\task_viewModelObj;
+use zovye\model\task_vwModelObj;
 use zovye\model\userModelObj;
 
 class Task
@@ -16,7 +16,7 @@ class Task
     const REJECT = 1;
     const ACCEPT = 2;
 
-    public static function createLog(userModelObj $user, accountModelObj $account, array $data): ?task_viewModelObj
+    public static function createLog(userModelObj $user, accountModelObj $account, array $data): ?task_vwModelObj
     {
         $log = BalanceLog::create([
             'user_id' => $user->getId(),
@@ -32,7 +32,7 @@ class Task
             return null;
         }
 
-        $taskLog = new task_viewModelObj($log->getId(), $log->factory());
+        $taskLog = new task_vwModelObj($log->getId(), $log->factory());
         $data = $log->__getData('all');
         $taskLog->__setData($data);
 
@@ -44,7 +44,7 @@ class Task
         return m('task_vw')->query($condition);
     }
 
-    public static function get($id, bool $is_uid = false): ?task_viewModelObj
+    public static function get($id, bool $is_uid = false): ?task_vwModelObj
     {
         if ($is_uid) {
             return self::findOne(['s2' => $id]);
@@ -53,7 +53,7 @@ class Task
         return self::findOne(['id' => $id]);
     }
 
-    public static function findOne($condition = []): ?task_viewModelObj
+    public static function findOne($condition = []): ?task_vwModelObj
     {
         return self::query($condition)->findOne();
     }
@@ -95,7 +95,7 @@ class Task
         $query->orderBy('id DESC');
 
         $result['participated'] = [];
-        /** @var task_viewModelObj $entry */
+        /** @var task_vwModelObj $entry */
         foreach ($query->findAll() as $entry) {
             $data = $entry->format();
             $data['uid'] = $entry->getUid();

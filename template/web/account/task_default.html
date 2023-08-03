@@ -125,8 +125,8 @@
                 {/if}
                 <th>用户</th>
                 <th class="center">图片</th>
-                <th>创建时间</th>
-                <th>操作</th>
+                <th class="center">创建时间</th>
+                <th class="center">操作</th>
             </tr>
             </thead>
             <tbody>
@@ -149,7 +149,7 @@
                             </span>
                         </div>
                     </td>
-                    <td>
+                    <td class="center">
                         <ul class="images-list">
                             {loop $item['submit']['images'] $p}
                             <li>
@@ -158,10 +158,10 @@
                             {/loop}
                         </ul>
                     </td>
-                    <td>
+                    <td class="center">
                         {php echo date('Y-m-d H:i:s', $item['createtime']);}
                     </td>
-                    <td class="operate">
+                    <td class="center operate">
                         {if $item['status'] == \zovye\Task::INIT}
                         <button type="button" class="btn btn-danger btn-sm" data-op="reject">拒绝</button>
                         <button type="button" class="btn btn-success btn-sm" data-op="accept">通过</button>

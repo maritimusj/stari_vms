@@ -8,7 +8,7 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-use zovye\model\task_viewModelObj;
+use zovye\model\task_vwModelObj;
 
 $tpl_data = [];
 
@@ -48,7 +48,7 @@ if ($total > 0) {
     $query->orderBy('id desc');
 
     $list = [];
-    /** @var task_viewModelObj $entry */
+    /** @var task_vwModelObj $entry */
     foreach ($query->findAll() as $entry) {
         $data = $entry->format();
         $data['id'] = $entry->getId();

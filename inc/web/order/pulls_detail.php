@@ -19,7 +19,7 @@ $list = Helper::getOrderPullLog($order);
 
 Response::templateJSON(
     'web/order/pulls',
-    '出货记录',
+    "出货记录 [ {$order->getOrderId()} ]",
     [
         'list' => $list,
     ]

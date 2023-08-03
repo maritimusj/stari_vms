@@ -3,11 +3,12 @@
     <thead>
         <tr>
             <td>#</td>
-            <td>原因</td>
+            <td>来源</td>
+            <td>货道</td>
             <td>结果</td> 
             <td>商品</td>            
             <td>名称</td>
-            <td>库存</td>
+            <td class="center">库存</td>
             <td>时间</td>
         </tr>
     </thead>
@@ -16,9 +17,11 @@
         <tr>
             <td>{php echo $index + 1}</td>
             <td class="title">{$item['title']}</td>
+            <td>
+                [ {php echo $item['goods']['cargo_lane'] + 1} ] 
+            </td>
             <td class="result">
                 <div class="{php echo $item['result']['errno']?'error':'success'}">
-                    货道：{php echo $item['goods']['cargo_lane'] + 1} -> 
                     {$item['result']['message']}
                     {if isset($item['confirm'])}
                     <span class="{php echo $item['confirm']['errno']?'error':'success'}" title="订单确认结果">(* {php echo
@@ -39,7 +42,7 @@
                 {$item['goods']['name']}
                 {/if}
             </td>
-            <td>
+            <td class="center">
                 {if $item['goods']}
                 <div class="goods_num">{$item['goods']['num']}</div>
                 {/if}

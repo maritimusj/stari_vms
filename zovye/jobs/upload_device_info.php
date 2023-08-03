@@ -20,9 +20,9 @@ use function zovye\isEmptyArray;
 use function zovye\settings;
 
 $op = Request::op('default');
-$lastId = Request::int('lastId');
+$last_id = Request::int('lastId');
 $data = [
-    'lastId' => $lastId,
+    'lastId' => $last_id,
 ];
 
 if ($op == 'upload_device_info' && CtrlServ::checkJobSign($data)) {
@@ -38,8 +38,8 @@ if ($op == 'upload_device_info' && CtrlServ::checkJobSign($data)) {
 
     $query = Device::query();
 
-    if ($lastId > 0) {
-        $query->where(['id >' => $lastId]);
+    if ($last_id > 0) {
+        $query->where(['id >' => $last_id]);
     }
 
     $query->orderBy('id ASC');

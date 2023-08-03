@@ -42,6 +42,7 @@ if ($op == 'withdraw' && CtrlServ::checkJobSign($data)) {
                 'keyword2' => ['value' => date('Y-m-d H:i:s')],
                 'keyword3' => ['value' => ($data['amount'] / 100).'元'],
             ];
+
             $admin_id = intval(settings('notice.withdrawAdminUserId'));
             if ($admin_id) {
                 $query = User::query(['id' => $admin_id]);

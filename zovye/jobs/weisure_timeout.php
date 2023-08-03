@@ -26,9 +26,9 @@ $op = Request::op('default');
 if ($op == 'weisure_timeout' && CtrlServ::checkJobSign($data)) {
 
     try {
-        $outUserId = base64_encode("{$data['user']}:{$data['device']}");
+        $out_user_id = base64_encode("{$data['user']}:{$data['device']}");
         WeiSureAccount::cb([
-            'outerUserId' => $outUserId,
+            'outerUserId' => $out_user_id,
         ], true);
 
     } catch(Exception $e) {

@@ -21,7 +21,7 @@ use zovye\Pay;
 use zovye\Request;
 
 $uid = Request::str('uid');
-$chargerID = Request::int('chargerID');
+$charger_id = Request::int('chargerID');
 $device_id = Request::int('device');
 $user_id = Request::int('user');
 $order_id = Request::int('order');
@@ -29,7 +29,7 @@ $time = Request::int('time');
 
 $params = [
     'uid' => $uid,
-    'chargerID' => $chargerID,
+    'chargerID' => $charger_id,
     'device' => $device_id,
     'user' => $user_id,
     'order' => $order_id,
@@ -43,7 +43,7 @@ if ($op == 'charging_start_timeout' && CtrlServ::checkJobSign($params)) {
     if ($order) {
         $result = $order->getChargingResult();
         if (empty($result)) {
-            Charging::end($uid, $chargerID, function ($order) {
+            Charging::end($uid, $charger_id, function ($order) {
                 $order->setExtraData('timeout', [
                     'at' => time(),
                     'reason' => '充电桩无响应，请稍后再试！',
@@ -66,9 +66,9 @@ if ($op == 'charging_start_timeout' && CtrlServ::checkJobSign($params)) {
 
     $device = Device::get($device_id);
     if ($device) {
-        $data = $device->getChargerBMSData($chargerID);
+        $data = $device->getChargerBMSData($charger_id);
         if (empty($data)) {
-            Charging::end($uid, $chargerID, function ($order) {
+            Charging::end($uid, $charger_id, function ($order) {
                 $order->setExtraData('timeout', [
                     'at' => time(),
                     'reason' => '充电桩失去响应，请重试！',

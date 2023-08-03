@@ -17,19 +17,19 @@ use zovye\model\agentModelObj;
 use zovye\Request;
 
 $agent_id = Request::str('agent');
-$accountUID = Request::str('account');
+$account_uid = Request::str('account');
 $total = Request::int('total');
 
 $params = [
     'agent' => $agent_id,
-    'account' => $accountUID,
+    'account' => $account_uid,
     'total' => $total,
 ];
 
 $op = Request::op('default');
 if ($op == 'auth_account' && CtrlServ::checkJobSign($params)) {
 
-    $acc = Account::findOneFromUID($accountUID);
+    $acc = Account::findOneFromUID($account_uid);
     if ($acc) {
         /** @var agentModelObj $agent_id */
         $agent = Agent::get($agent_id);
@@ -43,7 +43,7 @@ if ($op == 'auth_account' && CtrlServ::checkJobSign($params)) {
     } else {
         $params['error'] = '找不到这个公众号或者公众号还没有创建！';
         if ($total < 60) {
-            Job::authAccount($agent_id, $accountUID, $total + 1);
+            Job::authAccount($agent_id, $account_uid, $total + 1);
         }
     }
 }

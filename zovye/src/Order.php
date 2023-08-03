@@ -1394,7 +1394,7 @@ class Order extends State
                     'value' => Wx::trim_character($device->getImei()),
                 ];
                 $data['thing3'] = ['value' => Wx::trim_thing($goods_name)];
-                $data['amount4'] = ['value' => number_format($order->getPrice() / 100, 2, '.', '')];
+                $data['amount4'] = ['value' => number_format($order->getPrice() / 100, 2, '.', '') . '元'];
                 $data['time5'] = ['value' => date('Y-m-d H:i:s', $order->getCreatetime())];
                 break;
             case self::EVENT_FAILED:

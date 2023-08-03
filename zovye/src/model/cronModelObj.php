@@ -29,22 +29,22 @@ class cronModelObj extends modelObj
 	/** @var int */
 	protected $uniacid;
 
-	/** @var varchar */
+	/** @var string */
 	protected $uid;
 
-    /** @var varchar */
+    /** @var string */
     protected $job_uid;
 
-	/** @var varchar */
+	/** @var string */
 	protected $spec;
 
 	/** @var int */
 	protected $total;
 
-	/** @var varchar */
+	/** @var string */
 	protected $url;
 
-    /** @var varchar */
+    /** @var string */
     protected $extra;
 
 	/** @var int */

@@ -44,6 +44,8 @@ if ($op == 'order_notify' && CtrlServ::checkJobSign($log)) {
             throw new JobException('找不到这个设备！', $log);
         }
 
+        $log['devicd'] = $device->profile();
+
         Helper::sendWxPushMessageTo($device, Order::EVENT_FAILED, [
             'character_string2' => ['value' => Wx::trim_character($log['order'])],
             'character_string1' => [
@@ -53,7 +55,8 @@ if ($op == 'order_notify' && CtrlServ::checkJobSign($log)) {
             'time4' => ['value' => $log['time']],
         ]);
     }
-
+} else {
+    $log['error'] = '签名失败！';
 }
 
 Log::debug('order_notify', $log);

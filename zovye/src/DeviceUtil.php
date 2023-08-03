@@ -450,7 +450,7 @@ class DeviceUtil
                     if (empty($locker)) {
                         return err('设备正忙，请重试！');
                     }
-                    $v = $device->resetPayload([$goods['cargo_lane'] => -1], "设备出货：{$order->getOrderNO()}");
+                    $v = $device->resetPayload([$goods['cargo_lane'] => -1], "订单：{$order->getOrderNO()}");
                     if (is_error($v)) {
                         return err('保存库存失败！');
                     }

@@ -406,7 +406,7 @@ class Job
     {
         if (CtrlServ::scheduleJob('order_notify', [
                 'id' => $order->getId(),
-                'device_id' => '',
+                'device_id' => 0,
                 'order' => '',
                 'goods' => '',
                 'time' => '',
@@ -420,7 +420,7 @@ class Job
     public static function orderErrorNotify(deviceModelObj $device, array $data = []): bool
     {
         if (CtrlServ::scheduleJob('order_notify', [
-                'id' => '',
+                'id' => 0,
                 'device_id' => $device->getId(),
                 'order' => $data['order_no'] ?? '',
                 'goods' => $data['goods_name'] ?? '<未指定商品>',

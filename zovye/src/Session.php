@@ -46,21 +46,6 @@ class Session
 
                         $user = User::create($data);
                         if ($user) {
-                            //创建云众商城关联
-                            if (isset($params['yzshop']) && YZShop::isInstalled()) {
-                                $yz_shop = $params['yzshop'];
-                                $agent = null;
-                                if (isset($yz_shop['agent']) && $yz_shop['agent'] instanceof userModelObj) {
-                                    $agent = $yz_shop['agent'];
-                                } elseif (isset($yz_shop['device']) && $yz_shop['device'] instanceof deviceModelObj) {
-                                    $agent = $yz_shop['device']->getAgent();
-                                }
-
-                                if ($agent) {
-                                    YZShop::create($user, $agent);
-                                }
-                            }
-
                             if (!empty($params['from'])) {
                                 $user->set('fromData', $params['from']);
                             }

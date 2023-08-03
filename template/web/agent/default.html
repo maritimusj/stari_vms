@@ -56,9 +56,6 @@
         <span class="operate">
             <i class="fa fa-fw fa-paste" title="复制邀请登记网址链接" data-url="{$mobile_url}"></i>
             <i class="fa fa-fw fa-diamond" title="创建代理商" onclick="searchDlg.choose('agent');"></i>
-            {if \zovye\YZShop::isInstalled()}
-            <i class="fa fa-retweet" title="刷新上级代理关系" id="refresh_rel"></i>
-            {/if}
         </span>
     </div>
     <div class="panel-body">
@@ -220,28 +217,6 @@
         </div>
         <script>
             $(function(){
-                {if \zovye\YZShop::isInstalled()}
-                const url = "{php echo $this->createWebUrlUrl('agent');}";
-                function refresh_rel(page) {
-                    $.getJSON(url, {op: 'refresh_rel', 'page': page }).then(function(res){
-                        if (res) {
-                            if (res.data) {
-                                if (res.data.more === 'y') {
-                                    refresh_rel(page + 1);
-                                } else if (res.data.more === 'n') {
-                                    location.href = url;
-                                }
-                            }
-                        }
-                    })
-                }
-                $('#refresh_rel').click(function(){
-                    if (confirm("注意，该操作会根据商城关系链重新绑定所有代理商的上级代理，确定要继续吗？")) {
-                        $(this).removeClass('fa-retweet').addClass('fa-refresh fa-spin').attr('title', '正在加载...');
-                        refresh_rel(1);
-                    }
-                });
-                {/if}
                 $('[data-url]').each(function() {
                       util.clip(this, $(this).data('url'));
                 })

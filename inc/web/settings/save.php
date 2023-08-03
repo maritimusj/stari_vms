@@ -300,8 +300,6 @@ if ($page == 'device') {
     ];
 
     if ($settings['agent']['reg']['mode'] == Agent::REG_MODE_AUTO) {
-
-        $settings['agent']['reg']['superior'] = Request::bool('YzshopSuperiorRelationship') ? 'yz' : 'n/a';
         $settings['agent']['reg']['level'] = Request::str('agentRegLevel');
         $settings['agent']['reg']['commission_fee'] = round(Request::float('agentCommissionFee', 0, 2) * 100);
         $settings['agent']['reg']['commission_fee_type'] = Request::bool('feeType') ? 1 : 0;
@@ -364,35 +362,6 @@ if ($page == 'device') {
                 $settings['agent']['reg']['bonus']['level2'] = Request::float('rel_bonus_level2', 0, 2) * 100;
                 $settings['agent']['reg']['bonus']['level3'] = Request::float('rel_bonus_level3', 0, 2) * 100;
             }
-        }
-    }
-
-    $settings['agent']['yzshop']['goods_limits']['enabled'] = Request::bool('YzshopGoodsLimits') ? 1 : 0;
-
-    if ($settings['agent']['yzshop']['goods_limits']['enabled']) {
-        $goods_id = Request::int('goodsID');
-        if ($goods_id) {
-            $settings['agent']['yzshop']['goods_limits']['id'] = $goods_id;
-        }
-
-        $settings['agent']['yzshop']['goods_limits']['OR'] = max(1, Request::int('goodsOR'));
-        $settings['agent']['yzshop']['goods_limits']['title'] = Request::trim('restrictGoodsTitle');
-
-        $settings['agent']['yzshop']['goods_limits']['order_status'] = [];
-        if (request('goodsOrderState0')) {
-            $settings['agent']['yzshop']['goods_limits']['order_status'][] = 0;
-        }
-        if (request('goodsOrderState1')) {
-            $settings['agent']['yzshop']['goods_limits']['order_status'][] = 1;
-        }
-        if (request('goodsOrderState2')) {
-            $settings['agent']['yzshop']['goods_limits']['order_status'][] = 2;
-        }
-        if (request('goodsOrderState3')) {
-            $settings['agent']['yzshop']['goods_limits']['order_status'][] = 3;
-        }
-        if (request('goodsOrderStateN1')) {
-            $settings['agent']['yzshop']['goods_limits']['order_status'][] = -1;
         }
     }
 

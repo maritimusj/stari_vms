@@ -180,16 +180,6 @@ class CommissionEventHandler
      */
     protected static function free(deviceModelObj $device, orderModelObj $order, accountModelObj $account): bool
     {
-        if (settings('agent.yzshop.goods_limits.enabled') && YZShop::isInstalled()) {
-            $agent = $device->getAgent();
-            if ($agent) {
-                $stats = Stats::total($agent);
-                if ($stats && $stats['total'] >= YZShop::getRestrictGoodsTotal($agent)) {
-                    return true;
-                }
-            }
-        }
-
         $commission_total = $account->getCommissionPrice();
 
         if ($commission_total < 1) {

@@ -250,19 +250,6 @@
                         </div>
                     </div>
                 </div>
-                {if \zovye\YZShop::isInstalled()}
-                <div class="form-group">
-                    <label for="YzshopSuperiorRelationship" class="col-md-2 control-label">上级代理商</label>
-                    <div class="col-md-10">
-                        <div class="checkbox">
-                            <label>
-                                <input type="checkbox" name="YzshopSuperiorRelationship" id="YzshopSuperiorRelationship" value="1" {if $settings['agent']['reg']['superior'] == 'yz'}checked{/if}>
-                                使用分销商城关系链，自动绑定上级代理商
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                {/if}
                 {if $settings['commission']['enabled']}
                 <div class="seg-divider"></div>
                 <div class="form-group">
@@ -414,69 +401,6 @@
                 {/if}
                 </fieldset>
             </div>
-            {if $settings['commission']['enabled'] && \zovye\YZShop::isInstalled()}
-            <div class="seg" id="special2">
-                <div class="title">分销商城</div>
-                <div class="form-group">
-                    <label for="YzshopGoodsLimits" class="col-md-2 control-label">佣金限制</label>
-                    <div class="col-md-10">
-                        <div class="checkbox">
-                            <label>
-                                <input type="checkbox" name="YzshopGoodsLimits" id="YzshopGoodsLimits" value="1" {if $settings['agent']['yzshop']['goods_limits']['enabled']}checked{/if}>
-                                代理商的订单数量没有超过他购买的分佣商品数量时，才能获取佣金（佣金广告和佣金奖励）
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <fieldset {if  empty($settings['agent']['yzshop']['goods_limits']['enabled'])}disabled{/if} id="agent_goods_limits_enabled">
-                <div class="form-group">
-                    <label class="col-md-2 control-label">佣金商品</label>
-                    <div class="col-md-10">
-                        <select name="goodsID" style="width:100%">
-                            {loop $goods $index $item}
-                            <option value="{$item['id']}"{if $item['selected']} selected{/if} {if $item['id'] == 0}disabled{/if}> {$item['title']} </option>
-                            {/loop}
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="goodsOR" class="col-md-2 control-label">一个商品对应<br/>佣金订单数量</label>
-                    <div class="col-md-10">
-                        <input type="number" class="form-control" name="goodsOR" id="goodsOR" value="{php echo $settings['agent']['yzshop']['goods_limits']['OR'] ?: 1}" min="1">
-                        <span class="help-block">* 一个（单位）分销商品允许代理商产生多少佣金订单，超出后的订单将不会产生佣金</span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="agentRegMode" class="col-md-2 control-label">订单状态</label>
-                    <div class="col-md-10">
-                        <label class="checkbox-inline">
-                            <input type="checkbox" name="goodsOrderState0" value="1" {if is_array($settings['agent']['yzshop']['goods_limits']['order_status']) && in_array(0, $settings['agent']['yzshop']['goods_limits']['order_status'])}checked{/if}> 待支付
-                        </label>
-                        <label class="checkbox-inline">
-                            <input type="checkbox" name="goodsOrderState1" value="1" {if is_array($settings['agent']['yzshop']['goods_limits']['order_status']) && in_array(1, $settings['agent']['yzshop']['goods_limits']['order_status'])}checked{/if}> 待发货
-                        </label>
-                        <label class="checkbox-inline">
-                            <input type="checkbox" name="goodsOrderState2" value="1" {if is_array($settings['agent']['yzshop']['goods_limits']['order_status']) && in_array(2, $settings['agent']['yzshop']['goods_limits']['order_status'])}checked{/if}> 待收货
-                        </label>
-                        <label class="checkbox-inline">
-                            <input type="checkbox" name="goodsOrderState3" value="1" {if is_array($settings['agent']['yzshop']['goods_limits']['order_status']) && in_array(3, $settings['agent']['yzshop']['goods_limits']['order_status'])}checked{/if}> 已完成
-                        </label>
-                        <label class="checkbox-inline">
-                            <input type="checkbox" name="goodsOrderStateN1" value="1" {if is_array($settings['agent']['yzshop']['goods_limits']['order_status']) && in_array(-1, $settings['agent']['yzshop']['goods_limits']['order_status'])}checked{/if}> 已关闭
-                        </label>
-                        <span class="help-block">* 用户的订单数量包括哪些状态的订单</span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="restrictGoodsTitle" class="col-md-2 control-label">代理商小程序<br/>商品数量提示语</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" name="restrictGoodsTitle" id="restrictGoodsTitle" value="{$settings['agent']['yzshop']['goods_limits']['title']}">
-                        <span class="help-block">* 默认提示，佣金商品剩余：{num}{unit}，占位符：{num}数量，{unit}单位</span>
-                    </div>
-                </div>
-                </fieldset>
-            </div>
-            {/if}
             <div class="seg" id="special3">
                 <div class="title">代理商协议</div>
                 <div class="form-group">
@@ -555,10 +479,6 @@
 
         $('#special input[name=agentBonusEnabled]').click(function(){
             $('#special fieldset#agent_bonus_enabled').attr('disabled', !$(this).is(':checked'));
-        })
-
-        $('#special2 input[name=YzshopGoodsLimits]').click(function(){
-            $('#special2 fieldset#agent_goods_limits_enabled').attr('disabled', !$(this).is(':checked'));
         })
        
         $('#special3 input[name=agent_agreement]').click(function(){

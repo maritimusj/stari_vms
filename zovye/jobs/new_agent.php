@@ -15,7 +15,6 @@ use zovye\Log;
 use zovye\model\goodsModelObj;
 use zovye\Request;
 use zovye\Wx;
-use zovye\YZShop;
 use function zovye\request;
 use function zovye\settings;
 
@@ -31,10 +30,6 @@ if ($op == 'new_agent' && CtrlServ::checkJobSign(['id' => request('id')])) {
     $id = Request::int('id');
     $agent = Agent::get($id);
     if ($agent) {
-        if (YZShop::isInstalled()) {
-            YZShop::create($agent, $agent->getSuperior());
-        }
-
         $tpl_id = settings('notice.agentresult_tplid');
         if ($tpl_id) {
             $agent_data = $agent->get('agentData', []);

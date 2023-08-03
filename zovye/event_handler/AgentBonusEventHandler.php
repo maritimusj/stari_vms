@@ -28,13 +28,6 @@ class AgentBonusEventHandler
             return true;
         }
 
-        if (settings('agent.yzshop.goods_limits.enabled') && YZShop::isInstalled()) {
-            $stats = Stats::total($agent);
-            if ($stats && $stats['total'] >= YZShop::getRestrictGoodsTotal($agent)) {
-                return true;
-            }
-        }
-
         //免费订单
         if ($order->isFree() && !$agent->settings('agentData.bonus.order.f')) {
             return true;

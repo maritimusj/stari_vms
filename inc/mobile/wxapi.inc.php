@@ -27,7 +27,6 @@ use zovye\api\wx\mp;
 use zovye\api\wx\order;
 use zovye\api\wx\promoter;
 use zovye\api\wx\vip;
-use zovye\api\wx\yzshop;
 use zovye\api\wxweb\api;
 use zovye\api\wxx\common;
 use zovye\Request;
@@ -176,8 +175,6 @@ router::exec($op, [
     'KeeperMRList' => [maintenance::class, 'keeperMRList'],
     'FBPic' => [fb::class, 'pic'],
     'FeedBack' => [fb::class, 'feedback'],
-    'YZShopStats' => [yzshop::class, 'stats'],
-    'News' => [yzshop::class, 'news'],
     'DeviceStats' => [misc::class, 'deviceStats'],
     'OrderStats' => [misc::class, 'orderStats'],
     'ChargingStats' => [commission::class, 'chargingStats'],

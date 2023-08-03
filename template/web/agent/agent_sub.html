@@ -174,33 +174,11 @@
         </div>
         <script>
             $(function(){
-                {if \zovye\YZShop::isInstalled()}
-                const url = "{php echo $this->createWebUrlUrl('agent');}";
-                function refresh_rel(page) {
-                    $.getJSON(url, {op: 'refresh_rel', 'page': page }).then(function(res){
-                        if (res) {
-                            if (res.data) {
-                                if (res.data.more === 'y') {
-                                    refresh_rel(page + 1);
-                                } else if (res.data.more === 'n') {
-                                    location.href = url;
-                                }
-                            }
-                        }
-                    })
-                }
-                $('#refresh_rel').click(function(){
-                    if (confirm("注意，该操作会根据商城关系链重新绑定所有代理商的上级代理，确定要继续吗？")) {
-                        $(this).removeClass('fa-retweet').addClass('fa-refresh fa-spin').attr('title', '正在加载...');
-                        refresh_rel(1);
-                    }
-                })
-                {/if}
-                    $('[data-url]').each(function() {
-                        util.clip(this, $(this).data('url'));
-                    });
-                    $('.pagination li:not(.active) a').click(function(){ setTimeout(function(){util.loading()}, 1000)});
-                })
+                $('[data-url]').each(function() {
+                    util.clip(this, $(this).data('url'));
+                });
+                $('.pagination li:not(.active) a').click(function(){ setTimeout(function(){util.loading()}, 1000)});
+            })
         </script>
         {else}
         <div class="text-center text-muted">

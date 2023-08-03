@@ -33,27 +33,6 @@ if ($page == 'device') {
 } elseif ($page == 'agent') {
 
     $tpl_data['mobile_url'] = Util::murl('mobile');
-
-    if (YZShop::isInstalled()) {
-        $goods = YZShop::getGoodsList();
-        $exists = false;
-        foreach ($goods as &$entry) {
-            if ($settings['agent']['yzshop']['goods_limits']['id'] == $entry['id']) {
-                $entry['selected'] = true;
-                $exists = true;
-            }
-        }
-
-        if (!$exists) {
-            $goods[] = [
-                'id' => 0,
-                'title' => '<找不到指定的商品，请重新选择>',
-                'selected' => true,
-            ];
-        }
-    }
-
-    $tpl_data['goods'] = $goods ?? [];
     $tpl_data['agreement'] = Config::agent('agreement', []);
 
 } elseif ($page == 'account') {

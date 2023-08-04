@@ -228,7 +228,7 @@ if (Request::bool('is_export')) {
         $logs[] = $data;
     }
 
-    Util::exportExcel($file_name, $title_arr, $logs);
+    Util::exportCSV($file_name, $title_arr, $logs);
 }
 
 $title = '';

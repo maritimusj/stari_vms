@@ -186,7 +186,7 @@ if ($is_export) {
         ];
     }
 
-    Util::exportExcel('维护记录', $title, $e_data);
+    Util::exportCSV('维护记录', $title, $e_data);
     exit();
 } else {
 

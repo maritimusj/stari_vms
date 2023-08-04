@@ -63,7 +63,7 @@ if ($step == 'load') {
         $n++;
     }
 
-    Util::exportExcelFile($full_filename, [
+    Util::exportCSVToFile($full_filename, [
         '\'设备IMEI',
         '\'ICCID',
         '运营商',

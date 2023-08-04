@@ -89,7 +89,7 @@ class Questionnaire
         $uid = REQUEST_ID;
         $short_filename = "export/$uid.xls";
         $filename = ATTACHMENT_ROOT.$short_filename;
-        Util::exportExcelFile($filename, ['#', '昵称', 'openid', '设备名称', '设备编号', '订单号', '问卷内容', '创建时间']);
+        Util::exportCSVToFile($filename, ['#', '昵称', 'openid', '设备名称', '设备编号', '订单号', '问卷内容', '创建时间']);
 
         foreach ($query->findAll() as $index => $log) {
             $user = $log->getData('user', []);
@@ -130,7 +130,7 @@ class Questionnaire
                 $content,
                 date('Y-m-d H:i:s', $log->getCreatetime()),
             ];
-            Util::exportExcelFile($filename, [], [$data]);
+            Util::exportCSVToFile($filename, [], [$data]);
         }
 
         return [

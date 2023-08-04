@@ -1339,7 +1339,7 @@ class Order extends State
         $all_headers = Order::getExportHeaders();
         $column = array_values(array_intersect_key($all_headers, array_flip($headers)));
 
-        Util::exportExcelFile($filename, $column, $result);
+        Util::exportCSVToFile($filename, $column, $result);
 
         return $last_id;
     }

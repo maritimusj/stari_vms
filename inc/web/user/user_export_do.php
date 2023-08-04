@@ -116,7 +116,7 @@ if ($step == 'load') {
         $n++;
     }
 
-    Util::exportExcelFile($full_filename, [
+    Util::exportCSVToFile($full_filename, [
         '#',
         '归属',
         'openid',

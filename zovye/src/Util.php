@@ -767,7 +767,8 @@ include './index.php';
                     $order_limits = $account->getOrderLimits();
                     if ($order_limits > 0) {
                         //更新公众号统计，并检查吸粉总量
-                        if (Order::query(['account' => $account->getName()])->limit($order_limits + 1)->count() >= $order_limits) {
+                        if (Order::query(['account' => $account->getName()])->limit($order_limits + 1)->count(
+                            ) >= $order_limits) {
                             $account->setState(Account::BANNED);
                             Account::updateAccountData();
                         }
@@ -1158,22 +1159,23 @@ include './index.php';
         //return is_error($res) || empty($res['short_url']) ? $url : $res['short_url'];
     }
 
-    public static function exportExcelFile($filename, array $header = [], array $data = [])
+    public static function exportCSVToFile($filename, array $header = [], array $data = [])
     {
         We7::make_dirs(dirname($filename));
 
-        $str_export = chr(0xEF).chr(0xBB).chr(0xBF);
-
         if (!file_exists($filename)) {
-            $tab_header = implode(",", $header);
-            $str_export = $tab_header."\r\n";
+            $file = fopen($filename, 'w');
+            fwrite($file, chr(0xEF).chr(0xBB).chr(0xBF));
+            fputcsv($file, $header);
+        } else {
+            $file = fopen($filename, 'a');
         }
 
         foreach ($data as $row) {
-            $str_export .= implode(",", $row)."\r\n";
+            fputcsv($file, $row);
         }
 
-        return file_put_contents($filename, $str_export, FILE_APPEND);
+        fclose($file);
     }
 
     /**
@@ -1183,18 +1185,16 @@ include './index.php';
      * @param array $header
      * @param array $data
      */
-    public static function exportExcel(string $filename = '', array $header = [], array $data = [])
+    public static function exportCSV(string $filename = '', array $header = [], array $data = [])
     {
-        header('Content-type:application/vnd.ms-excel');
-        header('Content-Disposition:filename='.$filename.'.xls');
+        $serial = date('YmdHis');
+        $filename = "{$filename}_$serial.csv";
+        $dirname = "export/data/";
+        $full_filename = Util::getAttachmentFileName($dirname, $filename);
 
-        $tab_header = implode(",", $header);
-        $str_export = chr(0xEF).chr(0xBB).chr(0xBF).$tab_header."\r\n";
-        foreach ($data as $row) {
-            $str_export .= implode(",", $row)."\r\n";
-        }
+        self::exportCSVToFile($full_filename, $header, $data);
 
-        exit($str_export);
+        Response::redirect(self::toMedia($full_filename));
     }
 
     public static function getWe7Material($typename, $page, $page_size = DEFAULT_PAGE_SIZE): array

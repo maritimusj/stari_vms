@@ -813,7 +813,7 @@ class agent
                     'hex' => bin2hex(base64_decode($data)),
                 ];
             }
-            $resp['msg'] = '请求已发送！';
+            $resp['msg'] = '已发送！';
         } else {
             $resp['msg'] = '出货成功！';
         }

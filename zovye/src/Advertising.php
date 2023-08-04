@@ -523,8 +523,6 @@ class Advertising extends State
                         Advertising::notifyAll($assign_data);
                     }
 
-                    Job::advReviewResult($ad->getId());
-
                     return true;
                 }
             }
@@ -547,9 +545,6 @@ class Advertising extends State
                         "reviewData.$current.result",
                         ReviewResult::REJECTED
                     ) && Advertising::update($ad)) {
-
-                    Job::advReviewResult($ad->getId());
-
                     return true;
                 }
             }

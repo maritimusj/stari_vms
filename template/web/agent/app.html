@@ -35,12 +35,11 @@
                         </span>
                     </td>
                     <td class="operate">
-                        <i class="fa fa-reply-all" title="转发给其它代理商" data-id="{$item['id']}"></i>
                         <a href="{php echo $this->createWebUrl('agent', array('op'=>'appStateChecked', 'id'=>$item['id']));}">
                         {if $item['state']==zovye\AgentApp::WAIT}
-                        <i class="fa fa-eye" title="设置为已查看"></i></a>
+                        <i class="fa fa-eye" title="设置为已处理"></i></a>
                         {else}
-                        <i class="fa fa-eye-slash" title="设置为查看"></i>                     
+                        <i class="fa fa-eye-slash" title="设置为未处理"></i>
                         {/if}
                         </a>
                         <a href="{php echo $this->createWebUrl('agent', array('op'=>'appRemove', 'id'=>$item['id']));}" onclick="if(!confirm('确定要删除这条请求信息吗？')){return false;}">

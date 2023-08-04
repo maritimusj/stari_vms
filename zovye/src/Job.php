@@ -146,29 +146,9 @@ class Job
         return CtrlServ::scheduleJob('adv_review', ['id' => $id]);
     }
 
-    public static function advReviewResult($id): bool
-    {
-        return CtrlServ::scheduleJob('adv_review_result', ['id' => $id]);
-    }
-
-    public static function newAgent($user_id): bool
-    {
-        return CtrlServ::scheduleJob('new_agent', ['id' => $user_id]);
-    }
-
     public static function agentApplicationNotification($id): bool
     {
         return CtrlServ::scheduleJob('agent_app', ['id' => $id]);
-    }
-
-    public static function agentAppForward($id, $target_ids = []): bool
-    {
-        $job = [
-            'id' => $id,
-            'agentIds' => urlencode(serialize($target_ids)),
-        ];
-
-        return CtrlServ::scheduleJob('forward_agent_app', $job);
     }
 
     public static function goodsClone($goods_id): bool

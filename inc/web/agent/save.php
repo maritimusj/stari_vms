@@ -330,8 +330,6 @@ $result = DBUtil::transactionDo(function() use ($id, &$from) {
             return ['message' => '保存成功！'];
         }
         $from = 'edit';
-        //使用控制中心推送通知
-        Job::newAgent($user->getId());
         return ['message' => '代理商设置成功！'];
     }
     return err('保存失败！');

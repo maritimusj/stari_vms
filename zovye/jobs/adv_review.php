@@ -67,7 +67,7 @@ if ($op == 'adv_review' && CtrlServ::checkJobSign($log)) {
     );
 
     $log['data'] = [
-        'thing9' => ['value' => '代理商广告审核'],
+        'thing9' => ['value' => '广告审核'],
         'phrase25' => ['value' => '待审核'],
         'thing7' => ['value' => Wx::trim_thing($agent->getName())],
         'phone_number28' => ['value' => $agent->getMobile()],

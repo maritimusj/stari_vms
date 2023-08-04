@@ -42,7 +42,7 @@ class agent_appModelObj extends modelObj
     public function getTplMsgData(): array
     {
         return [
-            'thing9' => ['value' => '代理商申请'],
+            'thing9' => ['value' => '合作申请'],
             'phrase25' => ['value' => '待审核'],
             'thing7' => ['value' => Wx::trim_thing($this->name)],
             'phone_number28' => ['value' => $this->mobile],

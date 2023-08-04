@@ -117,6 +117,8 @@ if ($s_type_third) {
 
 if ($types) {
     $query->where(['app' => $types]);
+} else {
+    $query->where(['app <>' => User::PSEUDO]);
 }
 
 $total = $query->count();

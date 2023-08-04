@@ -10,55 +10,55 @@ defined('IN_IA') or exit('Access Denied');
 
 //代理商申请提交
 
+use zovye\Config;
 use zovye\CtrlServ;
-use zovye\Job;
+use zovye\JobException;
 use zovye\Log;
 use zovye\model\agent_appModelObj;
-use zovye\model\userModelObj;
 use zovye\Request;
 use zovye\User;
-use zovye\We7;
 use zovye\Wx;
-use function zovye\is_error;
 use function zovye\m;
-use function zovye\request;
-use function zovye\settings;
 
 $op = Request::op('default');
 $log = [
-    'id' => request('id'),
+    'id' => Request::int('id'),
 ];
-if ($op == 'agent_app' && CtrlServ::checkJobSign(['id' => request('id')])) {
-    $tpl_id = settings('notice.agentReq_tplid');
-    if ($tpl_id) {
-        /** @var agent_appModelObj $app */
-        $app = m('agent_app')->findOne(We7::uniacid(['id' => Request::int('id')]));
-        if ($app) {
-            $notify_data = $app->getTplMsgData();
-            if (settings('notice.authorizedAdminUserId')) {
-                $query = User::query(['id' => settings('notice.authorizedAdminUserId')]);
-                /** @var userModelObj $user */
-                $user = $query->findOne();
-                if ($user) {
-                    $res = Wx::sendTplNotice($user->getOpenid(), $tpl_id, $notify_data);
-                    if (is_error($res)) {
-                        $log['result'][] = [
-                            'user' => $user->profile(),
-                            'error' => $res,
-                        ];
-                    }
-                } else {
-                    $log['result']['error'] = '找不到指定的用户！';
-                }
-            } else {
-                $log['result']['error'] = '没有指定用户！';
-            }
-            $log['data'] = $notify_data;
-            Log::debug('agent_app', $log);
-            Job::exit();
-        }
+
+if ($op == 'agent_app' && CtrlServ::checkJobSign($log)) {
+
+    $tpl_id = Config::WxPushMessage('config.sys.tpl_id');
+    if (empty($tpl_id)) {
+        throw new JobException('没有配置模板消息id！', $log);
+    } else {
+        $log['tpl_id'] = $tpl_id;
     }
+
+    $user_id = Config::WxPushMessage('config.sys.auth.user.id', 0);
+    if (empty($user_id)) {
+        throw new JobException('没有指定代理审核管理员！', $log);
+    }
+
+    $user = User::get($user_id);
+    if (empty($user)) {
+        throw new JobException('找不到指定代理审核管理员！', $log);
+    }
+
+    $log['admin'] = $user->profile();
+
+    /** @var agent_appModelObj $app */
+    $app = m('agent_app')->findOne(['id' => $log['id']]);
+
+    if (empty($app)) {
+        throw new JobException('找不到这个申请记录！', $log);
+    }
+
+    $log['result'] = Wx::sendTemplateMsg([
+        'template_id' => $tpl_id,
+        'data' => $app->getTplMsgData(),
+    ]);
+} else {
+    $log['error'] = '签名不正确！';
 }
 
-$log['result'] = 'fail';
 Log::debug('agent_app', $log);

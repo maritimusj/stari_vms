@@ -8,6 +8,7 @@ namespace zovye\model;
 
 use zovye\base\modelObj;
 
+use zovye\Wx;
 use function zovye\tb;
 
 /**
@@ -38,16 +39,14 @@ class agent_appModelObj extends modelObj
         return tb('agent_app');
     }
 
-
     public function getTplMsgData(): array
     {
-        $datetime = date('Y-m-d H:i:s', $this->createtime);
-
         return [
-            'first' => ['value' => '代理商申请通知'],
-            'keyword1' => ['value' => $this->name],
-            'keyword2' => ['value' => $this->mobile],
-            'remark' => ['value' => "区域：{$this->address}，推荐人：{$this->referee}，日期：$datetime"],
+            'thing9' => ['value' => '代理商申请通知'],
+            'phrase25' => ['value' => '待审核'],
+            'thing7' => ['value' => Wx::trim_thing($this->name)],
+            'phone_number28' => ['value' => $this->mobile],
+            'time3' => date('Y-m-d H:i:s', $this->createtime),
         ];
     }
 

@@ -600,16 +600,12 @@ if ($page == 'device') {
                 'event' => 'withdrawAdminUser',
                 'key' => 'sys.withdraw',
                 'user_id' => Request::int('withdrawAdminUser'),
-                'tpl_short_id' => '43719',
-                'tpl_params' => ['工单名称', '工单状态', '发起人员', '用户手机号', '创建时间'],
             ],
             [
                 'title' => '广告审核',
                 'event' => 'reviewAdminUser',
                 'key' => 'sys.review',
                 'user_id' => Request::int('reviewAdminUser'),
-                'tpl_short_id' => '43719',
-                'tpl_params' => ['工单名称', '工单状态', '发起人员', '用户手机号', '创建时间'],
             ],
         ];
 
@@ -638,9 +634,11 @@ if ($page == 'device') {
         $tpl_id = getArray($config, 'sys.tpl_id', '');
 
         if ($template_reg && (empty($tpl_id) || !$existsFN($tpl_id))) {
+
             $tpl_short_id = '43719';
             $tpl_params = ['工单名称', '工单状态', '发起人员', '用户手机号', '创建时间'];
-            $res = Wx::addTemplate($item['tpl_short_id'], $item['tpl_params']);
+
+            $res = Wx::addTemplate($tpl_short_id,$tpl_params);
             if (!is_error($res)) {
                 setArray($config, 'sys.tpl_id', $res['template_id']);
             } else {

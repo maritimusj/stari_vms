@@ -156,7 +156,7 @@ class Job
         return CtrlServ::scheduleJob('new_agent', ['id' => $user_id]);
     }
 
-    public static function agentApplyNotice($id): bool
+    public static function agentApplicationNotification($id): bool
     {
         return CtrlServ::scheduleJob('agent_app', ['id' => $id]);
     }

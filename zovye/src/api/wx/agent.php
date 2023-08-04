@@ -322,7 +322,7 @@ class agent
 
         $app = m('agent_app')->create($data);
         if ($app) {
-            Job::agentApplyNotice($app->getId());
+            Job::agentApplicationNotification($app->getId());
 
             return ['msg' => '提交成功，请耐心等待管理员审核！'];
         }

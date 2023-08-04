@@ -63,11 +63,10 @@
                     </div>
                     <div class="col-2">
                         <button type="button" class="btn btn-success" onclick="showAuthUserDlg()" title="搜索管理员"><i class="fa fa-user"></i></button>
-                        <button type="button" class="btn btn-danger" onclick="setAuthAdmin()" title="清除管理员"><i class="fa fa-times"></i></button>
+                        <button type="button" class="btn btn-danger" onclick="setAuthAdmin({})" title="清除管理员"><i class="fa fa-trash"></i></button>
                     </div>
                 </div>
             </div>
-
             <div class="seg">
                 <div class="title">提现审核</div>
                 <div class="form-group">
@@ -78,7 +77,7 @@
                     </div>
                     <div class="col-2">
                         <button type="button" class="btn btn-success" onclick="showWithdrawDlg()" title="搜索用户"><i class="fa fa-user"></i></button>
-                        <button type="button" class="btn btn-danger" onclick="setWithdraw()" title="清除用户"><i class="fa fa-times"></i></button>
+                        <button type="button" class="btn btn-danger" onclick="setWithdrawAdmin({})" title="清除用户"><i class="fa fa-trash"></i></button>
                     </div>
                 </div>
             </div>
@@ -92,7 +91,7 @@
                     </div>
                     <div class="col-2">
                         <button type="button" class="btn btn-success" onclick="showUserDlg()" title="搜索管理员"><i class="fa fa-user"></i></button>
-                        <button type="button" class="btn btn-danger" onclick="setAdmin()" title="清除管理员"><i class="fa fa-times"></i></button>
+                        <button type="button" class="btn btn-danger" onclick="setReviewAdmin({})" title="清除管理员"><i class="fa fa-trash"></i></button>
                     </div>
                 </div>                
             </div>    
@@ -130,34 +129,49 @@
             if(typename === 'auth') {
                 setAuthAdmin(admin)
             }else if (typename === 'review') {
-                setAdminReview(admin)
+                setReviewAdmin(admin)
             } else if (typename === 'withdraw') {
-                setWithdraw(admin)
+                setWithdrawAdmin(admin)
             }
         }
     })
     
     function setAuthAdmin({id, nickname, mobile}) {
-        $('input[name=authorizedAdminUser]').val(id);
-        $('input[id=authorizedAdminUser]').val(nickname + (mobile ? ' ( ' + mobile +' ) ' : ''));
+        if (id) {
+            $('input[name=authorizedAdminUser]').val(id);
+            $('input[id=authorizedAdminUser]').val(nickname + (mobile ? ' ( ' + mobile +' ) ' : ''));
+        } else {
+            $('input[name=authorizedAdminUser]').val(0);
+            $('input[id=authorizedAdminUser]').val('');
+        }
     }
 
     function showAuthUserDlg() {
         searchDlg.choose('auth');
     }
 
-    function setAdminReview({id, nickname, mobile}) {
-        $('input[name=reviewAdminUser]').val(id);
-        $('input[id=reviewAdminUser]').val(nickname + (mobile ? ' ( ' + mobile +' ) ' : ''));
+    function setReviewAdmin({id, nickname, mobile}) {
+        if (id) {
+            $('input[name=reviewAdminUser]').val(id);
+            $('input[id=reviewAdminUser]').val(nickname + (mobile ? ' ( ' + mobile +' ) ' : ''));
+        } else {
+            $('input[name=reviewAdminUser]').val(0);
+            $('input[id=reviewAdminUser]').val('');
+        }
     }
 
     function showUserDlg() {
         searchDlg.choose('review');
     }
 
-    function setWithdraw({id, nickname, mobile}) {
-        $('input[name=withdrawAdminUser]').val(id);
-        $('input[id=withdrawAdminUser]').val(nickname + (mobile ? ' ( ' + mobile +' ) ' : ''));
+    function setWithdrawAdmin({id, nickname, mobile}) {
+        if (id) {
+            $('input[name=withdrawAdminUser]').val(id);
+            $('input[id=withdrawAdminUser]').val(nickname + (mobile ? ' ( ' + mobile +' ) ' : ''));
+        } else {
+            $('input[name=withdrawAdminUser]').val(0);
+            $('input[id=withdrawAdminUser]').val('');
+        }
     }
 
     function showWithdrawDlg() {

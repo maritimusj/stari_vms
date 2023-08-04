@@ -20,7 +20,6 @@ use zovye\Request;
 use zovye\User;
 use zovye\Util;
 use zovye\Wx;
-use function zovye\err;
 
 $op = Request::op('default');
 $log = [

@@ -74,7 +74,7 @@ if ($op == 'default') {
 
     $ad_id = Request::int('id');
     if ($user->getId() != settings('notice.reviewAdminUserId') || Request::str('sign') !== sha1(
-            App::uid()."{$user->getOpenid()}:$ad_id"
+            App::uid()."{$user->getId()}:$ad_id"
         )) {
         Response::alert('无效的请求！', 'error');
     }
@@ -89,7 +89,7 @@ if ($op == 'default') {
     }
 
     if ($ad->getReviewResult() == ReviewResult::REJECTED) {
-        Request::is_ajax() ? JSON::success('已拒绝！') : Response::alert('已拒绝！', 'warning');
+        Request::is_ajax() ? JSON::success('已拒绝广告通过审核！') : Response::alert('已拒绝广告通过审核！', 'warning');
     }
 
     $fn = Request::str('fn');
@@ -100,7 +100,7 @@ if ($op == 'default') {
         Request::is_ajax() ? JSON::fail('审核操作失败！') : Response::alert('审核操作失败！', 'error');
     } elseif ($fn == 'reject') {
         if (Advertising::reject($ad_id)) {
-            Request::is_ajax() ? JSON::success('已拒绝！') : Response::alert('已拒绝！');
+            Request::is_ajax() ? JSON::success('已拒绝广告通过审核！') : Response::alert('已拒绝广告通过审核！');
         }
         Request::is_ajax() ? JSON::fail('审核操作失败！') : Response::alert('审核操作失败！', 'error');
     }
@@ -168,11 +168,13 @@ if ($op == 'default') {
             $tpl_data['audios'][$index] = Util::toMedia($url);
         }
     }
+
     if ($tpl_data['videos']) {
         foreach ($tpl_data['videos'] as $index => $url) {
             $tpl_data['videos'][$index] = Util::toMedia($url);
         }
     }
+
     if ($tpl_data['images']) {
         foreach ($tpl_data['images'] as $index => $url) {
             $tpl_data['images'][$index] = Util::toMedia($url);

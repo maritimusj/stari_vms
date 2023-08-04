@@ -178,4 +178,9 @@ class advertisingModelObj extends modelObj
         return $this->save();
     }
 
+    public function getAgent(): ?agentModelObj
+    {
+        return Agent::get($this->agent_id);
+    }
+
 }

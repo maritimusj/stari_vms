@@ -17,6 +17,7 @@ use zovye\CtrlServ;
 use zovye\JobException;
 use zovye\Log;
 use zovye\Request;
+use zovye\ReviewResult;
 use zovye\User;
 use zovye\Util;
 use zovye\Wx;
@@ -47,6 +48,15 @@ if ($op == 'adv_review' && CtrlServ::checkJobSign($log)) {
         throw new JobException('找不到这个广告！', $log);
     }
 
+    if ($ad->getReviewResult() != ReviewResult::WAIT) {
+        throw new JobException('这个广告已审核！', $log);
+    }
+
+    $agent = $ad->getAgent();
+    if (empty($agent)) {
+        throw new JobException('找不到广告所属代理商！', $log);
+    }
+
     $url = Util::murl(
         'util',
         [
@@ -59,9 +69,9 @@ if ($op == 'adv_review' && CtrlServ::checkJobSign($log)) {
     $log['data'] = [
         'thing9' => ['value' => '广告申请'],
         'phrase25' => ['value' => '待审核'],
-        'thing7' => ['value' => Wx::trim_thing($this->name)],
-        'phone_number28' => ['value' => $this->mobile],
-        'time3' => ['value' => date('Y-m-d H:i:s', $this->createtime)],
+        'thing7' => ['value' => Wx::trim_thing($agent->getName())],
+        'phone_number28' => ['value' => $agent->getMobile()],
+        'time3' => ['value' => date('Y-m-d H:i:s')],
     ];
 
     $log['result'] = Wx::sendTemplateMsg([

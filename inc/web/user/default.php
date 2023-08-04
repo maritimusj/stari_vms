@@ -54,7 +54,7 @@ if ($s_principal) {
 }
 
 if (empty($query)) {
-    $query = User::query(['app <>' => User::PSEUDO]);
+    $query = User::query();
 }
 
 if (Request::has('openid')) {
@@ -115,8 +115,7 @@ if ($s_type_third) {
     $types[] = User::THIRD_ACCOUNT;
 }
 
-//当指定了**部分**用户类型时，加入用户app条件过滤
-if ($types && count($types) < 3) {
+if ($types) {
     $query->where(['app' => $types]);
 }
 

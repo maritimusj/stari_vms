@@ -165,7 +165,7 @@
         },
         apiQuery: function(principal, page) {
             const keywords = $("#userDialog input[id=search_user_keywords]").val();
-            $.getJSON("{url 'site/entry/user' array('m' => APP_NAME)}", 
+            $.getJSON("{url 'site/entry/user' array('m' => APP_NAME, 's_type_wx' => 1)}",
                 {   op: 'search', 
                     principal: principal,
                     keywords:keywords,

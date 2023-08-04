@@ -1181,20 +1181,20 @@ include './index.php';
     /**
      * 导出excel.
      *
-     * @param string $filename
+     * @param string $name
      * @param array $header
      * @param array $data
      */
-    public static function exportCSV(string $filename = '', array $header = [], array $data = [])
+    public static function exportCSV(string $name = '', array $header = [], array $data = [])
     {
         $serial = date('YmdHis');
-        $filename = "{$filename}_$serial.csv";
+        $name = "{$name}_$serial.csv";
         $dirname = "export/data/";
-        $full_filename = Util::getAttachmentFileName($dirname, $filename);
+        $full_filename = Util::getAttachmentFileName($dirname, $name);
 
         self::exportCSVToFile($full_filename, $header, $data);
 
-        Response::redirect(self::toMedia($full_filename));
+        Response::redirect(self::toMedia("$dirname$name"));
     }
 
     public static function getWe7Material($typename, $page, $page_size = DEFAULT_PAGE_SIZE): array

@@ -34,12 +34,12 @@ if ($op == 'adv_review' && CtrlServ::checkJobSign($log)) {
 
     $user_id = Config::WxPushMessage('config.sys.review.user.id', 0);
     if (empty($user_id)) {
-        throw new JobException('没有指定代理审核管理员！', $log);
+        throw new JobException('没有指定广告审核管理员！', $log);
     }
 
     $user = User::get($user_id);
     if (empty($user)) {
-        throw new JobException('找不到指定代理审核管理员！', $log);
+        throw new JobException('找不到指定广告审核管理员！', $log);
     }
 
     $ad = Advertising::get($log['id']);
@@ -56,7 +56,13 @@ if ($op == 'adv_review' && CtrlServ::checkJobSign($log)) {
         ]
     );
 
-    $log['data'] = [];
+    $log['data'] = [
+        'thing9' => ['value' => '广告申请'],
+        'phrase25' => ['value' => '待审核'],
+        'thing7' => ['value' => Wx::trim_thing($this->name)],
+        'phone_number28' => ['value' => $this->mobile],
+        'time3' => ['value' => date('Y-m-d H:i:s', $this->createtime)],
+    ];
 
     $log['result'] = Wx::sendTemplateMsg([
         'touser' => $user->getOpenid(),

@@ -29,11 +29,7 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
 }  elseif (isset(\$_SERVER['HTTP_STA_WXWEB'])) {
     \$_GET['do'] = 'wxweb';
 } else {
-    if (\zovye\App::isApiEnabled()) {
-        \$_GET['do'] = 'query';
-    } else {
-        exit('invalid request!');
-    }
+    \$_GET['do'] = 'query';
 }
 ";
 });

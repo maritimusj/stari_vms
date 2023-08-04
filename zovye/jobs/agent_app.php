@@ -53,9 +53,14 @@ if ($op == 'agent_app' && CtrlServ::checkJobSign($log)) {
         throw new JobException('找不到这个申请记录！', $log);
     }
 
+    $data = $app->getTplMsgData();
+
+    $log['data'] = $data;
+
     $log['result'] = Wx::sendTemplateMsg([
+        'touser' => $user->getOpenid(),
         'template_id' => $tpl_id,
-        'data' => $app->getTplMsgData(),
+        'data' => $data,
     ]);
 } else {
     $log['error'] = '签名不正确！';

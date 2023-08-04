@@ -22,7 +22,7 @@
             </thead>
             <tbody>
                 {loop $apps $index $item}
-                <tr class="appstate_{$item['state']}">
+                <tr class="appstate_{$item['state']}" data-id="{$item['id']}">
                     <td>{php echo $index + 1}</td>
                     <td>{$item['name']}</td>
                     <td>{$item['mobile']}</td>

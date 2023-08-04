@@ -14,52 +14,18 @@ use zovye\Goods;
 use zovye\Log;
 use zovye\model\goodsModelObj;
 use zovye\Request;
-use zovye\Wx;
-use function zovye\request;
-use function zovye\settings;
 
-//代理申请通过微信推送通知
+//代理申请通过后处理
 
 $op = Request::op('default');
 
 $log = [
-    'id' => request('id'),
+    'id' => Request::int('id'),
 ];
 
-if ($op == 'new_agent' && CtrlServ::checkJobSign(['id' => request('id')])) {
-    $id = Request::int('id');
-    $agent = Agent::get($id);
+if ($op == 'new_agent' && CtrlServ::checkJobSign($log)) {
+    $agent = Agent::get($log['id']);
     if ($agent) {
-        $tpl_id = settings('notice.agentresult_tplid');
-        if ($tpl_id) {
-            $agent_data = $agent->get('agentData', []);
-            if ($agent_data) {
-                $superior = $agent->getSuperior();
-
-                if ($superior) {
-                    $text = "{$superior->settings('agentData.name', 'n/a')}，{$superior->getMobile()}";
-                }
-
-                $data = [
-                    'first' => ['value' => '恭喜，您的代理商申请已经通过审核！'],
-                    'keyword1' => ['value' => $agent_data['license'] ?: '<无>'],
-                    'keyword2' => ['value' => $agent_data['name'] ?: '<未填写>'],
-                    'keyword3' => ['value' => $agent->getMobile()],
-                    'keyword4' => ['value' => $text ?? '<无>'],
-                ];
-
-                $res = Wx::sendTplNotice(
-                    $agent->getOpenid(),
-                    $tpl_id,
-                    $data
-                );
-
-                $log['agent'] = $agent->getName();
-                $log['data'] = $data;
-                $log['result'] = $res;
-            }
-        }
-
         $query = Goods::query(['agent_id' => 0, 'sync' => 1]);
         $log['goods'] = [];
         /** @var goodsModelObj $entry */
@@ -69,7 +35,7 @@ if ($op == 'new_agent' && CtrlServ::checkJobSign(['id' => request('id')])) {
     }
 
 } else {
-    $log['err'] = 'check sign failed!';
+    $log['err'] = '签名检验失败！';
 }
 
 Log::debug('new_agent', $log);

@@ -105,7 +105,6 @@ class Agent
 
     public static function remove(agentModelObj $agent): array
     {
-        $msg_owners = [$agent->getId()];
         //移除合伙人
         $agent_data = $agent->get('agentData', []);
         if ($agent_data) {
@@ -115,7 +114,6 @@ class Agent
                     if (!$agent->removePartner($partner_id)) {
                         return err('移除合伙人失败！');
                     }
-                    $msg_owners[] = $partner_id;
                 }
             }
         }

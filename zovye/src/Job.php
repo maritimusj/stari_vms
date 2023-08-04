@@ -151,6 +151,11 @@ class Job
         return CtrlServ::scheduleJob('agent_app', ['id' => $id]);
     }
 
+    public static function newAgent(userModelObj $user): bool
+    {
+        return CtrlServ::scheduleJob('new_agent', ['id' => $user->getId()]);
+    }
+
     public static function goodsClone($goods_id): bool
     {
         return CtrlServ::scheduleJob('goods_clone', ['id' => $goods_id]);

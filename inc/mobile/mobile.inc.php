@@ -141,6 +141,7 @@ if ($op == 'save') {
             }
 
             if ($user->save()) {
+                Job::newAgent($user);
                 return ['message' => '恭喜您已经成功注册为代理商！'];
             }
         }

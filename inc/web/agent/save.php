@@ -330,6 +330,7 @@ $result = DBUtil::transactionDo(function() use ($id, &$from) {
             return ['message' => '保存成功！'];
         }
         $from = 'edit';
+        Job::newAgent($user);
         return ['message' => '代理商设置成功！'];
     }
     return err('保存失败！');

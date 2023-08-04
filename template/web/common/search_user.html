@@ -81,7 +81,7 @@
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 <script type="text/html" id="userProfileTpl">
-    <div class="profile_4_" data-id="_1_" data-nickname="_2_" title="_5_点击选择或取消">
+    <div class="profile_4_" data-id="_1_" data-nickname="_2_" title="_5_" data-mobile="_6_">
         <img src="_3_">
         <div class="nickname">_2_</div>
     </div>
@@ -122,7 +122,12 @@
                        searchDlg.selected = null; 
                     }
                 } else {
-                    const user = {id: id, nickname: self.data('nickname'), avatar: self.find('img').attr('src')};
+                    const user = {
+                        id: id, 
+                        nickname: self.data('nickname'), 
+                        mobile: self.data('mobile'),
+                        avatar: self.find('img').attr('src'),
+                    };
                     if(searchDlg.multiSel) {
                         const pos = searchDlg.selected.findIndex(function(u) {
                             return u.id === id;
@@ -194,7 +199,8 @@
                             replace(/_2_/g, entry['nickname']).
                             replace(/_3_/g, entry['avatar']).
                             replace(/_4_/g, searchDlg.isSelected(entry)).
-                            replace(/_5_/g, entry['mobile'] ? '手机号码：' + entry['mobile'] + '，' : '');
+                            replace(/_6_/g, entry['mobile']).
+                            replace(/_5_/g, entry['mobile'] ? '手机号码：' + entry['mobile'] : '');
                 })
                 
                 if(res.page < res.totalpage) {

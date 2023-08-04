@@ -128,34 +128,38 @@
     searchDlg.init('user', function(admin, typename){
         if(admin && admin.id) {
             if(typename === 'auth') {
-                setAuthAdmin(admin.id, admin.nickname)
+                setAuthAdmin(admin)
             }else if (typename === 'review') {
-                setAdmin(admin.id, admin.nickname)
+                setAdminReview(admin)
             } else if (typename === 'withdraw') {
-                setWithdraw(admin.id, admin.nickname)
+                setWithdraw(admin)
             }
         }
     })
     
-    function setAuthAdmin(id, nickname) {
+    function setAuthAdmin({id, nickname, mobile}) {
         $('input[name=authorizedAdminUser]').val(id);
-        $('input[id=authorizedAdminUser]').val(nickname);
+        $('input[id=authorizedAdminUser]').val(nickname + (mobile ? ' ( ' + mobile +' ) ' : ''));
     }
+
     function showAuthUserDlg() {
         searchDlg.choose('auth');
-    }   
-    function setAdmin(id, nickname) {
-        $('input[name=reviewAdminUser]').val(id);
-        $('input[id=reviewAdminUser]').val(nickname);
     }
+
+    function setAdminReview({id, nickname, mobile}) {
+        $('input[name=reviewAdminUser]').val(id);
+        $('input[id=reviewAdminUser]').val(nickname + (mobile ? ' ( ' + mobile +' ) ' : ''));
+    }
+
     function showUserDlg() {
         searchDlg.choose('review');
     }
 
-    function setWithdraw(id, nickname) {
+    function setWithdraw({id, nickname, mobile}) {
         $('input[name=withdrawAdminUser]').val(id);
-        $('input[id=withdrawAdminUser]').val(nickname);
+        $('input[id=withdrawAdminUser]').val(nickname + (mobile ? ' ( ' + mobile +' ) ' : ''));
     }
+
     function showWithdrawDlg() {
         searchDlg.choose('withdraw');
     }

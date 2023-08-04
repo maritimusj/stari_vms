@@ -621,6 +621,10 @@ if ($page == 'device') {
                         'id' => $user->getId(),
                         'name' => $user->getName(),
                     ];
+                    $mobile = $user->getMobile();
+                    if ($mobile) {
+                        $conf['user']['name'] .= " ( $mobile )";
+                    }
                 } else {
                     $conf['user'] = [];
                 }

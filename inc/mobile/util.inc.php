@@ -72,47 +72,47 @@ if ($op == 'default') {
         Response::alert('找不到这个用户或者用户已被禁用！', 'error');
     }
 
-    $adv_id = Request::int('id');
+    $ad_id = Request::int('id');
     if ($user->getId() != settings('notice.reviewAdminUserId') || Request::str('sign') !== sha1(
-            App::uid().$user->getOpenid().$adv_id
+            App::uid()."{$user->getOpenid()}:$ad_id"
         )) {
         Response::alert('无效的请求！', 'error');
     }
 
-    $adv = Advertising::get($adv_id);
-    if (empty($adv) || $adv->getState() == Advertising::DELETED) {
+    $ad = Advertising::get($ad_id);
+    if (empty($ad) || $ad->getState() == Advertising::DELETED) {
         Response::alert('找不到这个广告！', 'error');
     }
 
-    if ($adv->getReviewResult() == ReviewResult::PASSED) {
+    if ($ad->getReviewResult() == ReviewResult::PASSED) {
         Request::is_ajax() ? JSON::success('已通过审核！') : Response::alert('已通过审核！');
     }
 
-    if ($adv->getReviewResult() == ReviewResult::REJECTED) {
+    if ($ad->getReviewResult() == ReviewResult::REJECTED) {
         Request::is_ajax() ? JSON::success('已拒绝！') : Response::alert('已拒绝！', 'warning');
     }
 
     $fn = Request::str('fn');
     if ($fn == 'pass') {
-        if (Advertising::pass($adv_id, _W('username'))) {
+        if (Advertising::pass($ad_id, _W('username'))) {
             Request::is_ajax() ? JSON::success('广告已经通过审核！') : Response::alert('广告已经通过审核！');
         }
         Request::is_ajax() ? JSON::fail('审核操作失败！') : Response::alert('审核操作失败！', 'error');
     } elseif ($fn == 'reject') {
-        if (Advertising::reject($adv_id)) {
+        if (Advertising::reject($ad_id)) {
             Request::is_ajax() ? JSON::success('已拒绝！') : Response::alert('已拒绝！');
         }
         Request::is_ajax() ? JSON::fail('审核操作失败！') : Response::alert('审核操作失败！', 'error');
     }
 
     $tpl_data = [
-        'id' => $adv->getId(),
+        'id' => $ad->getId(),
         'sign' => Request::str('sign'),
-        'title' => $adv->getTitle(),
-        'type' => Advertising::desc($adv->getType()),
+        'title' => $ad->getTitle(),
+        'type' => Advertising::desc($ad->getType()),
     ];
 
-    $agent_id = $adv->getAgentId();
+    $agent_id = $ad->getAgentId();
     if ($agent_id) {
         $agent = Agent::get($agent_id);
         if (empty($agent)) {
@@ -124,43 +124,43 @@ if ($op == 'default') {
         $tpl_data['agent'] = $agent->profile();
     }
 
-    switch ($adv->getType()) {
+    switch ($ad->getType()) {
         case Advertising::SCREEN:
-            $media = $adv->getExtraData('media');
+            $media = $ad->getExtraData('media');
             if ($media == 'srt') {
-                $tpl_data['content'] = $adv->getExtraData('text');
+                $tpl_data['content'] = $ad->getExtraData('text');
             } elseif ($media == 'image') {
-                $tpl_data['images'] = [$adv->getExtraData('url')];
+                $tpl_data['images'] = [$ad->getExtraData('url')];
             } elseif ($media == 'video') {
-                $tpl_data['videos'] = [$adv->getExtraData('url')];
+                $tpl_data['videos'] = [$ad->getExtraData('url')];
             } elseif ($media == 'audio') {
-                $tpl_data['audios'] = [$adv->getExtraData('url')];
+                $tpl_data['audios'] = [$ad->getExtraData('url')];
             }
             break;
         case Advertising::SCREEN_NAV:
-            $tpl_data['images'] = [$adv->getExtraData('url')];
+            $tpl_data['images'] = [$ad->getExtraData('url')];
             break;
         case Advertising::WELCOME_PAGE:
         case Advertising::GET_PAGE:
-            $tpl_data['images'] = $adv->getExtraData('images');
+            $tpl_data['images'] = $ad->getExtraData('images');
             break;
         case Advertising::REDIRECT_URL:
-            $tpl_data['content'] = $adv->getExtraData('url', '');
+            $tpl_data['content'] = $ad->getExtraData('url', '');
             break;
         case Advertising::PUSH_MSG:
-            $tpl_data['content'] = $adv->getExtraData('msg');
+            $tpl_data['content'] = $ad->getExtraData('msg');
             break;
         case Advertising::GOODS:
-            $tpl_data['images'] = [$adv->getExtraData('image')];
-            $tpl_data['content'] = $adv->getExtraData('url');
+            $tpl_data['images'] = [$ad->getExtraData('image')];
+            $tpl_data['content'] = $ad->getExtraData('url');
             break;
         case Advertising::QRCODE:
-            $tpl_data['content'] = $adv->getExtraData('text');
-            $tpl_data['images'] = [$adv->getExtraData('image')];
+            $tpl_data['content'] = $ad->getExtraData('text');
+            $tpl_data['images'] = [$ad->getExtraData('image')];
             break;
         case Advertising::LINK:
-            $tpl_data['content'] = $adv->getExtraData('url');
-            $tpl_data['images'] = [$adv->getExtraData('image')];
+            $tpl_data['content'] = $ad->getExtraData('url');
+            $tpl_data['images'] = [$ad->getExtraData('image')];
     }
 
     if ($tpl_data['audios']) {

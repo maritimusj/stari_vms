@@ -12,79 +12,59 @@ defined('IN_IA') or exit('Access Denied');
 
 use zovye\Advertising;
 use zovye\App;
+use zovye\Config;
 use zovye\CtrlServ;
-use zovye\Job;
+use zovye\JobException;
 use zovye\Log;
-use zovye\Media;
-use zovye\model\userModelObj;
 use zovye\Request;
 use zovye\User;
 use zovye\Util;
 use zovye\Wx;
-use function zovye\is_error;
-use function zovye\request;
-use function zovye\settings;
+use function zovye\err;
 
 $op = Request::op('default');
+$log = [
+    'id' => Request::int('id'),
+];
 
-if ($op == 'adv_review' && CtrlServ::checkJobSign(['id' => request('id')])) {
-    $id = Request::int('id');
-    $adv = Advertising::get($id);
-    if (empty($adv)) {
-        Log::fatal('adv_review', [
-            'error' => "adv[$id] not found!",
-        ]);
+if ($op == 'adv_review' && CtrlServ::checkJobSign($log)) {
+    $tpl_id = Config::WxPushMessage('config.sys.tpl_id');
+    if (empty($tpl_id)) {
+        throw new JobException('没有配置模板消息id！', $log);
     }
 
-    $tpl_id = settings('notice.advReviewTplid');
-    if ($tpl_id) {
-        $agent = $adv->getOwner();
-        if (empty($agent)) {
-            Log::fatal('adv_review', [
-                'error' => 'adv\'s agent is empty!',
-            ]);
-        }
-
-        $agent_data = $agent->getAgentData();
-        $type = Media::desc($adv->getExtraData('media'));
-        $agentName = $agent_data['name'] ?: $agent->getNickname();
-        $notify_data = [
-            'first' => ['value' => '代理商广告需要审核！'],
-            'keyword1' => ['value' => "{$type}广告"],
-            'keyword2' => ['value' => '<无>'],
-            'keyword3' => ['value' => date('Y-m-d H:i:s', $adv->getCreatetime())],
-            'remark' => ['value' => "代理商：$agentName"],
-        ];
-
-        if (settings('notice.reviewAdminUserId')) {
-            /** @var userModelObj $user */
-            $user = User::findOne(['id' => settings('notice.reviewAdminUserId')]);
-            if ($user) {
-                $url = Util::murl(
-                    'util',
-                    [
-                        'op' => 'adv_review',
-                        'id' => $adv->getId(),
-                        'sign' => sha1(App::uid().$user->getOpenid().$adv->getId()),
-                    ]
-                );
-                $res = Wx::sendTplNotice($user->getOpenid(), $tpl_id, $notify_data, $url);
-                if (is_error($res)) {
-                    $res = [
-                        'user' => $user->profile(),
-                        'err' => $res['message'],
-                    ];
-                }
-            } else {
-                $res = '找不到指定用户！';
-            }
-        } else {
-            $res = '没有指定用户！';
-        }
-
-        Log::debug('adv_review', ['result' => $res]);
-        Job::exit();
+    $user_id = Config::WxPushMessage('config.sys.review.user.id', 0);
+    if (empty($user_id)) {
+        throw new JobException('没有指定代理审核管理员！', $log);
     }
+
+    $user = User::get($user_id);
+    if (empty($user)) {
+        throw new JobException('找不到指定代理审核管理员！', $log);
+    }
+
+    $ad = Advertising::get($log['id']);
+    if (empty($ad)) {
+        throw new JobException('找不到这个广告！', $log);
+    }
+
+    $url = Util::murl(
+        'util',
+        [
+            'op' => 'adv_review',
+            'id' => $ad->getId(),
+            'sign' => sha1(App::uid()."{$user->getId()}:{$ad->getId()}"),
+        ]
+    );
+
+    $log['data'] = [];
+
+    $log['result'] = Wx::sendTemplateMsg([
+        'touser' => $user->getOpenid(),
+        'template_id' => $tpl_id,
+        'url' => $url,
+        'data' => $log['data'],
+    ]);
 }
 
-Log::debug('adv_review', ['result' => 'failed, advReviewTplid is empty!']);
+Log::debug('adv_review', $log);

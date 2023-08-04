@@ -794,6 +794,30 @@ class Helper
         return $result;
     }
 
+    public static function sendSysTemplateMessageTo($w, $data = [])
+    {
+        $tpl_id = Config::WxPushMessage('config.sys.tpl_id');
+        if (empty($tpl_id)) {
+            return err('没有配置模板消息id！');
+        }
+
+        $user_id = Config::WxPushMessage("config.sys.$w.user.id", 0);
+        if (empty($user_id)) {
+            return err('没有指定代理审核管理员！');
+        }
+
+        $user = User::get($user_id);
+        if (empty($user)) {
+            return err('找不到指定代理审核管理员！');
+        }
+
+        return Wx::sendTemplateMsg([
+            'touser' => $user->getOpenid(),
+            'template_id' => $tpl_id,
+            'data' => $data,
+        ]);
+    }
+
     public static function sendWxPushMessageTo(deviceModelObj $device, string $event, array $params)
     {
         $agent = $device->getAgent();
@@ -832,7 +856,7 @@ class Helper
         $device->setLastNotification($event);
     }
 
-    public static function getWxPushMessageConfig($data = [])
+    public static function getWxPushMessageConfig($data = []): array
     {
         $config = Config::WxPushMessage('config', []);
 

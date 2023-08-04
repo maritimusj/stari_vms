@@ -25,7 +25,7 @@ namespace zovye;
  * @method static mixed GDCVMachine(string $key, $v = '', $update = false)
  * @method static mixed api(string $string, $v = '', $update=false)
  * @method static mixed tk(string $string, $v = '', $update=false)
- * @method static WxPushMessage(string $string, $v = '', $update=false)
+ * @method static mixed WxPushMessage(string $string, $v = '', $update=false)
  */
 class Config
 {

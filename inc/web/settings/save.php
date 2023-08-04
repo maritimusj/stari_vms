@@ -494,21 +494,6 @@ if ($page == 'device') {
 
 } elseif ($page == 'notice') {
 
-    $auth_user_id = Request::int('authorizedAdminUser');
-    if ($auth_user_id) {
-        $auth_user = User::get($auth_user_id);
-    }
-
-    $withdraw_user_id = Request::int('withdrawAdminUser');
-    if ($withdraw_user_id) {
-        $withdraw_user = User::get($withdraw_user_id);
-    }
-
-    $review_user_id = Request::int('reviewAdminUser');
-    if ($review_user_id) {
-        $review_user = User::get($review_user_id);
-    }
-
     $data = [
         [
             'title' => '设备上线',
@@ -601,6 +586,70 @@ if ($page == 'device') {
             }
 
             setArray($config, $item['key'], $conf);
+        }
+
+        $data = [
+            [
+                'title' => '代理审核',
+                'event' => 'authorizedAdminUser',
+                'key' => 'sys.auth',
+                'user_id' => Request::int('authorizedAdminUser'),
+            ],
+            [
+                'title' => '提现审核',
+                'event' => 'withdrawAdminUser',
+                'key' => 'sys.withdraw',
+                'user_id' => Request::int('withdrawAdminUser'),
+                'tpl_short_id' => '43719',
+                'tpl_params' => ['工单名称', '工单状态', '发起人员', '用户手机号', '创建时间'],
+            ],
+            [
+                'title' => '广告审核',
+                'event' => 'reviewAdminUser',
+                'key' => 'sys.review',
+                'user_id' => Request::int('reviewAdminUser'),
+                'tpl_short_id' => '43719',
+                'tpl_params' => ['工单名称', '工单状态', '发起人员', '用户手机号', '创建时间'],
+            ],
+        ];
+
+        $template_reg = false;
+
+        foreach($data as $item) {
+            $conf = getArray($config, $item['key'], []);
+            if ($item['user_id']) {
+                $template_reg = true;
+                $user = User::get($item['user_id']);
+                if ($user) {
+                    $conf['user'] = [
+                        'id' => $user->getId(),
+                        'name' => $user->getName(),
+                    ];
+                } else {
+                    $conf['user'] = [];
+                }
+            } else {
+                $conf['user'] = [];
+            }
+
+            setArray($config, $item['key'], $conf);
+        }
+
+        $tpl_id = getArray($config, 'sys.tpl_id', '');
+
+        if ($template_reg && (empty($tpl_id) || !$existsFN($tpl_id))) {
+            $tpl_short_id = '43719';
+            $tpl_params = ['工单名称', '工单状态', '发起人员', '用户手机号', '创建时间'];
+            $res = Wx::addTemplate($item['tpl_short_id'], $item['tpl_params']);
+            if (!is_error($res)) {
+                setArray($config, 'sys.tpl_id', $res['template_id']);
+            } else {
+                setArray($config, 'sys.tpl_id', '');
+                Log::error('settings', [
+                    'item' => $item,
+                    'result' => $res,
+                ]);
+            }
         }
 
         Config::WxPushMessage('config', $config, true);

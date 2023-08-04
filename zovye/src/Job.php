@@ -191,9 +191,9 @@ class Job
         return CtrlServ::scheduleJob('get_result', ['openid' => $openid, 'orderNO' => $order_no]);
     }
 
-    public static function withdraw($user_id, $amount): bool
+    public static function withdraw($user_id): bool
     {
-        return CtrlServ::scheduleJob('withdraw', ['id' => $user_id, 'amount' => $amount]);
+        return CtrlServ::scheduleJob('withdraw', ['id' => $user_id]);
     }
 
     public static function createThirdPartyPlatformOrder($params = []): bool

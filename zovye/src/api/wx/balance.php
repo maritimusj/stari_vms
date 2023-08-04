@@ -235,7 +235,7 @@ class balance
 
                 $msg = '提现申请提交成功，请等待管理员审核！';
 
-                Job::withdraw($user->getId(), $amount);
+                Job::withdraw($user->getId());
 
                 //自动打款
                 if (settings('commission.withdraw.pay_type') == WITHDRAW_AUTO) {

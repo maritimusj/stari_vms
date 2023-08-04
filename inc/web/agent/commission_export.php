@@ -92,7 +92,6 @@ if (Request::bool('is_export')) {
             'id' => $index + 1,
             'xval' => number_format($entry->getXVal() / 100, 2, '.', ''),
             'createtime' => date('Y-m-d H:i:s', $entry->getCreatetime()),
-            'event' => '',  //事件
             'device' => '',  //设备
             'wx_account' => '', //公众号
         ];

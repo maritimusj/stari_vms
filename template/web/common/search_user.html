@@ -201,7 +201,7 @@
                         title = '手机号码：' + entry['mobile'];
                     }
                     if (entry['openid']) {
-                        title += '，openid：' + entry['openid'];
+                        title += '，用户UID：' + entry['openid'];
                     }
                     str += tpl.replace(/_1_/g, entry['id']).
                             replace(/_2_/g, entry['nickname']).

@@ -29,6 +29,10 @@ if ($principal == 'agent') {
     $query = User::query();
 }
 
+if (Request::isset('app')) {
+    $query->where(['app' => Request::int('app')]);
+}
+
 $keywords = Request::trim('keywords');
 if (!empty($keywords)) {
     $query->whereOr(

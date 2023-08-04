@@ -62,6 +62,7 @@ if ($total > 0) {
     foreach ($query->findAll() as $user) {
         $result['list'][] = [
             'id' => $user->getId(),
+            'openid' => $user->getOpenid(),
             'nickname' => $user->getName(),
             'avatar' => $user->getAvatar(),
             'mobile' => $user->getMobile(),

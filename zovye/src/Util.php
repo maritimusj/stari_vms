@@ -1162,7 +1162,7 @@ include './index.php';
     {
         We7::make_dirs(dirname($filename));
 
-        $str_export = '';
+        $str_export = chr(0xEF).chr(0xBB).chr(0xBF);
 
         if (!file_exists($filename)) {
             $tab_header = implode(",", $header);

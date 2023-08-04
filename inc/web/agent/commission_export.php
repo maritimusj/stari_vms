@@ -3,7 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
- 
+
 namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
@@ -100,12 +100,7 @@ if (Request::bool('is_export')) {
             $data['xval'] = '+'.$data['xval'];
         }
 
-        if ($entry->getSrc() == CommissionBalance::WITHDRAW) {
-            $status = $entry->getState();
-            $data['event'] = '余额提现'.$status;
-        } elseif ($entry->getSrc() == CommissionBalance::REFUND) {
-            $data['event'] = '退款';
-        } elseif (in_array(
+        if (in_array(
             $entry->getSrc(),
             [
                 CommissionBalance::ORDER_FREE,
@@ -224,6 +219,8 @@ if (Request::bool('is_export')) {
             $data['event'] = '提现手续费'.$title;
         } elseif ($entry->getSrc() == CommissionBalance::ADJUST) {
             $data['event'] = '管理员调整';
+        } else {
+            $data['event'] = CommissionBalance::desc($entry->getSrc());;
         }
         $logs[] = $data;
     }

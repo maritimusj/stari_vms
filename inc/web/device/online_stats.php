@@ -34,19 +34,15 @@ if (is_array($ids)) {
         $online_ids['uid'][] = $entry->getImei();
     }
 
-    if (empty($online_ids)) {
-        JSON::success($result);
-    }
-
     $ids_str = json_encode($online_ids);
-    $devices_status = CacheUtil::cachedCall(10, function () use ($ids_str) {
+    $devices_status = $ids_str ? CacheUtil::cachedCall(10, function () use ($ids_str) {
         $res = CtrlServ::postV2('detail', $ids_str);
         if (!empty($res) && $res['status'] === true && is_array($res['data'])) {
             return $res['data'];
         }
 
         return [];
-    }, $ids_str);
+    }, $ids_str) : [];
 
     /** @var deviceModelObj $entry */
     foreach ($devices as $entry) {

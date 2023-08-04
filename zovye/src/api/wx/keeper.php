@@ -1164,7 +1164,7 @@ class keeper
             return $res;
         }
 
-        $resp = ['id' => $device->getImei(), 'msg' => '出货成功！'];
+        $resp = ['id' => $device->getImei()];
         if ($device->isBlueToothDevice()) {
             $data = $res['data'];
             if (!empty($data)) {
@@ -1173,6 +1173,9 @@ class keeper
                     'hex' => bin2hex(base64_decode($data)),
                 ];
             }
+            $resp['msg'] = '已发送！';
+        } else {
+            $resp['msg'] = '出货成功！';
         }
 
         return $resp;

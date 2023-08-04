@@ -64,7 +64,7 @@ class cmd implements ICmd
                 return '<= 查询电量';
         }
 
-        return '<= 未知命令';
+        return sprintf('<= 未知命令: 0x%0x',  $this->id);
     }
 
     function crc($data): int

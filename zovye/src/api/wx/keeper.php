@@ -192,58 +192,53 @@ class keeper
 
         common::checkCurrentUserPrivileges('F_yy');
 
-        if ($user->isAgent() || $user->isPartner()) {
-            $id = Request::int('id');
+        $id = Request::int('id');
+        $name = Request::trim('name');
+        $mobile = Request::trim('mobile');
 
-            $name = Request::trim('name');
-            $mobile = Request::trim('mobile');
-
-            if (empty($name) || empty($mobile)) {
-                return err('请输入姓名和手机号码！');
-            }
-
-            if ($id) {
-                if (\zovye\Keeper::findOne(['mobile' => $mobile, 'id <>' => $id])) {
-                    return err('手机号码已经被其它运营人员使用！');
-                }
-                /** @var keeperModelObj $keeper */
-                $keeper = \zovye\Keeper::findOne(['id' => $id, 'agent_id' => $user->getAgentId()]);
-                if ($keeper) {
-                    if ($name != $keeper->getName()) {
-                        $keeper->setName($name);
-                    }
-                    if ($mobile != $keeper->getMobile()) {
-                        $keeper->setMobile($mobile);
-                    }
-                }
-            } else {
-                if (\zovye\Keeper::findOne(['mobile' => $mobile])) {
-                    return err('手机号码已经被其它运营人员使用！');
-                }
-                /** @var keeperModelObj $keeper */
-                $keeper = \zovye\Keeper::create([
-                    'agent_id' => $user->getAgentId(),
-                    'name' => $name,
-                    'mobile' => $mobile,
-                ]);
-            }
-
-            if ($keeper) {
-                $keeper_user = $keeper->getUser();
-                if ($keeper_user && !$keeper_user->isKeeper()) {
-                    $keeper_user->setKeeper();
-                    $keeper_user->save();
-                }
-
-                if ($keeper->save()) {
-                    return ['msg' => empty($id) ? '请联系运营人员登录并绑定手机号！' : '运营人员资料保存成功！'];
-                }
-            }
-
-            return err('保存数据出错！');
+        if (empty($name) || empty($mobile) || !preg_match(REGULAR_TEL, $mobile)) {
+            return err('请输入正确的姓名和手机号码！');
         }
 
-        return err('只有代理商才能保存运营人员信息！');
+        if ($id) {
+            if (\zovye\Keeper::findOne(['mobile' => $mobile, 'id <>' => $id])) {
+                return err('手机号码已经被其它运营人员使用！');
+            }
+            /** @var keeperModelObj $keeper */
+            $keeper = \zovye\Keeper::findOne(['id' => $id, 'agent_id' => $user->getAgentId()]);
+            if ($keeper) {
+                if ($name != $keeper->getName()) {
+                    $keeper->setName($name);
+                }
+                if ($mobile != $keeper->getMobile()) {
+                    $keeper->setMobile($mobile);
+                }
+            }
+        } else {
+            if (\zovye\Keeper::findOne(['mobile' => $mobile])) {
+                return err('手机号码已经被其它运营人员使用！');
+            }
+            /** @var keeperModelObj $keeper */
+            $keeper = \zovye\Keeper::create([
+                'agent_id' => $user->getAgentId(),
+                'name' => $name,
+                'mobile' => $mobile,
+            ]);
+        }
+
+        if ($keeper) {
+            $keeper_user = $keeper->getUser();
+            if ($keeper_user && !$keeper_user->isKeeper()) {
+                $keeper_user->setKeeper();
+                $keeper_user->save();
+            }
+
+            if ($keeper->save()) {
+                return ['msg' => empty($id) ? '请联系运营人员登录并绑定手机号！' : '运营人员资料保存成功！'];
+            }
+        }
+
+        return err('保存数据出错！');
     }
 
     /**
@@ -257,39 +252,33 @@ class keeper
 
         common::checkCurrentUserPrivileges('F_yy');
 
-        if ($user->isAgent() || $user->isPartner()) {
+        return DBUtil::transactionDo(function () use ($user) {
             $id = Request::int('id');
 
-            return DBUtil::transactionDo(
-                function () use ($user, $id) {
-                    /** @var keeperModelObj $keeper */
-                    $keeper = \zovye\Keeper::findOne(['id' => $id, 'agent_id' => $user->getAgentId()]);
-                    if ($keeper) {
-                        $query = Device::keeper($keeper)->where(['agent_id' => $user->getAgentId()]);
+            /** @var keeperModelObj $keeper */
+            $keeper = \zovye\Keeper::findOne(['id' => $id, 'agent_id' => $user->getAgentId()]);
+            if (empty($keeper)) {
+                return err('找不到这个运营人员！');
+            }
 
-                        /** @var deviceModelObj $entry */
-                        foreach ($query->findAll() as $entry) {
-                            if (!$entry->removeKeeper($keeper)) {
-                                return err('删除失败！');
-                            }
-                        }
+            $query = Device::keeper($keeper)->where(['agent_id' => $user->getAgentId()]);
 
-                        $keeper_user = $keeper->getUser();
-                        if ($keeper_user) {
-                            $keeper_user->setKeeper(false);
-                        }
-
-                        if ($keeper->destroy()) {
-                            return ['msg' => '删除运营人员成功！'];
-                        }
-                    }
-
-                    return err('删除运营人员出错！');
+            /** @var deviceModelObj $entry */
+            foreach ($query->findAll() as $entry) {
+                if (!$entry->removeKeeper($keeper)) {
+                    return err('删除运营人员设备失败！');
                 }
-            );
-        }
+            }
 
-        return err('只有代理商才能删除运营人员信息！');
+            $keeper_user = $keeper->getUser();
+            if ($keeper_user) {
+                $keeper_user->setKeeper(false);
+            }
+
+            $keeper->destroy();
+
+            return ['msg' => '删除运营人员成功！'];
+        });
     }
 
     /**
@@ -356,8 +345,8 @@ class keeper
         common::checkCurrentUserPrivileges('F_yy');
 
         return DBUtil::transactionDo(function () use ($user) {
-
             $keeper_id = Request::int('keeperid');
+
             $keeper = \zovye\Keeper::get($keeper_id);
             if (empty($keeper) || $keeper->getAgentId() != $user->getAgentId()) {
                 return err('找不到这个运营人员！');
@@ -368,7 +357,7 @@ class keeper
                 $device_ids = array_values(Request::array('devices'));
             }
 
-            if ($device_ids) {
+            if (!empty($device_ids)) {
                 $query = Device::query([
                     'keeper_id' => $keeper->getId(),
                     'agent_id' => $user->getAgentId(),
@@ -379,11 +368,9 @@ class keeper
                 foreach ($query->findAll() as $entry) {
                     $entry->removeKeeper($keeper);
                 }
-
-                return ['msg' => '操作成功！'];
             }
 
-            return err('请求处理失败！');
+            return ['msg' => '操作成功！'];
         });
     }
 
@@ -399,88 +386,83 @@ class keeper
         common::checkCurrentUserPrivileges('F_yy');
 
         return DBUtil::transactionDo(function () use ($user) {
+            $device_ids = [];
 
-            if ($user->isAgent() || $user->isPartner()) {
+            if (Request::is_array('devices')) {
+                $device_ids = array_values(Request::array('devices'));
+            }
 
-                $device_ids = [];
-                if (Request::is_array('devices')) {
-                    $device_ids = array_values(Request::array('devices'));
-                }
+            if (Request::is_array('groups')) {
+                $group_ids = array_values(Request::array('groups'));
+                if ($group_ids) {
+                    $query = Device::query(['group_id' => $group_ids, 'agent_id' => $user->getAgentId()]);
 
-                if (Request::is_array('groups')) {
-                    $group_ids = array_values(Request::array('groups'));
-                    if ($group_ids) {
-                        $query = Device::query(['group_id' => $group_ids, 'agent_id' => $user->getAgentId()]);
-
-                        /** @var deviceModelObj $entry */
-                        foreach ($query->findAll() as $entry) {
-                            $device_ids[] = $entry->getImei();
-                        }
-
-                        $device_ids = array_unique($device_ids);
+                    /** @var deviceModelObj $entry */
+                    foreach ($query->findAll() as $entry) {
+                        $device_ids[] = $entry->getImei();
                     }
+
+                    $device_ids = array_unique($device_ids);
                 }
+            }
 
-                if (Request::has('commission')) {
-                    $commission = Request::str('commission', '', true);
+            if (Request::has('commission')) {
+                $commission = Request::str('commission', '', true);
 
-                    //%结尾表示百分比，*表示固定金额
-                    if (substr($commission, -1) == '%') {
-                        $commission = rtrim($commission, '%');
-                        $percent = max(0, min(10000, intval($commission * 100)));
-                        $set_commission = function (&$data) use ($percent) {
-                            $data['percent'] = $percent;
-                            unset($data['fixed']);
+                //%结尾表示百分比，*表示固定金额
+                if (substr($commission, -1) == '%') {
+                    $commission = rtrim($commission, '%');
+                    $percent = max(0, min(10000, intval($commission * 100)));
+                    $set_commission = function (&$data) use ($percent) {
+                        $data['percent'] = $percent;
+                        unset($data['fixed']);
 
-                            return $data;
-                        };
-                    } else {
-                        $commission = rtrim($commission, '*');
-                        $fixed = max(0, intval($commission));
-                        $set_commission = function (&$data) use ($fixed) {
-                            $data['fixed'] = $fixed;
-                            unset($data['percent']);
-
-                            return $data;
-                        };
-                    }
+                        return $data;
+                    };
                 } else {
-                    $set_commission = function ($data) {
+                    $commission = rtrim($commission, '*');
+                    $fixed = max(0, intval($commission));
+                    $set_commission = function (&$data) use ($fixed) {
+                        $data['fixed'] = $fixed;
+                        unset($data['percent']);
+
                         return $data;
                     };
                 }
-
-                //way 分佣时机：Keeper::COMMISSION_RELOAD，补货时 Keeper::COMMISSION_ORDER，订单生成时
-                $way = Request::int('way', -1);
-                $kind = Request::int('kind', -1);
-
-                $keeper_id = Request::int('keeperid');
-                $keeper = \zovye\Keeper::get($keeper_id);
-                if (empty($keeper) || $keeper->getAgentId() != $user->getAgentId()) {
-                    return err('找不到这个运营人员！');
-                }
-
-                $query = Device::query([
-                    'agent_id' => $user->getAgentId(),
-                    'imei' => $device_ids,
-                ]);
-
-                /** @var deviceModelObj $entry */
-                foreach ($query->findAll() as $entry) {
-                    $keeper_data = $entry->getKeeperData($keeper);
-                    if ($way != -1) {
-                        $keeper_data['way'] = $way;
-                    }
-                    if ($kind != -1) {
-                        $keeper_data['kind'] = $kind;
-                    }
-                    $entry->setKeeper($keeper, $set_commission($keeper_data));
-                }
-
-                return ['msg' => '分配成功！'];
+            } else {
+                $set_commission = function ($data) {
+                    return $data;
+                };
             }
 
-            return err('操作失败！');
+            //way 分佣时机：Keeper::COMMISSION_RELOAD，补货时 Keeper::COMMISSION_ORDER，订单生成时
+            $way = Request::int('way', -1);
+            $kind = Request::int('kind', -1);
+
+            $keeper_id = Request::int('keeperid');
+            $keeper = \zovye\Keeper::get($keeper_id);
+            if (empty($keeper) || $keeper->getAgentId() != $user->getAgentId()) {
+                return err('找不到这个运营人员！');
+            }
+
+            $query = Device::query([
+                'agent_id' => $user->getAgentId(),
+                'imei' => $device_ids,
+            ]);
+
+            /** @var deviceModelObj $entry */
+            foreach ($query->findAll() as $entry) {
+                $keeper_data = $entry->getKeeperData($keeper);
+                if ($way != -1) {
+                    $keeper_data['way'] = $way;
+                }
+                if ($kind != -1) {
+                    $keeper_data['kind'] = $kind;
+                }
+                $entry->setKeeper($keeper, $set_commission($keeper_data));
+            }
+
+            return ['msg' => '分配成功！'];
         });
     }
 
@@ -494,34 +476,34 @@ class keeper
         $keeper = keeper::getKeeper();
         $user = $keeper->getUser();
 
-        if ($user) {
-            if (!empty(settings('commission.withdraw.bank_card'))) {
-                if (empty($user->settings('agentData.bank'))) {
-                    return err('请先绑定银行卡！');
-                }
-            }
-
-            //如果用户是运营人员，则需要检查对应代理商账户是否异常        
-            $agent = $keeper->getAgent();
-            if (empty($agent)) {
-                return err('检查身份失败！');
-            }
-
-            //如果运营人员补货导致代理商余额小于零，则不允许运营人员提现
-            if ($agent->getCommissionBalance()->total() < 0) {
-                return err('代理商账户异常，请联系代理商！');
-            }
-
-            if ($agent->isPaymentConfigEnabled()) {
-                return err('提现申请被拒绝，请联系代理商！');
-            }
-
-            $total = round(Request::float('amount', 0, 2) * 100);
-
-            return balance::balanceWithdraw($user, $total);
+        if (!$user) {
+            return err('找不到运营人员关联的用户，请联系客服！');
         }
 
-        return err('提现失败，请联系客服！');
+        if (!empty(settings('commission.withdraw.bank_card'))) {
+            if (empty($user->settings('agentData.bank'))) {
+                return err('请先绑定银行卡！');
+            }
+        }
+
+        //如果用户是运营人员，则需要检查对应代理商账户是否异常
+        $agent = $keeper->getAgent();
+        if (empty($agent)) {
+            return err('检查身份失败！');
+        }
+
+        //如果运营人员补货导致代理商余额小于零，则不允许运营人员提现
+        if ($agent->getCommissionBalance()->total() < 0) {
+            return err('代理商账户异常，请联系代理商！');
+        }
+
+        if ($agent->isPaymentConfigEnabled()) {
+            return err('提现申请被拒绝，请联系代理商！');
+        }
+
+        $total = round(Request::float('amount', 0, 2) * 100);
+
+        return balance::balanceWithdraw($user, $total);
     }
 
     /**
@@ -756,16 +738,15 @@ class keeper
         $keeper = keeper::getKeeper();
         $user = $keeper->getUser();
 
-        if ($user) {
-
-            $type = Request::str('type');
-            $page = max(1, Request::int('page'));
-            $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
-
-            return balance::getUserBalanceLog($user, $type, $page, $page_size);
+        if (!$user) {
+            return err('找不到运营人员关联的用户！');
         }
 
-        return err('获取列表失败！');
+        $type = Request::str('type');
+        $page = max(1, Request::int('page'));
+        $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
+
+        return balance::getUserBalanceLog($user, $type, $page, $page_size);
     }
 
     /**
@@ -968,22 +949,19 @@ class keeper
             return err('找不到这个设备！');
         }
 
-        if (
-            $device->getAgentId() != $keeper->getAgentId() ||
+        if ($device->getAgentId() != $keeper->getAgentId() ||
             !$device->hasKeeper($keeper) ||
-            $device->getKeeperKind($keeper) != \zovye\Keeper::OP
-        ) {
+            $device->getKeeperKind($keeper) != \zovye\Keeper::OP) {
             return err('没有权限执行这个操作！');
-        }
-
-        $locker = $device->payloadLockAcquire();
-        if (empty($locker)) {
-            return err('设备正忙，请稍后再试！');
         }
 
         $agent = $device->getAgent();
         if (empty($agent)) {
             return err('找不到设备代理商！');
+        }
+
+        if (!$device->payloadLockAcquire()) {
+            return err('设备正忙，请稍后再试！');
         }
 
         //补货佣金计算函数
@@ -1065,62 +1043,69 @@ class keeper
             $data = [];
         }
 
-        $result = $device->resetPayload($data, "运营人员补货：{$keeper->getMobile()}");
-        if (is_error($result)) {
-            return err('保存库存失败！');
-        }
+        return DBUtil::transactionDo(
+            function () use ($device, $data, $keeper, $commission_price_calc, $create_commission_fn) {
 
-        if (App::isInventoryEnabled()) {
-            $user = $keeper->getUser();
-            $v = Inventory::syncDevicePayloadLog($user, $device, $result, '运营人员补货');
-            if (is_error($v)) {
-                return $v;
+                //改变库存
+                $result = $device->resetPayload($data, "运营人员补货：{$keeper->getMobile()}");
+                if (is_error($result)) {
+                    return err('保存库存失败！');
+                }
+
+                if (App::isInventoryEnabled()) {
+                    $user = $keeper->getUser();
+                    $v = Inventory::syncDevicePayloadLog($user, $device, $result, '运营人员补货');
+                    if (is_error($v)) {
+                        return $v;
+                    }
+                }
+
+                $total = 0;
+                foreach ($result as $entry) {
+                    //创建补货记录
+                    \zovye\Keeper::createReplenish(
+                        $keeper,
+                        $device,
+                        $entry['goodsId'],
+                        $entry['org'],
+                        $entry['num'],
+                        [
+                            'device' => [
+                                'id' => $device->getId(),
+                                'name' => $device->getName(),
+                            ],
+                        ]
+                    );
+
+                    //累计佣金
+                    $total += $commission_price_calc($entry['num'], $entry['goodsId']);
+                }
+
+                //保存佣金
+                if ($total > 0) {
+                    $err = $create_commission_fn($total);
+                    if (is_error($err)) {
+                        Log::error('keeper', [
+                            'error' => '创建运营人员补货佣金失败:'.$err['message'],
+                            'total' => $total,
+                        ]);
+
+                        return $err;
+                    }
+                }
+
+                $device->updateAppRemain();
+                if (!$device->save()) {
+                    return err('保存设备数据失败！');
+                }
+
+                if (App::isGDCVMachineEnabled()) {
+                    GDCVMachine::scheduleUploadDeviceJob($device);
+                }
+
+                return ['msg' => '设置成功！'];
             }
-        }
-
-        $locker->unlock();
-
-        $total = 0;
-        foreach ($result as $entry) {
-            \zovye\Keeper::createReplenish(
-                $keeper,
-                $device,
-                $entry['goodsId'],
-                $entry['org'],
-                $entry['num'],
-                [
-                    'device' => [
-                        'id' => $device->getId(),
-                        'name' => $device->getName(),
-                    ],
-                ]
-            );
-
-            //累计佣金
-            $total += $commission_price_calc($entry['num'], $entry['goodsId']);
-        }
-
-        //保存佣金
-        if ($total > 0) {
-            $err = $create_commission_fn($total);
-            if (is_error($err)) {
-                Log::error('keeper', [
-                    'error' => '创建运营人员补货佣金失败:'.$err['message'],
-                    'total' => $total,
-                ]);
-
-                return $err;
-            }
-        }
-
-        $device->updateAppRemain();
-        $device->save();
-
-        if (App::isGDCVMachineEnabled()) {
-            GDCVMachine::scheduleUploadDeviceJob($device);
-        }
-
-        return ['msg' => '设置成功！'];
+        );
     }
 
     /**

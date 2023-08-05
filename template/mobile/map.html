@@ -212,8 +212,9 @@
 						locationBtn.style.display = "flex";
 						locationBtn.style.alignItems = "center";
 						locationBtn.style.justifyContent = "center";
-						locationBtn.style.marginRight = "10px";
-						locationBtn.style.marginBottom = "25px";
+						locationBtn.style.position = 'fixed'
+						locationBtn.style.bottom = '25px'
+						locationBtn.style.right = '10px'
 						new qq.maps.Control({
 							content: locationBtn,
 							align: qq.maps.ALIGN.BOTTOM_RIGHT,
@@ -244,8 +245,9 @@
 						listBtn.style.display = "flex";
 						listBtn.style.alignItems = "center";
 						listBtn.style.justifyContent = "center";
-						listBtn.style.marginBottom = "70px";
-						listBtn.style.marginRight = "-37px";
+						listBtn.style.position = 'fixed'
+						listBtn.style.bottom = '70px'
+						listBtn.style.right = '10px'
 						new qq.maps.Control({
 							content: listBtn,
 							align: qq.maps.ALIGN.BOTTOM_RIGHT,
@@ -310,7 +312,7 @@
 						}
 						
 					    machines.sort(this.compare('distance'));
-						machines = machines.splice(0,50);
+						// machines = machines.splice(0,50);
 						
 						this.machines = machines;
 						//console.log(machines)

@@ -1433,58 +1433,28 @@ class agent
         return ['msg' => '修改成功！'];
     }
 
-    public
-    static function getAgentKeepers(): array
+    public static function getAgentKeepers(): array
     {
-        $user = common::getAgentOrPartner();
-        $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
+        $agent = common::getAgent();
 
-        $keep_res = Keeper::query(['agent_id' => $agent->getId()])->findAll();
+        $query = Keeper::query(['agent_id' => $agent->getId()]);
 
-        $data = [];
-        /** @var keeperModelObj $item */
-        foreach ($keep_res as $item) {
-            $user = $item->getUser();
+        $list = [];
+
+        /** @var keeperModelObj $keeper */
+        foreach ($query->findAll() as $keeper) {
+            $user = $keeper->getUser();
             if ($user) {
-                $data[] = [
+                $list[] = [
                     'id' => $user->getId(),
-                    'name' => $item->getName(),
+                    'name' => $keeper->getName(),
+                    'mobile' => $keeper->getMobile(),
+                    'createtime' => date('Y-m-d H:i:s'),
                 ];
             }
         }
 
-        $s_query = m('settings_user');
-        $s_arr = [];
-        $s_query = $s_query->query(We7::uniacid([]))->where(['name LIKE' => '%partnerData']);
-        $s_res = $s_query->findAll();
-        $_reg = '/.+:(.+):.+/';
-        /** @var settings_userModelObj $val */
-        foreach ($s_res as $val) {
-            $s_data = unserialize($val->getData());
-            $s_agent = $s_data['agent'] ?? '';
-            if ($s_agent == $agent->getId()) {
-                $str = $val->getName();
-                preg_match($_reg, $str, $mat);
-                if (isset($mat[1])) {
-                    $s_arr[] = $mat[1];
-                }
-            }
-        }
-        $user_res = User::query()->where('id IN ('.implode(',', $s_arr).')')->findAll();
-        /** @var userModelObj $item */
-        foreach ($user_res as $item) {
-            $data[] = [
-                'id' => $item->getId(),
-                'name' => $item->getNickname(),
-            ];
-        }
-
-        $data[] = [
-            'id' => $agent->getId(),
-            'name' => $agent->getName(),
-        ];
-
-        return ['data' => $data];
+        return ['data' => $list];
     }
 
     static function agentStatsData(agentModelObj $agent): array
@@ -1634,7 +1604,7 @@ class agent
                                     '-',
                                     array_values($agent_data['area'])
                                 ) : '',
-                                'level' => $agent_levels[$agent_data['level']],
+                                'level' => $agent_levels[$agent_data['level']] ?? [],
                                 'device_count' => Device::query(['agent_id' => $agent->getAgentId()])->count(),
                                 'hasB' => User::findOne(['superior_id' => $agent->getAgentId()]) ? 1 : 0,
                             ];

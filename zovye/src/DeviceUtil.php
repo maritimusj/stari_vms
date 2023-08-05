@@ -105,8 +105,8 @@ class DeviceUtil
             $params
         );
 
-        if (!$device->lockAcquire()) {
-            return err('设备锁定失败，请重试！');
+        if (!$device->lockAcquire(3)) {
+            return err('设备正在使用中，请重试！');
         }
 
         $goods = Device::getGoodsByLane($device, $lane);

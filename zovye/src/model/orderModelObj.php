@@ -261,19 +261,16 @@ class orderModelObj extends modelObj
      */
     public function isPullOk(): bool
     {
-        if ($this->getBluetoothDeviceBUID()) {
-            $pull_result = $this->isBluetoothResultFail() ? ['errno' => 1] : [];
-        } else {
-            $pull_result = $this->getExtraData('pull.result', []);
-            if (empty($pull_result) || is_error($pull_result)) {
-                $callback = $this->getExtraData('pull.callback', []);
-                if ($callback && $callback['extra']['re'] == 3) {
-                    return true;
-                }
+        $pull_result = $this->getExtraData('pull.result', []);
+
+        if (empty($pull_result) || is_error($pull_result)) {
+            $callback = $this->getExtraData('pull.callback', []);
+            if ($callback && $callback['extra']['re'] == 3) {
+                return true;
             }
         }
 
-        return !empty($pull_result) && !is_error($pull_result);
+        return $pull_result && !is_error($pull_result);
     }
 
     public function setChargingStatus($data)

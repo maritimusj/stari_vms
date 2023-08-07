@@ -264,9 +264,9 @@ class orderModelObj extends modelObj
         if ($this->getBluetoothDeviceBUID()) {
             $pull_result = $this->isBluetoothResultFail() ? ['errno' => 1] : [];
         } else {
-            $pull_result = $this->getExtraData('pull.result');
+            $pull_result = $this->getExtraData('pull.result', []);
             if (empty($pull_result) || is_error($pull_result)) {
-                $callback = $this->getExtraData('pull.callback');
+                $callback = $this->getExtraData('pull.callback', []);
                 if ($callback && $callback['extra']['re'] == 3) {
                     return true;
                 }

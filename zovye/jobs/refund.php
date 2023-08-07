@@ -26,24 +26,20 @@ use function zovye\request;
 $op = Request::op('default');
 $order_no = Request::str('orderNO');
 $num = Request::int('num');
-$reset_payload = request('reset');
+$reset_payload = Request::int('reset');
+$message = urldecode(Request::str('message'));
 
 $log = [
     'orderNO' => $order_no,
     'num' => $num,
     'resetPayload' => $reset_payload,
-    'message' => urldecode(request('message')),
+    'message' => $message,
 ];
 
-if ($op == 'refund' && CtrlServ::checkJobSign([
-        'orderNO' => $order_no,
-        'reset' => $reset_payload,
-        'num' => $num,
-        'message' => request('message'),
-    ])) {
+if ($op == 'refund' && CtrlServ::checkJobSign($log)) {
 
     if (!Locker::try("pay:$order_no", REQUEST_ID, 3)) {
-        $log['relaunch refund job'] = Job::refund($order_no, request('message'), $num, $reset_payload, 10);
+        $log['relaunch refund job'] = Job::refund($order_no, request('message'), $num, boolval($reset_payload), 10);
         Log::debug('refund', $log);
         Job::exit();
     }

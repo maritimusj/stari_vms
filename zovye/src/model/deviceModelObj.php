@@ -2306,7 +2306,7 @@ class deviceModelObj extends modelObj
                     $order = Order::getLastOrderOfDevice($this);
                     if ($order) {
                         //超时后检查订单是否成功，否则退款
-                        Job::refund($order->getOrderNO(), '设备响应超时', 0, true, $timeout);
+                        Job::refund($order->getOrderNO(), '设备响应超时', 0, true, intval(settings('order.rollback.delay', 0)));
                     }
                 }
             }

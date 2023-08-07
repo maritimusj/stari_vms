@@ -668,8 +668,17 @@ class DeviceEventProcessor
             }
             $device->save();
         }
-    }
 
+        $extra = (array)$data['extra'];
+        if ($extra && $extra['ser'] && $extra['re'] === 3) {
+            $order = Order::get($extra['ser'], true);
+            if ($order) {
+                $order->setResultCode(0);
+                $order->setExtraData('pull.callback', $data);
+                $order->save();
+            }
+        }
+    }
 
     /**
      * v1版本 m-report上报

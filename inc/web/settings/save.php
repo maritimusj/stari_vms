@@ -87,6 +87,7 @@ if ($page == 'device') {
     ];
 
     $settings['order']['rollback']['enabled'] = Request::bool('autoRollbackOrder') ? 1 : 0;
+    $settings['order']['rollback']['delay'] = max(0, Request::int('rollbackOrderDelay'));
     $settings['order']['goods']['maxNum'] = Request::int('orderGoodsMaxNum');
 
     $settings['device']['v-device']['enabled'] = Request::bool('vDevice') ? 1 : 0;

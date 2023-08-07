@@ -356,7 +356,7 @@ function refund(string $order_no, deviceModelObj $device, string $reason)
 {
     $need = Helper::NeedAutoRefund($device);
     if ($need) {
-        $result = Job::refund($order_no, $reason, -1);
+        $result = Job::refund($order_no, $reason, -1, false, intval(settings('order.rollback.delay', 0)));
         if (empty($result)) {
             Log::error('order_create_multi', [
                 'orderNO' => $order_no,

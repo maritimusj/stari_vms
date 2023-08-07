@@ -37,7 +37,7 @@ class Job
             return CtrlServ::scheduleDelayJob('refund', [
                 'orderNO' => $order_no,
                 'num' => $num,
-                'reset' => $reset_payload,
+                'reset' => $reset_payload ? 1 : 0,
                 'message' => urlencode($message),
             ], $delay);
         }
@@ -45,7 +45,7 @@ class Job
         return CtrlServ::scheduleJob('refund', [
             'orderNO' => $order_no,
             'num' => $num,
-            'reset' => $reset_payload,
+            'reset' => $reset_payload ? 1 : 0,
             'message' => urlencode($message),
         ]);
     }

@@ -664,19 +664,18 @@ class DeviceEventProcessor
                     Charging::onEventResult($device, $extra);
                 } elseif ($device->isFuelingDevice()) {
                     Fueling::onEventResult($device, $extra);
+                } else {
+                    if ($extra && $extra['ser'] && $extra['re'] === 3) {
+                        $order = Order::get($extra['ser'], true);
+                        if ($order) {
+                            $order->setResultCode(0);
+                            $order->setExtraData('pull.callback', $data);
+                            $order->save();
+                        }
+                    }
                 }
             }
             $device->save();
-        }
-
-        $extra = (array)$data['extra'];
-        if ($extra && $extra['ser'] && $extra['re'] === 3) {
-            $order = Order::get($extra['ser'], true);
-            if ($order) {
-                $order->setResultCode(0);
-                $order->setExtraData('pull.callback', $data);
-                $order->save();
-            }
         }
     }
 

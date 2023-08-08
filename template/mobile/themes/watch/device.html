@@ -72,9 +72,9 @@
 					</div>
 					<img class="account-qrcode" :src="item.qrcode" v-if="item.qrcode" />
 					<div class="account-video" v-else-if="item.media">
-						<img class="video-cover" :src="item.img"></img>
+						<img class="video-cover" :src="item.img" />
 						<div class="play-icon-mask" @click="playClick(item)">
-						    <img class="play-icon" src="{MODULE_URL}static/m/watch/img/play_icon.png">
+						    <img class="play-icon" src="{MODULE_URL}static/m/watch/img/play_icon.png" />
 						</div>
 					</div>
 					<span class="tips">{{item.qrcode ? '长按识别二维码' : '点击观看'}}</span>
@@ -86,7 +86,7 @@
 			<div :class="['goods-item', goods.length == 1 ? 'goods-single' : '']" v-for="(item,index) in goods">
 				<img :class="['goods-pic', goods.length == 1 ? 'goods-pic-single' : '']" :src="item.img" @click="goodsClick(item)">
 				<div :class="['sell-out-view', goods.length == 1 ? 'sell-out-view-single' : '']" v-if="item.num == 0" @click="goodsClick(item)">
-					<img class="sell-out-icon" src="{MODULE_URL}static/m/watch/img/sellout_icon.png">
+					<img class="sell-out-icon" src="{MODULE_URL}static/m/watch/img/sellout_icon.png"/>
 				</div>
 				<div class="goods-row">
 					<div class="goods-name">{{item.name}}</div>

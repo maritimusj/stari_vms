@@ -72,9 +72,9 @@
 					</div>
 					<img class="account-qrcode" :src="item.qrcode" v-if="item.qrcode" />
 					<div class="account-video" v-else-if="item.media">
-						<img class="video-cover" :src="item.img"></img>
+						<img class="video-cover" :src="item.img" />
 						<div class="play-icon-mask" @click="playClick(item)">
-						    <img class="play-icon" src="{MODULE_URL}static/m/dtm-jd/img/play_icon.png">
+						    <img class="play-icon" src="{MODULE_URL}static/m/dtm-jd/img/play_icon.png" />
 						</div>
 					</div>
 					<span class="tips">{{item.qrcode ? '长按识别二维码' : '点击观看'}}</span>

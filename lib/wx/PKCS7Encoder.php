@@ -37,7 +37,7 @@ class PKCS7Encoder
 
     /**
      * 对解密后的明文进行补位删除
-     * @param string 解密后的明文
+     * @param string $text 解密后的明文
      * @return string 删除填充补位后的明文
      */
     function decode(string $text): string

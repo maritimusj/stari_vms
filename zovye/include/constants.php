@@ -33,7 +33,7 @@ define('SYS_MAX_LOAD_AVERAGE_VALUE', 10);
 
 define('DEBUG', true);
 
-define('GET_WX_FANS_INFO', true);
+define('GET_WX_FANS_INFO', false);
 
 //默认settings数据是否使用cache，建议开启redis缓存后设置为true
 define('SETTINGS_USE_CACHE', true);

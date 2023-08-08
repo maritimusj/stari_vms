@@ -41,6 +41,7 @@ if (Session::isAliUser()) {
                     Account::QUESTIONNAIRE,
                 ],
                 'include' => [Account::COMMISSION],
+                'redirect_exclusive' => true, //如果有需要转跳的任务，则只返回这个任务
             ]);
         }
     }

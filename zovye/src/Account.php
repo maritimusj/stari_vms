@@ -535,13 +535,21 @@ class Account extends State
         };
 
         $max = intval($params['max']);
+
         foreach ($list as $getter) {
             $res = $getter();
+
             if (empty($res) || is_error($res)) {
                 continue;
             }
+
             foreach ($res as $account) {
                 if (self::isReady($account)) {
+                    //如果包含需要转跳的$account，则直接返回这个$account
+                    if ($params['redirect_exclusive'] && $account['redirect_url']) {
+                        return [$account];
+                    }
+
                     $result[] = $account;
                 }
             }

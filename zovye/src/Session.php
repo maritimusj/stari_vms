@@ -95,7 +95,7 @@ class Session
             return [];
         }
 
-        if (!$update) {
+        if (!GET_WX_FANS_INFO || !$update) {
             return [
                 'openid' => $openid,
             ];

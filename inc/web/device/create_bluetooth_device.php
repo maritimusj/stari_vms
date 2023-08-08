@@ -58,7 +58,7 @@ $extra['bluetooth'] = [
 ];
 
 if ($data['agent_id']) {
-    $agent = Agent::get($data['agentId']);
+    $agent = Agent::get($data['agent_id']);
     if (empty($agent)) {
         JSON::fail('找不到这个代理商!');
     }

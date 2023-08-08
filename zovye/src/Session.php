@@ -91,29 +91,32 @@ class Session
     public static function fansInfo(bool $update = false): array
     {
         $openid = _W('openid');
-        if ($openid) {
-            if ($update) {
-                $userinfo = CacheUtil::cachedCall(6, function () use ($openid) {
-                    $oauth_account = WeAccount::createByUniacid();
-                    $userinfo = $oauth_account->fansQueryInfo($openid);
-                    $userinfo['nickname'] = stripcslashes($userinfo['nickname']);
-                    $userinfo['avatar'] = $userinfo['headimgurl'];
-
-                    return $userinfo;
-                }, $openid);
-
-                //接口调用次数上限后，$userinfo中相关字段为空
-                if (!empty($userinfo['nickname']) && !empty($userinfo['avatar'])) {
-                    return $userinfo;
-                }
-            }
-            $res = We7::mc_oauth_userinfo();
-            if (!is_error($res)) {
-                return $res;
-            }
+        if (!$openid) {
+            return [];
         }
 
-        return [];
+        if (!$update) {
+            return [
+                'openid' => $openid,
+            ];
+        }
+
+        $userinfo = CacheUtil::cachedCall(6, function () use ($openid) {
+            $oauth_account = WeAccount::createByUniacid();
+
+            $userinfo = $oauth_account->fansQueryInfo($openid);
+            $userinfo['nickname'] = stripcslashes($userinfo['nickname']);
+            $userinfo['avatar'] = $userinfo['headimgurl'];
+
+            return $userinfo;
+        }, $openid);
+
+        //接口调用次数上限后，$userinfo中相关字段为空
+        if (!empty($userinfo['nickname']) && !empty($userinfo['avatar'])) {
+            return $userinfo;
+        }
+
+        return We7::mc_oauth_userinfo();
     }
 
     protected static function getAliUserSex($gender): int

@@ -32,7 +32,7 @@ class Session
             $user = User::get(self::getUserUID(), true);
         } else {
             if (empty($user)) {
-                $update = !empty($params['update']);
+                $update = boolval($params['update']);
                 $fans = self::fansInfo($update);
                 if ($fans && !empty($fans['openid'])) {
                     $user = User::get($fans['openid'], true);
@@ -95,7 +95,7 @@ class Session
             return [];
         }
 
-        if (!GET_WX_FANS_INFO || !$update) {
+        if (!$update) {
             return [
                 'openid' => $openid,
             ];

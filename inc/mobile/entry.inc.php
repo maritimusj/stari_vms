@@ -40,7 +40,7 @@ if (CZTV::handle($device_id)) {
 
 $params = [
     'create' => true,
-    'update' => true,
+    'update' => false,
 ];
 
 $cb = null;

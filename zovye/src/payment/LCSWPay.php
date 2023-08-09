@@ -398,7 +398,7 @@ JSCODE;
             'result' => 'success',
             'type' => $this->getName(),
             'pay_type' => $res['pay_type'],
-            'merchant_no' => $res['merchant_no'],
+            'merchant_no' => $this->config['merchant_no'],
             'orderNO' => $res['pay_trace'],
             'transaction_id' => $res['out_trade_no'],
             'total' => $res['total_fee'],

@@ -58,6 +58,14 @@ class common
 
         $result = Wx::decodeWxAppData($code, $iv, $encrypted_data, $config);
         if (is_error($result)) {
+            Log::error('wxapi', [
+                'code' => $code,
+                'iv' => $iv,
+                'encrypted_data' => $encrypted_data,
+                'config' => $config,
+                'session_key' => $_SESSION['session_key'],
+                'result' => $result,
+            ]);
             return $result;
         }
 

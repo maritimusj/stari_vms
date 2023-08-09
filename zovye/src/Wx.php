@@ -184,7 +184,7 @@ class Wx
             $_SESSION['session_key'] = $auth_data['session_key'];
             $res = $wx_app->pkcs7Encode($encryptedData, $iv);
             if (is_error($res)) {
-                return $res;
+                return err('登录失败，请重试！');
             }
         } else {
             $res = [];

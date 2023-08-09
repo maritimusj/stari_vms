@@ -190,7 +190,7 @@ class Wx
             $res = [];
         }
 
-        $res['session_key'] = $_SESSION['session_key'];
+        $res['session_key'] = $auth_data['session_key'];
 
         if (!empty($auth_data['openid'])) {
             $res['openId'] = $auth_data['openid'];

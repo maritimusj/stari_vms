@@ -3,16 +3,16 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
- 
+
 namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
 $data = [
-    'agent_id' => request('agent'),
-    'name' => request('name'),
-    'imei' => request('imei'),
-    'group_id' => request('groupId'),
+    'agent_id' => Request::int('agent'),
+    'name' => Request::trim('name'),
+    'imei' => Request::trim('imei'),
+    'group_id' => Request::int('groupId'),
     'capacity' => 0,
     'remain' => 0,
 ];
@@ -21,7 +21,7 @@ if (empty($data['name']) || empty($data['imei'])) {
     JSON::fail('设备名称或IMEI不能为空！');
 }
 
-if (!Locker::try('create:' . $data['imei'])) {
+if (!Locker::try('create:'.$data['imei'])) {
     JSON::fail('无法锁定，请稍后重试！');
 }
 
@@ -39,19 +39,19 @@ $extra = [
     'location' => [],
 ];
 
-$protocol = strtolower(request('protocol'));
+$protocol = strtolower(Request::trim('protocol'));
 if (empty($protocol)) {
     $protocol = 'wx';
 }
 
-$blue_tooth_screen = empty(request('screen')) ? 0 : 1;
-$power = empty(request('power')) ? 0 : 1;
-$blue_tooth_disinfectant = empty(request('disinfect')) ? 0 : 1;
+$blue_tooth_screen = Request::bool('screen') ? 0 : 1;
+$power = Request::bool('power') ? 0 : 1;
+$blue_tooth_disinfectant = Request::bool('disinfect') ? 0 : 1;
 
 $extra['bluetooth'] = [
     'protocol' => $protocol,
-    'uid' => strval(request('buid')),
-    'mac' => strval(request('mac')),
+    'uid' => Request::trim('buid'),
+    'mac' => Request::trim('mac'),
     'screen' => $blue_tooth_screen,
     'power' => $power,
     'disinfectant' => $blue_tooth_disinfectant,
@@ -64,7 +64,7 @@ if ($data['agent_id']) {
     }
 }
 
-$type_id = request('typeid');
+$type_id = Request::int('typeid');
 if ($type_id) {
     $device_type = DeviceTypes::get($type_id);
     if (empty($device_type)) {

@@ -761,8 +761,8 @@ include './index.php';
                 $order_limits = $account->getOrderLimits();
                 if ($order_limits > 0) {
                     //更新公众号统计，并检查吸粉总量
-                    if (Order::query(['account' => $account->getName()])->limit($order_limits + 1)->count(
-                        ) >= $order_limits) {
+                    $total = Order::query(['account' => $account->getName()])->limit($order_limits + 1)->count();
+                    if ($total >= $order_limits) {
                         $account->setState(Account::BANNED);
                         Account::updateAccountData();
                     }

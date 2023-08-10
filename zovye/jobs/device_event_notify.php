@@ -17,8 +17,8 @@ use zovye\Request;
 
 $op = Request::op('default');
 $data = [
-    'id' => request::int('id'),
-    'event' => request::str('event'),
+    'id' => Request::int('id'),
+    'event' => Request::str('event'),
 ];
 
 $log = [

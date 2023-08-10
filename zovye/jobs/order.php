@@ -15,6 +15,7 @@ use zovye\CtrlServ;
 use zovye\DBUtil;
 use zovye\Device;
 use zovye\Job;
+use zovye\JobException;
 use zovye\Locker;
 use zovye\Log;
 use zovye\model\deviceModelObj;
@@ -31,138 +32,120 @@ $id = Request::int('id');
 
 $log = [
     'id' => $id,
-    'url' => $_SERVER['QUERY_STRING'],
 ];
 
 $op = Request::op('default');
-if ($op == 'order' && CtrlServ::checkJobSign(['id' => request('id')])) {
-    $locker = Locker::try("order::statistics");
-    if ($locker) {
-        if ($id > 0) {
-            $order = Order::get($id);
-            if ($order) {
-                if (Util::isSysLoadAverageOk()) {
-                    Job::updateAppCounter();
+if ($op == 'order' && CtrlServ::checkJobSign($log)) {
+    if ($id > 0) {
+        $order = Order::get($id);
+        if (!$order) {
+            throw new JobException('找不到这个订单！', $log);
+        }
+
+        $device = $order->getDevice();
+        if (!$device) {
+            throw new JobException('找不到这个设备！', $log);
+        }
+
+        //是否自动清除错误代码
+        if (settings('device.clearErrorCode')) {
+            $device->cleanLastError();
+            $device->save();
+        }
+
+        //检查剩余商品数量
+        $device->checkRemain();
+
+        //检查公众号消息推送设置
+        $media = null;
+        $adv = $device->getOneAdv(Advertising::PUSH_MSG, true);
+        if ($adv) {
+            $media = [
+                'type' => $adv['extra']['msg']['type'],
+                'val' => $adv['extra']['msg']['val'],
+                'delay' => intval($adv['extra']['delay']),
+            ];
+        }
+
+        //使用全局默认设置
+        if (isEmptyArray($media)) {
+            $media = [
+                'type' => settings('misc.pushAccountMsg_type'),
+                'val' => settings('misc.pushAccountMsg_val'),
+                'delay' => settings('misc.pushAccountMsg_delay'),
+            ];
+        }
+
+        if ($media && $media['type'] != 'settings' && $media['type'] != 'none' && $media['val'] != '') {
+            $media['touser'] = $order->getOpenid();
+            $log['accountMsg_res'] = Job::accountMsg($media);
+        }
+
+        if ($order->isFree() && App::isSponsorAdEnabled()) {
+            $data = $device->getOneAdv(Advertising::SPONSOR, true, function ($ad) {
+                return $ad && $ad->getExtraData('num', 0) > 0;
+            });
+            if ($data) {
+                $ad = Advertising::get($data['id']);
+                if ($adv) {
+                    $num = $ad->getExtraData('num', 0);
+                    $ad->setExtraData('num', max(0, $num - 1));
+                    $ad->save();
                 }
+            }
+        }
 
-                $agent_id = $order->getAgentId();
-                if ($agent_id) {
-                    $agent = Agent::get($agent_id);
-                    if ($agent) {
-                        if (Util::isSysLoadAverageOk()) {
-                            Job::updateAgentCounter($agent);
-                        }
-                        $agent->updateSettings('agentData.stats.last_order', [
-                            'id' => $order->getId(),
-                            'createtime' => $order->getCreatetime(),
-                        ]);
-                    }
-                }
+        $agent = $order->getAgent();
+        if ($agent) {
+            $agent->updateSettings('agentData.stats.last_order', [
+                'id' => $order->getId(),
+                'createtime' => $order->getCreatetime(),
+            ]);
+        }
 
-                $device_id = $order->getDeviceId();
+        if (Locker::try("order::statistics")) {
+            if (Util::isSysLoadAverageOk()) {
+                Job::updateAppCounter();
+            }
 
-                /** @var deviceModelObj $device */
-                $device = Device::get($device_id);
+            if ($agent && Util::isSysLoadAverageOk()) {
+                Job::updateAgentCounter($agent);
+            }
 
-                //日志数据
-                $log['order'] = [
-                    'goodsName' => $order->getExtraData('goods.name'),
-                    'num' => $order->getNum(),
-                    'price' => $order->getPrice(),
-                    'account' => $order->getAccount(),
-                    'ip' => $order->getIp(),
-                ];
+            if (Util::isSysLoadAverageOk()) {
+                Job::updateDeviceCounter($device);
+            }
 
-                if ($device) {
-                    if (Util::isSysLoadAverageOk()) {
-                        Job::updateDeviceCounter($device);
-                    }
-
-                    $log['device'] = [
-                        'name' => $device->getName(),
-                        'imei' => $device->getImei(),
-                        'remain' => $device->getRemainNum(),
-                    ];
-                }
-
-                if ($device && time() - $order->getCreatetime() < 30) {
-                    //是否自动清除错误代码
-                    if (settings('device.clearErrorCode')) {
-                        $device->cleanLastError();
-                        $device->save();
-                    }
-
-                    //检查剩余商品数量
-                    $device->checkRemain();
-
-                    //检查公众号消息推送设置
-                    $media = null;
-                    $adv = $device->getOneAdv(Advertising::PUSH_MSG, true);
-                    if ($adv) {
-                        $media = [
-                            'type' => $adv['extra']['msg']['type'],
-                            'val' => $adv['extra']['msg']['val'],
-                            'delay' => intval($adv['extra']['delay']),
-                        ];
-                    }
-
-                    //使用全局默认设置
-                    if (isEmptyArray($media)) {
-                        $media = [
-                            'type' => settings('misc.pushAccountMsg_type'),
-                            'val' => settings('misc.pushAccountMsg_val'),
-                            'delay' => settings('misc.pushAccountMsg_delay'),
-                        ];
-                    }
-
-                    if ($media && $media['type'] != 'settings' && $media['type'] != 'none' && $media['val'] != '') {
-                        $media['touser'] = $order->getOpenid();
-                        $log['accountMsg_res'] = Job::accountMsg($media);
-                    }
-                }
-
+            if (Util::isSysLoadAverageOk()) {
                 $log['statistics'][$order->getId()] = DBUtil::transactionDo(function () use ($order) {
                     return Util::orderStatistics($order);
                 });
-
-                if ($order->isFree() && App::isSponsorAdEnabled()) {
-                    $data = $device->getOneAdv(Advertising::SPONSOR, true, function($adv) {
-                       return $adv && $adv->getExtraData('num', 0) > 0;
-                     });                     
-                    if ($data) {
-                        $adv = Advertising::get($data['id']);
-                        if ($adv) {
-                             $num =  $adv->getExtraData('num', 0);
-                             $adv->setExtraData('num', max(0, $num - 1));
-                             $adv->save();                            
-                        }
-                    }
-                 }
-            }
-        }
-
-        if (Util::isSysLoadAverageOk()) {
-            //其它未处理订单
-            $other_order = Order::query([
-                'updatetime' => 0,
-            ])->limit(100);
-
-            $total = 0;
-            /** @var orderModelObj $entry */
-            foreach ($other_order->findAll() as $entry) {
-                if ($entry && empty($entry->getUpdatetime())) {
-                    $result = DBUtil::transactionDo(function () use ($entry) {
-                        return Util::orderStatistics($entry);
-                    });
-                    $log['statistics'][$entry->getId()] = $result ?: 'success';
-                }
-                $total++;
-            }
-
-            if ($total > 50) {
-                Job::order(0);
             }
         }
     }
+
+    if (Util::isSysLoadAverageOk()) {
+        //其它未处理订单
+        $other_order = Order::query([
+            'updatetime' => 0,
+        ])->limit(100);
+
+        $total = 0;
+        /** @var orderModelObj $entry */
+        foreach ($other_order->findAll() as $entry) {
+            if ($entry && empty($entry->getUpdatetime())) {
+                $result = DBUtil::transactionDo(function () use ($entry) {
+                    return Util::orderStatistics($entry);
+                });
+                $log['statistics'][$entry->getId()] = $result ?: 'success';
+            }
+            $total++;
+        }
+
+        if ($total > 50) {
+            Job::order(0);
+        }
+    }
 }
+
 Log::debug('order', $log);

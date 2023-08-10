@@ -23,7 +23,6 @@ use zovye\Util;
 use function zovye\isEmptyArray;
 use function zovye\settings;
 
-
 $id = Request::int('id');
 
 $log = [

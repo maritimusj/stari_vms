@@ -52,7 +52,7 @@ class Job
 
     public static function deviceEventNotify(deviceModelObj $device, string $event): bool
     {
-        if (Config::WxPushMessage("config.$event.enabled")) {
+        if (Config::WxPushMessage("config.device.$event.enabled")) {
             return CtrlServ::scheduleJob('device_event_notify', ['id' => $device->getId(), 'event' => $event]);
         }
 

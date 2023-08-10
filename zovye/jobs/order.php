@@ -9,22 +9,18 @@ namespace zovye\job\order;
 defined('IN_IA') or exit('Access Denied');
 
 use zovye\Advertising;
-use zovye\Agent;
 use zovye\App;
 use zovye\CtrlServ;
 use zovye\DBUtil;
-use zovye\Device;
 use zovye\Job;
 use zovye\JobException;
 use zovye\Locker;
 use zovye\Log;
-use zovye\model\deviceModelObj;
 use zovye\model\orderModelObj;
 use zovye\Order;
 use zovye\Request;
 use zovye\Util;
 use function zovye\isEmptyArray;
-use function zovye\request;
 use function zovye\settings;
 
 

@@ -1385,7 +1385,7 @@ class deviceModelObj extends modelObj
 
         if ($remainWarning > 0 && $this->remain < $remainWarning) {
             $set_s2_flag = true;
-            Job::deviceEventNotify($this, 'low_remain');
+            Job::deviceEventNotify($this, 'device.low_remain');
         }
 
         $this->setS2($this->remain < 1 || $set_s2_flag ? 1 : 0);

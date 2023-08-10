@@ -751,37 +751,24 @@ include './index.php';
      *
      * @param orderModelObj $order 订单对象
      *
-     * @return array
      */
-    public static function orderStatistics(orderModelObj $order): array
+    public static function orderStatistics(orderModelObj $order)
     {
-        $result = [];
-
-        $locker = DBUtil::lockObject($order, ['updatetime' => 0]);
-
-        if ($locker && $locker->isLocked()) {
-            $name = $order->getAccount();
-            if ($name) {
-                $account = Account::findOneFromName($name);
-                if ($account) {
-                    $order_limits = $account->getOrderLimits();
-                    if ($order_limits > 0) {
-                        //更新公众号统计，并检查吸粉总量
-                        if (Order::query(['account' => $account->getName()])->limit($order_limits + 1)->count(
-                            ) >= $order_limits) {
-                            $account->setState(Account::BANNED);
-                            Account::updateAccountData();
-                        }
+        $name = $order->getAccount();
+        if ($name) {
+            $account = Account::findOneFromName($name);
+            if ($account) {
+                $order_limits = $account->getOrderLimits();
+                if ($order_limits > 0) {
+                    //更新公众号统计，并检查吸粉总量
+                    if (Order::query(['account' => $account->getName()])->limit($order_limits + 1)->count(
+                        ) >= $order_limits) {
+                        $account->setState(Account::BANNED);
+                        Account::updateAccountData();
                     }
                 }
             }
-
-            $result['order'] = $order->getId().' Ok!';
-        } else {
-            $result[] = $order->getId().' lock failed!';
         }
-
-        return $result;
     }
 
 

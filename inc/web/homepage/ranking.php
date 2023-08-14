@@ -181,11 +181,11 @@ if ($fn == 'default') {
     JSON::success($result);
 }
 
-function getYears(array $first_order): array
+function getYears($first_order): array
 {
     $years = [];
 
-    if ($first_order) {
+    if (is_array($first_order) && $first_order) {
         $begin = new DateTime();
 
         $begin->setTimestamp($first_order['createtime']);

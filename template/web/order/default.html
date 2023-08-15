@@ -548,10 +548,19 @@
                                     <span class="title">订单佣金 </span>
                                     <span data-op="commissionDetail">
                                         ￥{php echo number_format($order['commission']['local']['total'] / 100, 2)}元
-                                        {if $order['commission']['fee']}
-                                        <span class="commission-fee">
-                                            (扣除手续费￥{php echo number_format($order['commission']['fee'] / 100, 2)}元)
-                                        </span>
+                                        {if $order['commission']['local']['cost_price'] || $order['commission']['fee']}
+                                        (扣除
+                                            {if $order['commission']['local']['cost_price']}
+                                            <span class="commission-fee">
+                                                成本￥{php echo number_format($order['commission']['local']['cost_price'] / 100, 2)}元
+                                            </span>
+                                            {/if}
+                                            {if $order['commission']['fee']}
+                                            <span class="commission-fee">
+                                                手续费￥{php echo number_format($order['commission']['fee'] / 100, 2)}元
+                                            </span>
+                                            {/if}
+                                        )
                                         {/if}
                                     </span>
                                 </div>

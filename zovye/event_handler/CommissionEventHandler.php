@@ -244,6 +244,9 @@ class CommissionEventHandler
         if ($goods && empty($goods->getExtraData('cw', 0))) {
             //成本参与分佣
             $remaining_total += $cost_price;
+        } else {
+            //记录成本
+            $order->setExtraData('commission.local.cost_price', $cost_price);
         }
 
         if ($remaining_total < 1) {

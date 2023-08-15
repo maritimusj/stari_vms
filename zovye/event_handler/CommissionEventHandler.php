@@ -229,9 +229,9 @@ class CommissionEventHandler
         $order->setExtraData('commission.local.total', $remaining_total);
 
         //第2步，计算商品利润（减去成本价）
-        $goods = $order->getGoods();
+        $goods = $order->getGoodsData();
 
-        $cost_price = empty($goods) ? 0 : $goods->getCostPrice() * $order->getItemNum();
+        $cost_price = empty($goods) ? 0 : $goods['costPrice'] * $order->getItemNum();
 
         $remaining_total -= $cost_price;
 
@@ -241,7 +241,7 @@ class CommissionEventHandler
         }
 
         //第4步，成本及剩余利润分配给代理商, cw 设置为成本是否作为佣金分配给设备代理商
-        if ($goods && empty($goods->getExtraData('cw', 0))) {
+        if ($goods && empty($goods['cw'])) {
             //成本参与分佣
             $remaining_total += $cost_price;
         } else {

@@ -141,11 +141,9 @@ if ($total > 0) {
                 'bank' => $user->settings('agentData.bank', []),
             ];
 
-            $user_qrcode = [];
             if ($user->isKeeper()) {
                 $keeper = $user->getKeeper();
                 if ($keeper) {
-                    $user_qrcode = $keeper->settings('qrcode', []);
                     $data['keeper'] = [
                         'name' => $keeper->getName(),
                         'mobile' => $keeper->getMobile(),
@@ -154,9 +152,8 @@ if ($total > 0) {
             } elseif ($user->isPromoter()) {
                 $data['promoter'] = true;
             }
-            if (isEmptyArray($user_qrcode)) {
-                $user_qrcode = $user->settings('qrcode', []);
-            }
+
+            $user_qrcode = $user->settings('qrcode', []);
             if (isset($user_qrcode['wx'])) {
                 $user_qrcode['wx'] = Util::toMedia($user_qrcode['wx']);
             }

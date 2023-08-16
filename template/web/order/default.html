@@ -551,8 +551,10 @@
                             {if $order['commission']}
                             <div class="commission_detail local">
                                 <div class="total">
-                                    <div data-op="commissionDetail">
-                                        订单佣金￥{php echo number_format($order['commission']['local']['total'] / 100, 2)}元
+                                    <div>
+                                        <span data-op="commissionDetail">
+                                            订单佣金￥{php echo number_format($order['commission']['local']['total'] / 100, 2)}元
+                                        </span>
                                         {if $order['commission']['local']['cost_price'] || $order['commission']['fee']}
                                         <div class="commission-fee">
                                             {if $order['commission']['fee']}

@@ -3,7 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
- 
+
 namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
@@ -46,4 +46,4 @@ foreach ($query->findAll() as $device) {
 
 $zip->close();
 
-JSON::success(['url' => Util::toMedia($file_name)]);
+JSON::success(['url' => Util::toMedia($file_name, false, true)]);

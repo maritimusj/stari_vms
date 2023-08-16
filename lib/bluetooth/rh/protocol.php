@@ -19,6 +19,7 @@ class protocol implements IBlueToothProtocol
     const VOLTAGE = 'voltage';
     const SECRET = 'secret';
     const OPEN = 'open';
+    const UNKNOWN = 'unknown';
 
     public function getTitle(): string
     {

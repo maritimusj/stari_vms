@@ -30,7 +30,11 @@ class response implements IResponse
             return protocol::SECRET;
         }
 
-        return protocol::RESULT;
+        if (substr($this->data, 0, 1) == '{' && substr($this->data, -1) == '}') {
+            return protocol::RESULT;
+        }
+
+        return protocol::UNKNOWN;
     }
 
     public function isOpenResult(): bool
@@ -100,6 +104,8 @@ class response implements IResponse
                 return '=> 随机密钥：'.$this->getEncodeData();
             case protocol::RESULT:
                 return $this->isOpenResultOk() ? '=> 出货成功' : '=> 出货失败';
+            case protocol::UNKNOWN:
+                return '=> 其它消息';
         }
 
         return '=> 未知消息';
@@ -117,7 +123,7 @@ class response implements IResponse
 
     public function getEncodeData(): string
     {
-        return bin2hex($this->data);
+        return $this->data;
     }
 
     public function getAttachedCMD(): ?ICmd

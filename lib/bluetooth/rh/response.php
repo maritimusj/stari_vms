@@ -123,7 +123,7 @@ class response implements IResponse
 
     public function getEncodeData(): string
     {
-        return $this->data;
+        return base64_encode($this->data);
     }
 
     public function getAttachedCMD(): ?ICmd

@@ -46,7 +46,7 @@ class order
         }
         if ($order->getPrice() > 0) {
             $m = number_format($order->getPrice() / 100, 2);
-            $result['spec'] = "支付￥{$m}元购买";
+            $result['spec'] = "支付{$m}元购买";
         } else {
             $result['spec'] = '免费领取';
         }

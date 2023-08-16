@@ -160,7 +160,7 @@
 			<span class="way-num">{$button_index}</span>
 			<span class="way-desc" >支付购买</span>
 		</div>
-		<div class="pay-btn orange" onclick="zovye_fn.wxpay()">支付￥{$tpl['purchase']['price_formatted']}元购买</div>
+		<div class="pay-btn orange" onclick="zovye_fn.wxpay()">支付{$tpl['purchase']['price_formatted']}元购买</div>
 {/if}
 {if empty($tpl['accounts']) && empty($tpl['purchase'])}
     <div class="pay-btn disabled">暂时无法领取</div>

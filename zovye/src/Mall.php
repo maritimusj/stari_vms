@@ -20,7 +20,7 @@ class Mall
                 'name' => strval($goods->getName()),
                 'img' => Util::toMedia($goods->getImg(), true),
                 'price' => intval($goods->getPrice()),
-                'price_formatted' => '￥'.number_format($goods->getPrice() / 100, 2).'元',
+                'price_formatted' => number_format($goods->getPrice() / 100, 2).'元',
                 'unit_title' => $goods->getUnitTitle(),
                 'balance' => $goods->getBalance(),
                 'createtime_formatted' => date('Y-m-d H:i:s', $goods->getCreatetime()),
@@ -30,12 +30,12 @@ class Mall
 
             if (!empty($cost_price)) {
                 $data['costPrice'] = $cost_price;
-                $data['costPrice_formatted'] = '￥'.number_format($cost_price / 100, 2).'元';
+                $data['costPrice_formatted'] = number_format($cost_price / 100, 2).'元';
             }
             $discountPrice = $goods->getExtraData('discountPrice', 0);
             if (!empty($discountPrice)) {
                 $data['discountPrice'] = $discountPrice;
-                $data['discountPrice_formatted'] = '￥'.number_format($discountPrice / 100, 2).'元';
+                $data['discountPrice_formatted'] = number_format($discountPrice / 100, 2).'元';
             }
             $detailImg = $goods->getDetailImg();
             if ($detailImg) {

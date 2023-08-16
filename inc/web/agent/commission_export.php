@@ -114,7 +114,7 @@ if (Request::bool('is_export')) {
                 $goods = Goods::data($order->getGoodsId());
                 if ($order->getPrice() > 0) {
                     $pay_type = User::getUserCharacter($order->getOpenid())['title'];
-                    $spec = $pay_type."：￥".number_format(
+                    $spec = $pay_type."：".number_format(
                             $order->getPrice() / 100,
                             2
                         )."元 购买：".$goods['name']."x".$order->getNum();
@@ -154,7 +154,7 @@ if (Request::bool('is_export')) {
                 $goods = Goods::data($order->getGoodsId());
                 if ($order->getPrice() > 0) {
                     $pay_type = User::getUserCharacter($order->getOpenid())['title'];
-                    $spec = $pay_type."：￥".number_format(
+                    $spec = $pay_type."：".number_format(
                             $order->getPrice() / 100,
                             2
                         )."元 购买：".$goods['name']."x".$order->getNum();
@@ -185,7 +185,7 @@ if (Request::bool('is_export')) {
                 $goods = Goods::data($order->getGoodsId());
                 if ($order->getPrice() > 0) {
                     $pay_type = User::getUserCharacter($order->getOpenid())['title'];
-                    $spec = $pay_type."：￥".number_format(
+                    $spec = $pay_type."：".number_format(
                             $order->getPrice() / 100,
                             2
                         )."元 购买：".$goods['name']."x".$order->getNum();

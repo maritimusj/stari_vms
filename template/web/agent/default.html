@@ -105,7 +105,7 @@
                     <td>
                         {if isset($agent['commission'])}
                         <div class="commission log operate">
-                            <span class="price">￥<b>{php echo number_format($agent['commission']['total']/100, 2);}</b>元</span>
+                            <span class="price"><b>{php echo number_format($agent['commission']['total']/100, 2);}</b>元</span>
                             <i class="fa fa-list" data-op="viewCommissionLog" title="点击查看详情..."></i>
                             <i class='balance-edit fa fa-pencil' title='修改用户余额...' data-op='balanceEdit'></i>
                         </div>

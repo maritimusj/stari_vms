@@ -553,22 +553,23 @@
                                 <div class="total">
                                     <div>
                                         <span data-op="commissionDetail">
-                                            订单佣金￥{php echo number_format($order['commission']['local']['total'] / 100, 2)}元
+                                            订单佣金 {php echo number_format($order['commission']['local']['total'] / 100, 2)}元
                                         </span>
                                         {if $order['commission']['local']['cost_price'] || $order['commission']['fee']}
                                         <div class="commission-fee">
                                             {if $order['commission']['fee']}
                                             <div class="fee">
-                                                手续费￥{php echo number_format($order['commission']['fee'] / 100, 2)}元
+                                                手续费 {php echo number_format($order['commission']['fee'] / 100, 2)}元
                                             </div>
                                             {/if}
                                             {if $order['commission']['local']['cost_price']}
                                             <div class="cost">
-                                                成本￥{php echo number_format($order['commission']['local']['cost_price'] / 100, 2)}元
+                                                成本 {php echo number_format($order['commission']['local']['cost_price'] / 100, 2)}元
                                             </div>
                                             {/if}
-                                        {/if}
                                         </div>
+                                        {/if}
+                                        
                                     </div>
                                 </div>
                                 {if $order['commission']['bonus']}
@@ -584,7 +585,7 @@
                                         {/if}
                                     </div>
                                     <div class="income">
-                                        <b>奖励：</b><span class="money">￥{php echo number_format($item['xval'] / 100, 2);}元</span>
+                                        <b>奖励：</b><span class="money">{php echo number_format($item['xval'] / 100, 2);}元</span>
                                     </div>
                                 </div>
                                 {/if}
@@ -603,7 +604,7 @@
                                         {/if}
                                     </div>
                                     <div class="income">
-                                        <b>佣金：</b><span class="money">￥{php echo number_format($item['xval'] / 100, 2);}元</span>
+                                        <b>佣金：</b><span class="money">{php echo number_format($item['xval'] / 100, 2);}元</span>
                                     </div>
                                 </div>
                                 {/if}
@@ -616,7 +617,7 @@
                                         <span>{$order['agent']['name']}</span>
                                     </div>
                                     <div class="income">
-                                        <b>佣金：</b><span class="money">￥{php echo number_format($order['commission']['agent']['xval']/100, 2)}元</span>
+                                        <b>佣金：</b><span class="money">{php echo number_format($order['commission']['agent']['xval']/100, 2)}元</span>
                                     </div>
                                 </div>
                                 {/if}
@@ -633,13 +634,13 @@
                                         {/if}
                                     </div>
                                     <div class="income">
-                                        <b>佣金：</b><span class="money">￥{php echo number_format($item['xval'] / 100, 2);}元</span>
+                                        <b>佣金：</b><span class="money">{php echo number_format($item['xval'] / 100, 2);}元</span>
                                     </div>
                                 </div>
                                 {else}
                                 <div class="profile text-muted">&lt;已删除&gt;</div>
                                 <div class="income">
-                                    <b>佣金：</b><span class="money">￥{php echo number_format($item['xval'] / 100, 2);}元</span>
+                                    <b>佣金：</b><span class="money">{php echo number_format($item['xval'] / 100, 2);}元</span>
                                 </div>
                                 {/if}
                                 {/loop}

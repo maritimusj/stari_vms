@@ -341,7 +341,7 @@
                     </td>
                     <td class="bonus">
                         {if isset($a['commission'])}
-                            <span class="commission{if empty($a['commission'])} disabled{/if}" title="佣金">￥{php echo number_format($a['commission']/100, 2)}元</span>
+                            <span class="commission{if empty($a['commission'])} disabled{/if}" title="佣金">{php echo number_format($a['commission']/100, 2)}元</span>
                         {/if}
                         {if isset($a['balance'])}
                             <span class="balance" title="积分">{$a['balance']}</span>

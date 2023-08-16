@@ -253,13 +253,13 @@
                         </div>
                     </td>
                     <td>
-                        <div class="price"{if isset($item['remain'])} title="剩余：￥{$item['remain']}"{/if}>
-                            {if isset($item['current'])}￥{$item['current']}{else}<span class="text-muted">n/a</span>{/if}
+                        <div class="price"{if isset($item['remain'])} title="剩余：{$item['remain']}元"{/if}>
+                            {if isset($item['current'])}{$item['current']}元{else}<span class="text-muted">n/a</span>{/if}
                         </div>
                     </td>
                     <td>
                         <div class="price val">
-                            ￥{$item['xval']}
+                            {$item['xval']}元
                             {if $item['memo']}
                             <i class="fa fa-comment" title="{$item['memo']}"></i>
                             {/if}
@@ -273,7 +273,7 @@
                     <td>
                         <div class="price">
                             {if isset($item['fee'])}
-                            <span{if empty($item['fee'])} class="text-muted"{/if}>￥{php echo number_format($item['fee'] / 100, 2);}</span>
+                            <span{if empty($item['fee'])} class="text-muted"{/if}>{php echo number_format($item['fee'] / 100, 2);}元</span>
                             {else}
                             <span class="text-muted">n/a</span>
                             {/if}

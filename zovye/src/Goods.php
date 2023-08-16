@@ -156,7 +156,7 @@ class Goods
             'sync' => boolval($entry->getSync()),
             'price' => intval($entry->getPrice()),
             'type' => $entry->getType(),
-            'price_formatted' => '￥'.number_format($entry->getPrice() / 100, 2).'元',
+            'price_formatted' => number_format($entry->getPrice() / 100, 2).'元',
             'unit_title' => $entry->getUnitTitle(),
             'createtime_formatted' => date('Y-m-d H:i:s', $entry->getCreatetime()),
             'cw' => $entry->getExtraData('cw', 0), //成本是否参与分佣
@@ -185,7 +185,7 @@ class Goods
 
         if (!empty($cost_price)) {
             $data['costPrice'] = $cost_price;
-            $data['costPrice_formatted'] = '￥'.number_format($cost_price / 100, 2).'元';
+            $data['costPrice_formatted'] = number_format($cost_price / 100, 2).'元';
         }
 
         if (App::isMultiGoodsItemEnabled()) {
@@ -202,7 +202,7 @@ class Goods
         $discountPrice = $entry->getExtraData('discountPrice', 0);
         if (!empty($discountPrice)) {
             $data['discountPrice'] = $discountPrice;
-            $data['discountPrice_formatted'] = '￥'.number_format($discountPrice / 100, 2).'元';
+            $data['discountPrice_formatted'] = number_format($discountPrice / 100, 2).'元';
         }
 
         $detailImg = $entry->getDetailImg();

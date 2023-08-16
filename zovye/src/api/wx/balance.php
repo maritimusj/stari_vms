@@ -363,7 +363,7 @@ class balance
                             if ($order->getPrice() > 0) {
                                 $type = User::getUserCharacter($user)['title'];
                                 $m = number_format($order->getPrice() / 100, 2);
-                                $spec = "{$type}付款￥{$m}元购买";
+                                $spec = "{$type}付款{$m}元购买";
                             } else {
                                 $spec = '免费领取';
                             }

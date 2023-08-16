@@ -441,11 +441,11 @@ TRANSFER;
                 if ($order->getPrice() > 0) {
                     if ($order->getExtraData('group')) {
                         $m = number_format($order->getPrice() / 100, 2);
-                        $spec = "<span class=\"wxpay\">充电桩充电，支付：<span class=\"money\">￥$m</span>元</span>";
+                        $spec = "<span class=\"wxpay\">充电桩充电，支付：<span class=\"money\">$m</span>元</span>";
                     } else {
                         $m = number_format($order->getPrice() / 100, 2);
                         $userData = User::getUserCharacter($order->getOpenid());
-                        $spec = "<span class=\"wxpay\"><img src=\"{$userData['icon']}\" title=\"{$userData['title']}\"  alt=\"\"/>{$userData['title']}<span class=\"money\">￥$m</span>元购买：{$goods['name']}x{$order->getNum()}</span>";
+                        $spec = "<span class=\"wxpay\"><img src=\"{$userData['icon']}\" title=\"{$userData['title']}\"  alt=\"\"/>{$userData['title']}<span class=\"money\">$m</span>元购买：{$goods['name']}x{$order->getNum()}</span>";
                     }
 
                 } elseif ($order->getBalance() > 0) {

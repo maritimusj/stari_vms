@@ -3017,7 +3017,7 @@ class deviceModelObj extends modelObj
                     //如果相同商品设置了不同价格，则使用更高的价格
                     if ($result[$key]['price'] < $goods_data['price']) {
                         $result[$key]['price'] = $goods_data['price'];
-                        $result[$key]['price_formatted'] = '￥'.number_format($goods_data['price'] / 100, 2).'元';
+                        $result[$key]['price_formatted'] = number_format($goods_data['price'] / 100, 2).'元';
                     }
                 } else {
                     $data = [
@@ -3026,7 +3026,7 @@ class deviceModelObj extends modelObj
                         'img' => $goods_data['img'],
                         'detail_img' => $goods_data['detailImg'],
                         'price' => $goods_data['price'],
-                        'price_formatted' => '￥'.number_format($goods_data['price'] / 100, 2).'元',
+                        'price_formatted' => number_format($goods_data['price'] / 100, 2).'元',
                         'num' => intval($goods_data['num']),
                         Goods::AllowFree => $goods_data[Goods::AllowFree],
                         Goods::AllowPay => $goods_data[Goods::AllowPay],
@@ -3045,7 +3045,7 @@ class deviceModelObj extends modelObj
 
                         $discount = User::getUserDiscount($user, $goods_data);
                         $data['discount'] = $discount;
-                        $data['discount_formatted'] = '￥'.number_format($discount / 100, 2).'元';
+                        $data['discount_formatted'] = number_format($discount / 100, 2).'元';
                     }
 
                     $result[$key] = $data;

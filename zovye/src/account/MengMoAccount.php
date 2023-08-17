@@ -16,6 +16,7 @@ use zovye\model\userModelObj;
 use zovye\Order;
 use zovye\Session;
 use zovye\User;
+use zovye\Util;
 use function zovye\err;
 use function zovye\is_error;
 use function zovye\isEmptyArray;
@@ -43,6 +44,16 @@ class MengMoAccount implements IAccountProvider
         }
 
         $fans = empty($user) ? Session::fansInfo() : $user->profile();
+
+        if (empty($fans['sex'])) {
+            //要求用户必须提供性别
+            $data = $acc->format();
+            //防止qrcode为空被IsReady()过滤掉
+            $data['qrcode'] = Account::MENGMO_HEAD_IMG;
+            $data['redirect_url'] = Util::murl('util', ['op' => 'user', 'device' => $device->getImei()]);
+            return [$data];
+        }
+
         $area = $device->getArea();
 
         $data = [

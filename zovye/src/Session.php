@@ -321,7 +321,7 @@ class Session
 
             return $user;
         } catch (Exception $e) {
-            Log::error('error', [
+            Log::error('ali', [
                 'msg' => '获取支付宝用户失败！',
                 'error' => $e->getMessage(),
             ]);

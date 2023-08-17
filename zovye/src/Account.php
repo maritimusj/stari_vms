@@ -377,16 +377,20 @@ class Account extends State
             if (empty($acc) || $acc->isBanned()) {
                 return false;
             }
+
             if (!$include_balance && $acc->getBonusType() == Account::BALANCE) {
                 return false;
             }
+
             if (!$include_commission && $acc->getBonusType() == Account::COMMISSION) {
                 return false;
             }
+
             $index = sprintf("%03d", $acc->getOrderNo());
             if ($list[$index]) {
                 $index .= $acc->getId();
             }
+
             $list[$index] = function () use ($getter_fn, $acc, $device, $user) {
                 if ($acc->getBonusType() == Account::BALANCE) {
                     $res = Util::checkBalanceAvailable($user, $acc);
@@ -394,6 +398,7 @@ class Account extends State
                     //检查用户是否允许
                     $res = Util::checkAvailable($user, $acc, $device);
                 }
+
                 if (is_error($res)) {
                     return $res;
                 }
@@ -424,10 +429,12 @@ class Account extends State
 
         $accounts = $device->getAccounts($include);
         foreach ($accounts as $uid => $entry) {
+
             $group_name = $entry['groupname'];
             if (empty($group_name)) {
                 continue;
             }
+
             if (!isset($groups[$group_name])) {
                 $groups[$group_name] = [
                     'uid' => $uid,
@@ -499,6 +506,7 @@ class Account extends State
 
         uksort($list, function ($a, $b) {
             $res = strcmp($a, $b);
+
             if ($res < 0) {
                 return 1;
             } elseif ($res > 0) {

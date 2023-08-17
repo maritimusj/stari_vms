@@ -553,6 +553,7 @@ class Account extends State
 
             foreach ($res as $account) {
                 if (self::isReady($account)) {
+
                     //如果包含需要转跳的$account，则直接返回这个$account
                     if ($params['redirect_exclusive'] && $account['redirect_url']) {
                         return [$account];
@@ -561,6 +562,7 @@ class Account extends State
                     $result[] = $account;
                 }
             }
+
             if ($max > 0 && count($result) >= $max) {
                 $result = array_slice($result, 0, $max, true);
 

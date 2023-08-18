@@ -58,7 +58,7 @@ class MoscaleAccount implements IAccountProvider
         return DeviceUtil::isAssigned($device, $acc->getAssignData());
     }
 
-    public static function getUid(): string
+    public static function getUID(): string
     {
         return Account::makeThirdPartyPlatformUID(Account::MOSCALE, Account::MOSCALE_NAME);
     }

@@ -29,7 +29,7 @@ class WeiSureAccount implements IAccountProvider
 
     const ResponseOk = '{"code":"0", "msg":"成功","returnData":{}}';
 
-    public static function getUid(): string
+    public static function getUID(): string
     {
         return Account::makeThirdPartyPlatformUID(Account::WEISURE, Account::WEISURE_NAME);
     }

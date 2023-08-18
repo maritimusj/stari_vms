@@ -47,7 +47,7 @@ class YfbAccount implements IAccountProvider
         $this->scene = $scene;
     }
 
-    public static function getUid(): string
+    public static function getUID(): string
     {
         return Account::makeThirdPartyPlatformUID(Account::YFB, Account::YFB_NAME);
     }

@@ -41,7 +41,7 @@ class KingFansAccount implements IAccountProvider
         $this->key = $key;
     }
 
-    public static function getUid(): string
+    public static function getUID(): string
     {
         return Account::makeThirdPartyPlatformUID(Account::KINGFANS, Account::KINGFANS_NAME);
     }

@@ -29,7 +29,7 @@ class YiDaoAccount implements IAccountProvider
 {
     const API_URL = 'https://api.yidaogz.cn/open/commercial/get_qrcode';
 
-    public static function getUid(): string
+    public static function getUID(): string
     {
         return Account::makeThirdPartyPlatformUID(Account::YIDAO, Account::YIDAO_NAME);
     }

@@ -50,7 +50,7 @@ class SNTOAccount implements IAccountProvider
         $this->token = $token;
     }
 
-    public static function getUid(): string
+    public static function getUID(): string
     {
         return Account::makeThirdPartyPlatformUID(Account::SNTO, Account::SNTO_NAME);
     }

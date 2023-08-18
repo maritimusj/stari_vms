@@ -41,7 +41,7 @@ class CloudFIAccount implements IAccountProvider
         $this->area = $area;
     }
 
-    public static function getUid(): string
+    public static function getUID(): string
     {
         return Account::makeThirdPartyPlatformUID(Account::CloudFI, Account::CloudFI_NAME);
     }

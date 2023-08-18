@@ -35,7 +35,7 @@ class AQIInfoAccount extends AQIInfo implements IAccountProvider
         $this->app_secret = $app_secret;
     }
 
-    public static function getUid(): string
+    public static function getUID(): string
     {
         return Account::makeThirdPartyPlatformUID(Account::AQIINFO, Account::AQIINFO_NAME);
     }

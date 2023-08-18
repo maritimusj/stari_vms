@@ -37,7 +37,7 @@ class YunfenbaAccount implements IAccountProvider
         $this->sub_uid = $sub_uid;
     }
 
-    public static function getUid(): string
+    public static function getUID(): string
     {
         return Account::makeThirdPartyPlatformUID(Account::YUNFENBA, Account::YUNFENBA_NAME);
     }

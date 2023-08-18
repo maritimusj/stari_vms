@@ -12,7 +12,7 @@ use zovye\model\userModelObj;
 
 interface IAccountProvider
 {
-    static function getUid();
+    static function getUID();
 
     static function fetch(deviceModelObj $device, userModelObj $user);
 }

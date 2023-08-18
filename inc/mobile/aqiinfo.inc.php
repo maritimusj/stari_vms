@@ -44,7 +44,7 @@ if (Request::str('appResult') == 'nomore') {
     }
 
     $tpl_data = Util::getTplData([$user, $device]);
-    $tpl_data['exclude'][] = AQIInfoAccount::getUid();
+    $tpl_data['exclude'][] = AQIInfoAccount::getUID();
 
     //设备首页
     Response::devicePage($tpl_data);

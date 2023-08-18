@@ -32,7 +32,7 @@ class JfbAccount implements IAccountProvider
     const REDIRECT_URL = 'http://wx.zhuna888.com/fans/?redirectUri={redirectUri}&channelId={channelId}&userId={userId}#/Jump';
     const CB_RESPONSE = 'ok';
 
-    public static function getUid(): string
+    public static function getUID(): string
     {
         return Account::makeThirdPartyPlatformUID(Account::JFB, Account::JFB_NAME);
     }

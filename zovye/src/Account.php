@@ -489,7 +489,7 @@ class Account extends State
                 continue;
             }
 
-            $uid = $obj::getUid();
+            $uid = $obj::getUID();
 
             if (in_array($uid, $exclude)) {
                 continue;

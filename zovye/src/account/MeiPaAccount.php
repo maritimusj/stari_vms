@@ -44,7 +44,7 @@ class MeiPaAccount implements IAccountProvider
         $this->app_key = $app_key;
     }
 
-    public static function getUid(): string
+    public static function getUID(): string
     {
         return Account::makeThirdPartyPlatformUID(Account::MEIPA, Account::MEIPA_NAME);
     }

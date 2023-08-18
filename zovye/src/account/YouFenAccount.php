@@ -38,7 +38,7 @@ class YouFenAccount implements IAccountProvider
         $this->app_key = $app_key;
     }
 
-    public static function getUid(): string
+    public static function getUID(): string
     {
         return Account::makeThirdPartyPlatformUID(Account::YOUFEN, Account::YOUFEN_NAME);
     }

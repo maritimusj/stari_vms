@@ -216,11 +216,13 @@ foreach ($query->findAll() as $entry) {
         }
     }
 
+    $fee = $entry->getExtraData('pay.fee');
+
     //分佣
     $commission = $entry->getExtraData('commission', []);
-    if ($commission) {
+    if ($fee || $commission) {
         $data['commission'] = $commission;
-        $data['commission']['fee'] = $entry->getExtraData('pay.fee');
+        $data['commission']['fee'] = $fee;
     }
 
     $pay_result = $entry->getExtraData('payResult');

@@ -20,26 +20,19 @@ class EventBus
      */
     public static function init()
     {
-        $events = settings(
-            'events',
-            [
-                'device' =>
-                    [
-                        'AccountEventHandler', //公众号检查
-                        'CommissionEventHandler', //处理佣金
-                        'AgentBonusEventHandler', //佣金奖励
-                        'LocationEventHandler', //定位检查
-                        'We7CreditEventHandler', //处理微擎积分
-                        'JobEventHandler', //订单后续处理Job
-                        'VoucherEventHandler', //提货券
-                        'GoodsQuotaEventHandler',//商品限额
-                    ],
-            ]
-        );
-
-        if (empty($events) || !is_array($events)) {
-            return;
-        }
+        $events = [
+            'device' =>
+                [
+                    'AccountEventHandler', //公众号检查
+                    'CommissionEventHandler', //处理佣金
+                    'AgentBonusEventHandler', //佣金奖励
+                    'LocationEventHandler', //定位检查
+                    'We7CreditEventHandler', //处理微擎积分
+                    'JobEventHandler', //订单后续处理Job
+                    'VoucherEventHandler', //提货券
+                    'GoodsQuotaEventHandler',//商品限额
+                ],
+        ];
 
         foreach ($events as $type => $classes) {
             if (!isset(self::$events_data[$type])) {

@@ -130,12 +130,12 @@ class advertisingModelObj extends modelObj
 
     public function getExtra()
     {
-        $this->unserializeExtra();
+        $this->deserializeExtra();
 
         return $this->extra;
     }
 
-    public function unserializeExtra()
+    public function deserializeExtra()
     {
         if (We7::is_serialized($this->extra)) {
             $res = unserialize($this->extra);
@@ -151,7 +151,7 @@ class advertisingModelObj extends modelObj
      */
     public function getExtraData(string $key, $default = null)
     {
-        $this->unserializeExtra();
+        $this->deserializeExtra();
 
         return getArray($this->extra, $key, $default);
     }
@@ -163,7 +163,8 @@ class advertisingModelObj extends modelObj
      */
     public function setExtraData(string $key, $val)
     {
-        $this->unserializeExtra();
+        $this->deserializeExtra();
+
         setArray($this->extra, $key, $val);
     }
 

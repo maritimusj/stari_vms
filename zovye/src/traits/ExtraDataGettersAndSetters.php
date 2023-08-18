@@ -35,7 +35,7 @@ trait ExtraDataGettersAndSetters
      */
     public function getExtraData($key = '', $default = null)
     {
-        $this->unserializeExtra();
+        $this->deserializeExtra();
 
         if ($key) {
             return getArray($this->__extraData, $key, $default);
@@ -52,7 +52,7 @@ trait ExtraDataGettersAndSetters
      */
     public function setExtraData($key, $val = null)
     {
-        $this->unserializeExtra();
+        $this->deserializeExtra();
 
         if (is_array($this->__extraData)) {
             if (is_string($key)) {
@@ -65,7 +65,7 @@ trait ExtraDataGettersAndSetters
         return static::setExtra(json_encode($this->__extraData));
     }
 
-    public function unserializeExtra()
+    public function deserializeExtra()
     {
         if (is_null($this->__extraData)) {
             if ($this->extra) {

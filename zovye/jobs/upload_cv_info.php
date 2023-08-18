@@ -14,6 +14,7 @@ use zovye\GDCVMachine;
 use zovye\Log;
 use zovye\model\cv_upload_deviceModelObj;
 use zovye\model\cv_upload_orderModelObj;
+use zovye\model\orderModelObj;
 use zovye\Request;
 use function zovye\m;
 
@@ -76,7 +77,7 @@ if ($op == 'upload_cv_info' && CtrlServ::checkJobSign($data)) {
                 $data['response'] = $response;
                 Config::GDCVMachine('last.order_upload', time(), true);
                 if (!empty($response)) {
-                    /** @var cv_upload_orderModelObj $order */
+                    /** @var orderModelObj $order */
                     foreach ($list as $index => $order) {
                         $result = $response[$index] ?? ['code' => -1, 'message' => '返回数据为空或者错误！'];
                         if ($order) {

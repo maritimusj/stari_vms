@@ -39,7 +39,7 @@ $params = [$user, $device, new DateTime()];
 
 if (App::isTKPromotingEnabled() && $type_id == Advertising::WELCOME_PAGE) {
     $account = TKPromoting::getAccount();
-    if ($account && !is_error($account)) {
+    if (!is_error($account)) {
         $res = Util::checkAvailable($user, $account, $device);
         if (!is_error($res)) {
             $result[] = TKPromoting::getAd();

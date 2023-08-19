@@ -39,7 +39,7 @@ $params = [$user, $device, new DateTime()];
 
 if (App::isTKPromotingEnabled() && $type_id == Advertising::WELCOME_PAGE) {
     $account = TKPromoting::getAccount();
-    if ($account && !$account->isBanned()) {
+    if ($account) {
         $res = Util::checkAvailable($user, $account, $device);
         if (!is_error($res)) {
             $result[] = TKPromoting::getAd();

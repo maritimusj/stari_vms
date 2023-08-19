@@ -14,6 +14,7 @@ use zovye\Device;
 use zovye\Fueling;
 use zovye\Log;
 
+use zovye\model\orderModelObj;
 use zovye\Order;
 use zovye\Request;
 
@@ -39,14 +40,8 @@ if ($op == 'fueling_start_timeout' && CtrlServ::checkJobSign($params)) {
     if ($order) {
         $result = $order->getFuelingResult();
         if (empty($result)) {
-            Fueling::end($uid, $chargerID, function ($order) {
-                $order->setSrc(Order::FUELING);
 
-                $order->setExtraData('timeout', [
-                    'at' => time(),
-                    'reason' => '设备无响应，请稍后再试！',
-                ]);
-            });
+            handle($order);
 
             $params['error'] = [
                 'at' => time(),
@@ -61,14 +56,9 @@ if ($op == 'fueling_start_timeout' && CtrlServ::checkJobSign($params)) {
     if ($device) {
         $data = $device->getFuelingStatusData($chargerID);
         if (empty($data)) {
-            Fueling::end($uid, $chargerID, function ($order) {
-                $order->setSrc(Order::FUELING);
 
-                $order->setExtraData('timeout', [
-                    'at' => time(),
-                    'reason' => '设备失去响应，请重试！',
-                ]);
-            });
+            handle($order);
+
             $params['error'] = [
                 'at' => time(),
                 'reason' => '设备失去响应，请重试！',
@@ -81,3 +71,26 @@ if ($op == 'fueling_start_timeout' && CtrlServ::checkJobSign($params)) {
 
 $params['time_formatted'] = date('Y-m-d H:i:s', $params['time']);
 Log::debug('fueling_start_timeout', $params);
+
+function handle(orderModelObj $order) {
+
+    $device = $order->getDevice();
+    $chargerID = $order->getChargerID();
+
+    //启动超时，设备也可能已经工作并产生费用
+
+    Fueling::settle($device, [
+        'ser' => $order->getOrderNO(),
+        'ch' => $chargerID,
+        'reason' => -1,
+        'solo' => Fueling::MODE_REMOTE,
+        'time' => time(),
+    ]);
+
+    $order->setExtraData('timeout', [
+        'at' => time(),
+        'reason' => '设备无响应，请稍后再试！',
+    ]);
+
+    $order->save();
+}

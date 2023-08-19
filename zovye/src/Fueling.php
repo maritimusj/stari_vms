@@ -409,6 +409,16 @@ class Fueling
         $serial = strval($data['ser']);
         $chargerID = intval($data['ch']);
 
+        if (!Locker::try("settle:$serial", REQUEST_ID, 3)) {
+            Log::error("fueling", [
+                'error' => '结算订单时，锁定失败！',
+                'data' => $data,
+                'device' => $device->profile(),
+            ]);
+
+            return err('订单锁订失败！');
+        }
+
         self::end($serial, $chargerID, function (orderModelObj $order) use ($device, $serial, $data) {
             if (isset($data['price_total'])) {
                 $total_price = intval($data['price_total']);
@@ -422,16 +432,6 @@ class Fueling
 
             $order->setFuelingRecord($data);
         });
-
-        if (!Locker::try("settle:$serial", REQUEST_ID, 3)) {
-            Log::error("fueling", [
-                'error' => '结算订单时，锁定失败！',
-                'data' => $data,
-                'device' => $device->profile(),
-            ]);
-
-            return err('订单锁订失败！');
-        }
 
         $result = DBUtil::transactionDo(function () use ($serial, $device, $chargerID) {
             $order = Order::findOne(['order_id' => $serial, 'src' => Order::FUELING_UNPAID]);

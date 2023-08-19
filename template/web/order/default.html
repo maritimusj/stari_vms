@@ -673,7 +673,7 @@
                                     {else}
                                     ，退回 {php echo number_format($order['fueling']['refund']['total'] / 100, 2, '.', '')}元
                                     {/if}
-                                {else}，已用完{/if}
+                                {/if}
                             {/if}
 
                             {if $order['src'] ==  \zovye\Order::CHARGING}
@@ -683,7 +683,7 @@
                                     {else}
                                     ，退回 {php echo number_format($order['charging']['refund']['total'] / 100, 2, '.', '')}元
                                     {/if}
-                                {else}，已用完{/if}
+                                {/if}
                             {/if}
                         </div>
                         {/if}

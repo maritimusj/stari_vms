@@ -298,31 +298,30 @@ class DeviceEventProcessor
      */
     public static function handle(string $event, array $data)
     {
-        DBUtil::transactionDo(function () use ($event, $data) {
-            $e = self::$events[$event];
-            if (isset($e)) {
-                self::log($e, $data);
+        $e = self::$events[$event];
 
-                $fn = $e['handler'];
-                if (!empty($fn)) {
-                    if (is_callable($fn)) {
-                        call_user_func($fn, $data);
-                    } else {
-                        Log::warning('events', [
-                            'event' => $event,
-                            'data' => $data,
-                            'error' => 'handler is not function!',
-                        ]);
-                    }
+        if (isset($e)) {
+            self::log($e, $data);
+
+            $fn = $e['handler'];
+            if (!empty($fn)) {
+                if (is_callable($fn)) {
+                    call_user_func($fn, $data);
+                } else {
+                    Log::warning('events', [
+                        'event' => $event,
+                        'data' => $data,
+                        'error' => 'handler is not function!',
+                    ]);
                 }
-            } else {
-                Log::warning('events', [
-                    'event' => $event,
-                    'data' => $data,
-                    'error' => 'unhandled event!',
-                ]);
             }
-        });
+        } else {
+            Log::warning('events', [
+                'event' => $event,
+                'data' => $data,
+                'error' => 'unhandled event!',
+            ]);
+        }
 
         exit(CtrlServ::OK);
     }

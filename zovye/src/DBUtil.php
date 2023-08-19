@@ -67,11 +67,13 @@ class DBUtil
             }
         }
 
-        We7::cache_write($key, microtime(true));
-
-        We7::pdo_begin();
         try {
+            We7::cache_write($key, microtime(true));
+
+            We7::pdo_begin();
+
             $ret = $cb();
+
             if (is_error($ret)) {
                 We7::pdo_rollback();
             } else {
@@ -79,6 +81,7 @@ class DBUtil
             }
 
             return $ret;
+
         } catch (Exception $e) {
             We7::pdo_rollback();
 

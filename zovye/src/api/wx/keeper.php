@@ -108,15 +108,15 @@ class keeper
             return err('获取手机号码失败，请稍后再试！');
         }
 
-        $user = User::findOne(['mobile' => $mobile, 'app' => User::WX]);
-        if (empty($user)) {
+        $h5_user = User::findOne(['mobile' => $mobile, 'app' => User::WX]);
+        if (empty($h5_user)) {
             $url = Util::murl('keeper', ['openid' => $user->getOpenid()]);
             JSON::fail(['msg' => "手机号码{$mobile}还没有绑定用户，请立即绑定！", 'url' => $url]);
         }
 
         $query = \zovye\Keeper::query(['mobile' => $mobile]);
         if (empty($query->count())) {
-            return err('找不到相应的运营人员信息，手机号码：'.$mobile);
+            return err("手机号码{$mobile}没有对应的运营人员信息！");
         }
 
         $keeper_data = [];
@@ -134,7 +134,7 @@ class keeper
                 }
                 $keeper_data[] = [
                     'id' => $keeper->getId(),
-                    'user_id' => $user->getId(),
+                    'user_id' => $h5_user->getId(),
                     'name' => $keeper->getName(),
                     'agent' => [
                         'id' => $agent->getId(),
@@ -155,7 +155,7 @@ class keeper
             'src' => LoginData::KEEPER,
             'user_id' => 0,
             'session_key' => strval($res['session_key']),
-            'openid_x' => $user->getOpenid(),
+            'openid_x' => $h5_user->getOpenid(),
             'token' => $token,
         ];
 

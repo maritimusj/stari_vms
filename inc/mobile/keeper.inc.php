@@ -24,6 +24,16 @@ if (empty($user)) {
     Response::alert('只能从微信中打开，谢谢！', 'error');
 }
 
+if (Request::has('openid')) {
+    $u = User::get(Request::str('openid'), true);
+    //如果h5用户已经登记手机号码并且与小程序用户手机号码不同，则清除小程序用户绑定的手机号码，触发小程序端手机号码授权登录，从而重新获取用户手机号码
+    //解决小程序用户已经保存了不正确手机号码导致用户无法登录的情况
+    if ($u && !empty($u->getMobile()) && !empty($user->getMobile()) && $u->getMobile() != $user->getMobile()) {
+        $u->setMobile('');
+        $u->save();
+    }
+}
+
 $op = Request::op('default');
 
 if ($op == 'save') {

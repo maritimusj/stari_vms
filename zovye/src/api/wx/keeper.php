@@ -110,8 +110,8 @@ class keeper
 
         $user = User::findOne(['mobile' => $mobile, 'app' => User::WX]);
         if (empty($user)) {
-            $url = Util::murl('keeper', ['mobile' => $mobile]);
-            JSON::fail(['msg' => '您还没有绑定手机号码，请立即绑定！', 'url' => $url]);
+            $url = Util::murl('keeper', ['openid' => $user->getOpenid()]);
+            JSON::fail(['msg' => "手机号码{$mobile}还没有绑定用户，请立即绑定！", 'url' => $url]);
         }
 
         $query = \zovye\Keeper::query(['mobile' => $mobile]);

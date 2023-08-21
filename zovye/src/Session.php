@@ -68,8 +68,6 @@ class Session
                             if ($user->getAvatar() != $fans['headimgurl']) {
                                 $user->setAvatar($fans['headimgurl']);
                             }
-                            $customData = $user->get('customData', []);
-                            $user->set('fansData', array_merge($fans, $customData));
                             $user->save();
                         }
                         self::setContainer($user);

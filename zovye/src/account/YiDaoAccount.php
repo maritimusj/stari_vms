@@ -55,7 +55,7 @@ class YiDaoAccount implements IAccountProvider
 
         $fans = $user->profile();
 
-        if (!isset($fans['sex'])) {
+        if (empty($fans['sex'])) {
             //要求用户必须提供性别
             $data = $acc->format();
             //防止qrcode为空被IsReady()过滤掉

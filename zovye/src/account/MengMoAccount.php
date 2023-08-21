@@ -62,7 +62,7 @@ class MengMoAccount implements IAccountProvider
             'openId' => $fans['openid'],
             'facilityId' => $device->getImei(),
             'nickname' => $fans['nickname'],
-            'sex' => empty($fans['sex']) ? 0 : $fans['sex'],
+            'sex' => $fans['sex'],
             'headUrl' => $fans['headimgurl'],
             'ipAddress' => CLIENT_IP,
             'userAgent' => $_SERVER['HTTP_USER_AGENT'],

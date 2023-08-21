@@ -63,7 +63,7 @@ class MoscaleAccount implements IAccountProvider
         return Account::makeThirdPartyPlatformUID(Account::MOSCALE, Account::MOSCALE_NAME);
     }
 
-    public static function fetch(deviceModelObj $device, userModelObj $user = null): array
+    public static function fetch(deviceModelObj $device, userModelObj $user): array
     {
         $v = [];
 

@@ -46,7 +46,7 @@ class KingFansAccount implements IAccountProvider
         return Account::makeThirdPartyPlatformUID(Account::KINGFANS, Account::KINGFANS_NAME);
     }
 
-    public static function fetch(deviceModelObj $device, userModelObj $user = null): array
+    public static function fetch(deviceModelObj $device, userModelObj $user): array
     {
         $acc = Account::findOneFromType(Account::KINGFANS);
         if (empty($acc)) {

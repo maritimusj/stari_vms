@@ -41,7 +41,7 @@ class YiDaoAccount implements IAccountProvider
         return md5(implode($arr));
     }
 
-    public static function fetch(deviceModelObj $device, userModelObj $user = null): array
+    public static function fetch(deviceModelObj $device, userModelObj $user): array
     {
         $acc = Account::findOneFromType(Account::YIDAO);
         if (empty($acc)) {
@@ -53,9 +53,9 @@ class YiDaoAccount implements IAccountProvider
             return [];
         }
 
-        $fans = empty($user) ? Session::fansInfo() : $user->profile();
+        $fans = $user->profile();
 
-        if (empty($fans['sex'])) {
+        if (!isset($fans['sex'])) {
             //要求用户必须提供性别
             $data = $acc->format();
             //防止qrcode为空被IsReady()过滤掉

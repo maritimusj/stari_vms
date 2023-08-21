@@ -49,7 +49,7 @@ class MeiPaAccount implements IAccountProvider
         return Account::makeThirdPartyPlatformUID(Account::MEIPA, Account::MEIPA_NAME);
     }
 
-    public static function fetch(deviceModelObj $device, userModelObj $user = null): array
+    public static function fetch(deviceModelObj $device, userModelObj $user): array
     {
         /** @var accountModelObj $acc */
         $acc = Account::findOneFromType(Account::MEIPA);

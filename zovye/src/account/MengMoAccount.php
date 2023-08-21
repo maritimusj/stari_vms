@@ -31,7 +31,7 @@ class MengMoAccount implements IAccountProvider
         return Account::makeThirdPartyPlatformUID(Account::MENGMO, Account::MENGMO_NAME);
     }
 
-    public static function fetch(deviceModelObj $device, userModelObj $user = null): array
+    public static function fetch(deviceModelObj $device, userModelObj $user): array
     {
         $acc = Account::findOneFromType(Account::MENGMO);
         if (empty($acc)) {
@@ -43,9 +43,9 @@ class MengMoAccount implements IAccountProvider
             return [];
         }
 
-        $fans = empty($user) ? Session::fansInfo() : $user->profile();
+        $fans = $user->profile();
 
-        if (empty($fans['sex'])) {
+        if (!isset($fans['sex'])) {
             //要求用户必须提供性别
             $data = $acc->format();
             //防止qrcode为空被IsReady()过滤掉

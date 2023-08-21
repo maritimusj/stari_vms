@@ -37,7 +37,7 @@ class JfbAccount implements IAccountProvider
         return Account::makeThirdPartyPlatformUID(Account::JFB, Account::JFB_NAME);
     }
 
-    public static function fetch(deviceModelObj $device, userModelObj $user = null): array
+    public static function fetch(deviceModelObj $device, userModelObj $user): array
     {
         $acc = Account::findOneFromType(Account::JFB);
         if (empty($acc)) {

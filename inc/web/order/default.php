@@ -94,7 +94,6 @@ if ($way == 'free') {
     $condition['result_code >'] = 0;
 }
 
-
 $limit = Request::array('datelimit');
 if ($limit['start']) {
     $start = DateTime::createFromFormat('Y-m-d H:i:s', $limit['start'].' 00:00:00');
@@ -118,8 +117,8 @@ $query->where($condition);
 $order_no = Request::str('order');
 if ($order_no) {
     $query->whereOr([
-        'order_id' => $order_no,
-        'transaction_id' => $order_no,
+        'order_id LIKE' => "%$order_no",
+        'transaction_id LIKE' => "%$order_no",
     ]);
     $tpl_data['s_order'] = $order_no;
 }

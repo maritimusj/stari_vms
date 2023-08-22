@@ -15,6 +15,7 @@ $tpl_data = [
     'commission_balance' => App::isCommissionEnabled(),
 ];
 
+$query = Order::query();
 $condition = [];
 
 $agent_openid = Request::str('agent_openid');
@@ -93,17 +94,6 @@ if ($way == 'free') {
     $condition['result_code >'] = 0;
 }
 
-$order_no = Request::str('order');
-if ($order_no) {
-    $condition['order_id LIKE'] = "%$order_no%";
-    $tpl_data['s_order'] = $order_no;
-} else {
-    $order_no = Request::str('orderNO');
-    if ($order_no) {
-        $condition['order_id'] = $order_no;
-        $tpl_data['s_order'] = $order_no;
-    }
-}
 
 $limit = Request::array('datelimit');
 if ($limit['start']) {
@@ -123,7 +113,16 @@ if ($limit['end']) {
     }
 }
 
-$query = Order::query($condition);
+$query->where($condition);
+
+$order_no = Request::str('order');
+if ($order_no) {
+    $query->whereOr([
+        'order_id' => $order_no,
+        'transaction_id' => $order_no,
+    ]);
+    $tpl_data['s_order'] = $order_no;
+}
 
 if (empty($condition)) {
     $last_order = Order::getLastOrder();

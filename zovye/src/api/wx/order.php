@@ -77,7 +77,7 @@ class order
                 }
             }
         }
-        
+
         $result['createtime'] = date('Y-m-d H:i:s', $order->getCreatetime());
 
         return $result;
@@ -262,6 +262,18 @@ class order
             //出货结果
             $data['result'] = $entry->getExtraData('pull.result', []);
 
+            if (is_error( $data['result'])) {
+                $data['status'] = [
+                    'title' =>  $data['result']['message'],
+                    'clr' => '#F56C6C',
+                ];
+            } else {
+                $data['status'] = [
+                    'title' => '出货成功',
+                    'clr' => '#67C23A',
+                ];
+            }
+
             if ($entry->isChargingOrder()) {
                 $data['type'] = 'charging';
                 $data['pay'] = $entry->getExtraData('card', []);
@@ -320,7 +332,7 @@ class order
         if (empty($step) || $step == 'init') {
             return [
                 'total' => $query->count(),
-                'serial' => $agent->getId() . (new DateTime())->format('YmdHis'),
+                'serial' => $agent->getId().(new DateTime())->format('YmdHis'),
             ];
         } else {
             $serial = Request::str('serial');
@@ -345,7 +357,7 @@ class order
                 return [
                     'url' => Util::toMedia("$dirname$filename"),
                 ];
-            }            
+            }
         }
 
         return err('不正确的请求！');

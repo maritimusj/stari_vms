@@ -243,6 +243,7 @@ function createOrder(
         'src' => intval($pay_log->getData('src', Order::PAY)),
         'order_id' => $order_no,
         'openid' => $user->getOpenid(),
+        'user_id' => $user->getId(),
         'agent_id' => $device->getAgentId(),
         'device_id' => $device->getId(),
         'num' => $pay_log->getTotal(),

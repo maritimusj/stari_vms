@@ -301,6 +301,7 @@ class DeviceUtil
 
                 $order_data = [
                     'openid' => $user->getOpenid(),
+                    'user_id' => $user->getId(),
                     'agent_id' => $device->getAgentId(),
                     'device_id' => $device->getId(),
                     'src' => Order::ACCOUNT,
@@ -309,6 +310,7 @@ class DeviceUtil
                     'num' => 1,
                     'price' => 0,
                     'account' => $acc ? $acc->name() : '',
+                    'account_id' => $acc ? $acc->getId() : 0,
                     'ip' => empty($args['ip']) ? CLIENT_IP : $args['ip'],
                     'extra' => [
                         'goods' => $goods,

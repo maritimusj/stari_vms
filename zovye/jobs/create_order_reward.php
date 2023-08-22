@@ -248,6 +248,7 @@ function createOrder(
         'src' => Order::ACCOUNT,
         'order_id' => $order_no,
         'openid' => $user->getOpenid(),
+        'user_id' => $user->getId(),
         'agent_id' => $device->getAgentId(),
         'device_id' => $device->getId(),
         'num' => $num,

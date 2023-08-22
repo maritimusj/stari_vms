@@ -224,6 +224,7 @@ function createOrder(array $params, string $order_no, array $goods): array
         'order_id' => $order_no,
         'transaction_id' => $params['transaction_id'],
         'openid' => $user->getOpenid(),
+        'user_id' => $user->getId(),
         'agent_id' => $device->getAgentId(),
         'device_id' => $device->getId(),
         'name' => $goods['name'],
@@ -231,6 +232,7 @@ function createOrder(array $params, string $order_no, array $goods): array
         'num' => 1,
         'price' => $goods['price'],
         'account' => empty($acc) ? '' : $acc->name(),
+        'account_id' => empty($acc) ? 0 : $acc->getId(),
         'ip' => $params['ip'],
         'extra' => [
             'goods' => $goods,

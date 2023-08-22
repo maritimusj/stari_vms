@@ -21,7 +21,6 @@ use zovye\model\deviceModelObj;
 use zovye\DeviceTypes;
 use zovye\Goods;
 use zovye\Group as ZovyeGroup;
-use zovye\model\goods_stats_vwModelObj;
 use zovye\Request;
 use zovye\Stats;
 use zovye\model\userModelObj;
@@ -406,55 +405,6 @@ class device
         }
 
         return err('找不到指定的设备！');
-    }
-
-    public static function deviceGoods(): array
-    {
-        $user = common::getAgentOrPartner();
-
-        common::checkCurrentUserPrivileges('F_tj');
-
-        $device = device::getDevice(request('id'), $user);
-        if (is_error($device)) {
-            return $device;
-        }
-
-        $agent = $user->isPartner() ? $user->getPartnerAgent() : $user;
-        if (!\zovye\Device::isOwner($device, $agent)) {
-            return err('没有权限执行这个操作！');
-        }
-
-        $date = Request::trim('date');
-        if (empty($date)) {
-            $date = date('Y-m-d');
-        }
-
-        $query = m('goods_stats_vw')->where(
-            [
-                'agent_id' => $device->getAgentId(),
-                'device_id' => $device->getId(),
-                'date' => $date,
-            ]
-        );
-
-        $result = [];
-
-        /** @var goods_stats_vwModelObj $entry */
-        foreach ($query->findAll() as $entry) {
-            $result[] = [
-                'id' => $entry->getId(),
-                'name' => strval($entry->getName()),
-                'total' => intval($entry->getTotal()),
-            ];
-        }
-
-        foreach ($result as &$entry) {
-            $data = Goods::data($entry['id']);
-            $entry['img'] = $data['img'];
-            $entry['unit_title'] = $data['unit_title'];
-        }
-
-        return $result;
     }
 
     protected static function getStatisticsData($user, $params = []): array

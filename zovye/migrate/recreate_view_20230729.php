@@ -59,10 +59,6 @@ CREATE OR REPLACE VIEW `ims_zovye_vms_device_keeper_vw` AS
 SELECT d.*,IFNULL(k.keeper_id,0) keeper_id,k.commission_percent, k.commission_fixed,IFNULL(k.kind,0) kind,IFNULL(k.way,0) way FROM `ims_zovye_vms_device` d 
 LEFT JOIN `ims_zovye_vms_keeper_devices` k ON d.id=k.device_id WHERE 1;
 
-CREATE OR REPLACE VIEW `ims_zovye_vms_goods_stats_vw` AS 
-SELECT agent_id,device_id,goods_id AS id,name,sum(num) as total,FROM_UNIXTIME(createtime,'%Y-%m-%d') as date 
-FROM `ims_zovye_vms_order` GROUP BY device_id,goods_id,date;
-
 CREATE OR REPLACE VIEW `ims_zovye_vms_goods_voucher_vw` AS
 SELECT v.*,g.name AS goods_name
 FROM `ims_zovye_vms_goods_voucher` v

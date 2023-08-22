@@ -82,7 +82,6 @@ router::exec($op, [
     'Repair' => [agent::class, 'repair'],
     'AgentStats' => [agent::class, 'stats'],
     'DeviceOnline' => [device::class, 'getDeviceOnline'],
-    'DeviceGoods' => [device::class, 'deviceGoods'],
     'Statistics' => [device::class, 'statistics'],
     'AppRestart' => [device::class, 'appRestart'],
     'DeviceTypes' => [device::class, 'deviceTypes'],

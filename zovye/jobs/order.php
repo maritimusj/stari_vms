@@ -40,7 +40,7 @@ if ($op == 'order' && CtrlServ::checkJobSign($log)) {
     }
 
     //是否自动清除错误代码
-    if (settings('device.clearErrorCode')) {
+    if (settings('device.clearErrorCode') && $order->isResultOk()) {
         $device->cleanLastError();
         $device->save();
     }

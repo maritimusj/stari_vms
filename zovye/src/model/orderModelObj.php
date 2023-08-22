@@ -273,6 +273,26 @@ class orderModelObj extends modelObj
         return $pull_result && !is_error($pull_result);
     }
 
+    public function isResultOk(): bool
+    {
+        $device = $this->getDevice();
+        if ($device) {
+            if ($device->isVDevice() || $device->isDummyDevice()) {
+                return true;
+            }
+            if ($device->isBlueToothDevice() && $this->isBluetoothResultOk()) {
+                return true;
+            }
+            if ($device->isChargingDevice() && $this->isChargingResultOk()) {
+                return true;
+            }
+            if ($device->isFuelingDevice() && $this->isFuelingResultOk()) {
+                return true;
+            }
+        }
+        return $this->isPullOk();
+    }
+
     public function setChargingStatus($data)
     {
         return $this->setExtraData('charging.status', $data);

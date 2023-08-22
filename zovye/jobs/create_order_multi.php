@@ -306,6 +306,7 @@ function createOrder(
     if ($query_result) {
         $query_result['from'] = 'query';
         $order_data['extra']['payResult'] = $query_result;
+        $order_data['transaction_id'] = strval($query_result['transaction_id']);
     } else {
         $pay_result = $pay_log->getPayResult();
         if (empty($pay_result)) {
@@ -313,6 +314,7 @@ function createOrder(
         }
         $pay_result['from'] = 'cb';
         $order_data['extra']['payResult'] = $pay_result;
+        $order_data['transaction_id'] = strval($pay_result['transaction_id']);
     }
 
     if (!empty($voucher)) {

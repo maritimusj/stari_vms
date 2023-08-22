@@ -163,6 +163,7 @@ function prepare(string $order_no)
             'total' => $pay_result['total'],
             'transaction_id' => $pay_result['transaction_id'],
         ],
+        'transaction_id' => strval($pay_result['transaction_id']),
     ];
 
     DBUtil::transactionDo(function () use (&$params, $order_no, $goods, &$log_data) {
@@ -221,6 +222,7 @@ function createOrder(array $params, string $order_no, array $goods): array
     $order_data = [
         'src' => $params['src'],
         'order_id' => $order_no,
+        'transaction_id' => $params['transaction_id'],
         'openid' => $user->getOpenid(),
         'agent_id' => $device->getAgentId(),
         'device_id' => $device->getId(),

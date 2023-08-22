@@ -61,31 +61,48 @@ class orderModelObj extends modelObj
 
     /** @var string */
     protected $openid;
+
     /** @var int */
     protected $num;
+
     /** @var int */
     protected $price;
+
     /** @var int */
     protected $balance;
+
     /** @var string */
     protected $account;
+
     /** @var string */
     protected $order_id;
+
+    /** @var string */
+    protected $transaction_id;
+
     /** @var int */
     protected $agent_id;
+
     /** @var int */
     protected $device_id;
+
     /** @var int */
     protected $goods_id;
+
     /** @var string */
     protected $ip;
+
     protected $extra;
+
     /** @var int */
     protected $result_code;
+
     /** @var bool */
     protected $refund;
+
     /** @var int */
     protected $createtime;
+
     /** @var int */
     protected $updatetime;
 

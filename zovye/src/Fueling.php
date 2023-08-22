@@ -113,6 +113,7 @@ class Fueling
             $order_data = [
                 'src' => Order::FUELING_UNPAID,
                 'order_id' => $serial,
+                'transaction_id' => $extra['transaction_id'] ?? '',
                 'openid' => $user->getOpenid(),
                 'agent_id' => $device->getAgentId(),
                 'device_id' => $device->getId(),
@@ -276,7 +277,9 @@ class Fueling
         $res = self::start($pay_log->getOrderNO(), $pay_log, $device, $chargerID, [
             'ip' => $pay_log->getData('ip', ''),
             'pay_name' => $pay_log->getPayName(),
+            'transaction_id' => $pay_log->getTransactionId(),
         ]);
+
         if (is_error($res)) {
             return $res;
         }

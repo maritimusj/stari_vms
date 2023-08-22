@@ -36,6 +36,10 @@
 {template "web/settings/nav"}
 <form action="{php echo $this->createWebUrl('settings');}" method="post">
     <div class="panel panel-default panel-first nav-tab-item">
+        <div class="heading">
+            <span class="operate">
+            </span>
+        </div>
         <div class="panel-body">
             {if DEBUG}
             <div class="alert alert-warning alert-dismissible" role="alert">

@@ -36,8 +36,7 @@ $log = [
 ];
 
 if (!CtrlServ::checkJobSign($log)) {
-    $log['error'] = '异常请求！';
-    throw new JobException($log);
+    throw new JobException( '异常请求！', $log);
 }
 
 if (!Locker::try("pay:$order_no", REQUEST_ID, 3)) {
@@ -52,12 +51,7 @@ if (empty($order)) {
     try {
         $log['result'] = Order::refundBy($order_no);
     } catch (Exception $e) {
-        $log['exception'] = [
-            'type' => get_class($e),
-            'code' => $e->getCode(),
-            'msg' => $e->getMessage(),
-        ];
-        throw new JobException($log);
+        throw new JobException($e->getMessage(), $log);
     }
     Log::debug('refund', $log);
     Job::exit();
@@ -68,8 +62,7 @@ if ($device) {
     //蓝牙设备退款
     if ($device->isBlueToothDevice()) {
         if ($order->isBluetoothResultOk()) {
-            $log['result'] = '订单已成功，取消退款！';
-            throw new JobException($log);
+            throw new JobException('订单已成功，取消退款！', $log);
         }
 
         //退款
@@ -80,7 +73,7 @@ if ($device) {
 
         $log['result'] = is_error($res) ? $res : '退款成功！';
         if (is_error($res)) {
-            throw new JobException($log);
+            throw new JobException($res['message'], $log);
         }
 
         Log::debug('refund', $log);
@@ -95,12 +88,7 @@ if ($device) {
                 $order->save();
                 $log['result'] = $res;
             } catch (Exception $e) {
-                $log['exception'] = [
-                    'type' => get_class($e),
-                    'code' => $e->getCode(),
-                    'msg' => $e->getMessage(),
-                ];
-                throw new JobException($log);
+                throw new JobException($e->getMessage(), $log);
             }
         } else {
             $log['err'] = '充电订单未结束！';
@@ -118,12 +106,7 @@ if ($device) {
                 $order->save();
                 $log['result'] = $res;
             } catch (Exception $e) {
-                $log['exception'] = [
-                    'type' => get_class($e),
-                    'code' => $e->getCode(),
-                    'msg' => $e->getMessage(),
-                ];
-                throw new JobException($log);
+                throw new JobException($e->getMessage(), $log);
             }
         } else {
             $log['err'] = '加注订单未结束！';
@@ -136,8 +119,7 @@ if ($device) {
 
 //以下是普通设备退款
 if (empty($num) && $order->isPullOk()) {
-    $log['result'] = '订单已成功，取消退款！';
-    throw new JobException($log);
+    throw new JobException('订单已成功，取消退款！', $log);
 }
 
 $res = [];
@@ -171,7 +153,7 @@ if ($num >= 0) {
 
 $log['result'] = !is_error($res) ? '退款成功！' : $res;
 if (is_error($res)) {
-    throw new JobException($log);
+    throw new JobException($res['message'], $log);
 }
 
 Log::debug('refund', $log);

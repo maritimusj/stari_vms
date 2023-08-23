@@ -716,6 +716,7 @@ class WxPlatform
                 if (!is_error($res)) {
                     return self::createOrder($device, $user, $acc);
                 }
+
                 return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $device->getUrl());
             }
 
@@ -760,6 +761,7 @@ class WxPlatform
             return err($e->getMessage());
 
         } catch (Exception $e) {
+
             Log::error('wxplatform', [
                 'msg' => $msg,
                 'error' => $e->getMessage(),

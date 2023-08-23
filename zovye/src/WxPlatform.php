@@ -643,22 +643,31 @@ class WxPlatform
             ZovyeException::throwWith('没有指定商品或商品库存不足！', -1, $device);
         }
 
-        Log::debug('wxplatform', [
-            'account' => $account->format(),
-            'user' => $user->profile(),
-            'device' => $device->profile(),
-        ]);
-
         $uid = empty($msg['Ticket']) ? sha1(time()) : sha1($msg['Ticket']);
         $order_uid = Order::makeUID($user, $device, $uid);
 
-        return Job::createThirdPartyPlatformOrder([
+        $result = Job::createThirdPartyPlatformOrder([
             'device' => $device->getId(),
             'user' => $user->getId(),
             'account' => $account->getId(),
             'orderUID' => $order_uid,
             'extra' => [],
         ]);
+
+        $log = [
+            'account' => $account->format(),
+            'user' => $user->profile(),
+            'device' => $device->profile(),
+            'start create order job' => $result,
+        ];
+
+        if ($result) {
+            Log::debug('wxplatform', $log);
+        } else {
+            Log::error('wxplatform', $log);
+        }
+
+        return $result;
     }
 
     public static function open($msg)
@@ -732,6 +741,7 @@ class WxPlatform
             //出货时机是用户点击链连后，直接返回推送的消息
             if (!empty($account->settings('config.open.timing'))) {
                 $user->setLastActiveDevice($device);
+
                 return $account->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $account->getUrl());
             }
 

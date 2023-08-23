@@ -509,7 +509,7 @@
 
                             {if $a['is_third_party_platform']}
                                 <li>
-                                    <a href="{php echo $this->createWebUrl('account', ['op' => 'viewQueryLog', 'id' => $a['id']])}">
+                                    <a href="{php echo $this->createWebUrl('account', ['op' => 'viewQueryLog', 'id' => $a['id'], 'from' => $type])}">
                                         <i class="fa fa-history fa-fw"></i> 查看请求日志
                                     </a>
                                 </li>
@@ -524,18 +524,18 @@
                             <li>
                                 {if $banned}
                                 <li>
-                                    <a href="{php echo $this->createWebUrl('account', array('op'=>'assign', 'id'=>$a['id']))}">
+                                    <a href="{php echo $this->createWebUrl('account', array('op'=>'assign', 'id'=>$a['id'], 'from' => $type))}">
                                     <i class="fa fa-wrench fa-fw"></i> 分配设备
                                     </a>
                                 </li>
                                 {else}
-                                <a href="{php echo $this->createWebUrl('account', array('op'=>'ban','id'=>$a['id']))}">
+                                <a href="{php echo $this->createWebUrl('account', array('op'=>'ban','id'=>$a['id'], 'from' => $type))}">
                                 {if $a['banned']}<i class="fa fa-eye fa-fw"></i> 启用{else}<i class="fa fa-eye-slash fa-fw"></i> 隐藏{/if}
                                 </a>
                                 {/if}
                             </li>
                             <li>
-                                <a href="#" onclick="if(confirm('确定要删除这个任务吗？')){location.href='{php echo $this->createWebUrl('account', array('op'=>'remove','id'=>$a['id']))}'}">
+                                <a href="#" onclick="if(confirm('确定要删除这个任务吗？')){location.href='{php echo $this->createWebUrl('account', array('op'=>'remove','id'=>$a['id'], 'from' => $type))}'}">
                                     <i class="fa fa-trash fa-fw"></i> 删除?
                                 </a>
                             </li>

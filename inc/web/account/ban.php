@@ -19,8 +19,8 @@ if ($account) {
     }
 
     if ($account->save() && Account::updateAccountData()) {
-        Response::toast("{$account->getTitle()}设置成功！", $this->createWebUrl('account'), 'success');
+        Response::toast("{$account->getTitle()}设置成功！", $this->createWebUrl('account', ['type' => Request::int('from')]), 'success');
     }
 }
 
-Response::toast('操作失败！', $this->createWebUrl('account'), 'error');
+Response::toast('操作失败！', $this->createWebUrl('account', ['type' => Request::int('from')]), 'error');

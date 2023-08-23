@@ -695,11 +695,33 @@ class WxPlatform
 
             $user = User::getOrCreate($msg['FromUserName'], User::WX);
             if (empty($user)) {
-                throw new RuntimeException('找不到这个用户！');
+                throw new RuntimeException('找不到这个用户[1]！');
             }
 
             if ($user->isBanned()) {
-                throw new RuntimeException('用户已被禁用！');
+                throw new RuntimeException('用户已被禁用[1]！');
+            }
+
+            //如果是来自屏幕二维码
+            if ($first == 'device') {
+                $res = Util::checkAvailable($user, $acc, $device, ['ignore_assigned' => true]);
+
+                Log::debug('wxplatform', [
+                    'user' => $user->profile(),
+                    'device' => $device->profile(),
+                    'account' => $acc->profile(),
+                    'result' => $res,
+                ]);
+
+                if (!is_error($res)) {
+                    return self::createOrder($device, $user, $acc);
+                }
+                return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $device->getUrl());
+            }
+
+            $user = User::get($first);
+            if (empty($user)) {
+                throw new RuntimeException('找不到这个用户[2]！');
             }
 
             Log::debug('wxplatform', [
@@ -708,13 +730,8 @@ class WxPlatform
                 'account' => $acc->profile(),
             ]);
 
-            //如果是来自屏幕二维码
-            if ($first == 'device') {
-                $res = Util::checkAvailable($user, $acc, $device, ['ignore_assigned' => true]);
-                if (!is_error($res)) {
-                    return self::createOrder($device, $user, $acc);
-                }
-                return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $device->getUrl());
+            if ($user->isBanned()) {
+                throw new RuntimeException('用户已被禁用[2]！');
             }
 
             //出货时机是用户点击链连后，直接返回推送的消息

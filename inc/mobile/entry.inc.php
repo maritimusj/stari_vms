@@ -228,9 +228,12 @@ if ($from == 'device') {
 }
 
 if (empty($device)) {
-    //设备扫描页面
-    $tpl_data = Util::getTplData([$user, $account]);
-    Response::scanPage($tpl_data);
+    $device = $user->getLastActiveDevice();
+    if (empty($device)) {
+        //设备扫描页面
+        $tpl_data = Util::getTplData([$user, $account]);
+        Response::scanPage($tpl_data);
+    }
 }
 
 //检查用户定位

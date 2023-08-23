@@ -26,3 +26,6 @@ ALTER TABLE `ims_zovye_vms_order` ADD `account_id` VARCHAR(32) NULL AFTER `goods
 SQL;
     Migrate::execSQL($sql);
 }
+
+//升级完成标志
+updateSettings('migration.order', '20230823');

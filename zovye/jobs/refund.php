@@ -14,6 +14,7 @@ use Exception;
 use zovye\CtrlServ;
 use zovye\Helper;
 use zovye\Job;
+use zovye\JobException;
 use zovye\Locker;
 use zovye\Log;
 use zovye\model\orderModelObj;
@@ -21,9 +22,7 @@ use zovye\Order;
 use zovye\Request;
 use function zovye\err;
 use function zovye\is_error;
-use function zovye\request;
 
-$op = Request::op('default');
 $order_no = Request::str('orderNO');
 $num = Request::int('num');
 $reset_payload = Request::int('reset');
@@ -32,136 +31,147 @@ $message = urldecode(Request::str('message'));
 $log = [
     'orderNO' => $order_no,
     'num' => $num,
-    'resetPayload' => $reset_payload,
+    'reset' => $reset_payload,
     'message' => $message,
 ];
 
-if ($op == 'refund' && CtrlServ::checkJobSign($log)) {
+if (!CtrlServ::checkJobSign($log)) {
+    $log['error'] = '异常请求！';
+    throw new JobException($log);
+}
 
-    if (!Locker::try("pay:$order_no", REQUEST_ID, 3)) {
-        $log['relaunch refund job'] = Job::refund($order_no, request('message'), $num, boolval($reset_payload), 10);
-        Log::debug('refund', $log);
-        Job::exit();
+if (!Locker::try("pay:$order_no", REQUEST_ID, 3)) {
+    $log['relaunch refund job'] = Job::refund($order_no, Request::str('message'), $num, boolval($reset_payload), 10);
+    Log::debug('refund', $log);
+    Job::exit();
+}
+
+$order = Order::get($order_no, true);
+if (empty($order)) {
+    //没有订单，也要尝试退款
+    try {
+        $log['result'] = Order::refundBy($order_no);
+    } catch (Exception $e) {
+        $log['exception'] = [
+            'type' => get_class($e),
+            'code' => $e->getCode(),
+            'msg' => $e->getMessage(),
+        ];
+        throw new JobException($log);
     }
+    Log::debug('refund', $log);
+    Job::exit();
+}
 
-    $order = Order::get($order_no, true);
-    if (empty($order)) {
-        //没有订单，也要尝试退款
-        try {
-            $log['result'] = Order::refundBy($order_no);
-        } catch (Exception $e) {
-            $log['exception'] = [
-                'type' => get_class($e),
-                'code' => $e->getCode(),
-                'msg' => $e->getMessage(),
-            ];
-        }
-        Log::debug('refund', $log);
-        Job::exit();
-    }
-
-    $device = $order->getDevice();
-    if ($device) {
-        //蓝牙设备退款
-        if ($device->isBlueToothDevice()) {
-            if ($order->isBluetoothResultOk()) {
-                $log['result'] = '订单已成功，取消退款！';
-                Log::debug('refund', $log);
-                Job::exit();
-            }
-
-            //退款
-            $res = Order::refund($order->getOrderNO(), 0, ['message' => $log['message']]);
-            if ($reset_payload && !is_error($res)) {
-                resetPayload($order, $num);
-            }
-
-            $log['result'] = is_error($res) ? $res : '退款成功！';
-            Log::debug('refund', $log);
-            Job::exit();
+$device = $order->getDevice();
+if ($device) {
+    //蓝牙设备退款
+    if ($device->isBlueToothDevice()) {
+        if ($order->isBluetoothResultOk()) {
+            $log['result'] = '订单已成功，取消退款！';
+            throw new JobException($log);
         }
 
-        if ($device->isChargingDevice()) {
-            if ($order->isChargingFinished()) {
-                try {
-                    $res = Order::refundBy($order_no, 0 - $order->getPrice());
-                    $order->setExtraData('charging.refund', $res);
-                    $order->save();
-                    $log['result'] = $res;
-                } catch (Exception $e) {
-                    $log['exception'] = [
-                        'type' => get_class($e),
-                        'code' => $e->getCode(),
-                        'msg' => $e->getMessage(),
-                    ];
-                }
-            } else {
-                $log['err'] = '充电订单未结束！';
-            }
-
-            Log::debug('refund', $log);
-            Job::exit();
-        }
-
-        if ($device->isFuelingDevice()) {
-            if ($order->isFuelingFinished()) {
-                try {
-                    $res = Order::refundBy($order_no, 0 - $order->getPrice());
-                    $order->setExtraData('fueling.refund', $res);
-                    $order->save();
-                    $log['result'] = $res;
-                } catch (Exception $e) {
-                    $log['exception'] = [
-                        'type' => get_class($e),
-                        'code' => $e->getCode(),
-                        'msg' => $e->getMessage(),
-                    ];
-                }
-            } else {
-                $log['err'] = '加注订单未结束！';
-            }
-            Log::debug('refund', $log);
-            Job::exit();
-        }
-    }
-
-    //以下是普通设备退款
-    if (empty($num) && $order->isPullOk()) {
-        $log['result'] = '订单已成功，取消退款！';
-        Log::debug('refund', $log);
-        Job::exit();
-    }
-
-    $res = [];
-
-    if ($num >= 0) {
         //退款
-        $res = Order::refund($order->getOrderNO(), $num, ['message' => $log['message']]);
+        $res = Order::refund($order->getOrderNO(), 0, ['message' => $log['message']]);
         if ($reset_payload && !is_error($res)) {
-            resetPayload($order, $num);
-        }
-    } else {
-        //找出所有出货失败的商品，并计算退款金额
-        $price = 0;
-
-        $list = Helper::getOrderPullLog($order);
-        foreach ($list as $entry) {
-            if (is_error($entry['result'])) {
-                $price += intval($entry['price']);
-            }
+            $log['resetPayload'] = resetPayload($order, $num);
         }
 
-        if ($price > 0) {
-            //退款
-            $res = Order::refund2($order->getOrderNO(), $price, ['message' => $log['message']]);
-            if ($reset_payload && !is_error($res)) {
-                //恢复指定商品库存
-                resetPayload2($order);
+        $log['result'] = is_error($res) ? $res : '退款成功！';
+        if (is_error($res)) {
+            throw new JobException($log);
+        }
+
+        Log::debug('refund', $log);
+        Job::exit();
+    }
+
+    if ($device->isChargingDevice()) {
+        if ($order->isChargingFinished()) {
+            try {
+                $res = Order::refundBy($order_no, 0 - $order->getPrice());
+                $order->setExtraData('charging.refund', $res);
+                $order->save();
+                $log['result'] = $res;
+            } catch (Exception $e) {
+                $log['exception'] = [
+                    'type' => get_class($e),
+                    'code' => $e->getCode(),
+                    'msg' => $e->getMessage(),
+                ];
+                throw new JobException($log);
             }
+        } else {
+            $log['err'] = '充电订单未结束！';
+        }
+
+        Log::debug('refund', $log);
+        Job::exit();
+    }
+
+    if ($device->isFuelingDevice()) {
+        if ($order->isFuelingFinished()) {
+            try {
+                $res = Order::refundBy($order_no, 0 - $order->getPrice());
+                $order->setExtraData('fueling.refund', $res);
+                $order->save();
+                $log['result'] = $res;
+            } catch (Exception $e) {
+                $log['exception'] = [
+                    'type' => get_class($e),
+                    'code' => $e->getCode(),
+                    'msg' => $e->getMessage(),
+                ];
+                throw new JobException($log);
+            }
+        } else {
+            $log['err'] = '加注订单未结束！';
+        }
+
+        Log::debug('refund', $log);
+        Job::exit();
+    }
+}
+
+//以下是普通设备退款
+if (empty($num) && $order->isPullOk()) {
+    $log['result'] = '订单已成功，取消退款！';
+    throw new JobException($log);
+}
+
+$res = [];
+
+if ($num >= 0) {
+    //退款
+    $res = Order::refund($order->getOrderNO(), $num, ['message' => $log['message']]);
+    if ($reset_payload && !is_error($res)) {
+        $log['resetPayload'] = resetPayload($order, $num);
+    }
+} else {
+    //找出所有出货失败的商品，并计算退款金额
+    $price = 0;
+
+    $list = Helper::getOrderPullLog($order);
+    foreach ($list as $entry) {
+        if (is_error($entry['result'])) {
+            $price += intval($entry['price']);
         }
     }
 
-    $log['result'] = !is_error($res) ? '退款成功！' : $res;
+    if ($price > 0) {
+        //退款
+        $res = Order::refund2($order->getOrderNO(), $price, ['message' => $log['message']]);
+        if ($reset_payload && !is_error($res)) {
+            //恢复指定商品库存
+            $log['resetPayload'] = resetPayload2($order);
+        }
+    }
+}
+
+$log['result'] = !is_error($res) ? '退款成功！' : $res;
+if (is_error($res)) {
+    throw new JobException($log);
 }
 
 Log::debug('refund', $log);

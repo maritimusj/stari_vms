@@ -48,7 +48,8 @@ class Platform
         }
 
         Log::debug('wxplatform', [
-            'fn' => 'parseEncryptedData',
+            'fn' => 'encryptMsg',
+            'data' => $data,
             'error' => $err,
         ]);
 

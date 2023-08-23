@@ -35,7 +35,12 @@ $log = [
     'message' => $message,
 ];
 
-if (!CtrlServ::checkJobSign($log)) {
+if (!CtrlServ::checkJobSign([
+    'orderNO' => $order_no,
+    'num' => $num,
+    'reset' => $reset_payload,
+    'message' => Request::str('message'),
+])) {
     throw new JobException( '异常请求！', $log);
 }
 

@@ -539,7 +539,7 @@ class WxPlatform
                 }
             }
 
-            if ($result && !is_error($result)) {
+            if (is_string($result)) {
                 return self::getEncryptedMsg($result);
             }
         }
@@ -670,8 +670,15 @@ class WxPlatform
             }
 
             $event_key = str_replace('qrscene_', '', strval($msg['EventKey']));
+
             list($prefix, $first, $second) = explode(':', $event_key, 3);
+
             if ($prefix != App::uid(6)) {
+                Log::error('wxplatform', [
+                    'msg' => $msg,
+                    'error' => 'App不匹配，已忽略！',
+                ]);
+
                 return [];
             }
 
@@ -682,71 +689,46 @@ class WxPlatform
             }
 
             $device = Device::get($second);
-
             if (empty($device)) {
-                throw new RuntimeException('找不到这个设备！');
+                throw new RuntimeException('找不到这个设备：'.$second);
             }
 
-            //如果是来自屏幕二维码
-            if ($first == 'device') {
-                $user = User::getOrCreate($msg['FromUserName'], User::WX);
-                if (empty($user)) {
-                    throw new RuntimeException('找不到这个用户！');
-                }
-
-                if ($user->isBanned()) {
-                    throw new RuntimeException('用户已被禁用！');
-                }
-
-                $res = Util::checkAvailable($user, $acc, $device, ['ignore_assigned' => true]);
-                if (!is_error($res)) {
-                    self::createOrder($device, $user, $acc);
-                } else {
-                    return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $device->getUrl());
-                }
-            }
-
-            $user = User::get($first);
+            $user = User::getOrCreate($msg['FromUserName'], User::WX);
             if (empty($user)) {
                 throw new RuntimeException('找不到这个用户！');
-            }
-
-            $profile = self::getUserProfile2(Account::getAuthorizerAccessToken($acc), $msg['FromUserName']);
-            Log::error("wxplatform", [
-                'msg' => $msg,
-                'profile' => $profile,
-                'user' => $user->profile(),
-            ]);
-
-            list($qr_app, $qr_user_id,) = explode(':', $profile['qr_scene_str'] ?? '');
-            if ($qr_app != App::uid(6)) {
-                throw new RuntimeException('AppUID不匹配！');
-            }
-
-            if ($qr_user_id != $user->getId()) {
-                throw new RuntimeException('用户不匹配！');
             }
 
             if ($user->isBanned()) {
                 throw new RuntimeException('用户已被禁用！');
             }
 
+            //如果是来自屏幕二维码
+            if ($first == 'device') {
+                $res = Util::checkAvailable($user, $acc, $device, ['ignore_assigned' => true]);
+                if (!is_error($res)) {
+                    return self::createOrder($device, $user, $acc);
+                }
+                return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $device->getUrl());
+            }
+
             //出货时机是用户点击链连后，直接返回推送的消息
             if (!empty($acc->settings('config.open.timing'))) {
-
                 $user->setLastActiveDevice($device);
-
                 return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $acc->getUrl());
             }
 
+            //创建订单
             self::createOrder($device, $user, $acc);
 
+            //返回消息
             return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $acc->getUrl());
 
         } catch (ZovyeException $e) {
             Log::error('wxplatform', [
+                'msg' => $msg,
                 'error' => $e->getMessage(),
             ]);
+
             $device = $e->getDevice();
             if ($device) {
                 $device->appShowMessage($e->getMessage(), 'error');
@@ -756,6 +738,7 @@ class WxPlatform
 
         } catch (Exception $e) {
             Log::error('wxplatform', [
+                'msg' => $msg,
                 'error' => $e->getMessage(),
             ]);
 

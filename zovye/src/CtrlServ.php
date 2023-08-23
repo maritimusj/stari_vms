@@ -414,7 +414,7 @@ class CtrlServ
             ]
         );
 
-        return request('sign') === self::makeSign($data);
+        return Request::str('sign') === self::makeSign($data);
     }
 
     /**

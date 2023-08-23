@@ -631,7 +631,7 @@ class WxPlatform
         return [];
     }
 
-    public static function createOrder(deviceModelObj $device, userModelObj $user, accountModelObj $acc): bool
+    public static function createOrder(deviceModelObj $device, userModelObj $user, accountModelObj $account): bool
     {
         //获取第一货道上的商品，如果该商品数量不足，则去获取其它货道上的相同商品
         $goods = $device->getGoodsByLane(0);
@@ -640,11 +640,11 @@ class WxPlatform
         }
 
         if (empty($goods) || $goods['num'] < 1) {
-            ZovyeException::throwWith('指定的商品库存不足！', -1, $device);
+            ZovyeException::throwWith('没有指定商品或商品库存不足！', -1, $device);
         }
 
         Log::debug('wxplatform', [
-            'account' => $acc->format(),
+            'account' => $account->format(),
             'user' => $user->profile(),
             'device' => $device->profile(),
         ]);
@@ -655,7 +655,7 @@ class WxPlatform
         return Job::createThirdPartyPlatformOrder([
             'device' => $device->getId(),
             'user' => $user->getId(),
-            'account' => $acc->getId(),
+            'account' => $account->getId(),
             'orderUID' => $order_uid,
             'extra' => [],
         ]);
@@ -683,8 +683,8 @@ class WxPlatform
             }
 
             $account_name = $msg['ToUserName'];
-            $acc = Account::findOneFromName($account_name);
-            if (empty($acc)) {
+            $account = Account::findOneFromName($account_name);
+            if (empty($account)) {
                 throw new RuntimeException('找不到指定的公众号：'.$account_name);
             }
 
@@ -704,20 +704,20 @@ class WxPlatform
 
             //如果是来自屏幕二维码
             if ($first == 'device') {
-                $res = Util::checkAvailable($user, $acc, $device, ['ignore_assigned' => true]);
+                $res = Util::checkAvailable($user, $account, $device, ['ignore_assigned' => true]);
+
+                if (!is_error($res)) {
+                    return self::createOrder($device, $user, $account);
+                }
 
                 Log::debug('wxplatform', [
                     'user' => $user->profile(),
                     'device' => $device->profile(),
-                    'account' => $acc->profile(),
+                    'account' => $account->profile(),
                     'result' => $res,
                 ]);
 
-                if (!is_error($res)) {
-                    return self::createOrder($device, $user, $acc);
-                }
-
-                return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $device->getUrl());
+                return $account->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $device->getUrl());
             }
 
             $user = User::get($first);
@@ -725,27 +725,21 @@ class WxPlatform
                 throw new RuntimeException('找不到这个用户[2]！');
             }
 
-            Log::debug('wxplatform', [
-                'user' => $user->profile(),
-                'device' => $device->profile(),
-                'account' => $acc->profile(),
-            ]);
-
             if ($user->isBanned()) {
                 throw new RuntimeException('用户已被禁用[2]！');
             }
 
             //出货时机是用户点击链连后，直接返回推送的消息
-            if (!empty($acc->settings('config.open.timing'))) {
+            if (!empty($account->settings('config.open.timing'))) {
                 $user->setLastActiveDevice($device);
-                return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $acc->getUrl());
+                return $account->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $account->getUrl());
             }
 
             //创建订单
-            self::createOrder($device, $user, $acc);
+            self::createOrder($device, $user, $account);
 
             //推送设备首页链接
-            return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $device->getUrl());
+            return $account->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $device->getUrl());
 
         } catch (ZovyeException $e) {
             Log::error('wxplatform', [

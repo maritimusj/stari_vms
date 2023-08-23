@@ -28,4 +28,4 @@ SQL;
 }
 
 //升级完成标志
-updateSettings('migration.order', '20230823');
+updateSettings('migration.order', '20230822');

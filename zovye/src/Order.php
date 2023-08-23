@@ -106,6 +106,10 @@ class Order extends State
             $data['uniacid'] = We7::uniacid();
         }
 
+        if (settings('migration.order') != '20230822') {
+            unset($data['user_id'], $data['account_id'], $data['transaction_id']);
+        }
+
         /** @var ExtraDataGettersAndSetters $classname */
         $classname = m('order')->objClassname();
         $data['extra'] = $classname::serializeExtra($data['extra']);

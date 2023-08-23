@@ -25,7 +25,7 @@ $type = $account->getType();
 if ($account->getAgentId()) {
     $agent = Agent::get($account->getAgentId());
     if ($agent) {
-        $agent_name = $agent->getNickname();
+        $agent_name = $agent->getName();
         $agent_mobile = $agent->getMobile();
         $agent_openid = $agent->getOpenid();
     }

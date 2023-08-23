@@ -57,6 +57,29 @@ if ($op == WxPlatform::AUTH_NOTIFY) {
     ]);
 
     echo <<<HTML
-授权成功！
+    <style>
+        .tip {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+        .content {
+            display: flex;
+            align-items: center;
+        }
+        .content img {
+            width: 32px;
+            height: 32px;
+            margin-right: 10px;
+        }
+    </style>
+<div class="tip">
+    <div class="content">
+        <img src="static/img/success_icon.jpg" class="icon"> 授权成功！
+    </div>
+</div>
 HTML;
 }

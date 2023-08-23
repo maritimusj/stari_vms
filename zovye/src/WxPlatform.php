@@ -702,6 +702,12 @@ class WxPlatform
                 throw new RuntimeException('用户已被禁用！');
             }
 
+            Log::debug('wxplatform', [
+                'user' => $user->profile(),
+                'device' => $device->profile(),
+                'account' => $acc->profile(),
+            ]);
+
             //如果是来自屏幕二维码
             if ($first == 'device') {
                 $res = Util::checkAvailable($user, $acc, $device, ['ignore_assigned' => true]);
@@ -720,8 +726,8 @@ class WxPlatform
             //创建订单
             self::createOrder($device, $user, $acc);
 
-            //返回消息
-            return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $acc->getUrl());
+            //推送设备首页链接
+            return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $device->getUrl());
 
         } catch (ZovyeException $e) {
             Log::error('wxplatform', [

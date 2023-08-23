@@ -8,7 +8,7 @@ namespace zovye\job\refund;
 
 defined('IN_IA') or exit('Access Denied');
 
-//订单退款
+//订单失败后退款
 
 use Exception;
 use zovye\CtrlServ;
@@ -41,7 +41,7 @@ if (!CtrlServ::checkJobSign([
     'reset' => $reset_payload,
     'message' => Request::str('message'),
 ])) {
-    throw new JobException( '异常请求！', $log);
+    throw new JobException('异常请求！', $log);
 }
 
 if (!Locker::try("pay:$order_no", REQUEST_ID, 3)) {

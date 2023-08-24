@@ -925,6 +925,7 @@ class Order extends State
                 $time_formatted = date('Y-m-d H:i:s', $refund['createtime']);
                 $data['refund'] = [
                     'title' => "退款时间：$time_formatted",
+                    'total' => intval($refund['total']),
                     'reason' => $refund['message'] ?? '未知',
                 ];
             }

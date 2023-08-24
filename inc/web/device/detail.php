@@ -44,7 +44,7 @@ if ($device->isChargingDevice()) {
     $accounts = $device->getAssignedAccounts();
     if ($accounts) {
         foreach ($accounts as &$entry) {
-            $entry['edit_url'] = $this->createWebUrl('account', ['op' => 'edit', 'id' => $entry['id']]);
+            $entry['edit_url'] = Util::url('account', ['op' => 'edit', 'id' => $entry['id']]);
             if (empty($entry['qrcode'])) {
                 $entry['qrcode'] = MODULE_URL.'static/img/qrcode_blank.svg';
             }

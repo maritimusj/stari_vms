@@ -63,6 +63,7 @@ if (is_array($ids)) {
                 'agent' => $device->settings('extra.location.tencent.address', ''),
             ],
             'isDown' => $device->settings('extra.isDown', Device::STATUS_NORMAL),
+            'logging' => $device->isEventLogEnabled(),
         ];
 
         if (App::isDeviceWithDoorEnabled()) {

@@ -1,6 +1,14 @@
 {template 'common/header'}
 {php \zovye\url(true, 'static/css/common.css?v=20230710');}
 {php \zovye\url(true, 'static/css/device.css?v=20230721');}
+<style>
+    #devicelist .log .app.online .mcb {
+        border-color: #FF9800;
+    }
+    #devicelist .log .app .mcb.online {
+        background-color: #FFC107;
+    }
+</style>
 <div id="appx" v-cloak>
     <div class="init-loading" v-if="device.list === undefined">
         <i class="fa fa-spinner fa-spin"></i>&nbsp;加载中...
@@ -397,7 +405,7 @@
                             </div>
                         </td>
                         <td>
-                            <div class="status">
+                            <div class="status" :class="{log: o.logging}">
                                 <i class="fa fa-clock-o loading" title="加载中..." style="color:#ddd;" v-if="!o.status"></i>
                                 <i class="fa fa-spinner fa-pulse" title="加载中..." style="color:#9e9e9e;" v-if="o.loading"></i>
                                 <div :class="{'app': true, 'loading': !o.status, 'none': o.status.app === null, 'online': o.status && o.status.app === true, 'offline': o.status && o.status.app === false, 'down': o.isDown}" v-if="o.status && !o.loading">

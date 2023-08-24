@@ -651,10 +651,10 @@
                             <div class="pay operate">
                                 {if $order['refund']}
                                 <span class="refund-title" title="{$order['refund']['title']}">
-                                    {if $order['refund']['total'] < $order['price']}
-                                    （部分退款）
-                                    {else}
+                                    {if $order['refund']['all']}
                                     （已退款）
+                                    {else}
+                                    （部分退款）
                                     {/if}
                                 </span>
                                 {/if}

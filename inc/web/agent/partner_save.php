@@ -15,12 +15,12 @@ $user_id = Request::int('userid');
 
 $agent = Agent::get($agent_id);
 if (empty($agent)) {
-    Response::toast('找不到这个代理商！', $this->createWebUrl('agent'), 'error');
+    Response::toast('找不到这个代理商！', Util::url('agent'), 'error');
 }
 
 $user = User::get($user_id);
 if (empty($user)) {
-    Response::toast('找不到这个用户！', $this->createWebUrl('agent', ['op' => 'partner', 'agentid' => $agent_id]), 'error');
+    Response::toast('找不到这个用户！', Util::url('agent', ['op' => 'partner', 'agentid' => $agent_id]), 'error');
 }
 
 $name = Request::trim('name');
@@ -43,7 +43,7 @@ $notice = [
 if (empty($mobile)) {
     Response::toast(
         '请填写合伙人的手机号码！',
-        $this->createWebUrl('agent', ['op' => $from, 'agentid' => $agent_id, 'userid' => $user_id]),
+        Util::url('agent', ['op' => $from, 'agentid' => $agent_id, 'userid' => $user_id]),
         'error'
     );
 }
@@ -52,7 +52,7 @@ $res = User::findOne(['id <>' => $user_id, 'mobile' => $mobile, 'app' => User::W
 if ($res) {
     Response::toast(
         '手机号码已经被其它用户使用！',
-        $this->createWebUrl('agent', ['op' => $from, 'agentid' => $agent_id, 'userid' => $user_id]),
+        Util::url('agent', ['op' => $from, 'agentid' => $agent_id, 'userid' => $user_id]),
         'error'
     );
 }
@@ -66,7 +66,7 @@ $res = DBUtil::transactionDo(
     }
 );
 
-$url = $this->createWebUrl('agent', ['op' => 'partner_edit', 'agentid' => $agent_id, 'userid' => $user->getId()]);
+$url = Util::url('agent', ['op' => 'partner_edit', 'agentid' => $agent_id, 'userid' => $user->getId()]);
 
 if (is_error($res)) {
     Response::toast('合伙人保存失败！', $url, 'error');

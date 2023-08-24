@@ -3,7 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
- 
+
 namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
@@ -38,7 +38,7 @@ $result = DBUtil::transactionDo(function () use ($id) {
 });
 
 if (is_error($result)) {
-    Response::toast($result['message'], $this->createWebUrl('user', ['principal' => 'keeper']), 'error');
+    Response::toast($result['message'], Util::url('user', ['principal' => 'keeper']), 'error');
 }
 
-Response::toast('取消取消运营人员成功！', $this->createWebUrl('user', ['principal' => 'keeper']), 'success');
+Response::toast('取消取消运营人员成功！', Util::url('user', ['principal' => 'keeper']), 'success');

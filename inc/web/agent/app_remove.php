@@ -13,7 +13,7 @@ $id = Request::int('id');
 $app = m('agent_app')->findOne(We7::uniacid(['id' => $id]));
 
 if ($app && $app->destroy()) {
-    Response::toast('删除成功！', $this->createWebUrl('agent', ['op' => 'app']), 'success');
+    Response::toast('删除成功！', Util::url('agent', ['op' => 'app']), 'success');
 }
 
-Response::toast('删除失败！', $this->createWebUrl('agent', ['op' => 'app']), 'error');
+Response::toast('删除失败！', Util::url('agent', ['op' => 'app']), 'error');

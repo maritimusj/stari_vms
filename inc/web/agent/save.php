@@ -336,4 +336,4 @@ $result = DBUtil::transactionDo(function() use ($id, &$from) {
     return err('保存失败！');
 });
 
-Response::toast($result['message'], $this->createWebUrl('agent', ['op' => $from, 'id' => $id]), is_error($result) ? 'error' : 'success');
+Response::toast($result['message'], Util::url('agent', ['op' => $from, 'id' => $id]), is_error($result) ? 'error' : 'success');

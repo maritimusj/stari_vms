@@ -18,7 +18,7 @@ $tpl_data['navs'] = Util::getSettingsNavs();
 $page = Request::trim('page', 'device');
 
 if (!(array_key_exists($page, $tpl_data['navs']) || $page == 'ctrl')) {
-    Response::toast('找不到这个配置页面！', $this->createWebUrl('settings'), 'error');
+    Response::toast('找不到这个配置页面！', Util::url('settings'), 'error');
 }
 
 if ($page == 'device') {

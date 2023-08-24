@@ -1093,8 +1093,8 @@ include './index.php';
     {
         $params['m'] = APP_NAME;
 
-        if ($eid && request('eid')) {
-            $params['eid'] = request('eid');
+        if ($eid && Request::isset('eid')) {
+            $params['eid'] = Request::int('eid');
         }
 
         return We7::url("site/entry/$do", $params);

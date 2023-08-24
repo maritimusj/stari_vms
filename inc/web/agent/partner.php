@@ -13,7 +13,7 @@ use zovye\model\userModelObj;
 $id = Request::int('id');
 $agent = Agent::get($id);
 if (empty($agent)) {
-    Response::toast('找不到这个代理商！', $this->createWebUrl('agent'), 'error');
+    Response::toast('找不到这个代理商！', Util::url('agent'), 'error');
 }
 
 $level = $agent->getAgentLevel();

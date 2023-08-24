@@ -15,12 +15,12 @@ if ($voucher) {
         'voucher' => GoodsVoucher::format($voucher, true),
         'multi_mode' => settings('advs.assign.multi') ? 'true' : '',
         'assign_data' => json_encode($voucher->getExtraData('assigned', [])),
-        'agent_url' => $this->createWebUrl('agent'),
-        'group_url' => $this->createWebUrl('device', array('op' => 'group')),
-        'tag_url' => $this->createWebUrl('tags'),
-        'device_url' => $this->createWebUrl('device'),
-        'save_url' => $this->createWebUrl('voucher', array('op' => 'saveAssignData')),
-        'back_url' => $this->createWebUrl('voucher'),
+        'agent_url' => Util::url('agent'),
+        'group_url' => Util::url('device', array('op' => 'group')),
+        'tag_url' => Util::url('tags'),
+        'device_url' => Util::url('device'),
+        'save_url' => Util::url('voucher', array('op' => 'saveAssignData')),
+        'back_url' => Util::url('voucher'),
     ]);
 }
 

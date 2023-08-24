@@ -21,7 +21,7 @@ if ($id > 0) {
     if (empty($ad)) {
         Response::toast(
             '找不到指定的广告！',
-            $this->createWebUrl(
+            Util::url(
                 'adv',
                 ['type' => $from_type, 'media' => $from_media]
             ),
@@ -34,7 +34,7 @@ $result = Advertising::createOrUpdate(null, $ad, Request::all());
 if (is_error($result)) {
     Response::toast(
         $result['message'],
-        $this->createWebUrl(
+        Util::url(
             'adv',
             ['type' => $from_type, 'op' => 'edit', 'id' => $id, 'media' => $from_media]
         ),
@@ -42,4 +42,4 @@ if (is_error($result)) {
     );
 }
 
-Response::toast($result['msg'], $this->createWebUrl('adv', ['op' => 'edit', 'type' => $from_type, 'media' => $from_media, 'id' => $id]), 'success');
+Response::toast($result['msg'], Util::url('adv', ['op' => 'edit', 'type' => $from_type, 'media' => $from_media, 'id' => $id]), 'success');

@@ -7,11 +7,11 @@ defined('IN_IA') or exit('Access Denied');
 $id = Request::int('id');
 $account = Account::get($id);
 if (empty($account)) {
-    Response::toast('这个任务不存在！', $this->createWebUrl('account'), 'error');
+    Response::toast('这个任务不存在！', Util::url('account'), 'error');
 }
 
 // if (App::isBalanceEnabled() && $account->getBonusType() == Account::BALANCE) {
-//     Response::toast('积分奖励的任务无法分配到指定设备！', $this->createWebUrl('account'), 'error');
+//     Response::toast('积分奖励的任务无法分配到指定设备！', Util::url('account'), 'error');
 // }
 
 $data = [

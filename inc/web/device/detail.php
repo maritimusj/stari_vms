@@ -13,7 +13,7 @@ use zovye\model\packageModelObj;
 
 $device = Device::get(Request::int('id'));
 if (empty($device)) {
-    Response::toast('找不到这个设备！', $this->createWebUrl('device'), 'error');
+    Response::toast('找不到这个设备！', Util::url('device'), 'error');
 }
 
 $tpl_data['navs'] = [

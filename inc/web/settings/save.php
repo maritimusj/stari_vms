@@ -947,7 +947,7 @@ if ($page == 'device') {
 }
 
 if (app()->saveSettings($settings)) {
-    Response::toast('设置保存成功！', $this->createWebUrl('settings', ['page' => $page]), 'success');
+    Response::toast('设置保存成功！', Util::url('settings', ['page' => $page]), 'success');
 }
 
-Response::toast('设置保存失败！', $this->createWebUrl('settings', ['page' => $page]), 'error');
+Response::toast('设置保存失败！', Util::url('settings', ['page' => $page]), 'error');

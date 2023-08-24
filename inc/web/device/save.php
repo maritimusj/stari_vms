@@ -381,7 +381,7 @@ $result = DBUtil::transactionDo(function () use ($id, &$device) {
 });
 
 if (is_error($result)) {
-    Response::toast($result['message'], $id ? We7::referer() : $this->createWebUrl('device'), 'error');
+    Response::toast($result['message'], $id ? We7::referer() : Util::url('device'), 'error');
 }
 
 if ($device) {
@@ -398,7 +398,7 @@ if ($device) {
     }
 }
 
-$redirect_url = $this->createWebUrl('device', [
+$redirect_url = Util::url('device', [
     'op' => 'edit',
     'id' => $device ? $device->getId() : $id,
     'from' => Request::str('from'),

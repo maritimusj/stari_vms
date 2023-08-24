@@ -8,7 +8,7 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-$back_url = $this->createWebUrl('settings', ['page' => 'upgrade']);
+$back_url = Util::url('settings', ['page' => 'upgrade']);
 
 $data = HttpUtil::get(UPGRADE_URL . '/?op=exec');
 $res = json_decode($data, true);

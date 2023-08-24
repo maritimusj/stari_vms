@@ -524,6 +524,6 @@ if (is_error($res)) {
     Response::toast($res['message'], We7::referer(), 'error');
 } else {
     $id = Request::int('id', $res['id']);
-    $back_url = $this->createWebUrl('account', ['op' => 'edit', 'id' => $id, 'from' => Request::str('from')]);
+    $back_url = Util::url('account', ['op' => 'edit', 'id' => $id, 'from' => Request::str('from')]);
     Response::toast($res['message'], $back_url, 'success');
 }

@@ -33,7 +33,7 @@ if ($id) {
     /** @var advertisingModelObj $adv */
     $adv = Advertising::findOne(['type' => Advertising::ACTIVE_QRCODE, 'id' => $id]);
     if (empty($adv)) {
-        Response::toast('找不到这个活码！', $this->createWebUrl('qrcode'), 'error');
+        Response::toast('找不到这个活码！', Util::url('qrcode'), 'error');
     }
 
     $adv->setTitle($title);
@@ -42,7 +42,7 @@ if ($id) {
     }
 
     if ($adv->save()) {
-        Response::toast('保存成功！', $this->createWebUrl('qrcode'), 'success');
+        Response::toast('保存成功！', Util::url('qrcode'), 'success');
     }
 } else {
     $data = [
@@ -54,8 +54,8 @@ if ($id) {
 
     $adv = Advertising::create($data);
     if ($adv) {
-        Response::toast('创建成功！', $this->createWebUrl('qrcode'), 'success');
+        Response::toast('创建成功！', Util::url('qrcode'), 'success');
     }
 }
 
-Response::toast('操作失败，请联系管理员！', $this->createWebUrl('qrcode'), 'error');
+Response::toast('操作失败，请联系管理员！', Util::url('qrcode'), 'error');

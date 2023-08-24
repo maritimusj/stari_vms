@@ -13,12 +13,12 @@ use zovye\model\team_memberModelObj;
 $user_id = Request::int('id');
 $user = User::get($user_id);
 if (empty($user)) {
-    Response::toast('找不到这个用户！', $this->createWebUrl('user'), 'error');
+    Response::toast('找不到这个用户！', Util::url('user'), 'error');
 }
 
 $team = Team::getOrCreateFor($user);
 if (empty($team)) {
-    Response::toast('找不车队或者创建车队失败！', $this->createWebUrl('user'), 'error');
+    Response::toast('找不车队或者创建车队失败！', Util::url('user'), 'error');
 }
 
 $tpl_data = [];

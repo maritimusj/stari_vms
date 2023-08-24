@@ -22,8 +22,8 @@ if ($url && $version) {
             ]
         )
     )) {
-        Response::toast('保存成功！', $this->createWebUrl('upgrade'), 'success');
+        Response::toast('保存成功！', Util::url('upgrade'), 'success');
     }
 }
 
-Response::toast('保存失败！', $this->createWebUrl('upgrade'), 'error');
+Response::toast('保存失败！', Util::url('upgrade'), 'error');

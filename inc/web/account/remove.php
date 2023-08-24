@@ -38,7 +38,7 @@ $result = DBUtil::transactionDo(function() {
 });
 
 if (is_error($result)) {
-    Response::toast('删除失败！', $this->createWebUrl('account', ['type' => Request::int('from')]), 'error');
+    Response::toast('删除失败！', Util::url('account', ['type' => Request::int('from')]), 'error');
 }
 
-Response::toast("删除任务{$result['title']}成功！", $this->createWebUrl('account', ['type' => Request::int('from')] ), 'success');
+Response::toast("删除任务{$result['title']}成功！", Util::url('account', ['type' => Request::int('from')] ), 'success');

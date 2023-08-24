@@ -20,7 +20,7 @@ $id = Request::int('id');
 if ($id > 0) {
     $faq = m('article')->findOne(We7::uniacid(['id' => $id, 'type' => 'faq']));
     if (empty($faq)) {
-        Response::toast('找不到这条FAQ！', $this->createWebUrl('article', ['op' => 'faq']), 'error');
+        Response::toast('找不到这条FAQ！', Util::url('article', ['op' => 'faq']), 'error');
     }
 
     $tpl_data['id'] = $id;

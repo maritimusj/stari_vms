@@ -12,7 +12,7 @@ $id = Request::int('id');
 $type = Request::int('type');
 
 if (Advertising::reject($id)) {
-    Response::toast('广告已经被设置为拒绝通过！', $this->createWebUrl('adv', ['type' => $type]), 'success');
+    Response::toast('广告已经被设置为拒绝通过！', Util::url('adv', ['type' => $type]), 'success');
 }
 
-Response::toast('审核操作失败！', $this->createWebUrl('adv', ['type' => $type]), 'error');
+Response::toast('审核操作失败！', Util::url('adv', ['type' => $type]), 'error');

@@ -34,7 +34,7 @@ $tpl_data = [
     'agent' => $agent,
 ];
 
-$back_url = $this->createWebUrl('agent', array('id' => $agent->getId(), 'op' => 'agent_commission'));
+$back_url = Util::url('agent', array('id' => $agent->getId(), 'op' => 'agent_commission'));
 $tpl_data['back_url'] = $back_url;
 
 $fn = Request::trim('fn');

@@ -40,7 +40,7 @@ $agent_id = Request::int('agentId');
 if ($agent_id > 0) {
     $agent = Agent::get($agent_id);
     if (empty($agent)) {
-        Response::toast('找不到这个代理商！', $this->createWebUrl('goods'), 'error');
+        Response::toast('找不到这个代理商！', Util::url('goods'), 'error');
     }
     $params['agent_id'] = $agent->getId();
     $tpl_data['s_agent'] = $agent->profile();

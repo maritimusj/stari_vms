@@ -3,7 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
- 
+
 namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
@@ -18,8 +18,8 @@ if ($app) {
     $state = $app->getState() != AgentApp::CHECKED ? AgentApp::CHECKED : AgentApp::WAIT;
     $app->setState($state);
     if ($app->save()) {
-        Response::toast('设置成功！', $this->createWebUrl('agent', ['op' => 'app']), 'success');
+        Response::toast('设置成功！', Util::url('agent', ['op' => 'app']), 'success');
     }
 }
 
-Response::toast('设置失败！', $this->createWebUrl('agent', ['op' => 'app']), 'error');
+Response::toast('设置失败！', Util::url('agent', ['op' => 'app']), 'error');

@@ -51,7 +51,7 @@ if (Request::isset('agentId')) {
     if ($filter_agentId > 0) {
         $filter_agent = Agent::get($filter_agentId);
         if (empty($filter_agent)) {
-            Response::toast('找不到这个代理商', $this->createWebUrl('adv', ['type' => $type]), 'error');
+            Response::toast('找不到这个代理商', Util::url('adv', ['type' => $type]), 'error');
         }
         $tpl_data['filter_agent'] = $filter_agent;
     }
@@ -199,7 +199,7 @@ if ($total > 0) {
 $tpl_data['advs'] = $list;
 
 $url_params['type'] = $type;
-$tpl_data['search_url'] = $this->createWebUrl('adv', $url_params);
+$tpl_data['search_url'] = Util::url('adv', $url_params);
 
 $filename = Advertising::$names[$type];
 Response::showTemplate("web/adv/$filename", $tpl_data);

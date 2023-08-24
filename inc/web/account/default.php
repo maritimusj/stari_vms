@@ -180,5 +180,5 @@ Response::showTemplate('web/account/default', [
     'banned' => $banned,
     'pager' => $pager,
     'keywords' => $keywords,
-    'search_url' => $this->createWebUrl('account', ['banned' => $banned]),
+    'search_url' => Util::url('account', ['banned' => $banned]),
 ]);

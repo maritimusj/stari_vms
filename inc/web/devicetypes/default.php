@@ -29,7 +29,7 @@ if ($agent_openid) {
     } else {
         $agent = Agent::get($agent_openid, true);
         if (empty($agent)) {
-            Response::toast('找不到这个代理商！', $this->createWebUrl('devicetypes'), 'error');
+            Response::toast('找不到这个代理商！', Util::url('devicetypes'), 'error');
         }
         $params['agent_id'] = $agent->getId();
         $tpl_data['s_agent'] = $agent->profile();
@@ -39,7 +39,7 @@ if ($agent_openid) {
 
 $result = DeviceTypes::getList($params);
 if (is_error($result)) {
-    Response::toast($result['message'], $this->createWebUrl('devicetypes'), 'error');
+    Response::toast($result['message'], Util::url('devicetypes'), 'error');
 }
 
 $pager = We7::pagination($result['total'], $result['page'], $result['pagesize']);

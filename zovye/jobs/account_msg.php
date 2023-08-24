@@ -11,51 +11,51 @@ defined('IN_IA') or exit('Access Denied');
 //公众号消息推送
 
 use zovye\CtrlServ;
+use zovye\JobException;
 use zovye\Log;
-use zovye\Request;
 use zovye\Wx;
 use function zovye\request;
 
-$media = [
+$log = [
     'type' => request('type'),
     'val' => request('val'),
     'delay' => request('delay'),
     'touser' => request('touser'),
 ];
 
-$op = Request::op('default');
+if (!CtrlServ::checkJobSign($log)) {
+    throw new JobException('签名不正确!', $log);
+}
 
-if ($op == 'account_msg' && CtrlServ::checkJobSign($media)) {
-    $openid = $media['touser'];
+$openid = $log['touser'];
 
-    //推送领取消息
-    if ($openid) {
-        $msg = ['touser' => $openid];
-        if ($media['type'] == 'text') {
-            $msg['msgtype'] = 'text';
-            $msg['text'] = [
-                'content' => urlencode($media['val']),
-            ];
-        } elseif ($media['type'] == 'image') {
-            $msg['msgtype'] = 'image';
-            $msg['image'] = [
-                'media_id' => $media['val'],
-            ];
-        } elseif ($media['type'] == 'mpnews') {
-            $msg['msgtype'] = 'mpnews';
-            $msg['mpnews'] = [
-                'media_id' => $media['val'],
-            ];
-        }
-
-        $res = Wx::sendCustomNotice($msg);
+//推送领取消息
+if ($openid) {
+    $msg = ['touser' => $openid];
+    if ($log['type'] == 'text') {
+        $msg['msgtype'] = 'text';
+        $msg['text'] = [
+            'content' => urlencode($log['val']),
+        ];
+    } elseif ($log['type'] == 'image') {
+        $msg['msgtype'] = 'image';
+        $msg['image'] = [
+            'media_id' => $log['val'],
+        ];
+    } elseif ($log['type'] == 'mpnews') {
+        $msg['msgtype'] = 'mpnews';
+        $msg['mpnews'] = [
+            'media_id' => $log['val'],
+        ];
     }
+
+    $res = Wx::sendCustomNotice($msg);
 }
 
 Log::debug(
     'accountMsg',
     [
-        'media' => $media,
+        'media' => $log,
         'result' => $res ?? '<null>',
     ]
 );

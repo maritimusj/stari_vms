@@ -12,26 +12,24 @@ defined('IN_IA') or exit('Access Denied');
 
 use zovye\CtrlServ;
 use zovye\Device;
+use zovye\JobException;
 use zovye\Log;
 use zovye\Request;
 
-$op = Request::op('default');
-$data = [
+$log = [
     'id' => Request::int('id'),
     'event' => Request::str('event'),
 ];
 
-$log = [
-    'data' => $data,
-];
+if (!CtrlServ::checkJobSign($log)) {
+    throw new JobException('签名不正确!', $log);
+}
 
-if ($op == 'device_event_notify' && CtrlServ::checkJobSign($data)) {
-    $device = Device::get($data['id']);
-    if ($device) {
-        $log['result'] = Device::sendEventTemplateMsg($device, $data['event']);
-    } else {
-        $log['error'] = '找不到这个设备！';
-    }
+$device = Device::get($log['id']);
+if ($device) {
+    $log['result'] = Device::sendEventTemplateMsg($device, $log['event']);
+} else {
+    $log['error'] = '找不到这个设备！';
 }
 
 Log::debug('device_event_notify', $log);

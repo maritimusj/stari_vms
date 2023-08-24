@@ -11,32 +11,28 @@ defined('IN_IA') or exit('Access Denied');
 //出货
 
 use zovye\CtrlServ;
+use zovye\JobException;
 use zovye\Log;
 use zovye\Order;
 use zovye\Request;
 use zovye\User;
-use function zovye\request;
-
-$op = Request::op('default');
-$data = [
-    'openid' => request('openid'),
-    'orderNO' => request('orderNO'),
-];
 
 $log = [
-    'data' => $data,
+    'openid' => Request::str('openid'),
+    'orderNO' => Request::str('orderNO'),
 ];
 
-if ($op == 'get_result' && CtrlServ::checkJobSign($data)) {
-    $user = User::get($data['openid'], true);
-    if (empty($user)) {
-        $log['error'] = 'user not exists.';
-    } else {
-        $order_no = strval($data['orderNO']);
-        if (!Order::exists($order_no)) {
-            $this->payResultBy($user, $order_no);
-        }
-    }
+if (!CtrlServ::checkJobSign($log)) {
+    throw new JobException('签名不正确!', $log);
 }
 
+$user = User::get($log['openid'], true);
+if (empty($user)) {
+    $log['error'] = 'user not exists.';
+} else {
+    $order_no = strval($log['orderNO']);
+    if (!Order::exists($order_no)) {
+        $this->payResultBy($user, $order_no);
+    }
+}
 Log::debug('get_result', $log);

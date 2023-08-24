@@ -19,6 +19,7 @@ use zovye\EventBus;
 use zovye\ExceptionNeedsRefund;
 use zovye\Helper;
 use zovye\Job;
+use zovye\JobException;
 use zovye\Log;
 use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
@@ -33,49 +34,54 @@ use function zovye\err;
 use function zovye\is_error;
 use function zovye\settings;
 
-$op = Request::op('default');
 $order_no = Request::str('orderNO');
 
-if ($op == 'create_order' && CtrlServ::checkJobSign(['orderNO' => $order_no])) {
-    try {
-        prepare($order_no);
-    } catch (ExceptionNeedsRefund $e) {
-        $device = $e->getDevice();
-        $refund = Helper::NeedAutoRefund($device);
-        if ($refund) {
-            $res = Job::refund($order_no, $e->getMessage(), 0, false, intval(settings('order.rollback.delay', 0)));
-            if (!$res) {
-                $device->appShowMessage('退款失败，请联系客服，谢谢！');
-                Log::fatal('order_create', [
-                    'orderNO' => $order_no,
-                    'msg' => '启动退款任务失败！',
-                ]);
-            } else {
-                $device->appShowMessage('正在退款，请稍后再试，谢谢！');
-            }
-        }
-        Log::fatal('order_create', [
-            'orderNO' => $order_no,
-            'refund' => $refund,
-            'error' => $e->getMessage(),
-        ]);
+$log = [
+    'orderNO' => $order_no,
+];
 
-    } catch (ZovyeException $e) {
-        $device = $e->getDevice();
-        if ($device) {
-            $device->appShowMessage($e->getMessage(), 'error');
+if (!CtrlServ::checkJobSign($log)) {
+    throw new JobException('签名不正确!', $log);
+}
+
+try {
+    prepare($order_no);
+} catch (ExceptionNeedsRefund $e) {
+    $device = $e->getDevice();
+    $refund = Helper::NeedAutoRefund($device);
+    if ($refund) {
+        $res = Job::refund($order_no, $e->getMessage(), 0, false, intval(settings('order.rollback.delay', 0)));
+        if (!$res) {
+            $device->appShowMessage('退款失败，请联系客服，谢谢！');
+            Log::fatal('order_create', [
+                'orderNO' => $order_no,
+                'msg' => '启动退款任务失败！',
+            ]);
+        } else {
+            $device->appShowMessage('正在退款，请稍后再试，谢谢！');
         }
-        Log::error('order_create', [
-            'orderNO' => $order_no,
-            'error' => $e->getMessage(),
-        ]);
-    } catch (Exception $e) {
-        Log::error('order_create', [
-            'orderNO' => $order_no,
-            'refund' => false,
-            'error' => $e->getMessage(),
-        ]);
     }
+    Log::fatal('order_create', [
+        'orderNO' => $order_no,
+        'refund' => $refund,
+        'error' => $e->getMessage(),
+    ]);
+
+} catch (ZovyeException $e) {
+    $device = $e->getDevice();
+    if ($device) {
+        $device->appShowMessage($e->getMessage(), 'error');
+    }
+    Log::error('order_create', [
+        'orderNO' => $order_no,
+        'error' => $e->getMessage(),
+    ]);
+} catch (Exception $e) {
+    Log::error('order_create', [
+        'orderNO' => $order_no,
+        'refund' => false,
+        'error' => $e->getMessage(),
+    ]);
 }
 
 /**

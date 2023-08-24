@@ -13,48 +13,43 @@ use Exception;
 use zovye\Agent;
 use zovye\CtrlServ;
 use zovye\Device;
+use zovye\JobException;
 use zovye\Log;
 use zovye\OrderCounter;
 use zovye\Request;
 use function zovye\app;
 
-$op = Request::op('default');
-$data = [
+$log = [
     'agent' => Request::int('agent'),
     'device' => Request::str('device'),
     'datetime' => Request::str('datetime'),
 ];
 
-$log = [
-    'params' => $data,
-];
+if (!CtrlServ::checkJobSign($log)) {
+    throw new JobException('签名不正确!');
+}
 
-if ($op == 'update_counter' && CtrlServ::checkJobSign($data)) {
-
-    $counter = new OrderCounter();
-    try {
-        $datetime = new DateTimeImmutable($data['datetime']);
-        $str = $datetime->format('Y-m-d H:i:s');
-        if ($data['agent']) {
-            $agent = Agent::get($data['agent']);
-            if ($agent) {
-                $log["agent $str"] = $counter->getHourAll([$agent, 'goods'], $datetime);
-            }
+$counter = new OrderCounter();
+try {
+    $datetime = new DateTimeImmutable($log['datetime']);
+    $str = $datetime->format('Y-m-d H:i:s');
+    if ($log['agent']) {
+        $agent = Agent::get($log['agent']);
+        if ($agent) {
+            $log["agent $str"] = $counter->getHourAll([$agent, 'goods'], $datetime);
         }
-        if ($data['device']) {
-            $device = Device::get($data['device']);
-            if ($device) {
-                $log["device $str"] = $counter->getHourAll([$device, 'goods'], $datetime);
-            }
-        }
-        if (!isset($agent) && !isset($device)) {
-            $log["app $str"] = $counter->getHourAll([app(), 'goods'], $datetime);
-        }
-    } catch (Exception $e) {
-        $log['error'] = $e->getMessage();
     }
-} else {
-    $log['error'] = '签名检验失败！';
+    if ($log['device']) {
+        $device = Device::get($log['device']);
+        if ($device) {
+            $log["device $str"] = $counter->getHourAll([$device, 'goods'], $datetime);
+        }
+    }
+    if (!isset($agent) && !isset($device)) {
+        $log["app $str"] = $counter->getHourAll([app(), 'goods'], $datetime);
+    }
+} catch (Exception $e) {
+    $log['error'] = $e->getMessage();
 }
 
 Log::debug('update_counter', $log);

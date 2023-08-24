@@ -27,90 +27,91 @@ $log = [
     'id' => $id,
 ];
 
-$op = Request::op('default');
-if ($op == 'order' && CtrlServ::checkJobSign($log)) {
-    $order = Order::get($id);
-    if (!$order) {
-        throw new JobException('找不到这个订单！', $log);
-    }
+if (!CtrlServ::checkJobSign($log)) {
+    throw new JobException('签名不正确!', $log);
+}
 
-    $device = $order->getDevice();
-    if (!$device) {
-        throw new JobException('找不到这个设备！', $log);
-    }
+$order = Order::get($id);
+if (!$order) {
+    throw new JobException('找不到这个订单！', $log);
+}
 
-    //是否自动清除错误代码
-    if (settings('device.clearErrorCode') && $order->isResultOk()) {
-        $device->cleanLastError();
-        $device->save();
-    }
+$device = $order->getDevice();
+if (!$device) {
+    throw new JobException('找不到这个设备！', $log);
+}
 
-    //检查剩余商品数量
-    $device->checkRemain();
+//是否自动清除错误代码
+if (settings('device.clearErrorCode') && $order->isResultOk()) {
+    $device->cleanLastError();
+    $device->save();
+}
 
-    //检查公众号消息推送设置
-    $media = null;
-    $adv = $device->getOneAdv(Advertising::PUSH_MSG, true);
-    if ($adv) {
-        $media = [
-            'type' => $adv['extra']['msg']['type'],
-            'val' => $adv['extra']['msg']['val'],
-            'delay' => intval($adv['extra']['delay']),
-        ];
-    }
+//检查剩余商品数量
+$device->checkRemain();
 
-    //使用全局默认设置
-    if (isEmptyArray($media)) {
-        $media = [
-            'type' => settings('misc.pushAccountMsg_type'),
-            'val' => settings('misc.pushAccountMsg_val'),
-            'delay' => settings('misc.pushAccountMsg_delay'),
-        ];
-    }
+//检查公众号消息推送设置
+$media = null;
+$adv = $device->getOneAdv(Advertising::PUSH_MSG, true);
+if ($adv) {
+    $media = [
+        'type' => $adv['extra']['msg']['type'],
+        'val' => $adv['extra']['msg']['val'],
+        'delay' => intval($adv['extra']['delay']),
+    ];
+}
 
-    if ($media && $media['type'] != 'settings' && $media['type'] != 'none' && $media['val'] != '') {
-        $media['touser'] = $order->getOpenid();
-        $log['accountMsg_res'] = Job::accountMsg($media);
-    }
+//使用全局默认设置
+if (isEmptyArray($media)) {
+    $media = [
+        'type' => settings('misc.pushAccountMsg_type'),
+        'val' => settings('misc.pushAccountMsg_val'),
+        'delay' => settings('misc.pushAccountMsg_delay'),
+    ];
+}
 
-    if ($order->isFree() && App::isSponsorAdEnabled()) {
-        $data = $device->getOneAdv(Advertising::SPONSOR, true, function ($ad) {
-            return $ad && $ad->getExtraData('num', 0) > 0;
-        });
-        if ($data) {
-            $ad = Advertising::get($data['id']);
-            if ($adv) {
-                $num = $ad->getExtraData('num', 0);
-                $ad->setExtraData('num', max(0, $num - 1));
-                $ad->save();
-            }
+if ($media && $media['type'] != 'settings' && $media['type'] != 'none' && $media['val'] != '') {
+    $media['touser'] = $order->getOpenid();
+    $log['accountMsg_res'] = Job::accountMsg($media);
+}
+
+if ($order->isFree() && App::isSponsorAdEnabled()) {
+    $data = $device->getOneAdv(Advertising::SPONSOR, true, function ($ad) {
+        return $ad && $ad->getExtraData('num', 0) > 0;
+    });
+    if ($data) {
+        $ad = Advertising::get($data['id']);
+        if ($adv) {
+            $num = $ad->getExtraData('num', 0);
+            $ad->setExtraData('num', max(0, $num - 1));
+            $ad->save();
         }
     }
+}
 
-    $agent = $order->getAgent();
-    if ($agent) {
-        $agent->updateSettings('agentData.stats.last_order', [
-            'id' => $order->getId(),
-            'createtime' => $order->getCreatetime(),
-        ]);
+$agent = $order->getAgent();
+if ($agent) {
+    $agent->updateSettings('agentData.stats.last_order', [
+        'id' => $order->getId(),
+        'createtime' => $order->getCreatetime(),
+    ]);
+}
+
+if (Locker::try("order::statistics")) {
+    if (Util::isSysLoadAverageOk()) {
+        Job::updateAppCounter();
     }
 
-    if (Locker::try("order::statistics")) {
-        if (Util::isSysLoadAverageOk()) {
-            Job::updateAppCounter();
-        }
+    if ($agent && Util::isSysLoadAverageOk()) {
+        Job::updateAgentCounter($agent);
+    }
 
-        if ($agent && Util::isSysLoadAverageOk()) {
-            Job::updateAgentCounter($agent);
-        }
+    if (Util::isSysLoadAverageOk()) {
+        Job::updateDeviceCounter($device);
+    }
 
-        if (Util::isSysLoadAverageOk()) {
-            Job::updateDeviceCounter($device);
-        }
-
-        if (Util::isSysLoadAverageOk()) {
-            Util::orderStatistics($order);
-        }
+    if (Util::isSysLoadAverageOk()) {
+        Util::orderStatistics($order);
     }
 }
 

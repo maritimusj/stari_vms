@@ -12,6 +12,7 @@ defined('IN_IA') or exit('Access Denied');
 
 use zovye\Charging;
 use zovye\CtrlServ;
+use zovye\JobException;
 use zovye\Log;
 
 use zovye\Order;
@@ -20,26 +21,26 @@ use zovye\Request;
 $uid = Request::str('uid');
 $time = Request::int('time');
 
-$params = [
+$log = [
     'uid' => $uid,
     'time' => $time,
 ];
 
-$op = Request::op('default');
-if ($op == 'charging_stop_timeout' && CtrlServ::checkJobSign($params)) {
+if (!CtrlServ::checkJobSign($log)) {
+    throw new JobException('签名不正确!', $log);
+}
 
-    $order = Order::get($uid, true);
-    if ($order) {
-        if (!$order->isChargingFinished()) {
-            $chargerID = $order->getChargerID();
-            Charging::end($uid, $chargerID, function ($order) {
-                $order->setExtraData('timeout', [
-                    'at' => time(),
-                    'reason' => '没有收到充电桩帐单通知！',
-                ]);
-            });
-        }
+$order = Order::get($uid, true);
+if ($order) {
+    if (!$order->isChargingFinished()) {
+        $chargerID = $order->getChargerID();
+        Charging::end($uid, $chargerID, function ($order) {
+            $order->setExtraData('timeout', [
+                'at' => time(),
+                'reason' => '没有收到充电桩帐单通知！',
+            ]);
+        });
     }
 }
 
-Log::debug('charging_stop_timeout', $params);
+Log::debug('charging_stop_timeout', $log);

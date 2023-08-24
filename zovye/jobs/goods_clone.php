@@ -13,41 +13,40 @@ defined('IN_IA') or exit('Access Denied');
 use zovye\Agent;
 use zovye\CtrlServ;
 use zovye\Goods;
+use zovye\JobException;
 use zovye\Log;
 use zovye\Request;
 use function zovye\request;
 
-$op = Request::op('default');
-
 $log = [
-    'id' => request('id'),
+    'id' => Request::int('id'),
 ];
 
-if ($op == 'goods_clone' && CtrlServ::checkJobSign(['id' => request('id')])) {
-    $goods = Goods::get(request('id'));
-    if (empty($goods)) {
-        $log['error'] = 'goods not exists!';
-    } else {
-        $log['name'] = $goods->getName();
-        $log['result'] = [];
+if (!CtrlServ::checkJobSign($log)) {
+    throw new JobException('签名不正确!', $log);
+}
 
-        $query = Agent::query();
-        foreach ($query->findAll() as $agent) {
-            $goods_query = Goods::query(['agent_id' => $agent->getId()]);
-            $exists = false;
-            foreach ($goods_query->findAll() as $g) {
-                if ($g->settings('extra.clone.original') == $goods->getId()) {
-                    $exists = true;
-                    break;
-                }
-            }
-            if (!$exists) {
-                $log['result'][] = Goods::CopyToAgent($agent->getId(), $goods);
+$goods = Goods::get(request('id'));
+if (empty($goods)) {
+    $log['error'] = 'goods not exists!';
+} else {
+    $log['name'] = $goods->getName();
+    $log['result'] = [];
+
+    $query = Agent::query();
+    foreach ($query->findAll() as $agent) {
+        $goods_query = Goods::query(['agent_id' => $agent->getId()]);
+        $exists = false;
+        foreach ($goods_query->findAll() as $g) {
+            if ($g->settings('extra.clone.original') == $goods->getId()) {
+                $exists = true;
+                break;
             }
         }
+        if (!$exists) {
+            $log['result'][] = Goods::CopyToAgent($agent->getId(), $goods);
+        }
     }
-} else {
-    $log['error'] = 'checkJobSign failed';
 }
 
 Log::debug('goods_clone', $log);

@@ -13,6 +13,7 @@ use zovye\Charging;
 use zovye\CtrlServ;
 use zovye\Device;
 use zovye\Job;
+use zovye\JobException;
 use zovye\Log;
 
 use zovye\model\orderModelObj;
@@ -27,7 +28,7 @@ $user_id = Request::int('user');
 $order_id = Request::int('order');
 $time = Request::int('time');
 
-$params = [
+$log = [
     'uid' => $uid,
     'chargerID' => $charger_id,
     'device' => $device_id,
@@ -36,58 +37,59 @@ $params = [
     'time' => $time,
 ];
 
-$op = Request::op('default');
-if ($op == 'charging_start_timeout' && CtrlServ::checkJobSign($params)) {
-    /** @var orderModelObj $order */
-    $order = Order::get($uid, true);
-    if ($order) {
-        $result = $order->getChargingResult();
-        if (empty($result)) {
-            Charging::end($uid, $charger_id, function ($order) {
-                $order->setExtraData('timeout', [
-                    'at' => time(),
-                    'reason' => '充电桩无响应，请稍后再试！',
-                ]);
-                //如果即时支付，尝试退款
-                $pay_log = Pay::getPayLog($order->getOrderNO());
-                if ($pay_log) {
-                    Job::refund($order->getOrderNO(), '充电订单超时退款');
-                }
-            });
+if (!CtrlServ::checkJobSign($log)) {
+    throw new JobException('签名不正确!', $log);
+}
 
-            $params['error'] = [
+/** @var orderModelObj $order */
+$order = Order::get($uid, true);
+if ($order) {
+    $result = $order->getChargingResult();
+    if (empty($result)) {
+        Charging::end($uid, $charger_id, function ($order) {
+            $order->setExtraData('timeout', [
                 'at' => time(),
                 'reason' => '充电桩无响应，请稍后再试！',
-            ];
-        } else {
-            $params['result'] = $result;
-        }
-    }
+            ]);
+            //如果即时支付，尝试退款
+            $pay_log = Pay::getPayLog($order->getOrderNO());
+            if ($pay_log) {
+                Job::refund($order->getOrderNO(), '充电订单超时退款');
+            }
+        });
 
-    $device = Device::get($device_id);
-    if ($device) {
-        $data = $device->getChargerBMSData($charger_id);
-        if (empty($data)) {
-            Charging::end($uid, $charger_id, function ($order) {
-                $order->setExtraData('timeout', [
-                    'at' => time(),
-                    'reason' => '充电桩失去响应，请重试！',
-                ]);
-                //如果即时支付，尝试退款
-                $pay_log = Pay::getPayLog($order->getOrderNO());
-                if ($pay_log) {
-                    Job::refund($order->getOrderNO(), '充电订单超时退款');
-                }
-            });
-            $params['error'] = [
-                'at' => time(),
-                'reason' => '充电桩失去响应，请重试！',
-            ];
-        } else {
-            $params['BMS'] = $data;
-        }
+        $log['error'] = [
+            'at' => time(),
+            'reason' => '充电桩无响应，请稍后再试！',
+        ];
+    } else {
+        $log['result'] = $result;
     }
 }
 
-$params['time_formatted'] = date('Y-m-d H:i:s', $params['time']);
-Log::debug('charging_start_timeout', $params);
+$device = Device::get($device_id);
+if ($device) {
+    $data = $device->getChargerBMSData($charger_id);
+    if (empty($data)) {
+        Charging::end($uid, $charger_id, function ($order) {
+            $order->setExtraData('timeout', [
+                'at' => time(),
+                'reason' => '充电桩失去响应，请重试！',
+            ]);
+            //如果即时支付，尝试退款
+            $pay_log = Pay::getPayLog($order->getOrderNO());
+            if ($pay_log) {
+                Job::refund($order->getOrderNO(), '充电订单超时退款');
+            }
+        });
+        $log['error'] = [
+            'at' => time(),
+            'reason' => '充电桩失去响应，请重试！',
+        ];
+    } else {
+        $log['BMS'] = $data;
+    }
+}
+
+$log['time_formatted'] = date('Y-m-d H:i:s', $log['time']);
+Log::debug('charging_start_timeout', $log);

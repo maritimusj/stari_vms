@@ -16,28 +16,27 @@ use zovye\Request;
 use zovye\User;
 use zovye\Wx;
 
-$op = Request::op('default');
-
 $log = [
     'id' => Request::int('id'),
 ];
 
-if ($op == 'withdraw' && CtrlServ::checkJobSign($log)) {
-
-    $user = User::get($log['id']);
-    if (empty($user) || $user->isBanned()) {
-        throw new JobException('找不到这个用户或者用户已禁用！', $log);
-    }
-
-    $log['data'] = [
-        'thing9' => ['value' => '提现申请'],
-        'phrase25' => ['value' => '待审核'],
-        'thing7' => ['value' => Wx::trim_thing($user->getName())],
-        'phone_number28' => ['value' => $user->getMobile()],
-        'time3' => ['value' => date('Y-m-d H:i:s')],
-    ];
-
-    $log['result'] = Helper::sendSysTemplateMessageTo('withdraw', $log['data']);
+if (!CtrlServ::checkJobSign($log)) {
+    throw new JobException('签名不正确!');
 }
+
+$user = User::get($log['id']);
+if (empty($user) || $user->isBanned()) {
+    throw new JobException('找不到这个用户或者用户已禁用！', $log);
+}
+
+$log['data'] = [
+    'thing9' => ['value' => '提现申请'],
+    'phrase25' => ['value' => '待审核'],
+    'thing7' => ['value' => Wx::trim_thing($user->getName())],
+    'phone_number28' => ['value' => $user->getMobile()],
+    'time3' => ['value' => date('Y-m-d H:i:s')],
+];
+
+$log['result'] = Helper::sendSysTemplateMessageTo('withdraw', $log['data']);
 
 Log::debug('withdraw', $log);

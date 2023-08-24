@@ -13,29 +13,27 @@ defined('IN_IA') or exit('Access Denied');
 use Exception;
 use zovye\account\WeiSureAccount;
 use zovye\CtrlServ;
+use zovye\JobException;
 use zovye\Log;
 use zovye\Request;
 
-$data = [
+$log = [
     'user' => Request::str('user'),
     'device' => Request::str('device'),
 ];
 
-$op = Request::op('default');
-
-if ($op == 'weisure_timeout' && CtrlServ::checkJobSign($data)) {
-
-    try {
-        $out_user_id = base64_encode("{$data['user']}:{$data['device']}");
-        WeiSureAccount::cb([
-            'outerUserId' => $out_user_id,
-        ], true);
-
-    } catch(Exception $e) {
-        $data['error'] = $e->getMessage();
-    }
-} else {
-    $data['error'] = '签名不正确！';
+if (!CtrlServ::checkJobSign($log)) {
+    throw new JobException('签名不正确!');
 }
 
-Log::debug('weisure', $data);
+try {
+    $out_user_id = base64_encode("{$log['user']}:{$log['device']}");
+    WeiSureAccount::cb([
+        'outerUserId' => $out_user_id,
+    ], true);
+
+} catch(Exception $e) {
+    $log['error'] = $e->getMessage();
+}
+
+Log::debug('weisure', $log);

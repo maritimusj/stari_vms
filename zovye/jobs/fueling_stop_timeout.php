@@ -12,6 +12,7 @@ defined('IN_IA') or exit('Access Denied');
 
 use zovye\CtrlServ;
 use zovye\Fueling;
+use zovye\JobException;
 use zovye\Log;
 
 use zovye\Order;
@@ -21,45 +22,46 @@ use function zovye\is_error;
 $uid = Request::str('uid');
 $time = Request::int('time');
 
-$params = [
+$log = [
     'uid' => $uid,
     'time' => $time,
 ];
 
-$op = Request::op('default');
-if ($op == 'fueling_stop_timeout' && CtrlServ::checkJobSign($params)) {
-    $order = Order::get($uid, true);
-    if ($order) {
-        if (!$order->isFuelingFinished()) {
+if (!CtrlServ::checkJobSign($log)) {
+    throw new JobException('签名不正确!', $log);
+}
 
-            $device = $order->getDevice();
-            $chargerID = $order->getChargerID();
+$order = Order::get($uid, true);
+if ($order) {
+    if (!$order->isFuelingFinished()) {
 
-            $result = Fueling::settle($device, [
-                'ser' => $order->getOrderNO(),
-                'ch' => $chargerID,
-                'reason' => -1,
-                'solo' => Fueling::MODE_REMOTE,
-                'time' => time(),
+        $device = $order->getDevice();
+        $chargerID = $order->getChargerID();
+
+        $result = Fueling::settle($device, [
+            'ser' => $order->getOrderNO(),
+            'ch' => $chargerID,
+            'reason' => -1,
+            'solo' => Fueling::MODE_REMOTE,
+            'time' => time(),
+        ]);
+
+        if (is_error($result)) {
+            Log::error('fueling', [
+                'job' => 'fueling_stop_timeout',
+                'uid' => $uid,
+                'time' => $time,
+                'error' => $result,
             ]);
-
-            if (is_error($result)) {
-                Log::error('fueling', [
-                    'job' => 'fueling_stop_timeout',
-                    'uid' => $uid,
-                    'time' => $time,
-                    'error' => $result,
-                ]);
-            }
-
-            $order->setExtraData('timeout', [
-                'at' => time(),
-                'reason' => '没有收到计费信息！',
-            ]);
-
-            $order->save();
         }
+
+        $order->setExtraData('timeout', [
+            'at' => time(),
+            'reason' => '没有收到计费信息！',
+        ]);
+
+        $order->save();
     }
 }
 
-Log::debug('fueling_stop_timeout', $params);
+Log::debug('fueling_stop_timeout', $log);

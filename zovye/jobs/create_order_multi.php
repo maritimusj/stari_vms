@@ -17,6 +17,7 @@ use zovye\EventBus;
 use zovye\ExceptionNeedsRefund;
 use zovye\Helper;
 use zovye\Job;
+use zovye\JobException;
 use zovye\Locker;
 use zovye\Log;
 use zovye\model\deviceModelObj;
@@ -32,32 +33,35 @@ use function zovye\err;
 use function zovye\is_error;
 use function zovye\settings;
 
-$op = Request::op('default');
 $order_no = Request::str('orderNO');
 
-if ($op == 'create_order_multi' && CtrlServ::checkJobSign(['orderNO' => $order_no])) {
-    try {
-        process($order_no);
-    } catch (ExceptionNeedsRefund $e) {
-        $device = $e->getDevice();
-        if ($device) {
-            refund($order_no, $device, $e->getMessage());
-        }
-    } catch (ZovyeException $e) {
-        $device = $e->getDevice();
-        if ($device) {
-            $device->appShowMessage($e->getMessage(), 'error');
-        }
-        Log::error('order_create_multi', [
-            'orderNO' => $order_no,
-            'error' => $e->getMessage(),
-        ]);
-    } catch (Exception $e) {
-        Log::error('order_create_multi', [
-            'orderNO' => $order_no,
-            'error' => $e->getMessage(),
-        ]);
+$log = ['orderNO' => $order_no];
+
+if (!CtrlServ::checkJobSign($log)) {
+    throw new JobException('签名不正确!', $log);
+}
+
+try {
+    process($order_no);
+} catch (ExceptionNeedsRefund $e) {
+    $device = $e->getDevice();
+    if ($device) {
+        refund($order_no, $device, $e->getMessage());
     }
+} catch (ZovyeException $e) {
+    $device = $e->getDevice();
+    if ($device) {
+        $device->appShowMessage($e->getMessage(), 'error');
+    }
+    Log::error('order_create_multi', [
+        'orderNO' => $order_no,
+        'error' => $e->getMessage(),
+    ]);
+} catch (Exception $e) {
+    Log::error('order_create_multi', [
+        'orderNO' => $order_no,
+        'error' => $e->getMessage(),
+    ]);
 }
 
 /**

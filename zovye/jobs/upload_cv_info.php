@@ -11,6 +11,7 @@ defined('IN_IA') or exit('Access Denied');
 use zovye\Config;
 use zovye\CtrlServ;
 use zovye\GDCVMachine;
+use zovye\JobException;
 use zovye\Log;
 use zovye\model\cv_upload_deviceModelObj;
 use zovye\model\cv_upload_orderModelObj;
@@ -18,79 +19,76 @@ use zovye\model\orderModelObj;
 use zovye\Request;
 use function zovye\m;
 
-$data = [
+$log = [
     'w' => Request::str('w'),
 ];
 
-$op = Request::op('default');
+if (!CtrlServ::checkJobSign($log)) {
+    throw new JobException('签名不正确!');
+}
 
-if ($op == 'upload_cv_info' && CtrlServ::checkJobSign($data)) {
+$w = Request::str('w');
 
-    $w = Request::str('w');
-
-    if ($w == 'device') {
-        $list = [];
-        /** @var cv_upload_deviceModelObj $entry */
-        foreach (m('cv_upload_device')->findAll() as $entry) {
-            $device = $entry->getDevice();
-            if ($device) {
-                $list[] = $device;
-            }
-
-            $entry->destroy();
+if ($w == 'device') {
+    $list = [];
+    /** @var cv_upload_deviceModelObj $entry */
+    foreach (m('cv_upload_device')->findAll() as $entry) {
+        $device = $entry->getDevice();
+        if ($device) {
+            $list[] = $device;
         }
 
-        $list = array_values($list);
+        $entry->destroy();
+    }
 
-        if ($list) {
-            $last_ts = Config::GDCVMachine('last.device_upload', 0);
-            $delay = min(0, max(1, 65 - (time() - $last_ts)));
-            sleep($delay);
+    $list = array_values($list);
 
-            $response = (new GDCVMachine())->uploadDevicesInfo($list);
-            if ($response) {
-                $data['response'] = $response;
-                Config::GDCVMachine('last.device_upload', time(), true);
-            }
+    if ($list) {
+        $last_ts = Config::GDCVMachine('last.device_upload', 0);
+        $delay = min(0, max(1, 65 - (time() - $last_ts)));
+        sleep($delay);
+
+        $response = (new GDCVMachine())->uploadDevicesInfo($list);
+        if ($response) {
+            $log['response'] = $response;
+            Config::GDCVMachine('last.device_upload', time(), true);
         }
+    }
 
-    } elseif ($w == 'order') {
-        $list = [];
-        /** @var cv_upload_orderModelObj $entry */
-        foreach (m('cv_upload_order')->findAll() as $entry) {
-            $order = $entry->getOrder();
-            if ($order) {
-                $list[$order->getId()] = $order;
-            }
-            $entry->destroy();
+} elseif ($w == 'order') {
+    $list = [];
+    /** @var cv_upload_orderModelObj $entry */
+    foreach (m('cv_upload_order')->findAll() as $entry) {
+        $order = $entry->getOrder();
+        if ($order) {
+            $list[$order->getId()] = $order;
         }
+        $entry->destroy();
+    }
 
-        $list = array_values($list);
+    $list = array_values($list);
 
-        if ($list) {
-            $last_ts = Config::GDCVMachine('last.order_upload', 0);
-            $delay = min(0, max(1, 65 - (time() - $last_ts)));
-            sleep($delay);
+    if ($list) {
+        $last_ts = Config::GDCVMachine('last.order_upload', 0);
+        $delay = min(0, max(1, 65 - (time() - $last_ts)));
+        sleep($delay);
 
-            $response = (new GDCVMachine())->uploadOrdersInfo($list);
-            if ($response) {
-                $data['response'] = $response;
-                Config::GDCVMachine('last.order_upload', time(), true);
-                if (!empty($response)) {
-                    /** @var orderModelObj $order */
-                    foreach ($list as $index => $order) {
-                        $result = $response[$index] ?? ['code' => -1, 'message' => '返回数据为空或者错误！'];
-                        if ($order) {
-                            $order->setExtraData('CV.upload', $result);
-                            $order->save();
-                        }
+        $response = (new GDCVMachine())->uploadOrdersInfo($list);
+        if ($response) {
+            $log['response'] = $response;
+            Config::GDCVMachine('last.order_upload', time(), true);
+            if (!empty($response)) {
+                /** @var orderModelObj $order */
+                foreach ($list as $index => $order) {
+                    $result = $response[$index] ?? ['code' => -1, 'message' => '返回数据为空或者错误！'];
+                    if ($order) {
+                        $order->setExtraData('CV.upload', $result);
+                        $order->save();
                     }
                 }
             }
         }
     }
-} else {
-    $data['error'] = '签名不正确！';
 }
 
-Log::debug('upload_cv_info', $data);
+Log::debug('upload_cv_info', $log);

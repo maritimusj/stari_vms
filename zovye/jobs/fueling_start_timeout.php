@@ -12,6 +12,7 @@ defined('IN_IA') or exit('Access Denied');
 use zovye\CtrlServ;
 use zovye\Device;
 use zovye\Fueling;
+use zovye\JobException;
 use zovye\Log;
 
 use zovye\model\orderModelObj;
@@ -25,7 +26,7 @@ $user_id = Request::int('user');
 $order_id = Request::int('order');
 $time = Request::int('time');
 
-$params = [
+$log = [
     'uid' => $uid,
     'chargerID' => $chargerID,
     'device' => $device_id,
@@ -34,43 +35,44 @@ $params = [
     'time' => $time,
 ];
 
-$op = Request::op('default');
-if ($op == 'fueling_start_timeout' && CtrlServ::checkJobSign($params)) {
-    $order = Order::get($uid, true);
-    if ($order) {
-        $result = $order->getFuelingResult();
-        if (empty($result)) {
+if (!CtrlServ::checkJobSign($log)) {
+    throw new JobException('签名不正确!', $log);
+}
 
-            handle($order);
+$order = Order::get($uid, true);
+if ($order) {
+    $result = $order->getFuelingResult();
+    if (empty($result)) {
 
-            $params['error'] = [
-                'at' => time(),
-                'reason' => '设备无响应，请稍后再试！',
-            ];
-        } else {
-            $params['result'] = $result;
-        }
-    }
+        handle($order);
 
-    $device = Device::get($device_id);
-    if ($device) {
-        $data = $device->getFuelingStatusData($chargerID);
-        if (empty($data)) {
-
-            handle($order);
-
-            $params['error'] = [
-                'at' => time(),
-                'reason' => '设备失去响应，请重试！',
-            ];
-        } else {
-            $params['status'] = $data;
-        }
+        $log['error'] = [
+            'at' => time(),
+            'reason' => '设备无响应，请稍后再试！',
+        ];
+    } else {
+        $log['result'] = $result;
     }
 }
 
-$params['time_formatted'] = date('Y-m-d H:i:s', $params['time']);
-Log::debug('fueling_start_timeout', $params);
+$device = Device::get($device_id);
+if ($device) {
+    $data = $device->getFuelingStatusData($chargerID);
+    if (empty($data)) {
+
+        handle($order);
+
+        $log['error'] = [
+            'at' => time(),
+            'reason' => '设备失去响应，请重试！',
+        ];
+    } else {
+        $log['status'] = $data;
+    }
+}
+
+$log['time_formatted'] = date('Y-m-d H:i:s', $log['time']);
+Log::debug('fueling_start_timeout', $log);
 
 function handle(orderModelObj $order) {
 

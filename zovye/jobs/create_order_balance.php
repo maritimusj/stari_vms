@@ -21,6 +21,7 @@ use zovye\EventBus;
 use zovye\ExceptionNeedsRefund;
 use zovye\Helper;
 use zovye\Job;
+use zovye\JobException;
 use zovye\Log;
 use zovye\model\balanceModelObj;
 use zovye\model\deviceModelObj;
@@ -34,8 +35,6 @@ use function zovye\err;
 use function zovye\is_error;
 use function zovye\settings;
 
-$op = Request::op('default');
-
 $order_no = Request::str('order_no');
 $user_id = Request::int('user');
 $device_id = Request::int('device');
@@ -44,7 +43,6 @@ $num = Request::int('num');
 $ip = Request::str('ip');
 
 $log = [
-    'op' => $op,
     'order_no' => $order_no,
     'user' => $user_id,
     'device' => $device_id,
@@ -53,213 +51,205 @@ $log = [
     'ip' => $ip,
 ];
 
+if (!CtrlServ::checkJobSign($log)) {
+    throw new JobException('签名不正确!', $log);
+}
+
 $writeLog = function () use (&$log) {
     Log::debug('create_order_balance', $log);
 };
 
-if ($op == 'create_order_balance' && CtrlServ::checkJobSign([
-        'order_no' => $order_no,
-        'user' => $user_id,
-        'device' => $device_id,
-        'goods' => $goods_id,
-        'num' => $num,
-        'ip' => $ip,
-    ])) {
+$balance_id = 0;
 
-    $balance_id = 0;
+try {
+    if (!App::isBalanceEnabled()) {
+        throw new RuntimeException('积分功能没有启用！');
+    }
 
-    try {
-        if (!App::isBalanceEnabled()) {
-            throw new RuntimeException('积分功能没有启用！');
+    $user = User::get($user_id);
+    if (empty($user)) {
+        throw new RuntimeException('找不到这个用户！');
+    }
+
+    $log['user'] = $user->profile();
+
+    if (!$user->acquireLocker(User::BALANCE_LOCKER)) {
+        throw new RuntimeException('无法锁定用户，请稍后再试！');
+    }
+
+    $device = Device::get($device_id);
+    if (empty($device)) {
+        throw new RuntimeException('找不到这个设备！');
+    }
+
+    if ($num < 1) {
+        throw new RuntimeException('对不起，商品数量不正确！');
+    }
+
+    if (Balance::isFreeOrder()) {
+        $quota = Util::getFreeOrderLimits($user, $device);
+        if ($num > $quota) {
+            throw new RuntimeException('超过可用的免费额度！');
         }
+    }
 
-        $user = User::get($user_id);
-        if (empty($user)) {
-            throw new RuntimeException('找不到这个用户！');
-        }
+    $log['device'] = $device->profile();
 
-        $log['user'] = $user->profile();
+    //锁定设备
+    $retries = intval(settings('device.lockRetries', 0));
+    $delay = intval(settings('device.lockRetryDelay', 1));
 
-        if (!$user->acquireLocker(User::BALANCE_LOCKER)) {
-            throw new RuntimeException('无法锁定用户，请稍后再试！');
-        }
-
-        $device = Device::get($device_id);
-        if (empty($device)) {
-            throw new RuntimeException('找不到这个设备！');
-        }
-
-        if ($num < 1) {
-            throw new RuntimeException('对不起，商品数量不正确！');
-        }
-
-        if (Balance::isFreeOrder()) {
-            $quota = Util::getFreeOrderLimits($user, $device);
-            if ($num > $quota) {
-                throw new RuntimeException('超过可用的免费额度！');
+    if (!$device->lockAcquire($retries, $delay)) {
+        if (settings('order.waitQueue.enabled', false)) {
+            if (!Job::createBalanceOrder($order_no, $user, $device, $goods_id, $num, $ip)) {
+                throw new RuntimeException('启动排队任务失败！');
             }
+
+            return true;
         }
+        throw new RuntimeException('设备被占用！');
+    }
 
-        $log['device'] = $device->profile();
+    $goods = $device->getGoods($goods_id);
+    if (empty($goods) || empty($goods['balance'])) {
+        throw new RuntimeException('无法兑换这个商品，请联系管理员！');
+    }
 
-        //锁定设备
-        $retries = intval(settings('device.lockRetries', 0));
-        $delay = intval(settings('device.lockRetryDelay', 1));
+    $log['goods'] = $goods;
 
-        if (!$device->lockAcquire($retries, $delay)) {
-            if (settings('order.waitQueue.enabled', false)) {
-                if (!Job::createBalanceOrder($order_no, $user, $device, $goods_id, $num, $ip)) {
-                    throw new RuntimeException('启动排队任务失败！');
-                }
+    if ($goods['num'] < $num) {
+        throw new RuntimeException('对不起，商品数量不足！');
+    }
 
-                return true;
+    $orderResult = DBUtil::transactionDo(
+        function () use ($order_no, $device, $user, $goods, $num, &$balance_id, $ip) {
+
+            $total = $goods['balance'] * $num;
+
+            $balance = $user->getBalance();
+            if ($balance->total() < $total) {
+                return err('您的积分不够！');
             }
-            throw new RuntimeException('设备被占用！');
-        }
 
-        $goods = $device->getGoods($goods_id);
-        if (empty($goods) || empty($goods['balance'])) {
-            throw new RuntimeException('无法兑换这个商品，请联系管理员！');
-        }
+            $balance_log = $user->getBalance()->change(-$total, Balance::GOODS_EXCHANGE, [
+                'user' => $user->profile(),
+                'device' => $device->profile(),
+                'goods' => $goods,
+                'num' => $num,
+                'ip' => $ip,
+            ]);
 
-        $log['goods'] = $goods;
+            if (empty($balance_log)) {
+                return err('创建积分记录失败！');
+            }
 
-        if ($goods['num'] < $num) {
-            throw new RuntimeException('对不起，商品数量不足！');
-        }
+            if (empty($order_no)) {
+                $order_no = Order::makeUID(
+                    $user,
+                    $device,
+                    sha1($balance_log->getId().$balance_log->getCreatetime())
+                );
+            }
 
-        $orderResult = DBUtil::transactionDo(
-            function () use ($order_no, $device, $user, $goods, $num, &$balance_id, $ip) {
+            if (Order::exists($order_no)) {
+                return err('订单已存在！');
+            }
 
-                $total = $goods['balance'] * $num;
+            //事件：设备已锁定
+            EventBus::on('device.locked', [
+                'device' => $device,
+                'user' => $user,
+            ]);
 
-                $balance = $user->getBalance();
-                if ($balance->total() < $total) {
-                    return err('您的积分不够！');
-                }
-
-                $balance_log = $user->getBalance()->change(-$total, Balance::GOODS_EXCHANGE, [
-                    'user' => $user->profile(),
-                    'device' => $device->profile(),
-                    'goods' => $goods,
-                    'num' => $num,
-                    'ip' => $ip,
-                ]);
-
-                if (empty($balance_log)) {
-                    return err('创建积分记录失败！');
-                }
-
-                if (empty($order_no)) {
-                    $order_no = Order::makeUID(
-                        $user,
-                        $device,
-                        sha1($balance_log->getId().$balance_log->getCreatetime())
-                    );
-                }
-
-                if (Order::exists($order_no)) {
-                    return err('订单已存在！');
-                }
-
-                //事件：设备已锁定
-                EventBus::on('device.locked', [
-                    'device' => $device,
-                    'user' => $user,
-                ]);
-
-                $result = createOrder($order_no, $device, $user, $goods, $balance_log);
-                if (is_error($result)) {
-                    return $result;
-                }
-
-                $balance_log->setExtraData('order.id', $order_no);
-                if (!$balance_log->save()) {
-                    return err('保存订单数据失败！');
-                }
-
-                //保存balance id，后面出货失败后退积分使用
-                $balance_id = $balance_log->getId();
-
+            $result = createOrder($order_no, $device, $user, $goods, $balance_log);
+            if (is_error($result)) {
                 return $result;
             }
-        );
 
-        if (is_error($orderResult)) {
-            throw new RuntimeException($orderResult['message']);
-        }
-
-        /** @var orderModelObj $order */
-        $order = $orderResult;
-
-        //事件：出货成功，目前用于统计数据
-        EventBus::on('device.openSuccess', [
-            'device' => $device,
-            'user' => $user,
-            'order' => $order,
-        ]);
-
-        $fail = 0;
-        $success = 0;
-
-        $is_pull_result_updated = false;
-        $goods['goods_id'] = $goods['id'];
-
-        for ($i = 0; $i < $num; $i++) {
-            $result = Helper::pullGoods($order, $device, $user, LOG_GOODS_BALANCE, $goods);
-            if (is_error($result) || !$is_pull_result_updated) {
-                $order->setResultCode($result['errno']);
-                $order->setExtraData('pull.result', $result);
-                if ($order->save()) {
-                    $is_pull_result_updated = true;
-                }
+            $balance_log->setExtraData('order.id', $order_no);
+            if (!$balance_log->save()) {
+                return err('保存订单数据失败！');
             }
-            if (is_error($result)) {
-                Log::error('create_order_balance', [
-                    'orderNO' => $order->getOrderNO(),
-                    'error' => $result,
-                ]);
-                $fail++;
-            } else {
-                $success++;
+
+            //保存balance id，后面出货失败后退积分使用
+            $balance_id = $balance_log->getId();
+
+            return $result;
+        }
+    );
+
+    if (is_error($orderResult)) {
+        throw new RuntimeException($orderResult['message']);
+    }
+
+    /** @var orderModelObj $order */
+    $order = $orderResult;
+
+    //事件：出货成功，目前用于统计数据
+    EventBus::on('device.openSuccess', [
+        'device' => $device,
+        'user' => $user,
+        'order' => $order,
+    ]);
+
+    $fail = 0;
+    $success = 0;
+
+    $is_pull_result_updated = false;
+    $goods['goods_id'] = $goods['id'];
+
+    for ($i = 0; $i < $num; $i++) {
+        $result = Helper::pullGoods($order, $device, $user, LOG_GOODS_BALANCE, $goods);
+        if (is_error($result) || !$is_pull_result_updated) {
+            $order->setResultCode($result['errno']);
+            $order->setExtraData('pull.result', $result);
+            if ($order->save()) {
+                $is_pull_result_updated = true;
             }
         }
-
-        if (empty($success)) {
-            ExceptionNeedsRefund::throwWith($device, '出货失败！');
-        } elseif ($fail > 0) {
-            $order->setExtraData('pull.result', err('部分商品出货失败！'));
-            $order->save();
-
-            ExceptionNeedsRefund::throwWithN($device, $fail, '部分商品出货失败！');
+        if (is_error($result)) {
+            Log::error('create_order_balance', [
+                'orderNO' => $order->getOrderNO(),
+                'error' => $result,
+            ]);
+            $fail++;
+        } else {
+            $success++;
         }
+    }
 
-        $order->setExtraData('pull.result', [
-            'errno' => 0,
-            'message' => '出货完成！',
-        ]);
-
+    if (empty($success)) {
+        ExceptionNeedsRefund::throwWith($device, '出货失败！');
+    } elseif ($fail > 0) {
+        $order->setExtraData('pull.result', err('部分商品出货失败！'));
         $order->save();
 
-        $device->appShowMessage('出货完成，欢迎下次使用！');
-
-    } catch (ExceptionNeedsRefund $e) {
-        $log['error'] = $e->getMessage();
-        $res = refund($balance_id, $e->getNum(), $e->getMessage());
-        $log['refund'] = $res;
-        if (is_error($res)) {
-            Log::error('balance_refund', [
-                'error' => $e->getMessage(),
-                'balance_id' => $balance_id,
-                'result' => $res,
-            ]);
-        }
-    } catch (Exception $e) {
-        $log['error'] = $e->getMessage();
-        Log::error('create_order_balance', $log);
+        ExceptionNeedsRefund::throwWithN($device, $fail, '部分商品出货失败！');
     }
-} else {
-    $log['error'] = '签名校验失败！';
+
+    $order->setExtraData('pull.result', [
+        'errno' => 0,
+        'message' => '出货完成！',
+    ]);
+
+    $order->save();
+
+    $device->appShowMessage('出货完成，欢迎下次使用！');
+
+} catch (ExceptionNeedsRefund $e) {
+    $log['error'] = $e->getMessage();
+    $res = refund($balance_id, $e->getNum(), $e->getMessage());
+    $log['refund'] = $res;
+    if (is_error($res)) {
+        Log::error('balance_refund', [
+            'error' => $e->getMessage(),
+            'balance_id' => $balance_id,
+            'result' => $res,
+        ]);
+    }
+} catch (Exception $e) {
+    $log['error'] = $e->getMessage();
+    Log::error('create_order_balance', $log);
 }
 
 Job::exit($writeLog);

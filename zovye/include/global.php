@@ -20,7 +20,7 @@ try {
     //设置request数据来源
     Request::setData($GLOBALS['_GPC']);
 
-    LOG::init(new FileLogWriter(), settings('app.log.level', L_ERROR));
+    Log::init(new FileLogWriter(), settings('app.log.level', L_ERROR));
 
     //捕获错误和异常
     Util::setErrorHandler();

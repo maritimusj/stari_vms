@@ -22,42 +22,40 @@ class WeApp extends Settings
     }
 
     /**
-     * @param $filename
-     * @param array $tpl_data
+     * @return $this
+     * @throws Exception
      */
-    public function showTemplate($filename, array $tpl_data = [])
+    public function run(): WeApp
     {
-        $tpl_data['_GPC'] = $GLOBALS['_GPC'];
-        $tpl_data['_W'] = $GLOBALS['_W'];
+        //输出模块类
+        class_alias(__NAMESPACE__.'\Site', lcfirst(APP_NAME).'ModuleSite');
 
-        extract($tpl_data);
+        //默认加载缓存
+        We7::load()->func('cache');
 
-        include self::template($filename);
-        exit();
-    }
+        Request::extraAjaxJsonData();
 
-    public static function template($filename)
-    {
-        global $_W;
-        if (defined('IN_SYS')) {
-            $source = ZOVYE_ROOT."template/$filename.html";
-            $compile = ZOVYE_ROOT."data/tpl/$filename.tpl.php";
-        } else {
-            $source = ZOVYE_ROOT."template/mobile/$filename.html";
-            $compile = ZOVYE_ROOT."data/tpl/mobile/$filename.tpl.php";
+        //设置request数据源
+        Request::setData($GLOBALS['_GPC']);
+
+        //初始化日志
+        Log::init(new FileLogWriter(), settings('app.log.level', LOG_LEVEL));
+
+        //捕获错误和异常
+        Util::setErrorHandler();
+
+        //初始化事件驱动
+        EventBus::init();
+
+        //设置CtrlServ
+        CtrlServ::init(new we7HttpClient(), settings('ctrl', []));
+
+        //初始化充电设备服务
+        if (App::isChargingDeviceEnabled()) {
+            ChargingServ::setHttpClient(new we7HttpClient(), Config::charging('server', []));
         }
 
-        if (!is_file($source)) {
-            exit("Error: template source '$filename' is not exist!");
-        }
-
-        $paths = pathinfo($compile);
-        $compile = str_replace($paths['filename'], $_W['uniacid'].'_'.$paths['filename'], $compile);
-        if (DEVELOPMENT || !is_file($compile) || filemtime($source) > filemtime($compile)) {
-            template::compile($source, $compile, true);
-        }
-
-        return $compile;
+        return $this;
     }
 
     public function forceUnlock(): bool
@@ -107,43 +105,6 @@ class WeApp extends Settings
     public function isSite(): bool
     {
         return class_exists(__NAMESPACE__.'\Site');
-    }
-
-    /**
-     * @return $this
-     * @throws Exception
-     */
-    public function run(): WeApp
-    {
-        //输出模块类
-        class_alias(__NAMESPACE__.'\Site', lcfirst(APP_NAME).'ModuleSite');
-
-        //默认加载缓存
-        We7::load()->func('cache');
-
-        Request::extraAjaxJsonData();
-
-        //设置request数据源
-        Request::setData($GLOBALS['_GPC']);
-
-        //初始化日志
-        Log::init(new FileLogWriter(), settings('app.log.level', LOG_LEVEL));
-
-        //捕获错误和异常
-        Util::setErrorHandler();
-
-        //初始化事件驱动
-        EventBus::init();
-
-        //设置CtrlServ
-        CtrlServ::init(new we7HttpClient(), settings('ctrl', []));
-
-        //初始化充电设备服务
-        if (App::isChargingDeviceEnabled()) {
-            ChargingServ::setHttpClient(new we7HttpClient(), Config::charging('server', []));
-        }
-
-        return $this;
     }
 
     public function saveSettings($settings): bool
@@ -196,6 +157,45 @@ class WeApp extends Settings
         if ($this->logger && isset($level) && isset($title) && isset($data)) {
             $this->logger->create(intval($level), strval($title), $data);
         }
+    }
+
+    /**
+     * @param $filename
+     * @param array $tpl_data
+     */
+    public function showTemplate($filename, array $tpl_data = [])
+    {
+        $tpl_data['_GPC'] = $GLOBALS['_GPC'];
+        $tpl_data['_W'] = $GLOBALS['_W'];
+
+        extract($tpl_data);
+
+        include self::template($filename);
+        exit();
+    }
+
+    public static function template($filename)
+    {
+        global $_W;
+        if (defined('IN_SYS')) {
+            $source = ZOVYE_ROOT."template/$filename.html";
+            $compile = ZOVYE_ROOT."data/tpl/$filename.tpl.php";
+        } else {
+            $source = ZOVYE_ROOT."template/mobile/$filename.html";
+            $compile = ZOVYE_ROOT."data/tpl/mobile/$filename.tpl.php";
+        }
+
+        if (!is_file($source)) {
+            exit("Error: template source '$filename' is not exist!");
+        }
+
+        $paths = pathinfo($compile);
+        $compile = str_replace($paths['filename'], $_W['uniacid'].'_'.$paths['filename'], $compile);
+        if (DEVELOPMENT || !is_file($compile) || filemtime($source) > filemtime($compile)) {
+            template::compile($source, $compile, true);
+        }
+
+        return $compile;
     }
 
     /**

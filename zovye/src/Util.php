@@ -536,7 +536,7 @@ include './index.php';
     {
         //每日免费额度限制
         if (Util::getUserTodayFreeNum($user, $device) < 1) {
-            return err('今天领的太多了，明天再来吧！');
+            return err('今天已经不能再领了，明天再来吧！');
         }
 
         //全部免费额度限制

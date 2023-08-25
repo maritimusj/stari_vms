@@ -1137,7 +1137,7 @@ class agent
 
         $num = Request::int('num');
 
-        $res = Order::refund($order->getOrderNO(), $num, ['msg' => '代理商：'.$agent->getName()]);
+        $res = Order::refund($order->getOrderNO(), $num, ['message' => '代理商：'.$agent->getName()]);
         if (is_error($res)) {
             return err($res['message']);
         }

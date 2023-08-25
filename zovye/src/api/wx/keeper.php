@@ -1328,7 +1328,7 @@ class keeper
 
         $num = Request::int('num');
 
-        $res = Order::refund($order->getOrderNO(), $num, ['msg' => '运营人员：'.$keeper->getName()]);
+        $res = Order::refund($order->getOrderNO(), $num, ['message' => '运营人员：'.$keeper->getName()]);
         if (is_error($res)) {
             return err($res['message']);
         }

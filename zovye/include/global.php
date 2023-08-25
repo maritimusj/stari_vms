@@ -20,6 +20,7 @@ try {
     //设置request数据来源
     Request::setData($GLOBALS['_GPC']);
 
+    //初始化日志
     Log::init(new FileLogWriter(), settings('app.log.level', L_ERROR));
 
     //捕获错误和异常

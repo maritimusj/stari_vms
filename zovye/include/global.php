@@ -21,7 +21,7 @@ try {
     Request::setData($GLOBALS['_GPC']);
 
     //初始化日志
-    Log::init(new FileLogWriter(), settings('app.log.level', L_ERROR));
+    Log::init(new FileLogWriter(), settings('app.log.level', LOG_LEVEL));
 
     //捕获错误和异常
     Util::setErrorHandler();

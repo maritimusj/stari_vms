@@ -23,13 +23,13 @@ class Log
 
     public static function append($level, $topic, $data)
     {
-        if ($level >= self::$log_level && (empty(LOG_TOPIC_INCLUDES) || in_array($topic, LOG_TOPIC_INCLUDES))) {
+        if (self::$writer != null
+            && $level >= self::$log_level
+            && (empty(LOG_TOPIC_INCLUDES) || in_array($topic, LOG_TOPIC_INCLUDES))) {
             if (is_callable($data)) {
                 $data = call_user_func($data);
             }
-            if (self::$writer != null) {
-                self::$writer->write($level, $topic, $data);
-            }
+            self::$writer->write($level, $topic, $data);
         }
     }
 

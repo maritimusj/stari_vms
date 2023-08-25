@@ -17,7 +17,7 @@ try {
 
     Request::extraAjaxJsonData();
 
-    //设置request数据来源
+    //设置request数据源
     Request::setData($GLOBALS['_GPC']);
 
     //初始化日志
@@ -32,6 +32,7 @@ try {
     //设置CtrlServ
     CtrlServ::init(new we7HttpClient(), settings('ctrl', []));
 
+    //初始化充电设备服务
     if (App::isChargingDeviceEnabled()) {
         ChargingServ::setHttpClient(new we7HttpClient(), Config::charging('server', []));
     }

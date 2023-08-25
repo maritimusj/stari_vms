@@ -19,14 +19,14 @@ class Log
         L_FATAL => 'fatal',
     ];
 
-    public static function append($level, $topic, $data = [])
+    public static function append($level, $topic, $data)
     {
         if ($level >= LOG_LEVEL && (empty(LOG_TOPIC_INCLUDES) || in_array($topic, LOG_TOPIC_INCLUDES))) {
             self::logToFile($topic, $data, true, self::$suffix[$level] ?? '');
         }
     }
 
-    public static function error($topic, $data = [])
+    public static function error($topic, $data)
     {
         self::append(L_ERROR, $topic, $data);
     }
@@ -36,7 +36,7 @@ class Log
      * @param mixed $data
      * @return never-return
      */
-    public static function fatal($topic, $data = [])
+    public static function fatal($topic, $data)
     {
         self::append(L_FATAL, $topic, $data);
         if (defined("IN_JOB")) {
@@ -45,17 +45,17 @@ class Log
         exit();
     }
 
-    public static function warning($topic, $data = [])
+    public static function warning($topic, $data)
     {
         self::append(L_WARN, $topic, $data);
     }
 
-    public static function info($topic, $data = [])
+    public static function info($topic, $data)
     {
         self::append(L_INFO, $topic, $data);
     }
 
-    public static function debug($topic, $data = [])
+    public static function debug($topic, $data)
     {
         self::append(L_DEBUG, $topic, $data);
     }
@@ -133,6 +133,9 @@ class Log
                 register_shutdown_function(function () use ($name) {
                     foreach (self::$log_cache as $filename => $data) {
                         if ($filename && $data) {
+                            if (is_callable($data)) {
+                                $data = call_user_func($data);
+                            }
                             file_put_contents($filename, $data, FILE_APPEND);
                         }
                     }

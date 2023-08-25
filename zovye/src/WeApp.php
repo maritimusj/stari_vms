@@ -125,6 +125,9 @@ class WeApp extends Settings
      */
     public function run(): WeApp
     {
+        //输出模块类
+        class_alias(__NAMESPACE__.'\Site', lcfirst(APP_NAME).'ModuleSite');
+
         //默认加载缓存
         We7::load()->func('cache');
 
@@ -149,8 +152,6 @@ class WeApp extends Settings
         if (App::isChargingDeviceEnabled()) {
             ChargingServ::setHttpClient(new we7HttpClient(), Config::charging('server', []));
         }
-
-        class_alias(__NAMESPACE__.'\Site', lcfirst(APP_NAME).'ModuleSite');
 
         return $this;
     }

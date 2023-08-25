@@ -11,14 +11,19 @@ use Exception;
 //定义常量REQUEST_ID
 define('REQUEST_ID', Util::generateUID());
 
-//捕获错误和异常
-Util::setErrorHandler();
-
 try {
+    //默认加载缓存
+    We7::load()->func('cache');
+
     Request::extraAjaxJsonData();
 
     //设置request数据来源
     Request::setData($GLOBALS['_GPC']);
+
+    LOG::init(new FileLogWriter(), settings('app.log.level', L_ERROR));
+
+    //捕获错误和异常
+    Util::setErrorHandler();
 
     //初始化事件驱动
     EventBus::init();
@@ -29,9 +34,6 @@ try {
     if (App::isChargingDeviceEnabled()) {
         ChargingServ::setHttpClient(new we7HttpClient(), Config::charging('server', []));
     }
-
-    //默认加载缓存
-    We7::load()->func('cache');
 
     //启动应用
     app()->run();

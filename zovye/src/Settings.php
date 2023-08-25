@@ -147,7 +147,6 @@ CODE;
         $ret = [];
         $keys = is_array($key) ? $key : [$key];
 
-
         foreach ($keys as $entry) {
             if ($this->use_cache) {
                 $val = We7::cache_read($this->cacheKey($entry));

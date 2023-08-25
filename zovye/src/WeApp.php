@@ -157,9 +157,13 @@ class WeApp extends Settings
         if (is_null(self::$app_settings)) {
             self::$app_settings = $this->get('settings', []);
             if (empty(self::$app_settings)) {
-                $filename = ZOVYE_CORE_ROOT.'include/settings_default.php';
-                if (file_exists($filename)) {
-                    self::$app_settings = include $filename;
+                if (DEBUG) {
+                    $filename = ZOVYE_CORE_ROOT.'include/settings_default.php';
+                    if (file_exists($filename)) {
+                        self::$app_settings = include $filename;
+                    }
+                } else {
+                    trigger_error('global settings is empty!');
                 }
             }
         }

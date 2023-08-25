@@ -539,7 +539,7 @@ class WxPlatform
                 }
             }
 
-            if (is_string($result)) {
+            if ($result && is_string($result)) {
                 return self::getEncryptedMsg($result);
             }
         }
@@ -726,7 +726,10 @@ class WxPlatform
                     'result' => $res,
                 ]);
 
-                return $account->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $device->getUrl());
+                $message = $account->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $device->getUrl());
+                if (empty($message)) {
+                    ZovyeException::throwWith($res['message'], -1, $device);
+                }
             }
 
             $user = User::get($first);

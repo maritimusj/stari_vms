@@ -215,14 +215,6 @@
         <div class="pull-right">
             {$pager}
         </div>
-        <script>
-            $(function(){
-                $('[data-url]').each(function() {
-                      util.clip(this, $(this).data('url'));
-                })
-                $('.pagination li:not(.active) a').click(function(){ setTimeout(function(){util.loading()}, 1000)});
-            })
-        </script>
         {else}
         <div class="text-center text-muted">
             <i class="fa fa-question-circle"></i> 暂时还没有任何代理商！
@@ -232,8 +224,13 @@
 </div>
 
 {template 'web/common/search_user'}
-
 <script>
+    $(function(){
+        $('[data-url]').each(function() {
+            util.clip(this, $(this).data('url'));
+        })
+        $('.pagination li:not(.active) a').click(function(){ setTimeout(function(){util.loading()}, 1000)});
+    })
     function getUrlParam(name) {
         const reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
         const r = window.location.search.substr(1).match(reg);  //匹配目标参数

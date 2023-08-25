@@ -22,6 +22,9 @@ class Log
     public static function append($level, $topic, $data)
     {
         if ($level >= LOG_LEVEL && (empty(LOG_TOPIC_INCLUDES) || in_array($topic, LOG_TOPIC_INCLUDES))) {
+            if (is_callable($data)) {
+                $data = call_user_func($data);
+            }
             self::logToFile($topic, $data, true, self::$suffix[$level] ?? '');
         }
     }
@@ -133,9 +136,6 @@ class Log
                 register_shutdown_function(function () use ($name) {
                     foreach (self::$log_cache as $filename => $data) {
                         if ($filename && $data) {
-                            if (is_callable($data)) {
-                                $data = call_user_func($data);
-                            }
                             file_put_contents($filename, $data, FILE_APPEND);
                         }
                     }

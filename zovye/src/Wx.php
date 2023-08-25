@@ -84,7 +84,7 @@ class Wx
         $api_url = self::GET_ALL_TEMPLATE_URL.$token;
 
         return self::checkResult(
-            HttpUtil::get($api_url, 3, [], true)
+            HttpUtil::getJSON($api_url)
         );
     }
 

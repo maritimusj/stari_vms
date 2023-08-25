@@ -584,7 +584,8 @@ class Device extends State
 
         //刷新域名转发缓存
         $url = str_replace('{imei}', urlencode($imei), settings('ctrl.qrcode.url', FLUSH_DEVICE_FORWARDER_URL));
-        if (file_get_contents($url) === false) {
+        $res = HttpUtil::getJSON($url);
+        if (empty($res) || !$res['status']) {
             return err('刷新域名缓存失败！');
         }
 

@@ -271,6 +271,7 @@ if ($page == 'device') {
     $tpl_data['upgrade'] = [];
 
     $data = HttpUtil::get(UPGRADE_URL);
+
     if (empty($data)) {
         $tpl_data['upgrade']['error'] = '检查更新失败！';
     } else {
@@ -278,7 +279,8 @@ if ($page == 'device') {
         if ($res) {
             if ($res['status']) {
                 $tpl_data['upgrade']['settings'] = $res['data']['settings'];
-                $processFile = function ($arr) {
+
+                $processFileFN = function ($arr) {
                     $result = [];
                     foreach ($arr as $filename) {
                         $fi = [
@@ -298,10 +300,11 @@ if ($page == 'device') {
 
                     return $result;
                 };
-                $tpl_data['upgrade']['download'] = $processFile($res['data']['download']);
-                $tpl_data['upgrade']['copy'] = $processFile($res['data']['copy']);
-                $tpl_data['upgrade']['move'] = $processFile($res['data']['move']);
-                $tpl_data['upgrade']['remove'] = $processFile($res['data']['remove']);
+
+                $tpl_data['upgrade']['download'] = $processFileFN($res['data']['download']);
+                $tpl_data['upgrade']['copy'] = $processFileFN($res['data']['copy']);
+                $tpl_data['upgrade']['move'] = $processFileFN($res['data']['move']);
+                $tpl_data['upgrade']['remove'] = $processFileFN($res['data']['remove']);
             } else {
                 $tpl_data['upgrade']['error'] = empty($res['data']['message']) ? '暂无无法检查升级！' : strval(
                     $res['data']['message']

@@ -640,7 +640,7 @@ class WxPlatform
         }
 
         if (empty($goods) || $goods['num'] < 1) {
-            ZovyeException::throwWith('没有指定商品或商品库存不足！', -1, $device);
+            ZovyeException::throwWith('找不到指定商品或商品库存不足！', -1, $device);
         }
 
         $uid = empty($msg['Ticket']) ? sha1(time()) : sha1($msg['Ticket']);
@@ -748,11 +748,7 @@ class WxPlatform
             $res = Util::checkAvailable($user, $account, $device, ['ignore_assigned' => true]);
 
             if (is_error($res)) {
-                return  self::createToUserTextMsg(
-                    $msg['ToUserName'],
-                    $msg['FromUserName'],
-                    $res['message']
-                );
+                ZovyeException::throwWith($res['message'], -1, $device);
             }
 
             //创建订单
@@ -772,7 +768,11 @@ class WxPlatform
                 $device->appShowMessage($e->getMessage(), 'error');
             }
 
-            return err($e->getMessage());
+            return self::createToUserTextMsg(
+                $msg['ToUserName'],
+                $msg['FromUserName'],
+                $e->getMessage()
+            );
 
         } catch (Exception $e) {
 

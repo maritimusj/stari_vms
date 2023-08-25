@@ -745,6 +745,16 @@ class WxPlatform
                 return $account->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $account->getUrl());
             }
 
+            $res = Util::checkAvailable($user, $account, $device, ['ignore_assigned' => true]);
+
+            if (is_error($res)) {
+                return  self::createToUserTextMsg(
+                    $msg['ToUserName'],
+                    $msg['FromUserName'],
+                    $res['message']
+                );
+            }
+
             //创建订单
             self::createOrder($device, $user, $account);
 

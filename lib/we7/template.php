@@ -98,7 +98,7 @@ class template
     public static function parse($str, $inmodule = false)
     {
         $str = preg_replace('/<!--{(.+?)}-->/s', '{$1}', $str);
-        $str = preg_replace('/{template\s+(.+?)}/', '<?php include self::template($1, TEMPLATE_INCLUDEPATH);?>', $str);
+        $str = preg_replace('/{template\s+(.+?)}/', '<?php include \zovye\TemplateUtil::compile($1, TEMPLATE_INCLUDEPATH);?>', $str);
         $str = preg_replace('/{php\s+(.+?)}/', '<?php $1?>', $str);
         $str = preg_replace('/{if\s+(.+?)}/', '<?php if($1) { ?>', $str);
         $str = preg_replace('/{else}/', '<?php } else { ?>', $str);

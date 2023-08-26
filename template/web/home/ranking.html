@@ -160,7 +160,7 @@
                 <tr v-for="(item, index) in agentList.list">
                     <td class="center">{{index + 1}}</td>
                     <td>
-                        <div v-if="item.agent" title="查看代理商设备排行榜"  @click="search(item.agent)">
+                        <div v-if="item.agent" title="查看代理商设备排行榜" @click="search(item.agent)">
                             <div class="profile agent selected" style="position:relative">
                                 <img :src="item.agent.avatar">
                                 <span v-text="item.agent.name"></span>
@@ -168,7 +168,7 @@
                         </div>
                     </td>
                     <td class="center">
-                        <span class="device-total">
+                        <span class="device-total" @click="search(item.agent)">
                         {{item.devices_total}}
                         </span>
                     </td>

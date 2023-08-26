@@ -685,7 +685,7 @@ class WxPlatform
             if ($prefix != App::uid(6)) {
                 Log::error('wxplatform', [
                     'msg' => $msg,
-                    'error' => 'App不匹配，已忽略！',
+                    'error' => '未知来源用户，已忽略！',
                 ]);
 
                 return [];

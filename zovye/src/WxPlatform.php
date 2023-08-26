@@ -702,7 +702,7 @@ class WxPlatform
                 throw new RuntimeException('找不到这个设备：'.$second);
             }
 
-            $user = User::getOrCreate($msg['FromUserName'], User::WX);
+            $user = User::getOrCreate($msg['FromUserName'], User::THIRD_ACCOUNT);
             if (empty($user)) {
                 throw new RuntimeException('找不到这个用户[1]！');
             }

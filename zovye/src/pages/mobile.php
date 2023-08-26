@@ -87,4 +87,9 @@ $js_sdk
     }
 </script>
 JSCODE;
+
+if (Session::isSnapshot()) {
+    $tpl['js']['code'] .= Response::snapshotJs();
+}
+
 Response::showTemplate('mobile', ['tpl' => $tpl], true);

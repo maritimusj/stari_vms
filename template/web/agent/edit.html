@@ -56,7 +56,7 @@
     <div style="position:absolute;float:right;right:2em;top:1em;z-index: 99;">
         <div class="profile {if $agent->isAgent()}agent{/if}" style="position:relative">
             <img src="{php echo $agent->getAvatar();}">
-            <span>{php echo $agent->getName() ?: '<未知>'}</span>
+            <span>{php echo $agent->getName() ?: '<匿名用户>'}</span>
             {if $agent->isAgent()}
             <span class="agent-user">[ 代理商 ]</span>
             {/if}

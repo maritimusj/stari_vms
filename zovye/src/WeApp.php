@@ -7,7 +7,6 @@
 namespace zovye;
 
 use Exception;
-use we7\template;
 use zovye\base\modelObj;
 use zovye\model\weapp_configModelObj;
 
@@ -180,32 +179,8 @@ class WeApp extends Settings
 
         extract($tpl_data);
 
-        include self::template($filename);
+        include TemplateUtil::compile($filename);
         exit();
-    }
-
-    public static function template($filename)
-    {
-        global $_W;
-        if (defined('IN_SYS')) {
-            $source = ZOVYE_ROOT."template/$filename.html";
-            $compile = ZOVYE_ROOT."data/tpl/$filename.tpl.php";
-        } else {
-            $source = ZOVYE_ROOT."template/mobile/$filename.html";
-            $compile = ZOVYE_ROOT."data/tpl/mobile/$filename.tpl.php";
-        }
-
-        if (!is_file($source)) {
-            exit("Error: template source '$filename' is not exist!");
-        }
-
-        $paths = pathinfo($compile);
-        $compile = str_replace($paths['filename'], $_W['uniacid'].'_'.$paths['filename'], $compile);
-        if (DEVELOPMENT || !is_file($compile) || filemtime($source) > filemtime($compile)) {
-            template::compile($source, $compile, true);
-        }
-
-        return $compile;
     }
 
     /**
@@ -224,7 +199,7 @@ class WeApp extends Settings
 
         ob_start();
 
-        include self::template($name);
+        include TemplateUtil::compile($name);
 
         return ob_get_clean();
     }

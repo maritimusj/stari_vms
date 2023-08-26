@@ -344,7 +344,7 @@
                                             </td>
                                             <td>
                                                 <template v-if="isCustomizedType">
-                                                    <input type="float" class="form-control goods" 
+                                                    <input type="number" class="form-control goods" 
                                                     :name="'capacities[' + i + ']'" 
                                                     v-model="lane.capacity" 
                                                     min="0.00">
@@ -354,7 +354,7 @@
                                                     {{lane.capacity}} 
                                                 </template>
                                             <td>
-                                                <input type="float" class="form-control goods" :name="'lane' + i + '_num'" v-model="lane.num" min="0.00" :max="lane.capacity">
+                                                <input type="number" class="form-control goods" :name="'lane' + i + '_num'" v-model="lane.num" min="0.00" :max="lane.capacity">
                                             </td>
                                             <td class="operate">                                          
                                                 <i class="fa fa-gift" 

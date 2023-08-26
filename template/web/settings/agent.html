@@ -53,7 +53,7 @@
                 <div class="form-group">
                     <label for="deviceFeeYear" class="col-md-2 control-label">年费价格（元）</label>
                     <div class="col-md-10">
-                        <input type="float" class="form-control" name="deviceFeeYear" id="deviceFeeYear" value="{php echo number_format($settings['agent']['device']['fee']['year'] / 100, 2)}" min="0" step="0.01">
+                        <input type="number" class="form-control" name="deviceFeeYear" id="deviceFeeYear" value="{php echo number_format($settings['agent']['device']['fee']['year'] / 100, 2)}" min="0" step="0.01">
                         <span class="help-block">* 每台设备有效期续费一年的金额</span>
                     </div>
                 </div>
@@ -312,21 +312,21 @@
                     <div class="form-group">
                         <label for="rel_gsp_level1" class="col-md-2 control-label"><b>直接上级</b>（<span class="modeTitle">{if $settings['agent']['reg']['gsp_mode_type']=='percent'}%{else}元{/if}</span>）</label>
                         <div class="col-md-10">
-                            <input type="float" class="form-control" name="rel_gsp_level1" id="rel_gsp_level1" value="{php echo number_format($settings['agent']['reg']['rel_gsp']['level1'] / 100, 2)}" min="0" step="0.01" max="100">
+                            <input type="number" class="form-control" name="rel_gsp_level1" id="rel_gsp_level1" value="{php echo number_format($settings['agent']['reg']['rel_gsp']['level1'] / 100, 2)}" min="0" step="0.01" max="100">
                             <span class="help-block">* 直接上级代理商会获得的佣金</span>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="rel_gsp_level2" class="col-md-2 control-label"><b>上上级</b>（<span class="modeTitle">{if $settings['agent']['reg']['gsp_mode_type']=='percent'}%{else}元{/if}</span>）</label>
                         <div class="col-md-10">
-                            <input type="float" class="form-control" name="rel_gsp_level2" id="rel_gsp_level2" value="{php echo number_format($settings['agent']['reg']['rel_gsp']['level2'] / 100, 2)}" min="0" step="0.01"  max="100">
+                            <input type="number" class="form-control" name="rel_gsp_level2" id="rel_gsp_level2" value="{php echo number_format($settings['agent']['reg']['rel_gsp']['level2'] / 100, 2)}" min="0" step="0.01"  max="100">
                             <span class="help-block">* 上级的上一级代理会获得的佣金</span>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="rel_gsp_level3" class="col-md-2 control-label"><b>上上上级</b>（<span class="modeTitle">{if $settings['agent']['reg']['gsp_mode_type']=='percent'}%{else}元{/if}</span>）</label>
                         <div class="col-md-10">
-                            <input type="float" class="form-control" name="rel_gsp_level3" id="rel_gsp_level3" value="{php echo number_format($settings['agent']['reg']['rel_gsp']['level3'] / 100, 2)}" min="0" step="0.01" max="100">
+                            <input type="number" class="form-control" name="rel_gsp_level3" id="rel_gsp_level3" value="{php echo number_format($settings['agent']['reg']['rel_gsp']['level3'] / 100, 2)}" min="0" step="0.01" max="100">
                             <span class="help-block">* 上级的上一级的上级代理会获得的佣金</span>
                         </div>
                     </div>

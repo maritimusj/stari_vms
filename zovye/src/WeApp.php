@@ -139,7 +139,7 @@ class WeApp extends Settings
                         self::$app_settings = include $filename;
                     }
                 } else {
-                    trigger_error('global settings is empty!');
+                    trigger_error('global settings is empty!', E_USER_ERROR);
                 }
             }
         }

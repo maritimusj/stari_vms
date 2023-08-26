@@ -23,41 +23,37 @@ class FileLogWriter implements ILogWriter
         L_FATAL => 'fatal',
     ];
 
-    public function write($level, $topic, $data): bool
+    public function write($level, $topic, $data)
     {
-        if (DEBUG) {
-            if (empty(self::$log_cache)) {
-                register_shutdown_function(function () use ($topic) {
-                    foreach (self::$log_cache as $filename => $data) {
-                        if ($filename && $data) {
-                            file_put_contents($filename, $data, FILE_APPEND);
-                        }
+        if (empty(self::$log_cache)) {
+            register_shutdown_function(function () use ($topic) {
+                foreach (self::$log_cache as $filename => $data) {
+                    if ($filename && $data) {
+                        file_put_contents($filename, $data, FILE_APPEND);
                     }
+                }
 
-                    self::$log_cache = [];
+                self::$log_cache = [];
 
-                    if (rand(0, 10) == 10) {
-                        self::deleteExpiredLogFiles($topic, LOG_MAX_DAY);
-                    }
-                });
-            }
-
-            $log_filename = self::logFileName($topic, self::$suffix[$level] ?? '');
-
-            ob_start();
-
-            echo PHP_EOL."-----------------------------".date(
-                    'Y-m-d H:i:s'
-                ).' [ '.REQUEST_ID." ]---------------------------------------".PHP_EOL;
-
-            print_r($data);
-
-            echo PHP_EOL;
-
-            self::$log_cache[$log_filename][] = ob_get_clean();
+                if (rand(0, 10) == 10) {
+                    self::deleteExpiredLogFiles($topic, LOG_MAX_DAY);
+                }
+            });
         }
 
-        return true;
+        $log_filename = self::logFileName($topic, self::$suffix[$level] ?? '');
+
+        ob_start();
+
+        echo PHP_EOL."-----------------------------".date(
+                'Y-m-d H:i:s'
+            ).' [ '.REQUEST_ID." ]---------------------------------------".PHP_EOL;
+
+        print_r($data);
+
+        echo PHP_EOL;
+
+        self::$log_cache[$log_filename][] = ob_get_clean();
     }
 
     /**

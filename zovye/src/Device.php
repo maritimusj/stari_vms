@@ -498,6 +498,24 @@ class Device extends State
         return null;
     }
 
+    public static function find($id, $condition = [])
+    {
+        if (empty($id)) {
+            return null;
+        }
+
+        if (empty($condition)) {
+            return self::get($id);
+        }
+
+        $data = [];
+        foreach ($condition as $v) {
+            $data[$v] = $id;
+        }
+
+        return self::query()->whereOr($data)->findOne();
+    }
+
     /**
      * 根据AppId查找设备.
      *
@@ -533,18 +551,6 @@ class Device extends State
         }
 
         return m('device')->create($data);
-    }
-
-    /**
-     * 根据指定条件查找设备，可以传入id,imei或者影子ID
-     * @param $cond
-     * @param null $hints
-     * @return deviceModelObj|null
-     * @deprecated
-     */
-    public static function find($cond, $hints = null): ?deviceModelObj
-    {
-        return DBUtil::findObject('device', $cond, $hints);
     }
 
     public static function findOne($cond = []): ?deviceModelObj

@@ -47,11 +47,11 @@
         display: none;
     }
     #goodslist tr:not(.disabled):hover .index {
-        display: none;       
+        display: none;
     }
     #goodslist tr .check {
         display: none;
-        color: green;       
+        color: green;
     }
     #goodslist tr td:nth-child(2) {
         cursor: pointer;
@@ -70,155 +70,155 @@
     }
 </style>
 {template "web/goods/nav"}
-    <div class="panel panel-default nav-tab-item">
-        <div class="heading">
+{if $goods_list}
+<div class="panel panel-default">
+    <div class="heading">
+    </div>
+    <div class="panel-body">
+        <div id="search-bar">
+            <div class="text-input">
+                <span>根据条件搜索商品 ...</span>
+                <span class="button"><i class="fa fa-search"></i>&nbsp;搜索</span>
+            </div>
         </div>
-        <div class="panel-body">
-            {if $goods_list}
-            <div id="search-bar">
-                <div class="text-input">
-                    <span>根据条件搜索商品 ...</span>
-                    <span class="button"><i class="fa fa-search"></i>&nbsp;搜索</span>
+        <div id="search-form">
+            <form action="{php echo $this->createWebUrl('goods', array('op'=>'default'));}" method="post">
+                <div class="form-group">
+                    <label for="agent_search_result" class="col-md-2 control-label">所属代理商</label>
+                    <div class="col-md-5">
+                        <select name="agentId" id="agent_search_result" style="width:100%;">
+                            <option value="" {if empty($s_agentId)} selected="selected"{/if}>&lt;不限&gt;</option>
+                            <option value="-1" {if $s_agentId == -1} selected="selected"{/if}>&lt;平台&gt;</option>
+                            {if $s_agent}
+                            <option value="{$s_agent['id']}" selected="selected">{$s_agent['name']}{if $s_agent['mobile']}，手机号码：{$s_agent['mobile']}{/if}</option>
+                            {/if}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" name="keyword_agent" id="keyword_agent" placeholder="请输入手机号码或者名称查找...">
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-default" type="button" id="search_agent" title="搜索代理商"><i class="fa fa-search"></i></button>
+                    </div>
                 </div>
-            </div>
-            <div id="search-form">
-                <form action="{php echo $this->createWebUrl('goods', array('op'=>'default'));}" method="post">
-                    <div class="form-group">
-                        <label for="agent_search_result" class="col-md-2 control-label">所属代理商</label>
-                        <div class="col-md-5">
-                            <select name="agentId" id="agent_search_result" style="width:100%;">
-                                <option value="" {if empty($s_agentId)} selected="selected"{/if}>&lt;不限&gt;</option>
-                                <option value="-1" {if $s_agentId == -1} selected="selected"{/if}>&lt;平台&gt;</option>
-                                {if $s_agent}
-                                <option value="{$s_agent['id']}" selected="selected">{$s_agent['name']}{if $s_agent['mobile']}，手机号码：{$s_agent['mobile']}{/if}</option>
-                                {/if}
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <input type="text" class="form-control" name="keyword_agent" id="keyword_agent" placeholder="请输入手机号码或者名称查找...">
-                        </div>
-                        <div class="col-md-2">
-                            <button class="btn btn-default" type="button" id="search_agent" title="搜索代理商"><i class="fa fa-search"></i></button>
-                        </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">关键字</label>
+                    <div class="col-md-6">
+                        <input name="s_keywords"  class="form-control" type="text" value="{$s_keywords}" style="width: 100%;"/>
                     </div>
-                    <div class="form-group">
-                        <label class="col-md-2 control-label">关键字</label>
-                        <div class="col-md-6">
-                            <input name="s_keywords"  class="form-control" type="text" value="{$s_keywords}" style="width: 100%;"/>
-                        </div>
-                        <div class="col-md-4">
-                            <button class="btn btn-primary"><i class="fa fa-search"></i>&nbsp;搜索</button>
-                            <button class="btn btn-default btn-close" title="清除搜索"><i class="fa fa-ban" style="color: gray;"></i></button>
-                        </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-primary"><i class="fa fa-search"></i>&nbsp;搜索</button>
+                        <button class="btn btn-default btn-close" title="清除搜索"><i class="fa fa-ban" style="color: gray;"></i></button>
                     </div>
-                </form>
-            </div>
-            <table class="table" id="goodslist">
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th>名称</th>
-                    <th>单位</th>
-                    <th>图片</th>
-                    <th>领取方式</th>
-                    <th>单价</th>
-                    <th>所属代理商</th>
-                </tr>
-                </thead>
-                <tbody>
-                {loop $goods_list $index $item}
-                <tr 
-                {if $types && !in_array($item['type'], $types)}class="disabled" title="这个商品不可用！"{/if}
-                data-goods="{$item['id']}" 
-                data-name="{$item['name']}" 
-                data-title="{$item['unit_title']}" 
-                data-price="{php echo number_format($item['price'] / 100, 2)}"
-                data-img="{$item['img']}">
-                    <td style="width:40px;">
+                </div>
+            </form>
+        </div>
+        <table class="table" id="goodslist">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>名称</th>
+                <th>单位</th>
+                <th>图片</th>
+                <th>领取方式</th>
+                <th>单价</th>
+                <th>所属代理商</th>
+            </tr>
+            </thead>
+            <tbody>
+            {loop $goods_list $index $item}
+            <tr
+                    {if $types && !in_array($item['type'], $types)}class="disabled" title="这个商品不可用！"{/if}
+            data-goods="{$item['id']}"
+            data-name="{$item['name']}"
+            data-title="{$item['unit_title']}"
+            data-price="{php echo number_format($item['price'] / 100, 2)}"
+            data-img="{$item['img']}">
+            <td style="width:40px;">
                         <span class="index">
                             {php echo $index + 1}
                         </span>
-                        <span class="check">
+                <span class="check">
                             <i class="fa fa-check"></i>
-                        </span>                        
-                    </td>
-                    <td class="name">
-                        {$item['name']}<sup class="id" title="商品ID">{$item['id']}</sup>
-                        {if $item['lottery']}
-                        <span class="lottery" title="固定货道商品">
+                        </span>
+            </td>
+            <td class="name">
+                {$item['name']}<sup class="id" title="商品ID">{$item['id']}</sup>
+                {if $item['lottery']}
+                <span class="lottery" title="固定货道商品">
                             <i class="fa fa-fw fa-ticket"></i>
                         </span>
-                        {elseif $item['type'] == 'fueling'}
-                        <span class="lottery">
+                {elseif $item['type'] == 'fueling'}
+                <span class="lottery">
                             <img src="{MODULE_URL}static/img/gas.svg" class="icon" title="尿素机商品">
                         </span>
-                        {elseif $item['type'] == 'flash_egg'}
-                        <span class="icon">
+                {elseif $item['type'] == 'flash_egg'}
+                <span class="icon">
                             <img src="{MODULE_URL}static/img/egg.svg" class="icon" title="闪蛋商品">
                         </span>
-                        {/if}
-                    </td>
-                    <td>
-                        {$item['unit_title']}
-                    </td>
-                    <td class="goods">
-                        <img src="{$item['img']}" />
-                    </td>
-                    <td class="way">
-                        <span class="free{if $item['allowFree']} allowed{/if}">免费</span>
-                        <span class="pay{if $item['allowPay']} allowed{/if}">支付</span>
-                        <span class="balance{if $item['allowBalance']} allowed{/if}">积分</span>
-                        <span class="mall{if $item['allowDelivery']} allowed{/if}">商城</span> 
-                    </td>
-                    <td>
-                        <span{if !$item['allowPay']} style="color:#666;"{/if}>
-                        {if $item['allowPay']}
-                        {$item['price_formatted']}
+                {/if}
+            </td>
+            <td>
+                {$item['unit_title']}
+            </td>
+            <td class="goods">
+                <img src="{$item['img']}" />
+            </td>
+            <td class="way">
+                <span class="free{if $item['allowFree']} allowed{/if}">免费</span>
+                <span class="pay{if $item['allowPay']} allowed{/if}">支付</span>
+                <span class="balance{if $item['allowBalance']} allowed{/if}">积分</span>
+                <span class="mall{if $item['allowDelivery']} allowed{/if}">商城</span>
+            </td>
+            <td>
+                <span{if !$item['allowPay']} style="color:#666;"{/if}>
+                {if $item['allowPay']}
+                {$item['price_formatted']}
+                {else}
+                <del>{$item['price_formatted']}</del>
+                {/if}
+                </span>
+            </td>
+            <td>
+                {if $item['agent']}
+                {if empty($s_agent) || $s_agent['id'] != $item['agent']['id']}
+                <a filter data-name="agentId" data-val="{$item['agent']['id']}" href="{php echo $this->createWebUrl('goods', ['agentId'=>$item['agent']['id']]);}">
+                    <div class="agent" title="点击查看{$item['agent']['name']}全部商品" style="display:inline-block;">
                         {else}
-                        <del>{$item['price_formatted']}</del>
-                        {/if}
-                        </span>
-                    </td>
-                    <td>
-                        {if $item['agent']}
+                        <div class="agent" style="display:inline-block;">
+                            {/if}
+                            <div class="profile" style="background-color:{$item['agent']['level']['clr']}">
+                                <img src="{$item['agent']['headimgurl']}">
+                                <div class="nickname">{php echo cutstr($item['agent']['name'], 10, true);}</div>
+                            </div>
+                        </div>
                         {if empty($s_agent) || $s_agent['id'] != $item['agent']['id']}
-                        <a filter data-name="agentId" data-val="{$item['agent']['id']}" href="{php echo $this->createWebUrl('goods', ['agentId'=>$item['agent']['id']]);}">
-                            <div class="agent" title="点击查看{$item['agent']['name']}全部商品" style="display:inline-block;">
-                                {else}
-                                <div class="agent" style="display:inline-block;">
-                                    {/if}
-                                    <div class="profile" style="background-color:{$item['agent']['level']['clr']}">
-                                        <img src="{$item['agent']['headimgurl']}">
-                                        <div class="nickname">{php echo cutstr($item['agent']['name'], 10, true);}</div>
-                                    </div>
-                                </div>
-                                {if empty($s_agent) || $s_agent['id'] != $item['agent']['id']}
-                        </a>
-                        {/if}
-                        {else}
-                            {if $s_agentId != -1}
-                            <a filter data-name="agentId" data-val="-1" href="{php echo $this->createWebUrl('goods', ['agentId'=>-1]);}" title="点击查看所有平台商品">
-                                <span style="color:gray;">&lt;平台&gt;</span>
-                            </a>
-                            {else}
-                            <span style="color:gray;">&lt;平台&gt;</span>
-                            {/if}                        
-                        {/if}
-                    </td>
-                </tr>
-                {/loop}
-                </tbody>
-            </table>
-            <div class="pull-right">
-                {$pager}
-            </div>
-            {else}
-            <div class="text-center text-muted">
-                <i class="fa fa-question-circle"></i> 暂时还没有任何商品！
-            </div>
-            {/if}
+                </a>
+                {/if}
+                {else}
+                {if $s_agentId != -1}
+                <a filter data-name="agentId" data-val="-1" href="{php echo $this->createWebUrl('goods', ['agentId'=>-1]);}" title="点击查看所有平台商品">
+                    <span style="color:gray;">&lt;平台&gt;</span>
+                </a>
+                {else}
+                <span style="color:gray;">&lt;平台&gt;</span>
+                {/if}
+                {/if}
+            </td>
+            </tr>
+            {/loop}
+            </tbody>
+        </table>
+        <div class="pull-right">
+            {$pager}
         </div>
     </div>
+</div>
+{else}
+<div class="text-center text-muted">
+    <i class="fa fa-question-circle"></i> 暂时还没有任何商品！
+</div>
+{/if}
 <script>
     //搜索
     backer = parseInt("{$backer}");

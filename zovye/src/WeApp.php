@@ -168,6 +168,11 @@ class WeApp extends Settings
         return Util::murl($do, $params);
     }
 
+    public static function template($filename)
+    {
+        return TemplateUtil::compile($filename);
+    }
+
     /**
      * @param $filename
      * @param array $tpl_data
@@ -179,7 +184,7 @@ class WeApp extends Settings
 
         extract($tpl_data);
 
-        include TemplateUtil::compile($filename);
+        include self::template($filename);
         exit();
     }
 
@@ -199,7 +204,7 @@ class WeApp extends Settings
 
         ob_start();
 
-        include TemplateUtil::compile($name);
+        include self::template($name);
 
         return ob_get_clean();
     }

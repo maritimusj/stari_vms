@@ -39,7 +39,7 @@ class Session
                     if (empty($user) && !empty($params['create'])) {
                         $data = [
                             'app' => User::WX,
-                            'nickname' => strval($fans['nickname'] ?? '匿名用户'),
+                            'nickname' => strval($fans['nickname'] ?? '<匿名用户>'),
                             'avatar' => strval($fans['headimgurl']),
                             'openid' => strval($fans['openid']),
                         ];

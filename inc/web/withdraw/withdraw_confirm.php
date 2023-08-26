@@ -8,7 +8,7 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-$balance_obj = Util::getAndCheckWithdraw(Request::int('id'));
+$balance_obj = Helper::getAndCheckWithdraw(Request::int('id'));
 if (is_error($balance_obj)) {
     JSON::fail($balance_obj);
 }

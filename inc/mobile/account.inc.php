@@ -143,13 +143,13 @@ if ($op == 'default') {
         Response::alert('找不到指定的设备！', 'error');
     }
 
-    $res = Util::checkAvailable($user, $account, $device, ['ignore_assigned' => true]);
+    $res = Helper::checkAvailable($user, $account, $device, ['ignore_assigned' => true]);
     if (is_error($res)) {
         $user->setLastActiveData('ticket', []);
         Response::alert($res['message'], 'error');
     }
 
-    $tpl_data = Util::getTplData(
+    $tpl_data = TemplateUtil::getTplData(
         [
             $user,
             $account,
@@ -290,7 +290,7 @@ if ($op == 'default') {
         JSON::fail('找不到这个小程序！');
     }
 
-    $res = Util::checkAvailable($user, $account, $device);
+    $res = Helper::checkAvailable($user, $account, $device);
     if (is_error($res)) {
         JSON::fail($res);
     }

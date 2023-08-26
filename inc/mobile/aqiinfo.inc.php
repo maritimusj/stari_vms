@@ -43,7 +43,7 @@ if (Request::str('appResult') == 'nomore') {
         Response::alert('请重新扫描设备二维码[05]，谢谢！', 'error');
     }
 
-    $tpl_data = Util::getTplData([$user, $device]);
+    $tpl_data = TemplateUtil::getTplData([$user, $device]);
     $tpl_data['exclude'][] = AQIInfoAccount::getUID();
 
     //设备首页

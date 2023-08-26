@@ -12,12 +12,12 @@ use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 
 /** @var deviceModelObj $device */
-$device = Util::getTemplateVar('device');
+$device = TemplateUtil::getTemplateVar('device');
 
 /** @var userModelObj $user */
-$user = Util::getTemplateVar('user');
+$user = TemplateUtil::getTemplateVar('user');
 
-$tpl_data = Util::getTplData([$user]);
+$tpl_data = TemplateUtil::getTplData([$user]);
 
 $user_data = [
     'status' => true,

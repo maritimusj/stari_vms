@@ -123,7 +123,7 @@ if ($op == 'goods') {
             return true;
         }
 
-        $res = Util::checkAvailable($user, $account, $device, ['ignore_assigned' => true]);
+        $res = Helper::checkAvailable($user, $account, $device, ['ignore_assigned' => true]);
         return is_error($res);
     };
 

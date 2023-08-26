@@ -9,7 +9,7 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 //以下为页面数据
-$params = Util::getTemplateVar();
+$params = TemplateUtil::getTemplateVar();
 $tpl = is_array($params) ? $params : [];
 
 $token = Util::getTokenValue();

@@ -11,12 +11,12 @@ defined('IN_IA') or exit('Access Denied');
 use zovye\model\deviceModelObj;
 
 /** @var deviceModelObj $device */
-$device = Util::getTemplateVar('device');
+$device = TemplateUtil::getTemplateVar('device');
 
 /** @var string $order_no */
-$order_no = Util::getTemplateVar('order_no');
+$order_no = TemplateUtil::getTemplateVar('order_no');
 
-$tpl_data = Util::getTplData(
+$tpl_data = TemplateUtil::getTplData(
     [
         [
             'timeout' => App::getDeviceWaitTimeout(),

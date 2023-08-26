@@ -38,7 +38,7 @@ class AccountEventHandler
             if (App::isTKPromotingEnabled() && Config::tk('config.account_uid', 'n/a') == $account->getUid()) {
                 $params['ignore_assigned'] = true;
             }
-            $res = Util::checkAvailable($user, $account, $device, $params);
+            $res = Helper::checkAvailable($user, $account, $device, $params);
             if (is_error($res)) {
                 ZovyeException::throwWith($res['message'], -1, $device);
             }

@@ -83,7 +83,7 @@ class QRCodeUtil
         $filename = "$id.png";
         $dirname = "zovye/$type/";
 
-        $full_filename = Util::getAttachmentFileName($dirname, $filename);
+        $full_filename = Helper::getAttachmentFileName($dirname, $filename);
 
         load()->library('qrcode');
 
@@ -116,7 +116,7 @@ class QRCodeUtil
             if (stripos($filename, '{hash}') !== false) {
                 $filename = str_replace('{hash}', sha1($content), $filename);
             }
-            $full_filename = Util::getAttachmentFileName($dirname, $filename);
+            $full_filename = Helper::getAttachmentFileName($dirname, $filename);
             if (file_put_contents($full_filename, $content) !== false) {
                 return "$dirname$filename";
             }

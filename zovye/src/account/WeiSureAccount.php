@@ -13,6 +13,7 @@ use zovye\Account;
 use zovye\App;
 use zovye\Contract\IAccountProvider;
 use zovye\Device;
+use zovye\Helper;
 use zovye\Log;
 use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
@@ -42,7 +43,7 @@ class WeiSureAccount implements IAccountProvider
         }
 
         //每个用户限领一次
-        if (Util::checkLimit($acc, $user, [], 1)) {
+        if (Helper::checkLimit($acc, $user, [], 1)) {
             return [];
         }
 
@@ -123,7 +124,7 @@ class WeiSureAccount implements IAccountProvider
             $acc = $res['account'];
 
             // 每个用户限领一次
-            if (Util::checkLimit($acc, $user, [], 1)) {
+            if (Helper::checkLimit($acc, $user, [], 1)) {
                 throw new RuntimeException('用户已经参加了活动！');
             }
 

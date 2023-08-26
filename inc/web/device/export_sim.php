@@ -31,7 +31,7 @@ if (empty($serial)) {
 
 $filename = "$serial.csv";
 $dirname = "export/sim/";
-$full_filename = Util::getAttachmentFileName($dirname, $filename);
+$full_filename = Helper::getAttachmentFileName($dirname, $filename);
 
 if ($step == 'load') {
     $last_id = Request::int('last');

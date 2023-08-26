@@ -87,7 +87,7 @@ $result = DBUtil::transactionDo(function() use ($id, &$from) {
                 'area' => $area,
                 'notice' => [
                 ],
-                'funcs' => Util::getAgentFNs(),
+                'funcs' => Helper::getAgentFNs(),
                 'superior' => $superior_data,
                 'location' => [
                     'validate' => [
@@ -129,7 +129,7 @@ $result = DBUtil::transactionDo(function() use ($id, &$from) {
     } elseif (Request::has('agent_funcs')) {
 
         if ($user->isAgent()) {
-            $data = Util::parseAgentFNsFromGPC();
+            $data = Helper::parseAgentFNsFromGPC();
             $user->updateSettings('agentData.funcs', $data);
 
             if (App::isCustomWxAppEnabled()) {
@@ -312,7 +312,7 @@ $result = DBUtil::transactionDo(function() use ($id, &$from) {
                 $data['lcsw']['access_token'] = Request::trim('access_token');
 
                 //创建扫呗接口文件
-                Util::createApiRedirectFile('payment/lcsw.php', 'payresult', [
+                Helper::createApiRedirectFile('payment/lcsw.php', 'payresult', [
                     'headers' => [
                         'HTTP_USER_AGENT' => 'lcsw_notify',
                     ],

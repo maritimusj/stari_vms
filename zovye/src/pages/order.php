@@ -9,7 +9,7 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 /** @var string $user */
-$user = Util::getTemplateVar();
+$user = TemplateUtil::getTemplateVar();
 
 $api_url = Util::murl('order', ['user' => $user]);
 $jquery_url = JS_JQUERY_URL;
@@ -49,6 +49,6 @@ zovye_fn.get_order_detail =function(orderNO) {
 </script>
 CODE;
 
-$tpl_data = Util::getTplData();
+$tpl_data = TemplateUtil::getTplData();
 $tpl_data['js']['code'] = $js_code;
 Response::showTemplate('order', ['tpl' => $tpl_data], true);

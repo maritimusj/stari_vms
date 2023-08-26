@@ -57,14 +57,14 @@ if ($user->isBanned()) {
     Response::alert('用户暂时不可用！');
 }
 
-$tpl_data = Util::getTplData([$user]);
+$tpl_data = TemplateUtil::getTplData([$user]);
 
 $acc = Account::findOneFromType(Account::WEISURE);
 if (empty($acc)) {
     Response::alert('活动暂时不可用！');
 }
 
-if (Util::checkLimit($acc, $user, [], 1)) {
+if (Helper::checkLimit($acc, $user, [], 1)) {
     Response::alert('已经参加过活动！');
 }
 

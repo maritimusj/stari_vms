@@ -19,12 +19,12 @@ defined('IN_IA') or exit('Access Denied');
  */
 
 /** @var deviceModelObj $device */
-$device = Util::getTemplateVar('device');
+$device = TemplateUtil::getTemplateVar('device');
 
 /** @var userModelObj $user */
-$user = Util::getTemplateVar('user');
+$user = TemplateUtil::getTemplateVar('user');
 
-$tpl_data = Util::getTplData([
+$tpl_data = TemplateUtil::getTplData([
     'user' => $user->profile(),
     'device' => $device->profile(),
 ]);

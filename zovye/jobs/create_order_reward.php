@@ -137,7 +137,7 @@ try {
         throw new RuntimeException('订单已存在！');
     }
 
-    $res = Util::checkFreeOrderLimits($user, $device);
+    $res = Helper::checkFreeOrderLimits($user, $device);
     if (is_error($res)) {
         throw new RuntimeException($res['message']);
     }

@@ -9,7 +9,7 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 /** @var string $cb_url */
-$cb_url = Util::getTemplateVar('cb_url');
+$cb_url = TemplateUtil::getTemplateVar('cb_url');
 
 $app_id = settings('ali.appid');
 if (empty($app_id)) {

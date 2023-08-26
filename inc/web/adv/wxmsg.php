@@ -21,7 +21,7 @@ if ($ad) {
 }
 
 $typename = Request::trim('typename');
-$res = Util::getWe7Material($typename, Request::int('page'), Request::int('pagesize'));
+$res = Helper::getWe7Material($typename, Request::int('page'), Request::int('pagesize'));
 
 Response::templateJSON(
     'web/adv/msg',

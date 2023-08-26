@@ -32,7 +32,7 @@ $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 $query = m('tags')->where(We7::uniacid([]));
 
 //搜索指定ID
-$ids = Util::parseIdsFromGPC();
+$ids = Helper::parseIdsFromGPC();
 if (!empty($ids)) {
     $query->where(['id' => $ids]);
 }

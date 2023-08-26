@@ -11,6 +11,7 @@ defined('IN_IA') or exit('Access Denied');
 use zovye\Advertising;
 use zovye\App;
 use zovye\CtrlServ;
+use zovye\Helper;
 use zovye\Job;
 use zovye\JobException;
 use zovye\Locker;
@@ -111,7 +112,7 @@ if (Locker::try("order::statistics")) {
     }
 
     if (Util::isSysLoadAverageOk()) {
-        Util::orderStatistics($order);
+        Helper::orderStatistics($order);
     }
 }
 

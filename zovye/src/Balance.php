@@ -424,7 +424,7 @@ TEXT;
             $bonus = $account->getBalancePrice();
 
             if (!$account->isTask()) {
-                $result = Util::checkBalanceAvailable($user, $account);
+                $result = Helper::checkBalanceAvailable($user, $account);
                 if (is_error($result)) {
                     return $result;
                 }

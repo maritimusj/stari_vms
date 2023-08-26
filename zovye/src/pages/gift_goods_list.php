@@ -12,10 +12,10 @@ use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 
 /** @var deviceModelObj $device */
-$device = Util::getTemplateVar('device');
+$device = TemplateUtil::getTemplateVar('device');
 
 /** @var userModelObj $user */
-$user = Util::getTemplateVar('user');
+$user = TemplateUtil::getTemplateVar('user');
 
 $api_url = Util::murl('sample');
 $account_api_url = Util::murl('account');
@@ -32,7 +32,7 @@ if ($agent) {
 $device_name = $device->getName();
 $device_imei = $device->getImei();
 
-$tpl_data = Util::getTplData();
+$tpl_data = TemplateUtil::getTplData();
 
 $tpl_data['user'] = $user->profile();
 $tpl_data['device'] = $device->profile();

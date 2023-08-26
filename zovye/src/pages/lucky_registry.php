@@ -12,15 +12,15 @@ use zovye\model\userModelObj;
 use zovye\model\luckyModelObj;
 
 /** @var userModelObj $user */
-$user = Util::getTemplateVar('user');
+$user = TemplateUtil::getTemplateVar('user');
 
 /** @var luckyModelObj $lucky */
-$lucky = Util::getTemplateVar('lucky');
+$lucky = TemplateUtil::getTemplateVar('lucky');
 
 /** @var string $code */
-$code = Util::getTemplateVar('code');
+$code = TemplateUtil::getTemplateVar('code');
 
-$tpl_data = Util::getTplData([
+$tpl_data = TemplateUtil::getTplData([
     'user' => $user->profile(false),
     'gift' => $lucky->profile(true),
 ]);

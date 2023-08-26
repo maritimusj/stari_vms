@@ -18,15 +18,15 @@ use zovye\model\userModelObj;
  */
 
 /** @var deviceModelObj $device */
-$device = Util::getTemplateVar('device');
+$device = TemplateUtil::getTemplateVar('device');
 
 /** @var userModelObj $user */
-$user = Util::getTemplateVar('user');
+$user = TemplateUtil::getTemplateVar('user');
 
 $api_url = Util::murl('douyin');
 $jquery_url = JS_JQUERY_URL;
 
-$tpl_data = Util::getTplData([$device, $user]);
+$tpl_data = TemplateUtil::getTplData([$device, $user]);
 
 $tpl_data['js']['code'] = <<<JSCODE
 <script src="$jquery_url"></script>

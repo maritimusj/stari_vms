@@ -67,6 +67,6 @@ zovye_fn.feedback = function(device, text, pics) {
 </script>
 CODE;
 
-$tpl_data = Util::getTplData();
+$tpl_data = TemplateUtil::getTplData();
 $tpl_data['js']['code'] = $js_code;
 Response::showTemplate('feedback', ['tpl' => $tpl_data], true);

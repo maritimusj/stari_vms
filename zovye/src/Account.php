@@ -393,10 +393,10 @@ class Account extends State
 
             $list[$index] = function () use ($getter_fn, $acc, $device, $user) {
                 if ($acc->getBonusType() == Account::BALANCE) {
-                    $res = Util::checkBalanceAvailable($user, $acc);
+                    $res = Helper::checkBalanceAvailable($user, $acc);
                 } else {
                     //检查用户是否允许
-                    $res = Util::checkAvailable($user, $acc, $device);
+                    $res = Helper::checkAvailable($user, $acc, $device);
                 }
 
                 if (is_error($res)) {

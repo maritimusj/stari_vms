@@ -26,7 +26,7 @@ if ($keywords) {
 }
 
 //分配assign.js通过ids获取对应分组数据
-$ids = Util::parseIdsFromGPC();
+$ids = Helper::parseIdsFromGPC();
 if (!empty($ids)) {
     $query->where(['id' => $ids]);
 }

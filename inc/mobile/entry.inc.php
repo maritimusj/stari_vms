@@ -127,7 +127,7 @@ if ($device_id) {
             $cb = function(userModelObj $user) use($account) {
                 $user->setLastActiveAccount($account);
                 
-                $tpl_data = Util::getTplData([
+                $tpl_data = TemplateUtil::getTplData([
                     $user,
                     $account,
                     'misc' => [
@@ -210,7 +210,7 @@ if ($from == 'device') {
 
     if ($device->isReadyTimeout()) {
         //设备准备页面，检测设备是否在线等等
-        $tpl_data = Util::getTplData([$device, $user]);
+        $tpl_data = TemplateUtil::getTplData([$device, $user]);
         Response::devicePreparePage($tpl_data);
     }
 
@@ -231,7 +231,7 @@ if (empty($device)) {
     $device = $user->getLastActiveDevice();
     if (empty($device)) {
         //设备扫描页面
-        $tpl_data = Util::getTplData([$user, $account]);
+        $tpl_data = TemplateUtil::getTplData([$user, $account]);
         Response::scanPage($tpl_data);
     }
 }
@@ -240,7 +240,7 @@ if (empty($device)) {
 if (LocationUtil::mustValidate($user, $device)) {
 
     $user->cleanLastActiveData();
-    $tpl_data = Util::getTplData(
+    $tpl_data = TemplateUtil::getTplData(
         [
             $user,
             $device,
@@ -259,12 +259,12 @@ if ($account) {
     if ($account->isQuestionnaire() && $tid) {
         $acc = Account::findOneFromUID($tid);
         if ($acc) {
-            $res = Util::checkAvailable($user, $acc, $device);
+            $res = Helper::checkAvailable($user, $acc, $device);
         } else {
             $res = err('找不到这个任务！');
         }
     } else {
-        $res = Util::checkAvailable($user, $account, $device);
+        $res = Helper::checkAvailable($user, $account, $device);
     }
     if (is_error($res)) {
         $user->cleanLastActiveData();
@@ -274,7 +274,7 @@ if ($account) {
 
 if (empty($account)) {
     //设置用户最后活动数据
-    $tpl_data = Util::getTplData([$user, $device]);
+    $tpl_data = TemplateUtil::getTplData([$user, $device]);
     $tpl_data['from'] = $from;
 
     //设备首页
@@ -284,10 +284,10 @@ if (empty($account)) {
 }
 
 //处理多个关注二维码
-$more_accounts = Util::getRequireAccounts($device, $user, $account, [$account_id, $xid]);
+$more_accounts = Helper::getRequireAccounts($device, $user, $account, [$account_id, $xid]);
 if ($more_accounts) {
     //准备页面广告
-    $tpl_data = Util::getTplData([$user, $account, $device]);
+    $tpl_data = TemplateUtil::getTplData([$user, $account, $device]);
     $tpl_data['accounts'] = $more_accounts;
 
     //显示更多关注页面
@@ -314,7 +314,7 @@ $ticket_data = [
 //准备领取商品的ticket
 $user->setLastActiveData('ticket', $ticket_data);
 
-$tpl_data = Util::getTplData([
+$tpl_data = TemplateUtil::getTplData([
     $user,
     $account,
     $device,

@@ -45,7 +45,7 @@ if (empty($step) || $step == 'init') {
 
     $filename = "$serial.csv";
     $dirname = "export/order/";
-    $full_filename = Util::getAttachmentFileName($dirname, $filename);
+    $full_filename = Helper::getAttachmentFileName($dirname, $filename);
 
     if ($step == 'load') {
         $query = $query->where(['id >' => Request::int('last')])->limit(100)->orderBy('id asc');

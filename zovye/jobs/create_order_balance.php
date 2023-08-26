@@ -87,7 +87,7 @@ try {
     }
 
     if (Balance::isFreeOrder()) {
-        $quota = Util::getFreeOrderLimits($user, $device);
+        $quota = Helper::getFreeOrderLimits($user, $device);
         if ($num > $quota) {
             throw new RuntimeException('超过可用的免费额度！');
         }

@@ -19,6 +19,7 @@ use zovye\DBUtil;
 use zovye\DeviceUtil;
 use zovye\Fueling;
 use zovye\GDCVMachine;
+use zovye\Helper;
 use zovye\Inventory;
 use zovye\Log;
 use zovye\model\agentModelObj;
@@ -185,7 +186,7 @@ class agent
             'name' => $agent->getName(),
             'company' => $agent_data['company'] ?: '<未登记>',
             'level' => $agent_levels[$agent_data['level']],
-            'funcs' => array_merge(Util::getAgentFNs(false), $FNs),
+            'funcs' => array_merge(Helper::getAgentFNs(false), $FNs),
         ];
 
         $referral = $agent->getReferral();

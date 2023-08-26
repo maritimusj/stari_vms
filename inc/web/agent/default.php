@@ -56,7 +56,7 @@ $page_size = Request::int('pagesize', 10);
 $query = Principal::agent();
 
 //搜索指定ID
-$ids = Util::parseIdsFromGPC();
+$ids = Helper::parseIdsFromGPC();
 if (!empty($ids)) {
     $query->where(['id' => $ids]);
 }

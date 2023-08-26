@@ -11,9 +11,9 @@ use zovye\model\userModelObj;
 defined('IN_IA') or exit('Access Denied');
 
 /** @var userModelObj $user */
-$user = Util::getTemplateVar('user');
+$user = TemplateUtil::getTemplateVar('user');
 
-$tpl_data = Util::getTplData([
+$tpl_data = TemplateUtil::getTplData([
     'user' => $user->profile(false),
 ]);
 

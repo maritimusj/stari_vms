@@ -32,6 +32,7 @@ use zovye\LoginData;
 use zovye\model\goods_voucher_logsModelObj;
 use zovye\Order;
 use zovye\model\orderModelObj;
+use zovye\TemplateUtil;
 use zovye\User;
 use zovye\model\userModelObj;
 use zovye\Util;
@@ -119,7 +120,7 @@ class common
             return err('找不到这个设备！');
         }
 
-        $result = Util::getTplData();
+        $result = TemplateUtil::getTplData();
         if ($device->isBlueToothDevice()) {
             $extra = $device->get('extra', []);
             $result['device'] = [

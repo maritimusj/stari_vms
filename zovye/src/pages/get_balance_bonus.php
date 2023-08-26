@@ -12,12 +12,12 @@ use zovye\model\accountModelObj;
 use zovye\model\userModelObj;
 
 /** @var userModelObj $user */
-$user = Util::getTemplateVar('user');
+$user = TemplateUtil::getTemplateVar('user');
 
 /** @var accountModelObj $user */
-$account = Util::getTemplateVar('account');
+$account = TemplateUtil::getTemplateVar('account');
 
-$tpl_data = Util::getTplData([$user, $account]);
+$tpl_data = TemplateUtil::getTplData([$user, $account]);
 
 $api_url = Util::murl('account');
 $jquery_url = JS_JQUERY_URL;
@@ -70,7 +70,7 @@ $js_sdk
     }
 JSCODE;
 
-$result = Util::checkBalanceAvailable($user, $account);
+$result = Helper::checkBalanceAvailable($user, $account);
 if (is_error($result)) {
     $tpl_data['js']['code'] .= <<<JSCODE
         \r\nzovye_fn.isOk = function(cb) {

@@ -12,6 +12,7 @@ use zovye\Balance;
 use zovye\ChargingNowData;
 use zovye\Device;
 use zovye\Goods;
+use zovye\Helper;
 use zovye\Request;
 use zovye\model\orderModelObj;
 use zovye\User;
@@ -342,7 +343,7 @@ class order
 
             $filename = "$serial.csv";
             $dirname = "export/order/";
-            $full_filename = Util::getAttachmentFileName($dirname, $filename);
+            $full_filename = Helper::getAttachmentFileName($dirname, $filename);
 
             if ($step == 'load') {
                 $query = $query->where(['id >' => Request::int('last')])->limit(100)->orderBy('id asc');

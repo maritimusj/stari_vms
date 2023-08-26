@@ -325,7 +325,7 @@ class WxPlatform
         $v = sha1(http_build_query($params));
 
         $filename = "/$v.php";
-        Util::createApiRedirectFile($filename, 'wxplatform', $params);
+        Helper::createApiRedirectFile($filename, 'wxplatform', $params);
 
         $notify_url = _W('siteroot');
         $path = 'addons/'.APP_NAME.'/';
@@ -713,7 +713,7 @@ class WxPlatform
 
             //如果是来自屏幕二维码
             if ($first == 'device') {
-                $res = Util::checkAvailable($user, $account, $device, ['ignore_assigned' => true]);
+                $res = Helper::checkAvailable($user, $account, $device, ['ignore_assigned' => true]);
 
                 if (!is_error($res)) {
                     return self::createOrder($device, $user, $account);
@@ -748,7 +748,7 @@ class WxPlatform
                 return $account->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $account->getUrl());
             }
 
-            $res = Util::checkAvailable($user, $account, $device, ['ignore_assigned' => true]);
+            $res = Helper::checkAvailable($user, $account, $device, ['ignore_assigned' => true]);
 
             if (is_error($res)) {
                 ZovyeException::throwWith($res['message'], -1, $device);

@@ -78,7 +78,7 @@ try {
         throw new RuntimeException('找不到设备或者用户操作超时！');
     }   
 
-    $res = Util::checkAvailable($user, $account, $device, ['ignore_assigned' => true]);
+    $res = Helper::checkAvailable($user, $account, $device, ['ignore_assigned' => true]);
     if (is_error($res)) {
         throw new RuntimeException($res['message']);
     }

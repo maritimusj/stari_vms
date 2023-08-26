@@ -11,9 +11,9 @@ defined('IN_IA') or exit('Access Denied');
 use zovye\model\userModelObj;
 
 /** @var userModelObj $user */
-$user = Util::getTemplateVar('user');
+$user = TemplateUtil::getTemplateVar('user');
 
-$tpl_data = Util::getTplData([$user]);
+$tpl_data = TemplateUtil::getTplData([$user]);
 
 $api_url = Util::murl('mall');
 $jquery_url = JS_JQUERY_URL;

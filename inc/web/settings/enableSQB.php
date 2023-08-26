@@ -19,7 +19,7 @@ if (is_error($result)) {
     JSON::fail($result);
 }
 
-if (false === Util::createApiRedirectFile('/payment/SQB.php', 'payresult', [
+if (false === Helper::createApiRedirectFile('/payment/SQB.php', 'payresult', [
         'headers' => [
             'HTTP_USER_AGENT' => 'SQB_notify',
         ],

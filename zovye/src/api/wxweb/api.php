@@ -318,7 +318,7 @@ class api
             return err('找不到这个设备！');
         }
 
-        $res = Util::checkFreeOrderLimits($user, $device);
+        $res = Helper::checkFreeOrderLimits($user, $device);
         if (is_error($res)) {
             return $res;
         }

@@ -77,7 +77,7 @@ if ($device->isActiveQrcodeEnabled() && $device->getShadowId() !== $device_id) {
 if ($from == 'device') {
     if ($device->isReadyTimeout()) {
         //设备准备页面，检测设备是否在线等等
-        $tpl_data = Util::getTplData([$device, $user]);
+        $tpl_data = TemplateUtil::getTplData([$device, $user]);
         Response::devicePreparePage($tpl_data);
     }
 
@@ -87,7 +87,7 @@ if ($from == 'device') {
 //设置用户最后活动数据
 $user->setLastActiveDevice($device);
 
-$tpl_data = Util::getTplData([$user, $device]);
+$tpl_data = TemplateUtil::getTplData([$user, $device]);
 $tpl_data['from'] = $from;
 
 //设备首页

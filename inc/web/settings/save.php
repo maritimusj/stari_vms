@@ -12,7 +12,7 @@ use zovye\model\accountModelObj;
 
 $url = _W('siteroot');
 
-Util::createApiRedirectFile('api.php', '', [
+Helper::createApiRedirectFile('api.php', '', [
     'memo' => '这个文件是小程序请求转发程序!',
 ], function () use ($url) {
     return "
@@ -301,7 +301,7 @@ if ($page == 'device') {
         $settings['agent']['reg']['commission_fee'] = round(Request::float('agentCommissionFee', 0, 2) * 100);
         $settings['agent']['reg']['commission_fee_type'] = Request::bool('feeType') ? 1 : 0;
 
-        $settings['agent']['reg']['funcs'] = Util::parseAgentFNsFromGPC();
+        $settings['agent']['reg']['funcs'] = Helper::parseAgentFNsFromGPC();
 
         if ($settings['commission']['enabled']) {
             //佣金分享
@@ -764,7 +764,7 @@ if ($page == 'device') {
             'key' => Request::trim('V3key'),
         ];
 
-        if (false === Util::createApiRedirectFile('payment/wx.php', 'payresult', [
+        if (false === Helper::createApiRedirectFile('payment/wx.php', 'payresult', [
                 'headers' => [
                     'HTTP_USER_AGENT' => 'wx_notify',
                 ],
@@ -786,7 +786,7 @@ if ($page == 'device') {
         $settings['pay']['lcsw']['terminal_id'] = Request::trim('terminal_id');
         $settings['pay']['lcsw']['access_token'] = Request::trim('access_token');
 
-        if (false === Util::createApiRedirectFile('payment/lcsw.php', 'payresult', [
+        if (false === Helper::createApiRedirectFile('payment/lcsw.php', 'payresult', [
                 'headers' => [
                     'HTTP_USER_AGENT' => 'lcsw_notify',
                 ],
@@ -809,7 +809,7 @@ if ($page == 'device') {
         $settings['pay']['SQB']['wx'] = Request::bool('SQB_weixin');
         $settings['pay']['SQB']['ali'] = Request::bool('SQB_ali');
         $settings['pay']['SQB']['wxapp'] = Request::bool('SQB_wxapp');
-        Util::createApiRedirectFile('/payment/SQB.php', 'payresult', [
+        Helper::createApiRedirectFile('/payment/SQB.php', 'payresult', [
             'headers' => [
                 'HTTP_USER_AGENT' => 'SQB_notify',
             ],

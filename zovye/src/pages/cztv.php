@@ -19,13 +19,13 @@ use zovye\model\userModelObj;
  */
 
 /** @var deviceModelObj $device */
-$device = Util::getTemplateVar('device');
+$device = TemplateUtil::getTemplateVar('device');
 
 /** @var userModelObj $user */
-$user = Util::getTemplateVar('user');
+$user = TemplateUtil::getTemplateVar('user');
 
 /** @var string $redirect_url */
-$redirect_url = Util::getTemplateVar('redirect_url');
+$redirect_url = TemplateUtil::getTemplateVar('redirect_url');
 
 $tpl = [];
 

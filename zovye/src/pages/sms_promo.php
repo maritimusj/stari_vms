@@ -8,7 +8,7 @@ namespace zovye;
 
 use zovye\model\deviceModelObj;
 
-$params = Util::getTemplateVar();
+$params = TemplateUtil::getTemplateVar();
 
 /** @var deviceModelObj $device */
 $device = Device::get($params['device'], true);

@@ -63,7 +63,7 @@ class CZTV
 
         $account = Account::findOneFromUID($config['account_uid']);
         if ($account) {
-            $res = Util::checkAvailable($user, $account,  $device);
+            $res = Helper::checkAvailable($user, $account, $device);
             if (is_error($res)) {
                 Response::alert($res['message'], 'error');
             }

@@ -89,7 +89,7 @@ if ($op == 'auth' || $op == 'get_openid') {
         JSON::fail('抖音号没有正确配置[03]');
     }
 
-    if (!Util::checkAvailable($user, $account, $device)) {
+    if (!Helper::checkAvailable($user, $account, $device)) {
         JSON::fail('暂时无法免费领取，请重试[01]');
     }
 
@@ -167,7 +167,7 @@ if ($device->isDown()) {
 //检查用户定位
 if (LocationUtil::mustValidate($user, $device)) {
     $user->cleanLastActiveData();
-    $tpl_data = Util::getTplData(
+    $tpl_data = TemplateUtil::getTplData(
         [
             $user,
             $device,
@@ -185,7 +185,7 @@ if (LocationUtil::mustValidate($user, $device)) {
 if ($from == 'device') {
     if (time() - $device->settings('last.online', 0) > 60) {
         //设备准备页面，检测设备是否在线等等
-        $tpl_data = Util::getTplData([$device, $user]);
+        $tpl_data = TemplateUtil::getTplData([$device, $user]);
         Response::devicePreparePage($tpl_data);
     }
     $user->remove('last');

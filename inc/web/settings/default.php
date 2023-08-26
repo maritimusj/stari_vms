@@ -13,7 +13,7 @@ use zovye\model\wx_appModelObj;
 
 $settings = settings();
 
-$tpl_data['navs'] = Util::getSettingsNavs();
+$tpl_data['navs'] = Helper::getSettingsNavs();
 
 $page = Request::trim('page', 'device');
 
@@ -61,7 +61,7 @@ if ($page == 'device') {
 
 } elseif ($page == 'balance') {
 
-    $tpl_data['navs'] = Util::getSettingsNavs();
+    $tpl_data['navs'] = Helper::getSettingsNavs();
     $tpl_data['bonus_url'] = Util::murl('bonus');
     $tpl_data['api_url'] = Util::murl('user');
     $tpl_data['app_key'] = Config::balance('app.key');
@@ -167,7 +167,7 @@ if ($page == 'device') {
         'g10' => '商品十',
     ];
 
-    $provinces = Util::getProvinceList();
+    $provinces = Helper::getProvinceList();
 
     $tpl_data['goods'] = $goods;
     $tpl_data['provinces'] = $provinces;
@@ -224,10 +224,10 @@ if ($page == 'device') {
 
 } elseif ($page == 'ctrl') {
 
-    $tpl_data['navs'] = Util::getSettingsNavs();
+    $tpl_data['navs'] = Helper::getSettingsNavs();
 
     $tpl_data['is_locked'] = app()->isLocked();
-    $tpl_data['cb_url'] = Util::getCtrlServCallbackUrl();
+    $tpl_data['cb_url'] = Helper::getCtrlServCallbackUrl();
     $tpl_data['navs']['ctrl'] = '高级设置';
 
     $res = CtrlServ::query();

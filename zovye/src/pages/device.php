@@ -12,7 +12,7 @@ use DateTimeImmutable;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 
-$params = Util::getTemplateVar();
+$params = TemplateUtil::getTemplateVar();
 
 $tpl = is_array($params) ? $params : [];
 $tpl['slides'] = [];

@@ -14,7 +14,7 @@ defined('IN_IA') or exit('Access Denied');
  * @param array $params
  */
 
-$params = Util::getTemplateVar();
+$params = TemplateUtil::getTemplateVar();
 $tpl = is_array($params) ? $params : [];
 
 $api_url = Util::murl('util', ['op' => 'location', 'id' => $tpl['device']['shadowId']]);

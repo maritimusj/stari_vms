@@ -121,7 +121,7 @@ if (empty($price)) {
         JSON::fail('公众号被禁用！');
     }
 
-    $res = Util::checkAvailable($user, $account, $device, ['ignore_assigned' => true]);
+    $res = Helper::checkAvailable($user, $account, $device, ['ignore_assigned' => true]);
     if (is_error($res)) {
         JSON::fail($res['message']);
     }

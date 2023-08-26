@@ -13,18 +13,18 @@ use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 
 /** @var userModelObj $user */
-$user = Util::getTemplateVar('user');
+$user = TemplateUtil::getTemplateVar('user');
 
 /** @var accountModelObj $account */
-$account = Util::getTemplateVar('account');
+$account = TemplateUtil::getTemplateVar('account');
 
 /** @var deviceModelObj $device */
-$device = Util::getTemplateVar('device');
+$device = TemplateUtil::getTemplateVar('device');
 
 /** @var string $tid */
-$tid = Util::getTemplateVar('tid');
+$tid = TemplateUtil::getTemplateVar('tid');
 
-$tpl_data = Util::getTplData([$user, $account]);
+$tpl_data = TemplateUtil::getTplData([$user, $account]);
 
 $api_url = Util::murl('account', $tid ? ['tid' => $tid] : []);
 $jquery_url = JS_JQUERY_URL;

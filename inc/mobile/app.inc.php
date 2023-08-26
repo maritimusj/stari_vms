@@ -235,7 +235,7 @@ if ($op == 'default') {
         30,
         31,
     ];
-    $arr_assoc = Util::getProvinceList();
+    $arr_assoc = Helper::getProvinceList();
 
     //省份
     if ($type == 'provinces') {

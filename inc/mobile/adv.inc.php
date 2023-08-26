@@ -40,7 +40,7 @@ $params = [$user, $device, new DateTime()];
 if (App::isTKPromotingEnabled() && $type_id == Advertising::WELCOME_PAGE) {
     $account = TKPromoting::getAccount();
     if (!is_error($account)) {
-        $res = Util::checkAvailable($user, $account, $device);
+        $res = Helper::checkAvailable($user, $account, $device);
         if (!is_error($res)) {
             $result[] = TKPromoting::getAd();
             $params['tk_user_uid'] = TKPromoting::getUserPrefix() . $user->getOpenid();

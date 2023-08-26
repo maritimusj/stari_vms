@@ -646,28 +646,13 @@ class WxPlatform
         $uid = empty($msg['Ticket']) ? sha1(time()) : sha1($msg['Ticket']);
         $order_uid = Order::makeUID($user, $device, $uid);
 
-        $result = Job::createThirdPartyPlatformOrder([
+       return Job::createThirdPartyPlatformOrder([
             'device' => $device->getId(),
             'user' => $user->getId(),
             'account' => $account->getId(),
             'orderUID' => $order_uid,
             'extra' => [],
         ]);
-
-        $log = [
-            'account' => $account->format(),
-            'user' => $user->profile(),
-            'device' => $device->profile(),
-            'start create order job' => $result,
-        ];
-
-        if ($result) {
-            Log::debug('wxplatform', $log);
-        } else {
-            Log::error('wxplatform', $log);
-        }
-
-        return $result;
     }
 
     public static function open($msg)
@@ -716,7 +701,10 @@ class WxPlatform
                 $res = Helper::checkAvailable($user, $account, $device, ['ignore_assigned' => true]);
 
                 if (!is_error($res)) {
-                    return self::createOrder($device, $user, $account);
+                    if (!self::createOrder($device, $user, $account)) {
+                        throw new RuntimeException('启动订单任务失败[1]！');
+                    }
+                    return true;
                 }
 
                 Log::debug('wxplatform', [
@@ -755,7 +743,9 @@ class WxPlatform
             }
 
             //创建订单
-            self::createOrder($device, $user, $account);
+            if (!self::createOrder($device, $user, $account)) {
+                throw new RuntimeException('启动订单任务失败[2]！');
+            }
 
             //推送设备首页链接
             return $account->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $device->getUrl());

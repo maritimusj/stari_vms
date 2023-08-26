@@ -194,4 +194,8 @@ try {
 
 $log['serial'] = Request::str('serial');
 
-Log::debug('create_order_account', $log);
+if ($log['error']) {
+    Log::error('create_order_account', $log);
+} else {
+    Log::debug('create_order_account', $log);
+}

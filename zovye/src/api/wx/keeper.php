@@ -110,7 +110,7 @@ class keeper
 
         $h5_user = User::findOne(['mobile' => $mobile, 'app' => User::WX]);
         if (empty($h5_user)) {
-            $url = Util::murl('keeper', ['openid' => $user->getOpenid()]);
+            $url = Util::murl('keeper', ['openid' => $user->getOpenid(), 'mobile' => $mobile]);
             JSON::fail(['msg' => "手机号码{$mobile}还没有绑定用户，请立即绑定！", 'url' => $url]);
         }
 

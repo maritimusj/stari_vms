@@ -83,7 +83,7 @@ Response::keeperPage([
             [
                 'nickname' => $user->getNickname(),
                 'avatar' => $user->getAvatar(),
-                'mobile' => $user->getMobile(),
+                'mobile' => Request::has('mobile') ? Request::trim('mobile') : $user->getMobile(),
             ],
     ]
 );

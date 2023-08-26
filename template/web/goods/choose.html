@@ -74,6 +74,7 @@
         <div class="heading">
         </div>
         <div class="panel-body">
+            {if $goods_list}
             <div id="search-bar">
                 <div class="text-input">
                     <span>根据条件搜索商品 ...</span>
@@ -112,7 +113,6 @@
                     </div>
                 </form>
             </div>
-            {if $goods_list}
             <table class="table" id="goodslist">
                 <thead>
                 <tr>

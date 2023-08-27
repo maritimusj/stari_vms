@@ -154,19 +154,16 @@ try {
 
     try {
         $result = DeviceUtil::open($data);
-        $log['result'] = $result;
-
         if (is_error($result)) {
             if ($result['errno'] === State::ERROR_LOCK_FAILED && settings('order.waitQueue.enabled', false)) {
-                unset($log['result']);
                 if (!Job::createAccountOrder($log)) {
                     throw new Exception('启动排队任务失败！');
                 }
-
                 return true;
             }
             throw new Exception($result['message']);
         }
+        $log['result'] = $result;
     } catch (Exception $e) {
         ZovyeException::throwWith($e->getMessage(), $e->getCode(), $device);
     }

@@ -249,7 +249,7 @@ class DeviceUtil
         $delay = intval(settings('device.lockRetryDelay', 1));
 
         if (!$device->lockAcquire($retries, $delay)) {
-            return err('设备被占用，请重新扫描设备二维码');
+            return error(State::ERROR_LOCK_FAILED, '设备被占用，请重新扫描设备二维码');
         }
 
         $goods = $device->getGoods($goods_id);

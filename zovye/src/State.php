@@ -11,7 +11,7 @@ class State
     const OK = 0;
     const FAIL = 1;
     const ERROR = -1;
-    const ERROR_LOCK_FAILED = 2;
+    const ERROR_LOCK_FAILED = 999;
 
     protected static $unknown = '未知';
 

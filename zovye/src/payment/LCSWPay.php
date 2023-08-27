@@ -400,7 +400,7 @@ JSCODE;
             'pay_type' => $res['pay_type'],
             'merchant_no' => $this->config['merchant_no'],
             'orderNO' => $res['pay_trace'],
-            'transaction_id' => $res['out_trade_no'],
+            'transaction_id' => $res['channel_trade_no'],
             'total' => $res['total_fee'],
             'paytime' => $res['end_time'],
             'openid' => $res['user_id'],
@@ -424,7 +424,7 @@ JSCODE;
             'deviceUID' => $data['attach'],
             'orderNO' => $data['terminal_trace'],
             'total' => intval($data['total_fee']),
-            'transaction_id' => $data['out_trade_no'],
+            'transaction_id' => $data['channel_trade_no'],
             'raw' => $data,
         ];
     }

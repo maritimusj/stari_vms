@@ -175,6 +175,7 @@ try {
     $device->appShowMessage('领取成功，欢迎下次使用！');
 
 } catch (ZovyeException $e) {
+
     $log['error'] = $e->getMessage();
 
     if (isset($account) && $account->isThirdPartyPlatform() && isset($user)) {

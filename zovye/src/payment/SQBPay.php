@@ -251,7 +251,7 @@ JS_CODE;
                     'pay_way' => $data['payway_name'],
                     'sn' => $this->config['sn'],
                     'orderNO' => $data['client_sn'],
-                    'transaction_id' => $data['sn'],
+                    'transaction_id' => $data['trade_no'],
                     'total' => $data['total_amount'],
                     'paytime' => $data['finish_time'],
                     'openid' => $data['payer_uid'],
@@ -278,7 +278,7 @@ JS_CODE;
                 'deviceUID' => $data['operator'],
                 'orderNO' => $data['client_sn'],
                 'total' => intval($data['total_amount']),
-                'transaction_id' => $data['sn'],
+                'transaction_id' => $data['trade_no'],
                 'raw' => $data,
             ];
         }

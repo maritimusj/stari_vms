@@ -159,11 +159,15 @@ try {
                 if (!Job::createAccountOrder($log)) {
                     throw new Exception('启动排队任务失败！');
                 }
+
+                $log['message'] = '重新排队中';
                 return true;
             }
             throw new Exception($result['message']);
         }
+
         $log['result'] = $result;
+
     } catch (Exception $e) {
         ZovyeException::throwWith($e->getMessage(), $e->getCode(), $device);
     }
@@ -185,14 +189,19 @@ try {
     if ($device) {
         $device->appShowMessage($e->getMessage(), 'error');
     }
+
 } catch (Exception $e) {
+
     $log['error'] = $e->getMessage();
+
+} finally {
+
+    $log['serial'] = Request::str('serial');
+
+    if ($log['error']) {
+        Log::error('create_order_account', $log);
+    } else {
+        Log::debug('create_order_account', $log);
+    }
 }
 
-$log['serial'] = Request::str('serial');
-
-if ($log['error']) {
-    Log::error('create_order_account', $log);
-} else {
-    Log::debug('create_order_account', $log);
-}

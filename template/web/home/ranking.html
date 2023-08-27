@@ -207,6 +207,7 @@
                         <td class="center">#</td>
                         <td>设备</td>
                         <td>IMEI</td>
+                        <td>所属代理商</td>
                         <td class="center">
                             <span :class="{'sort': true, 'fa desc': sort === 'total'}" @click="sort='total'">
                                 订单总数
@@ -238,6 +239,14 @@
                         <td>
                             <div v-if="item.device">
                                 {{item.device.imei}}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="agent" :title="item.agent.name}" v-if="item.agent">
+                                <div class="profile" :style="item.agent.level.clr || '#9e9e9e'}">
+                                    <img :src="item.agent.avatar">
+                                    <div class="nickname" v-text="item.agent.name || '<匿名用户>'">}</div>
+                                </div>
                             </div>
                         </td>
                         <td class="center">

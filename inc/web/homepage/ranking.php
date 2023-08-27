@@ -149,13 +149,21 @@ if ($fn == 'default') {
         foreach ((array)$all as $item) {
             $device = Device::get($item['device_id']);
             if ($device) {
-                $list[] = [
+                $data = [
                     'device' => $device->profile(),
                     'order_total' => intval($item['total']),
                     'price' => number_format($item['price'] / 100, 2, '.', ''),
                     'amount' => App::isFuelingDeviceEnabled() ?
                         number_format($item['amount'] / 100, 2, '.', '') : $item['amount'],
                 ];
+
+                $agent = $device->getAgent();
+                if ($agent) {
+                    $data['agent'] = $agent->profile(false);
+                }
+
+                $list[] = $data;
+
                 $summary['order'] += intval($item['total']);
                 $summary['price'] += $item['price'];
                 $summary['amount'] += $item['amount'];

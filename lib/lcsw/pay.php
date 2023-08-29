@@ -223,7 +223,7 @@ class pay
                 return error(100, '正在支付中');
             }
 
-            return err('查询订单失败！');
+            return err($res['return_msg'] ?? '查询订单失败！');
         }
 
         return $res;

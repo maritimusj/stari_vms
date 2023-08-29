@@ -8,6 +8,13 @@
     #devicelist .log .app .mcb.online {
         background-color: #FFC107;
     }
+    #devicelist tr.deleted {
+        filter: grayscale(1);
+        opacity: 0.3;
+    }
+    .operate img.icon.disabled {
+        opacity: 0.1;
+    }
 </style>
 <div id="appx" v-cloak>
     <div class="init-loading" v-if="device.list === undefined">
@@ -16,46 +23,77 @@
     <div class="panel panel-default" v-else>
         <div class="heading">
             <span class="operate">
-                <a href="{php echo $this->createWebUrl('device', ['op'=>'edit', 'model'=>'normal']);}">
-                    <img src="{MODULE_URL}static/img/machine.svg" class="icon" title="添加新设备">
-                </a>
-                {if \zovye\App::isChargingDeviceEnabled()}
-                <a href="{php echo $this->createWebUrl('device', ['op'=>'edit', 'model'=>'charging']);}">
-                    <img src="{MODULE_URL}static/img/charging.svg" class="icon" title="添加充电桩">
-                </a>
-                {/if}
-                {if \zovye\App::isFuelingDeviceEnabled()}
-                <a href="{php echo $this->createWebUrl('device', ['op'=>'edit', 'model'=>'fueling']);}">
-                    <img src="{MODULE_URL}static/img/fueling.svg" class="icon" title="添加尿素加注设备">
-                </a>
-                {/if}
-                {if \zovye\App::isVDeviceSupported()}
-                <a href="{php echo $this->createWebUrl('device', ['op'=>'edit', 'model'=>'vd']);}">
-                    <img src="{MODULE_URL}static/img/vdevice.svg" class="icon" title="添加虚拟设备">
-                </a>
-                {/if}
-                {if \zovye\App::isBluetoothDeviceSupported()}
-                <a href="{php echo $this->createWebUrl('device', ['op'=>'edit', 'model'=>'bluetooth']);}">
-                    <img src="{MODULE_URL}static/img/bluetooth.svg" class="icon" title="添加蓝牙设备">
-                </a>
-                <a href="{php echo $this->createWebUrl('device', ['op'=>'import_bluetooth_device_upload']);}">
-                    <img src="{MODULE_URL}static/img/upload_bluetooth.svg" class="icon" title="导入蓝牙设备">
-                </a>
-                {/if}
-                <a href="{php echo $this->createWebUrl('device', ['op'=>'new_group']);}">
-                    <img src="{MODULE_URL}static/img/group.svg" class="icon" title="分组管理">
-                </a>
-                <a href="{php echo $this->createWebUrl('device', ['op'=>'report_list']);}">
-                    <img src="{MODULE_URL}static/img/malfunction.svg" class="icon" title="故障报告列表">
-                </a>
-                <img src="{MODULE_URL}static/img/reload.svg" class="icon" title="通知所有设备刷新配置？"  onclick="api.refreshAll();">
-                <a href="{php echo $this->createWebUrl('device', ['op'=>'clean_error']);}">
-                    <img src="{MODULE_URL}static/img/clear.svg" class="icon" title="清除所有设备错误代码">
-                </a>
-                {if $upload}
-                <img src="{MODULE_URL}static/img/upload_device.svg" class="icon" title="上传设备信息"  onclick="api.uploadInfo();">
-                {/if}
-                <img src="{MODULE_URL}static/img/sim.svg" class="icon" title="导出SIM卡信息"  onclick="api.exportSIM();">
+                <template v-if="showSelectInputCtrl">
+                    <img src="{MODULE_URL}static/img/remove.svg" class="icon" title="删除所有选中设备" @click="deleteAllDevice">
+                    <img src="{MODULE_URL}static/img/qrcode_download.svg" class="icon" title="下载选中设备二维码" @click="downloadQRCode" v-if="canDownload">
+                    <img src="{MODULE_URL}static/img/qrcode_download.svg" class="icon" title="请先选择设备" v-else="canDownload">
+                    <img src="{MODULE_URL}static/img/machine.svg" class="icon disabled" title="添加新设备">
+                    {if \zovye\App::isChargingDeviceEnabled()}
+                    <img src="{MODULE_URL}static/img/charging.svg" class="icon disabled" title="添加充电桩">
+                    {/if}
+                    {if \zovye\App::isFuelingDeviceEnabled()}
+                    <img src="{MODULE_URL}static/img/fueling.svg" class="icon disabled" title="添加尿素加注设备">
+                    {/if}
+                    {if \zovye\App::isVDeviceSupported()}
+                    <img src="{MODULE_URL}static/img/vdevice.svg" class="icon disabled" title="添加虚拟设备">
+                    {/if}
+                    {if \zovye\App::isBluetoothDeviceSupported()}
+                    <img src="{MODULE_URL}static/img/bluetooth.svg" class="icon disabled" title="添加蓝牙设备">
+                    <img src="{MODULE_URL}static/img/upload_bluetooth.svg" class="icon disabled" title="导入蓝牙设备">
+                    {/if}
+                    <img src="{MODULE_URL}static/img/group.svg" class="icon disabled" title="分组管理">
+                    <img src="{MODULE_URL}static/img/malfunction.svg" class="icon disabled" title="故障报告列表">
+                    <img src="{MODULE_URL}static/img/reload.svg" class="icon disabled" title="通知所有设备刷新配置？">
+                    <img src="{MODULE_URL}static/img/clear.svg" class="icon disabled" title="清除所有设备错误代码">
+                    {if $upload}
+                    <img src="{MODULE_URL}static/img/upload_device.svg" class="icon disabled" title="上传设备信息">
+                    {/if}
+                    <img src="{MODULE_URL}static/img/sim.svg" class="icon disabled" title="导出SIM卡信息">
+                </template>
+                <template v-else>
+                    <img src="{MODULE_URL}static/img/remove.svg" class="icon disabled" title="删除设备">
+                    <img src="{MODULE_URL}static/img/qrcode_download.svg" class="icon disabled" title="下载二维码">
+                    <a href="{php echo $this->createWebUrl('device', ['op'=>'edit', 'model'=>'normal']);}">
+                        <img src="{MODULE_URL}static/img/machine.svg" class="icon" title="添加新设备">
+                    </a>
+                    {if \zovye\App::isChargingDeviceEnabled()}
+                    <a href="{php echo $this->createWebUrl('device', ['op'=>'edit', 'model'=>'charging']);}">
+                        <img src="{MODULE_URL}static/img/charging.svg" class="icon" title="添加充电桩">
+                    </a>
+                    {/if}
+                    {if \zovye\App::isFuelingDeviceEnabled()}
+                    <a href="{php echo $this->createWebUrl('device', ['op'=>'edit', 'model'=>'fueling']);}">
+                        <img src="{MODULE_URL}static/img/fueling.svg" class="icon" title="添加尿素加注设备">
+                    </a>
+                    {/if}
+                    {if \zovye\App::isVDeviceSupported()}
+                    <a href="{php echo $this->createWebUrl('device', ['op'=>'edit', 'model'=>'vd']);}">
+                        <img src="{MODULE_URL}static/img/vdevice.svg" class="icon" title="添加虚拟设备">
+                    </a>
+                    {/if}
+                    {if \zovye\App::isBluetoothDeviceSupported()}
+                    <a href="{php echo $this->createWebUrl('device', ['op'=>'edit', 'model'=>'bluetooth']);}">
+                        <img src="{MODULE_URL}static/img/bluetooth.svg" class="icon" title="添加蓝牙设备">
+                    </a>
+                    <a href="{php echo $this->createWebUrl('device', ['op'=>'import_bluetooth_device_upload']);}">
+                        <img src="{MODULE_URL}static/img/upload_bluetooth.svg" class="icon" title="导入蓝牙设备">
+                    </a>
+                    {/if}
+                    <a href="{php echo $this->createWebUrl('device', ['op'=>'new_group']);}">
+                        <img src="{MODULE_URL}static/img/group.svg" class="icon" title="分组管理">
+                    </a>
+                    <a href="{php echo $this->createWebUrl('device', ['op'=>'report_list']);}">
+                        <img src="{MODULE_URL}static/img/malfunction.svg" class="icon" title="故障报告列表">
+                    </a>
+                    <img src="{MODULE_URL}static/img/reload.svg" class="icon" title="通知所有设备刷新配置？"  onclick="api.refreshAll();">
+                    <a href="{php echo $this->createWebUrl('device', ['op'=>'clean_error']);}">
+                        <img src="{MODULE_URL}static/img/clear.svg" class="icon" title="清除所有设备错误代码">
+                    </a>
+                    {if $upload}
+                    <img src="{MODULE_URL}static/img/upload_device.svg" class="icon" title="上传设备信息"  onclick="api.uploadInfo();">
+                    {/if}
+                    <img src="{MODULE_URL}static/img/sim.svg" class="icon" title="导出SIM卡信息"  onclick="api.exportSIM();">
+                </template>
             </span>
         </div>
         <div class="panel-body">
@@ -221,10 +259,7 @@
                             <template v-else>#</template>
                         </th>
                         <th class="operate" style="position: relative;">
-                            <template v-if="showSelectInputCtrl && canDownload">
-                                <i class="fa fa-download" title="下载选中的设备二维码" @click="downloadQRCode"></i><span class="badge" style="position: absolute;">{{selectedInputCtrl.length}}</span>
-                            </template>
-                            <i :class="{'fa':true, 'fa-sign-out': showSelectInputCtrl, 'fa-square-o':!showSelectInputCtrl}" title="选择" @click="showSelectInputCtrl=!showSelectInputCtrl" v-else></i>
+                            <i :class="{'fa':true, 'fa-sign-out': showSelectInputCtrl, 'fa-square-o':!showSelectInputCtrl}" title="选择" @click="showSelectInputCtrl=!showSelectInputCtrl"></i>
                         </th>
                         <th>                    
                             <div data-orderby="imei" @click="getListBy('imei')" :class="['fa', sort.by === 'imei' ? sort.dir: '']">设备名称</div>
@@ -259,10 +294,10 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(o,index) in device.list" :key="o.id" :data-fetchid="o.id" :class="o.model">
+                    <tr v-for="(o,index) in device.list" :key="o.id" :data-fetchid="o.id" :class="{[o.model]:true, deleted: o.deleted}">
                         <td class="operate">
                             <template v-if="showSelectInputCtrl">
-                                <input type="checkbox" id="downloadQRCode" :value="o.id" v-model="selectedInputCtrl">                                
+                                <input type="checkbox" id="downloadQRCode" :value="o.id" v-model="selectedInputCtrl" :disabled="o.deleted">                                
                             </template>
                             <template v-else>
                                 <template v-if="o.lockedTime">
@@ -595,5 +630,5 @@
         tags: JSON.parse(decodeURIComponent('{php echo json_encode($s_tags ?: [])}')),
     }
 </script>
-<script src="{php echo MODULE_URL}static/js/device.min.js?v=20220903003"></script>
+<script src="{php echo MODULE_URL}static/js/device.min.js?v=20220903004"></script>
 {template 'common/footer'}

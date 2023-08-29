@@ -475,7 +475,7 @@ class Pay
             ];
         }
 
-        $data = We7::uniacid(['title' => $order_no, 'level' => $level]);
+        $data = We7::uniacid(['level' => $level, 'title' => $order_no]);
 
         return m('pay_logs')->findOne($data);
     }

@@ -54,12 +54,13 @@ class WXPay implements IPay
         return $notify_url;
     }
 
-    public function createQrcodePay(string $code,
+    public function createQrcodePay(
+        string $code,
         string $device_uid,
         string $order_no,
         int $price,
-        string $body = '')
-    {
+        string $body = ''
+    ) {
         $wx = $this->getWx();
 
         $params = [
@@ -263,21 +264,10 @@ $js_sdk
 JS_CODE;
     }
 
-    public function refund(string $order_no, int $total, bool $is_transaction_id = false)
-    {
-        $wx = $this->getWx();
-
-        $res = $this->query($order_no);
-        if (is_error($res)) {
-            return $res;
-        }
-
-        return $wx->refund($order_no, intval($res['total']), $total, $is_transaction_id);
-    }
-
     public function query(string $order_no)
     {
         $wx = $this->getWx();
+
         $res = $wx->queryOrder($order_no);
         if (is_error($res)) {
             return $res;
@@ -294,6 +284,25 @@ JS_CODE;
             'openid' => $res['openid'],
             'deviceUID' => $res['device_info'],
         ];
+    }
+
+    public function close(string $order_no)
+    {
+        $wx = $this->getWx();
+
+        return $wx->close($order_no);
+    }
+
+    public function refund(string $order_no, int $total, bool $is_transaction_id = false)
+    {
+        $wx = $this->getWx();
+
+        $res = $this->query($order_no);
+        if (is_error($res)) {
+            return $res;
+        }
+
+        return $wx->refund($order_no, intval($res['total']), $total, $is_transaction_id);
     }
 
     public function decodeData(string $input): array

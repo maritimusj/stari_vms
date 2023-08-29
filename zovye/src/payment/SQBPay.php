@@ -56,12 +56,13 @@ class SQBPay implements IPay
         return $notify_url;
     }
 
-    public function createQrcodePay(string $code,
+    public function createQrcodePay(
+        string $code,
         string $device_uid,
         string $order_no,
         int $price,
-        string $body = '')
-    {
+        string $body = ''
+    ) {
         $SQB = $this->getSQB();
 
         $notify_url = $this->getNotifyUrl();
@@ -87,6 +88,7 @@ class SQBPay implements IPay
             if ($res['result_code'] == 'PAY_IN_PROGRESS') {
                 return error(100, '正在支付中');
             }
+
             return err($res['error_message']);
         }
 
@@ -211,7 +213,7 @@ $js_sdk
 JS_CODE;
     }
 
-    public function  close(string $order_no)
+    public function close(string $order_no)
     {
         $SQB = $this->getSQB();
 

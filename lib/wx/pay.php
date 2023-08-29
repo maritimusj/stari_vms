@@ -84,6 +84,7 @@ class pay
             if ($result['err_code'] == "USERPAYING") {
                 return error(100, '正在支付中');
             }
+
             return err($result['err_code_des'] ?: '接口返回失败！');
         }
 
@@ -91,6 +92,7 @@ class pay
             if ($result['trade_state'] == 'USERPAYING') {
                 return error(100, '正在支付中');
             }
+
             return err($result['trade_state_desc'] ?: '接口返回失败！');
         }
 
@@ -249,6 +251,20 @@ class pay
         $params['sign'] = $this->buildSign($params);
 
         return $this->requestApi('https://api.mch.weixin.qq.com/pay/orderquery', $params);
+    }
+
+    public function close($no)
+    {
+        $params = array(
+            'appid' => $this->config['appid'],
+            'mch_id' => $this->config['mch_id'],
+            'out_trade_no' => $no,
+            'nonce_str' => Util::random(32),
+        );
+
+        $params['sign'] = $this->buildSign($params);
+
+        return $this->requestApi('https://api.mch.weixin.qq.com/pay/closeorder', $params);
     }
 
     /*

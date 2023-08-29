@@ -110,8 +110,9 @@ class pay
 
         if ($res['result_code'] !== '01') {
             if ($res['result_code'] == '03') {
-                return  error(100, '正在支付中');
+                return error(100, '正在支付中');
             }
+
             return err($res['return_msg'] ?? '订单付款失败！');
         }
 
@@ -221,7 +222,38 @@ class pay
             if ($res['result_code'] == '03') {
                 return error(100, '正在支付中');
             }
+
             return err('查询订单失败！');
+        }
+
+        return $res;
+    }
+
+    public function close($out_trade_no)
+    {
+        $path = '/pay/100/close';
+
+        $params = [
+            'pay_ver' => '100',
+            'pay_type' => '000',
+            'service_id' => '041',
+            'merchant_no' => $this->config['merchant_no'],
+            'terminal_id' => $this->config['terminal_id'],
+            'terminal_trace' => empty($serial) ? 'R'.time() : $serial,
+            'terminal_time' => date('YmdHis'),
+            'out_trade_no' => $out_trade_no,
+        ];
+
+        $params['key_sign'] = $this->sign($params);
+
+        $res = $this->requestApi("$this->api$path", $params);
+
+        if (is_error($res)) {
+            return $res;
+        }
+
+        if ($res['result_code'] !== '01') {
+            return err('关闭订单失败！');
         }
 
         return $res;

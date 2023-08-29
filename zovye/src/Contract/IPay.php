@@ -61,6 +61,13 @@ interface IPay
     public function getPayJs(deviceModelObj $device, userModelObj $user);
 
     /**
+     * 关闭订单
+     * @param string $order_no
+     * @return mixed
+     */
+    public function close(string $order_no);
+
+    /**
      * 请求退款
      * @param string $order_no
      * @param int $total

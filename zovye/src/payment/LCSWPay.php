@@ -104,12 +104,13 @@ class LCSWPay implements IPay
         ];
     }
 
-    public function createQrcodePay(string $code,
+    public function createQrcodePay(
+        string $code,
         string $device_uid,
         string $order_no,
         int $price,
-        string $body = '')
-    {
+        string $body = ''
+    ) {
         $lcsw = $this->getLCSW();
 
         $params = [
@@ -361,6 +362,23 @@ ALI_JSCODE;
 JSCODE;
     }
 
+    public function close(string $order_no)
+    {
+        $lcsw = $this->getLCSW();
+
+        $res = $lcsw->close($order_no);
+
+        if (is_error($res)) {
+            return $res;
+        }
+
+        if ($res['result_code'] !== '01') {
+            return err($res['return_msg']);
+        }
+
+        return $res;
+    }
+
     public function refund(string $order_no, int $total, bool $is_transaction_id = false)
     {
         $res = $this->query($order_no);
@@ -373,6 +391,7 @@ JSCODE;
         }
 
         $lcsw = $this->getLCSW();
+
         $res = $lcsw->doRefund($res['transaction_id'], $total, $res['pay_type']);
 
         if (is_error($res)) {

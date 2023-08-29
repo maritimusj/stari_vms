@@ -340,6 +340,26 @@ class Pay
     }
 
     /**
+     * 关闭订单
+     * @param string $order_no
+     * @return mixed
+     */
+    public static function close(string $order_no)
+    {
+        $pay_log = self::getPayLog($order_no);
+        if (empty($pay_log)) {
+            return err('找不到支付记录！');
+        }
+
+        $pay = self::getPayObj($pay_log);
+        if (is_error($pay)) {
+            return $pay;
+        }
+
+        return $pay->close($order_no);
+    }
+
+    /**
      * 请求退款
      * @param string $order_no
      * @param int $total
@@ -356,7 +376,7 @@ class Pay
         return self::refundByLog($pay_log, $total, $data);
     }
 
-    public static function refundByLog(pay_logsModelObj $pay_log, int &$total = 0, array $data = [])
+    public static function getPayObj(pay_logsModelObj $pay_log)
     {
         $device_id = $pay_log->getDeviceId();
 
@@ -368,7 +388,12 @@ class Pay
             $device = Device::getDummyDevice();
         }
 
-        $pay = self::getActivePayObj($device, $pay_log->getPayName());
+        return self::getActivePayObj($device, $pay_log->getPayName());
+    }
+
+    public static function refundByLog(pay_logsModelObj $pay_log, int &$total = 0, array $data = [])
+    {
+        $pay = self::getPayObj($pay_log);
         if (is_error($pay)) {
             return $pay;
         }

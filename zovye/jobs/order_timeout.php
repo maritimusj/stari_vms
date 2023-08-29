@@ -50,6 +50,10 @@ if (empty($order)) {
         $data = $pay_log->getData();
         if ($data) {
             if (empty($data['cancelled']) && empty($data['payResult']) && empty($data['timeout'])) {
+                //关闭订单
+                $log['close_order'] = Pay::close($order_no);
+                $pay_log->setData('close_order', $log['close_order']);
+                //记录超时
                 $pay_log->setData('timeout', ['createtime' => time()]);
                 $pay_log->save();
             }

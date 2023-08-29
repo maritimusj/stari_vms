@@ -141,7 +141,7 @@ if ($op === 'create') {
 
     $pay_log = Pay::getPayLog($order_no);
     if ($pay_log) {
-
+        $pay_log->setData('close_order', Pay::close($order_no));
         $pay_log->setData('cancelled', ['createtime' => time()]);
         $pay_log->save();
 
@@ -155,7 +155,7 @@ if ($op === 'create') {
         if (empty($user) || $user->isBanned()) {
             JSON::fail(['code' => 401, 'msg' => '找不到用户或者用户无法领取！']);
         }
-        
+
     } else {
         //查询订单状态
         $user = Session::getCurrentUser();
@@ -206,7 +206,7 @@ if ($op === 'create') {
         if ($response['code'] != 200) {
             JSON::success($response);
         }
-        
+
         $vouchers = $order->getExtraData('extra.voucher.recv', 0);
         if ($vouchers > 0) {
             $response['tips'] = [
@@ -351,7 +351,7 @@ if ($op === 'create') {
     } else {
         $user = Session::getCurrentUser();
     }
-    
+
     if (empty($user) || $user->isBanned()) {
         JSON::fail('找不到用户！');
     }
@@ -393,7 +393,7 @@ if ($op === 'create') {
     } else {
         $user = Session::getCurrentUser();
     }
-    
+
     if (empty($user) || $user->isBanned()) {
         JSON::fail(['code' => 401, 'msg' => '找不到用户或者用户无法领取！']);
     }

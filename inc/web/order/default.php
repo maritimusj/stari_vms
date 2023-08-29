@@ -117,9 +117,7 @@ $query->where($condition);
 $order_no = Request::str('order');
 if ($order_no) {
     if (settings('migration.order') != '20230822') {
-        $query->whereOr([
-            'order_id' => $order_no,
-        ]);
+        $query->where(['order_id' => $order_no]);
     } else {
         $query->whereOr([
             'order_id' => $order_no,

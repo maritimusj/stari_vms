@@ -113,23 +113,26 @@
                 <td>￥{php echo number_format($log['data']['orderData']['price'] / 100, 2, '.', '')}</td>
                 <td>
                     <div class="pay_status">
-                        {php $payResult = $log['data']['payResult'];}
-                        {if !empty($payResult)}
-                        {if $log['data']['cancelled']}
-                        支付取消
-                        {elseif $log['data']['timeout']}
-                        支付超时
-                        {elseif !is_error($log['data']['payResult'])}
-                        支付成功
-                        {/if}
+                        {if $log['data']['payResult']}
+                            {if is_error($log['data']['payResult'])}
+                            支付失败
+                            {else}
+                            支付成功
+                            {/if}
                         {else}
-                        {if $log['data']['queryResult']}
-                        {if $log['data']['queryResult']['result'] == 'success'}
-                        支付成功(<span class="query success" title="查询结果">*</span>)
-                        {else}
-                        {$log['data']['queryResult']['message']}(<span class="query fail" title="查询结果">*</span>)
-                        {/if}
-                        {/if}
+                            {if $log['data']['queryResult']}
+                                {if $log['data']['queryResult']['result'] == 'success'}
+                                支付成功(<span class="query success" title="查询结果">*</span>)
+                                {else}
+                                {$log['data']['queryResult']['message']}(<span class="query fail" title="查询结果">*</span>)
+                                {/if}
+                            {else}
+                                {if $log['data']['cancelled']}
+                                支付取消
+                                {elseif $log['data']['timeout']}
+                                支付超时
+                                {/if}
+                            {/if}
                         {/if}                     
                     </div>
                 </td>

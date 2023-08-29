@@ -180,6 +180,21 @@ fwIDAQAB
         return "https://qr.shouqianba.com/gateway?".$paramsStr;
     }
 
+    public function close($uid, $isSN = false)
+    {
+        $path = '/upay/v2/cancel';
+        $params = [
+            'terminal_sn' => $this->config['sn'],
+        ];
+        if ($isSN) {
+            $params['sn'] = $uid;
+        } else {
+            $params['client_sn'] = $uid;
+        }
+
+        return $this->requestApi("$this->api$path", $params);
+    }
+
     public function refund($uid, $amount, $isSN = false, $serial = '')
     {
         $path = '/upay/v2/refund';

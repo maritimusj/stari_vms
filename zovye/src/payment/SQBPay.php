@@ -211,9 +211,26 @@ $js_sdk
 JS_CODE;
     }
 
+    public function  close(string $order_no)
+    {
+        $SQB = $this->getSQB();
+
+        $res = $SQB->close($order_no);
+        if (is_error($res)) {
+            return $res;
+        }
+
+        if ($res['result_code'] === 'CANCEL_SUCCESS') {
+            return $res;
+        }
+
+        return err($res['error_message'] ?? '关闭订单失败');
+    }
+
     public function refund(string $order_no, int $total, bool $is_transaction_id = false)
     {
         $SQB = $this->getSQB();
+
         $res = $SQB->refund($order_no, $total, $is_transaction_id);
         if (is_error($res)) {
             return $res;
@@ -237,6 +254,7 @@ JS_CODE;
     public function query(string $order_no)
     {
         $SQB = $this->getSQB();
+
         $res = $SQB->query($order_no);
         if (is_error($res)) {
             return $res;

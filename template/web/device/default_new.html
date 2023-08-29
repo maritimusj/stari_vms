@@ -255,11 +255,15 @@
                 <thead v-show="device.list !== undefined">
                     <tr>
                         <th class="operate">
-                            <i :class="{'fa': true, 'fa-check-square': isAllSelected, 'fa-square-o': !isAllSelected}" title="全部" v-if="showSelectInputCtrl" @click="selectAll"></i> 
+                            <i :class="{'fa': true, 'fa-check-square': isAllSelected, 'fa-square-o': !isAllSelected}" 
+                            :title="selectedInputCtrl.length == 0 ? '点击勾选全部':'已选中'+selectedInputCtrl.length+'项'" v-if="showSelectInputCtrl" @click="selectAll"></i> 
                             <template v-else>#</template>
                         </th>
                         <th class="operate" style="position: relative;">
-                            <i :class="{'fa':true, 'fa-sign-out': showSelectInputCtrl, 'fa-square-o':!showSelectInputCtrl}" title="选择" @click="showSelectInputCtrl=!showSelectInputCtrl"></i>
+                            <div class="selectBtn">
+                                <i :class="{'fa':true, 'fa-sign-out': showSelectInputCtrl, 'fa-square-o':!showSelectInputCtrl}" 
+                                title="选择" @click="showSelectInputCtrl=!showSelectInputCtrl"></i>
+                            </div>
                         </th>
                         <th>                    
                             <div data-orderby="imei" @click="getListBy('imei')" :class="['fa', sort.by === 'imei' ? sort.dir: '']">设备名称</div>

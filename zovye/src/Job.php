@@ -141,9 +141,9 @@ class Job
         return CtrlServ::scheduleDelayJob('order_timeout', ['orderNO' => $order_no], $timeout);
     }
 
-    public static function advReview($id): bool
+    public static function adReview($id): bool
     {
-        return CtrlServ::scheduleJob('adv_review', ['id' => $id]);
+        return CtrlServ::scheduleJob('ad_review', ['id' => $id]);
     }
 
     public static function agentApplicationNotification($id): bool

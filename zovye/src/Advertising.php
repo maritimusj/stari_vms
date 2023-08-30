@@ -461,7 +461,7 @@ class Advertising extends State
                 );
 
                 if ($ad->updateSettings('reviewData.current', $content_md5) && Advertising::update($ad)) {
-                    Job::advReview($ad->getId());
+                    Job::adReview($ad->getId());
                 }
             } else {
                 if ($ad->isReviewPassed()) {

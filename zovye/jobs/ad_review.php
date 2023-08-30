@@ -4,7 +4,7 @@
  * @url www.stariture.com
  */
 
-namespace zovye\job\advReview;
+namespace zovye\job\adReview;
 
 defined('IN_IA') or exit('Access Denied');
 

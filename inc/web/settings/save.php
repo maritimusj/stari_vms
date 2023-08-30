@@ -526,7 +526,7 @@ if ($page == 'device') {
             'key' => 'device.low_remain',
             'tpl_short_id' => '44162',
             'tpl_params' => ['设备名称', '设备编号', '设备位置', '设备状态'],
-        ],        
+        ],
         [
             'title' => '设备自动售卖成功通知',
             'event' => 'orderSucceed',
@@ -608,7 +608,7 @@ if ($page == 'device') {
 
         $template_reg = false;
 
-        foreach($data as $item) {
+        foreach ($data as $item) {
             $conf = getArray($config, $item['key'], []);
             if ($item['user_id']) {
                 $template_reg = true;
@@ -639,7 +639,7 @@ if ($page == 'device') {
             $tpl_short_id = '43719';
             $tpl_params = ['工单名称', '工单状态', '发起人员', '用户手机号', '创建时间'];
 
-            $res = Wx::addTemplate($tpl_short_id,$tpl_params);
+            $res = Wx::addTemplate($tpl_short_id, $tpl_params);
             if (!is_error($res)) {
                 setArray($config, 'sys.tpl_id', $res['template_id']);
             } else {
@@ -820,6 +820,7 @@ if ($page == 'device') {
 
 } elseif ($page == 'data_vw') {
     $db_arr = [];
+
     $res = m('data_vw')->findAll();
     foreach ($res as $item) {
         $db_arr[$item->getK()] = $item->getV();
@@ -910,9 +911,12 @@ if ($page == 'device') {
         }
     }
 
-    $query = m('data_vw');
     foreach ($need_inserted_arr as $key => $val) {
-        $query->create(['k' => $key, 'v' => $val, 'createtime' => time()]);
+        m('data_vw')->create([
+            'k' => $key,
+            'v' => $val,
+            'createtime' => time(),
+        ]);
     }
 } elseif ($page == 'balance') {
 

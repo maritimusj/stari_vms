@@ -822,6 +822,10 @@
             border-radius: 20px;
         }
 
+        .blank {
+            flex: 1;
+        }
+
         .slogan {
             padding: 10px 0;
             font-size: 16px;
@@ -873,6 +877,19 @@
                     <button class="buy clickable" @click="buyClick(pay[0])">直接<br>购买</button>
                 </div>
             </div>
+            <div class="none-view" v-if="!loading && account.list.length === 0 && pay.length === 0">
+                <svg t="1647324768311" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                    xmlns="http://www.w3.org/2000/svg" p-id="10822" width="48" height="48">
+                    <path
+                        d="M0 512c0 282.816 229.184 512 512 512 282.784 0 512-229.184 512-512 0-282.784-229.216-512-512-512C229.184 0 0 229.216 0 512z"
+                        fill="#FFC60A" p-id="10823"></path>
+                    <path
+                        d="M496 672h32a32 32 0 0 1 32 32v32a32 32 0 0 1-32 32h-32a32 32 0 0 1-32-32v-32a32 32 0 0 1 32-32z m0-416h32a32 32 0 0 1 32 32v256a32 32 0 0 1-32 32h-32a32 32 0 0 1-32-32V288a32 32 0 0 1 32-32z"
+                        fill="#5C3A00" p-id="10824"></path>
+                </svg>
+                <span>暂无免费次数可用，或商品已售罄！</span>
+            </div>
+            <div class="blank" v-if="!wechatState || account.list.length === 0 || pay.length === 0"></div>
             <div class="slogan">• 让白色污染远离地球 •</div>
         </div>
         <div class="mask" v-if="wechat.visible">
@@ -1013,9 +1030,13 @@
             methods: {
                 judgeWechat () {
                     let wechat = navigator.userAgent.match(/MicroMessenger\/([\d\.]+)/i);
-                    let judgewechat = wechat[1].split('.');
-                    if (judgewechat[0] > 7 || judgewechat[0] == 7 && (judgewechat[1] > 0 || judgewechat[1] == 0 && judgewechat[2] >= 12)) {
-                        this.wechatState = true;
+                    if (wechat) {
+                        let judgewechat = wechat[1].split('.');
+                        if (judgewechat[0] > 7 || judgewechat[0] == 7 && (judgewechat[1] > 0 || judgewechat[1] == 0 && judgewechat[2] >= 12)) {
+                            this.wechatState = true;
+                        } else {
+                            this.wechatState = false;
+                        }
                     } else {
                         this.wechatState = false;
                     }

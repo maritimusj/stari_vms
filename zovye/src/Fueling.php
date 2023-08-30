@@ -640,7 +640,7 @@ class Fueling
                         if (empty($user) || $user->isBanned()) {
                             $should_stop_fueling = true;
                         } else {
-                            $card = $user->getCommissionBalanceCard();
+                            $card = self::isVIP($user, $device) ? $user->getVIPCard() : $user->getCommissionBalanceCard();
                             if ($card->total() <= $total_price) {
                                 $should_stop_fueling = true;
                             }
@@ -658,6 +658,18 @@ class Fueling
 
             self::settleTimeoutOrder($device, $serial);
         }
+    }
+
+    public static function isVIP(userModelObj $user, deviceModelObj $device): bool
+    {
+        $agent = $device->getAgent();
+        if ($agent) {
+            $vip = VIP::getFor($agent, $user);
+
+            return $vip && $vip->hasPrivilege($device);
+        }
+
+        return false;
     }
 
     public static function getSoloUser(): userModelObj

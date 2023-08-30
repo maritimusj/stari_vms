@@ -10,28 +10,13 @@ use zovye\api\wx\common;
 use zovye\Config;
 use zovye\Device;
 use zovye\Helper;
-use zovye\model\deviceModelObj;
-use zovye\model\userModelObj;
 use zovye\Order;
 use zovye\Request;
 use zovye\User;
-use zovye\VIP;
 use function zovye\err;
 
 class fueling
 {
-    protected static function isVIP(userModelObj $user, deviceModelObj $device): bool
-    {
-        $agent = $device->getAgent();
-        if ($agent) {
-            $vip = VIP::getFor($agent, $user);
-
-            return $vip && $vip->hasPrivilege($device);
-        }
-
-        return false;
-    }
-
     public static function rechargeInfo() {
         return Config::fueling('vip.recharge.promotion', []);
     }
@@ -50,7 +35,7 @@ class fueling
         }
 
         $data = $device->profile(true);
-        $data['vip'] = self::isVIP($user, $device);
+        $data['vip'] = \zovye\Fueling::isVIP($user, $device);
 
         $fuelingNOWData = $user->fuelingNOWData();
         if ($fuelingNOWData) {
@@ -95,7 +80,7 @@ class fueling
 
         $chargerID = Request::int('chargerID');
 
-        $card = self::isVIP($user, $device) ? $user->getVIPCard() : $user->getCommissionBalanceCard();
+        $card = \zovye\Fueling::isVIP($user, $device) ? $user->getVIPCard() : $user->getCommissionBalanceCard();
 
         return \zovye\Fueling::start('', $card, $device, $chargerID);
     }

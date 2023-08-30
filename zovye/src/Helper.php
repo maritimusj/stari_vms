@@ -453,7 +453,10 @@ class Helper
         }
 
         //加入一个支付结果检查
-        Job::orderPayResult($order_no);
+        $res = Job::orderPayResult($order_no);
+        if (empty($res) || is_error($res)) {
+            JSON::fail('创建支付任务失败！');
+        }
 
         //加入一个支付超时任务
         $res = Job::orderTimeout($order_no);
@@ -598,7 +601,6 @@ class Helper
 
         //加入一个支付超时任务
         $res = Job::orderTimeout($order_no);
-
         if (empty($res) || is_error($res)) {
             return err('创建支付任务失败！');
         }

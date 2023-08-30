@@ -641,7 +641,7 @@ class Fueling
                             $should_stop_fueling = true;
                         } else {
                             $card = self::isVIP($user, $device) ? $user->getVIPCard() : $user->getCommissionBalanceCard();
-                            if ($card->total() <= $total_price) {
+                            if ($total_price >= $card->total()) {
                                 $should_stop_fueling = true;
                             }
                         }

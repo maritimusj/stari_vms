@@ -153,7 +153,7 @@ if ($page == 'device') {
         $tpl_data['config'] = $config;
     }
 } elseif ($page == 'data_vw') {
-    $tpl_data['navs']['data_view'] = '数据大屏';
+    $tpl_data['navs']['data_vw'] = '数据大屏';
 
     $goods = [
         'g1' => '商品一',

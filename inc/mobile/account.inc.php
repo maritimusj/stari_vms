@@ -176,7 +176,7 @@ if ($op == 'default') {
     }
 
     if (!$user->isWxUser()) {
-        JSON::success([]);
+        JSON::success();
     }
 
     if (Request::has('deviceId')) {

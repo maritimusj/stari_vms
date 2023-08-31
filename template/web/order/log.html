@@ -139,25 +139,25 @@
                 <td>
                     <div class="refund_status">
                         {if $log['transaction_id']}
-                        {if $log['data']['refund']}
-                        <span class="title">
-                            已退款{if $log['refund_total']}({php echo number_format($log['refund_total'] / 100, 2, '.', '') . '元';}){/if}
-                        </span>
-                        <span class="memo">
-                            {$log['data']['refund']['message']}
-                        </span>
-                        {elseif $log['data']['refund_fail']}
-                        <span class="title">
-                            退款失败
-                        </span>
-                        <span class="memo">
-                            {$log['data']['refund_fail']['result']['message']}
-                        </span>
-                        {else}
-                        <div class="operate">
-                            <i class="fa fa-reply" data-op="refundByLog" title="退款"></i>
-                        </div>
-                        {/if}
+                            {if $log['data']['refund']}
+                            <span class="title">
+                                已退款{if $log['refund_total']}({php echo number_format($log['refund_total'] / 100, 2, '.', '') . '元';}){/if}
+                            </span>
+                            <span class="memo">
+                                {$log['data']['refund']['message']}
+                            </span>
+                            {elseif $log['data']['refund_fail']}
+                            <span class="title operate">
+                                退款失败 <i class="fa fa-reply" data-op="refundByLog" title="重试退款"></i>
+                            </span>
+                            <span class="memo">
+                                {$log['data']['refund_fail']['result']['message']}
+                            </span>
+                            {else}
+                            <div class="operate">
+                                <i class="fa fa-reply" data-op="refundByLog" title="退款"></i>
+                            </div>
+                            {/if}
                         {/if}
                     </div>
                 </td>

@@ -6,7 +6,6 @@
 
 namespace zovye;
 
-use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Exception;
@@ -38,7 +37,7 @@ abstract class StatsCounter
 
                 $v = $this->initFN($begin, $end, $params);
 
-                if ((int)$hour->format('YmdH') < (int)date('YmdH') && Locker::try("counter:init:$uid")) {
+                if (intval($hour->format('YmdH')) < intval(date('YmdH')) && Locker::try("counter:init:$uid")) {
                     Counter::create([
                         'uid' => $uid,
                         'num' => $v,
@@ -75,7 +74,7 @@ abstract class StatsCounter
 
                 $num = $this->initFN($begin, $end, $params);
 
-                if ((int)$day->format('Ymd') < (int)date('Ymd') && Locker::try("counter:init:$uid")) {
+                if (intval($day->format('Ymd')) < intval(date('Ymd')) && Locker::try("counter:init:$uid")) {
                     Counter::create([
                         'uid' => $uid,
                         'num' => $num,
@@ -112,7 +111,7 @@ abstract class StatsCounter
 
                 $num = $this->initFN($begin, $end, $params);
 
-                if ((int)$month->format('Ym') < (int)date('Ym') && Locker::try("counter:init:$uid")) {
+                if (intval($month->format('Ym')) < intval(date('Ym')) && Locker::try("counter:init:$uid")) {
                     Counter::create([
                         'uid' => $uid,
                         'num' => $num,
@@ -145,7 +144,7 @@ abstract class StatsCounter
 
             $num = $this->initFN($begin, $end, $params);
 
-            if ((int)$year->format('Y') < (int)date('Y') && Locker::try("counter:init:$uid")) {
+            if (intval($year->format('Y')) < intval(date('Y')) && Locker::try("counter:init:$uid")) {
                 Counter::create([
                     'uid' => $uid,
                     'num' => $num,

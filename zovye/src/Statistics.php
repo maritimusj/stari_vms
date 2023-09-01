@@ -86,7 +86,7 @@ class Statistics
         return $result;
     }
 
-    public static function deviceOrder(deviceModelObj $device, $start = '', $end = '')
+    public static function deviceOrder(deviceModelObj $device, $start = '', $end = ''): array
     {
         try {
             $begin = new DateTime($start);
@@ -103,9 +103,7 @@ class Statistics
 
         $end->modify('next day 00:00');
 
-        return CacheUtil::cachedCall($end->getTimestamp() > time() ? 10 : 0, function () use ($device, $begin, $end) {
-            return self::calc($device, $begin, $end);
-        }, $device->getId(), $begin->getTimestamp(), $end->getTimestamp());
+        return self::calc($device, $begin, $end);
     }
 
     public static function deviceOrderMonth(deviceModelObj $device, $month = ''): array
@@ -184,19 +182,22 @@ class Statistics
         return $result;
     }
 
-    public static function monthData(modelObj $obj, $month = '', $day = 0)
+    public static function monthData(modelObj $obj, $month = '', $day = 0): array
     {
         $fn = function (DateTimeInterface $begin, $w = 'day') use ($obj) {
             $result = [];
-
-            $end = new DateTime($begin->format('Y-m-d 00:00'));
-            if ($w == 'day') {
-                $result['order'] = (new OrderCounter())->getDayAll([$obj, 'goods'], $begin);
-                $end->modify('next day 00:00');
-            } elseif ($w == 'month') {
-                $result['order'] = (new OrderCounter())->getMonthAll([$obj, 'goods'], $begin);
-                $end->modify('first day of next month 00:00');
-            } else {
+            try {
+                $end = new DateTime($begin->format('Y-m-d 00:00'));
+                if ($w == 'day') {
+                    $result['order'] = (new OrderCounter())->getDayAll([$obj, 'goods'], $begin);
+                    $end->modify('next day 00:00');
+                } elseif ($w == 'month') {
+                    $result['order'] = (new OrderCounter())->getMonthAll([$obj, 'goods'], $begin);
+                    $end->modify('first day of next month 00:00');
+                } else {
+                    return [];
+                }
+            } catch (Exception $e) {
                 return [];
             }
 
@@ -209,21 +210,19 @@ class Statistics
             }
 
             if ($obj instanceof agentModelObj) {
-                $total = (int)CacheUtil::cachedCall(0, function () use ($obj, $begin, $end) {
-                    return CommissionBalance::query()->where([
-                        'openid' => $obj->getOpenid(),
-                        'src' => [
-                            CommissionBalance::ORDER_FREE,
-                            CommissionBalance::ORDER_BALANCE,
-                            CommissionBalance::ORDER_WX_PAY,
-                            CommissionBalance::ORDER_REFUND,
-                            CommissionBalance::GSP,
-                            CommissionBalance::BONUS,
-                        ],
-                        'createtime >=' => $begin->getTimestamp(),
-                        'createtime <' => $end->getTimestamp(),
-                    ])->get('sum(x_val)');
-                }, get_class($obj), $obj->getId(), $begin->getTimestamp(), $end->getTimestamp());
+                $total = CommissionBalance::query()->where([
+                    'openid' => $obj->getOpenid(),
+                    'src' => [
+                        CommissionBalance::ORDER_FREE,
+                        CommissionBalance::ORDER_BALANCE,
+                        CommissionBalance::ORDER_WX_PAY,
+                        CommissionBalance::ORDER_REFUND,
+                        CommissionBalance::GSP,
+                        CommissionBalance::BONUS,
+                    ],
+                    'createtime >=' => $begin->getTimestamp(),
+                    'createtime <' => $end->getTimestamp(),
+                ])->get('sum(x_val)');
 
                 $result['commission'] = [
                     'total' => number_format($total / 100, 2, '.', ''),
@@ -238,30 +237,32 @@ class Statistics
             return [];
         }
 
-        return CacheUtil::cachedCall($begin->format('Y-m') === date('Y-m') ? 10 : 0, function () use ($fn, $day, $begin) {
-            $result = [
-                'summary' => $fn($begin, 'month'),
-            ];
+        $result = [
+            'summary' => $fn($begin, 'month'),
+        ];
 
-            if ($day === true) {
-                $result['list'] = [];
-                $end = DateTimeImmutable::createFromMutable($begin)->modify('first day of next month 00:00');
-                while ($begin < $end) {
-                    $start = DateTimeImmutable::createFromMutable($begin);
-                    $begin->modify('next day 00:00');
-                    $result['list'][$start->format('m月d日')] = $fn($start, 'day');
-                }
-            } elseif ($day > 0) {
-                $result['list'] = [];
+        if ($day === true) {
+            $result['list'] = [];
+            $end = DateTimeImmutable::createFromMutable($begin)->modify('first day of next month 00:00');
+            while ($begin < $end) {
+                $start = DateTimeImmutable::createFromMutable($begin);
+                $begin->modify('next day 00:00');
+                $result['list'][$start->format('m月d日')] = $fn($start, 'day');
+            }
+        } elseif ($day > 0) {
+            $result['list'] = [];
+            try {
                 $start = new DateTimeImmutable($begin->format("Y-m-$day 00:00:00"));
+
                 if ($start->format('Y-m') != $begin->format('Y-m')) {
                     return [];
                 }
                 $result['list'][$start->format('m月d日')] = $fn($start, 'day');
+            } catch (Exception $e) {
             }
+        }
 
-            return $result;
-        }, get_class($obj), $obj->getId(), $begin->format('Y-m'), $day);
+        return $result;
     }
 
     public static function userYear(userModelObj $user, $year = '', $month = 0): array
@@ -269,7 +270,7 @@ class Statistics
         return self::yearData($user, $year, $month);
     }
 
-    public static function userMonth(userModelObj $user, $month = '', $day = 0)
+    public static function userMonth(userModelObj $user, $month = '', $day = 0): array
     {
         return self::monthData($user, $month, $day);
     }
@@ -279,7 +280,7 @@ class Statistics
         return self::yearData($account, $year, $month);
     }
 
-    public static function accountMonth(accountModelObj $account, $month = '', $day = 0)
+    public static function accountMonth(accountModelObj $account, $month = '', $day = 0): array
     {
         return self::monthData($account, $month, $day);
     }

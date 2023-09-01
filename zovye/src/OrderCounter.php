@@ -53,6 +53,7 @@ class OrderCounter extends StatsCounter
         } else {
             $v = Order::query($condition)->count();
         }
+
         return intval($v);
     }
 

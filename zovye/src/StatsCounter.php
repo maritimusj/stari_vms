@@ -43,7 +43,6 @@ abstract class StatsCounter
                         'uid' => $uid,
                         'num' => $v,
                         'createtime' => time(),
-                        'updatetime' => 0,
                     ]);
                 }
 
@@ -81,7 +80,6 @@ abstract class StatsCounter
                         'uid' => $uid,
                         'num' => $num,
                         'createtime' => time(),
-                        'updatetime' => 0,
                     ]);
                 }
 
@@ -119,7 +117,6 @@ abstract class StatsCounter
                         'uid' => $uid,
                         'num' => $num,
                         'createtime' => time(),
-                        'updatetime' => 0,
                     ]);
                 }
 
@@ -153,7 +150,6 @@ abstract class StatsCounter
                     'uid' => $uid,
                     'num' => $num,
                     'createtime' => time(),
-                    'updatetime' => 0,
                 ]);
             }
 

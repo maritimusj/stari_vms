@@ -71,10 +71,8 @@ abstract class StatsCounter
             }
 
             try {
-                $begin = new DateTime($day->format('Y-m-d 00:00'));
-                $end = new DateTime($day->format('Y-m-d 00:00'));
-
-                $end->modify('next day 00:00');
+                $begin = new DateTimeImmutable($day->format('Y-m-d 00:00'));
+                $end = $begin->modify('next day 00:00');
 
                 $num = $this->initFN($begin, $end, $params);
 
@@ -111,10 +109,8 @@ abstract class StatsCounter
             }
 
             try {
-                $begin = new DateTime($month->format('Y-m 00:00'));
-                $end = new DateTime($month->format('Y-m 00:00'));
-
-                $end->modify("first day of next month 00:00");
+                $begin = new DateTimeImmutable($month->format('Y-m-01 00:00'));
+                $end = $begin->modify("first day of next month 00:00");
 
                 $num = $this->initFN($begin, $end, $params);
 
@@ -147,10 +143,8 @@ abstract class StatsCounter
         }
 
         try {
-            $begin = new DateTime($year->format('Y-01-01 00:00'));
-            $end = new DateTime($year->format('Y-01-01 00:00'));
-
-            $end->modify("first day of Jan next year 00:00");
+            $begin = new DateTimeImmutable($year->format('Y-01-01 00:00'));
+            $end = $begin->modify("first day of Jan next year 00:00");
 
             $num = $this->initFN($begin, $end, $params);
 
@@ -169,38 +163,5 @@ abstract class StatsCounter
         }
 
         return 0;
-    }
-
-    public function removeDays(array $params = [], DateTimeInterface...$days)
-    {
-        foreach ($days as $day) {
-            $uid = $this->makeUID(array_merge(['datetime' => $day->format('Ymd')], $params));
-            $counter = Counter::get($uid, true);
-            if ($counter && Locker::try("counter:init:$uid")) {
-                $counter->destroy();
-            }
-        }
-    }
-
-    public function removeMonths(array $params, DateTimeInterface...$months)
-    {
-        foreach ($months as $month) {
-            $uid = $this->makeUID(array_merge(['datetime' => $month->format('Ym')], $params));
-            $counter = Counter::get($uid, true);
-            if ($counter && Locker::try("counter:init:$uid")) {
-                $counter->destroy();
-            }
-        }
-    }
-
-    public function removeYears(array $params, DateTimeInterface...$years)
-    {
-        foreach ($years as $year) {
-            $uid = $this->makeUID(array_merge(['datetime' => $year->format('Y')], $params));
-            $counter = Counter::get($uid, true);
-            if ($counter && Locker::try("counter:init:$uid")) {
-                $counter->destroy();
-            }
-        }
     }
 }

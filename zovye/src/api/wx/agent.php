@@ -142,6 +142,7 @@ class agent
             return err('登录失败，用户手机号码获取失败！');
         }
 
+        /** @var userModelObj $user */
         $user = User::findOne(['mobile' => $mobile, 'app' => User::WX]);
         if (empty($user)) {
             return err("您还不是我们的代理商，立即注册? [ $mobile ]");
@@ -152,7 +153,8 @@ class agent
         }
 
         if (!($user->isAgent() || $user->isPartner())) {
-            return err('您还不是我们的代理商，立即注册?');
+            $mobile = $user->getMobile();
+            return err("您还不是我们的代理商，立即注册?! [ $mobile ]");
         }
 
         //清除原来的登录信息

@@ -55,15 +55,15 @@ class YiDaoAccount implements IAccountProvider
 
         $fans = $user->profile();
 
-        if (empty($fans['sex'])) {
-            //要求用户必须提供性别
-            $data = $acc->format();
-            //防止qrcode为空被IsReady()过滤掉
-            $data['qrcode'] = Account::YIDAO_HEAD_IMG;
-            $data['redirect_url'] = Util::murl('util', ['op' => 'user', 'device' => $device->getImei()]);
-
-            return [$data];
-        }
+//        if (empty($fans['sex'])) {
+//            //要求用户必须提供性别
+//            $data = $acc->format();
+//            //防止qrcode为空被IsReady()过滤掉
+//            $data['qrcode'] = Account::YIDAO_HEAD_IMG;
+//            $data['redirect_url'] = Util::murl('util', ['op' => 'user', 'device' => $device->getImei()]);
+//
+//            return [$data];
+//        }
 
         $data = [
             'key' => strval($config['device_key']),
@@ -72,7 +72,7 @@ class YiDaoAccount implements IAccountProvider
             'ip' => CLIENT_IP,
             'auth_open_id' => $fans['openid'],
             'nickname' => $fans['nickname'],
-            'sex' => $fans['sex'],
+            'sex' => $fans['sex'] ?? 0,
             'nonce' => Util::random(16, true),
             'timestamp' => TIMESTAMP,
             'state' => $device->getImei().':'.Util::random(16),

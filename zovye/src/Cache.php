@@ -142,6 +142,7 @@ class Cache
     {
         $uid = self::makeUID($obj);
 
+        /** @var cacheModelObj $result */
         $result = self::get($uid, true);
         if ($result) {
             if ($result->isExpired()) {

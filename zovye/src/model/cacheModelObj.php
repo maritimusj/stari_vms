@@ -9,6 +9,11 @@ namespace zovye\model;
 use zovye\base\modelObj;
 use function zovye\tb;
 
+/**
+ * @method getData()
+ * @method setData(false|string $json_encode)
+ * @method setUpdatetime(int $time)
+ */
 class cacheModelObj extends modelObj
 {
     public static function getTableName($readOrWrite): string

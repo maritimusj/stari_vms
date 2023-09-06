@@ -762,11 +762,11 @@ class device
                 }
 
                 if ($date) {
-                    $data['stats']['day'] = Stats::getDayTotal($device, $date)['total'];
+                    $data['stats']['day'] = intval(Stats::getDayTotal($device, $date)['total']);
                 }
 
                 if ($month) {
-                    $data['stats']['month'] = Stats::getMonthTotal($device, $month)['total'];
+                    $data['stats']['month'] = intval(Stats::getMonthTotal($device, $month)['total']);
                 }
 
                 $result['list'][] = $data;

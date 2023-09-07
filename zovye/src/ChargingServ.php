@@ -94,6 +94,7 @@ class ChargingServ
         if (is_error($res)) {
             return $res;
         }
+
         if (!$res['status']) {
             return err($res['data']['message'] ?? '请求失败！');
         }
@@ -136,6 +137,7 @@ class ChargingServ
         if (is_error($res)) {
             return $res;
         }
+
         if (!$res['status']) {
             return err($res['data']['message'] ?? '请求失败！');
         }
@@ -149,6 +151,7 @@ class ChargingServ
         if (is_error($res)) {
             return $res;
         }
+
         if (!$res['status']) {
             return err($res['data']['message'] ?? '请求失败！');
         }
@@ -164,15 +167,18 @@ class ChargingServ
                 'title' => $device->getName(),
                 'group' => $group->getName(),
             ], '', 'PUT');
+
             if (is_error($res)) {
                 return $res;
             }
+
             if (!$res['status']) {
                 return err($res['data']['message'] ?? '请求失败！');
             }
 
             return true;
         }
+
         return false;
     }
 

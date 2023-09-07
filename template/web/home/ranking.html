@@ -145,92 +145,26 @@
             <div class="text-center text-muted" v-show="loading">
                 <i class="fa fa-question-circle"></i> 正在加载中...
             </div>
-            <table class="table table-bordered" id="list" v-if="(view === 'agent') && !loading">
-                <thead>
-                <tr class="active">
-                    <td class="center">#</td>
-                    <td>代理商</td>
-                    <td class="center" >设备总数</td>
-                    <td class="center">
-                        <span :class="{'sort': true, 'fa desc': sort === 'total'}" @click="sort='total'">订单总数</span>
-                    </td>
-                    <td class="center">
-                        <span :class="{'sort': true, 'fa desc': sort === 'price'}" @click="sort='price'">订单金额</span>
-                    </td>
-                    <td class="center">
-                        <span :class="{'sort': true, 'fa desc': sort === 'amount'}" @click="sort='amount'">
-                            {if \zovye\App::isFuelingDeviceEnabled()}
-                            加注数量(升)
-                            {else}
-                            出货数量
-                            {/if}
-                        </span>
-                    </td>
-                </tr>
-                </thead>
-                <tr v-for="(item, index) in agentList.list">
-                    <td class="center">{{index + 1}}</td>
-                    <td>
-                        <div v-if="item.agent" title="查看代理商设备排行榜" @click="search(item.agent)">
-                            <div class="profile agent selected" style="position:relative">
-                                <img :src="item.agent.avatar">
-                                <span v-text="item.agent.name"></span>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="center">
-                        <span class="device-total" @click="search(item.agent)">
-                        {{item.devices_total}}
-                        </span>
-                    </td>
-                    <td class="center">
-                        <span class="order-total">
-                            {{item.order_total}}
-                        </span>
-                    </td>
-                    <td class="center">
-                        {{item.price}}
-                    </td>
-                    <td class="center">
-                        {{item.amount}}
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="6">
-                        <div class="summary" v-if="agentList.summary">
-                            <div class="item">
-                                订单合计：{{agentList.summary.order}}
-                            </div>
-                            <div class="item">
-                                金额合计：¥ {{agentList.summary.price}}
-                            </div>
-                            <div class="item">
-                                数量合计：{{agentList.summary.amount}}
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-            </table>
-            <div class="device-list" v-if="(agent || view === 'device') && !loading">
-                <table class="table table-bordered" id="list">
+            <template v-if="emptyList">
+                <div class="text-center text-muted">
+                    <i class="fa fa-question-circle"></i> 暂时没有数据！
+                </div>
+            </template>
+            <template v-else>
+                <table class="table table-bordered" id="list" v-if="(view === 'agent') && !loading">
                     <thead>
                     <tr class="active">
                         <td class="center">#</td>
-                        <td>设备</td>
-                        <td>IMEI</td>
-                        <td>所属代理商</td>
+                        <td>代理商</td>
+                        <td class="center" >设备总数</td>
                         <td class="center">
-                            <span :class="{'sort': true, 'fa desc': sort === 'total'}" @click="sort='total'">
-                                订单总数
-                            </span>
+                            <span :class="{'sort': true, 'fa desc': sort === 'total'}" @click="sort='total'">订单总数</span>
                         </td>
                         <td class="center">
-                            <span :class="{'sort': true, 'fa desc': sort === 'price'}" @click="sort='price'">
-                                订单金额
-                            </span>
+                            <span :class="{'sort': true, 'fa desc': sort === 'price'}" @click="sort='price'">订单金额</span>
                         </td>
                         <td class="center">
-                            <span  :class="{'sort': true, 'fa desc': sort === 'amount'}" @click="sort='amount'">
+                            <span :class="{'sort': true, 'fa desc': sort === 'amount'}" @click="sort='amount'">
                                 {if \zovye\App::isFuelingDeviceEnabled()}
                                 加注数量(升)
                                 {else}
@@ -240,23 +174,20 @@
                         </td>
                     </tr>
                     </thead>
-                    <tr v-for="(item, index) in deviceList.list">
+                    <tr v-for="(item, index) in agentList.list">
                         <td class="center">{{index + 1}}</td>
                         <td>
-                            <div v-if="item.device">
-                                {{item.device.name}}
+                            <div v-if="item.agent" title="查看代理商设备排行榜" @click="search(item.agent)">
+                                <div class="profile agent selected" style="position:relative">
+                                    <img :src="item.agent.avatar">
+                                    <span v-text="item.agent.name"></span>
+                                </div>
                             </div>
                         </td>
-                        <td>
-                            <div v-if="item.device">
-                                {{item.device.imei}}
-                            </div>
-                        </td>
-                        <td>
-                            <div class="profile agent" style="position:relative" v-if="item.agent" @click="search(item.agent)">
-                                <img :src="item.agent.avatar">
-                                <span v-text="item.agent.name"></span>
-                            </div>
+                        <td class="center">
+                            <span class="device-total" @click="search(item.agent)">
+                            {{item.devices_total}}
+                            </span>
                         </td>
                         <td class="center">
                             <span class="order-total">
@@ -271,21 +202,98 @@
                         </td>
                     </tr>
                     <tr>
-                        <td colspan="7">
-                            <div class="summary" v-if="deviceList.summary">
+                        <td colspan="6">
+                            <div class="summary" v-if="agentList.summary">
                                 <div class="item">
-                                    订单合计：{{deviceList.summary.order}}
+                                    订单合计：{{agentList.summary.order}}
                                 </div>
                                 <div class="item">
-                                    金额合计：¥ {{deviceList.summary.price}}
+                                    金额合计：¥ {{agentList.summary.price}}
                                 </div>
                                 <div class="item">
-                                    数量合计：{{deviceList.summary.amount}}
+                                    数量合计：{{agentList.summary.amount}}
                                 </div>
                             </div>
                         </td>
                     </tr>
                 </table>
+                <div class="device-list" v-if="(agent || view === 'device') && !loading">
+                    <table class="table table-bordered" id="list">
+                        <thead>
+                        <tr class="active">
+                            <td class="center">#</td>
+                            <td>设备</td>
+                            <td>IMEI</td>
+                            <td>所属代理商</td>
+                            <td class="center">
+                                <span :class="{'sort': true, 'fa desc': sort === 'total'}" @click="sort='total'">
+                                    订单总数
+                                </span>
+                            </td>
+                            <td class="center">
+                                <span :class="{'sort': true, 'fa desc': sort === 'price'}" @click="sort='price'">
+                                    订单金额
+                                </span>
+                            </td>
+                            <td class="center">
+                                <span  :class="{'sort': true, 'fa desc': sort === 'amount'}" @click="sort='amount'">
+                                    {if \zovye\App::isFuelingDeviceEnabled()}
+                                    加注数量(升)
+                                    {else}
+                                    出货数量
+                                    {/if}
+                                </span>
+                            </td>
+                        </tr>
+                        </thead>
+                        <tr v-for="(item, index) in deviceList.list">
+                            <td class="center">{{index + 1}}</td>
+                            <td>
+                                <div v-if="item.device">
+                                    {{item.device.name}}
+                                </div>
+                            </td>
+                            <td>
+                                <div v-if="item.device">
+                                    {{item.device.imei}}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="profile agent" style="position:relative" v-if="item.agent" @click="search(item.agent)">
+                                    <img :src="item.agent.avatar">
+                                    <span v-text="item.agent.name"></span>
+                                </div>
+                            </td>
+                            <td class="center">
+                                <span class="order-total">
+                                    {{item.order_total}}
+                                </span>
+                            </td>
+                            <td class="center">
+                                {{item.price}}
+                            </td>
+                            <td class="center">
+                                {{item.amount}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="7">
+                                <div class="summary" v-if="deviceList.summary">
+                                    <div class="item">
+                                        订单合计：{{deviceList.summary.order}}
+                                    </div>
+                                    <div class="item">
+                                        金额合计：¥ {{deviceList.summary.price}}
+                                    </div>
+                                    <div class="item">
+                                        数量合计：{{deviceList.summary.amount}}
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+            </template>
+
             </div>
         </div>
     </div>
@@ -312,9 +320,13 @@
                 end: '{$s_end_date}',
                 sort: 'price',
                 years: JSON.parse(`{php echo json_encode($years)}`),
-                agentList: {},
+                agentList: {
+                    years: [],
+                    list: [],
+                },
                 deviceList: {
                     years: [],
+                    list: [],
                 },
                 year: null,
                 agent: null,
@@ -340,10 +352,17 @@
             },
             computed: {
                 yearList() {
-                    if (this.deviceList.years.length > 0) {
+                    if (this.deviceList.years && this.deviceList.years.length > 0) {
                         return this.deviceList.years;
                     }
+                    if (this.agentList.years && this.agentList.years.length > 0) {
+                        return this.agentList.years;
+                    }
                     return this.years;
+                },
+                emptyList() {
+                    return !this.loading && (this.agentList.list !== undefined && this.agentList.list.length  === 0) &&
+                    (this.deviceList.list !== undefined && this.deviceList.list.length === 0);
                 }
             },
             mounted() {
@@ -394,8 +413,8 @@
                     const self = this;
                     self.loading = true;
 
-                    self.agentList = {};
-                    self.deviceList = { years:[]};
+                    self.deviceList = {};
+                    self.agentList = { years: [], list: []};
                     $.getJSON(apiUrl, {fn: 'agent', begin, end, sort: self.sort}).then(res => {
                         if (res && res.status) {
                             self.agentList = res.data;
@@ -429,9 +448,8 @@
                 getDeviceList(id, begin, end) {
                     const self = this;
                     self.loading = true;
-                    self.deviceList = {
-                        years: [],
-                    };
+                    self.agentList = {};
+                    self.deviceList = { years: [], list: []};
                     $.getJSON(apiUrl, {fn: 'device', id, begin, end, sort: this.sort}).then(res => {
                         if (res && res.status) {
                             self.deviceList = res.data;

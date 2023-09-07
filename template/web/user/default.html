@@ -25,12 +25,9 @@
     }
     {/loop}
     .log i.fa-list, .log i.balance-edit {
-        display: none;
+        display: inline;
         color: #fff;
         margin-left: 6px;
-    }
-    .log i.fa-list, .log i.balance-edit {
-        display: inline;
     }
     .fa-weixin {
         color: #4CAF50;
@@ -632,8 +629,8 @@
 
         $('#search-form .btn-close').click(function (e) {
             if (backer) {
-                location.href = $('#search-form form').attr('action');    
-                setTimeout(function(){util.loading()}, 1000);               
+                location.href = $('#search-form form').attr('action');
+                setTimeout(function(){util.loading()}, 1000);
             } else {
                 $('#search-form').hide();
                 $('#search-bar').show();

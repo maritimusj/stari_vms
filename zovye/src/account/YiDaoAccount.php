@@ -55,16 +55,6 @@ class YiDaoAccount implements IAccountProvider
 
         $fans = $user->profile();
 
-//        if (empty($fans['sex'])) {
-//            //要求用户必须提供性别
-//            $data = $acc->format();
-//            //防止qrcode为空被IsReady()过滤掉
-//            $data['qrcode'] = Account::YIDAO_HEAD_IMG;
-//            $data['redirect_url'] = Util::murl('util', ['op' => 'user', 'device' => $device->getImei()]);
-//
-//            return [$data];
-//        }
-
         $data = [
             'key' => strval($config['device_key']),
             'develop_appid' => strval($config['appid']),

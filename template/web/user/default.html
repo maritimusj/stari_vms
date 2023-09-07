@@ -1,7 +1,7 @@
 {template 'common/header'}
 {php \zovye\url(true, 'static/css/common.css?v=20230710');}
 <style>
-    #userlist td div.stats{
+    #userlist td div.stats {
         text-align: center;
         padding: 1em;
         display: flex;
@@ -16,8 +16,7 @@
         width: 100%;
     }
     {loop $agent_levels $index $data}
-
-    .profile.agent.{$index} .agent-user{
+    .profile.agent.{$index} .agent-user {
         background-color: {$data['clr']};
     }
     .partner-user {
@@ -25,19 +24,18 @@
         color: gray;
     }
     {/loop}
-
     .log i.fa-list, .log i.balance-edit {
         display: none;
         color: #fff;
         margin-left: 6px;
     }
-    .log i.fa-list, .log i.balance-edit{
+    .log i.fa-list, .log i.balance-edit {
         display: inline;
     }
     .fa-weixin {
         color: #4CAF50;
     }
-    svg[data-icon="alipay"]{
+    svg[data-icon="alipay"] {
         color: #03A9F4;
         width: 1.5em;
     }
@@ -309,7 +307,6 @@
     {$item['credit']}
 </td>
 {/if}
-
 <td class="operate">
     <div class="stats">
         <div>

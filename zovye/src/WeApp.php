@@ -187,6 +187,7 @@ class WeApp extends Settings
         extract($tpl_data);
 
         include self::template($filename);
+
         exit();
     }
 

@@ -46,12 +46,14 @@ class WeApp extends Settings
         //初始化事件驱动
         EventBus::init();
 
+        $http_client = new we7HttpClient();
+
         //设置CtrlServ
-        CtrlServ::init(new we7HttpClient(), settings('ctrl', []));
+        CtrlServ::init($http_client, settings('ctrl', []));
 
         //初始化充电设备服务
         if (App::isChargingDeviceEnabled()) {
-            ChargingServ::setHttpClient(new we7HttpClient(), Config::charging('server', []));
+            ChargingServ::setHttpClient($http_client, Config::charging('server', []));
         }
 
         return $this;

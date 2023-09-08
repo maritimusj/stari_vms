@@ -418,6 +418,7 @@ if ($device) {
             };
 
             $ids = [];
+
             foreach ((array)$payload['cargo_lanes'] as $index => $lane) {
                 $alert = GoodsExpireAlert::getFor($device, $index, 0, false);
                 if ($alert) {
@@ -433,9 +434,11 @@ if ($device) {
                         'expired_at' => $getExpiredTimestampFN($index),
                     ]);
                 }
+
                 $alert->setPreAlertDays(intval($alertPreDays[$index]));
                 $alert->setInvalidIfExpired(boolval($alertInvalid[$index]));
                 $alert->save();
+
                 $ids[] = $alert->getId();
             }
 

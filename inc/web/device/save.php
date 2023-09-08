@@ -413,6 +413,7 @@ if ($device) {
                         return $datetime->getTimestamp();
                     }
                 }
+
                 return 0;
             };
 
@@ -439,9 +440,9 @@ if ($device) {
             }
 
             $all = GoodsExpireAlert::query(['device_id' => $device->getId()])->findAll();
-            
-            foreach($all as $alert) {
-                if (!in_array($ids, $alert->getId())) {
+
+            foreach ($all as $alert) {
+                if (!in_array($alert->getId(), $ids)) {
                     $alert->destroy();
                 }
             }

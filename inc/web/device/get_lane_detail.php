@@ -64,4 +64,20 @@ if ($type_id) {
     $data = ['cargo_lanes' => []];
 }
 
+if (App::isGoodsExpireAlertEnabled() && isset($device) && $data['cargo_lanes']) {
+    foreach ((array)$data['cargo_lanes'] as $index => $lane) {
+        $data['cargo_lanes'][$index]['num'] = intval($lane['num']);
+
+        $alert = GoodsExpireAlert::getFor($device, $index, $lane['goods']);
+        if ($alert) {
+            $expire_at = $alert->getExpireAt();
+            $data['cargo_lanes'][$index]['alert'] = [
+                'at' => $expire_at > 0 ? date('Y-m-d H:i:s', $expire_at) : '',
+                'pre_days' => $alert->getPreAlertDays(),
+                'invalid_if_expired' => $alert->invalidIfExpired(),
+            ];
+        }
+    }
+}
+
 JSON::success($data);

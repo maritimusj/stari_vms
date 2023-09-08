@@ -37,7 +37,7 @@ class GoodsExpireAlert
         return self::model()->delete($condition);
     }
 
-    public static function getExpireAlert(deviceModelObj $device, int $index, $goods_id = 0): ?goods_expire_alertModelObj
+    public static function getFor(deviceModelObj $device, int $index, $goods_id = 0): ?goods_expire_alertModelObj
     {
         $condition = [
             'device_id' => $device->getId(),

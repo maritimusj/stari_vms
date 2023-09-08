@@ -10,6 +10,9 @@ use zovye\base\modelObj;
 use zovye\traits\ExtraDataGettersAndSetters;
 use function zovye\tb;
 
+/**
+ * @method getExpireAt()
+ */
 class goods_expire_alertModelObj extends modelObj
 {
     public static function getTableName($read_or_write): string

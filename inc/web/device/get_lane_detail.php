@@ -49,7 +49,7 @@ if ($type_id) {
             if (App::isGoodsExpireAlertEnabled()) {
                 $alert = GoodsExpireAlert::getExpireAlert($device, $index, $lane['goods']);
                 if ($alert) {
-                    $expire_at = $alert->getCreatetime();
+                    $expire_at = $alert->getExpireAt();
                     $data['cargo_lanes'][$index]['expire_alert'] = [
                         'expire_at' => $expire_at > 0 ? date('Y-m-d H:i:s', $expire_at) : '',
                         'pre_alert_days' => $alert->getPreAlertDays(),

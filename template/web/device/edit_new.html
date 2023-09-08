@@ -603,14 +603,22 @@
                         <div class="form-group">
                             <label :for="'alertExpiredAt['+i+']'" class="col-md-2 control-label">过期时间</label>
                             <div class="col-md-10">
-                                <input :id="'alertExpiredAt['+i+']'" type="text" class="form-control" :name="'alertExpiredAt['+i+']'" @click="showDatetimePicker(lane, event)" autocomplete="off">
+                                <input :id="'alertExpiredAt['+i+']'" type="text" class="form-control"
+                                       :name="'alertExpiredAt['+i+']'"
+                                       @click="showDatetimePicker(lane, event)"
+                                       :value="lane.alert && lane.alert.at"
+                                       autocomplete="off">
                                 <span class="help-block">* 指定该货道的商品过期时间</span>
                             </div>
                         </div>
                         <div class="form-group">
                             <label :for="'alertPreDays['+i+']'" class="col-md-2 control-label">提前预警（天）</label>
                             <div class="col-md-10">
-                                <input type="number" class="form-control" :name="'alertPreDays['+i+']'" :id="'alertPreDays['+i+']'">
+                                <input type="number" class="form-control"
+                                       :name="'alertPreDays['+i+']'"
+                                       :id="'alertPreDays['+i+']'"
+                                       :value="lane.alert&&lane.alert.pre_days"
+                                >
                                 <span class="help-block">* 指定提前多少天就显示提醒信息</span>
                             </div>
                         </div>
@@ -618,11 +626,11 @@
                             <label class="col-xs-12 col-md-2 col-md-2 control-label">过期处理</label>
                             <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
                                 <label :for="'alertInvalid['+i+']0'" class="radio-inline">
-                                    <input :name="'alertInvalid['+i+']'" :id="'alertInvalid['+i+']0'" type="radio" value="1">
+                                    <input :name="'alertInvalid['+i+']'" :id="'alertInvalid['+i+']0'" type="radio" value="1" :checked="lane.alert&&lane.alert.invalid_if_expired">
                                     禁止购买
                                 </label>
                                 <label :for="'alertInvalid['+i+']1'" class="radio-inline">
-                                    <input :name="'alertInvalid['+i+']'" :id="'alertInvalid['+i+']1'" type="radio" value="0">
+                                    <input :name="'alertInvalid['+i+']'" :id="'alertInvalid['+i+']1'" type="radio" value="0" :checked="lane.alert&&lane.alert.invalid_if_expired">
                                     允许购买
                                 </label>
                                 <span class="help-block">* 商品过期后，用户是否可以购买</span>

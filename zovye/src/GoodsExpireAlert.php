@@ -7,6 +7,7 @@
 
 namespace zovye;
 
+use zovye\model\deviceModelObj;
 use zovye\model\goods_expire_alertModelObj;
 
 class GoodsExpireAlert
@@ -34,5 +35,24 @@ class GoodsExpireAlert
     public static function delete($condition = []): bool
     {
         return self::model()->delete($condition);
+    }
+
+    public static function getExpireAlert(deviceModelObj $device, int $index, $goods_id = 0): ?goods_expire_alertModelObj
+    {
+        $condition = [
+            'device_id' => $device->getId(),
+            'lane_id' => $index,
+        ];
+
+        if ($goods_id > 0) {
+            $condition['goods_id'] = $goods_id;
+        }
+
+        $agent = $device->getAgent();
+        if ($agent) {
+            $condition['agent_id'] = $agent->getId();
+        }
+
+        return self::findOne($condition);
     }
 }

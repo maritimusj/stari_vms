@@ -3,7 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
- 
+
 namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
@@ -46,6 +46,17 @@ if ($type_id) {
         $payload = $device->getPayload();
         foreach ((array)$payload['cargo_lanes'] as $index => $lane) {
             $data['cargo_lanes'][$index]['num'] = intval($lane['num']);
+            if (App::isGoodsExpireAlertEnabled()) {
+                $alert = GoodsExpireAlert::getExpireAlert($device, $index, $lane['goods']);
+                if ($alert) {
+                    $expire_at = $alert->getCreatetime();
+                    $data['cargo_lanes'][$index]['expire_alert'] = [
+                        'expire_at' => $expire_at > 0 ? date('Y-m-d H:i:s', $expire_at) : '',
+                        'pre_alert_days' => $alert->getPreAlertDays(),
+                        'invalid_if_expired' => $alert->invalidIfExpired(),
+                    ];
+                }
+            }
         }
     }
     JSON::success($priceFN(isset($device) && $device->isFuelingDevice(), $data));

@@ -17,7 +17,7 @@ if ($user && $adv) {
     $url = $adv->getExtraData('link');
 
     /** @var advs_statsModelObj $stats */
-    $stats = m('advs_stats')->findOne(We7::uniacid(['openid' => $user->getOpenid(), 'advs_id' => $adv->getId()]));
+    $stats = AdStats::model()->findOne(We7::uniacid(['openid' => $user->getOpenid(), 'advs_id' => $adv->getId()]));
     if (empty($stats)) {
         $data = We7::uniacid(
             [
@@ -36,7 +36,7 @@ if ($user && $adv) {
             ]
         );
 
-        m('advs_stats')->create($data);
+        AdStats::model()->create($data);
     } else {
         $stats->setCount(intval($stats->getCount()) + 1);
     }

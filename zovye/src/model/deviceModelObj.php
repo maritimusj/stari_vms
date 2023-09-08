@@ -8,6 +8,7 @@
 namespace zovye\model;
 
 use Exception;
+use zovye\AdStats;
 use zovye\App;
 use zovye\Balance;
 use zovye\DeviceEvents;
@@ -915,7 +916,7 @@ class deviceModelObj extends modelObj
         //删除订单
         We7::pdo_delete(m('order')->getTableName(), We7::uniacid(['device_id' => $this->getId()]));
         We7::pdo_delete(m('maintenance')->getTableName(), We7::uniacid(['device_id' => $this->getId()]));
-        We7::pdo_delete(m('advs_stats')->getTableName(), We7::uniacid(['device_id' => $this->getId()]));
+        We7::pdo_delete(AdStats::model()->getTableName(), We7::uniacid(['device_id' => $this->getId()]));
         We7::pdo_delete(DeviceEvents::model()->getTableName(), We7::uniacid(['device_uid' => $this->getUid()]));
 
         $this->remove('lastErrorNotify');

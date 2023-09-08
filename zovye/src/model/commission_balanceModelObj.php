@@ -46,7 +46,7 @@ class commission_balanceModelObj extends modelObj
     /** @var int */
     protected $updatetime;
 
-    public static function getTableName($readOrWrite): string
+    public static function getTableName($read_or_write): string
     {
         return tb('commission_balance');
     }

@@ -13,7 +13,7 @@ use zovye\traits\ExtraDataGettersAndSetters;
 
 class order_goodsModelObj extends modelObj
 {
-    public static function getTableName($readOrWrite): string
+    public static function getTableName($read_or_write): string
     {
         return tb('order_goods');
     }

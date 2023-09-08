@@ -34,7 +34,7 @@ class goods_voucher_logsModelObj extends modelObj
     protected $device_id;
     protected $createtime;
 
-    public static function getTableName($readOrWrite): string
+    public static function getTableName($read_or_write): string
     {
         return tb('goods_voucher_logs');
     }

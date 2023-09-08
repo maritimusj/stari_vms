@@ -34,7 +34,7 @@ class agent_appModelObj extends modelObj
     protected $state;
     protected $createtime;
 
-    public static function getTableName($readOrWrite): string
+    public static function getTableName($read_or_write): string
     {
         return tb('agent_app');
     }

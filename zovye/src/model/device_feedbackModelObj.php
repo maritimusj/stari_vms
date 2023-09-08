@@ -20,7 +20,7 @@ use function zovye\tb;
  */
 class device_feedbackModelObj extends modelObj
 {
-    public static function getTableName($readOrWrite): string
+    public static function getTableName($read_or_write): string
     {
         return tb('device_feedback');
     }

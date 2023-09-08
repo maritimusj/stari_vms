@@ -21,11 +21,11 @@ class agent_vwModelObj extends agentModelObj
     /** @var int */
     protected $device_total;
 
-    public static function getTableName($readOrWrite): string
+    public static function getTableName($read_or_write): string
     {
-        if ($readOrWrite == self::OP_WRITE) {
+        if ($read_or_write == self::OP_WRITE) {
             return parent::getTableName(self::OP_WRITE);
-        } elseif ($readOrWrite == self::OP_READ) {
+        } elseif ($read_or_write == self::OP_READ) {
             return tb('agent_vw');
         }
         trigger_error('user getTableName(...) miss op!');

@@ -20,7 +20,7 @@ use zovye\traits\ExtraDataGettersAndSetters;
  */
 class account_queryModelObj extends modelObj
 {
-    public static function getTableName($readOrWrite): string
+    public static function getTableName($read_or_write): string
     {
         return tb('account_query');
     }

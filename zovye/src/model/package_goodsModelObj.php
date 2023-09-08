@@ -17,7 +17,7 @@ use zovye\base\modelObj;
  */
 class package_goodsModelObj extends modelObj
 {
-    public static function getTableName($readOrWrite): string
+    public static function getTableName($read_or_write): string
     {
         return tb('package_goods');
     }

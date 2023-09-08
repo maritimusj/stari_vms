@@ -18,7 +18,7 @@ use function zovye\tb;
  */
 class cronModelObj extends modelObj
 {
-    public static function getTableName($readOrWrite = modelObj::OP_WRITE): string
+    public static function getTableName($read_or_write = modelObj::OP_WRITE): string
     {
         return tb('cron');
     }

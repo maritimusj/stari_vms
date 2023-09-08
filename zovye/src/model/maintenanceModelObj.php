@@ -36,7 +36,7 @@ class maintenanceModelObj extends modelObj
     /** @var int */
     protected $createtime;
 
-    public static function getTableName($readOrWrite): string
+    public static function getTableName($read_or_write): string
     {
         return tb('maintenance');
     }

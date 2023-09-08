@@ -14,11 +14,11 @@ class keeper_vwModelObj extends userModelObj
     protected $updatetime;
     protected $name;
 
-    public static function getTableName($readOrWrite): string
+    public static function getTableName($read_or_write): string
     {
-        if ($readOrWrite == self::OP_WRITE) {
+        if ($read_or_write == self::OP_WRITE) {
             return parent::getTableName(self::OP_WRITE);
-        } elseif ($readOrWrite == self::OP_READ) {
+        } elseif ($read_or_write == self::OP_READ) {
             return tb('keeper_vw');
         }
         trigger_error('user getTableName(...) miss op!');

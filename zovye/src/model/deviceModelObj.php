@@ -171,7 +171,7 @@ class deviceModelObj extends modelObj
 
     private $agent = null;
 
-    public static function getTableName($readOrWrite): string
+    public static function getTableName($read_or_write): string
     {
         return tb('device');
     }

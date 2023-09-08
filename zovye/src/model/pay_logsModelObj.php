@@ -12,7 +12,7 @@ use function zovye\tb;
 
 class pay_logsModelObj extends BaseLogsModelObj implements ICard
 {
-    public static function getTableName($readOrWrite): string
+    public static function getTableName($read_or_write): string
     {
         return tb('user_logs');
     }

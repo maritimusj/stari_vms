@@ -71,14 +71,14 @@ class modelObj implements ISettings
         ];
     }
 
-    public static function getTableName($readOrWrite): string
+    public static function getTableName($read_or_write): string
     {
         $tb_name = get_called_class().'::TB_NAME';
         if (defined($tb_name)) {
             return constant($tb_name);
         }
 
-        unset($readOrWrite);
+        unset($read_or_write);
 
         trigger_error(
             'tb_name() must be implemented or constant TB_NAME must be defined by '.get_called_class(),

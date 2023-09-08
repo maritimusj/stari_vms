@@ -12,10 +12,10 @@ use function zovye\tb;
 
 class promoter_vwModelObj extends userModelObj
 {
-    public static function getTableName($readOrWrite): string
+    public static function getTableName($read_or_write): string
     {
-        if ($readOrWrite == modelObj::OP_WRITE) {
-            return parent::getTableName($readOrWrite);
+        if ($read_or_write == modelObj::OP_WRITE) {
+            return parent::getTableName($read_or_write);
         }
 
         return tb('promoter_vw');

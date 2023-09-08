@@ -17,9 +17,9 @@ use zovye\traits\ExtraDataGettersAndSetters;
  */
 class inventory_goodsModelObj extends modelObj
 {
-    public static function getTableName($readOrWrite): string
+    public static function getTableName($read_or_write): string
     {
-        if ($readOrWrite == self::OP_READ) {
+        if ($read_or_write == self::OP_READ) {
             return tb('inventory_goods_vw');
         }
 

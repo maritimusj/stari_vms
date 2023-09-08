@@ -35,7 +35,7 @@ class weapp_configModelObj extends modelObj
 
     protected $locked_uid;
 
-    public static function getTableName($readOrWrite): string
+    public static function getTableName($read_or_write): string
     {
         return tb('weapp_config');
     }

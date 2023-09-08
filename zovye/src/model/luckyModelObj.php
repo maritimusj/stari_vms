@@ -22,7 +22,7 @@ use function zovye\tb;
  */
 class luckyModelObj extends modelObj
 {
-    public static function getTableName($readOrWrite): string
+    public static function getTableName($read_or_write): string
     {
         return tb('lucky');
     }

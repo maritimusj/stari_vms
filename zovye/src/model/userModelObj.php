@@ -106,7 +106,7 @@ class userModelObj extends modelObj
 
     private $loginData = null;
 
-    public static function getTableName($readOrWrite): string
+    public static function getTableName($read_or_write): string
     {
         return tb('user');
     }

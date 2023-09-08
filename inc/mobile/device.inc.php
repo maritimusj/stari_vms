@@ -63,7 +63,7 @@ if ($op == 'default') {
         'createtime' => time(),
     ];
 
-    if (m('device_feedback')->create($data)) {
+    if (DeviceFeedback::model()->create($data)) {
         JSON::success('反馈成功！');
     } else {
         JSON::fail('反馈失败！');

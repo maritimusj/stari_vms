@@ -10,6 +10,7 @@ namespace zovye\api\wxweb;
 use DateTime;
 use zovye\Account;
 use zovye\Advertising;
+use zovye\DeviceFeedback;
 use zovye\DeviceUtil;
 use zovye\Goods;
 use zovye\Helper;
@@ -482,7 +483,7 @@ class api
             'createtime' => time(),
         ];
 
-        if (m('device_feedback')->create($data)) {
+        if (DeviceFeedback::model()->create($data)) {
             return ['msg' => '感谢您的反馈，我们会及时核实并处理！'];
         }
 

@@ -8,6 +8,7 @@ namespace zovye\api\wx;
 
 use Exception;
 use zovye\Device;
+use zovye\DeviceFeedback;
 use zovye\Log;
 use zovye\Request;
 use zovye\LoginData;
@@ -89,7 +90,7 @@ class fb
 
         ];
 
-        if (m('device_feedback')->create($data)) {
+        if (DeviceFeedback::model()->create($data)) {
             return ['msg' => '反馈成功！'];
         } else {
             return err('反馈失败！');

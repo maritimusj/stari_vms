@@ -13,7 +13,7 @@ use zovye\model\device_feedbackModelObj;
 $id = Request::int('id');
 
 /** @var device_feedbackModelObj $res */
-$res = m('device_feedback')->findOne(['id' => $id]);
+$res = DeviceFeedback::model()->findOne(['id' => $id]);
 if ($res) {
     if (!empty($res->getRemark())) {
         JSON::fail('已处理该反馈！');

@@ -36,7 +36,7 @@ if (!empty($device_id)) {
     $condition['device_id'] = $device_id;
 }
 
-$query = m('device_feedback')->query($condition);
+$query = DeviceFeedback::model()->query($condition);
 
 $page = max(1, Request::int('page'));
 $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);

@@ -18,6 +18,7 @@ use zovye\Balance;
 use zovye\BlueToothProtocol;
 use zovye\Contract\bluetooth\IBlueToothProtocol;
 use zovye\Device;
+use zovye\DeviceFeedback;
 use zovye\DeviceUtil;
 use zovye\Goods;
 use zovye\LocationUtil;
@@ -620,7 +621,7 @@ class common
 
         ];
 
-        if (m('device_feedback')->create($data)) {
+        if (DeviceFeedback::model()->create($data)) {
             return ['msg' => '反馈成功！'];
         }
 

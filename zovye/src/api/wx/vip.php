@@ -76,9 +76,9 @@ class vip
         }
 
         if (isset($mobile)) {
-            \zovye\VIP::addMobile($agent, $name, $mobile);
-
-            return ['msg' => '手机号码添加成功！'];
+            if (\zovye\VIP::addMobile($agent, $name, $mobile)) {
+                return ['msg' => '手机号码添加成功！'];
+            }
         }
 
         return err('创建失败！');

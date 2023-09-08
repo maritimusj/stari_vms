@@ -42,7 +42,7 @@ class VIP
         return self::query(['agent_id' => $agent->getId(), 'user_id' => $user->getId()])->findOne();
     }
 
-    public static function getByMobile(agentModelObj $agent, string $mobile): bool
+    public static function getByMobile(agentModelObj $agent, string $mobile): ?vipModelObj
     {
         return self::query(['agent_id' => $agent->getId(), 'mobile' => $mobile])->findOne();
     }
@@ -91,7 +91,7 @@ class VIP
         ]);
     }
 
-    public static function addUser(agentModelObj $agent, userModelObj $user, string $name): vipModelObj
+    public static function addUser(agentModelObj $agent, userModelObj $user, string $name): ?vipModelObj
     {
         return self::create([
             'agent_id' => $agent->getId(),
@@ -101,7 +101,7 @@ class VIP
         ]);
     }
 
-    public static function addMobile(agentModelObj $agent, string $name, string $mobile): vipModelObj
+    public static function addMobile(agentModelObj $agent, string $name, string $mobile): ?vipModelObj
     {
         return self::create([
             'agent_id' => $agent->getId(),

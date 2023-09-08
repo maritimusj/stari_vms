@@ -164,6 +164,7 @@ if ($page == 'device') {
     $settings['custom']['TKPromoting']['enabled'] = Request::bool('TKPromotingEnabled') ? 1 : 0;
 
     Config::app('ad.sponsor.enabled', Request::bool('sponsorAd'), true);
+    Config::app('misc.GoodsExpireAlert.enabled', Request::bool('GoodsExpireAlert') ? 1 : 0, true);
 
     $settings['account']['wx']['platform']['enabled'] = Request::bool('wxPlatform') ? 1 : 0;
     $settings['account']['douyin']['enabled'] = Request::bool('douyin') ? 1 : 0;

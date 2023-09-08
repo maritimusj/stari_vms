@@ -636,4 +636,11 @@ class App
             return boolval(Config::device('schedule.enabled'));
         });
     }
+
+    public static function isGoodsExpireAlertEnabled(): bool
+    {
+        return onceCall(function () {
+            return boolval(Config::app('misc.GoodsExpireAlert.enabled'));
+        });
+    }    
 }

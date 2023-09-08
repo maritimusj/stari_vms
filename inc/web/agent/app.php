@@ -13,7 +13,7 @@ use zovye\model\agent_appModelObj;
 $page = max(1, Request::int('page'));
 $page_size = Request::int('pagesize', 10);
 
-$query = m('agent_app')->where(We7::uniacid([]));
+$query = AgentApplication::model()->where(We7::uniacid([]));
 
 $total = $query->count();
 

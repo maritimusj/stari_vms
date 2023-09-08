@@ -13,7 +13,7 @@ use zovye\model\agent_appModelObj;
 $id = Request::int('id');
 
 /** @var agent_appModelObj $app */
-$app = m('agent_app')->findOne(We7::uniacid(['id' => $id]));
+$app = AgentApplication::model()->findOne(We7::uniacid(['id' => $id]));
 if ($app) {
     $state = $app->getState() != AgentApp::CHECKED ? AgentApp::CHECKED : AgentApp::WAIT;
     $app->setState($state);

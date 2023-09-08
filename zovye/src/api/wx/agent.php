@@ -11,6 +11,7 @@ use ali\aop\request\AlipaySystemOauthTokenRequest;
 use DateTime;
 use DateTimeImmutable;
 use Exception;
+use zovye\AgentApplication;
 use zovye\Cache;
 use zovye\CacheUtil;
 use zovye\Config;
@@ -323,7 +324,7 @@ class agent
             ]
         );
 
-        $app = m('agent_app')->create($data);
+        $app = AgentApplication::model()->create($data);
         if ($app) {
             Job::agentApplicationNotification($app->getId());
 

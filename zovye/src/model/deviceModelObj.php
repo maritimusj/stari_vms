@@ -18,6 +18,7 @@ use zovye\Helper;
 use zovye\Job;
 
 use zovye\Locker;
+use zovye\Maintenance;
 use zovye\Package;
 use zovye\PayloadLogs;
 use zovye\PlaceHolder;
@@ -915,7 +916,7 @@ class deviceModelObj extends modelObj
     {
         //删除订单
         We7::pdo_delete(m('order')->getTableName(), We7::uniacid(['device_id' => $this->getId()]));
-        We7::pdo_delete(m('maintenance')->getTableName(), We7::uniacid(['device_id' => $this->getId()]));
+        We7::pdo_delete(Maintenance::model()->getTableName(), We7::uniacid(['device_id' => $this->getId()]));
         We7::pdo_delete(AdStats::model()->getTableName(), We7::uniacid(['device_id' => $this->getId()]));
         We7::pdo_delete(DeviceEvents::model()->getTableName(), We7::uniacid(['device_uid' => $this->getUid()]));
 

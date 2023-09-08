@@ -13,7 +13,7 @@ defined('IN_IA') or exit('Access Denied');
 $tpl_data = [];
 
 $condition = We7::uniacid([]);
-$query = m('maintenance')->where($condition);
+$query = Maintenance::model()->where($condition);
 
 $page = max(1, Request::int('page'));
 $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
@@ -28,7 +28,7 @@ $condition = We7::uniacid([]);
 $query = We7::load()->object('query');
 
 $join = $query
-    ->from(m('maintenance')->getTableName(), 'm')
+    ->from(Maintenance::model()->getTableName(), 'm')
     ->leftjoin(Device::getTableName(), 'd')
     ->on('m.device_id', 'd.imei');
 

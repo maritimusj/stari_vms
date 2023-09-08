@@ -1308,7 +1308,7 @@ class agent
             'name' => $user->getName(),
         ]);
 
-        if (m('maintenance')->create($data) && $device->save()) {
+        if (\zovye\Maintenance::model()->create($data) && $device->save()) {
             $device->remove('lastErrorData');
 
             return [

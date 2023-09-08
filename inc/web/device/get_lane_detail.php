@@ -66,19 +66,18 @@ if ($type_id) {
 
 $data['alert_enabled'] = App::isGoodsExpireAlertEnabled();
 
-if (App::isGoodsExpireAlertEnabled() && $data['cargo_lanes']) {
+// 获取过期提醒数据
+if (App::isGoodsExpireAlertEnabled() && isset($device) && $data['cargo_lanes']) {
     foreach ((array)$data['cargo_lanes'] as $index => $lane) {
         $data['cargo_lanes'][$index]['alert'] = [];
-        if (isset($device)) {
-            $alert = GoodsExpireAlert::getFor($device, $index, $lane['goods']);
-            if ($alert) {
-                $expire_at = $alert->getExpireAt();
-                $data['cargo_lanes'][$index]['alert'] = [
-                    'at' => $expire_at > 0 ? date('Y-m-d H:i:s', $expire_at) : '',
-                    'pre_days' => $alert->getPreAlertDays(),
-                    'invalid_if_expired' => $alert->invalidIfExpired(),
-                ];
-            }
+        $alert = GoodsExpireAlert::getFor($device, $index, $lane['goods']);
+        if ($alert) {
+            $expire_at = $alert->getExpireAt();
+            $data['cargo_lanes'][$index]['alert'] = [
+                'at' => $expire_at > 0 ? date('Y-m-d H:i:s', $expire_at) : '',
+                'pre_days' => $alert->getPreAlertDays(),
+                'invalid_if_expired' => $alert->invalidIfExpired(),
+            ];
         }
     }
 }

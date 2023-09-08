@@ -8,7 +8,7 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-$priceFN = function ($is_floating, $data) {
+$priceFN = function ($is_floating, &$data) {
     if ($data['cargo_lanes']) {
         foreach ((array)$data['cargo_lanes'] as $index => $lane) {
             $data['cargo_lanes'][$index]['goods_price'] = number_format($lane['goods_price'] / 100, 2);
@@ -46,20 +46,12 @@ if ($type_id) {
         $payload = $device->getPayload();
         foreach ((array)$payload['cargo_lanes'] as $index => $lane) {
             $data['cargo_lanes'][$index]['num'] = intval($lane['num']);
-            if (App::isGoodsExpireAlertEnabled()) {
-                $alert = GoodsExpireAlert::getExpireAlert($device, $index, $lane['goods']);
-                if ($alert) {
-                    $expire_at = $alert->getExpireAt();
-                    $data['cargo_lanes'][$index]['expire_alert'] = [
-                        'expire_at' => $expire_at > 0 ? date('Y-m-d H:i:s', $expire_at) : '',
-                        'pre_alert_days' => $alert->getPreAlertDays(),
-                        'invalid_if_expired' => $alert->invalidIfExpired(),
-                    ];
-                }
-            }
         }
     }
-    JSON::success($priceFN(isset($device) && $device->isFuelingDevice(), $data));
+
+    $data = $priceFN(isset($device) && $device->isFuelingDevice(), $data);
+
+    JSON::success($data);
 }
 
 
@@ -69,10 +61,9 @@ if ($device_id) {
         JSON::fail('找不到这个设备！');
     }
 
-    $data = $device->getPayload(true);
-    JSON::success($priceFN($device->isFuelingDevice(), $data));
+    $data = $priceFN($device->isFuelingDevice(), $device->getPayload(true));
+
+    JSON::success($data);
 }
 
-JSON::success([
-    'cargo_lanes' => [],
-]);
+JSON::success(['cargo_lanes' => []]);

@@ -961,7 +961,7 @@ class Device extends State
 
             $tag_ids = array_unique($tag_ids);
             if ($tag_ids) {
-                $tags_query = m('tags')->where(['id' => $tag_ids]);
+                $tags_query = Tags::model()->where(['id' => $tag_ids]);
                 foreach ($tags_query->findAll() as $tag) {
                     $query->where("tags_data REGEXP '<{$tag->getId()}>'");
                 }

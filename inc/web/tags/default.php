@@ -13,7 +13,7 @@ use zovye\model\tagsModelObj;
 
 if (Request::is_ajax() && Request::has('id')) {
     /** @var tagsModelObj $res */
-    $res = m('tags')->findOne(We7::uniacid(['id' => Request::int('id')]));
+    $res = Tags::model()->findOne(We7::uniacid(['id' => Request::int('id')]));
     if ($res) {
         $tag = [
             'id' => $res->getId(),
@@ -29,7 +29,7 @@ if (Request::is_ajax() && Request::has('id')) {
 $page = max(1, Request::int('page'));
 $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
-$query = m('tags')->where(We7::uniacid([]));
+$query = Tags::model()->where(We7::uniacid([]));
 
 //搜索指定ID
 $ids = Helper::parseIdsFromGPC();

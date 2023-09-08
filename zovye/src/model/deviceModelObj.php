@@ -21,6 +21,7 @@ use zovye\PlaceHolder;
 use zovye\QRCodeUtil;
 use zovye\SIM;
 use zovye\Stats;
+use zovye\Tags;
 use zovye\We7;
 use zovye\User;
 use zovye\Util;
@@ -1066,10 +1067,10 @@ class deviceModelObj extends modelObj
                 if ($text) {
                     $condition = We7::uniacid(['title' => $text]);
                     /** @var tagsModelObj $tag */
-                    $tag = m('tags')->findOne($condition);
+                    $tag = Tags::model()->findOne($condition);
                     if (empty($tag)) {
                         $condition['count'] = 1;
-                        $tag = m('tags')->create($condition);
+                        $tag = Tags::model()->create($condition);
                     } else {
                         $count = Device::query("tags_data REGEXP '<{$tag->getId()}>'")->where("id<>$this->id")->count();
                         $tag->setCount($count + 1);
@@ -1085,7 +1086,7 @@ class deviceModelObj extends modelObj
 
         $diff_tags = array_diff($org_ids, $ids);
         foreach ($diff_tags as $id) {
-            $tag = m('tags')->findOne(['id' => $id]);
+            $tag = Tags::model()->findOne(['id' => $id]);
             if ($tag) {
                 $count = Device::query("tags_data REGEXP '<{$tag->getId()}>'")->count();
                 $tag->setCount($count - 1);
@@ -1406,7 +1407,7 @@ class deviceModelObj extends modelObj
             if ($tags) {
                 foreach (explode('><', $tags) as $id) {
                     /** @var tagsModelObj $tag */
-                    $tag = m('tags')->findOne(['id' => $id]);
+                    $tag = Tags::model()->findOne(['id' => $id]);
                     if ($tag) {
                         $titles[$tag->getId()] = $tag->getTitle();
                     }

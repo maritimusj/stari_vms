@@ -13,7 +13,7 @@ use zovye\model\tagsModelObj;
 $id = Request::int('id');
 if ($id) {
     /** @var tagsModelObj $tag */
-    $tag = m('tags')->findOne(We7::uniacid(['id' => Request::int('id')]));
+    $tag = Tags::model()->findOne(We7::uniacid(['id' => Request::int('id')]));
     if (empty($tag)) {
         JSON::fail('找不到这个标签！');
     }

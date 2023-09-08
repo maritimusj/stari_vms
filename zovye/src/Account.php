@@ -6,7 +6,7 @@
 
 namespace zovye;
 
-//公众号状态
+//吸粉广告
 
 use zovye\account\AQIInfoAccount;
 use zovye\account\CloudFIAccount;
@@ -666,7 +666,7 @@ class Account extends State
                 if (!in_array($obj->getId(), $assign_data['devices'])) {
                     return false;
                 }
-            } elseif (is_a($obj, m('tags')->objClassname())) {
+            } elseif (is_a($obj, Tags::model()->objClassname())) {
                 if (!in_array($obj->getId(), $assign_data['tags'])) {
                     return false;
                 }
@@ -699,7 +699,7 @@ class Account extends State
                 'list' => [],
             ],
             'tags' => [
-                'classname' => m('tags')->objClassname(),
+                'classname' => Tags::model()->objClassname(),
                 'list' => [],
             ],
             'groups' => [

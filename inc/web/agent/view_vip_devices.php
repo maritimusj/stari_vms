@@ -3,7 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
- 
+
 namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
@@ -17,7 +17,7 @@ $devices_list = [];
 
 $ids = $vip->getDeviceIds();
 
-foreach($ids as $id) {
+foreach ($ids as $id) {
     $device = Device::get($id);
     if ($device) {
         $data = $device->profile();
@@ -26,6 +26,8 @@ foreach($ids as $id) {
     }
 }
 
+$user = $vip->getUser();
+
 Response::templateJSON(
     'web/agent/vip_devices',
     "{$vip->getName()}的可用设备",
@@ -33,7 +35,7 @@ Response::templateJSON(
         'vip' => [
             'id' => $vip->getId(),
         ],
-        'user' => $vip->getUser() ?? [],
+        'user' => $user ? $user->profile() : [],
         'list' => $devices_list,
     ]
 );

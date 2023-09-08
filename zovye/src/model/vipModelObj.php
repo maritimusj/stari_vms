@@ -16,6 +16,7 @@ use function zovye\tb;
  * @method getMobile();
  * @method getAgentId();
  * @method getCreatetime();
+ * @method getUserId()
  */
 class vipModelObj extends modelObj
 {

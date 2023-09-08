@@ -12,6 +12,7 @@ use zovye\model\deviceModelObj;
 use zovye\model\orderModelObj;
 use zovye\model\pay_logsModelObj;
 use zovye\model\userModelObj;
+use zovye\model\vipModelObj;
 
 class Fueling
 {
@@ -665,6 +666,13 @@ class Fueling
         $agent = $device->getAgent();
         if ($agent) {
             $vip = VIP::getFor($agent, $user);
+            if (empty($vip)) {
+                /** @var vipModelObj $vip */
+                $vip = VIP::getByMobile($agent, $user->getMobile());
+                if ($vip && !empty($vip->getUserId())) {
+                    return false;
+                }
+            }
 
             return $vip && $vip->hasPrivilege($device);
         }

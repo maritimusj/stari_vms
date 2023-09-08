@@ -713,14 +713,15 @@ class device
                 ) : 'ASC';
                 $query->orderBy("$order_by $order");
             } else {
-                $query->orderBy('rank DESC, id DESC');
+                $query->orderBy(['rank DESC', 'id DESC']);
             }
-
+  
             $query->page($page, $page_size);
 
             $ids = [];
             $online_status = [];
             $devices = $query->findAll();
+
             if (!$simple) {
                 /** @var deviceModelObj $device */
                 foreach ($devices as $device) {

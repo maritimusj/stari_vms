@@ -28,7 +28,7 @@ if (Request::has('orderNO')) {
     ])->orderBy('id DESC');
 
     //使用自增长id做为总数，数据量大时使用$query->count()效率太低，
-    //注意：需要先调用$query->orderBy('id desc');
+    //注意：需要先调用$query->orderBy('id DESC');
     $last = $query->findOne();
     $total = $last ? $last->getId() : 0;
 

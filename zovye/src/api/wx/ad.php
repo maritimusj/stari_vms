@@ -113,7 +113,7 @@ class ad
 
         if ($total > 0) {
             $query->page($page, $page_size);
-            $query->orderBy('id desc');
+            $query->orderBy('id DESC');
 
             /** @var advertisingModelObj $adv */
             foreach ($query->findAll() as $adv) {

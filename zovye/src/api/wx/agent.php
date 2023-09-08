@@ -1168,7 +1168,7 @@ class agent
         ];
 
         $query->page($page, $page_size);
-        $query->orderBy('id desc');
+        $query->orderBy('id DESC');
 
         /** @var orderModelObj $order */
         foreach ($query->findAll() as $order) {

@@ -45,7 +45,7 @@ $res = $join
     ->where($condition)
     ->page($page, $page_size)
     ->select('m.*', 'm.name as mname', 'd.name as dname', 'd.imei')
-    ->orderby("m.createtime desc")
+    ->orderby("m.createtime DESC")
     ->getAll();
 
 foreach ($res as $entry) {

@@ -15,7 +15,7 @@ set_time_limit(60);
 $query = CommissionBalance::query(['src' => CommissionBalance::WITHDRAW]);
 $query->where('(updatetime IS NULL OR updatetime=0)');
 
-$query->orderBy('id desc');
+$query->orderBy('id DESC');
 
 $list = [];
 

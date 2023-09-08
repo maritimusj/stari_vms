@@ -65,7 +65,7 @@ class commission
             $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
 
             $query->page($page, $page_size);
-            $query->orderBy('id desc');
+            $query->orderBy('id DESC');
 
             /** @var accountModelObj $entry */
             foreach ($query->findAll() as $entry) {

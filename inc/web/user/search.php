@@ -55,7 +55,7 @@ $result = [
 ];
 
 if ($total > 0) {
-    $query->orderBy('id desc');
+    $query->orderBy('id DESC');
     $query->page($page, $page_size);
 
     /** @var userModelObj $user */

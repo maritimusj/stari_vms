@@ -1177,7 +1177,7 @@ class Stats
         ];
 
         try {
-            $first = Balance::query(['src' => Balance::API_UPDATE])->orderBy('id asc')->findOne();
+            $first = Balance::query(['src' => Balance::API_UPDATE])->orderBy('id ASC')->findOne();
             if (empty($first) || empty($first->getCreatetime())) {
                 return $chart;
             }

@@ -320,7 +320,7 @@ class keeper
             }
         }
 
-        $query->orderBy('id desc');
+        $query->orderBy('id DESC');
 
         /** @var keeperModelObj $keeper */
         foreach ($query->findAll() as $keeper) {

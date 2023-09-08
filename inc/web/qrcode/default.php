@@ -39,7 +39,7 @@ $total = $query->count();
 $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
 
 $query->page($page, $page_size);
-$query->orderBy('id desc');
+$query->orderBy('id DESC');
 
 $sex_title = [
     User::UNKNOWN => '不限',

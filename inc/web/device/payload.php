@@ -36,7 +36,7 @@ if (ceil($total / $page_size) < $page) {
 $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
 
 $query->page($page, $page_size);
-$query->orderBy('id desc');
+$query->orderBy('id DESC');
 
 $logs = [];
 
@@ -72,7 +72,7 @@ foreach ($logs as $index => $log) {
     if (isset($logs[$index + 1])) {
         $verified[$code] = sha1($logs[$index + 1]['code'].$create_time) == $code;
     } else {
-        $l = $device->payloadQuery(['id <' => $log['id']])->orderBy('id desc')->findOne();
+        $l = $device->payloadQuery(['id <' => $log['id']])->orderBy('id DESC')->findOne();
         if ($l) {
             $verified[$code] = sha1($l->getExtraData('code').$create_time) == $code;
         } else {

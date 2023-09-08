@@ -45,7 +45,7 @@ if ($total > 0) {
     $page_size = Request::int('pagesize', 10);
 
     $query->page($page, $page_size);
-    $query->orderBy('id desc');
+    $query->orderBy('id DESC');
 
     $list = [];
     /** @var task_vwModelObj $entry */

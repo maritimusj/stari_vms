@@ -99,7 +99,7 @@ if ($page == 'device') {
 
     if (App::isCustomWxAppEnabled()) {
         $query = WxApp::query();
-        $query->orderBy('id desc');
+        $query->orderBy('id DESC');
 
         $list = [];
         /** @var wx_appModelObj $app */

@@ -163,7 +163,7 @@ class GoodsVoucher
         if ($params['type'] == 'unused') {
             $query->where(['used_user_id' => 0])->whereOr(['end' => 0, 'end >' => $now])->orderBy('id DESC');
         } elseif ($params['type'] == 'used') {
-            $query->where(['used_user_id >' => 0])->orderBy('used_time desc');
+            $query->where(['used_user_id >' => 0])->orderBy('used_time DESC');
         } elseif ($params['type'] == 'expired') {
             $query->where('end != 0')->where(['used_user_id' => 0, 'end <' => $now])->orderBy('end DESC');
         }

@@ -35,7 +35,7 @@ if (!empty($agent_ids)) {
 
     if ($total > 0) {
         $query->page($page, $page_size);
-        $query->orderBy('id desc');
+        $query->orderBy('id DESC');
 
         $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
 

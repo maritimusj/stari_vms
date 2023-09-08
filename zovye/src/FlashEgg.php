@@ -371,7 +371,7 @@ class FlashEgg
                 $query = self::giftQuery([
                     'agent_id' => $agent->getId(),
                     'enabled' => 1,
-                ])->orderBy('id desc');
+                ])->orderBy('id DESC');
 
                 /** @var giftModelObj $item */
                 foreach ($query->findAll() as $item) {
@@ -387,7 +387,7 @@ class FlashEgg
             $query = self::giftQuery([
                 'agent_id' => 0,
                 'enabled' => 1,
-            ])->orderBy('id desc');
+            ])->orderBy('id DESC');
 
             foreach ($query->findAll() as $item) {
                 if (self::isUserGiftLogExists($user, $item)) {

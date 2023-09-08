@@ -24,7 +24,7 @@ $tpl_data = [
 $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
 
 $query->page($page, $page_size);
-$query->orderBy('id desc');
+$query->orderBy('id DESC');
 
 $faq = [];
 

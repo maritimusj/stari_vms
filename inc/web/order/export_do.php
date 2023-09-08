@@ -48,7 +48,7 @@ if (empty($step) || $step == 'init') {
     $full_filename = Helper::getAttachmentFileName($dirname, $filename);
 
     if ($step == 'load') {
-        $query = $query->where(['id >' => Request::int('last')])->limit(100)->orderBy('id asc');
+        $query = $query->where(['id >' => Request::int('last')])->limit(100)->orderBy('id ASC');
         $last_id = Order::export($full_filename, $query, Request::array('headers'));
 
         JSON::success([

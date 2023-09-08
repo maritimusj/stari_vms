@@ -65,7 +65,7 @@ $full_filename = Helper::getAttachmentFileName($dirname, $filename);
 
 if ($step == 'load') {
     $last_id = Request::int('last');
-    $query = $query->where(['id >' => $last_id])->limit(10)->orderBy('id asc');
+    $query = $query->where(['id >' => $last_id])->limit(10)->orderBy('id ASC');
 
     $result = [];
     $n = 0;

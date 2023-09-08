@@ -38,7 +38,7 @@ if ($step == 'load') {
 
     $result = [];
 
-    $query = Device::query(['id >' => $last_id])->limit(10)->orderBy('id asc');
+    $query = Device::query(['id >' => $last_id])->limit(10)->orderBy('id ASC');
 
     $n = 0;
     /** @var deviceModelObj $device */

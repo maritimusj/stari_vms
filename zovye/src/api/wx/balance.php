@@ -327,7 +327,7 @@ class balance
 
         if ($total > 0) {
             $query->page($page, $page_size);
-            $query->orderBy('id desc');
+            $query->orderBy('id DESC');
 
             /** @var commission_balanceModelObj $entry */
             foreach ($query->findAll() as $entry) {

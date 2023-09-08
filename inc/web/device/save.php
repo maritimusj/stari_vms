@@ -431,8 +431,8 @@ if ($device) {
                         'expired_at' => $getExpiredTimestampFN($index),
                     ]);
                 }
-                $alert->setPreAlertDays($alertPreDays[$index] ?? 0);
-                $alert->setInvalidIfExpired($alertInvalid[$index] ?? true);
+                $alert->setPreAlertDays(intval($alertPreDays[$index]));
+                $alert->setInvalidIfExpired(boolval($alertInvalid[$index]));
                 $alert->save();
             }
         }

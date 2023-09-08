@@ -583,6 +583,53 @@
                         </div>
                     </div> 
                 </div>
+                <div v-show="active === 'alert'">
+                    <div class="seg" v-for="(lane, i) in currentType.cargo_lanes" :class="{unknown: lane.goods_id==0}" :key="currentTypeID+':'+i">
+                        <div class="title">货道 {{i + 1}}</div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">当前商品</label>
+                            <div class="col-md-10">
+                                <input :name="'alertLane['+i+']'" type="hidden" :value="i">
+                                <label v-if="lane.goods_id">
+                                {{lane.goods_name}}<sup class="id" title="商品ID" v-if="lane.goods_id>0">{{lane.goods_id}}</sup>
+                                </label>
+                                <label v-else>
+                                    <span class="text-muted">
+                                        &lt;没有商品&gt;
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label :for="'alertExpiredAt['+i+']'" class="col-md-2 control-label">过期时间</label>
+                            <div class="col-md-10">
+                                <input :id="'alertExpiredAt['+i+']'" type="text" class="form-control" :name="'alertExpiredAt['+i+']'" @click="showDatetimePicker(lane, event)" autocomplete="off">
+                                <span class="help-block">* 指定该货道的商品过期时间</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label :for="'alertPreDays['+i+']'" class="col-md-2 control-label">提前预警（天）</label>
+                            <div class="col-md-10">
+                                <input type="number" class="form-control" :name="'alertPreDays['+i+']'" :id="'alertPreDays['+i+']'">
+                                <span class="help-block">* 指定提前多少天就显示提醒信息</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-xs-12 col-md-2 col-md-2 control-label">过期处理</label>
+                            <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                                <label :for="'alertInvalid['+i+']0'" class="radio-inline">
+                                    <input :name="'alertInvalid['+i+']'" :id="'alertInvalid['+i+']0'" type="radio" value="1">
+                                    禁止购买
+                                </label>
+                                <label :for="'alertInvalid['+i+']1'" class="radio-inline">
+                                    <input :name="'alertInvalid['+i+']'" :id="'alertInvalid['+i+']1'" type="radio" value="0">
+                                    允许购买
+                                </label>
+                                <span class="help-block">* 商品过期后，用户是否可以购买</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div v-show="active === 'extra'">
                     <!--
                         <div class="form-group">
@@ -893,7 +940,7 @@
         api.showResult({pagesize: 10, ...params});
     }
 
-    require(['jquery', '{php \zovye\url(false, JS_VUE_URL);}'], function($, Vue) {
+    require(['jquery', '{php \zovye\url(false, JS_VUE_URL);}', 'datetimepicker'], function($, Vue, datetimepicker) {
         const api_url = "{php echo $this->createWebUrl('devicetypes');}";
         const device_api_url = "{php echo $this->createWebUrl('device')}";
         const package_api_url = "{php echo $this->createWebUrl('package')}";
@@ -916,6 +963,7 @@
                 currentPackage: null,
                 config: {
                     goods_package_enabled: `{php echo \zovye\App::isGoodsPackageEnabled()? 1 : ''}`,
+                    expire_alert_enabled: `{php echo \zovye\App::isGoodsExpireAlertEnabled()? 1 : ''}`,
                     is_normal_device: `{php echo $is_normal_device? 1 :''}`,
                     is_bluetooth_device: `{php echo $is_bluetooth_device? 1 :''}`,
                     is_vdevice: `{php echo $is_vdevice? 1 :''}`,
@@ -947,6 +995,10 @@
                         {
                             'op': 'schedule',
                             'content': `定时任务`,
+                        },
+                        {
+                            'op': 'alert',
+                            'content': `过期设置`,
                         },
                         {
                             'op': 'extra',
@@ -1001,6 +1053,9 @@
                     this.navs.push(nav);
                 } else {
                     let ops_removed = [];
+                    if (!this.config.expire_alert_enabled) {
+                        ops_removed.push('alert');
+                    }
                     if (!this.config.is_bluetooth_device) {
                         ops_removed.push('func');
                     }
@@ -1224,6 +1279,21 @@
                 {
                     this.calcPackageGoodsTotal(this.currentPackage);
                 },
+                showDatetimePicker(lane, e)
+                {
+                    if (!lane.datetimepicker) {
+                        Vue.set(lane, "datetimepicker", true);
+                        const option = {
+                                lang : "zh",
+                                step : 5,
+                                //timepicker : false,
+                                closeOnDateSelect : true,
+                                format : "Y-m-d H:i",
+                            };
+                        $(e.target).datetimepicker(option);
+                        $(e.target).datetimepicker('show');
+                    }
+                }
             }
         })
 
@@ -1263,7 +1333,6 @@
     const vuejsUrl = "{php \zovye\url(false, JS_VUE_URL);}";
 
     function initLegacyJs() {
-
         if (moscale_enabled) { 
             require(["{php echo MODULE_URL}static/js/moscale.min.js?v=20210417"], function(moscale) {          
                 moscale.init("#moscale", {
@@ -1446,17 +1515,5 @@
             reload(url);
         })
     })
-</script>
-<script>
-    require(["datetimepicker"], function(){
-            var option = {
-                lang : "zh",
-                step : 5,
-                timepicker : false,
-                closeOnDateSelect : true,
-                format : "Y-m-d",
-            };
-        $(".datetimepicker[name = 'expiration']").datetimepicker(option);
-    });
 </script>
 {template 'common/footer'}

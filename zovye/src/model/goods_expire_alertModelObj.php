@@ -12,6 +12,9 @@ use function zovye\tb;
 
 /**
  * @method getExpireAt()
+ * @method setGoodsId(mixed $goods)
+ * @method setAgentId($getAgentId)
+ * @method setExpiredAt(int $int)
  */
 class goods_expire_alertModelObj extends modelObj
 {

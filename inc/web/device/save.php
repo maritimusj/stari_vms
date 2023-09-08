@@ -396,6 +396,47 @@ if ($device) {
     if (!App::isDeviceScheduleTaskEnabled()) {
         $device->updateSettings('schedule', []);
     }
+
+    if (App::isGoodsExpireAlertEnabled()) {
+        $payload = $device->getPayload();
+        if ($payload['cargo_lanes']) {
+
+            $alertExpiredAt = Request::array('alertExpiredAt');
+            $alertPreDays = Request::array('alertPreDays');
+            $alertInvalid = Request::array('alertInvalid');
+
+            $getExpiredTimestampFN = function ($index) use ($alertExpiredAt) {
+                $expire_at = $alertExpiredAt[$index];
+                if ($expire_at) {
+                    $datetime = date_create_from_format('Y-m-d H:i', $expire_at);
+                    if ($datetime) {
+                        return $datetime->getTimestamp();
+                    }
+                }
+                return 0;
+            };
+
+            foreach ((array)$payload['cargo_lanes'] as $index => $lane) {
+                $alert = GoodsExpireAlert::getFor($device, $index, 0, false);
+                if ($alert) {
+                    $alert->setGoodsId($lane['goods'] ?? 0);
+                    $alert->setAgentId($device->getAgentId());
+                    $alert->setExpiredAt($getExpiredTimestampFN($index));
+                } else {
+                    $alert = GoodsExpireAlert::create([
+                        'agent_id' => $device->getAgentId(),
+                        'device_id' => $device->getId(),
+                        'lane_id' => $index,
+                        'goods_id' => $lane['goods'] ?? 0,
+                        'expired_at' => $getExpiredTimestampFN($index),
+                    ]);
+                }
+                $alert->setPreAlertDays($alertPreDays[$index] ?? 0);
+                $alert->setInvalidIfExpired($alertInvalid[$index] ?? true);
+                $alert->save();
+            }
+        }
+    }
 }
 
 $redirect_url = Util::url('device', [

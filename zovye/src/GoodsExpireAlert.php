@@ -19,6 +19,9 @@ class GoodsExpireAlert
 
     public static function create($data = []): ?goods_expire_alertModelObj
     {
+        if (isset($data['extra'])) {
+            $data['extra'] = json_encode($data['extra']);
+        }
         return self::model()->create($data);
     }
 
@@ -37,7 +40,7 @@ class GoodsExpireAlert
         return self::model()->delete($condition);
     }
 
-    public static function getFor(deviceModelObj $device, int $index, $goods_id = 0): ?goods_expire_alertModelObj
+    public static function getFor(deviceModelObj $device, int $index, $goods_id = 0, $agent_restrict = true): ?goods_expire_alertModelObj
     {
         $condition = [
             'device_id' => $device->getId(),
@@ -48,9 +51,11 @@ class GoodsExpireAlert
             $condition['goods_id'] = $goods_id;
         }
 
-        $agent = $device->getAgent();
-        if ($agent) {
-            $condition['agent_id'] = $agent->getId();
+        if ($agent_restrict) {
+            $agent = $device->getAgent();
+            if ($agent) {
+                $condition['agent_id'] = $agent->getId();
+            }
         }
 
         return self::findOne($condition);

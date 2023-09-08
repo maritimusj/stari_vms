@@ -51,19 +51,17 @@ if ($type_id) {
 
     $data = $priceFN(isset($device) && $device->isFuelingDevice(), $data);
 
-    JSON::success($data);
-}
+} elseif ($device_id) {
 
-
-if ($device_id) {
-    $device = Device::get($device_id);
     if (empty($device)) {
         JSON::fail('找不到这个设备！');
     }
 
-    $data = $priceFN($device->isFuelingDevice(), $device->getPayload(true));
+    $payload = $device->getPayload(true);
+    $data = $priceFN($device->isFuelingDevice(), $payload);
 
-    JSON::success($data);
+} else {
+    $data = ['cargo_lanes' => []];
 }
 
-JSON::success(['cargo_lanes' => []]);
+JSON::success($data);

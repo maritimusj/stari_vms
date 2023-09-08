@@ -27,9 +27,10 @@
         <div class="heading">
             <span class="operate">
                 <template v-if="showSelectInputCtrl">
-                    <img src="{MODULE_URL}static/img/remove.svg" class="icon" title="删除所有选中设备" @click="deleteAllDevice">
-                    <img src="{MODULE_URL}static/img/qrcode_download.svg" class="icon" title="下载选中设备二维码" @click="downloadQRCode" v-if="canDownload">
-                    <img src="{MODULE_URL}static/img/qrcode_download.svg" class="icon" title="请先选择设备" v-else="canDownload">
+                    <img src="{MODULE_URL}static/img/remove.svg" class="icon" title="删除所有选中设备" @click="deleteAllDevice" v-if="canDownload">
+                    <img src="{MODULE_URL}static/img/remove.svg" class="icon" title="请先选择要删除的设备" v-else>
+                    <img src="{MODULE_URL}static/img/qrcode_download.svg" class="icon" title="下载选中设备的二维码" @click="downloadQRCode" v-if="canDownload">
+                    <img src="{MODULE_URL}static/img/qrcode_download.svg" class="icon" title="请先选择设备后下载二维码" v-else>
                     <img src="{MODULE_URL}static/img/machine.svg" class="icon disabled" title="添加新设备">
                     {if \zovye\App::isChargingDeviceEnabled()}
                     <img src="{MODULE_URL}static/img/charging.svg" class="icon disabled" title="添加充电桩">
@@ -55,7 +56,7 @@
                 </template>
                 <template v-else>
                     <img src="{MODULE_URL}static/img/remove.svg" class="icon disabled" title="批量删除设备">
-                    <img src="{MODULE_URL}static/img/qrcode_download.svg" class="icon disabled" title="下载设备二维码">
+                    <img src="{MODULE_URL}static/img/qrcode_download.svg" class="icon disabled" title="批量下载设备二维码">
                     <a href="{php echo $this->createWebUrl('device', ['op'=>'edit', 'model'=>'normal']);}">
                         <img src="{MODULE_URL}static/img/machine.svg" class="icon" title="添加新设备">
                     </a>

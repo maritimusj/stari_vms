@@ -15,10 +15,9 @@ class Migrate
     public static function execSQL($sql)
     {
         $prefix = Util::config('db.master.tablepre') ?: Util::config('db.tablepre');
-        $tb_name = APP_NAME;
 
         $sql = preg_replace('/ims_/', $prefix, $sql);
-        $sql = preg_replace('/zovye_vms/', $tb_name, $sql);
+        $sql = preg_replace('/zovye_vms/', APP_NAME, $sql);
 
         $result = We7::pdo_query($sql);
         Log::debug('migrate', [

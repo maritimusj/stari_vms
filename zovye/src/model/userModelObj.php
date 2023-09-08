@@ -19,6 +19,7 @@ use zovye\DBUtil;
 use zovye\Fueling;
 use zovye\Locker;
 use zovye\Pay;
+use zovye\PayLogs;
 use zovye\Referral;
 use zovye\UserCommissionBalanceCard;
 use zovye\VIP;
@@ -294,7 +295,7 @@ class userModelObj extends modelObj
     public function getPayLog($order_id)
     {
         if ($order_id) {
-            return m('pay_logs')->findOne(We7::uniacid(['title' => $order_id]));
+            return PayLogs::model()->findOne(We7::uniacid(['title' => $order_id]));
         }
 
         return null;

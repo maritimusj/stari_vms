@@ -479,7 +479,7 @@ class Pay
 
     public static function getPayLogById(int $id): ?pay_logsModelObj
     {
-        return m('pay_logs')->findOne(['id' => $id]);
+        return PayLogs::model()->findOne(['id' => $id]);
     }
 
     /**
@@ -502,7 +502,7 @@ class Pay
 
         $data = We7::uniacid(['level' => $level, 'title' => $order_no]);
 
-        return m('pay_logs')->findOne($data);
+        return PayLogs::model()->findOne($data);
     }
 
     public static function selectPayParams(array $params, string $name): array

@@ -589,7 +589,6 @@
                         <div class="form-group">
                             <label class="col-md-2 control-label">当前商品</label>
                             <div class="col-md-10">
-                                <input :name="'alertLane['+i+']'" type="hidden" :value="i">
                                 <label v-if="lane.goods_id">
                                 {{lane.goods_name}}<sup class="id" title="商品ID" v-if="lane.goods_id>0">{{lane.goods_id}}</sup>
                                 </label>
@@ -630,7 +629,7 @@
                                     禁止购买
                                 </label>
                                 <label :for="'alertInvalid['+i+']1'" class="radio-inline">
-                                    <input :name="'alertInvalid['+i+']'" :id="'alertInvalid['+i+']1'" type="radio" value="0" :checked="lane.alert&&lane.alert.invalid_if_expired">
+                                    <input :name="'alertInvalid['+i+']'" :id="'alertInvalid['+i+']1'" type="radio" value="0" :checked="lane.alert&&!lane.alert.invalid_if_expired">
                                     允许购买
                                 </label>
                                 <span class="help-block">* 商品过期后，用户是否可以购买</span>

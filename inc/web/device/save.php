@@ -416,6 +416,7 @@ if ($device) {
                 return 0;
             };
 
+            $ids = [];
             foreach ((array)$payload['cargo_lanes'] as $index => $lane) {
                 $alert = GoodsExpireAlert::getFor($device, $index, 0, false);
                 if ($alert) {
@@ -434,6 +435,15 @@ if ($device) {
                 $alert->setPreAlertDays(intval($alertPreDays[$index]));
                 $alert->setInvalidIfExpired(boolval($alertInvalid[$index]));
                 $alert->save();
+                $ids[] = $alert->getId();
+            }
+
+            $all = GoodsExpireAlert::query(['device_id' => $device->getId()])->findAll();
+            
+            foreach($all as $alert) {
+                if (!in_array($ids, $alert->getId())) {
+                    $alert->destroy();
+                }
             }
         }
     }

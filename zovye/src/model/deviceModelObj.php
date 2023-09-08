@@ -10,6 +10,7 @@ namespace zovye\model;
 use Exception;
 use zovye\App;
 use zovye\Balance;
+use zovye\DeviceEvents;
 use zovye\DeviceUtil;
 use zovye\Helper;
 use zovye\Job;
@@ -923,7 +924,7 @@ class deviceModelObj extends modelObj
         We7::pdo_delete(m('order')->getTableName(), We7::uniacid(['device_id' => $this->getId()]));
         We7::pdo_delete(m('maintenance')->getTableName(), We7::uniacid(['device_id' => $this->getId()]));
         We7::pdo_delete(m('advs_stats')->getTableName(), We7::uniacid(['device_id' => $this->getId()]));
-        We7::pdo_delete(m('device_events')->getTableName(), We7::uniacid(['device_uid' => $this->getUid()]));
+        We7::pdo_delete(DeviceEvents::model()->getTableName(), We7::uniacid(['device_uid' => $this->getUid()]));
 
         $this->remove('lastErrorNotify');
         $this->remove('lastRemainWarning');
@@ -2847,7 +2848,7 @@ class deviceModelObj extends modelObj
 
     public function eventQuery($cond = []): modelObjFinder
     {
-        return m('device_events')->where(We7::uniacid(['device_uid' => $this->getUid()]))->where($cond);
+        return DeviceEvents::model()->where(We7::uniacid(['device_uid' => $this->getUid()]))->where($cond);
     }
 
     public function isOwnerOrSuperior(userModelObj $user): bool

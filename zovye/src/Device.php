@@ -679,7 +679,7 @@ class Device extends State
                     ]),
                 ]);
 
-                if (!m('device_events')->create($data)) {
+                if (!DeviceEvents::model()->create($data)) {
                     Log::error('events', [
                         'error' => 'create device log failed',
                         'data' => $data,
@@ -711,7 +711,7 @@ class Device extends State
 
                 $data['extra'] = json_encode($data['extra']);
 
-                if (!m('device_events')->create($data)) {
+                if (!DeviceEvents::model()->create($data)) {
                     Log::error('events', [
                         'error' => 'create device log failed',
                         'data' => $data,

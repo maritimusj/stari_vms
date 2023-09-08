@@ -352,7 +352,7 @@ class DeviceEventProcessor
                         'extra' => json_encode($data),
                     ]);
 
-                    if (!m('device_events')->create($data)) {
+                    if (!DeviceEvents::model()->create($data)) {
                         Log::error('events', [
                             'error' => 'create device log failed',
                             'data' => $data,

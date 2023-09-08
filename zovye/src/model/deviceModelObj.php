@@ -11,6 +11,7 @@ use Exception;
 use zovye\App;
 use zovye\Balance;
 use zovye\DeviceEvents;
+use zovye\DeviceLogs;
 use zovye\DeviceUtil;
 use zovye\Helper;
 use zovye\Job;
@@ -196,15 +197,6 @@ class deviceModelObj extends modelObj
     public function goodsLog(int $level, array $data = []): bool
     {
         return $this->log($level, $this->getImei(), $data);
-    }
-
-    /**
-     * @param $keywords
-     * @return modelObj | device_logsModelObj
-     */
-    public function getGoodsLog($keywords)
-    {
-        return m('device_logs')->findOne("LOCATE('$keywords', data) > 0");
     }
 
     public function getLastOnlineIp()
@@ -2843,7 +2835,7 @@ class deviceModelObj extends modelObj
 
     public function logQuery($cond = []): modelObjFinder
     {
-        return m('device_logs')->where(We7::uniacid(['title' => $this->getImei()]))->where($cond);
+        return DeviceLogs::model()->where(We7::uniacid(['title' => $this->getImei()]))->where($cond);
     }
 
     public function eventQuery($cond = []): modelObjFinder

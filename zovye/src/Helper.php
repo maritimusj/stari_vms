@@ -121,7 +121,7 @@ class Helper
             $condition['title'] = $device->getImei();
         }
 
-        $query = m('device_logs')->where($condition);
+        $query = DeviceLogs::model()->where($condition);
 
         $list = [];
         /** @var device_logsModelObj $entry */

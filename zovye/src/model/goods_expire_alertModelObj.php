@@ -51,21 +51,21 @@ class goods_expire_alertModelObj extends modelObj
 
     public function setPreAlertDays(int $days): bool
     {
-        return $this->updateSettings('extra.preAlertDays', $days);
+        return $this->setExtraData('extra.preAlertDays', $days);
     }
 
     public function getPreAlertDays(): int
     {
-        return intval($this->settings('extra.preAlertDays'));
+        return intval($this->getExtraData('extra.preAlertDays'));
     }
 
     public function setInvalidIfExpired(bool $enabled): bool
     {
-        return $this->updateSettings('extra.invalidIfExpired', $enabled ? 1 : 0);
+        return $this->setExtraData('extra.invalidIfExpired', $enabled ? 1 : 0);
     }
 
     public function invalidIfExpired(): bool
     {
-        return boolval($this->settings('extra.invalidIfExpired'));
+        return boolval($this->getExtraData('extra.invalidIfExpired'));
     }
 }

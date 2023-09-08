@@ -11,7 +11,7 @@ use zovye\traits\ExtraDataGettersAndSetters;
 use function zovye\tb;
 
 /**
- * @method getExpireAt()
+ * @method getExpiredAt()
  * @method setGoodsId(mixed $goods)
  * @method setAgentId($getAgentId)
  * @method setExpiredAt(int $int)

@@ -69,7 +69,7 @@ $data['alert_enabled'] = App::isGoodsExpireAlertEnabled();
 if (App::isGoodsExpireAlertEnabled() && $data['cargo_lanes']) {
     foreach ((array)$data['cargo_lanes'] as $index => $lane) {
         $data['cargo_lanes'][$index]['alert'] = [];
-        if ($device) {
+        if (isset($device)) {
             $alert = GoodsExpireAlert::getFor($device, $index, $lane['goods']);
             if ($alert) {
                 $expire_at = $alert->getExpireAt();

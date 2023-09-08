@@ -117,7 +117,7 @@ class Keeper
         int $num,
         array $extra = []
     ): ?replenishModelObj {
-        return m('replenish')->create(
+        return Replenish::model()->create(
             We7::uniacid(
                 [
                     'device_uid' => $device->getImei(),

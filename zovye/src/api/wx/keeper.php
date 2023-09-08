@@ -24,6 +24,7 @@ use zovye\model\deviceModelObj;
 use zovye\Goods;
 use zovye\Group as ZovyeGroup;
 use zovye\Order;
+use zovye\Replenish;
 use zovye\Request;
 use zovye\JSON;
 use zovye\model\keeperModelObj;
@@ -625,13 +626,13 @@ class keeper
             }
         }
 
-        $result['stats']['today'] = (int)m('replenish')->where(
+        $result['stats']['today'] = (int)Replenish::model()->where(
             We7::uniacid(
                 ['keeper_id' => $keeper->getId(), 'createtime >=' => (new DateTimeImmutable('00:00'))->getTimestamp()]
             )
         )->get('sum(num)');
 
-        $result['stats']['this_month'] = (int)m('replenish')->where(
+        $result['stats']['this_month'] = (int)Replenish::model()->where(
             We7::uniacid(
                 [
                     'keeper_id' => $keeper->getId(),
@@ -640,7 +641,7 @@ class keeper
             )
         )->get('sum(num)');
 
-        $result['stats']['all'] = (int)m('replenish')->where(We7::uniacid(['keeper_id' => $keeper->getId()]))->get(
+        $result['stats']['all'] = (int)Replenish::model()->where(We7::uniacid(['keeper_id' => $keeper->getId()]))->get(
             'sum(num)'
         );
 
@@ -653,7 +654,7 @@ class keeper
         $result['devices']['low'] = $lowQuery->count();
         $result['devices']['error'] = $errorQuery->count();
 
-        $lastQuery = m('replenish')->where(We7::uniacid(['keeper_id' => $keeper->getId()]))->orderBy(
+        $lastQuery = Replenish::model()->where(We7::uniacid(['keeper_id' => $keeper->getId()]))->orderBy(
             'createtime DESC'
         )->limit(10);
 
@@ -1195,7 +1196,7 @@ class keeper
             'list' => [],
         ];
 
-        $query = m('replenish')->where(
+        $query = Replenish::model()->where(
             We7::uniacid([
                 'keeper_id' => $keeper->getId(),
                 'agent_id' => $keeper->getAgentId(),
@@ -1259,8 +1260,8 @@ class keeper
                     'createtime <' => $ts_end,
                 ]);
 
-                if (m('replenish')->where($cond)->count() > 0) {
-                    $total = (int)m('replenish')->where($cond)->get('sum(num)');
+                if (Replenish::model()->where($cond)->count() > 0) {
+                    $total = (int)Replenish::model()->where($cond)->get('sum(num)');
                     $result['list'][$title] = $total;
                 }
             }

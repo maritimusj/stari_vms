@@ -23,7 +23,7 @@ if ($user->isKeeper()) {
     $keeper = $user->getKeeper();
     if ($keeper) {
 
-        $query = m('replenish')->query(We7::uniacid(['keeper_id' => $keeper->getId()]));
+        $query = Replenish::model()->query(We7::uniacid(['keeper_id' => $keeper->getId()]));
         $total = $query->count();
 
         $goods_arr = [];

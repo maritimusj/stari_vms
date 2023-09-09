@@ -17,6 +17,11 @@ class Base
         trigger_error('Base::model not implemented', E_USER_ERROR);
     }
 
+    protected static function hasUniacid(): bool
+    {
+        return property_exists(static::model()->objClassname(), 'uniacid');
+    }
+
     public static function create($data)
     {
         if (is_callable($data)) {
@@ -29,7 +34,7 @@ class Base
 
         $classname = static::model()->objClassname();
 
-        if (property_exists($classname, 'uniacid')) {
+        if (self::hasUniacid()) {
             $data['uniacid'] = We7::uniacid();
         }
 
@@ -42,21 +47,25 @@ class Base
 
     public static function query($condition = []): modelObjFinder
     {
+        if (self::hasUniacid()) {
+            return static::model()->where(We7::uniacid([]))->where($condition);
+        }
+
         return static::model()->query($condition);
     }
 
     public static function findOne($condition = [])
     {
-        return static::model()->findOne($condition);
+        return self::query($condition)->findOne();
     }
 
     public static function exists($condition = []): bool
     {
-        return static::model()->exists($condition);
+        return self::query($condition)->exists();
     }
 
     public static function remove($condition): bool
     {
-        return static::model()->remove($condition);
+        return self::query($condition)->delete();
     }
 }

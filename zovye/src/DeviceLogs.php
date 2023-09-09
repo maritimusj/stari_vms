@@ -9,7 +9,7 @@ namespace zovye;
 
 class DeviceLogs
 {
-    public static function model(): model\base\modelFactory
+    public static function model(): base\modelFactory
     {
         return m('device_logs');
     }

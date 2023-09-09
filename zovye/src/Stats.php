@@ -10,7 +10,7 @@ use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Exception;
-use zovye\model\base\modelObj;
+use zovye\base\modelObj;
 use zovye\model\commission_balanceModelObj;
 use zovye\model\device_groupsModelObj;
 use zovye\model\userModelObj;

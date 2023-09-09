@@ -8,7 +8,7 @@ namespace zovye;
 
 class WxApp
 {
-    public static function query($condition = []): model\base\modelObjFinder
+    public static function query($condition = []): base\modelObjFinder
     {
         return m('wx_app')->where(We7::uniacid([]))->where($condition);
     }

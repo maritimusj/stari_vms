@@ -11,7 +11,7 @@ use Exception;
 
 class Cron
 {
-    public static function query($condition = []): model\base\modelObjFinder
+    public static function query($condition = []): base\modelObjFinder
     {
         return m('cron')->query(We7::uniacid([]))->where($condition);
     }

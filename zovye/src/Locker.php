@@ -7,7 +7,7 @@
 namespace zovye;
 
 use Exception;
-use zovye\model\base\modelObjFinder;
+use zovye\base\modelObjFinder;
 use zovye\model\lockerModelObj;
 
 class Locker

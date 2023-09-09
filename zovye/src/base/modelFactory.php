@@ -4,7 +4,7 @@
  * @url www.stariture.com
  */
 
-namespace zovye\model\base;
+namespace zovye\base;
 
 use zovye\Util;
 use zovye\We7;

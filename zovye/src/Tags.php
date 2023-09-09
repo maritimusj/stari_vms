@@ -9,7 +9,7 @@ namespace zovye;
 
 class Tags extends Base
 {
-    public static function model(): model\base\modelFactory
+    public static function model(): base\modelFactory
     {
         return m('tags');
     }

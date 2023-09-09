@@ -6,8 +6,8 @@
 
 namespace zovye;
 
-use zovye\model\base\modelObj;
-use zovye\model\base\modelObjFinder;
+use zovye\base\modelObj;
+use zovye\base\modelObjFinder;
 use zovye\model\deviceModelObj;
 use zovye\model\inventoryModelObj;
 use zovye\model\userModelObj;

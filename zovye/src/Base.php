@@ -7,8 +7,8 @@
 
 namespace zovye;
 
-use zovye\model\base\modelFactory;
-use zovye\model\base\modelObjFinder;
+use zovye\base\modelFactory;
+use zovye\base\modelObjFinder;
 
 class Base
 {

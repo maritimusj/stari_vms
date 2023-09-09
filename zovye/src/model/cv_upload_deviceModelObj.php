@@ -5,8 +5,8 @@
  */
 namespace zovye\model;
 
+use zovye\base\modelObj;
 use zovye\Device;
-use zovye\model\base\modelObj;
 use function zovye\tb;
 
 class cv_upload_deviceModelObj extends modelObj

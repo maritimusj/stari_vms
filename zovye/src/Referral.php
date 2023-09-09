@@ -11,7 +11,7 @@ use zovye\model\referralModelObj;
 
 class Referral
 {
-    public static function query($condition): model\base\modelObjFinder
+    public static function query($condition): base\modelObjFinder
     {
         return m('referral')->query(We7::uniacid())->where($condition);
     }

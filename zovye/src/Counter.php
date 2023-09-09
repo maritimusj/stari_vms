@@ -15,7 +15,7 @@ class Counter
         return m('counter')->create($data);
     }
 
-    public static function query($condition = []): model\base\modelObjFinder
+    public static function query($condition = []): base\modelObjFinder
     {
         return m('counter')->query($condition);
     }

@@ -6,7 +6,7 @@
 
 namespace zovye;
 
-use zovye\model\base\modelObjFinder;
+use zovye\base\modelObjFinder;
 use zovye\model\goodsModelObj;
 
 class Goods

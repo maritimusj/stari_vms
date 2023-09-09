@@ -6,8 +6,8 @@
 
 namespace zovye;
 
+use zovye\base\modelObjFinder;
 use zovye\model\agentModelObj;
-use zovye\model\base\modelObjFinder;
 use zovye\model\userModelObj;
 use zovye\model\vipModelObj;
 

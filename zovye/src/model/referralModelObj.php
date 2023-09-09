@@ -7,7 +7,7 @@
 namespace zovye\model;
 
 use zovye\Agent;
-use zovye\model\base\modelObj;
+use zovye\base\modelObj;
 use zovye\User;
 use function zovye\tb;
 

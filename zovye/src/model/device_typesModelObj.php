@@ -7,8 +7,8 @@
 namespace zovye\model;
 
 use zovye\Agent;
+use zovye\base\modelObj;
 use zovye\DeviceTypes;
-use zovye\model\base\modelObj;
 use zovye\traits\ExtraDataGettersAndSetters;
 use function zovye\tb;
 

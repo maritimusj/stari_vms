@@ -13,12 +13,12 @@ use zovye\model\userModelObj;
 
 class ChargingNowData
 {
-    protected static function model(): model\base\modelFactory
+    protected static function model(): base\modelFactory
     {
         return m('charging_now_data');
     }
 
-    public static function query($condition = []): model\base\modelObjFinder
+    public static function query($condition = []): base\modelObjFinder
     {
         return self::model()->where($condition);
     }

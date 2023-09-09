@@ -4,7 +4,7 @@
 namespace zovye\model;
 
 
-use zovye\model\base\modelObj;
+use zovye\base\modelObj;
 use function zovye\tb;
 
 class tester_vwModelObj extends userModelObj

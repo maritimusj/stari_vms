@@ -556,7 +556,7 @@ ORDER;
     /**
      * 返回用户余额变动记录
      */
-    public function log(): ?model\base\modelObjFinder
+    public function log(): ?base\modelObjFinder
     {
         if ($this->user) {
             $openid = $this->user->getOpenid();
@@ -592,7 +592,7 @@ ORDER;
         return null;
     }
 
-    public static function query($condition = []): model\base\modelObjFinder
+    public static function query($condition = []): base\modelObjFinder
     {
         if (is_array($condition) && isset($condition['id'])) {
             return m('commission_balance')->where($condition);

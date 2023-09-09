@@ -8,8 +8,8 @@ namespace zovye\model;
 
 use DateTimeInterface;
 use zovye\Agent;
+use zovye\base\modelObj;
 use zovye\Group;
-use zovye\model\base\modelObj;
 use zovye\traits\ExtraDataGettersAndSetters;
 use function zovye\tb;
 

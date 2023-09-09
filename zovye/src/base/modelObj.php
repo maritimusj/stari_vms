@@ -4,7 +4,7 @@
  * @url www.stariture.com
  */
 
-namespace zovye\model\base;
+namespace zovye\base;
 
 use Exception;
 use ReflectionClass;

@@ -14,7 +14,7 @@ use zovye\model\userModelObj;
 
 class Questionnaire
 {
-    public static function log($cond = []): model\base\modelObjFinder
+    public static function log($cond = []): base\modelObjFinder
     {
         return m('account_logs')->where($cond);
     }

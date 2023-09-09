@@ -6,8 +6,8 @@
 
 namespace zovye\model;
 
+use zovye\base\modelObj;
 use zovye\Delivery;
-use zovye\model\base\modelObj;
 use zovye\traits\ExtraDataGettersAndSetters;
 use zovye\User;
 use function zovye\tb;

@@ -12,7 +12,7 @@ use zovye\model\goods_expire_alertModelObj;
 
 class GoodsExpireAlert
 {
-    public static function model(): model\base\modelFactory
+    public static function model(): base\modelFactory
     {
         return m('goods_expire_alert');
     }
@@ -25,7 +25,7 @@ class GoodsExpireAlert
         return self::model()->create($data);
     }
 
-    public static function query($condition = []): model\base\modelObjFinder
+    public static function query($condition = []): base\modelObjFinder
     {
         return self::model()->where($condition);
     }

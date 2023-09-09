@@ -10,9 +10,9 @@ use DateTimeInterface;
 use ReflectionException;
 use ReflectionFunction;
 use ReflectionMethod;
-use zovye\model\base\model;
-use zovye\model\base\modelFactory;
-use zovye\model\base\modelObj;
+use zovye\base\model;
+use zovye\base\modelFactory;
+use zovye\base\modelObj;
 
 /**
  * 返回全局唯一的APP

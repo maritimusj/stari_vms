@@ -6,9 +6,9 @@
 
 namespace zovye;
 
+use zovye\base\modelObjFinder;
 use zovye\model\advertisingModelObj;
 use zovye\model\agentModelObj;
-use zovye\model\base\modelObjFinder;
 use zovye\model\deviceModelObj;
 use zovye\model\goodsModelObj;
 use zovye\model\keeperModelObj;

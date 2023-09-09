@@ -9,7 +9,7 @@ namespace zovye;
 
 class AgentApplication
 {
-    public static function model(): model\base\modelFactory
+    public static function model(): base\modelFactory
     {
         return m('agent_app');
     }

@@ -6,8 +6,6 @@
 
 namespace zovye\model;
 
-use zovye\base\modelObj;
-
 use function zovye\tb;
 
 /**
@@ -16,7 +14,7 @@ use function zovye\tb;
  * @method getCreatetime()
  * @method setCount(int $param)
  */
-class tagsModelObj extends modelObj
+class tagsModelObj extends \zovye\base\modelObj
 {
     /** @var int */
     protected $id;

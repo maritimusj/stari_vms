@@ -7,7 +7,7 @@
 namespace zovye;
 
 use Exception;
-use zovye\model\base\modelObj;
+use zovye\base\modelObj;
 use zovye\model\weapp_configModelObj;
 
 class WeApp extends Settings

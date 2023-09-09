@@ -6,7 +6,7 @@
 
 namespace zovye\model;
 
-use zovye\model\base\modelObj;
+use zovye\base\modelObj;
 use zovye\PackageGoods;
 use zovye\Util;
 use function zovye\tb;

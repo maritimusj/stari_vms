@@ -7,9 +7,9 @@
 namespace zovye\model;
 
 use zovye\Agent;
+use zovye\base\modelObj;
+use zovye\base\modelObjFinder;
 use zovye\Keeper;
-use zovye\model\base\modelObj;
-use zovye\model\base\modelObjFinder;
 use zovye\traits\ExtraDataGettersAndSetters;
 use zovye\User;
 use function zovye\m;

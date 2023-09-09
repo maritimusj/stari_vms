@@ -8,7 +8,7 @@ namespace zovye\model;
 
 use zovye\Advertising;
 use zovye\Agent;
-use zovye\model\base\modelObj;
+use zovye\base\modelObj;
 use zovye\ReviewResult;
 use zovye\traits\ExtraDataGettersAndSetters;
 use zovye\We7;

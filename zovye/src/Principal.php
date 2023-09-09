@@ -51,7 +51,7 @@ class Principal
             'principal_id' => $id,
         ]);
     }
-    public static function admin($condition = []): model\base\modelObjFinder
+    public static function admin($condition = []): base\modelObjFinder
     {
         if (is_array($condition) && isset($condition['id'])) {
             return m('admin_vw')->where($condition);
@@ -60,7 +60,7 @@ class Principal
         return m('admin_vw')->where(We7::uniacid([]))->where($condition);
     }
 
-    public static function agent($condition = []): model\base\modelObjFinder
+    public static function agent($condition = []): base\modelObjFinder
     {
         if (is_array($condition) && isset($condition['id'])) {
             return m('agent_vw')->where($condition);
@@ -69,7 +69,7 @@ class Principal
         return m('agent_vw')->where(We7::uniacid([]))->where($condition);
     }
 
-    public static function partner($condition = []): model\base\modelObjFinder
+    public static function partner($condition = []): base\modelObjFinder
     {
         if (is_array($condition) && isset($condition['id'])) {
             return m('partner_vw')->where($condition);
@@ -78,7 +78,7 @@ class Principal
         return m('partner_vw')->where(We7::uniacid([]))->where($condition);
     }
 
-    public static function keeper($condition = []): model\base\modelObjFinder
+    public static function keeper($condition = []): base\modelObjFinder
     {
         if (is_array($condition) && isset($condition['id'])) {
             return m('keeper_vw')->where($condition);
@@ -87,7 +87,7 @@ class Principal
         return m('keeper_vw')->where(We7::uniacid([]))->where($condition);
     }
 
-    public static function gspor($condition = []): model\base\modelObjFinder
+    public static function gspor($condition = []): base\modelObjFinder
     {
         if (is_array($condition) && isset($condition['id'])) {
             return m('gspor_vw')->where($condition);
@@ -96,7 +96,7 @@ class Principal
         return m('gspor_vw')->where(We7::uniacid([]))->where($condition);
     }
 
-    public static function tester($condition = []): model\base\modelObjFinder
+    public static function tester($condition = []): base\modelObjFinder
     {
         if (is_array($condition) && isset($condition['id'])) {
             return m('tester_vw')->where($condition);
@@ -105,7 +105,7 @@ class Principal
         return m('tester_vw')->where(We7::uniacid([]))->where($condition);
     }
 
-    public static function promoter($condition = []): model\base\modelObjFinder
+    public static function promoter($condition = []): base\modelObjFinder
     {
         if (is_array($condition) && isset($condition['id'])) {
             return m('promoter_vw')->where($condition);

@@ -7,7 +7,7 @@
 namespace zovye\model;
 
 
-use zovye\model\base\modelObj;
+use zovye\base\modelObj;
 use function zovye\tb;
 
 class admin_vwModelObj extends userModelObj

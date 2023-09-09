@@ -436,7 +436,7 @@ if ($device) {
                 }
 
                 $alert->setPreAlertDays(intval($alertPreDays[$index]));
-                $alert->setInvalidIfExpired(boolval($alertInvalid[$index]));
+                $alert->setInvalidIfExpired($alertInvalid[$index] == 'true');
                 $alert->save();
 
                 $ids[] = $alert->getId();

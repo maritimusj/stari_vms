@@ -179,7 +179,7 @@
                     <i class="fa fa-reply" title="返回"  onclick="backToList();"></i>
                 </span>
             </div>
-            <div class="panel-body seg">
+            <div class="panel-body">
                 <div v-show="active === 'base'">
                     <div class="form-group">
                         <label for="select_agent" class="col-md-2 control-label">所属代理商</label>
@@ -328,8 +328,8 @@
                                                 <div v-show="currentLane == lane">
                                                     <input class="form-control goods" type="number" 
                                                     :name="'price' + i" 
-                                                    min="0" 
-                                                    step="0.01"
+                                                    :step="config.is_fueling_device ? 0.01:1"
+                                                    :min="config.is_fueling_device ? 0.01:1">
                                                     ref="price"
                                                     v-model="lane.goods_price"
                                                     @blur="editPriceDone(lane)"
@@ -347,14 +347,19 @@
                                                     <input type="number" class="form-control goods" 
                                                     :name="'capacities[' + i + ']'" 
                                                     v-model="lane.capacity" 
-                                                    min="0.00">
+                                                    :step="config.is_fueling_device ? 0.01:1"
+                                                    :min="config.is_fueling_device ? 0.01:1">
                                                     <input type="hidden" :name="'goods['+i+']'" :value="lane.goods_id">
                                                 </template>
                                                 <template v-else>
                                                     {{lane.capacity}} 
                                                 </template>
                                             <td>
-                                                <input type="number" class="form-control goods" :name="'lane' + i + '_num'" v-model="lane.num" min="0.00" :max="lane.capacity">
+                                                <input type="number" class="form-control goods" 
+                                                :name="'lane' + i + '_num'" v-model="lane.num" 
+                                                :min="config.is_fueling_device ? 0.01:1"
+                                                :step="config.is_fueling_device ? 0.01:1" 
+                                                :max="lane.capacity">
                                             </td>
                                             <td class="operate">                                          
                                                 <i class="fa fa-gift" 
@@ -493,7 +498,7 @@
                         </div>                         
                     </div>
                 </div>
-                <div v-if="active === 'func'">
+                <div v-if="active === 'func'"  v-if="navExists('func')">
                     <div class="form-group">
                         <label class="col-xs-12 col-md-2 col-md-2 control-label">屏幕</label>
                         <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
@@ -583,7 +588,7 @@
                         </div>
                     </div> 
                 </div>
-                <div v-show="active === 'alert'">
+                <div v-show="active === 'alert'" v-if="navExists('alert')">
                     <div class="seg" v-for="(lane, i) in currentType.cargo_lanes" :class="{unknown: lane.goods_id==0}" :key="currentTypeID+':'+i">
                         <div class="title">货道 {{i + 1}}</div>
                         <div class="form-group">
@@ -602,11 +607,11 @@
                         <div class="form-group">
                             <label :for="'alertExpiredAt['+i+']'" class="col-md-2 control-label">过期时间</label>
                             <div class="col-md-10">
-                                <input :id="'alertExpiredAt['+i+']'" type="text" class="form-control"
-                                       :name="'alertExpiredAt['+i+']'"
-                                       @click="showDatetimePicker(lane, event)"
-                                       :value="lane.alert.expired_at && (lane.alert.expired_at || '')"
-                                       autocomplete="off">
+                                <input type="text" class="form-control" placeholder="<未设置>" autocomplete="off"
+                                    :id="'alertExpiredAt['+i+']'" 
+                                    :name="'alertExpiredAt['+i+']'"
+                                    @click="showDatetimePicker(lane.alert, event, true, true)"
+                                    v-model="lane.alert.expired_at">
                                 <span class="help-block">* 该货道的商品过期时间</span>
                             </div>
                         </div>
@@ -616,7 +621,7 @@
                                 <input type="number" class="form-control"
                                        :name="'alertPreDays['+i+']'"
                                        :id="'alertPreDays['+i+']'"
-                                       :value="lane.alert && (lane.alert.pre_days || 0)"
+                                       v-model="lane.alert.pre_days"
                                 >
                                 <span class="help-block">* 提前多少天就显示提醒信息，0表示不提前提醒</span>
                             </div>
@@ -625,11 +630,13 @@
                             <label class="col-xs-12 col-md-2 col-md-2 control-label">过期处理</label>
                             <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
                                 <label :for="'alertInvalid['+i+']0'" class="radio-inline">
-                                    <input :name="'alertInvalid['+i+']'" :id="'alertInvalid['+i+']0'" type="radio" value="0" :checked="lane.alert && !lane.alert.invalid_if_expired">
+                                    <input :name="'alertInvalid['+i+']'" :id="'alertInvalid['+i+']0'" type="radio" value="true" 
+                                    v-model="lane.alert.invalid_if_expired">
                                     禁止购买
                                 </label>
                                 <label :for="'alertInvalid['+i+']1'" class="radio-inline">
-                                    <input :name="'alertInvalid['+i+']'" :id="'alertInvalid['+i+']1'" type="radio" value="1" :checked="lane.alert && lane.alert.invalid_if_expired">
+                                    <input :name="'alertInvalid['+i+']'" :id="'alertInvalid['+i+']1'" type="radio" value="false" 
+                                    v-model="lane.alert.invalid_if_expired">
                                     允许购买
                                 </label>
                                 <span class="help-block">* 商品过期后，用户是否可以购买</span>
@@ -788,7 +795,12 @@
                         <div class="form-group">
                             <label class="col-md-2 control-label">到期时间</label>
                             <div class="col-md-8">
-                                <input type="text" name="expiration"  value="{php echo $device ? $device->getExpiration() : ''}" placeholder="&lt;无限制&gt;" readonly="readonly" class="datetimepicker form-control" style="padding-left:12px;" />
+                                <input type="text" name="expiration"  
+                                value="{php echo $device ? $device->getExpiration() : ''}" 
+                                placeholder="&lt;无限制&gt;" readonly="readonly" class="form-control"
+                                style="padding-left:12px;" 
+                                @click="showDatetimePicker(ctrl.expiration, event)"
+                                />
                                 <span class="help-block">* 请输入设备到期时间</span>
                             </div>
                             <div class="col-md-2">
@@ -836,7 +848,7 @@
                         </div>
                     </div>
                 </div>
-                <div v-show="active === 'schedule'">
+                <div v-show="active === 'schedule'" v-if="navExists('schedule')">
                     <div class="form-group">
                         <label class="col-xs-12 col-md-2 col-md-2 control-label">是否启用</label>
                         <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
@@ -852,31 +864,31 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="volume" class="col-md-2 control-label">重启时间</label>
+                        <label for="start" class="col-md-2 control-label">重启时间</label>
                         <div class="col-md-4">
-                            {php echo tpl_form_field_clock('start', $extra['schedule']['screen']['on'] ?? '00:00')}
+                            <input class="form-control"  type="text" name="start" id="start" value="{php echo $extra['schedule']['screen']['on'] ?? '00:00'}" @click="showDatetimePicker(ctrl.start, event, false, true)">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="volume" class="col-md-2 control-label">关闭时间</label>
+                        <label for="end" class="col-md-2 control-label">关闭时间</label>
                         <div class="col-md-4">
-                            {php echo tpl_form_field_clock('end', $extra['schedule']['screen']['off'] ?? '00:00')}
+                            <input class="form-control" type="text" name="end" id="end" value="{php echo $extra['schedule']['screen']['off'] ?? '00:00'}" @click="showDatetimePicker(ctrl.end, event, false, true)">
                         </div>
                     </div>
                 </div>
-                <div v-show="active === 'zjb'">
+                <div v-show="active === 'zjb'" v-if="navExists('zjb')">
                     <div class="form-group">
                         <label for="ZJBao_Scene" class="col-md-2 control-label">场景</label>
                         <div class="col-md-10">
-                            <input type="text" class="form-control" name="ZJBao_Scene" id="ZJBao_Scene" value="{php echo strval($zjbao['scene'])}">
+                            <input class="form-control" type="text" name="ZJBao_Scene" id="ZJBao_Scene" value="{php echo strval($zjbao['scene'])}">
                         </div>
                     </div>
                 </div>
-                <div v-show="active === 'moscale'">
+                <div v-show="active === 'moscale'" v-if="navExists('moscale')">
                     <div id="moscale">
                     </div>
                 </div>
-                <div v-show="active === 'zeroBonus'">
+                <div v-show="active === 'zeroBonus'" v-if="navExists('zeroBonus')">
                     <div class="form-group">
                         <label for="zeroBonus" class="col-md-2 control-label">零佣金概率(%)</label>
                         <div class="col-md-10">
@@ -909,13 +921,13 @@
         dlg: null,
     }
 
-    api.showResult = function(params, url, loading, cb) {
+    api.showResult = function (params, url, loading, cb) {
         loading && util.loading();
-        $.getJSON(url || api.url, params).done(function(res){
+        $.getJSON(url || api.url, params).done(function (res) {
             loading && util.loaded();
             if (res) {
                 if (typeof cb == 'function') {
-                    if(cb(res)) {
+                    if (cb(res)) {
                         return;
                     }
                 }
@@ -932,22 +944,22 @@
                     util.message(res.data.msg, '', res.status ? 'success' : 'error');
                 }
             }
-        }).fail(function(){
+        }).fail(function () {
             loading && util.loaded();
         })
     }
-    
+
     api.hide = function () {
         if (api.dlg) {
             api.dlg.modal('hide');
         }
     }
 
-    api.chooseGoods = function(params) {
-        api.showResult({pagesize: 10, ...params});
+    api.chooseGoods = function (params) {
+        api.showResult({ pagesize: 10, ...params });
     }
 
-    require(['jquery', '{php \zovye\url(false, JS_VUE_URL);}', 'datetimepicker'], function($, Vue, datetimepicker) {
+    require(['jquery', '{php \zovye\url(false, JS_VUE_URL);}', 'datetimepicker'], function ($, Vue, datetimepicker) {
         const api_url = "{php echo $this->createWebUrl('devicetypes');}";
         const device_api_url = "{php echo $this->createWebUrl('device')}";
         const package_api_url = "{php echo $this->createWebUrl('package')}";
@@ -959,7 +971,7 @@
                 keywords: '',
                 list: [],
                 currentType: {
-                    cargo_lanes:[],
+                    cargo_lanes: [],
                 },
                 error: '',
                 currentLane: null,
@@ -968,6 +980,11 @@
                 creating: false,
                 packages: [],
                 currentPackage: null,
+                ctrl: {
+                    start: { initilized: false },
+                    end: { initilized: false },
+                    expiration: { initilized: false },
+                },
                 config: {
                     goods_package_enabled: `{php echo \zovye\App::isGoodsPackageEnabled()? 1 : ''}`,
                     expire_alert_enabled: `{php echo \zovye\App::isGoodsExpireAlertEnabled()? 1 : ''}`,
@@ -982,47 +999,47 @@
                     moscale_enabled: `{php echo $moscale ? 1 : ''}`,
                     zjb_enabled: `{php echo $zjb ? 1 : ''}`,
                 },
-                navs:[
-                        {
-                            'op': 'base',
-                            'content': `{$icon} 基本设置`,
-                        },
-                        {
-                            'op': 'func',
-                            'content': `功能设置`,
-                        },
-                        {
-                            'op': 'egg',
-                            'content': `闪蛋设置`,
-                        },
-                        {
-                            'op': 'app',
-                            'content': `APP设置`,
-                        },
-                        {
-                            'op': 'schedule',
-                            'content': `定时任务`,
-                        },
-                        {
-                            'op': 'alert',
-                            'content': `过期设置`,
-                        },
-                        {
-                            'op': 'extra',
-                            'content': `高级设置`,
-                        },
-                        {
-                            'op': 'moscale',
-                            'content': `公锤平台设置`,
-                        },
-                        {
-                            'op': 'zjb',
-                            'content': `纸巾平台宝设置`,
-                        },                        
-                        {
-                            'op': 'zeroBonus',
-                            'content': `零佣金`,
-                        },
+                navs: [
+                    {
+                        'op': 'base',
+                        'content': `{$icon} 基本设置`,
+                    },
+                    {
+                        'op': 'func',
+                        'content': `功能设置`,
+                    },
+                    {
+                        'op': 'egg',
+                        'content': `闪蛋设置`,
+                    },
+                    {
+                        'op': 'app',
+                        'content': `APP设置`,
+                    },
+                    {
+                        'op': 'schedule',
+                        'content': `定时任务`,
+                    },
+                    {
+                        'op': 'alert',
+                        'content': `过期设置`,
+                    },
+                    {
+                        'op': 'extra',
+                        'content': `高级设置`,
+                    },
+                    {
+                        'op': 'moscale',
+                        'content': `公锤平台设置`,
+                    },
+                    {
+                        'op': 'zjb',
+                        'content': `纸巾平台宝设置`,
+                    },
+                    {
+                        'op': 'zeroBonus',
+                        'content': `零佣金`,
+                    },
                 ],
                 active: '{$from}',
             },
@@ -1060,7 +1077,9 @@
                     this.navs.push(nav);
                 } else {
                     let ops_removed = [];
-                    if (!this.config.expire_alert_enabled) {
+                    if (!this.config.expire_alert_enabled ||
+                        this.config.is_charging_device ||
+                        this.config.is_fueling_device) {
                         ops_removed.push('alert');
                     }
                     if (!this.config.is_bluetooth_device) {
@@ -1078,22 +1097,21 @@
                     if (!this.config.zero_bonus_enabled) {
                         ops_removed.push('zeroBonus');
                     }
-                    if (!this.config.flash_egg_enabled) {
+                    if (!this.config.flash_egg_enabled || !this.config.is_normal_device) {
                         ops_removed.push('egg');
                     }
                     this.navs = this.navs.filter(nav => nav && ops_removed.indexOf(nav.op) === -1);
-                    console.log(this.navs);                    
                 }
             },
             mounted() {
-                if (this.deviceId > 0) {                    
+                if (this.deviceId > 0) {
                     this.change(true);
                 } else {
                     this.search();
                     this.addCargoLane();
                 }
                 if (this.config.goods_package_enabled) {
-                    $.getJSON(package_api_url, {op: 'list', device: this.deviceId}).then(res => {
+                    $.getJSON(package_api_url, { op: 'list', device: this.deviceId }).then(res => {
                         if (res && res.status) {
                             this.packages = res.data;
                         }
@@ -1103,20 +1121,23 @@
             },
 
             methods: {
+                navExists(op) {
+                    return this.navs.findIndex(nav => nav.op == op) !== -1;
+                },
                 search() {
                     const self = this;
                     self.searching = true;
-                    $.getJSON(api_url, {keywords: self.keywords, op: 'search'}).then(function (res) {
-                        if(res) {
+                    $.getJSON(api_url, { keywords: self.keywords, op: 'search' }).then(function (res) {
+                        if (res) {
                             if (res.status) {
-                                self.list = res.data.list || [];  
-                            } else  {
+                                self.list = res.data.list || [];
+                            } else {
                                 self.list = [];
                                 self.error = res.data.msg || '&lt;出错了&gt;';
                             }
                         }
                         if (self.list.length === 0) {
-                            self.currentType = {};      
+                            self.currentType = {};
                             self.currentTypeID = 0;
                         }
                         self.searching = false;
@@ -1125,7 +1146,7 @@
                 change(first = false) {
                     const self = this;
                     self.changing = true;
-                    $.getJSON(device_api_url, {op: 'get_lane_detail', deviceid: this.deviceId, typeid: this.currentTypeID}).then(res => {
+                    $.getJSON(device_api_url, { op: 'get_lane_detail', deviceid: this.deviceId, typeid: this.currentTypeID }).then(res => {
                         if (res) {
                             if (res.status) {
                                 self.currentType = res.data;
@@ -1158,6 +1179,7 @@
                             goods_id: 0,
                             goods_name: '<请选择商品>',
                             goods_price: '0.00',
+                            alert: {},
                         })
                     }
                 },
@@ -1166,7 +1188,7 @@
                     if (i !== -1) {
                         this.currentType.cargo_lanes.splice(i, 1);
                     }
-                    if(this.currentType.cargo_lanes.length == 0) {
+                    if (this.currentType.cargo_lanes.length == 0) {
                         this.addCargoLane();
                     }
                 },
@@ -1188,12 +1210,12 @@
                         this.creating = true;
                         $.post(package_api_url, params).then(res => {
                             if (res && res.status) {
-                                $.getJSON(package_api_url, {op: 'detail', id: res.data.id}).then(res => {
+                                $.getJSON(package_api_url, { op: 'detail', id: res.data.id }).then(res => {
                                     if (res && res.status) {
                                         this.packages.push(res.data);
                                         this.currentPackage = null;
                                     }
-                                    this.creating  = false;
+                                    this.creating = false;
                                 })
                             } else {
                                 this.creating = false;
@@ -1219,14 +1241,14 @@
                         this.calcPackageGoodsTotal(this.currentPackage);
                     }
                 },
-                removePackage(p,index) {
+                removePackage(p, index) {
                     if (p && p.id && !this.loading && confirm('确定要删除这个套餐吗？')) {
-                        $.getJSON(package_api_url, {op: 'remove', id: p.id}).then(res => {
+                        $.getJSON(package_api_url, { op: 'remove', id: p.id }).then(res => {
                             if (res && res.status) {
-                                this.packages.splice(index,1);
+                                this.packages.splice(index, 1);
                             }
                         })
-                    }                    
+                    }
                 },
                 removeGoodsFromPackage(index) {
                     if (this.currentPackage) {
@@ -1244,7 +1266,7 @@
                 chooseGoods(lane) {
                     if (this.isCustomizedType) {
                         this.currentLane = lane;
-                        api.chooseGoods(this.config.is_fueling_device ? {types: ['fueling']} : {});
+                        api.chooseGoods(this.config.is_fueling_device ? { types: ['fueling'] } : {});
                     }
                 },
                 setGoods(goods) {
@@ -1263,63 +1285,70 @@
                         this.$nextTick(() => {
                             this.$refs.price[index].focus();
                         })
-                    }                 
+                    }
                 },
                 editPriceDone(lane) {
                     this.currentLane = null;
                     lane.goods_price = parseFloat(lane.goods_price).toFixed(2);
                 },
-                editPackageGoodsPrice(goods,index)
-                {
+                editPackageGoodsPrice(goods, index) {
                     Vue.set(goods, 'edit', true);
                     this.$nextTick(() => {
                         this.$refs.packageGoodsPrice[index].focus();
                     })
                 },
-                editPackageGoodsPriceDone(goods,index)
-                {
+                editPackageGoodsPriceDone(goods, index) {
                     goods.edit = false;
                     goods.price = parseFloat(goods.price).toFixed(2);
                     this.calcPackageGoodsTotal(this.currentPackage);
                 },
-                editPackageGoodsNumDone(goods,index)
-                {
+                editPackageGoodsNumDone(goods, index) {
                     this.calcPackageGoodsTotal(this.currentPackage);
                 },
-                showDatetimePicker(lane, e)
-                {
-                    if (!lane.datetimepicker) {
-                        Vue.set(lane, "datetimepicker", true);
-                        const option = {
-                                lang : "zh",
-                                step : 5,
-                                //timepicker : false,
-                                closeOnDateSelect : true,
-                                format : "Y-m-d H:i",
-                            };
-                        $(e.target).datetimepicker(option);
+                showDatetimePicker(o, e, datepicker = true, timepicker = false) {
+                    if (!o.initilized) {
+                        Vue.set(o, "datetimepicker", true);
+                        let format = '';
+                        if (datepicker) {
+                            format = 'Y-m-d';
+                        }
+                        if (timepicker) {
+                            format = format ? format + ' H:i' : 'H:i';
+                        }
+                        $(e.target).datetimepicker({
+                            lang: "zh",
+                            step: 5,
+                            datepicker: datepicker,
+                            timepicker: timepicker,
+                            closeOnDateSelect: timepicker ? false : true,
+                            format: format,
+                            onChangeDateTime: (dp, $input) => {
+                                Vue.set(o, 'expired_at', $input.val());
+                            }
+                        });
                         $(e.target).datetimepicker('show');
+
                     }
                 }
             }
         })
 
-        $(function() {
-            $('body').on('click', '#goodslist tr:not(.disabled)[data-goods] .name', function(e) {
+        $(function () {
+            $('body').on('click', '#goodslist tr:not(.disabled)[data-goods] .name', function (e) {
                 const tr = $(e.currentTarget).closest('tr');
                 const id = tr.data('goods');
                 const name = tr.data('name');
                 const unit_title = tr.data('title');
                 const price = tr.data('price');
-                if (id) {       
-                    app.setGoods({id, name, unit_title, price});
+                if (id) {
+                    app.setGoods({ id, name, unit_title, price });
                 }
             })
         })
     })
 
     function backToList() {
-        setTimeout(function(){
+        setTimeout(function () {
             util.loading();
         }, 1000);
         const page = localStorage.getItem('device_list.page') || 1;
@@ -1329,7 +1358,7 @@
     function renderTags(tags) {
         const tpl = $('#tag_tpl').clone().removeAttr('id').prop('outerHTML');
         let html = '';
-        tags.forEach(function(title){
+        tags.forEach(function (title) {
             html += tpl.replace(/#{title}#/g, title);
         })
         $('#tagslist').html(html || '<span style="color:gray;">&lt;暂无标签&gt;</span>');
@@ -1340,8 +1369,8 @@
     const vuejsUrl = "{php \zovye\url(false, JS_VUE_URL);}";
 
     function initLegacyJs() {
-        if (moscale_enabled) { 
-            require(["{php echo MODULE_URL}static/js/moscale.min.js?v=20210417"], function(moscale) {          
+        if (moscale_enabled) {
+            require(["{php echo MODULE_URL}static/js/moscale.min.js?v=20210417"], function (moscale) {
                 moscale.init("#moscale", {
                     moscaleMachineKey: "{$moscale['MachineKey']}",
                     label: JSON.parse(`{php echo json_encode($moscale['LabelList']);}`),
@@ -1353,16 +1382,16 @@
         }
 
         let tags = [];
-        $('input[name=tags]').val().split(',').forEach(function(title){
+        $('input[name=tags]').val().split(',').forEach(function (title) {
             if (title !== "") {
                 tags.push(title);
             }
         })
         renderTags(tags);
 
-        $('#addTagBtn').click(function() {
+        $('#addTagBtn').click(function () {
             const titles = $('input[name=newtags]').val().split(',');
-            titles.forEach(function(title){
+            titles.forEach(function (title) {
                 title = $.trim(title);
                 if (title !== "" && tags.indexOf(title) === -1) {
                     tags.push(title);
@@ -1372,19 +1401,19 @@
             renderTags(tags);
         })
 
-        $('#removeExpiration').click(function() {
+        $('#removeExpiration').click(function () {
             $('input[name=expiration]').val('');
         })
 
-        $('#tagslist').on('click', '.tag', function() {
+        $('#tagslist').on('click', '.tag', function () {
             const title = $(this).text().trim();
-            tags = tags.filter(function(e){
+            tags = tags.filter(function (e) {
                 return e !== title;
             })
             renderTags(tags);
         })
 
-        $('[enter-key]').bind("keypress", function(e) {
+        $('[enter-key]').bind("keypress", function (e) {
             if (e.keyCode === 13) {
                 const target = $(this).attr('enter-key');
                 $(target).click();
@@ -1393,19 +1422,19 @@
         })
 
         const ownerId = parseInt("{php echo $agent?$agent->getId() : 0}", 10);
-        $('#find_agent').click(function(){
+        $('#find_agent').click(function () {
             const keyword = $('input[name=keyword_agent]').val();
             let complete = false;
-            setTimeout(function(){
+            setTimeout(function () {
                 if (!complete) {
                     util.loading();
                 }
             }, 1000)
-            $.get("{php echo $this->createWebUrl('agent');}", {op:'search', keyword:keyword}, function(res){
+            $.get("{php echo $this->createWebUrl('agent');}", { op: 'search', keyword: keyword }, function (res) {
                 let html = '';
-                if(res.status) {
+                if (res.status) {
                     const list = res.data || [];
-                    list.forEach(function(e) {
+                    list.forEach(function (e) {
                         html += '<option value="_1*" _**!_>_2*，手机号码：_3*</option>'
                             .replace('_1*', e.id)
                             .replace('_2*', e.name)
@@ -1416,13 +1445,13 @@
                 html += '<option value="0"><无></option>';
                 $('#select_agent').html(html);
 
-            }, 'json').complete(function(){
+            }, 'json').complete(function () {
                 complete = true;
                 util.loaded();
             })
         })
 
-        $('#special input[name=spec]').click(function() {
+        $('#special input[name=spec]').click(function () {
             $('#special fieldset').attr('disabled', !$(this).is(':checked'));
         })
     }
@@ -1431,11 +1460,11 @@
 <script>
     let backer = "";
     let agentId = "";
-    $(function(){
+    $(function () {
         function reload(url) {
             api.showResult({}, url);
         }
-        
+
         $('body').on('click', '#search-bar', function () {
             $(this).hide();
             $('#search-form').show();
@@ -1448,9 +1477,9 @@
             } else {
                 $('#search-form').hide();
                 $('#search-bar').show();
-            }       
-            e.preventDefault();     
-         })
+            }
+            e.preventDefault();
+        })
 
         $('body').on('click', '#search_agent', function () {
             const keyword = $('#search-form input[name=keyword_agent]').val();
@@ -1484,7 +1513,7 @@
             if (s_keywords) {
                 params.append("keywords", s_keywords);
             }
-            
+
             const agentId = $.trim(form.find('select[name=agentId]').val());
             if (agentId !== '') {
                 params.append("agentId", agentId);
@@ -1495,12 +1524,12 @@
             }
 
             params.append("pagesize", 10);
-            
+
             reload(form.attr("action") + "&" + encodeURI(params.toString()));
         }
 
-        $('body').on('submit', "#search-form form", function(e){
-            reloadPageWithFilter();            
+        $('body').on('submit', "#search-form form", function (e) {
+            reloadPageWithFilter();
             e.preventDefault();
         })
 

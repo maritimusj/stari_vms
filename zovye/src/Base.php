@@ -7,6 +7,7 @@
 
 namespace zovye;
 
+use RuntimeException;
 use zovye\base\modelFactory;
 use zovye\base\modelObjFinder;
 
@@ -14,7 +15,7 @@ class Base
 {
     public static function model(): modelFactory
     {
-        trigger_error('Base::model not implemented', E_USER_ERROR);
+        throw new RuntimeException('Base::model not implemented');
     }
 
     protected static function hasUniacid(): bool

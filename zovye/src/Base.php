@@ -7,9 +7,12 @@
 
 namespace zovye;
 
+use zovye\model\base\modelFactory;
+use zovye\model\base\modelObjFinder;
+
 class Base
 {
-    public static function model(): model\base\modelFactory
+    public static function model(): modelFactory
     {
         trigger_error('Base::model not implemented', E_USER_ERROR);
     }
@@ -37,7 +40,7 @@ class Base
         return static::model()->create($data);
     }
 
-    public static function query($condition): model\base\modelObjFinder
+    public static function query($condition): modelObjFinder
     {
         return self::model()->query($condition);
     }

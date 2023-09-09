@@ -1103,6 +1103,8 @@ class Order extends State
             'agent' => '代理商名称',
             'device_title' => '设备名称',
             'device_imei' => '设备IMEI',
+            'device_area' => '设备所属地区',
+            'device_address' => '设备地址',
             'ip' => 'ip地址',
             'address' => '定位地址',
             'createtime' => '创建时间',
@@ -1331,6 +1333,14 @@ class Order extends State
                     case 'device_imei':
                         $data[$header] = $device ? $device->getImei() : $entry->getExtraData('device.imei', '');
                         break;
+                    case 'device_area':
+                        $location = $device ? $device->getLocation() : [];
+                        $data[$header] = is_array($location['area']) ? implode('/', $location['area']) : '';
+                        break;
+                    case 'device_address':
+                        $location = $device ? $device->getLocation() : [];
+                        $data[$header] = strval($location['address']);
+                        break;                                           
                     case 'createtime':
                         $data[$header] = date('Y-m-d H:i:s', $entry->getCreatetime());
                         break;

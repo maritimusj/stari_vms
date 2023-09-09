@@ -233,6 +233,7 @@ class agent
                 'fueling' => App::isFuelingDeviceEnabled(),
                 'flash_egg' => App::isFlashEggEnabled(),
                 'device_schedule' => App::isDeviceScheduleTaskEnabled(),
+                'goods_expire_alert' => App::isGoodsExpireAlertEnabled(),
             ],
             'wxapp' => [
                 'debug' => false,

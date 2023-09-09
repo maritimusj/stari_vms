@@ -650,7 +650,7 @@
                                 <input type="text" class="form-control" placeholder="<未设置>" autocomplete="off"
                                     :id="'alertExpiredAt['+i+']'" 
                                     :name="'alertExpiredAt['+i+']'"
-                                    @click="showDatetimePicker(lane.alert, event, true, true)"
+                                    @click="showDatetimePicker(lane.alert, event, true, false)"
                                     v-model="lane.alert.expired_at">
                                 <span class="help-block">* 该货道的商品过期时间</span>
                             </div>

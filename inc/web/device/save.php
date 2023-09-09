@@ -8,6 +8,7 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use DateTime;
 use RuntimeException;
 use zovye\model\packageModelObj;
 
@@ -408,7 +409,7 @@ if ($device) {
             $getExpiredTimestampFN = function ($index) use ($alertExpiredAt) {
                 $expire_at = $alertExpiredAt[$index];
                 if ($expire_at) {
-                    $datetime = date_create_from_format('Y-m-d H:i', $expire_at);
+                    $datetime = new DateTime($expire_at);
                     if ($datetime) {
                         return $datetime->getTimestamp();
                     }

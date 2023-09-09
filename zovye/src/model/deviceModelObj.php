@@ -1055,12 +1055,12 @@ class deviceModelObj extends modelObj
             foreach ($arr as $text) {
                 $text = trim($text);
                 if ($text) {
-                    $condition = We7::uniacid(['title' => $text]);
+                    $condition = ['title' => $text];
                     /** @var tagsModelObj $tag */
-                    $tag = Tags::model()->findOne($condition);
+                    $tag = Tags::findOne($condition);
                     if (empty($tag)) {
                         $condition['count'] = 1;
-                        $tag = Tags::model()->create($condition);
+                        $tag = Tags::create($condition);
                     } else {
                         $count = Device::query("tags_data REGEXP '<{$tag->getId()}>'")->where("id<>$this->id")->count();
                         $tag->setCount($count + 1);
@@ -1076,7 +1076,7 @@ class deviceModelObj extends modelObj
 
         $diff_tags = array_diff($org_ids, $ids);
         foreach ($diff_tags as $id) {
-            $tag = Tags::model()->findOne(['id' => $id]);
+            $tag = Tags::findOne(['id' => $id]);
             if ($tag) {
                 $count = Device::query("tags_data REGEXP '<{$tag->getId()}>'")->count();
                 $tag->setCount($count - 1);
@@ -1397,7 +1397,7 @@ class deviceModelObj extends modelObj
             if ($tags) {
                 foreach (explode('><', $tags) as $id) {
                     /** @var tagsModelObj $tag */
-                    $tag = Tags::model()->findOne(['id' => $id]);
+                    $tag = Tags::findOne(['id' => $id]);
                     if ($tag) {
                         $titles[$tag->getId()] = $tag->getTitle();
                     }
@@ -2832,12 +2832,12 @@ class deviceModelObj extends modelObj
 
     public function logQuery($cond = []): modelObjFinder
     {
-        return DeviceLogs::model()->where(We7::uniacid(['title' => $this->getImei()]))->where($cond);
+        return DeviceLogs::query(['title' => $this->getImei()])->where($cond);
     }
 
     public function eventQuery($cond = []): modelObjFinder
     {
-        return DeviceEvents::model()->where(We7::uniacid(['device_uid' => $this->getUid()]))->where($cond);
+        return DeviceEvents::query(['device_uid' => $this->getUid()])->where($cond);
     }
 
     public function isOwnerOrSuperior(userModelObj $user): bool

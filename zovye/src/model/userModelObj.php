@@ -293,7 +293,7 @@ class userModelObj extends modelObj
     public function getPayLog($order_id)
     {
         if ($order_id) {
-            return PayLogs::model()->findOne(We7::uniacid(['title' => $order_id]));
+            return PayLogs::findOne(['title' => $order_id]);
         }
 
         return null;
@@ -547,17 +547,21 @@ class userModelObj extends modelObj
 
     public function isSigned(): bool
     {
-        return CacheUtil::expiredCallUtil("daily:sign_in:{$this->getId()}", new DateTime('next day 00:00'), function () {
-            if ($this->getBalance()->log()->where([
-                    'src' => Balance::SIGN_IN_BONUS,
-                    'createtime >=' => (new DateTimeImmutable('00:00'))->getTimestamp(),
-                    'createtime <' => (new DateTimeImmutable('next day 00:00'))->getTimestamp(),
-                ])->count() > 0) {
-                return true;
-            }
+        return CacheUtil::expiredCallUtil(
+            "daily:sign_in:{$this->getId()}",
+            new DateTime('next day 00:00'),
+            function () {
+                if ($this->getBalance()->log()->where([
+                        'src' => Balance::SIGN_IN_BONUS,
+                        'createtime >=' => (new DateTimeImmutable('00:00'))->getTimestamp(),
+                        'createtime <' => (new DateTimeImmutable('next day 00:00'))->getTimestamp(),
+                    ])->count() > 0) {
+                    return true;
+                }
 
-            return false;
-        });
+                return false;
+            }
+        );
     }
 
     public function signIn($val): bool

@@ -7,7 +7,7 @@
 
 namespace zovye;
 
-class AgentApplication
+class AgentApplication extends Base
 {
     public static function model(): base\modelFactory
     {

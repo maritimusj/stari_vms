@@ -27,7 +27,7 @@ class article
 
         $id = Request::int('id');
         /** @var articleModelObj $article */
-        $article = m('article')->findOne(We7::uniacid(['id' => $id]));
+        $article = \zovye\Article::findOne(['id' => $id]);
         if ($article) {
             $article->setTotal(intval($article->getTotal()) + 1);
             $article->save();
@@ -55,7 +55,7 @@ class article
         $page = max(1, Request::int('page'));
         $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
 
-        $query = m('article')->where(We7::uniacid(['type' => 'article']));
+        $query = \zovye\Article::query(['type' => 'article']);
         $total = $query->count();
 
         $result = [
@@ -137,7 +137,7 @@ class article
         $page = max(1, Request::int('page'));
         $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
 
-        $query = m('article')->where(We7::uniacid(['type' => 'faq']));
+        $query = \zovye\Article::query(['type' => 'faq']);
         $total = $query->count();
 
         $result = [

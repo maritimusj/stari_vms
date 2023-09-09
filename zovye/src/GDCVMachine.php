@@ -215,7 +215,7 @@ class GDCVMachine
             $condition['title'] = $device->getImei();
         }
 
-        $query = DeviceLogs::model()->where($condition);
+        $query = DeviceLogs::query($condition);
 
         $list = [];
         /** @var device_logsModelObj $entry */

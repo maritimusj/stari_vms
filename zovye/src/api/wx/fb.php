@@ -90,7 +90,7 @@ class fb
 
         ];
 
-        if (DeviceFeedback::model()->create($data)) {
+        if (DeviceFeedback::create($data)) {
             return ['msg' => '反馈成功！'];
         } else {
             return err('反馈失败！');

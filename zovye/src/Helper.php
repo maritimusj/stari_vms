@@ -110,18 +110,18 @@ class Helper
 
     public static function getOrderPullLog(orderModelObj $order): array
     {
-        $condition = We7::uniacid([
+        $condition = [
             'createtime >=' => $order->getCreatetime(),
             'createtime <' => $order->getCreatetime() + 3600,
             'data REGEXP' => "s:5:\"order\";i:{$order->getId()};",
-        ]);
+        ];
 
         $device = $order->getDevice();
         if ($device) {
             $condition['title'] = $device->getImei();
         }
 
-        $query = DeviceLogs::model()->where($condition);
+        $query = DeviceLogs::query($condition);
 
         $list = [];
         /** @var device_logsModelObj $entry */

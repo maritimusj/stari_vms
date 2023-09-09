@@ -7,7 +7,7 @@
 
 namespace zovye;
 
-class PayLogs
+class PayLogs extends Base
 {
     public static function model(): base\modelFactory
     {

@@ -3,7 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
- 
+
 namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
@@ -21,7 +21,7 @@ if (empty($title)) {
 
 if ($id) {
     /** @var articleModelObj $article */
-    $article = m('article')->findOne(We7::uniacid(['id' => $id, 'type' => $type]));
+    $article = Article::findOne(['id' => $id, 'type' => $type]);
     if ($article) {
         if ($article->getTitle() != $title) {
             $article->setTitle($title);
@@ -32,15 +32,11 @@ if ($id) {
         }
     }
 } else {
-    $article = m('article')->create(
-        We7::uniacid(
-            [
-                'type' => $type,
-                'title' => $title,
-                'content' => $content,
-            ]
-        )
-    );
+    $article = Article::create([
+        'type' => $type,
+        'title' => $title,
+        'content' => $content,
+    ]);
 }
 
 if ($article && $article->save()) {

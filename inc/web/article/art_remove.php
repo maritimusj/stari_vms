@@ -10,7 +10,7 @@ defined('IN_IA') or exit('Access Denied');
 
 $id = Request::int('id');
 if ($id) {
-    $article = m('article')->findOne(We7::uniacid(['id' => $id, 'type' => 'article']));
+    $article = Article::findOne(['id' => $id, 'type' => 'article']);
     if (empty($article)) {
         Response::toast('找不到这篇文章！', Util::url('article'), 'error');
     }

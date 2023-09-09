@@ -117,18 +117,16 @@ class Keeper
         int $num,
         array $extra = []
     ): ?replenishModelObj {
-        return Replenish::model()->create(
-            We7::uniacid(
-                [
-                    'device_uid' => $device->getImei(),
-                    'agent_id' => $device->getAgentId(),
-                    'keeper_id' => $keeper->getId(),
-                    'goods_id' => $goods_id,
-                    'org' => $original,
-                    'num' => $num,
-                    'extra' => json_encode($extra),
-                ]
-            )
+        return Replenish::create(
+            [
+                'device_uid' => $device->getImei(),
+                'agent_id' => $device->getAgentId(),
+                'keeper_id' => $keeper->getId(),
+                'goods_id' => $goods_id,
+                'org' => $original,
+                'num' => $num,
+                'extra' => json_encode($extra),
+            ]
         );
     }
 }

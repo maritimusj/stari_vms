@@ -10,7 +10,7 @@ defined('IN_IA') or exit('Access Denied');
 
 use zovye\model\user_logsModelObj;
 
-$query = UserLogs::model()->query();
+$query = UserLogs::query();
 
 if (Request::has('orderNO')) {
     $query->where(['title' => Request::str('orderNO')]);

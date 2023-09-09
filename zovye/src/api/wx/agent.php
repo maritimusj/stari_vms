@@ -312,17 +312,15 @@ class agent
             return err('对不起，请填写姓名和手机号码！');
         }
 
-        $data = We7::uniacid(
-            [
-                'name' => $name,
-                'mobile' => $mobile,
-                'address' => htmlspecialchars(Request::trim('address')),
-                'referee' => Request::trim('referee'),
-                'state' => 0,
-            ]
-        );
+        $data =             [
+            'name' => $name,
+            'mobile' => $mobile,
+            'address' => htmlspecialchars(Request::trim('address')),
+            'referee' => Request::trim('referee'),
+            'state' => 0,
+        ];
 
-        $app = AgentApplication::model()->create($data);
+        $app = AgentApplication::create($data);
         if ($app) {
             Job::agentApplicationNotification($app->getId());
 
@@ -1297,16 +1295,16 @@ class agent
             $device->cleanLastError();
         }
 
-        $data = We7::uniacid([
+        $data = [
             'device_id' => $device->getImei(),
             'error_code' => $device->getErrorCode(),
             'result_code' => $resultCode,
             'result' => $resultDesc,
             'mobile' => $user->getMobile(),
             'name' => $user->getName(),
-        ]);
+        ];
 
-        if (\zovye\Maintenance::model()->create($data) && $device->save()) {
+        if (\zovye\Maintenance::create($data) && $device->save()) {
             $device->remove('lastErrorData');
 
             return [

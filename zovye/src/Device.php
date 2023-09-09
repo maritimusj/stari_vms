@@ -668,18 +668,19 @@ class Device extends State
             $data = $cmd->getData();
             if ($data) {
                 $str = is_string($data) ? $data : json_encode($data);
-                $data = We7::uniacid([
+
+                $data = [
                     'event' => $cmd->getID(),
                     'device_uid' => $device->getUid(),
-                    'extra' => json_encode([
+                    'extra' => [
                         'id' => $cmd->getId(),
                         'data' => base64_encode($str),
                         'message' => $cmd->getMessage(),
                         'raw' => $cmd->getEncoded(IBlueToothProtocol::HEX),
-                    ]),
-                ]);
+                    ],
+                ];
 
-                if (!DeviceEvents::model()->create($data)) {
+                if (!DeviceEvents::create($data)) {
                     Log::error('events', [
                         'error' => 'create device log failed',
                         'data' => $data,
@@ -694,7 +695,7 @@ class Device extends State
         if ($device->isEventLogEnabled()) {
             $result_data = $result->getEncodeData();
             if ($result_data) {
-                $data = We7::uniacid([
+                $data = [
                     'event' => $result->getID(),
                     'device_uid' => $device->getUid(),
                     'extra' => [
@@ -702,16 +703,14 @@ class Device extends State
                         'code' => $result->getErrorCode(),
                         'message' => $result->getMessage(),
                     ],
-                ]);
+                ];
 
                 $serial = $result->getSerial();
                 if ($serial) {
                     $data['extra']['serial'] = $serial;
                 }
 
-                $data['extra'] = json_encode($data['extra']);
-
-                if (!DeviceEvents::model()->create($data)) {
+                if (!DeviceEvents::create($data)) {
                     Log::error('events', [
                         'error' => 'create device log failed',
                         'data' => $data,

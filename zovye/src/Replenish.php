@@ -7,7 +7,7 @@
 
 namespace zovye;
 
-class Replenish
+class Replenish extends Base
 {
     public static function model(): base\modelFactory
     {

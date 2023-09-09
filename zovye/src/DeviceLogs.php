@@ -7,7 +7,7 @@
 
 namespace zovye;
 
-class DeviceLogs
+class DeviceLogs extends Base
 {
     public static function model(): base\modelFactory
     {

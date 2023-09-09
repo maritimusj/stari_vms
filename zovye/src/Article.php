@@ -7,10 +7,10 @@
 
 namespace zovye;
 
-class UserLogs extends Base
+class Article extends Base
 {
     public static function model(): base\modelFactory
     {
-        return m('user_logs');
+        return m('article');
     }
 }

@@ -7,7 +7,7 @@
 
 namespace zovye;
 
-class AdStats
+class AdStats extends Base
 {
     public static function model(): base\modelFactory
     {

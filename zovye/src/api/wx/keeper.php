@@ -626,24 +626,17 @@ class keeper
             }
         }
 
-        $result['stats']['today'] = (int)Replenish::model()->where(
-            We7::uniacid(
-                ['keeper_id' => $keeper->getId(), 'createtime >=' => (new DateTimeImmutable('00:00'))->getTimestamp()]
-            )
-        )->get('sum(num)');
+        $result['stats']['today'] = (int)Replenish::query()->where([
+            'keeper_id' => $keeper->getId(),
+            'createtime >=' => (new DateTimeImmutable('00:00'))->getTimestamp(),
+        ])->get('sum(num)');
 
-        $result['stats']['this_month'] = (int)Replenish::model()->where(
-            We7::uniacid(
-                [
-                    'keeper_id' => $keeper->getId(),
-                    'createtime >=' => (new DateTimeImmutable('first day of this month 00:00'))->getTimestamp(),
-                ]
-            )
-        )->get('sum(num)');
+        $result['stats']['this_month'] = (int)Replenish::query()->where([
+            'keeper_id' => $keeper->getId(),
+            'createtime >=' => (new DateTimeImmutable('first day of this month 00:00'))->getTimestamp(),
+        ])->get('sum(num)');
 
-        $result['stats']['all'] = (int)Replenish::model()->where(We7::uniacid(['keeper_id' => $keeper->getId()]))->get(
-            'sum(num)'
-        );
+        $result['stats']['all'] = (int)Replenish::query()->where(['keeper_id' => $keeper->getId()])->get('sum(num)');
 
         $lowQuery = Device::keeper($keeper, \zovye\Keeper::OP)->where(
             ['agent_id' => $keeper->getAgentId(), 'remain <' => $remainWarning]
@@ -654,7 +647,7 @@ class keeper
         $result['devices']['low'] = $lowQuery->count();
         $result['devices']['error'] = $errorQuery->count();
 
-        $lastQuery = Replenish::model()->where(We7::uniacid(['keeper_id' => $keeper->getId()]))->orderBy(
+        $lastQuery = Replenish::query()->where(['keeper_id' => $keeper->getId()])->orderBy(
             'createtime DESC'
         )->limit(10);
 
@@ -1196,12 +1189,10 @@ class keeper
             'list' => [],
         ];
 
-        $query = Replenish::model()->where(
-            We7::uniacid([
-                'keeper_id' => $keeper->getId(),
-                'agent_id' => $keeper->getAgentId(),
-            ])
-        );
+        $query = Replenish::query()->where([
+            'keeper_id' => $keeper->getId(),
+            'agent_id' => $keeper->getAgentId(),
+        ]);
 
         if ($d) {
             //请求某天的出货记录
@@ -1260,8 +1251,8 @@ class keeper
                     'createtime <' => $ts_end,
                 ]);
 
-                if (Replenish::model()->where($cond)->count() > 0) {
-                    $total = (int)Replenish::model()->where($cond)->get('sum(num)');
+                if (Replenish::query()->where($cond)->count() > 0) {
+                    $total = (int)Replenish::query()->where($cond)->get('sum(num)');
                     $result['list'][$title] = $total;
                 }
             }

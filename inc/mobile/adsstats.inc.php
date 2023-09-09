@@ -17,26 +17,20 @@ if ($user && $adv) {
     $url = $adv->getExtraData('link');
 
     /** @var advs_statsModelObj $stats */
-    $stats = AdStats::model()->findOne(We7::uniacid(['openid' => $user->getOpenid(), 'advs_id' => $adv->getId()]));
+    $stats = AdStats::findOne(['openid' => $user->getOpenid(), 'advs_id' => $adv->getId()]);
     if (empty($stats)) {
-        $data = We7::uniacid(
-            [
-                'openid' => $user->getOpenid(),
-                'advs_id' => $adv->getId(),
-                'device_id' => Request::int('deviceid'),
-                'account_id' => Request::int('accountid'),
-                'ip' => CLIENT_IP,
-                'count' => 1,
-                'extra' => serialize(
-                    [
-                        'user-agent' => $_SERVER['HTTP_USER_AGENT'],
-                        'url' => $url,
-                    ]
-                ),
-            ]
-        );
-
-        AdStats::model()->create($data);
+        AdStats::create([
+            'openid' => $user->getOpenid(),
+            'advs_id' => $adv->getId(),
+            'device_id' => Request::int('deviceid'),
+            'account_id' => Request::int('accountid'),
+            'ip' => CLIENT_IP,
+            'count' => 1,
+            'extra' => [
+                'user-agent' => $_SERVER['HTTP_USER_AGENT'],
+                'url' => $url,
+            ],
+        ]);
     } else {
         $stats->setCount(intval($stats->getCount()) + 1);
     }

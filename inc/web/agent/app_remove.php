@@ -10,7 +10,7 @@ defined('IN_IA') or exit('Access Denied');
 
 $id = Request::int('id');
 
-$app = AgentApplication::model()->findOne(We7::uniacid(['id' => $id]));
+$app = AgentApplication::findOne(['id' => $id]);
 
 if ($app && $app->destroy()) {
     Response::toast('删除成功！', Util::url('agent', ['op' => 'app']), 'success');

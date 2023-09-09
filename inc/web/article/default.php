@@ -13,7 +13,7 @@ use zovye\model\articleModelObj;
 $page = max(1, Request::int('page'));
 $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
-$query = m('article')->where(We7::uniacid(['type' => 'article']));
+$query = Article::query(['type' => 'article']);
 
 $total = $query->count();
 

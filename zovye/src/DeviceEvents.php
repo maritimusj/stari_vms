@@ -7,7 +7,7 @@
 
 namespace zovye;
 
-class DeviceEvents
+class DeviceEvents extends Base
 {
     public static function model(): base\modelFactory
     {

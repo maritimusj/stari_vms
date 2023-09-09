@@ -18,7 +18,7 @@ $tpl_data = [
 
 $id = Request::int('id');
 if ($id > 0) {
-    $art = m('article')->findOne(We7::uniacid(['id' => $id, 'type' => 'article']));
+    $art = Article::findOne(['id' => $id, 'type' => 'article']);
     if (empty($art)) {
         Response::toast('找不到这篇文章！', Util::url('article'), 'error');
     }

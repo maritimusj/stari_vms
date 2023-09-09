@@ -47,7 +47,7 @@ class Promo
 
         $today = new DateTime('00:00');
 
-        $total = UserLogs::model()->where([
+        $total = UserLogs::query([
             'title' => $user->getMobile(),
             'level' => LOG_SMS,
             'createtime >' => $today->getTimestamp(),
@@ -67,8 +67,7 @@ class Promo
 
     public static function getLastSMSLog(userModelObj $user): ?user_logsModelObj
     {
-
-        return UserLogs::model()->where([
+        return UserLogs::query([
             'title' => $user->getMobile(),
             'level' => LOG_SMS,
         ])->orderBy('id desc')->findOne();
@@ -76,12 +75,10 @@ class Promo
 
     public static function createSMSLog(userModelObj $user, $data = []): ?user_logsModelObj
     {
-        return UserLogs::model()->create(
-            We7::uniacid([
-                'title' => $user->getMobile(),
-                'level' => LOG_SMS,
-                'data' => serialize($data),
-            ])
-        );
+        return UserLogs::create([
+            'title' => $user->getMobile(),
+            'level' => LOG_SMS,
+            'data' => serialize($data),
+        ]);
     }
 }

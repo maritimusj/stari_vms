@@ -7,7 +7,7 @@
 
 namespace zovye;
 
-class Maintenance
+class Maintenance extends Base
 {
     public static function model(): base\modelFactory
     {

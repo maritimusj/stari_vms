@@ -346,13 +346,13 @@ class DeviceEventProcessor
             }
             if (isset($device)) {
                 if ($device->isEventLogEnabled()) {
-                    $data = We7::uniacid([
+                    $data = [
                         'event' => $log['id'],
                         'device_uid' => $device->getUid(),
-                        'extra' => json_encode($data),
-                    ]);
+                        'extra' => $data,
+                    ];
 
-                    if (!DeviceEvents::model()->create($data)) {
+                    if (!DeviceEvents::create($data)) {
                         Log::error('events', [
                             'error' => 'create device log failed',
                             'data' => $data,

@@ -483,7 +483,7 @@ class api
             'createtime' => time(),
         ];
 
-        if (DeviceFeedback::model()->create($data)) {
+        if (DeviceFeedback::create($data)) {
             return ['msg' => '感谢您的反馈，我们会及时核实并处理！'];
         }
 

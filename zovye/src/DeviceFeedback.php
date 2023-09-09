@@ -7,7 +7,7 @@
 
 namespace zovye;
 
-class DeviceFeedback
+class DeviceFeedback extends Base
 {
     public static function model(): base\modelFactory
     {

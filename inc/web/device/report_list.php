@@ -12,8 +12,7 @@ defined('IN_IA') or exit('Access Denied');
 
 $tpl_data = [];
 
-$condition = We7::uniacid([]);
-$query = Maintenance::model()->where($condition);
+$query = Maintenance::query();
 
 $page = max(1, Request::int('page'));
 $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);

@@ -161,6 +161,33 @@
         position: relative;
         left: -10px;
     }
+    .cargo_lanes .goods {
+        position: relative;
+    }
+    .goods .expire-info {
+        display: none;
+        position: absolute;
+        left: 100px;
+        top: 30px;
+        background: #fff;
+        z-index: 99;
+        border: 1px solid #9e9e9e;
+        padding: 10px;
+        min-width: 200px;
+        flex-direction: column;
+        align-items: flex-start;
+        box-shadow: 4px 4px 1px 1px rgb(204 204 204 / 30%);
+    }
+    .goods .expire-info .item {
+        white-space: nowrap;
+    }
+    .goods .expire-info .item .title {
+        font-weight: bolder;
+        margin-right: 10px;
+    }
+    .goods:hover .expire-info {
+        display: flex;
+    }
     [v-cloak] {
         display: none;
     }
@@ -318,18 +345,31 @@
                                                 </div>
                                             </td>
                                             <td :class="{operate: isCustomizedType}">
-                                                <span :class="{'goods_name': isCustomizedType}"  @click="chooseGoods(lane)" title="点击选择商品">
-                                                    {{lane.goods_name}}
-                                                    <sup class="id" title="商品ID" v-if="lane.goods_id>0">{{lane.goods_id}}</sup>
-                                                </span>
-                                                <span v-show="lane.goods_unit_title">（{{lane.goods_unit_title}}）</span>                                     
+                                                <div class="goods">
+                                                    <span :class="{'goods_name': isCustomizedType}"  @click="chooseGoods(lane)" :title="navExists('alert') ? '':'点击选择商品'">
+                                                        {{lane.goods_name}}
+                                                        <sup class="id" title="商品ID" v-if="lane.goods_id>0">{{lane.goods_id}}</sup>
+                                                    </span>
+                                                    <span v-show="lane.goods_unit_title">（{{lane.goods_unit_title}}）</span> 
+                                                    <div v-if="navExists('alert') && lane.alert && lane.alert.expired_at" class="expire-info">
+                                                        <div class="item">
+                                                            <span class="title">过期时间</span><span class="value">{{lane.alert.expired_at}}</span>
+                                                        </div>
+                                                        <div class="item">
+                                                            <span class="title">提前预警</span><span class="value">{{lane.alert.pre_days}}天</span>
+                                                        </div>
+                                                        <div class="item">
+                                                            <span class="title">过期购买</span><span class="value">{{lane.alert.invalid_if_expired ? '禁止购买':'允许购买'}}</span>
+                                                        </div>
+                                                    </div>                                                       
+                                                </div>
                                             </td>
                                             <td>
                                                 <div v-show="currentLane == lane">
                                                     <input class="form-control goods" type="number" 
                                                     :name="'price' + i" 
                                                     :step="config.is_fueling_device ? '0.01':'1'"
-                                                    :min="config.is_fueling_device ? '0.00':'0'">
+                                                    :min="config.is_fueling_device ? '0.00':'0'"
                                                     ref="price"
                                                     v-model="lane.goods_price"
                                                     @blur="editPriceDone(lane)"

@@ -68,6 +68,12 @@
     #goodslist tr.disabled {
         filter: grayscale(1);
     }
+    #goodslist td.name {
+        cursor: pointer;
+        max-width: 150px;
+        white-space: nowrap;
+        overflow: auto;
+    }
 </style>
 {template "web/goods/nav"}
 {if $goods_list}

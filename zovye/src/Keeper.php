@@ -125,7 +125,7 @@ class Keeper
                 'goods_id' => $goods_id,
                 'org' => $original,
                 'num' => $num,
-                'extra' => json_encode($extra),
+                'extra' => $extra,
             ]
         );
     }

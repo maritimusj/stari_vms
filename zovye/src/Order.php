@@ -1085,7 +1085,7 @@ class Order extends State
         static $headers = [
             'ID' => 'ID',
             'order_no' => '订单号',
-            'pay_no' => '支付号',
+            'pay_no' => '交易号',
             'pay_type' => '支付类型',
             'username' => '用户名',
             'openid' => '用户openid',

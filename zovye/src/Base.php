@@ -18,9 +18,9 @@ class Base
         throw new RuntimeException('Base::model not implemented');
     }
 
-    protected static function hasUniacid(): bool
+    protected static function has($property): bool
     {
-        return property_exists(static::model()->objClassname(), 'uniacid');
+        return property_exists(static::model()->objClassname(), $property);
     }
 
     public static function create($data)
@@ -35,11 +35,11 @@ class Base
 
         $classname = static::model()->objClassname();
 
-        if (self::hasUniacid()) {
+        if (self::has('uniacid')) {
             $data['uniacid'] = We7::uniacid();
         }
 
-        if (property_exists($classname, 'extra') && isset($data['extra'])) {
+        if (self::has('extra') && isset($data['extra'])) {
             $data['extra'] = call_user_func([$classname, 'serializeExtra'], $data['extra']);
         }
 
@@ -48,7 +48,7 @@ class Base
 
     public static function query($condition = []): modelObjFinder
     {
-        if (self::hasUniacid()) {
+        if (self::has('uniacid')) {
             return static::model()->where(We7::uniacid([]))->where($condition);
         }
 

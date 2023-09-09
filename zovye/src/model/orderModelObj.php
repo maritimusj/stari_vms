@@ -7,19 +7,18 @@
 namespace zovye\model;
 
 use zovye\Account;
+use zovye\Agent;
 use zovye\App;
 use zovye\Balance;
-use zovye\LocationUtil;
-use zovye\Order;
-use zovye\User;
-use zovye\Agent;
-use zovye\Goods;
 use zovye\Device;
-use zovye\base\modelObj;
+use zovye\Goods;
+use zovye\LocationUtil;
+use zovye\model\base\modelObj;
+use zovye\Order;
 use zovye\traits\ExtraDataGettersAndSetters;
-
-use function zovye\tb;
+use zovye\User;
 use function zovye\is_error;
+use function zovye\tb;
 
 /**
  * Class orderModelObj

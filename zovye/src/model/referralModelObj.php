@@ -7,10 +7,9 @@
 namespace zovye\model;
 
 use zovye\Agent;
-
-use function zovye\tb;
-use zovye\base\modelObj;
+use zovye\model\base\modelObj;
 use zovye\User;
+use function zovye\tb;
 
 /**
  * Class referralModelObj

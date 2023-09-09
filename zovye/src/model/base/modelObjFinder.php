@@ -4,7 +4,7 @@
  * @url www.stariture.com
  */
 
-namespace zovye\base;
+namespace zovye\model\base;
 
 use we7\SqlParser;
 use zovye\We7;
@@ -23,12 +23,6 @@ class modelObjFinder extends SqlParser
     public function __construct(modelFactory $factory)
     {
         $this->factory = $factory;
-    }
-
-    public function isPropertyExists($name): bool
-    {
-        $class_name = $this->factory->objClassname();
-        return property_exists($class_name, $name);
     }
 
     /**
@@ -102,6 +96,7 @@ class modelObjFinder extends SqlParser
     public function page(int $page, int $page_size): modelObjFinder
     {
         $this->limit = [$page, $page_size];
+
         return $this;
     }
 
@@ -112,6 +107,7 @@ class modelObjFinder extends SqlParser
     public function orderBy($order_by): modelObjFinder
     {
         $this->orderBy = array_merge(is_array($order_by) ? $order_by : [$order_by], $this->orderBy);
+
         return $this;
     }
 
@@ -122,6 +118,7 @@ class modelObjFinder extends SqlParser
     public function groupBy($group_by): modelObjFinder
     {
         $this->groupBy = array_merge(is_array($group_by) ? $group_by : [$group_by], $this->groupBy);
+
         return $this;
     }
 
@@ -176,6 +173,7 @@ class modelObjFinder extends SqlParser
     public function delete($condition = []): bool
     {
         $this->where($condition);
+
         return We7::pdo_query($this->makeSQL('', true), $this->params);
     }
 
@@ -271,9 +269,11 @@ class modelObjFinder extends SqlParser
 
         if ($lazy) {
             $res = We7::pdo_fetchAll($this->makeSQL('id'), $this->params);
+
             return new modelObjIteratorLazy($this->factory, $res);
         } else {
             $res = We7::pdo_fetchAll($this->makeSQL('*'), $this->params);
+
             return new modelObjIterator($this->factory, $res);
         }
     }

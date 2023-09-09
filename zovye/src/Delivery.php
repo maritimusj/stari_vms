@@ -6,7 +6,7 @@
 
 namespace zovye;
 
-use zovye\base\modelObjFinder;
+use zovye\model\base\modelObjFinder;
 use zovye\model\deliveryModelObj;
 use zovye\model\goodsModelObj;
 use zovye\model\userModelObj;

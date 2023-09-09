@@ -6,8 +6,8 @@
 
 namespace zovye\model;
 
-use zovye\base\modelObj;
 use zovye\Device;
+use zovye\model\base\modelObj;
 use zovye\Order;
 use zovye\traits\ExtraDataGettersAndSetters;
 use zovye\User;

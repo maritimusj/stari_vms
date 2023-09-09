@@ -7,7 +7,7 @@
 namespace zovye;
 
 use Exception;
-use zovye\base\modelObj;
+use zovye\model\base\modelObj;
 use zovye\model\migrationModelObj;
 
 class Migrate
@@ -150,7 +150,7 @@ class Migrate
         We7::pdo_delete(migrationModelObj::getTableName(modelObj::OP_WRITE), We7::uniacid([]));
     }
 
-    public static function query($condition = []): base\modelObjFinder
+    public static function query($condition = []): model\base\modelObjFinder
     {
         return m('migration')->query(We7::uniacid([]))->where($condition);
     }

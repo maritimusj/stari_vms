@@ -6,9 +6,8 @@
 
 namespace zovye\model;
 
-use zovye\base\modelObj;
+use zovye\model\base\modelObj;
 use zovye\We7;
-
 use function zovye\tb;
 
 /**

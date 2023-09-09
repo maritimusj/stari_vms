@@ -7,12 +7,12 @@
 namespace zovye;
 
 use zovye\model\advertisingModelObj;
+use zovye\model\agentModelObj;
+use zovye\model\base\modelObjFinder;
+use zovye\model\deviceModelObj;
 use zovye\model\goodsModelObj;
 use zovye\model\keeperModelObj;
 use zovye\model\userModelObj;
-use zovye\model\deviceModelObj;
-use zovye\base\modelObjFinder;
-use zovye\model\agentModelObj;
 
 class Agent
 {

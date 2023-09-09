@@ -6,12 +6,12 @@
 
 namespace zovye\model;
 
-use zovye\User;
-use zovye\Device;
 use zovye\Account;
-use function zovye\tb;
-use zovye\base\modelObj;
+use zovye\Device;
+use zovye\model\base\modelObj;
 use zovye\traits\ExtraDataGettersAndSetters;
+use zovye\User;
+use function zovye\tb;
 
 /**
  * @method getRequestId()

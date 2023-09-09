@@ -6,7 +6,7 @@
 
 namespace zovye;
 
-use zovye\base\modelObjFinder;
+use zovye\model\base\modelObjFinder;
 use zovye\model\deviceModelObj;
 use zovye\model\keeperModelObj;
 use zovye\model\replenishModelObj;

@@ -9,7 +9,7 @@ namespace zovye;
 use Closure;
 use DateTimeImmutable;
 use Exception;
-use zovye\base\modelObj;
+use zovye\model\base\modelObj;
 use zovye\model\cacheModelObj;
 
 class Cache
@@ -19,7 +19,7 @@ class Cache
         return m('cache')->create($data);
     }
 
-    protected static function query($condition = []): base\modelObjFinder
+    protected static function query($condition = []): model\base\modelObjFinder
     {
         return m('cache')->query($condition);
     }

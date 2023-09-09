@@ -21,9 +21,9 @@ class Package
 
     /**
      * @param mixed $condition
-     * @return base\modelObjFinder
+     * @return \zovye\model\base\modelObjFinder
      */
-    public static function query($condition = []): base\modelObjFinder
+    public static function query($condition = []): model\base\modelObjFinder
     {
         return m('package')->query($condition);
     }

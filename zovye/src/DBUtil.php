@@ -8,7 +8,7 @@
 namespace zovye;
 
 use Exception;
-use zovye\base\modelObj;
+use zovye\model\base\modelObj;
 
 class DBUtil
 {

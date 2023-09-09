@@ -22,14 +22,14 @@ class PackageGoods
 
     /**
      * @param mixed $condition
-     * @return base\modelObjFinder
+     * @return \zovye\model\base\modelObjFinder
      */
-    public static function query($condition = []): base\modelObjFinder
+    public static function query($condition = []): model\base\modelObjFinder
     {
         return m('package_goods')->query($condition);
     }
 
-    public static function queryFor(packageModelObj $package): base\modelObjFinder
+    public static function queryFor(packageModelObj $package): model\base\modelObjFinder
     {
         return self::query(['package_id' => $package->getId()]);
     }

@@ -6,11 +6,11 @@
 
 namespace zovye;
 
-use zovye\base\modelObj;
-use zovye\model\userModelObj;
-use zovye\base\modelObjFinder;
+use zovye\model\base\modelObj;
+use zovye\model\base\modelObjFinder;
 use zovye\model\deviceModelObj;
 use zovye\model\inventoryModelObj;
+use zovye\model\userModelObj;
 use zovye\traits\ExtraDataGettersAndSetters;
 
 class Inventory

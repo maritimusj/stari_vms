@@ -39,7 +39,7 @@ class Task
         return $taskLog;
     }
 
-    public static function query($condition = []): base\modelObjFinder
+    public static function query($condition = []): model\base\modelObjFinder
     {
         return m('task_vw')->query($condition);
     }

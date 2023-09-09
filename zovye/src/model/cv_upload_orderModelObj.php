@@ -5,9 +5,8 @@
  */
 namespace zovye\model;
 
-use zovye\base\modelObj;
+use zovye\model\base\modelObj;
 use zovye\Order;
-
 use function zovye\tb;
 
 class cv_upload_orderModelObj extends modelObj

@@ -6,11 +6,10 @@
 
 namespace zovye\model;
 
+use zovye\model\base\modelObj;
 use zovye\We7;
-use zovye\base\modelObj;
-
-use function zovye\tb;
 use function zovye\getArray;
+use function zovye\tb;
 
 /**
  * Class commission_balanceModelObj

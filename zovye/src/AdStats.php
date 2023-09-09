@@ -9,7 +9,7 @@ namespace zovye;
 
 class AdStats
 {
-    public static function model(): base\modelFactory
+    public static function model(): model\base\modelFactory
     {
         return m('advs_stats');
     }

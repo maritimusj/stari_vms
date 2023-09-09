@@ -20,7 +20,7 @@ class BalanceLog
         return m('balance_logs')->create($data);
     }
 
-    public static function query($condition = []): base\modelObjFinder
+    public static function query($condition = []): model\base\modelObjFinder
     {
         return m('balance_logs')->query($condition);
     }

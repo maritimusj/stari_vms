@@ -6,15 +6,15 @@
 
 namespace zovye\model;
 
-use zovye\base\modelObjFinder;
-use zovye\User;
-use zovye\Locker;
 use zovye\Inventory;
-use function zovye\tb;
-use zovye\InventoryLog;
-use zovye\base\modelObj;
 use zovye\InventoryGoods;
+use zovye\InventoryLog;
+use zovye\Locker;
+use zovye\model\base\modelObj;
+use zovye\model\base\modelObjFinder;
 use zovye\traits\ExtraDataGettersAndSetters;
+use zovye\User;
+use function zovye\tb;
 
 /**
  * @method getTitle()

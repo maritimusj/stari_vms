@@ -6,11 +6,10 @@
 
 namespace zovye\model;
 
-use function zovye\m;
-
-use function zovye\tb;
-use zovye\base\modelObj;
+use zovye\model\base\modelObj;
 use zovye\traits\ExtraDataGettersAndSetters;
+use function zovye\m;
+use function zovye\tb;
 
 /**
  * Class goods_voucherModelObj

@@ -6,10 +6,10 @@
 
 namespace zovye\model;
 
+use zovye\model\base\modelObj;
+use zovye\PackageGoods;
 use zovye\Util;
 use function zovye\tb;
-use zovye\PackageGoods;
-use zovye\base\modelObj;
 
 /**
  * @method getTitle()

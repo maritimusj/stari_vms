@@ -43,7 +43,7 @@ class Balance
         return strval($this->total());
     }
 
-    public static function query($condition = []): base\modelObjFinder
+    public static function query($condition = []): model\base\modelObjFinder
     {
         if (is_array($condition) && isset($condition['id'])) {
             return m('balance')->where($condition);
@@ -200,7 +200,7 @@ class Balance
     /**
      * 返回用户积分变动记录
      */
-    public function log(): ?base\modelObjFinder
+    public function log(): ?model\base\modelObjFinder
     {
         if ($this->user) {
             $openid = $this->user->getOpenid();

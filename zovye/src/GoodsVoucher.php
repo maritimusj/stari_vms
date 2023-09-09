@@ -6,16 +6,16 @@
 
 namespace zovye;
 
-use zovye\model\goods_voucher_logsModelObj;
-use zovye\model\userModelObj;
 use zovye\model\agentModelObj;
-use zovye\model\goodsModelObj;
+use zovye\model\goods_voucher_logsModelObj;
 use zovye\model\goods_voucherModelObj;
+use zovye\model\goodsModelObj;
+use zovye\model\userModelObj;
 use zovye\traits\ExtraDataGettersAndSetters;
 
 class GoodsVoucher
 {
-    public static function query($condition = []): base\modelObjFinder
+    public static function query($condition = []): model\base\modelObjFinder
     {
         if (is_array($condition) && isset($condition['id'])) {
             return m('goods_voucher')->where($condition);
@@ -138,7 +138,7 @@ class GoodsVoucher
         return $data ?? [];
     }
 
-    public static function logs($cond = []): base\modelObjFinder
+    public static function logs($cond = []): model\base\modelObjFinder
     {
         return m('goods_voucher_logs')->where(We7::uniacid([]))->where($cond);
     }

@@ -7,9 +7,8 @@
 namespace zovye\model;
 
 use zovye\Keeper;
-
+use zovye\model\base\modelObj;
 use function zovye\tb;
-use zovye\base\modelObj;
 
 /**
  * @method getDeviceId()

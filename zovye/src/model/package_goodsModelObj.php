@@ -7,8 +7,8 @@
 namespace zovye\model;
 
 use zovye\Goods;
+use zovye\model\base\modelObj;
 use function zovye\tb;
-use zovye\base\modelObj;
 
 /**
  * @method getPrice()

@@ -4,7 +4,7 @@
  * @url www.stariture.com
  */
 
-namespace zovye\base;
+namespace zovye\model\base;
 
 use zovye\DBUtil;
 use zovye\We7;
@@ -96,7 +96,7 @@ DEBUG_MODE;
  */
 namespace zovye\model;
 
-use zovye\\base\\modelObj;
+use zovye\\model\\base\\modelObj;
 use function zovye\\tb;
 
 class $classname extends modelObj

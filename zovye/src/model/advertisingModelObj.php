@@ -6,16 +6,15 @@
 
 namespace zovye\model;
 
-use zovye\We7;
-use zovye\Agent;
 use zovye\Advertising;
+use zovye\Agent;
+use zovye\model\base\modelObj;
 use zovye\ReviewResult;
-use zovye\base\modelObj;
 use zovye\traits\ExtraDataGettersAndSetters;
-
-use function zovye\tb;
+use zovye\We7;
 use function zovye\getArray;
 use function zovye\setArray;
+use function zovye\tb;
 
 /**
  * Class advertisingModelObj

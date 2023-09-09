@@ -6,10 +6,9 @@
 
 namespace zovye\model;
 
-use function zovye\tb;
-
-use zovye\base\modelObj;
+use zovye\model\base\modelObj;
 use zovye\traits\ExtraDataGettersAndSetters;
+use function zovye\tb;
 
 class order_goodsModelObj extends modelObj
 {

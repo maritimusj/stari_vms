@@ -9,14 +9,13 @@ namespace zovye\model;
 use zovye\Account;
 use zovye\Agent;
 use zovye\App;
-use zovye\base\modelObj;
-use zovye\base\modelObjFinder;
 use zovye\Goods;
+use zovye\model\base\modelObj;
+use zovye\model\base\modelObjFinder;
 use zovye\State;
 use zovye\traits\ExtraDataGettersAndSetters;
 use zovye\Util;
 use zovye\WxPlatform;
-
 use function zovye\m;
 use function zovye\tb;
 

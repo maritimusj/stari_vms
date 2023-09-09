@@ -11,7 +11,6 @@ defined('IN_IA') or exit('Access Denied');
 //创建订单
 use Exception;
 use zovye\App;
-use zovye\base\modelObj;
 use zovye\CtrlServ;
 use zovye\DBUtil;
 use zovye\Device;
@@ -22,6 +21,7 @@ use zovye\Job;
 use zovye\JobException;
 use zovye\Log;
 use zovye\model\accountModelObj;
+use zovye\model\base\modelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\goods_voucher_logsModelObj;
 use zovye\model\userModelObj;

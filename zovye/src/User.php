@@ -6,8 +6,8 @@
 
 namespace zovye;
 
+use zovye\model\base\modelObjFinder;
 use zovye\model\userModelObj;
-use zovye\base\modelObjFinder;
 
 /**
  * Class User

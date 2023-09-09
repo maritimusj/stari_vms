@@ -94,7 +94,7 @@ class Team
         );
     }
 
-    public static function queryFor(userModelObj $user, $condition = []): base\modelObjFinder
+    public static function queryFor(userModelObj $user, $condition = []): model\base\modelObjFinder
     {
         return self::query(['owner_id' => $user->getId()])->where($condition);
     }
@@ -145,12 +145,12 @@ class Team
     }
 
 
-    public static function findAllMember(teamModelObj $team, $condition = []): base\modelObjFinder
+    public static function findAllMember(teamModelObj $team, $condition = []): model\base\modelObjFinder
     {
         return m('team_member')->where(['team_id' => $team->getId()])->where($condition);
     }
 
-    public static function query($condition = []): base\modelObjFinder
+    public static function query($condition = []): model\base\modelObjFinder
     {
         return m('team')->query($condition);
     }

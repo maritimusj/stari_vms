@@ -27,7 +27,7 @@ class GSP
     const LEVEL2 = '[level2]';
     const LEVEL3 = '[level3]';
 
-    public static function query($condition = []): base\modelObjFinder
+    public static function query($condition = []): model\base\modelObjFinder
     {
         return m('gsp_user')->query($condition);
     }
@@ -37,7 +37,7 @@ class GSP
         return self::query($condition)->findOne();
     }
 
-    public static function from(agentModelObj $agent): base\modelObjFinder
+    public static function from(agentModelObj $agent): model\base\modelObjFinder
     {
         return self::query(['agent_id' => $agent->getId()]);
     }

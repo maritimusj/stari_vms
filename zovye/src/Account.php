@@ -23,10 +23,10 @@ use zovye\account\YiDaoAccount;
 use zovye\account\YouFenAccount;
 use zovye\account\YunfenbaAccount;
 use zovye\account\ZhiJinBaoAccount;
-use zovye\base\modelObjFinder;
 use zovye\Contract\IAccountProvider;
 use zovye\model\account_queryModelObj;
 use zovye\model\accountModelObj;
+use zovye\model\base\modelObjFinder;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 

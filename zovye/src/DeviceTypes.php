@@ -6,7 +6,7 @@
 
 namespace zovye;
 
-use zovye\base\modelObjFinder;
+use zovye\model\base\modelObjFinder;
 use zovye\model\device_typesModelObj;
 use zovye\model\deviceModelObj;
 use zovye\traits\ExtraDataGettersAndSetters;

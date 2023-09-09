@@ -10,42 +10,40 @@ namespace zovye\model;
 use DateTime;
 use DateTimeImmutable;
 use zovye\Account;
+use zovye\Agent;
+use zovye\App;
 use zovye\Balance;
-
 use zovye\CacheUtil;
 use zovye\ChargingNowData;
+use zovye\CommissionBalance;
 use zovye\Contract\ICard;
 use zovye\DBUtil;
+use zovye\Device;
 use zovye\Fueling;
+use zovye\Keeper;
 use zovye\Locker;
+use zovye\LoginData;
+use zovye\model\base\modelObj;
+use zovye\Order;
 use zovye\Pay;
 use zovye\PayLogs;
+use zovye\Principal;
 use zovye\Referral;
+use zovye\User;
 use zovye\UserCommissionBalanceCard;
+use zovye\Util;
 use zovye\VIP;
 use zovye\VIPCard;
 use zovye\We7;
-use zovye\User;
-use zovye\Util;
-use zovye\Agent;
-use zovye\App;
-use zovye\Order;
-use zovye\WxMCHPay;
-use zovye\LoginData;
 use zovye\We7credit;
-use zovye\base\modelObj;
-use zovye\CommissionBalance;
-use zovye\Device;
-use zovye\Keeper;
-use zovye\Principal;
-
+use zovye\WxMCHPay;
 use zovye\WxMCHPayV3;
 use function zovye\err;
+use function zovye\is_error;
 use function zovye\isEmptyArray;
 use function zovye\m;
-use function zovye\tb;
 use function zovye\settings;
-use function zovye\is_error;
+use function zovye\tb;
 
 /**
  * Class userModelObj.

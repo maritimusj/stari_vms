@@ -7,7 +7,7 @@
 namespace zovye\model;
 
 
-use zovye\base\modelObj;
+use zovye\model\base\modelObj;
 use function zovye\tb;
 
 class promoter_vwModelObj extends userModelObj

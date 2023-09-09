@@ -6,10 +6,10 @@
 namespace zovye\model;
 
 use zovye\FlashEgg;
+use zovye\model\base\modelObj;
+use zovye\traits\ExtraDataGettersAndSetters;
 use zovye\User;
 use function zovye\tb;
-use zovye\base\modelObj;
-use zovye\traits\ExtraDataGettersAndSetters;
 
 /**
  * @method setStatus(int $int)

@@ -5,13 +5,12 @@
  */
 namespace zovye\model;
 
-use function zovye\tb;
-
 use zovye\Agent;
-use zovye\base\modelObj;
 use zovye\Goods;
+use zovye\model\base\modelObj;
 use zovye\traits\ExtraDataGettersAndSetters;
 use zovye\Util;
+use function zovye\tb;
 
 /**
  * @method setAgentId(int $param)

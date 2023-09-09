@@ -4,9 +4,8 @@
 namespace zovye\model;
 
 
-use zovye\base\modelObj;
 use zovye\GSP;
-
+use zovye\model\base\modelObj;
 use function zovye\tb;
 
 /**

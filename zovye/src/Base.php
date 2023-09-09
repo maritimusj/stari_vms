@@ -40,23 +40,23 @@ class Base
         return static::model()->create($data);
     }
 
-    public static function query($condition): modelObjFinder
+    public static function query($condition = []): modelObjFinder
     {
-        return self::model()->query($condition);
+        return static::model()->query($condition);
     }
 
-    public static function findOne($condition)
+    public static function findOne($condition = [])
     {
-        return self::model()->findOne($condition);
+        return static::model()->findOne($condition);
     }
 
-    public static function exists($condition): bool
+    public static function exists($condition = []): bool
     {
-        return self::model()->exists($condition);
+        return static::model()->exists($condition);
     }
 
     public static function remove($condition): bool
     {
-        return self::model()->remove($condition);
+        return static::model()->remove($condition);
     }
 }

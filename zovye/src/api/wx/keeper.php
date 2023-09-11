@@ -646,7 +646,7 @@ class keeper
         $errorQuery = Device::keeper($keeper, \zovye\Keeper::OP)->where(
             ['agent_id' => $keeper->getAgentId(), 'error_code <>' => 0]
         );
-        
+
         $result['devices']['low'] = $lowQuery->count();
         $result['devices']['error'] = $errorQuery->count();
 
@@ -658,7 +658,7 @@ class keeper
         foreach ($lastQuery->findAll() as $entry) {
             $device_name = $entry->getExtraData('device.name');
             if (empty($device_name)) {
-                $device = Device::get($entry->getDeviceUid(), true);
+                $device = $entry->getDevice();
                 if ($device) {
                     $device_name = $device->getName();
                 }
@@ -1216,7 +1216,7 @@ class keeper
                 foreach ($query->findAll() as $entry) {
                     $device_name = $entry->getExtraData('device.name');
                     if (empty($device_name)) {
-                        $device = Device::get($entry->getDeviceUid(), true);
+                        $device = $entry->getDevice();
                         if ($device) {
                             $device_name = $device->getName();
                         }

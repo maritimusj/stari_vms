@@ -7,6 +7,7 @@
 namespace zovye\model;
 
 use zovye\base\modelObj;
+use zovye\Device;
 use zovye\traits\ExtraDataGettersAndSetters;
 use function zovye\tb;
 
@@ -44,5 +45,10 @@ class replenishModelObj extends modelObj
     public static function getTableName($read_or_write): string
     {
         return tb('replenish');
+    }
+
+    public function getDevice(): ?deviceModelObj
+    {
+        return Device::get($this->device_uid, true);
     }
 }

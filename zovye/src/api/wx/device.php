@@ -205,7 +205,7 @@ class device
                     $alert = GoodsExpireAlert::getFor($device, $index, $lane['goods']);
                     if ($alert) {
                         $expire_at = $alert->getExpiredAt();
-                        $result['status']['cargo_lanes']['alert'] = [
+                        $result['status']['cargo_lanes'][$index]['alert'] = [
                             'expired_at' => $expire_at > 0 ? date('Y-m-d', $expire_at) : '',
                             'pre_days' => $alert->getPreAlertDays(),
                             'invalid_if_expired' => $alert->invalidIfExpired(),

@@ -33,9 +33,9 @@ class alert
             return err('指定货道不存在！');
         }
 
-        $expired_at = Request::str('expiredAt');
-        $pre_days = Request::int('preDays');
-        $invalid_if_expired = Request::bool('invalidIfExpired');
+        $expired_at = Request::str('expired_at');
+        $pre_days = Request::int('pre_days');
+        $invalid_if_expired = Request::bool('invalid_if_expired');
 
         $alert = GoodsExpireAlert::getFor($device, $lane_id);
 

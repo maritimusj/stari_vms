@@ -615,7 +615,6 @@ class keeper
 
         $result['stats']['all'] = (int)Replenish::query()->where(['keeper_id' => $keeper->getId()])->get('sum(num)');
 
-
         if (Request::has('remain')) {
             $remainWarning = max(1, Request::int('remain'));
         } else {
@@ -666,30 +665,29 @@ class keeper
                 $cond['device_id'][] = $device->getId();
             }
 
-            if (empty($cond['device_id'])) {
-                return [];
-            }
-
-            if (Request::has('src')) {
-                $cond['src'] = Request::int('src');
-            }
-
-            $w = Request::str('w');
-
-            if (empty($w) || $w == 'today') {
-                $result['today'] = agent::getUserTodayStats($user ? $user->getOpenid() : '', $cond);
-            }
-
-            if (empty($w) || $w == 'yesterday') {
-                $result['yesterday'] = agent::getUserYesterdayStats($user ? $user->getOpenid() : '', $cond);
-            }
-
-            if (empty($w) || $w == 'month') {
-                $result['month'] = agent::getUserMonthStats($user ? $user->getOpenid() : '', $cond);
-            }
-
-            if (empty($w) || $w == 'year') {
-                $result['year'] = agent::getUserYearStats($user ? $user->getOpenid() : '', $cond);
+            if (!empty($cond['device_id'])) {
+                
+                if (Request::has('src')) {
+                    $cond['src'] = Request::int('src');
+                }
+    
+                $w = Request::str('w');
+    
+                if (empty($w) || $w == 'today') {
+                    $result['today'] = agent::getUserTodayStats($user ? $user->getOpenid() : '', $cond);
+                }
+    
+                if (empty($w) || $w == 'yesterday') {
+                    $result['yesterday'] = agent::getUserYesterdayStats($user ? $user->getOpenid() : '', $cond);
+                }
+    
+                if (empty($w) || $w == 'month') {
+                    $result['month'] = agent::getUserMonthStats($user ? $user->getOpenid() : '', $cond);
+                }
+    
+                if (empty($w) || $w == 'year') {
+                    $result['year'] = agent::getUserYearStats($user ? $user->getOpenid() : '', $cond);
+                }
             }
         }
 

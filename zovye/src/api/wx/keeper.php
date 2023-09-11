@@ -897,7 +897,7 @@ class keeper
         }
 
         if (App::isGoodsExpireAlertEnabled()) {
-            $payload = Helper::getPayloadWithAlertData($device, true);
+            $payload = Helper::getPayloadWithAlertData($device);
         } else {
             $payload = $device->getPayload(true);
         }

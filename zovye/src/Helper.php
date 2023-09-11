@@ -1866,7 +1866,7 @@ include './index.php';
         return $remain;
     }
 
-    public static function getPayloadWithAlertData(deviceModelObj $device, bool $detail = false): array
+    public static function getPayloadWithAlertData(deviceModelObj $device, bool $detail = true): array
     {
         $payload = $device->getPayload($detail);
         foreach ($payload['cargo_lanes'] as $index => $lane) {

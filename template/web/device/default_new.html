@@ -20,7 +20,7 @@
     }
 </style>
 <div id="appx" v-cloak>
-    <div class="init-loading" v-if="device.list === undefined">
+    <div class="init-loading" v-if="device.loading">
         <i class="fa fa-spinner fa-spin"></i>&nbsp;加载中...
     </div>
     <div class="panel panel-default" v-else>

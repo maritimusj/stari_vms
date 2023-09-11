@@ -48,7 +48,7 @@ class alert
             try {
                 $ts = (new DateTime($expired_at))->getTimestamp();
                 if ($alert) {
-                    $alert->setGoodsId($lane['goods'] ?? 0);
+                    $alert->setGoodsId($payload['cargo_lanes'][$lane_id]['goods'] ?? 0);
                     $alert->setAgentId($device->getAgentId());
                     $alert->setExpiredAt($ts);
                 } else {

@@ -127,7 +127,14 @@ class Request
 
     public static function bool(string $name, bool $default = false): bool
     {
-        return boolval(getArray(self::$data, $name, $default));
+        $v = getArray(self::$data, $name, $default);
+        if (empty($v)) {
+            return false;
+        }
+        if (is_string($v) && strtolower($v) === 'false') {
+            return false;
+        }
+        return boolval($v);
     }
 
     public static function str(string $name, string $default = '', $url_decode = false): string

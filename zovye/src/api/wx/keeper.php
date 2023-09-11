@@ -603,30 +603,6 @@ class keeper
             }
         }
 
-        if (Request::has('remain')) {
-            $remainWarning = max(1, Request::int('remain'));
-        } else {
-            $remainWarning = settings('device.remainWarning', 0);
-        }
-
-        $lowQuery = Device::keeper($keeper)->where(['agent_id' => $keeper->getAgentId(), 'remain <' => $remainWarning]);
-        if ($lowQuery->count() > 0) {
-            foreach ($lowQuery->findAll() as $entry) {
-                if ($entry->settings('extra.keepers') == $keeper->getId()) {
-                    ++$result['devices']['low'];
-                }
-            }
-        }
-
-        $errorQuery = Device::keeper($keeper)->where(['agent_id' => $keeper->getAgentId(), 'error_code <>' => 0]);
-        if ($errorQuery->count() > 0) {
-            foreach ($errorQuery->findAll() as $entry) {
-                if ($entry->settings('extra.keepers') == $keeper->getId()) {
-                    ++$result['devices']['error'];
-                }
-            }
-        }
-
         $result['stats']['today'] = (int)Replenish::query()->where([
             'keeper_id' => $keeper->getId(),
             'createtime >=' => (new DateTimeImmutable('00:00'))->getTimestamp(),
@@ -638,6 +614,13 @@ class keeper
         ])->get('sum(num)');
 
         $result['stats']['all'] = (int)Replenish::query()->where(['keeper_id' => $keeper->getId()])->get('sum(num)');
+
+
+        if (Request::has('remain')) {
+            $remainWarning = max(1, Request::int('remain'));
+        } else {
+            $remainWarning = settings('device.remainWarning', 0);
+        }
 
         $lowQuery = Device::keeper($keeper, \zovye\Keeper::OP)->where(
             ['agent_id' => $keeper->getAgentId(), 'remain <' => $remainWarning]

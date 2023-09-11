@@ -59,6 +59,9 @@ class alert
                         'goods_id' => $payload['cargo_lanes'][$lane_id]['goods'] ?? 0,
                         'expired_at' => $ts,
                     ]);
+                    if (empty($alert)) {
+                        return err('创建提醒失败！');
+                    }
                 }
 
                 $alert->setPreAlertDays($pre_days);

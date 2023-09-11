@@ -1865,4 +1865,19 @@ include './index.php';
 
         return $remain;
     }
+
+    public static function removeInvalidAlert(deviceModelObj $device)
+    {
+        if (App::isGoodsExpireAlertEnabled()) {
+            $all = GoodsExpireAlert::query(['device_id' => $device->getId()])->findAll();
+            $payload = $device->getPayload();
+            foreach ($all as $alert) {
+                if (empty($payload['cargo_lanes'][$alert->getLaneId()])) {
+                    $alert->destroy();
+                }
+            }
+        } else {
+            GoodsExpireAlert::remove(['device_id' => $device->getId()]);
+        }
+    }
 }

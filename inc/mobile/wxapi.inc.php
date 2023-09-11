@@ -11,6 +11,7 @@ defined('IN_IA') or exit('Access Denied');
 use zovye\api\router;
 use zovye\api\wx\ad;
 use zovye\api\wx\agent;
+use zovye\api\wx\alert;
 use zovye\api\wx\article;
 use zovye\api\wx\balance;
 use zovye\api\wx\commission;
@@ -61,6 +62,7 @@ router::exec($op, [
     'DeviceScheduleList' => [agent::class, 'DeviceScheduleList'],
     'DeviceScheduleCreate' => [agent::class, 'deviceScheduleCreate'],
     'DeviceScheduleRemove' => [agent::class, 'deviceScheduleRemove'],
+    'DeviceExpireAlertUpdate' => [alert::class, 'update'],
     'OrderRefund' => [agent::class, 'orderRefund'],
     'Orders' => [agent::class, 'orderList'],
     'DeviceSetErrorCode' => [agent::class, 'deviceSetErrorCode'],

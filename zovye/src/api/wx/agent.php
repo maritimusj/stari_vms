@@ -24,6 +24,7 @@ use zovye\DeviceTypes;
 use zovye\DeviceUtil;
 use zovye\Fueling;
 use zovye\GDCVMachine;
+use zovye\GoodsExpireAlert;
 use zovye\Helper;
 use zovye\Inventory;
 use zovye\Job;
@@ -458,7 +459,7 @@ class agent
     }
 
     /**
-     * 更新终端设置.
+     * 更新设备设置.
      *
      * @return array
      */
@@ -643,6 +644,8 @@ class agent
                 'all' => Request::int('all'),
             ];
         }
+
+        Helper::removeInvalidAlert($device);
 
         if ($device->set('extra', $extra) && $device->save()) {
             if (App::isGDCVMachineEnabled()) {

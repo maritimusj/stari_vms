@@ -16,6 +16,7 @@ use zovye\DeviceTypes;
 use zovye\DeviceUtil;
 use zovye\GDCVMachine;
 use zovye\Goods;
+use zovye\GoodsExpireAlert;
 use zovye\Group as ZovyeGroup;
 use zovye\Inventory;
 use zovye\Locker;
@@ -196,6 +197,22 @@ class device
 
                 return $lane;
             }, $payload['cargo_lanes']);
+
+            // 获取过期提醒数据
+            if (App::isGoodsExpireAlertEnabled() && $payload['cargo_lanes']) {
+                foreach ($payload['cargo_lanes'] as $index => $lane) {
+                    $result['status']['cargo_lanes'][$index]['alert'] = [];
+                    $alert = GoodsExpireAlert::getFor($device, $index, $lane['goods']);
+                    if ($alert) {
+                        $expire_at = $alert->getExpiredAt();
+                        $result['status']['cargo_lanes']['alert'] = [
+                            'expired_at' => $expire_at > 0 ? date('Y-m-d', $expire_at) : '',
+                            'pre_days' => $alert->getPreAlertDays(),
+                            'invalid_if_expired' => $alert->invalidIfExpired(),
+                        ];
+                    }
+                }
+            }
         } else {
             $result['status']['cargo_lanes'] = [];
         }
@@ -714,7 +731,7 @@ class device
             } else {
                 $query->orderBy(['rank DESC', 'id DESC']);
             }
-  
+
             $query->page($page, $page_size);
 
             $ids = [];

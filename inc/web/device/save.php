@@ -9,6 +9,7 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 use DateTime;
+use Exception;
 use RuntimeException;
 use zovye\model\packageModelObj;
 
@@ -407,18 +408,15 @@ if ($device) {
             $alertInvalid = Request::array('alertInvalid');
 
             $getExpiredTimestampFN = function ($index) use ($alertExpiredAt) {
-                $expire_at = $alertExpiredAt[$index];
-                if ($expire_at) {
-                    $datetime = new DateTime($expire_at);
-                    if ($datetime) {
-                        return $datetime->getTimestamp();
+                $expired_at = $alertExpiredAt[$index];
+                if ($expired_at) {
+                    try {
+                        return (new DateTime($expired_at))->getTimestamp();
+                    } catch (Exception $e) {
                     }
                 }
-
                 return 0;
             };
-
-            $ids = [];
 
             foreach ((array)$payload['cargo_lanes'] as $index => $lane) {
                 $alert = GoodsExpireAlert::getFor($device, $index, 0, false);
@@ -439,19 +437,11 @@ if ($device) {
                 $alert->setPreAlertDays(intval($alertPreDays[$index]));
                 $alert->setInvalidIfExpired($alertInvalid[$index] == 'true');
                 $alert->save();
-
-                $ids[] = $alert->getId();
-            }
-
-            $all = GoodsExpireAlert::query(['device_id' => $device->getId()])->findAll();
-
-            foreach ($all as $alert) {
-                if (!in_array($alert->getId(), $ids)) {
-                    $alert->destroy();
-                }
             }
         }
     }
+
+    Helper::removeInvalidAlert($device);
 }
 
 $redirect_url = Util::url('device', [

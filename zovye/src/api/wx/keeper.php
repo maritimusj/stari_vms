@@ -17,6 +17,8 @@ use zovye\DBUtil;
 use zovye\Device;
 use zovye\DeviceUtil;
 use zovye\GDCVMachine;
+use zovye\GoodsExpireAlert;
+use zovye\Helper;
 use zovye\Inventory;
 use zovye\Locker;
 use zovye\Log;
@@ -666,25 +668,25 @@ class keeper
             }
 
             if (!empty($cond['device_id'])) {
-                
+
                 if (Request::has('src')) {
                     $cond['src'] = Request::int('src');
                 }
-    
+
                 $w = Request::str('w');
-    
+
                 if (empty($w) || $w == 'today') {
                     $result['today'] = agent::getUserTodayStats($user ? $user->getOpenid() : '', $cond);
                 }
-    
+
                 if (empty($w) || $w == 'yesterday') {
                     $result['yesterday'] = agent::getUserYesterdayStats($user ? $user->getOpenid() : '', $cond);
                 }
-    
+
                 if (empty($w) || $w == 'month') {
                     $result['month'] = agent::getUserMonthStats($user ? $user->getOpenid() : '', $cond);
                 }
-    
+
                 if (empty($w) || $w == 'year') {
                     $result['year'] = agent::getUserYearStats($user ? $user->getOpenid() : '', $cond);
                 }
@@ -894,7 +896,12 @@ class keeper
             }
         }
 
-        $payload = $device->getPayload(true);
+        if (App::isGoodsExpireAlertEnabled()) {
+            $payload = Helper::getPayloadWithAlertData($device, true);
+        } else {
+            $payload = $device->getPayload(true);
+        }
+
         if ($payload && is_array($payload['cargo_lanes'])) {
             $result['cargo_lanes'] = $payload['cargo_lanes'];
         } else {
@@ -1100,11 +1107,9 @@ class keeper
             return err('找不到这个设备！');
         }
 
-        if (
-            $device->getAgentId() != $keeper->getAgentId() ||
+        if ($device->getAgentId() != $keeper->getAgentId() ||
             !$device->hasKeeper($keeper) ||
-            $device->getKeeperKind($keeper) != \zovye\Keeper::OP
-        ) {
+            $device->getKeeperKind($keeper) != \zovye\Keeper::OP) {
             return err('没有权限！');
         }
 

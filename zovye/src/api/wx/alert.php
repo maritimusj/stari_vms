@@ -9,6 +9,7 @@ namespace zovye\api\wx;
 
 use DateTime;
 use Exception;
+use zovye\Device;
 use zovye\GoodsExpireAlert;
 use zovye\Request;
 use function zovye\err;
@@ -18,12 +19,30 @@ class alert
 {
     public static function update(): array
     {
-        $agent = common::getAgent();
+        $user = common::getUser();
+        if ($user->isAgent() || $user->isPartner()) {
+            $agent = common::getAgent();
+            $device = \zovye\api\wx\device::getDevice(Request::str('id'), $agent);
 
-        $device = device::getDevice(Request::str('id'), $agent);
+            if (is_error($device)) {
+                return $device;
+            }
 
-        if (is_error($device)) {
-            return $device;
+        } elseif ($user->isKeeper()) {
+            $keeper = keeper::getKeeper();
+            $device = Device::find(Request::str('id'), ['imei', 'shadow_id']);
+            if (empty($device)) {
+                return err('找不到这个设备！');
+            }
+
+            if ($device->getAgentId() != $keeper->getAgentId() ||
+                !$device->hasKeeper($keeper) ||
+                $device->getKeeperKind($keeper) != \zovye\Keeper::OP
+            ) {
+                return err('没有权限！');
+            }
+        } else {
+            return err('没有权限请求这个接口！');
         }
 
         $lane_id = Request::int('lane');
@@ -42,6 +61,7 @@ class alert
         if (empty($expired_at)) {
             if ($alert) {
                 $alert->destroy();
+
                 return ['msg' => '删除成功！'];
             }
         } else {

@@ -1866,6 +1866,24 @@ include './index.php';
         return $remain;
     }
 
+    public static function getPayloadWithAlertData(deviceModelObj $device, bool $detail = false): array
+    {
+        $payload = $device->getPayload($detail);
+        foreach ($payload['cargo_lanes'] as $index => $lane) {
+            $payload['cargo_lanes'][$index]['alert'] = [];
+            $alert = GoodsExpireAlert::getFor($device, $index, $lane['goods']);
+            if ($alert) {
+                $expire_at = $alert->getExpiredAt();
+                $payload['cargo_lanes'][$index]['alert'] = [
+                    'expired_at' => $expire_at > 0 ? date('Y-m-d', $expire_at) : '',
+                    'pre_days' => $alert->getPreAlertDays(),
+                    'invalid_if_expired' => $alert->invalidIfExpired(),
+                ];
+            }
+        }
+        return $payload;
+    }
+
     public static function removeInvalidAlert(deviceModelObj $device)
     {
         if (App::isGoodsExpireAlertEnabled()) {

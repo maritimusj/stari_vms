@@ -43,7 +43,7 @@ if ($type_id) {
 
     $data = DeviceTypes::format($device_type, true);
     if (isset($device)) {
-        $payload = $device->getPayload();
+        $payload = App::isGoodsExpireAlertEnabled() ? Helper::getPayloadWithAlertData($device) : $device->getPayload(true);
         foreach ((array)$payload['cargo_lanes'] as $index => $lane) {
             $data['cargo_lanes'][$index]['num'] = intval($lane['num']);
         }
@@ -57,7 +57,7 @@ if ($type_id) {
         JSON::fail('找不到这个设备！');
     }
 
-    $payload = $device->getPayload(true);
+    $payload = App::isGoodsExpireAlertEnabled() ? Helper::getPayloadWithAlertData($device) : $device->getPayload(true);
     $data = $priceFN($device->isFuelingDevice(), $payload);
 
 } else {
@@ -65,21 +65,5 @@ if ($type_id) {
 }
 
 $data['alert_enabled'] = App::isGoodsExpireAlertEnabled();
-
-// 获取过期提醒数据
-if (App::isGoodsExpireAlertEnabled() && isset($device) && $data['cargo_lanes']) {
-    foreach ((array)$data['cargo_lanes'] as $index => $lane) {
-        $data['cargo_lanes'][$index]['alert'] = [];
-        $alert = GoodsExpireAlert::getFor($device, $index, $lane['goods']);
-        if ($alert) {
-            $expire_at = $alert->getExpiredAt();
-            $data['cargo_lanes'][$index]['alert'] = [
-                'expired_at' => $expire_at > 0 ? date('Y-m-d', $expire_at) : '',
-                'pre_days' => $alert->getPreAlertDays(),
-                'invalid_if_expired' => $alert->invalidIfExpired(),
-            ];
-        }
-    }
-}
 
 JSON::success($data);

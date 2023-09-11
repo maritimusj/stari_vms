@@ -18,6 +18,7 @@ use zovye\GDCVMachine;
 use zovye\Goods;
 use zovye\GoodsExpireAlert;
 use zovye\Group as ZovyeGroup;
+use zovye\Helper;
 use zovye\Inventory;
 use zovye\Locker;
 use zovye\model\agentModelObj;
@@ -189,30 +190,18 @@ class device
             $result['device']['schedule'] = \zovye\Device::getScheduleTaskTotal($device);
         }
 
-        $payload = $device->getPayload(true);
+        if (App::isGoodsExpireAlertEnabled()) {
+            $payload = Helper::getPayloadWithAlertData($device, true);
+        } else {
+            $payload = $device->getPayload(true);
+        }
+
         if ($payload && is_array($payload['cargo_lanes'])) {
             $result['status']['cargo_lanes'] = array_map(function ($lane) {
                 $lane['goods_price'] = intval($lane['goods_price']);
                 $lane['goods_img'] = Util::toMedia($lane['goods_img']);
-
                 return $lane;
             }, $payload['cargo_lanes']);
-
-            // 获取过期提醒数据
-            if (App::isGoodsExpireAlertEnabled() && $payload['cargo_lanes']) {
-                foreach ($payload['cargo_lanes'] as $index => $lane) {
-                    $result['status']['cargo_lanes'][$index]['alert'] = [];
-                    $alert = GoodsExpireAlert::getFor($device, $index, $lane['goods']);
-                    if ($alert) {
-                        $expire_at = $alert->getExpiredAt();
-                        $result['status']['cargo_lanes'][$index]['alert'] = [
-                            'expired_at' => $expire_at > 0 ? date('Y-m-d', $expire_at) : '',
-                            'pre_days' => $alert->getPreAlertDays(),
-                            'invalid_if_expired' => $alert->invalidIfExpired(),
-                        ];
-                    }
-                }
-            }
         } else {
             $result['status']['cargo_lanes'] = [];
         }

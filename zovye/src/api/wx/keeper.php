@@ -587,6 +587,7 @@ class keeper
             ],
             'logs' => [],
         ];
+
         $user = $keeper->getUser();
         if ($user) {
             $result['balance_formatted'] = number_format($user->getCommissionBalance()->total() / 100, 2, '.', '');
@@ -641,9 +642,11 @@ class keeper
         $lowQuery = Device::keeper($keeper, \zovye\Keeper::OP)->where(
             ['agent_id' => $keeper->getAgentId(), 'remain <' => $remainWarning]
         );
+
         $errorQuery = Device::keeper($keeper, \zovye\Keeper::OP)->where(
             ['agent_id' => $keeper->getAgentId(), 'error_code <>' => 0]
         );
+        
         $result['devices']['low'] = $lowQuery->count();
         $result['devices']['error'] = $errorQuery->count();
 

@@ -560,7 +560,7 @@ EOF;
         return self::pdo()->fetchcolumn($sql, $params, $column);
     }
 
-    public static function pdo_fetchAll($sql, array $params)
+    public static function pdo_fetchAll($sql, array $params = [])
     {
         return self::pdo()->fetchall($sql, $params);
     }

@@ -169,17 +169,23 @@ class common
             if ($return_error) {
                 return null;
             }
-
             JSON::fail('请先登录后再请求数据![202]');
         }
 
-        $user = User::get($login_data->getUserId());
-        if ($user->isAgent()) {
-            return $user->getAgent();
+        self::$user = User::get($login_data->getUserId());
+        if (empty(self::$user)) {
+            if ($return_error) {
+                return null;
+            }
+            JSON::fail('请先登录后再请求数据![203]');
         }
 
-        if ($user->isPartner()) {
-            return $user->getPartnerAgent();
+        if (self::$user->isAgent()) {
+            return self::$user->getAgent();
+        }
+
+        if (self::$user->isPartner()) {
+            return self::$user->getPartnerAgent();
         }
 
         return null;

@@ -51,11 +51,6 @@ class keeper
      */
     public static function getKeeper(): keeperModelObj
     {
-        static $keeper = null;
-        if ($keeper) {
-            return $keeper;
-        }
-
         $user = common::getUser();
         if (!\zovye\Keeper::exists($user)) {
             JSON::fail(['msg' => '不是运营人员！']);

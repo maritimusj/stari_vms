@@ -425,7 +425,7 @@ if ($device) {
                     $alert->setAgentId($device->getAgentId());
                     $alert->setExpiredAt($getExpiredTimestampFN($index));
                     $alert->setPreDays(intval($alertPreDays[$index]));
-                    $alert->setInvalidIfExpired($alertInvalid[$index] == 'true');
+                    $alert->setInvalidIfExpired($alertInvalid[$index] == '1');
                 } else {
                     $alert = GoodsExpireAlert::create([
                         'agent_id' => $device->getAgentId(),
@@ -433,7 +433,7 @@ if ($device) {
                         'lane_id' => $index,
                         'expired_at' => $getExpiredTimestampFN($index),
                         'pre_days' => intval($alertPreDays[$index]),
-                        'invalid_if_expired' => $alertInvalid[$index] == 'true',
+                        'invalid_if_expired' => $alertInvalid[$index] == '1',
                     ]);
                 }
 

@@ -670,12 +670,12 @@
                             <label class="col-xs-12 col-md-2 col-md-2 control-label">过期处理</label>
                             <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
                                 <label :for="'alertInvalid['+i+']0'" class="radio-inline">
-                                    <input :name="'alertInvalid['+i+']'" :id="'alertInvalid['+i+']0'" type="radio" value="true" 
+                                    <input :name="'alertInvalid['+i+']'" :id="'alertInvalid['+i+']0'" type="radio" value="1" 
                                     v-model="lane.alert.invalid_if_expired">
                                     禁止购买
                                 </label>
                                 <label :for="'alertInvalid['+i+']1'" class="radio-inline">
-                                    <input :name="'alertInvalid['+i+']'" :id="'alertInvalid['+i+']1'" type="radio" value="false" 
+                                    <input :name="'alertInvalid['+i+']'" :id="'alertInvalid['+i+']1'" type="radio" value="0" 
                                     v-model="lane.alert.invalid_if_expired">
                                     允许购买
                                 </label>

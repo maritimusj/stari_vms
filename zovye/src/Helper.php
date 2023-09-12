@@ -1876,6 +1876,7 @@ include './index.php';
             if ($alert) {
                 $expire_at = $alert->getExpiredAt();
                 $payload['cargo_lanes'][$index]['alert'] = [
+                    'status' => GoodsExpireAlert::getStatus($alert),
                     'expired_at' => $expire_at > 0 ? date('Y-m-d', $expire_at) : '',
                     'pre_days' => $alert->getPreDays(),
                     'invalid_if_expired' => $alert->getInvalidIfExpired(),

@@ -188,6 +188,18 @@
     .goods:hover .expire-info {
         display: flex;
     }
+    .expire-info .item.expired>.value{
+        color:#FF5722;
+    }
+    .expire-info .item.alert {
+        all: unset;
+    }
+    .expire-info .item.alert>.value{
+        color:#FF9800;
+    }
+    .expire-info .item.normal>.value{
+        color:#4CAF50;
+    }
     [v-cloak] {
         display: none;
     }
@@ -352,7 +364,7 @@
                                                     </span>
                                                     <span v-show="lane.goods_unit_title">（{{lane.goods_unit_title}}）</span> 
                                                     <div v-if="navExists('alert') && lane.alert && lane.alert.expired_at" class="expire-info">
-                                                        <div class="item">
+                                                        <div class="item" :class="lane.alert.status">
                                                             <span class="title">过期时间</span><span class="value">{{lane.alert.expired_at}}</span>
                                                         </div>
                                                         <div class="item">

@@ -206,39 +206,6 @@ class common
         $keeper = \zovye\Keeper::findOne(['id' => $login_data->getUserId()]);
 
         return $keeper;
-
-    }
-
-    public static function getAgentOrKeeper()
-    {
-        if (empty($token)) {
-            $token = common::getToken();
-        }
-
-        $keeper = null;
-
-        $login_data = LoginData::get($token, [LoginData::AGENT, LoginData::AGENT_WEB]);
-        if (empty($login_data)) {
-            $login_data = LoginData::get($token, LoginData::KEEPER);
-            if (empty($login_data)) {
-                JSON::fail('请先登录后再请求数据![205]');
-            }
-
-            /** @var keeperModelObj $keeper */
-            $keeper = \zovye\Keeper::findOne(['id' => $login_data->getUserId()]);
-        } else {
-            $user = User::get($login_data->getUserId());
-        }
-
-        if (empty($keeper) && empty($user)) {
-            JSON::fail('请先登录后再请求数据！[206]');
-        }
-
-        if (empty($user)) {
-            $user = $keeper;
-        }
-
-        return $user;
     }
 
     /**

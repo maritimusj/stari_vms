@@ -1925,23 +1925,23 @@ class agent
 
     public static function getUserQRCode(): array
     {
-        $user = common::getAgentOrKeeper();
-        if ($user instanceof keeperModelObj) {
-            return common::getUserQRCode($user->getUser());
+        $keeper = common::getKeeper(true);
+        if ($keeper) {
+            return common::getUserQRCode($keeper->getUser());
         }
 
-        return common::getUserQRCode($user);
+        return common::getUserQRCode(common::getUser());
     }
 
     public static function updateUserQRCode(): array
     {
-        $user = common::getAgentOrKeeper();
         $type = Request::str('type');
-        if ($user instanceof keeperModelObj) {
-            return common::updateUserQRCode($user->getUser(), $type);
+        $keeper = common::getKeeper(true);
+        if ($keeper) {
+            return common::updateUserQRCode($keeper->getUser(), $type);
         }
 
-        return common::updateUserQRCode($user, $type);
+        return common::updateUserQRCode(common::getUser(), $type);
     }
 
     public static function aliAuthCode()

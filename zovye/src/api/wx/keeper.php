@@ -588,6 +588,7 @@ class keeper
                 'all' => 0,
             ],
             'logs' => [],
+            'goods_expired_alert' => alert::count(),
         ];
 
         $user = $keeper->getUser();

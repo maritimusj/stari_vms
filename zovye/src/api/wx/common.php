@@ -199,7 +199,7 @@ class common
                 return null;
             }
 
-            JSON::fail('请先登录后再请求数据![202]');
+            JSON::fail('请先登录后再请求数据![204]');
         }
 
         /** @var keeperModelObj $keeper */
@@ -221,7 +221,7 @@ class common
         if (empty($login_data)) {
             $login_data = LoginData::get($token, LoginData::KEEPER);
             if (empty($login_data)) {
-                JSON::fail('请先登录后再请求数据![202]');
+                JSON::fail('请先登录后再请求数据![205]');
             }
 
             /** @var keeperModelObj $keeper */
@@ -231,7 +231,7 @@ class common
         }
 
         if (empty($keeper) && empty($user)) {
-            JSON::fail('请先登录后再请求数据！[203]');
+            JSON::fail('请先登录后再请求数据！[206]');
         }
 
         if (empty($user)) {

@@ -17,7 +17,7 @@ CREATE TABLE `ims_zovye_vms_goods_expire_alert` (
     `createtime` INT NULL , 
     PRIMARY KEY (`id`), 
     INDEX `agent` (`agent_id`), 
-    INDEX `device` (`device_id`), 
+    INDEX `device` (`device_id`))
     ENGINE = InnoDB;
 SQL;
     Migrate::execSQL($sql);

@@ -131,25 +131,27 @@ class alert
 
         /** @var goods_expire_alertModelObj $alert */
         foreach ($all as $alert) {
-            $expired_at = $alert->getExpiredAt();
-
-            $data = [
-                'lane' => $alert->getLaneId(),
-                'pre_days' => $alert->getPreDays(),
-                'expired_at' => $expired_at ? date('Y-m-d', $expired_at) : '',
-                'valid_if_expired' => $alert->getInvalidIfExpired(),
-            ];
-
+            
             $device = $alert->getDevice();
             if (empty($device)) {
                 continue;
             }
 
-            $data['goods'] = $device->getGoodsByLane($data['lane']);
+            $goods = $device->getGoodsByLane($alert->getLaneId());
+            if (empty($goods)) {
+                continue;
+            }
 
-            $data['device'] = $device->profile();
+            $expired_at = $alert->getExpiredAt();
 
-            $result[] = $data;
+            $result[] = [
+                'device' => $device->profile(),
+                'goods' => $goods,
+                'lane' => $alert->getLaneId(),
+                'pre_days' => $alert->getPreDays(),
+                'expired_at' => $expired_at ? date('Y-m-d', $expired_at) : '',
+                'valid_if_expired' => $alert->getInvalidIfExpired(),
+            ];
         }
 
         return $result;

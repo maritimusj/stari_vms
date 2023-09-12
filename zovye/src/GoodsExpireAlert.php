@@ -90,7 +90,7 @@ class GoodsExpireAlert extends Base
         $alert_tb = We7::tb(self::model()->getTableName());
         $keeper_tb = We7::tb(Keeper::model()->getTableName());
         $keeper_device_tb = We7::tb(m('keeper_devices')->getTableName());
-        
+
         $ts = TIMESTAMP;
 
         $sql = <<<SQL
@@ -100,20 +100,21 @@ INNER JOIN $keeper_device_tb d ON k.id=d.keeper_id AND d.device_id=a.device_id
 WHERE k.id={$keeper->getId()} AND d.kind=1 AND a.expired_at>0 AND a.expired_at-a.pre_days*86400<=$ts
 SQL;
         if ($fetch_total) {
-            $res = We7::pdo_fetch('SELECT COUNT(*) AS total ' . $sql);
+            $res = We7::pdo_fetch('SELECT COUNT(*) AS total '.$sql);
+
             return intval($res['total'] ?? 0);
         }
 
-        $res =  We7::pdo_fetchAll('SELECT a.id ' . $sql . ' ORDER BY a.expired_at ASC');
+        $res = We7::pdo_fetchAll('SELECT a.id '.$sql.' ORDER BY a.expired_at ASC');
         if (empty($res)) {
             return [];
         }
 
         $ids = [];
-        foreach($res as $item) {
+        foreach ($res as $item) {
             $ids[] = $item['id'];
         }
-        
+
         return self::query(['id' => $ids])->findAll();
     }
 }

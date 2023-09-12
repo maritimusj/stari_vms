@@ -4,7 +4,6 @@
  * @url www.stariture.com
  */
 
-
 namespace zovye;
 
 use zovye\model\deviceModelObj;

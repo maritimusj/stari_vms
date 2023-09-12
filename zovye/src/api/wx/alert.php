@@ -9,6 +9,7 @@ namespace zovye\api\wx;
 
 use DateTime;
 use Exception;
+use zovye\App;
 use zovye\Device;
 use zovye\GoodsExpireAlert;
 use zovye\model\goods_expire_alertModelObj;
@@ -20,6 +21,10 @@ class alert
 {
     public static function update(): array
     {
+        if (!App::isGoodsExpireAlertEnabled()) {
+            return err('没有启用这个功能！');
+        }
+
         $user = common::getUser();
         if ($user->isAgent() || $user->isPartner()) {
             $agent = common::getAgent();
@@ -100,6 +105,10 @@ class alert
 
     public static function count()
     {
+        if (!App::isGoodsExpireAlertEnabled()) {
+            return 0;
+        }
+
         $user = common::getUser();
 
         if ($user->isAgent() || $user->isPartner()) {
@@ -116,6 +125,10 @@ class alert
 
     public static function list(): array
     {
+        if (!App::isGoodsExpireAlertEnabled()) {
+            return [];
+        }
+
         $user = common::getUser();
 
         if ($user->isAgent() || $user->isPartner()) {

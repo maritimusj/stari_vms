@@ -60,7 +60,8 @@ class GoodsExpireAlert extends Base
         $pre_days = max(0, $alert->getPreDays());
 
         try {
-            $datetime = new DateTimeImmutable($alert->getExpiredAt());
+            $datetime = new DateTimeImmutable();
+            $datetime->setTimestamp($alert->getExpiredAt());
             $now = new DateTimeImmutable();
             if ($now >= $datetime) {
                 return 'expired';

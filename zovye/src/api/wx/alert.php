@@ -115,8 +115,13 @@ class alert
 
         /** @var goods_expire_alertModelObj $alert */
         foreach ($all as $alert) {
+            $expired_at = $alert->getExpiredAt();
+
             $data = [
                 'lane' => $alert->getLaneId(),
+                'pre_days' => $alert->getPreDays(),
+                'expired_at' => $expired_at ? date('Y-m-d', $expired_at) : '',
+                'valid_if_expired' => $alert->getInvalidIfExpired(),
             ];
 
             $device = $alert->getDevice();

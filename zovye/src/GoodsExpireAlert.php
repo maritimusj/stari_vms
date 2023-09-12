@@ -39,7 +39,7 @@ class GoodsExpireAlert extends Base
     public static function getAllExpiredForAgent(userModelObj $user)
     {
         $query = self::query(['agent_id' => $user->getId()]);
-        $query->where('expired_at>0 AND expired_at-pre_days*86400>'.time());
+        $query->where('expired_at>0 AND expired_at-pre_days*86400<'.time());
         $query->orderBy('expired_at ASC');
         return $query->findAll();
     }

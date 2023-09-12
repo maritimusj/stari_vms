@@ -244,9 +244,7 @@ if ($op == 'default') {
         JSON::fail('用户已经是运营人员！');
     }
 
-    $token = Request::str('token');
-
-    $original = api\wx\common::getUser($token);
+    $original = api\wx\common::getUser();
 
     if ($user->getId() == $original->getId()) {
         JSON::fail('已完成迁移！');

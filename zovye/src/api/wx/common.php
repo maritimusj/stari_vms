@@ -94,7 +94,7 @@ class common
         return User::get($login_data->getOpenidX(), true);
     }
 
-    public static function getUser($token = ''): userModelObj
+    public static function getUser($src = []): userModelObj
     {
         if (self::$user) {
             return self::$user;
@@ -108,12 +108,16 @@ class common
             JSON::fail('请先登录后再请求数据！[101]');
         }
 
-        $login_data = LoginData::get($token, [
-            LoginData::AGENT,
-            LoginData::AGENT_WEB,
-            LoginData::KEEPER,
-            LoginData::USER,
-        ]);
+        if (empty($src)) {
+            $src = [
+                LoginData::AGENT,
+                LoginData::AGENT_WEB,
+                LoginData::KEEPER,
+                LoginData::USER,
+            ];
+        }
+
+        $login_data = LoginData::get($token, $src);
 
         if (empty($login_data)) {
             JSON::fail('请先登录后再请求数据！[102]');

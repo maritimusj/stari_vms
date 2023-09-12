@@ -63,6 +63,7 @@ router::exec($op, [
     'DeviceScheduleCreate' => [agent::class, 'deviceScheduleCreate'],
     'DeviceScheduleRemove' => [agent::class, 'deviceScheduleRemove'],
     'DeviceExpireAlertUpdate' => [alert::class, 'update'],
+    'DeviceExpireAlertList' => [alert::class, 'list'],
     'OrderRefund' => [agent::class, 'orderRefund'],
     'Orders' => [agent::class, 'orderList'],
     'DeviceSetErrorCode' => [agent::class, 'deviceSetErrorCode'],

@@ -98,7 +98,7 @@ class alert
         return ['msg' => '保存成功！'];
     }
 
-    public static function expiredGoodsList(): array
+    public static function list(): array
     {
         $user = common::getUser();
 

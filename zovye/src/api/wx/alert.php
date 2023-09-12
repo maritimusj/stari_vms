@@ -8,6 +8,7 @@
 namespace zovye\api\wx;
 
 use DateTime;
+use DateTimeImmutable;
 use Exception;
 use zovye\App;
 use zovye\Device;
@@ -144,7 +145,7 @@ class alert
 
         /** @var goods_expire_alertModelObj $alert */
         foreach ($all as $alert) {
-            
+
             $device = $alert->getDevice();
             if (empty($device)) {
                 continue;
@@ -156,13 +157,35 @@ class alert
             }
 
             $expired_at = $alert->getExpiredAt();
+            if (empty($expired_at)) {
+                continue;
+            }
+
+            $pre_days = max(0, $alert->getPreDays());
+
+            try {
+                $datetime = new DateTimeImmutable($expired_at);
+                $now = new DateTimeImmutable();
+                $status = 'normal';
+                if ($now >= $datetime) {
+                    $status = 'expired';
+                } else {
+                    $datetime = $datetime->modify("-{$pre_days}days");
+                    if ($now >= $datetime) {
+                        $status = 'alert';
+                    }
+                }
+            } catch (Exception $e) {
+                continue;
+            }
 
             $result[] = [
                 'device' => $device->profile(),
                 'goods' => $goods,
                 'lane' => $alert->getLaneId(),
+                'status' => $status,
                 'pre_days' => $alert->getPreDays(),
-                'expired_at' => $expired_at ? date('Y-m-d', $expired_at) : '',
+                'expired_at' => $datetime->format('Y-m-d'),
                 'valid_if_expired' => $alert->getInvalidIfExpired(),
             ];
         }

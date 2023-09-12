@@ -11,6 +11,7 @@ use DateTime;
 use Exception;
 use zovye\Device;
 use zovye\GoodsExpireAlert;
+use zovye\model\goods_expire_alertModelObj;
 use zovye\Request;
 use function zovye\err;
 use function zovye\is_error;
@@ -56,6 +57,7 @@ class alert
         $pre_days = Request::int('pre_days');
         $invalid_if_expired = Request::bool('invalid_if_expired');
 
+        /** @var goods_expire_alertModelObj $alert */
         $alert = GoodsExpireAlert::getFor($device, $lane_id);
 
         if (empty($expired_at)) {
@@ -68,34 +70,67 @@ class alert
             try {
                 $ts = (new DateTime($expired_at))->getTimestamp();
                 if ($alert) {
-                    $alert->setGoodsId($payload['cargo_lanes'][$lane_id]['goods'] ?? 0);
                     $alert->setAgentId($device->getAgentId());
                     $alert->setExpiredAt($ts);
+                    $alert->setPreDays($pre_days);
+                    $alert->setInvalidIfExpired($invalid_if_expired);
+                    if (!$alert->save()) {
+                        return ['msg' => '保存失败！'];
+                    }
                 } else {
                     $alert = GoodsExpireAlert::create([
                         'agent_id' => $device->getAgentId(),
                         'device_id' => $device->getId(),
                         'lane_id' => $lane_id,
-                        'goods_id' => $payload['cargo_lanes'][$lane_id]['goods'] ?? 0,
                         'expired_at' => $ts,
+                        'pre_days' => $pre_days,
+                        'invalid_if_expired' => $invalid_if_expired,
                     ]);
                     if (empty($alert)) {
                         return err('创建提醒失败！');
                     }
                 }
-
-                $alert->setPreAlertDays($pre_days);
-                $alert->setInvalidIfExpired($invalid_if_expired);
-
-                if (!$alert->save()) {
-                    return ['msg' => '保存失败！'];
-                }
-
             } catch (Exception $e) {
                 return err('保存失败！');
             }
         }
 
         return ['msg' => '保存成功！'];
+    }
+
+    public static function expiredGoodsList(): array
+    {
+        $user = common::getUser();
+
+        if ($user->isAgent() || $user->isPartner()) {
+            $agent = common::getAgent();
+            $all = GoodsExpireAlert::getAllExpiredForAgent($agent);
+        } elseif ($user->isKeeper()) {
+            $all = GoodsExpireAlert::getAllExpiredForKeeper(keeper::getKeeper());
+        } else {
+            return err('没有权限请求这个接口！');
+        }
+
+        $result = [];
+
+        /** @var goods_expire_alertModelObj $alert */
+        foreach ($all as $alert) {
+            $data = [
+                'lane' => $alert->getLaneId(),
+            ];
+
+            $device = $alert->getDevice();
+            if (empty($device)) {
+                continue;
+            }
+
+            $data['goods'] = $device->getGoodsByLane($data['lane']);
+
+            $data['device'] = $device->profile();
+
+            $result[] = $data;
+        }
+
+        return $result;
     }
 }

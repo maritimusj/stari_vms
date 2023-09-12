@@ -6,15 +6,21 @@
 
 namespace zovye\model;
 
+use zovye\Agent;
 use zovye\base\modelObj;
-use zovye\traits\ExtraDataGettersAndSetters;
+use zovye\Device;
 use function zovye\tb;
 
 /**
- * @method getExpiredAt()
- * @method setGoodsId(mixed $goods)
  * @method setAgentId($getAgentId)
+ * @method getExpiredAt()
  * @method setExpiredAt(int $int)
+ * @method setPreDays(int $int)
+ * @method getPreDays()
+ * @method setInvalidIfExpired(bool $v)
+ * @method getInvalidIfExpired()
+ * @method getLaneId()
+ * @method setLaneId($lane_id)
  */
 class goods_expire_alertModelObj extends modelObj
 {
@@ -36,36 +42,24 @@ class goods_expire_alertModelObj extends modelObj
     protected $lane_id;
 
     /** @var int */
-    protected $goods_id;
-
-    /** @var int */
     protected $expired_at;
 
-    /** @var text */
-    protected $extra;
+    /** @var int */
+    protected $pre_days;
+
+    /** @var int */
+    protected $invalid_if_expired;
 
     /** @var int */
     protected $createtime;
 
-    use ExtraDataGettersAndSetters;
-
-    public function setPreAlertDays(int $days): bool
+    public function getAgent(): ?agentModelObj
     {
-        return (bool)$this->setExtraData('preAlertDays', $days);
+        return Agent::get($this->agent_id);
     }
 
-    public function getPreAlertDays(): int
+    public function getDevice(): ?deviceModelObj
     {
-        return $this->getExtraData('preAlertDays', 0);
-    }
-
-    public function setInvalidIfExpired(bool $enabled): bool
-    {
-        return (bool)$this->setExtraData('invalidIfExpired', $enabled ? 1 : 0);
-    }
-
-    public function invalidIfExpired(): bool
-    {
-        return $this->getExtraData('invalidIfExpired', false);
+        return Device::get($this->device_id);
     }
 }

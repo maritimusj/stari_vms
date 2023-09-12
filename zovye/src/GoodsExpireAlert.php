@@ -9,6 +9,8 @@ namespace zovye;
 
 use zovye\model\deviceModelObj;
 use zovye\model\goods_expire_alertModelObj;
+use zovye\model\keeperModelObj;
+use zovye\model\userModelObj;
 
 class GoodsExpireAlert extends Base
 {
@@ -17,16 +19,12 @@ class GoodsExpireAlert extends Base
         return m('goods_expire_alert');
     }
 
-    public static function getFor(deviceModelObj $device, int $index, $goods_id = 0, $agent_restrict = true): ?goods_expire_alertModelObj
-    {
+    public static function getFor(deviceModelObj $device, int $index, bool $agent_restrict = false): ?goods_expire_alertModelObj {
+
         $condition = [
             'device_id' => $device->getId(),
             'lane_id' => $index,
         ];
-
-        if ($goods_id > 0) {
-            $condition['goods_id'] = $goods_id;
-        }
 
         if ($agent_restrict) {
             $agent = $device->getAgent();
@@ -36,5 +34,39 @@ class GoodsExpireAlert extends Base
         }
 
         return self::findOne($condition);
+    }
+
+    public static function getAllExpiredForAgent(userModelObj $user)
+    {
+        $query = self::query(['agent_id' => $user->getId()]);
+        $query->where('expired_at>0 AND expired_at-pre_days*86400>'.time());
+        $query->orderBy('expired_at ASC');
+        return $query->findAll();
+    }
+
+    public static function getAllExpiredForKeeper($user)
+    {
+        if ($user instanceof userModelObj) {
+            $keeper = $user->getKeeper();
+        } elseif ($user instanceof keeperModelObj) {
+            $keeper = $user;
+        } else {
+            return [];
+        }
+
+        $all = We7::load()->object('query')->from(self::model()->getTableName(), 'a')
+            ->leftjoin(Keeper::model()->getTableName(), 'k')
+            ->on('a.agent_id', 'k.agent_id')
+            ->leftjoin(m('keeper_devices')->getTableName(), 'd')
+            ->on('k.id', 'd.keeper_id')
+            ->on('d.device_id', 'a.device_id')
+            ->select('a.id')
+            ->where('k.id', $keeper->getId())
+            ->where('d.kind', '1')
+            ->where('expired_at>0 AND expired_at-pre_days*86400>'.time())
+            ->orderby('expired_at ASC')
+            ->getAll();
+
+        return self::query(['id' => $all])->findAll();
     }
 }

@@ -26,6 +26,11 @@ class Keeper
 
     private static $cache = [];
 
+    public static function model(): base\modelFactory
+    {
+        return m('keeper');
+    }
+
     public static function query($cond = []): modelObjFinder
     {
         if ($cond['id']) {

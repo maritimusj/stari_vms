@@ -415,27 +415,28 @@ if ($device) {
                     } catch (Exception $e) {
                     }
                 }
+
                 return 0;
             };
 
             foreach ((array)$payload['cargo_lanes'] as $index => $lane) {
-                $alert = GoodsExpireAlert::getFor($device, $index, 0, false);
+                $alert = GoodsExpireAlert::getFor($device, $index);
                 if ($alert) {
-                    $alert->setGoodsId($lane['goods'] ?? 0);
                     $alert->setAgentId($device->getAgentId());
                     $alert->setExpiredAt($getExpiredTimestampFN($index));
+                    $alert->setPreDays(intval($alertPreDays[$index]));
+                    $alert->setInvalidIfExpired($alertInvalid[$index] == 'true');
                 } else {
                     $alert = GoodsExpireAlert::create([
                         'agent_id' => $device->getAgentId(),
                         'device_id' => $device->getId(),
                         'lane_id' => $index,
-                        'goods_id' => $lane['goods'] ?? 0,
                         'expired_at' => $getExpiredTimestampFN($index),
+                        'pre_days' => intval($alertPreDays[$index]),
+                        'invalid_if_expired' => $alertInvalid[$index] == 'true',
                     ]);
                 }
 
-                $alert->setPreAlertDays(intval($alertPreDays[$index]));
-                $alert->setInvalidIfExpired($alertInvalid[$index] == 'true');
                 $alert->save();
             }
         }

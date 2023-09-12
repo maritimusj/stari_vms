@@ -14,6 +14,7 @@ use zovye\model\accountModelObj;
 use zovye\model\agentModelObj;
 use zovye\model\commission_balanceModelObj;
 use zovye\model\device_logsModelObj;
+use zovye\model\goods_expire_alertModelObj;
 use zovye\model\orderModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
@@ -1876,8 +1877,8 @@ include './index.php';
                 $expire_at = $alert->getExpiredAt();
                 $payload['cargo_lanes'][$index]['alert'] = [
                     'expired_at' => $expire_at > 0 ? date('Y-m-d', $expire_at) : '',
-                    'pre_days' => $alert->getPreAlertDays(),
-                    'invalid_if_expired' => $alert->invalidIfExpired(),
+                    'pre_days' => $alert->getPreDays(),
+                    'invalid_if_expired' => $alert->getInvalidIfExpired(),
                 ];
             }
         }
@@ -1889,6 +1890,7 @@ include './index.php';
         if (App::isGoodsExpireAlertEnabled()) {
             $all = GoodsExpireAlert::query(['device_id' => $device->getId()])->findAll();
             $payload = $device->getPayload();
+            /** @var goods_expire_alertModelObj $alert */
             foreach ($all as $alert) {
                 if (empty($payload['cargo_lanes'][$alert->getLaneId()])) {
                     $alert->destroy();

@@ -12,6 +12,7 @@ use Exception;
 use zovye\App;
 use zovye\Device;
 use zovye\GoodsExpireAlert;
+use zovye\LoginData;
 use zovye\model\goods_expire_alertModelObj;
 use zovye\Request;
 use function zovye\err;
@@ -129,15 +130,16 @@ class alert
             return [];
         }
 
-        $user = common::getUser();
+        $all = [];
 
-        if ($user->isAgent() || $user->isPartner()) {
-            $agent = common::getAgent();
+        $agent = common::getAgent(true);
+        if ($agent) {
             $all = GoodsExpireAlert::getAllExpiredForAgent($agent);
-        } elseif ($user->isKeeper()) {
-            $all = GoodsExpireAlert::getAllExpiredForKeeper(keeper::getKeeper());
         } else {
-            return err('没有权限请求这个接口！');
+            $keeper = common::getKeeper(true);
+            if ($keeper) {
+                $all = GoodsExpireAlert::getAllExpiredForKeeper($keeper);
+            }
         }
 
         $result = [];

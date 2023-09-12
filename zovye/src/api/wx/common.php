@@ -66,6 +66,7 @@ class common
                 'session_key' => $_SESSION['session_key'],
                 'result' => $result,
             ]);
+
             return $result;
         }
 
@@ -94,15 +95,13 @@ class common
         return User::get($login_data->getOpenidX(), true);
     }
 
-    public static function getUser($src = []): userModelObj
+    public static function getUser($src = null): userModelObj
     {
         if (self::$user) {
             return self::$user;
         }
 
-        if (empty($token)) {
-            $token = common::getToken();
-        }
+        $token = common::getToken();
 
         if (empty($token)) {
             JSON::fail('请先登录后再请求数据！[101]');
@@ -163,19 +162,45 @@ class common
         return $user->agent();
     }
 
-    public static function getAgent(): agentModelObj
+    public static function getAgent($return_error = false): ?agentModelObj
     {
-        $user = self::getUser();
+        $login_data = LoginData::get(common::getToken(), [LoginData::AGENT, LoginData::AGENT_WEB]);
+        if (empty($login_data)) {
+            if ($return_error) {
+                return null;
+            }
 
-        if (!$user->isAgent() && !$user->isPartner()) {
-            JSON::fail('您还不是我们的代理商，请联系我们！');
+            JSON::fail('请先登录后再请求数据![202]');
+        }
+
+        $user = User::get($login_data->getUserId());
+        if ($user->isAgent()) {
+            return $user->getAgent();
         }
 
         if ($user->isPartner()) {
             return $user->getPartnerAgent();
         }
 
-        return $user->agent();
+        return null;
+    }
+
+    public static function getKeeper($return_error = false): ?keeperModelObj
+    {
+        $login_data = LoginData::get(common::getToken(), LoginData::KEEPER);
+        if (empty($login_data)) {
+            if ($return_error) {
+                return null;
+            }
+
+            JSON::fail('请先登录后再请求数据![202]');
+        }
+
+        /** @var keeperModelObj $keeper */
+        $keeper = \zovye\Keeper::findOne(['id' => $login_data->getUserId()]);
+
+        return $keeper;
+
     }
 
     public static function getAgentOrKeeper()
@@ -374,7 +399,7 @@ class common
                 return ['status' => 'success', 'msg' => '上传成功！'];
             }
         }
-        
+
         return err('上传失败！');
     }
 }

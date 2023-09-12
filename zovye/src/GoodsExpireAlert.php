@@ -46,7 +46,7 @@ class GoodsExpireAlert extends Base
         $query->where('expired_at>0 AND expired_at-pre_days*86400<'.time());
 
         if ($fetch_total) {
-            $query->get('count(*)');
+            return $query->count();
         }
 
         $query->orderBy('expired_at ASC');
@@ -76,7 +76,7 @@ class GoodsExpireAlert extends Base
             ->where('expired_at>0 AND expired_at-pre_days*86400>'.time());
 
         if ($fetch_total) {
-            $query->count();
+            return $query->count();
         }
 
         $all = $query->orderby('expired_at ASC')->getAll();

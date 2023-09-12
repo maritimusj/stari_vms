@@ -2297,7 +2297,13 @@ class deviceModelObj extends modelObj
                     $order = Order::getLastOrderOfDevice($this);
                     if ($order) {
                         //超时后检查订单是否成功，否则退款
-                        Job::refund($order->getOrderNO(), '设备响应超时', 0, true, intval(settings('order.rollback.delay', 0)));
+                        Job::refund(
+                            $order->getOrderNO(),
+                            '设备响应超时',
+                            0,
+                            true,
+                            intval(settings('order.rollback.delay', 0))
+                        );
                     }
                 }
             }
@@ -2847,9 +2853,9 @@ class deviceModelObj extends modelObj
         return Device::isOwner($this, $agent);
     }
 
-    public function getGoodsByLane($lane): array
+    public function getGoodsByLane($lane, $params = []): array
     {
-        return Device::getGoodsByLane($this, $lane);
+        return Device::getGoodsByLane($this, $lane, $params);
     }
 
     public function getGoodsTotal($goods_id): int

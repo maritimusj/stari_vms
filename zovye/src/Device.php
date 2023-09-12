@@ -354,7 +354,7 @@ class Device extends State
         return $data;
     }
 
-    public static function getGoodsByLane(deviceModelObj $device, $lane_id): array
+    public static function getGoodsByLane(deviceModelObj $device, $lane_id, $params = []): array
     {
         $payload = self::getPayload($device);
         $lane = $payload['cargo_lanes'][$lane_id];
@@ -364,7 +364,7 @@ class Device extends State
         }
 
         $goods_id = $lane['goods'];
-        $result = Goods::data($goods_id);
+        $result = Goods::data($goods_id, $params);
         if ($result) {
             $result['num'] = $lane['num'];
             if ($lane['goods_price']) {

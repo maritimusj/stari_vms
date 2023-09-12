@@ -447,6 +447,7 @@ class device
                     'name' => '全部设备',
                 ],
             ],
+            'goods_expired_alert' => alert::count(),
         ];
 
         if ($params['date']) {

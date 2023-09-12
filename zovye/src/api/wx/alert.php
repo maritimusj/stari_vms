@@ -98,6 +98,22 @@ class alert
         return ['msg' => '保存成功！'];
     }
 
+    public static function count()
+    {
+        $user = common::getUser();
+
+        if ($user->isAgent() || $user->isPartner()) {
+            $agent = common::getAgent();
+
+            return GoodsExpireAlert::getAllExpiredForAgent($agent, true);
+
+        } elseif ($user->isKeeper()) {
+            return GoodsExpireAlert::getAllExpiredForKeeper(keeper::getKeeper(), true);
+        }
+
+        return 0;
+    }
+
     public static function list(): array
     {
         $user = common::getUser();

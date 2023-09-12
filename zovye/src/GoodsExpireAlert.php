@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+use DateTimeImmutable;
+use Exception;
 use zovye\model\deviceModelObj;
 use zovye\model\goods_expire_alertModelObj;
 use zovye\model\keeperModelObj;
@@ -51,6 +53,28 @@ class GoodsExpireAlert extends Base
         $query->orderBy('expired_at ASC');
 
         return $query->findAll();
+    }
+
+    public static function getStatus(goods_expire_alertModelObj $alert): string
+    {
+        $pre_days = max(0, $alert->getPreDays());
+
+        try {
+            $datetime = new DateTimeImmutable($alert->getExpiredAt());
+            $now = new DateTimeImmutable();
+            if ($now >= $datetime) {
+                return 'expired';
+            } else {
+                $datetime = $datetime->modify("-{$pre_days}days");
+                if ($now >= $datetime) {
+                    return 'alert';
+                }
+            }
+        } catch (Exception $e) {
+            return 'error';
+        }
+
+        return 'normal';
     }
 
     public static function getAllExpiredForKeeper($user, $fetch_total = false)

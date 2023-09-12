@@ -161,31 +161,13 @@ class alert
                 continue;
             }
 
-            $pre_days = max(0, $alert->getPreDays());
-
-            try {
-                $datetime = new DateTimeImmutable($expired_at);
-                $now = new DateTimeImmutable();
-                $status = 'normal';
-                if ($now >= $datetime) {
-                    $status = 'expired';
-                } else {
-                    $datetime = $datetime->modify("-{$pre_days}days");
-                    if ($now >= $datetime) {
-                        $status = 'alert';
-                    }
-                }
-            } catch (Exception $e) {
-                continue;
-            }
-
             $result[] = [
                 'device' => $device->profile(),
                 'goods' => $goods,
                 'lane' => $alert->getLaneId(),
-                'status' => $status,
+                'status' => GoodsExpireAlert::getStatus($alert),
                 'pre_days' => $alert->getPreDays(),
-                'expired_at' => $datetime->format('Y-m-d'),
+                'expired_at' => date('Y-m-d', $alert->getExpiredAt()),
                 'valid_if_expired' => $alert->getInvalidIfExpired(),
             ];
         }

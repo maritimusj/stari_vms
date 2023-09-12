@@ -12,7 +12,6 @@ use Exception;
 use zovye\App;
 use zovye\Device;
 use zovye\GoodsExpireAlert;
-use zovye\LoginData;
 use zovye\model\goods_expire_alertModelObj;
 use zovye\Request;
 use function zovye\err;
@@ -26,30 +25,33 @@ class alert
             return err('没有启用这个功能！');
         }
 
-        $user = common::getUser();
-        if ($user->isAgent() || $user->isPartner()) {
-            $agent = common::getAgent();
+        $agent = common::getAgent(true);
+        if ($agent) {
             $device = \zovye\api\wx\device::getDevice(Request::str('id'), $agent);
-
             if (is_error($device)) {
                 return $device;
             }
+        }
 
-        } elseif ($user->isKeeper()) {
-            $keeper = keeper::getKeeper();
-            $device = Device::find(Request::str('id'), ['imei', 'shadow_id']);
-            if (empty($device)) {
-                return err('找不到这个设备！');
-            }
+        if (empty($agent)) {
+            $keeper = common::getKeeper(true);
+            if ($keeper) {
+                $device = Device::find(Request::str('id'), ['imei', 'shadow_id']);
+                if (empty($device)) {
+                    return err('找不到这个设备！');
+                }
 
-            if ($device->getAgentId() != $keeper->getAgentId() ||
-                !$device->hasKeeper($keeper) ||
-                $device->getKeeperKind($keeper) != \zovye\Keeper::OP
-            ) {
-                return err('没有权限！');
+                if ($device->getAgentId() != $keeper->getAgentId() ||
+                    !$device->hasKeeper($keeper) ||
+                    $device->getKeeperKind($keeper) != \zovye\Keeper::OP
+                ) {
+                    return err('没有权限！');
+                }
             }
-        } else {
-            return err('没有权限请求这个接口！');
+        }
+
+        if (!isset($device)) {
+            return err('找不到这个设备！');
         }
 
         $lane_id = Request::int('lane');
@@ -110,15 +112,14 @@ class alert
             return 0;
         }
 
-        $user = common::getUser();
-
-        if ($user->isAgent() || $user->isPartner()) {
-            $agent = common::getAgent();
-
+        $agent = common::getAgent(true);
+        if ($agent) {
             return GoodsExpireAlert::getAllExpiredForAgent($agent, true);
+        }
 
-        } elseif ($user->isKeeper()) {
-            return GoodsExpireAlert::getAllExpiredForKeeper(keeper::getKeeper(), true);
+        $keeper = common::getKeeper(true);
+        if ($keeper) {
+            return GoodsExpireAlert::getAllExpiredForKeeper($keeper, true);
         }
 
         return 0;

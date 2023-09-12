@@ -61,7 +61,7 @@ class GoodsExpireAlert extends Base
         } elseif ($user instanceof keeperModelObj) {
             $keeper = $user;
         } else {
-            return [];
+            return $fetch_total ? 0 : [];
         }
 
         $query = We7::load()->object('query')->from(self::model()->getTableName(), 'a')

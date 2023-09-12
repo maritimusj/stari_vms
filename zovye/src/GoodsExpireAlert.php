@@ -44,7 +44,7 @@ class GoodsExpireAlert extends Base
     public static function getAllExpiredForAgent(userModelObj $user, $fetch_total = false)
     {
         $query = self::query(['agent_id' => $user->getId()]);
-        $query->where('expired_at>0 AND expired_at-pre_days*86400<'.time());
+        $query->where('expired_at>0 AND expired_at-pre_days*86400<='.time());
 
         if ($fetch_total) {
             return $query->count();
@@ -60,8 +60,7 @@ class GoodsExpireAlert extends Base
         $pre_days = max(0, $alert->getPreDays());
 
         try {
-            $datetime = new DateTimeImmutable();
-            $datetime->setTimestamp($alert->getExpiredAt());
+            $datetime = new DateTimeImmutable("@{$alert->getExpiredAt()}");
             $now = new DateTimeImmutable();
             if ($now >= $datetime) {
                 return 'expired';
@@ -88,23 +87,33 @@ class GoodsExpireAlert extends Base
             return $fetch_total ? 0 : [];
         }
 
-        $query = We7::load()->object('query')->from(self::model()->getTableName(), 'a')
-            ->leftjoin(Keeper::model()->getTableName(), 'k')
-            ->on('a.agent_id', 'k.agent_id')
-            ->leftjoin(m('keeper_devices')->getTableName(), 'd')
-            ->on('k.id', 'd.keeper_id')
-            ->on('d.device_id', 'a.device_id')
-            ->select('a.id')
-            ->where('k.id', $keeper->getId())
-            ->where('d.kind', '1')
-            ->where('expired_at>0 AND expired_at-pre_days*86400>'.time());
+        $alert_tb = We7::tb(self::model()->getTableName());
+        $keeper_tb = We7::tb(Keeper::model()->getTableName());
+        $keeper_device_tb = We7::tb(m('keeper_devices')->getTableName());
+        
+        $ts = TIMESTAMP;
 
+        $sql = <<<SQL
+FROM $alert_tb a 
+INNER JOIN $keeper_tb k ON a.agent_id=k.agent_id 
+INNER JOIN $keeper_device_tb d ON k.id=d.keeper_id AND d.device_id=a.device_id 
+WHERE k.id={$keeper->getId()} AND d.kind=1 AND a.expired_at>0 AND a.expired_at-a.pre_days*86400<=$ts
+SQL;
         if ($fetch_total) {
-            return $query->count();
+            $res = We7::pdo_fetch('SELECT COUNT(*) AS total ' . $sql);
+            return intval($res['total'] ?? 0);
         }
 
-        $all = $query->orderby('expired_at ASC')->getAll();
+        $res =  We7::pdo_fetchAll('SELECT a.id ' . $sql . ' ORDER BY a.expired_at ASC');
+        if (empty($res)) {
+            return [];
+        }
 
-        return self::query(['id' => $all])->findAll();
+        $ids = [];
+        foreach($res as $item) {
+            $ids[] = $item['id'];
+        }
+        
+        return self::query(['id' => $ids])->findAll();
     }
 }

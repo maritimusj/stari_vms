@@ -1872,7 +1872,7 @@ include './index.php';
         $payload = $device->getPayload($detail);
         foreach ($payload['cargo_lanes'] as $index => $lane) {
             $payload['cargo_lanes'][$index]['alert'] = [];
-            $alert = GoodsExpireAlert::getFor($device, $index, $lane['goods']);
+            $alert = GoodsExpireAlert::getFor($device, $index);
             if ($alert) {
                 $expire_at = $alert->getExpiredAt();
                 $payload['cargo_lanes'][$index]['alert'] = [

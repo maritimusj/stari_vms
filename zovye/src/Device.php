@@ -356,6 +356,10 @@ class Device extends State
 
     public static function getGoodsByLane(deviceModelObj $device, $lane_id, $params = []): array
     {
+        if (!GoodsExpireAlert::isAvailable($device, $lane_id)) {
+            return [];
+        }
+
         $payload = self::getPayload($device);
         $lane = $payload['cargo_lanes'][$lane_id];
 

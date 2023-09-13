@@ -46,6 +46,9 @@ if ($type_id) {
         $payload = App::isGoodsExpireAlertEnabled() ? Helper::getPayloadWithAlertData($device) : $device->getPayload(true);
         foreach ((array)$payload['cargo_lanes'] as $index => $lane) {
             $data['cargo_lanes'][$index]['num'] = intval($lane['num']);
+            if(isset($lane['alert'])) {
+                $data['cargo_lanes'][$index]['alert'] = $lane['alert'];
+            }
         }
     }
 

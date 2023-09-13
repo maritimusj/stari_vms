@@ -35,7 +35,7 @@ if (in_array(
         Response::toast('找不到这个代理商！', Util::url('agent'), 'error');
     }
 
-    $agent_data = $agent->get('agentData', []);
+    $agent_data = (array)$agent->get('agentData', []);
 
     $agent_data['notice'] = Helper::getWxPushMessageConfig((array)$agent_data['notice']);
 

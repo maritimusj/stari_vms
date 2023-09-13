@@ -117,4 +117,18 @@ SQL;
 
         return self::query(['id' => $ids])->findAll();
     }
+
+    public static function isAvailable(deviceModelObj $device, int $lane_id): bool
+    {
+        if (!App::isGoodsExpireAlertEnabled()) {
+            return true;
+        }
+
+        $alert = self::getFor($device, $lane_id, true);
+        if (empty($alert) || !$alert->getInvalidIfExpired() || empty($alert->getExpiredAt())) {
+            return true;
+        }
+
+        return self::getStatus($alert) != 'expired';
+    }
 }

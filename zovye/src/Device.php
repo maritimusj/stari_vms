@@ -299,8 +299,8 @@ class Device extends State
                 }
             }
 
-            //根据出货策略匹配货道
-            if ($match_fn($lane)) {
+            //根据出货策略匹配货道，并判断是否过期
+            if ($match_fn($lane) && GoodsExpireAlert::isAvailable($device, $index)) {
                 $result['num'] = $lane['num'];
                 $result['cargo_lane'] = $index;
                 if ($device->isCustomizedType() && isset($lane['goods_price'])) {

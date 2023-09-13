@@ -102,7 +102,7 @@ if ($op == 'default') {
 
 //获取商品列表
 if ($op == 'goods') {
-    $payload = $device->getPayload(true);
+    $payload = $device->getPayload(true, true);
     $result = $payload['cargo_lanes'] ?? [];
 
     $allow_free = Request::bool('free');

@@ -1522,7 +1522,7 @@ class deviceModelObj extends modelObj
         }
 
         //商品库存
-        $cfg = array_merge($cfg, Device::getPayload($this));
+        $cfg = array_merge($cfg, Device::getPayload($this, false, true));
 
         //字幕
         if ($srt['subs']) {
@@ -1940,7 +1940,7 @@ class deviceModelObj extends modelObj
      */
     public function updateAppRemain(): bool
     {
-        $data = $this->getPayload();
+        $data = $this->getPayload(false, true);
 
         //目前如果没有srt，config通知会导致app隐藏字幕
         $srt = $this->getSrcConfig();
@@ -1964,11 +1964,12 @@ class deviceModelObj extends modelObj
 
     /**
      * @param bool $detail
+     * @param bool $available_restrict
      * @return array
      */
-    public function getPayload(bool $detail = false): array
+    public function getPayload(bool $detail = false, bool $available_restrict = false): array
     {
-        return Device::getPayload($this, $detail);
+        return Device::getPayload($this, $detail, $available_restrict);
     }
 
     public function getCargoLanesNum(): int
@@ -2873,12 +2874,12 @@ class deviceModelObj extends modelObj
         return $total;
     }
 
-    public function getGoodsAndPackages($user, $params = []): array
+    public function getGoodsAndPackages($user, $params = [], $available_restrict = true): array
     {
         $result = [];
         $w = $this->settings('extra.goodsList');
         if (empty($w) || $w == 'all' || $w == 'goods') {
-            $result['goods'] = $this->getGoodsList($user, $params);
+            $result['goods'] = $this->getGoodsList($user, $params, $available_restrict);
         }
         if ($w == 'all' || $w == 'packages') {
             $result['packages'] = $this->getPackages();
@@ -2963,11 +2964,11 @@ class deviceModelObj extends modelObj
         }
     }
 
-    public function getGoodsList(userModelObj $user = null, $params = []): array
+    public function getGoodsList(userModelObj $user = null, $params = [], $available_restrict = true): array
     {
         $result = [];
 
-        $payload = $this->getPayload();
+        $payload = $this->getPayload(false, $available_restrict);
         $checkFN = function ($data) use ($params) {
             if ($params) {
                 if ((!empty($params[Goods::AllowPay]) || in_array(

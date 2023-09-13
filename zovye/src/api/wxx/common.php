@@ -1394,6 +1394,6 @@ class common
             return err('找不到这个设备！');
         }
 
-        return ['goods' => $device->getGoodsList(null, [Goods::AllowPay])];
+        return ['goods' => $device->getGoodsList(null, [Goods::AllowPay]), true];
     }
 }

@@ -287,7 +287,7 @@ class Device extends State
             };
         }
 
-        $payload = self::getPayload($device);
+        $payload = self::getPayload($device, false, true);
 
         $total = 0;
         foreach ($payload['cargo_lanes'] as $index => $lane) {
@@ -319,9 +319,10 @@ class Device extends State
      * 获取设备的当前商品的库存信息
      * @param deviceModelObj $device
      * @param bool $detail
+     * @param bool $available_restrict
      * @return array
      */
-    public static function getPayload(deviceModelObj $device, bool $detail = false): array
+    public static function getPayload(deviceModelObj $device, bool $detail = false, bool $available_restrict = false): array
     {
         $data = [];
 
@@ -337,8 +338,8 @@ class Device extends State
             $lanes_data = $device->getCargoLanes();
 
             foreach ($data['cargo_lanes'] as $index => &$lane) {
-                if (!GoodsExpireAlert::isAvailable($device, $index)) {
-                    unset($data['cargo_lanes'], $index);
+                if ($available_restrict && !GoodsExpireAlert::isAvailable($device, $index)) {
+                    unset($data['cargo_lanes'][$index]);
                     continue;
                 }
                 $laneId = "l$index";
@@ -360,7 +361,7 @@ class Device extends State
 
     public static function getGoodsByLane(deviceModelObj $device, $lane_id, $params = []): array
     {
-        $payload = self::getPayload($device);
+        $payload = self::getPayload($device, false, true);
         $lane = $payload['cargo_lanes'][$lane_id];
 
         if (empty($lane)) {

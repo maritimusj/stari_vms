@@ -33,7 +33,7 @@ if (empty($device)) {
     JSON::fail('请重新扫描设备二维码 [704]');
 }
 
-$payload = $device->getPayload(true);
+$payload = $device->getPayload(true, true);
 $result = $payload['cargo_lanes'] ?? [];
 
 $allow_free = Request::bool('free');

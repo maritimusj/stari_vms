@@ -826,7 +826,7 @@ class agent
     }
 
     /**
-     * 重置货量.
+     * 重置库存.
      *
      * @return array
      */

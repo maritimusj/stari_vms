@@ -322,8 +322,11 @@ class Device extends State
      * @param bool $available_restrict
      * @return array
      */
-    public static function getPayload(deviceModelObj $device, bool $detail = false, bool $available_restrict = false): array
-    {
+    public static function getPayload(
+        deviceModelObj $device,
+        bool $detail = false,
+        bool $available_restrict = false
+    ): array {
         $data = [];
 
         $device_type = DeviceTypes::from($device);
@@ -333,13 +336,11 @@ class Device extends State
 
         $res = DeviceTypes::format($device_type, $detail);
         if ($res && is_array($res['cargo_lanes'])) {
-            $data['cargo_lanes'] = $res['cargo_lanes'];
-
             $lanes_data = $device->getCargoLanes();
 
-            foreach ($data['cargo_lanes'] as $index => &$lane) {
+            $data['cargo_lanes'] = [];
+            foreach ($res['cargo_lanes'] as $index => $lane) {
                 if ($available_restrict && !GoodsExpireAlert::isAvailable($device, $index)) {
-                    unset($data['cargo_lanes'][$index]);
                     continue;
                 }
                 $laneId = "l$index";
@@ -353,6 +354,8 @@ class Device extends State
                 if ($device->isBlueToothDevice()) {
                     $lane['is_motor'] = $device->getMotor() > $index;
                 }
+
+                $data['cargo_lanes'][$index] = $lane;
             }
         }
 

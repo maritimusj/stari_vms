@@ -71,7 +71,7 @@ class Fueling
                 return err('锁定设备失败，请稍后再试！');
             }
 
-            $goods = $device->getGoodsByLane($chargerID);
+            $goods = $device->getGoodsByLane($chargerID, [], false);
             if (empty($goods)) {
                 return err('没有指定商品信息！');
             }
@@ -708,7 +708,7 @@ class Fueling
             return true;
         }
 
-        $goods = $device->getGoodsByLane($chargerID);
+        $goods = $device->getGoodsByLane($chargerID, [], false);
 
         $order_data = [
             'src' => Order::FUELING_SOLO,

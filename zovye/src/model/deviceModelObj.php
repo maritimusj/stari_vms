@@ -1015,7 +1015,7 @@ class deviceModelObj extends modelObj
 
     public function resetGoodsNum($goods_id, $delta, $reason = ''): array
     {
-        $goods = $this->getGoods($goods_id);
+        $goods = $this->getGoods($goods_id, false);
         if ($goods) {
             return $this->resetPayload([$goods['cargo_lane'] => $delta], $reason);
         }
@@ -2572,11 +2572,12 @@ class deviceModelObj extends modelObj
     /**
      * 获取指定的商品
      * @param int $goods_id
+     * @param bool $available_restrict
      * @return array
      */
-    public function getGoods(int $goods_id): array
+    public function getGoods(int $goods_id, bool $available_restrict = true): array
     {
-        return Device::getGoods($this, $goods_id);
+        return Device::getGoods($this, $goods_id, $available_restrict);
     }
 
     /**
@@ -2854,9 +2855,9 @@ class deviceModelObj extends modelObj
         return Device::isOwner($this, $agent);
     }
 
-    public function getGoodsByLane($lane, $params = []): array
+    public function getGoodsByLane($lane, $params = [], $available_restrict = true): array
     {
-        return Device::getGoodsByLane($this, $lane, $params);
+        return Device::getGoodsByLane($this, $lane, $params, $available_restrict);
     }
 
     public function getGoodsTotal($goods_id): int

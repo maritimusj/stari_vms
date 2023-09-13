@@ -259,9 +259,10 @@ class Device extends State
      * 获取指定货道上的商品数据，同时包括商品所在货道
      * @param deviceModelObj $device
      * @param int $goods_id
+     * @param bool $available_restrict
      * @return array
      */
-    public static function getGoods(deviceModelObj $device, int $goods_id): array
+    public static function getGoods(deviceModelObj $device, int $goods_id, bool $available_restrict = true): array
     {
         $result = Goods::data($goods_id);
         if (empty($result)) {
@@ -287,7 +288,7 @@ class Device extends State
             };
         }
 
-        $payload = self::getPayload($device, false, true);
+        $payload = self::getPayload($device, false, $available_restrict);
 
         $total = 0;
         foreach ($payload['cargo_lanes'] as $index => $lane) {
@@ -362,9 +363,13 @@ class Device extends State
         return $data;
     }
 
-    public static function getGoodsByLane(deviceModelObj $device, $lane_id, $params = []): array
-    {
-        $payload = self::getPayload($device, false, true);
+    public static function getGoodsByLane(
+        deviceModelObj $device,
+        $lane_id,
+        $params = [],
+        $available_restrict = true
+    ): array {
+        $payload = self::getPayload($device, false, $available_restrict);
         $lane = $payload['cargo_lanes'][$lane_id];
 
         if (empty($lane)) {

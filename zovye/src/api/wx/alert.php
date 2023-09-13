@@ -153,7 +153,7 @@ class alert
                 continue;
             }
 
-            $goods = $device->getGoodsByLane($alert->getLaneId(), ['useImageProxy' => true, 'fullPath' => true]);
+            $goods = $device->getGoodsByLane($alert->getLaneId(), ['useImageProxy' => true, 'fullPath' => true], false);
             if (empty($goods)) {
                 continue;
             }

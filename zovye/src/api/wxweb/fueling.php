@@ -52,7 +52,7 @@ class fueling
             ];
         }
 
-        $goods = $device->getGoodsByLane($chargerID);
+        $goods = $device->getGoodsByLane($chargerID, [], false);
         if ($goods) {
             $data['goods'] = $goods;
         } else {

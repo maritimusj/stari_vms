@@ -109,7 +109,7 @@ class DeviceUtil
             return err('设备正在使用中，请重试！');
         }
 
-        $goods = Device::getGoodsByLane($device, $lane);
+        $goods = Device::getGoodsByLane($device, $lane, false);
 
         $pull_data = Helper::preparePullData(null, $device, $user, $goods);
         if (is_error($pull_data)) {

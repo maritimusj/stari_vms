@@ -342,7 +342,7 @@ class Device extends State
                     $lane['num'] = intval($lanes_data[$laneId]['num']);
                     if ($device->isCustomizedType() && isset($lanes_data[$laneId]['price'])) {
                         $lane['goods_price'] = intval(round($lanes_data[$laneId]['price']));
-                        $lane['goods_price_formatted'] = '¥'.number_format($lane['goods_price'] / 100, 2).'元';
+                        $lane['goods_price_formatted'] = number_format($lane['goods_price'] / 100, 2).'元';
                     }
                 }
                 if ($device->isBlueToothDevice()) {

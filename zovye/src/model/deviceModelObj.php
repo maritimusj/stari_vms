@@ -2303,7 +2303,7 @@ class deviceModelObj extends modelObj
                             '设备响应超时',
                             0,
                             true,
-                            intval(settings('order.rollback.delay', 0))
+                            $timeout
                         );
                     }
                 }

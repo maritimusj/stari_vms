@@ -1870,12 +1870,12 @@ include './index.php';
     public static function getPayloadWithAlertData(deviceModelObj $device, bool $detail = true): array
     {
         $payload = $device->getPayload($detail);
-        foreach ($payload['cargo_lanes'] as $index => $lane) {
-            $payload['cargo_lanes'][$index]['alert'] = [];
+        foreach ((array)$payload['cargo_lanes'] as $index => &$lane) {
+            $lane['alert'] = [];
             $alert = GoodsExpireAlert::getFor($device, $index);
             if ($alert) {
                 $expire_at = $alert->getExpiredAt();
-                $payload['cargo_lanes'][$index]['alert'] = [
+                $lane['alert'] = [
                     'status' => GoodsExpireAlert::getStatus($alert),
                     'expired_at' => $expire_at > 0 ? date('Y-m-d', $expire_at) : '',
                     'pre_days' => $alert->getPreDays(),

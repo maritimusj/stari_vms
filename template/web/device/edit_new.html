@@ -209,7 +209,7 @@
         <li role="presentation" :class="{'active': nav.op === active}" @click="active=nav.op" v-for="nav in navs">
             <a href="#" v-html="nav.content">
             </a>
-        </li>  
+        </li>
     </ul>
     <form action="{php echo $this->createWebUrl('device');}" method="post" id="device_edit_form">
         <div class="panel panel-default panel-first">
@@ -289,7 +289,7 @@
                                     {/if}
                                     {loop $bluetooth['protocols'] $index $item}
                                     <option value="{$item['name']}" {if $item['name'] == $bluetooth['protocol'] } selected{/if}>
-                                        {$item['title']}
+                                    {$item['title']}
                                     </option>
                                     {/loop}
                                 </select>
@@ -307,7 +307,7 @@
                                 <input type="text" class="form-control" name="Motor" id="Motor" value="{php echo $device ? $device->getMotor() : ''}">
                                 <span class="help-block">* 请设置电机货道的数量，没有电机货道请填0</span>
                             </div>
-                        </div>                        
+                        </div>
                     </template>
                     {/if}
                     <div id="device_types" v-if="config.is_normal_device || config.is_bluetooth_device || config.is_vdevice || config.is_fueling_device">
@@ -315,8 +315,8 @@
                             <label for="select_device_types" class="col-md-2 control-label">设备型号</label>
                             <div class="col-md-5">
                                 <select name="deviceType" id="select_device_types" style="width:100%;" data-device="{php echo $device ? $device->getId() : 0}"
-                                :disabled="loading"
-                                v-model="currentTypeID">
+                                        :disabled="loading"
+                                        v-model="currentTypeID">
                                     <option v-for="item in list" :value="item['id']" :selected="item['id']==currentTypeID" v-if="list.length>0">
                                         {{item['title']}}（{{item['lanes_total']}}货道）
                                     </option>
@@ -339,215 +339,215 @@
                             <div class="col-md-10" id="lane_detail">
                                 <table  class="table table-bordered cargo_lanes" v-if="currentType && currentType.cargo_lanes">
                                     <thead>
-                                        <th>{{config.is_fueling_device ? '枪号':'货道'}}</th>
-                                        <th>商品名称</th>
-                                        <th class="fixed">价格</th>
-                                        <th class="fixed">容量</th>
-                                        <th class="fixed">当前数量</th>
-                                        <th>操作</th>
+                                    <th>{{config.is_fueling_device ? '枪号':'货道'}}</th>
+                                    <th>商品名称</th>
+                                    <th class="fixed">价格</th>
+                                    <th class="fixed">容量</th>
+                                    <th class="fixed">当前数量</th>
+                                    <th>操作</th>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="(lane, i) in currentType.cargo_lanes" :class="{unknown: lane.goods_id==0}" :key="currentTypeID+':'+i">
-                                            <td>
-                                                <div class="lane">
+                                    <tr v-for="(lane, i) in currentType.cargo_lanes" :class="{unknown: lane.goods_id==0}" :key="currentTypeID+':'+i">
+                                        <td>
+                                            <div class="lane">
                                                     <span>
                                                         {{i + 1}}
-                                                        <sup title="电机货道" v-if="lane.is_motor">[ 电机 ]</sup>   
-                                                    </span>                                                
-                                                </div>
-                                            </td>
-                                            <td :class="{operate: isCustomizedType}">
-                                                <div class="goods">
+                                                        <sup title="电机货道" v-if="lane.is_motor">[ 电机 ]</sup>
+                                                    </span>
+                                            </div>
+                                        </td>
+                                        <td :class="{operate: isCustomizedType}">
+                                            <div class="goods">
                                                     <span :class="{'goods_name': isCustomizedType}"  @click="chooseGoods(lane)" :title="navExists('alert') ? '':'点击选择商品'">
                                                         {{lane.goods_name}}
                                                         <sup class="id" title="商品ID" v-if="lane.goods_id>0">{{lane.goods_id}}</sup>
                                                     </span>
-                                                    <span v-show="lane.goods_unit_title">（{{lane.goods_unit_title}}）</span> 
-                                                    <div v-if="navExists('alert') && lane.alert && lane.alert.expired_at" class="expire-info">
-                                                        <div class="item" :class="lane.alert.status">
-                                                            <span class="title">过期时间</span><span class="value">{{lane.alert.expired_at}}</span>
-                                                        </div>
-                                                        <div class="item">
-                                                            <span class="title">提前预警</span><span class="value">{{lane.alert.pre_days}}天</span>
-                                                        </div>
-                                                        <div class="item">
-                                                            <span class="title">过期购买</span><span class="value">{{lane.alert.invalid_if_expired ? '禁止购买':'允许购买'}}</span>
-                                                        </div>
-                                                    </div>                                                       
+                                                <span v-show="lane.goods_unit_title">（{{lane.goods_unit_title}}）</span>
+                                                <div v-if="navExists('alert') && lane.alert && lane.alert.expired_at" class="expire-info">
+                                                    <div class="item" :class="lane.alert.status">
+                                                        <span class="title">过期时间</span><span class="value">{{lane.alert.expired_at}}</span>
+                                                    </div>
+                                                    <div class="item">
+                                                        <span class="title">提前预警</span><span class="value">{{lane.alert.pre_days}}天</span>
+                                                    </div>
+                                                    <div class="item">
+                                                        <span class="title">过期购买</span><span class="value">{{lane.alert.invalid_if_expired ? '禁止购买':'允许购买'}}</span>
+                                                    </div>
                                                 </div>
-                                            </td>
-                                            <td>
-                                                <div v-show="currentLane == lane">
-                                                    <input class="form-control goods" type="number" 
-                                                    :name="'price' + i" 
-                                                    step="0.01"
-                                                    :min="config.is_fueling_device ? '0':'0'"
-                                                    ref="price"
-                                                    v-model="lane.goods_price"
-                                                    @blur="editPriceDone(lane)"
-                                                    @keydown.enter.self.prevent="editPriceDone(lane)"
-                                                    >
-                                                </div>
-                                                <span 
-                                                :class="{price:isCustomizedType}"
-                                                @click="editPrice(lane, i)" 
-                                                v-show="currentLane!=lane"
-                                                title="点击修改价格">¥{{lane.goods_price}}元</span>
-                                            </td>
-                                            <td>
-                                                <template v-if="isCustomizedType">
-                                                    <input type="number" class="form-control goods" 
-                                                    :name="'capacities[' + i + ']'" 
-                                                    v-model="lane.capacity" 
-                                                    :step="config.is_fueling_device ? '0.01':'1'"
-                                                    min="0">
-                                                    <input type="hidden" :name="'goods['+i+']'" :value="lane.goods_id">
-                                                </template>
-                                                <template v-else>
-                                                    {{lane.capacity}} 
-                                                </template>
-                                            <td>
-                                                <input type="number" class="form-control goods" 
-                                                :name="'lane' + i + '_num'" v-model="lane.num" 
-                                                min="0"
-                                                :step="config.is_fueling_device ? '0.01':'1'" 
-                                                :max="lane.capacity ? lane.capacity : ''">
-                                            </td>
-                                            <td class="operate">                                          
-                                                <i class="fa fa-gift" 
-                                                v-if="currentPackage"
-                                                :class="{disabled: lane.goods_id===0,flash:currentPackage}" 
-                                                title="加入套餐" 
-                                                @click="addPackage(lane)"></i>
-                                                <i class="fa fa-trash" title="删除" 
-                                                @click="removeLane(lane)" v-if="isCustomizedType && !currentPackage"></i>
-                                            </td>
-                                        </tr>
-                                        <tr v-if="isCustomizedType">
-                                            <td class="operate">
-                                                <i class="fa fa-plus" title="添加货道"  @click.prevent="addCargoLane" :disabled="loading"></i>
-                                            </td>
-                                            <td colspan="5">
-                                            </td>
-                                        </tr>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div v-show="currentLane == lane">
+                                                <input class="form-control goods" type="number"
+                                                       :name="'price' + i"
+                                                       step="0.01"
+                                                       :min="config.is_fueling_device ? '0':'0'"
+                                                       ref="price"
+                                                       v-model="lane.goods_price"
+                                                       @blur="editPriceDone(lane)"
+                                                       @keydown.enter.self.prevent="editPriceDone(lane)"
+                                                >
+                                            </div>
+                                            <span
+                                                    :class="{price:isCustomizedType}"
+                                                    @click="editPrice(lane, i)"
+                                                    v-show="currentLane!=lane"
+                                                    title="点击修改价格">¥{{lane.goods_price}}元</span>
+                                        </td>
+                                        <td>
+                                            <template v-if="isCustomizedType">
+                                                <input type="number" class="form-control goods"
+                                                       :name="'capacities[' + i + ']'"
+                                                       v-model="lane.capacity"
+                                                       :step="config.is_fueling_device ? '0.01':'1'"
+                                                       min="0">
+                                                <input type="hidden" :name="'goods['+i+']'" :value="lane.goods_id">
+                                            </template>
+                                            <template v-else>
+                                                {{lane.capacity}}
+                                            </template>
+                                        <td>
+                                            <input type="number" class="form-control goods"
+                                                   :name="'lane' + i + '_num'" v-model="lane.num"
+                                                   min="0"
+                                                   :step="config.is_fueling_device ? '0.01':'1'"
+                                                   :max="lane.capacity ? lane.capacity : ''">
+                                        </td>
+                                        <td class="operate">
+                                            <i class="fa fa-gift"
+                                               v-if="currentPackage"
+                                               :class="{disabled: lane.goods_id===0,flash:currentPackage}"
+                                               title="加入套餐"
+                                               @click="addPackage(lane)"></i>
+                                            <i class="fa fa-trash" title="删除"
+                                               @click="removeLane(lane)" v-if="isCustomizedType && !currentPackage"></i>
+                                        </td>
+                                    </tr>
+                                    <tr v-if="isCustomizedType">
+                                        <td class="operate">
+                                            <i class="fa fa-plus" title="添加货道"  @click.prevent="addCargoLane" :disabled="loading"></i>
+                                        </td>
+                                        <td colspan="5">
+                                        </td>
+                                    </tr>
                                     </tbody>
                                 </table>
                                 <div v-if="config.goods_package_enabled && !config.is_bluetooth_device && !config.is_fueling_device">
-                                    <button class="btn btn-success" 
-                                    @click.prevent="newPackage" 
-                                    :disabled="loading"
-                                    v-if="!currentPackage">
+                                    <button class="btn btn-success"
+                                            @click.prevent="newPackage"
+                                            :disabled="loading"
+                                            v-if="!currentPackage">
                                         <i class="fa fa-gift"></i> 创建套餐
-                                    </button> 
-                                    <button class="btn btn-danger" 
-                                    @click.prevent="createPackage" 
-                                    :disabled="loading || currentPackage.list.length === 0"
-                                    v-if="currentPackage"
+                                    </button>
+                                    <button class="btn btn-danger"
+                                            @click.prevent="createPackage"
+                                            :disabled="loading || currentPackage.list.length === 0"
+                                            v-if="currentPackage"
                                     >
                                         <i class="fa fa-save"></i> 保存套餐
                                     </button>
                                 </div>
                                 <div class="package operate" v-if="currentPackage">
-                                    <i class="fa fa-ban close-btn" title="退出" @click="closePackage"></i>                           
+                                    <i class="fa fa-ban close-btn" title="退出" @click="closePackage"></i>
                                     <table class="table cargo_lanes">
                                         <thead>
-                                            <th>#</th>
-                                            <th>商品名称</th>
-                                            <th class="fixed">单价</th>
-                                            <th class="fixed">数量</th>
-                                            <th style="width: 60px;">操作</th>
+                                        <th>#</th>
+                                        <th>商品名称</th>
+                                        <th class="fixed">单价</th>
+                                        <th class="fixed">数量</th>
+                                        <th style="width: 60px;">操作</th>
                                         </thead>
                                         <tbody>
-                                            <tr v-for="(goods,index) in currentPackage.list">
-                                                <td>
-                                                    {{index +1}}
-                                                </td>
-                                                <td>
-                                                    {{goods.name}}<sup class="id" title="商品ID">{{goods.id}}</sup>
-                                                    <span v-if="goods.unit_title">({{goods.unit_title}})</span>
-                                                </td>
-                                                <td>
-                                                    <div v-show="goods.edit">
-                                                        <input type="number" class="form-control goods" 
-                                                        v-model="goods.price"
-                                                        ref="packageGoodsPrice"
-                                                        @blur="editPackageGoodsPriceDone(goods,index)"
-                                                        @keydown.enter.self.prevent="editPackageGoodsPriceDone(goods,index)"
-                                                        step="0.01" 
-                                                        min="0">
-                                                    </div>
-                                                    <span class="editable-price" @click="editPackageGoodsPrice(goods,index)" v-show="!goods.edit">
+                                        <tr v-for="(goods,index) in currentPackage.list">
+                                            <td>
+                                                {{index +1}}
+                                            </td>
+                                            <td>
+                                                {{goods.name}}<sup class="id" title="商品ID">{{goods.id}}</sup>
+                                                <span v-if="goods.unit_title">({{goods.unit_title}})</span>
+                                            </td>
+                                            <td>
+                                                <div v-show="goods.edit">
+                                                    <input type="number" class="form-control goods"
+                                                           v-model="goods.price"
+                                                           ref="packageGoodsPrice"
+                                                           @blur="editPackageGoodsPriceDone(goods,index)"
+                                                           @keydown.enter.self.prevent="editPackageGoodsPriceDone(goods,index)"
+                                                           step="0.01"
+                                                           min="0">
+                                                </div>
+                                                <span class="editable-price" @click="editPackageGoodsPrice(goods,index)" v-show="!goods.edit">
                                                         ¥{{goods.price}}元
-                                                    </span>                                                
-                                                </td>
-                                                <td>
-                                                    <input type="number" class="form-control goods" 
-                                                    v-model="goods.num"
-                                                    @blur="editPackageGoodsNumDone(goods, index)"
-                                                    min="1">
-                                                </td>
-                                                <td class="operate">
-                                                    <i class="fa fa-trash" title="删除" @click="removeGoodsFromPackage(index)"></i>
-                                                </td>
-                                            </tr>
-                                            <tr v-if="currentPackage.list.length === 0">
-                                                <td colspan="5" class="center text-muted">
-                                                    &lt;请从设备商品列表中选择商品&gt;
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="5" style="text-align: left;">
-                                                    <div class="total-price">
-                                                        <div>
-                                                            <b>套餐名称：</b><input type="text" style="text-align: left;" class="form-control goods" v-model="currentPackage.title">
-                                                        </div>
-                                                        <div>
-                                                            <b>商品总价：</b>
-                                                            <span style="padding-left: 12px;">¥{{currentPackage.price}}元</span>
-                                                        </div>                                                    
+                                                    </span>
+                                            </td>
+                                            <td>
+                                                <input type="number" class="form-control goods"
+                                                       v-model="goods.num"
+                                                       @blur="editPackageGoodsNumDone(goods, index)"
+                                                       min="1">
+                                            </td>
+                                            <td class="operate">
+                                                <i class="fa fa-trash" title="删除" @click="removeGoodsFromPackage(index)"></i>
+                                            </td>
+                                        </tr>
+                                        <tr v-if="currentPackage.list.length === 0">
+                                            <td colspan="5" class="center text-muted">
+                                                &lt;请从设备商品列表中选择商品&gt;
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="5" style="text-align: left;">
+                                                <div class="total-price">
+                                                    <div>
+                                                        <b>套餐名称：</b><input type="text" style="text-align: left;" class="form-control goods" v-model="currentPackage.title">
                                                     </div>
+                                                    <div>
+                                                        <b>商品总价：</b>
+                                                        <span style="padding-left: 12px;">¥{{currentPackage.price}}元</span>
+                                                    </div>
+                                                </div>
 
-                                                </td>
-                                            </tr>
+                                            </td>
+                                        </tr>
                                         </tbody>
                                     </table>
                                 </div>
                                 <div v-for="(p, index) in packages" class="package-list">
                                     <table class="table table-bordered cargo_lanes">
                                         <tbody>
-                                            <tr>
-                                                <td colspan="4" style="text-align: left;">
-                                                    <div>
-                                                        <b>套餐名称：</b>{{p.title}}
-                                                    </div>
-                                                    <div>
-                                                        <b>商品总价：</b>¥{{p.price}}元
-                                                    </div>
-                                                    <div class="package-delete operate">
-                                                        <i class="fa fa-ban" :class="{disabled: loading}" title="删除" @click="removePackage(p,index)"></i>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <tr v-for="(goods,index) in p.list" :class="{invalid:!isPackageGoodsValid(goods)}">
-                                                <td class="index">
-                                                    {{index +1}}
-                                                </td>
-                                                <td>
-                                                    {{goods.name}}<span class="text-muted" v-if="goods.deleted">&lt;已删除&gt;</span>
-                                                </td>
-                                                <td>
-                                                    ¥{{goods.price}}元
-                                                </td>
-                                                <td>
-                                                    {{goods.num}}
-                                                    <span v-if="goods.unit_title">({{goods.unit_title}})</span>
-                                                </td>
-                                            </tr>
+                                        <tr>
+                                            <td colspan="4" style="text-align: left;">
+                                                <div>
+                                                    <b>套餐名称：</b>{{p.title}}
+                                                </div>
+                                                <div>
+                                                    <b>商品总价：</b>¥{{p.price}}元
+                                                </div>
+                                                <div class="package-delete operate">
+                                                    <i class="fa fa-ban" :class="{disabled: loading}" title="删除" @click="removePackage(p,index)"></i>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr v-for="(goods,index) in p.list" :class="{invalid:!isPackageGoodsValid(goods)}">
+                                            <td class="index">
+                                                {{index +1}}
+                                            </td>
+                                            <td>
+                                                {{goods.name}}<span class="text-muted" v-if="goods.deleted">&lt;已删除&gt;</span>
+                                            </td>
+                                            <td>
+                                                ¥{{goods.price}}元
+                                            </td>
+                                            <td>
+                                                {{goods.num}}
+                                                <span v-if="goods.unit_title">({{goods.unit_title}})</span>
+                                            </td>
+                                        </tr>
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
-                        </div>                         
+                        </div>
                     </div>
                 </div>
                 <div v-if="active === 'func'"  v-if="navExists('func')">
@@ -638,7 +638,7 @@
                             <input type="number" class="form-control" name="all" id="all" value="{php echo $extra['limit']['all']??'0'}">
                             <span class="help-block">* 所有用户在这个设备上可免费领取的商品总数，0表示不限制数量</span>
                         </div>
-                    </div> 
+                    </div>
                 </div>
                 <div v-show="active === 'alert'" v-if="navExists('alert')">
                     <div class="seg" v-for="(lane, i) in currentType.cargo_lanes" :class="{unknown: lane.goods_id==0}" :key="currentTypeID+':'+i">
@@ -647,7 +647,7 @@
                             <label class="col-md-2 control-label">当前商品</label>
                             <div class="col-md-10">
                                 <label v-if="lane.goods_id">
-                                {{lane.goods_name}}<sup class="id" title="商品ID" v-if="lane.goods_id>0">{{lane.goods_id}}</sup>
+                                    {{lane.goods_name}}<sup class="id" title="商品ID" v-if="lane.goods_id>0">{{lane.goods_id}}</sup>
                                 </label>
                                 <label v-else>
                                     <span class="text-muted">
@@ -660,10 +660,10 @@
                             <label :for="'alertExpiredAt['+i+']'" class="col-md-2 control-label">过期时间</label>
                             <div class="col-md-10">
                                 <input type="text" class="form-control" placeholder="<未设置>" autocomplete="off"
-                                    :id="'alertExpiredAt['+i+']'" 
-                                    :name="'alertExpiredAt['+i+']'"
-                                    @click="showDatetimePicker(lane.alert, event, true, false)"
-                                    v-model="lane.alert.expired_at">
+                                       :id="'alertExpiredAt['+i+']'"
+                                       :name="'alertExpiredAt['+i+']'"
+                                       @click="showDatetimePicker(lane.alert, event, true, false)"
+                                       v-model="lane.alert && lane.alert.expired_at">
                                 <span class="help-block">* 该货道的商品过期时间</span>
                             </div>
                         </div>
@@ -673,7 +673,7 @@
                                 <input type="number" class="form-control"
                                        :name="'alertPreDays['+i+']'"
                                        :id="'alertPreDays['+i+']'"
-                                       v-model="lane.alert.pre_days"
+                                       v-model="lane.alert && lane.alert.pre_days"
                                 >
                                 <span class="help-block">* 提前多少天就显示提醒信息，0表示不提前提醒</span>
                             </div>
@@ -682,13 +682,13 @@
                             <label class="col-xs-12 col-md-2 col-md-2 control-label">过期处理</label>
                             <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
                                 <label :for="'alertInvalid['+i+']0'" class="radio-inline">
-                                    <input :name="'alertInvalid['+i+']'" :id="'alertInvalid['+i+']0'" type="radio" value="1" 
-                                    v-model="lane.alert.invalid_if_expired">
+                                    <input :name="'alertInvalid['+i+']'" :id="'alertInvalid['+i+']0'" type="radio" value="1"
+                                           v-model="lane.alert && lane.alert.invalid_if_expired">
                                     禁止购买
                                 </label>
                                 <label :for="'alertInvalid['+i+']1'" class="radio-inline">
-                                    <input :name="'alertInvalid['+i+']'" :id="'alertInvalid['+i+']1'" type="radio" value="0" 
-                                    v-model="lane.alert.invalid_if_expired">
+                                    <input :name="'alertInvalid['+i+']'" :id="'alertInvalid['+i+']1'" type="radio" value="0"
+                                           v-model="lane.alert && lane.alert.invalid_if_expired">
                                     允许购买
                                 </label>
                                 <span class="help-block">* 商品过期后，用户是否可以购买</span>
@@ -811,7 +811,7 @@
                             <span class="help-block">* 指定设备门锁数量，默认为零</span>
                         </div>
                     </div>
-                    {/if} 
+                    {/if}
                     -->
                     <!--尿素加注机-->
                     <template v-if="config.is_fueling_device">
@@ -847,11 +847,11 @@
                         <div class="form-group">
                             <label class="col-md-2 control-label">到期时间</label>
                             <div class="col-md-8">
-                                <input type="text" name="expiration"  
-                                value="{php echo $device ? $device->getExpiration() : ''}" 
-                                placeholder="&lt;无限制&gt;" readonly="readonly" class="form-control"
-                                style="padding-left:12px;" 
-                                @click="showDatetimePicker(ctrl.expiration, event)"
+                                <input type="text" name="expiration"
+                                       value="{php echo $device ? $device->getExpiration() : ''}"
+                                       placeholder="&lt;无限制&gt;" readonly="readonly" class="form-control"
+                                       style="padding-left:12px;"
+                                       @click="showDatetimePicker(ctrl.expiration, event)"
                                 />
                                 <span class="help-block">* 请输入设备到期时间</span>
                             </div>
@@ -957,7 +957,7 @@
             <input type="hidden" name="device_model" value="{$device_model}">
             <template v-if="deviceId > 0">
                 <input type="hidden" name="id" :value="deviceId">
-                <button type="submit" class="btn btn-primary">保存</button>                
+                <button type="submit" class="btn btn-primary">保存</button>
             </template>
             <template v-else>
                 <button type="submit" class="btn btn-primary">创建</button>
@@ -1358,7 +1358,7 @@
                     this.calcPackageGoodsTotal(this.currentPackage);
                 },
                 showDatetimePicker(o, e, datepicker = true, timepicker = false) {
-                    if (!o.initilized) {
+                    if (o && !o.initilized) {
                         Vue.set(o, "datetimepicker", true);
                         let format = '';
                         if (datepicker) {

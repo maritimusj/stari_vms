@@ -305,7 +305,7 @@ class Device extends State
                 $result['cargo_lane'] = $index;
                 if ($device->isCustomizedType() && isset($lane['goods_price'])) {
                     $result['price'] = $lane['goods_price'];
-                    $result['price_formatted'] = '¥'.number_format($result['price'] / 100, 2).'元';
+                    $result['price_formatted'] = number_format($result['price'] / 100, 2).'元';
                 }
             }
         }

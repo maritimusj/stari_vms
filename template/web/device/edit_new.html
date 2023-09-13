@@ -381,7 +381,7 @@
                                                     <input class="form-control goods" type="number" 
                                                     :name="'price' + i" 
                                                     step="0.01"
-                                                    :min="config.is_fueling_device ? '0.00':'0'"
+                                                    :min="config.is_fueling_device ? '0':'0'"
                                                     ref="price"
                                                     v-model="lane.goods_price"
                                                     @blur="editPriceDone(lane)"
@@ -400,7 +400,7 @@
                                                     :name="'capacities[' + i + ']'" 
                                                     v-model="lane.capacity" 
                                                     :step="config.is_fueling_device ? '0.01':'1'"
-                                                    :min="config.is_fueling_device ? '0.00':'0'">
+                                                    min="0">
                                                     <input type="hidden" :name="'goods['+i+']'" :value="lane.goods_id">
                                                 </template>
                                                 <template v-else>
@@ -409,8 +409,8 @@
                                             <td>
                                                 <input type="number" class="form-control goods" 
                                                 :name="'lane' + i + '_num'" v-model="lane.num" 
-                                                :min="config.is_fueling_device ? '0.00':'0'"
-                                                :step="config.is_fueling_device ? '0.00':'0'" 
+                                                min="0"
+                                                :step="config.is_fueling_device ? '0.01':'1'" 
                                                 :max="lane.capacity ? lane.capacity : ''">
                                             </td>
                                             <td class="operate">                                          

@@ -299,8 +299,8 @@ class Device extends State
                 }
             }
 
-            //根据出货策略匹配货道，并判断是否过期
-            if ($match_fn($lane) && GoodsExpireAlert::isAvailable($device, $index)) {
+            //根据出货策略匹配货道
+            if ($match_fn($lane)) {
                 $result['num'] = $lane['num'];
                 $result['cargo_lane'] = $index;
                 if ($device->isCustomizedType() && isset($lane['goods_price'])) {
@@ -337,6 +337,10 @@ class Device extends State
             $lanes_data = $device->getCargoLanes();
 
             foreach ($data['cargo_lanes'] as $index => &$lane) {
+                if (!GoodsExpireAlert::isAvailable($device, $index)) {
+                    unset($data['cargo_lanes'], $index);
+                    continue;
+                }
                 $laneId = "l$index";
                 if (!empty($lanes_data[$laneId])) {
                     $lane['num'] = intval($lanes_data[$laneId]['num']);
@@ -356,10 +360,6 @@ class Device extends State
 
     public static function getGoodsByLane(deviceModelObj $device, $lane_id, $params = []): array
     {
-        if (!GoodsExpireAlert::isAvailable($device, $lane_id)) {
-            return [];
-        }
-
         $payload = self::getPayload($device);
         $lane = $payload['cargo_lanes'][$lane_id];
 

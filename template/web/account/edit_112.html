@@ -173,19 +173,19 @@
                     {/if}
                     {if \zovye\App::isBalanceEnabled() && \zovye\App::isCommissionEnabled()}
                     <!-- 佣金和积分同时存在时设置 开始 -->
-                    <div id="bonus" {if $bonus_type == \zovye\Account::COMMISSION}data-commission="{$amount}"{else}data-balance="{$amount}"{/if}>
+                    <div id="bonus" {if $bonus_type == \zovye\domain\Account::COMMISSION}data-commission="{$amount}"{else}data-balance="{$amount}"{/if}>
                         <div class="form-group">
                             <label class="col-md-2 control-label">奖励方式</label>
                             <div class="col-md-10">
                                 <label class="radio-inline">
                                     <input type="radio" name="bonus_type" value="commission"
-                                    {if $bonus_type == \zovye\Account::COMMISSION}checked{/if}
+                                    {if $bonus_type == \zovye\domain\Account::COMMISSION}checked{/if}
                                     onclick="changeBonus('commission')">
                                     代理商获得佣金 <img src="{MODULE_URL}static/img/yen.svg" class="yen">
                                 </label>
                                 <label class="radio-inline">
                                     <input type="radio" name="bonus_type" value="balance"
-                                    {if $bonus_type == \zovye\Account::BALANCE}checked{/if}
+                                    {if $bonus_type == \zovye\domain\Account::BALANCE}checked{/if}
                                     onclick="changeBonus('balance')">
                                     用户获得积分 <img src="{MODULE_URL}static/img/coin.svg" class="balance">
                                 </label>
@@ -228,7 +228,7 @@
                 navs:[
                     {
                         'op': 'base',
-                        'content': `<img src="{php echo \zovye\Account::YIDAO_HEAD_IMG;}"> 基本设置`,
+                        'content': `<img src="{php echo \zovye\domain\Account::YIDAO_HEAD_IMG;}"> 基本设置`,
                     },
                     {
                         'op': 'config',

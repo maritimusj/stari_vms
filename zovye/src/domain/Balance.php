@@ -296,7 +296,7 @@ TEXT;
             $num = $entry->getExtraData('num', 1);
             if ($goods) {
                 $img = Util::toMedia($goods['img'], true);
-                $line .= "<dt>商品</dt><dd class=\"goods\"><img src=\"$img\"  alt="">{$goods['name']} x$num</dd>";
+                $line .= "<dt>商品</dt><dd class=\"goods\"><img src=\"$img\"  alt=\"\">{$goods['name']} x$num</dd>";
             }
             $device = $entry->getDevice();
             if ($device) {
@@ -343,7 +343,7 @@ TEXT;
         } elseif ($entry->getSrc() == Balance::TASK_BONUS) {
             $account_profile = $entry->getExtraData('account', []);
             $type_title = '任务';
-            $text = $account_profile ? "<dt>$type_title</dt><dd><img src=\"{$account_profile['img']}\" alt="">{$account_profile['title']}</dd>" : '';
+            $text = $account_profile ? "<dt>$type_title</dt><dd><img src=\"{$account_profile['img']}\" alt=\"\">{$account_profile['title']}</dd>" : '';
             $data['memo'] = <<<TEXT
 <dl class="log dl-horizontal">
 <dt>事件</dt>
@@ -355,7 +355,7 @@ TEXT;
         } elseif ($entry->getSrc() == Balance::PROMOTE_BONUS) {
             $account_profile = $entry->getExtraData('account', []);
             $type_title = Account::getTypeTitle($account_profile['type']);
-            $text = $account_profile ? "<dt>$type_title</dt><dd><img src=\"{$account_profile['img']}\" alt="">{$account_profile['title']}</dd>" : '';
+            $text = $account_profile ? "<dt>$type_title</dt><dd><img src=\"{$account_profile['img']}\" alt=\"\">{$account_profile['title']}</dd>" : '';
             $data['memo'] = <<<TEXT
 <dl class="log dl-horizontal">
 <dt>事件</dt>
@@ -396,7 +396,7 @@ TEXT;
         } elseif ($entry->getSrc() == Balance::USER_REF) {
             $user_profile = $entry->getExtraData('user', []);
             $type_title = '用户';
-            $text = $user_profile ? "<dt>$type_title</dt><dd><img src=\"{$user_profile['headimgurl']}\" alt="">{$user_profile['nickname']}</dd>" : '';
+            $text = $user_profile ? "<dt>$type_title</dt><dd><img src=\"{$user_profile['headimgurl']}\" alt=\"\">{$user_profile['nickname']}</dd>" : '';
             $data['memo'] = <<<TEXT
 <dl class="log dl-horizontal">
 <dt>事件</dt>

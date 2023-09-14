@@ -505,7 +505,7 @@
                                     {/if}> 
                                 {$order['num']}
                                 <span style="font-size: small;">{$order['goods']['unit_title']}</span>
-                                {if $order['src'] ==  \zovye\Order::FUELING_UNPAID}
+                                {if $order['src'] ==  \zovye\domain\Order::FUELING_UNPAID}
                                 <img src="{MODULE_URL}static/img/gun.svg" class="icon big" title="正在加注中" data-op="stopFueling">
                                 {/if}
                             </span>
@@ -573,7 +573,7 @@
                                 </div>
                                 {if $order['commission']['bonus']}
                                 {loop $order['commission']['bonus'] $index $item}
-                                {php $bonus_user = \zovye\User::get($item['openid'], true);}
+                                {php $bonus_user = \zovye\domain\User::get($item['openid'], true);}
                                 {if $bonus_user}
                                 <div class="gspor bonus_item">
                                     <div class="profile">
@@ -592,7 +592,7 @@
                                 {/if}
                                 {if $order['commission']['gsp']}
                                 {loop $order['commission']['gsp'] $index $item}
-                                {php $gspor = \zovye\User::get($item['openid'], true);}
+                                {php $gspor = \zovye\domain\User::get($item['openid'], true);}
                                 {if $gspor}
                                 <div class="gspor">
                                     <div class="profile">
@@ -622,7 +622,7 @@
                                 {/if}
                                 {if $order['commission']['keepers']}
                                 {loop $order['commission']['keepers'] $index $item}
-                                {php $keeper = \zovye\User::get($item['openid'], true);}
+                                {php $keeper = \zovye\domain\User::get($item['openid'], true);}
                                 {if $keeper}
                                 <div class="gspor keeper_item{if $item['promoter']} promoter{/if}">
                                     <div class="profile">
@@ -667,12 +667,12 @@
                             {else}
                             <i class="fa fa-tag"></i>
                             {/if}
-                            {if $order['src'] ==  \zovye\Order::FUELING_UNPAID ||  $order['src'] ==  \zovye\Order::CHARGING_UNPAID}
+                            {if $order['src'] ==  \zovye\domain\Order::FUELING_UNPAID ||  $order['src'] ==  \zovye\domain\Order::CHARGING_UNPAID}
                                 预支付 {php echo number_format($order['pay']['balance'] / 100, 2, '.', '')}元
                             {else}
                                 支付 {php echo number_format($order['pay']['balance'] / 100, 2, '.', '')}元
                             {/if}
-                            {if $order['src'] ==  \zovye\Order::FUELING}
+                            {if $order['src'] ==  \zovye\domain\Order::FUELING}
                                 {if $order['fueling']['refund']['total']>0}
                                     {if $order['fueling']['refund']['total'] == $order['pay']['balance']}
                                     ，已退款
@@ -682,7 +682,7 @@
                                 {/if}
                             {/if}
 
-                            {if $order['src'] ==  \zovye\Order::CHARGING}
+                            {if $order['src'] ==  \zovye\domain\Order::CHARGING}
                                 {if $order['charging']['refund']['total']>0}
                                     {if $order['charging']['refund']['total'] == $order['pay']['balance']}
                                     ，已退款

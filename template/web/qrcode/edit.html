@@ -37,9 +37,9 @@
           <label for="gender" class="col-md-2 control-label">性别</label>
           <div class="col-md-10">
             <select class="col-md-8" id="gender" name="gender">
-              <option value="0" {if $data['extra']['sex'] == \zovye\User::UNKNOWN}selected{/if}>不限</option>
-              <option value="1" {if $data['extra']['sex'] == \zovye\User::MALE}selected{/if}>男</option>
-              <option value="2" {if $data['extra']['sex'] == \zovye\User::FEMALE}selected{/if}>女</option>
+              <option value="0" {if $data['extra']['sex'] == \zovye\domain\User::UNKNOWN}selected{/if}>不限</option>
+              <option value="1" {if $data['extra']['sex'] == \zovye\domain\User::MALE}selected{/if}>男</option>
+              <option value="2" {if $data['extra']['sex'] == \zovye\domain\User::FEMALE}selected{/if}>女</option>
             </select>
           </div>
         </div>

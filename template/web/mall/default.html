@@ -202,7 +202,7 @@
                     </td>
                     <td>
                         <div class="order">
-                            {if $order['status'] == \zovye\Delivery::SHIPPING}
+                            {if $order['status'] == \zovye\domain\Delivery::SHIPPING}
                             <span class="status s{$order['status']}" data-op="package">
                                 {$order['status_formatted']}
                             </span>
@@ -271,9 +271,9 @@
                         {$order['createtime_formatted']}
                     </td>
                     <td class="operate">
-                        {if $order['status'] == \zovye\Delivery::PAYED}
+                        {if $order['status'] == \zovye\domain\Delivery::PAYED}
                         <button type="button" class="btn btn-success btn-sm" data-op="package" title="标记为已发货状态">发货</button>
-                        {elseif $order['status'] == \zovye\Delivery::SHIPPING}
+                        {elseif $order['status'] == \zovye\domain\Delivery::SHIPPING}
                         <button type="button" class="btn btn-warning btn-sm" data-op="finished" title="标记订单已完成">完成</button> 
                         {/if}
                     </td>

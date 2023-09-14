@@ -79,31 +79,31 @@
         </a>
     </li>
     {/if}
-    {if $s_status ===  \zovye\Task::INIT}
+    {if $s_status ===  \zovye\domain\Task::INIT}
     <li role="presentation" class="active">
         <a href="#">待审核</a>
     </li>
     {else}
     <li role="presentation">
-        <a href="{php echo $this->createWebUrl('task', ['op' => 'view', 'account' => $account['id'] ?? 0, 'status' => \zovye\Task::INIT])}">待审核</a>
+        <a href="{php echo $this->createWebUrl('task', ['op' => 'view', 'account' => $account['id'] ?? 0, 'status' => \zovye\domain\Task::INIT])}">待审核</a>
     </li>
     {/if}    
-    {if $s_status ===  \zovye\Task::REJECT}
+    {if $s_status ===  \zovye\domain\Task::REJECT}
     <li role="presentation" class="active">
         <a href="#">已拒绝</a>
     </li>
     {else}
     <li role="presentation">
-        <a href="{php echo $this->createWebUrl('task', ['op' => 'view', 'account' => $account['id'] ?? 0, 'status' => \zovye\Task::REJECT])}">已拒绝</a>
+        <a href="{php echo $this->createWebUrl('task', ['op' => 'view', 'account' => $account['id'] ?? 0, 'status' => \zovye\domain\Task::REJECT])}">已拒绝</a>
     </li>
     {/if}
-    {if $s_status ===  \zovye\Task::ACCEPT}
+    {if $s_status ===  \zovye\domain\Task::ACCEPT}
     <li role="presentation" class="active">
         <a href="#">已通过</a>
     </li>
     {else}
     <li role="presentation">
-        <a href="{php echo $this->createWebUrl('task', ['op' => 'view', 'account' => $account['id'] ?? 0, 'status' => \zovye\Task::ACCEPT])}">已通过</a>
+        <a href="{php echo $this->createWebUrl('task', ['op' => 'view', 'account' => $account['id'] ?? 0, 'status' => \zovye\domain\Task::ACCEPT])}">已通过</a>
     </li>
     {/if}
 
@@ -162,7 +162,7 @@
                         {php echo date('Y-m-d H:i:s', $item['createtime']);}
                     </td>
                     <td class="center operate">
-                        {if $item['status'] == \zovye\Task::INIT}
+                        {if $item['status'] == \zovye\domain\Task::INIT}
                         <button type="button" class="btn btn-danger btn-sm" data-op="reject">拒绝</button>
                         <button type="button" class="btn btn-success btn-sm" data-op="accept">通过</button>
                         {else}

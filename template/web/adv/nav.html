@@ -20,12 +20,12 @@
 </script>
 <ul class="nav nav-tabs" id="navbar">
     {loop $navs $index $e}
-        {if $e['type'] == zovye\Advertising::SCREEN && $type == $e['type']}
+        {if $e['type'] == \zovye\domain\Advertising::SCREEN && $type == $e['type']}
             {if isset($filter_agentId) || $filter_media}
-                <li role="presentation"><a href="{php echo $this->createWebUrl('adv', array('type' => zovye\Advertising::SCREEN));}">设备屏幕</a></li>
+                <li role="presentation"><a href="{php echo $this->createWebUrl('adv', array('type' => \zovye\domain\Advertising::SCREEN));}">设备屏幕</a></li>
                 {if isset($filter_agentId) && $filter_media}
                     <li role="presentation">
-                        <a href="{php echo $this->createWebUrl('adv', array('type' => zovye\Advertising::SCREEN, 'agentId'=>$filter_agentId));}">
+                        <a href="{php echo $this->createWebUrl('adv', array('type' => \zovye\domain\Advertising::SCREEN, 'agentId'=>$filter_agentId));}">
                             {php echo $filter_agent?$filter_agent->getName():'平台'}的<b>设备屏幕广告</b>
                         </a>
                     </li>
@@ -45,7 +45,7 @@
                 {if isset($filter_agentId)}
                     <li role="presentation"><a href="{php echo $this->createWebUrl('adv', array('type' => $e['type']));}">{$e['title']}</a></li>
                     
-                    {if $e['type'] == zovye\Advertising::PUSH_MSG && $filter_msgtype}
+                    {if $e['type'] == \zovye\domain\Advertising::PUSH_MSG && $filter_msgtype}
                         <li role="presentation" class="active">
                             <a href="#">
                                 {php echo $filter_agent?$filter_agent->getName():'平台'}的<b>{$wx_data[$filter_msgtype]['title']}消息推送广告</b>
@@ -59,7 +59,7 @@
                         </li>
                     {/if}
                 {else}
-                    {if $e['type'] == zovye\Advertising::PUSH_MSG && $filter_msgtype}
+                    {if $e['type'] == \zovye\domain\Advertising::PUSH_MSG && $filter_msgtype}
                     <li role="presentation"><a href="{php echo $this->createWebUrl('adv', array('type' => $e['type']));}">{$e['title']}</a></li>
                     <li role="presentation" class="active">
                         <a href="#">

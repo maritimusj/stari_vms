@@ -9,6 +9,8 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 use zovye\model\userModelObj;
+use zovye\util\TemplateUtil;
+use zovye\util\Util;
 
 /** @var userModelObj $user */
 $user = TemplateUtil::getTemplateVar('user');

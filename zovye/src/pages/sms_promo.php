@@ -6,7 +6,10 @@
 
 namespace zovye;
 
+use zovye\domain\Device;
 use zovye\model\deviceModelObj;
+use zovye\util\TemplateUtil;
+use zovye\util\Util;
 
 $params = TemplateUtil::getTemplateVar();
 

@@ -8,7 +8,7 @@
 namespace zovye;
 
 use DateTime;
-use zovye\Contract\ILogWriter;
+use zovye\contract\ILogWriter;
 
 class FileLogWriter implements ILogWriter
 {

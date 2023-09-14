@@ -6,6 +6,10 @@
 
 namespace zovye;
 
+use zovye\domain\Device;
+use zovye\domain\Order;
+use zovye\domain\User;
+
 defined('IN_IA') or exit('Access Denied');
 
 $op = Request::str('q');

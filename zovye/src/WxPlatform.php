@@ -9,9 +9,14 @@ namespace zovye;
 use Exception;
 use RuntimeException;
 use wx\Platform;
+use zovye\domain\Account;
+use zovye\domain\Device;
+use zovye\domain\Order;
+use zovye\domain\User;
 use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
+use zovye\util\HttpUtil;
 
 class WxPlatform
 {

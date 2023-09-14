@@ -6,6 +6,10 @@
  
 namespace zovye;
 
+use zovye\domain\CommissionBalance;
+use zovye\domain\Principal;
+use zovye\domain\User;
+
 defined('IN_IA') or exit('Access Denied');
 
 $user = User::get(Request::int('id'));

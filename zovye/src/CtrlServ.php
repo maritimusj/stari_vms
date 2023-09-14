@@ -6,7 +6,8 @@
 
 namespace zovye;
 
-use zovye\Contract\IHttpClient;
+use zovye\contract\IHttpClient;
+use zovye\util\Util;
 
 class CtrlServ
 {

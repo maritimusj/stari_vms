@@ -6,7 +6,7 @@
 
 namespace zovye\model;
 
-use zovye\base\modelObj;
+use zovye\base\ModelObj;
 use function zovye\tb;
 
 /**
@@ -15,7 +15,7 @@ use function zovye\tb;
  * @method getSecret()
  * @method getCreatetime()
  */
-class wx_appModelObj extends modelObj
+class wx_appModelObj extends ModelObj
 {
     public static function getTableName($read_or_write): string
     {

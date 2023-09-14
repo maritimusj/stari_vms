@@ -8,6 +8,8 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\domain\AdStats;
+use zovye\domain\Advertising;
 use zovye\model\advs_statsModelObj;
 
 $user = Session::getCurrentUser();

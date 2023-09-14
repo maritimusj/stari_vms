@@ -8,7 +8,10 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\business\FlashEgg;
+use zovye\domain\Account;
 use zovye\model\giftModelObj;
+use zovye\util\Util;
 
 $tpl_data = [
     'navs' => [

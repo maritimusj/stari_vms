@@ -10,9 +10,9 @@ defined('IN_IA') or exit('Access Denied');
 
 //复制指定商品到所有代理商
 
-use zovye\Agent;
 use zovye\CtrlServ;
-use zovye\Goods;
+use zovye\domain\Agent;
+use zovye\domain\Goods;
 use zovye\JobException;
 use zovye\Log;
 use zovye\Request;

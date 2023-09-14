@@ -9,7 +9,7 @@ namespace zovye\api\wx;
 use DateTime;
 use Exception;
 use zovye\App;
-use zovye\Goods;
+use zovye\domain\Goods;
 use zovye\model\userModelObj;
 use zovye\Request;
 use function zovye\err;
@@ -20,7 +20,7 @@ class misc
     {
         $remainWarning = App::getRemainWarningNum($agent);
 
-        return \zovye\Device::query(['agent_id' => $agent->getId(), 'remain <' => $remainWarning])->count();
+        return \zovye\domain\Device::query(['agent_id' => $agent->getId(), 'remain <' => $remainWarning])->count();
     }
 
     public static function deviceStats(): array
@@ -34,7 +34,7 @@ class misc
 
         /** @var userModelObj $sub */
         $list = [];
-        \zovye\Agent::getAllSubordinates($agent, $list, true);
+        \zovye\domain\Agent::getAllSubordinates($agent, $list, true);
         foreach ($list as $sub) {
             if ($sub->isAgent()) {
                 $sa = $sub->agent();
@@ -55,9 +55,9 @@ class misc
         $user = common::getAgentOrPartner();
         $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
 
-        $query = \zovye\Order::query();
+        $query = \zovye\domain\Order::query();
         if (Request::bool('all')) {
-            $ids = \zovye\Agent::getAllSubordinates($agent);
+            $ids = \zovye\domain\Agent::getAllSubordinates($agent);
             $ids[] = $agent->getId();
             $query->where(['agent_id' => $ids]);
         } else {
@@ -70,12 +70,12 @@ class misc
         }
 
         if (Request::has('group')) {
-            $group = \zovye\Group::get(Request::int('group'));
+            $group = \zovye\domain\Group::get(Request::int('group'));
             if (empty($group) || $group->getAgentId() != $agent->getId()) {
                 return err('分组不存在！');
             }
             $device_ids = [];
-            $device_query = \zovye\Device::query(['group_id' => $group->getId()]);
+            $device_query = \zovye\domain\Device::query(['group_id' => $group->getId()]);
             $result = $device_query->findAll([], true);
             for ($i = 0; $i < count($result); $i++) {
                 $device_ids[] = $result[$i]['id'];

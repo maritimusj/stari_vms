@@ -6,6 +6,10 @@
 
 namespace zovye;
 
+use zovye\domain\Agent;
+use zovye\domain\DeviceTypes;
+use zovye\util\Util;
+
 defined('IN_IA') or exit('Access Denied');
 
 $params = [

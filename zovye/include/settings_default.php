@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+use zovye\util\Util;
+
 return [
     //设备设置
     'device' => [

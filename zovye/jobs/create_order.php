@@ -11,10 +11,11 @@ defined('IN_IA') or exit('Access Denied');
 //创建订单
 use Exception;
 use zovye\App;
-use zovye\base\modelObj;
+use zovye\base\ModelObj;
 use zovye\CtrlServ;
-use zovye\DBUtil;
-use zovye\Device;
+use zovye\domain\Device;
+use zovye\domain\Order;
+use zovye\domain\User;
 use zovye\EventBus;
 use zovye\ExceptionNeedsRefund;
 use zovye\Helper;
@@ -25,10 +26,9 @@ use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\goods_voucher_logsModelObj;
 use zovye\model\userModelObj;
-use zovye\Order;
 use zovye\Pay;
 use zovye\Request;
-use zovye\User;
+use zovye\util\DBUtil;
 use zovye\ZovyeException;
 use function zovye\err;
 use function zovye\is_error;
@@ -292,7 +292,7 @@ function createOrder(array $params, string $order_no, array $goods): array
     $user->remove('last');
 
     foreach ($params as $entry) {
-        if ($entry instanceof modelObj && !$entry->save()) {
+        if ($entry instanceof ModelObj && !$entry->save()) {
             return [err('无法保存数据，请重试')];
         }
     }

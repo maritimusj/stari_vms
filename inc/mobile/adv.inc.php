@@ -9,6 +9,11 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 use DateTime;
+use zovye\business\TKPromoting;
+use zovye\domain\Advertising;
+use zovye\domain\Device;
+use zovye\util\DeviceUtil;
+use zovye\util\PlaceHolder;
 
 $user = Session::getCurrentUser();
 if (empty($user) || $user->isBanned()) {

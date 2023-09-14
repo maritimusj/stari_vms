@@ -8,6 +8,10 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\business\Charging;
+use zovye\business\ChargingNowData;
+use zovye\domain\Order;
+use zovye\domain\User;
 use zovye\model\charging_now_dataModelObj;
 
 $user = User::get(Request::int('id'));

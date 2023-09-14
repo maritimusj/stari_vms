@@ -9,14 +9,13 @@ namespace zovye\job\fuelingTimeout;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\business\Fueling;
 use zovye\CtrlServ;
-use zovye\Device;
-use zovye\Fueling;
+use zovye\domain\Device;
+use zovye\domain\Order;
 use zovye\JobException;
 use zovye\Log;
-
 use zovye\model\orderModelObj;
-use zovye\Order;
 use zovye\Request;
 
 $uid = Request::str('uid');

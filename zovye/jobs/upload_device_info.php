@@ -9,13 +9,13 @@ namespace zovye\job\upload_device_info;
 defined('IN_IA') or exit('Access Denied');
 
 use zovye\CtrlServ;
-use zovye\Device;
-use zovye\HttpUtil;
+use zovye\domain\Device;
 use zovye\Job;
 use zovye\JobException;
 use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\Request;
+use zovye\util\HttpUtil;
 use function zovye\isEmptyArray;
 use function zovye\settings;
 

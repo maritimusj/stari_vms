@@ -10,16 +10,16 @@ defined('IN_IA') or exit('Access Denied');
 
 //广告审核
 
-use zovye\Advertising;
 use zovye\App;
 use zovye\Config;
 use zovye\CtrlServ;
+use zovye\domain\Advertising;
+use zovye\domain\User;
 use zovye\JobException;
 use zovye\Log;
 use zovye\Request;
 use zovye\ReviewResult;
-use zovye\User;
-use zovye\Util;
+use zovye\util\Util;
 use zovye\Wx;
 
 $log = [

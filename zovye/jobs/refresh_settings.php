@@ -8,14 +8,14 @@ namespace zovye\job\refresh_settings;
 
 defined('IN_IA') or exit('Access Denied');
 
-use zovye\Account;
 use zovye\CtrlServ;
-use zovye\Device;
+use zovye\domain\Account;
+use zovye\domain\Device;
 use zovye\JobException;
 use zovye\Log;
 use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
-use zovye\Util;
+use zovye\util\Util;
 use function zovye\_W;
 use function zovye\is_error;
 

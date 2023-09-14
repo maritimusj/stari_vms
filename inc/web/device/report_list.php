@@ -6,6 +6,9 @@
  
 namespace zovye;
 
+use zovye\domain\Device;
+use zovye\domain\Maintenance;
+
 defined('IN_IA') or exit('Access Denied');
 
 //设备故障 提交列表

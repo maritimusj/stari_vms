@@ -6,11 +6,11 @@
 
 namespace zovye\model;
 
-use zovye\base\modelObj;
-use zovye\Device;
-use zovye\Order;
+use zovye\base\ModelObj;
+use zovye\domain\Device;
+use zovye\domain\Order;
+use zovye\domain\User;
 use zovye\traits\ExtraDataGettersAndSetters;
-use zovye\User;
 use function zovye\tb;
 
 /**
@@ -22,7 +22,7 @@ use function zovye\tb;
  * @method getExtra()
  * @method getCreatetime()
  */
-class balanceModelObj extends modelObj
+class balanceModelObj extends ModelObj
 {
     /** @var int */
     protected $id;

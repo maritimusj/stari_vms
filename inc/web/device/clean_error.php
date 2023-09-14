@@ -6,6 +6,9 @@
  
 namespace zovye;
 
+use zovye\domain\Device;
+use zovye\util\Util;
+
 defined('IN_IA') or exit('Access Denied');
 
 //清除所有设备的错误代码

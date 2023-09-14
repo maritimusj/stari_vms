@@ -6,6 +6,7 @@
 
 namespace zovye;
 
+use zovye\domain\CommissionBalance;
 use zovye\model\deviceModelObj;
 use zovye\model\orderModelObj;
 

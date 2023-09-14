@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+use zovye\domain\Group;
+
 defined('IN_IA') or exit('Access Denied');
 
 $group_id = request::int('id');

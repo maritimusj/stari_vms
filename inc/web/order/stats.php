@@ -10,7 +10,11 @@ defined('IN_IA') or exit('Access Denied');
 
 //统计 订单金额
 use DateTime;
+use zovye\domain\Agent;
+use zovye\domain\Order;
+use zovye\domain\User;
 use zovye\model\orderModelObj;
+use zovye\util\Util;
 
 $agent_openid = Request::str('agent_openid');
 $device_id = Request::int('device_id');

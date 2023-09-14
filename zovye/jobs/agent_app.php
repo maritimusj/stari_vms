@@ -10,8 +10,8 @@ defined('IN_IA') or exit('Access Denied');
 
 //代理商申请提交
 
-use zovye\AgentApplication;
 use zovye\CtrlServ;
+use zovye\domain\AgentApplication;
 use zovye\Helper;
 use zovye\JobException;
 use zovye\Log;

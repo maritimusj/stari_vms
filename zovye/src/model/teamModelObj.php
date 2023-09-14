@@ -6,15 +6,15 @@
 
 namespace zovye\model;
 
-use zovye\base\modelObj;
-use zovye\User;
+use zovye\base\ModelObj;
+use zovye\domain\User;
 use function zovye\tb;
 
 /**
  * @method getOwnerId();
  * @method setOwnerId()
  */
-class teamModelObj extends modelObj
+class teamModelObj extends ModelObj
 {
     public static function getTableName($read_or_write): string
     {

@@ -6,8 +6,8 @@
 
 namespace zovye\model;
 
-use zovye\base\modelObj;
-use zovye\Keeper;
+use zovye\base\ModelObj;
+use zovye\domain\Keeper;
 use function zovye\tb;
 
 /**
@@ -23,7 +23,7 @@ use function zovye\tb;
  * @method getName()
  * @method getImei()
  */
-class keeper_devicesModelObj extends modelObj
+class keeper_devicesModelObj extends ModelObj
 {
     /** @var int */
     protected $id;

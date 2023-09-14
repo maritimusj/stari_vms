@@ -6,6 +6,7 @@
 
 namespace zovye;
 
+use zovye\domain\Agent;
 use zovye\model\agentModelObj;
 use zovye\model\deviceModelObj;
 

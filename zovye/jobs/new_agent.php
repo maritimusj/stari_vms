@@ -8,9 +8,9 @@ namespace zovye\job\newAgent;
 
 defined('IN_IA') or exit('Access Denied');
 
-use zovye\Agent;
 use zovye\CtrlServ;
-use zovye\Goods;
+use zovye\domain\Agent;
+use zovye\domain\Goods;
 use zovye\JobException;
 use zovye\Log;
 use zovye\model\goodsModelObj;

@@ -6,11 +6,11 @@
 
 namespace zovye\model;
 
-use zovye\base\modelObj;
+use zovye\base\ModelObj;
 use zovye\traits\DataGetterAndSetter;
 use function zovye\tb;
 
-class account_logsModelObj extends modelObj
+class account_logsModelObj extends ModelObj
 {
     public static function getTableName($read_or_write): string
     {

@@ -6,7 +6,7 @@
 
 namespace zovye\model;
 
-use zovye\base\modelObj;
+use zovye\base\ModelObj;
 use zovye\We7;
 use function zovye\tb;
 
@@ -20,7 +20,7 @@ use function zovye\tb;
  * @method getAvailable()
  * @method setAvailable(int $param)
  */
-class lockerModelObj extends modelObj
+class lockerModelObj extends ModelObj
 {
     /** @var int */
     protected $id;

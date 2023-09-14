@@ -8,6 +8,8 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\domain\Principal;
+use zovye\domain\User;
 use zovye\model\userModelObj;
 
 $page = max(1, Request::int('page'));

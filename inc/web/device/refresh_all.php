@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+use zovye\domain\Advertising;
+use zovye\domain\Device;
 use zovye\model\deviceModelObj;
 
 defined('IN_IA') or exit('Access Denied');

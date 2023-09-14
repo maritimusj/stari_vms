@@ -5,10 +5,10 @@
  */
 namespace zovye\model;
 
-use zovye\Agent;
-use zovye\base\modelObj;
+use zovye\base\ModelObj;
+use zovye\domain\Agent;
+use zovye\domain\User;
 use zovye\traits\ExtraDataGettersAndSetters;
-use zovye\User;
 use function zovye\tb;
 
 /**
@@ -18,7 +18,7 @@ use function zovye\tb;
  * @method getCreatetime();
  * @method getUserId()
  */
-class vipModelObj extends modelObj
+class vipModelObj extends ModelObj
 {
     public static function getTableName($read_or_write): string
     {

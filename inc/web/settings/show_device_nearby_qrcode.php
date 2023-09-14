@@ -6,6 +6,9 @@
  
 namespace zovye;
 
+use zovye\util\QRCodeUtil;
+use zovye\util\Util;
+
 defined('IN_IA') or exit('Access Denied');
 
 $result = QRCodeUtil::createFile('deviceNearby', Util::murl('util'));

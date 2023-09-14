@@ -9,6 +9,7 @@ namespace zovye;
 use WeAccount;
 use WeiXinAccount;
 use WxappAccount;
+use zovye\util\HttpUtil;
 use function cache_delete;
 use function cache_system_key;
 

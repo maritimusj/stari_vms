@@ -7,9 +7,9 @@
 
 namespace zovye\api\wx;
 
+use zovye\domain\User;
 use zovye\Request;
-use zovye\User;
-use zovye\Util;
+use zovye\util\Util;
 use function zovye\err;
 
 class debug

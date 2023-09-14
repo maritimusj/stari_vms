@@ -8,8 +8,12 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-use zovye\base\modelObj;
+use zovye\base\ModelObj;
+use zovye\business\ChargingServ;
+use zovye\domain\Agent;
+use zovye\domain\Group;
 use zovye\model\device_groupsModelObj;
+use zovye\util\Util;
 
 $agent_id = Request::int('agent_id');
 if ($agent_id) {
@@ -92,7 +96,7 @@ if ($group && $group->save()) {
         $group->save();
     }
 
-    $tb_name = We7::tb(device_groupsModelObj::getTableName(modelObj::OP_WRITE));
+    $tb_name = We7::tb(device_groupsModelObj::getTableName(ModelObj::OP_WRITE));
     $sql = sprintf("UPDATE %s SET `loc` = ST_GeomFromText('POINT(%f %f)') WHERE `id`=%d", $tb_name, $lng, $lat, $group->getId());
     if (!We7::pdo_run($sql)) {
         Response::toast(

@@ -6,10 +6,10 @@
 
 namespace zovye\model;
 
-use zovye\base\modelObj;
-use zovye\Delivery;
+use zovye\base\ModelObj;
+use zovye\domain\Delivery;
+use zovye\domain\User;
 use zovye\traits\ExtraDataGettersAndSetters;
-use zovye\User;
 use function zovye\tb;
 
 /**
@@ -21,7 +21,7 @@ use function zovye\tb;
  * @method getStatus()
  * @method setStatus($status)
  */
-class deliveryModelObj extends modelObj
+class deliveryModelObj extends ModelObj
 {
     public static function getTableName($read_or_write): string
     {

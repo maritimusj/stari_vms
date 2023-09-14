@@ -8,9 +8,9 @@ namespace zovye\job\upload_cv_info;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\business\GDCVMachine;
 use zovye\Config;
 use zovye\CtrlServ;
-use zovye\GDCVMachine;
 use zovye\JobException;
 use zovye\Log;
 use zovye\model\cv_upload_deviceModelObj;

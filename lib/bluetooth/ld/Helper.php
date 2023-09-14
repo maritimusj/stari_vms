@@ -7,7 +7,7 @@
 
 namespace bluetooth\ld;
 
-use zovye\Device;
+use zovye\domain\Device;
 
 class Helper
 {

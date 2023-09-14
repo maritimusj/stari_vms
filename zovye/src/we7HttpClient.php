@@ -7,7 +7,7 @@
 namespace zovye;
 
 use we7\ihttp;
-use zovye\Contract\IHttpClient;
+use zovye\contract\IHttpClient;
 
 class we7HttpClient implements IHttpClient
 {

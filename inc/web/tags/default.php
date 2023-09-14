@@ -9,6 +9,7 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 //分配设备控件查询标签详情
+use zovye\domain\Tags;
 use zovye\model\tagsModelObj;
 
 if (Request::is_ajax() && Request::has('id')) {

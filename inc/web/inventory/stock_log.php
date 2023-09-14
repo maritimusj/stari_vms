@@ -8,6 +8,9 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\domain\Goods;
+use zovye\domain\Inventory;
+use zovye\domain\User;
 use zovye\model\inventory_logModelObj;
 
 $user = User::get(Request::int('id'));

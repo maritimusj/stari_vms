@@ -9,6 +9,10 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 use RuntimeException;
+use zovye\domain\Agent;
+use zovye\domain\Referral;
+use zovye\domain\User;
+use zovye\util\DBUtil;
 
 //用户参数
 $params = [

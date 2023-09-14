@@ -6,9 +6,9 @@
 
 namespace bluetooth\grid;
 
-use zovye\Contract\bluetooth\ICmd;
-use zovye\Contract\bluetooth\IResponse;
-use zovye\Device;
+use zovye\contract\bluetooth\ICmd;
+use zovye\contract\bluetooth\IResponse;
+use zovye\domain\Device;
 use zovye\We7;
 
 class response implements IResponse

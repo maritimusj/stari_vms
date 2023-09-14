@@ -4,17 +4,17 @@ namespace zovye\account;
 
 use Exception;
 use RuntimeException;
-use zovye\Account;
 use zovye\App;
-use zovye\Contract\IAccountProvider;
-use zovye\HttpUtil;
+use zovye\contract\IAccountProvider;
+use zovye\domain\Account;
+use zovye\domain\Order;
+use zovye\domain\User;
 use zovye\Log;
 use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
-use zovye\Order;
 use zovye\Session;
-use zovye\User;
+use zovye\util\HttpUtil;
 use function zovye\err;
 use function zovye\is_error;
 

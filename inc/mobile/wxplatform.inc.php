@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+use zovye\domain\Account;
+
 defined('IN_IA') or exit('Access Denied');
 
 $op = Request::op('default');
@@ -78,7 +80,7 @@ if ($op == WxPlatform::AUTH_NOTIFY) {
     </style>
 <div class="tip">
     <div class="content">
-        <img src="static/img/success_icon.jpg" class="icon"> 授权成功！
+        <img src="static/img/success_icon.jpg" class="icon" alt=""> 授权成功！
     </div>
 </div>
 HTML;

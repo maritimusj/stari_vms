@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+use zovye\domain\Account;
+
 defined('IN_IA') or exit('Access Denied');
 
 if (Request::has('uid')) {

@@ -7,11 +7,11 @@
 namespace zovye\payment;
 
 use wx\pay;
-use zovye\Contract\IPay;
+use zovye\contract\IPay;
 use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
-use zovye\Util;
+use zovye\util\Util;
 use zovye\We7;
 use function zovye\_W;
 use function zovye\is_error;

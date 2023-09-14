@@ -7,8 +7,10 @@
 namespace zovye;
 
 use Exception;
-use zovye\base\modelObj;
+use zovye\base\ModelObj;
 use zovye\model\migrationModelObj;
+use zovye\util\DBUtil;
+use zovye\util\Util;
 
 class Migrate
 {
@@ -147,10 +149,10 @@ class Migrate
     public static function reset()
     {
         app()->remove('migrate');
-        We7::pdo_delete(migrationModelObj::getTableName(modelObj::OP_WRITE), We7::uniacid([]));
+        We7::pdo_delete(migrationModelObj::getTableName(ModelObj::OP_WRITE), We7::uniacid([]));
     }
 
-    public static function query($condition = []): base\modelObjFinder
+    public static function query($condition = []): base\ModelObjFinder
     {
         return m('migration')->query(We7::uniacid([]))->where($condition);
     }

@@ -4,6 +4,7 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\domain\Agent;
 use zovye\model\agentModelObj;
 use zovye\model\keeper_devicesModelObj;
 

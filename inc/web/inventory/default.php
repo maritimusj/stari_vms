@@ -8,6 +8,7 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\domain\Inventory;
 use zovye\model\inventoryModelObj;
 
 $page = max(1, Request::int('page'));

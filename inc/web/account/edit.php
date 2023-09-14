@@ -9,6 +9,9 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 use zovye\account\MoscaleAccount;
+use zovye\domain\Account;
+use zovye\domain\Agent;
+use zovye\util\Util;
 
 $agent_name = '';
 $agent_mobile = '';

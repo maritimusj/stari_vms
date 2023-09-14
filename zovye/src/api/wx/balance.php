@@ -7,18 +7,18 @@
 namespace zovye\api\wx;
 
 use DateTimeImmutable;
-use zovye\Account;
 use zovye\App;
-use zovye\DBUtil;
-use zovye\model\commission_balanceModelObj;
-use zovye\CommissionBalance;
-use zovye\Device;
-use zovye\Goods;
-use zovye\Request;
+use zovye\domain\Account;
+use zovye\domain\CommissionBalance;
+use zovye\domain\Device;
+use zovye\domain\Goods;
+use zovye\domain\Order;
+use zovye\domain\User;
 use zovye\Job;
-use zovye\Order;
-use zovye\User;
+use zovye\model\commission_balanceModelObj;
 use zovye\model\userModelObj;
+use zovye\Request;
+use zovye\util\DBUtil;
 use function zovye\err;
 use function zovye\is_error;
 use function zovye\settings;

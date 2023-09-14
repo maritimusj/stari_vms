@@ -9,6 +9,7 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 use DateTime;
+use zovye\domain\Order;
 
 $headers = Order::getExportHeaders();
 unset($headers['ID']);

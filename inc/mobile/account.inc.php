@@ -8,7 +8,16 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\domain\Account;
+use zovye\domain\Balance;
+use zovye\domain\Device;
+use zovye\domain\Goods;
+use zovye\domain\Locker;
+use zovye\domain\Questionnaire;
 use zovye\model\balanceModelObj;
+use zovye\util\DBUtil;
+use zovye\util\TemplateUtil;
+use zovye\util\Util;
 
 $op = Request::op('default');
 

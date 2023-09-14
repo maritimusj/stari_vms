@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+use zovye\util\Util;
+
 class WxMCHPay
 {
     const TRANSFER_URL = 'https://api.mch.weixin.qq.com/mmpaymkttransfers/promotion/transfers';

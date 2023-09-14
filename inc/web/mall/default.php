@@ -9,6 +9,8 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 use DateTime;
+use zovye\domain\Delivery;
+use zovye\domain\User;
 use zovye\model\deliveryModelObj;
 
 $tpl_data = [

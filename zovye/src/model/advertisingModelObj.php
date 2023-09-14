@@ -6,9 +6,9 @@
 
 namespace zovye\model;
 
-use zovye\Advertising;
-use zovye\Agent;
-use zovye\base\modelObj;
+use zovye\base\ModelObj;
+use zovye\domain\Advertising;
+use zovye\domain\Agent;
 use zovye\ReviewResult;
 use zovye\traits\ExtraDataGettersAndSetters;
 use zovye\We7;
@@ -29,7 +29,7 @@ use function zovye\tb;
  * @method getCreatetime()
  * @method getUpdatetime()
  */
-class advertisingModelObj extends modelObj
+class advertisingModelObj extends ModelObj
 {
     /** @var int */
     protected $id;

@@ -9,7 +9,12 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\business\FlashEgg;
+use zovye\domain\Device;
+use zovye\domain\Goods;
+use zovye\domain\User;
 use zovye\model\userModelObj;
+use zovye\util\Util;
 
 if (!App::isFlashEggEnabled()) {
     Response::alert('该功能没有启用，请联系管理员，谢谢！', 'error');

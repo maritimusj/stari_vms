@@ -6,6 +6,10 @@
  
 namespace zovye;
 
+use zovye\domain\Device;
+use zovye\domain\DeviceTypes;
+use zovye\util\DBUtil;
+
 defined('IN_IA') or exit('Access Denied');
 
 $device_type = DeviceTypes::get(Request::int('id'));

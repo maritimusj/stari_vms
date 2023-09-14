@@ -10,21 +10,33 @@ use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Exception;
-use zovye\base\modelObj;
+use zovye\base\ModelObj;
+use zovye\domain\Account;
+use zovye\domain\Advertising;
+use zovye\domain\Agent;
+use zovye\domain\Balance;
+use zovye\domain\CommissionBalance;
+use zovye\domain\Device;
+use zovye\domain\Order;
+use zovye\domain\User;
 use zovye\model\commission_balanceModelObj;
 use zovye\model\device_groupsModelObj;
 use zovye\model\userModelObj;
+use zovye\util\Cache;
+use zovye\util\CacheUtil;
+use zovye\util\OrderCounter;
+use zovye\util\Util;
 
 class Stats
 {
     /**
      * 获取对象某天的统计数据
-     * @param modelObj $obj
+     * @param ModelObj $obj
      * @param mixed $day
      * @param string $w
      * @return array
      */
-    public static function getDayTotal(modelObj $obj, $day = null, string $w = 'goods'): array
+    public static function getDayTotal(ModelObj $obj, $day = null, string $w = 'goods'): array
     {
         try {
             if (is_string($day)) {
@@ -64,12 +76,12 @@ class Stats
 
     /**
      * 获取对象某月的统计数据
-     * @param modelObj $obj
+     * @param ModelObj $obj
      * @param mixed $month
      * @param string $w
      * @return array
      */
-    public static function getMonthTotal(modelObj $obj, $month = null, string $w = 'goods'): array
+    public static function getMonthTotal(ModelObj $obj, $month = null, string $w = 'goods'): array
     {
         try {
             if (is_string($month)) {
@@ -108,14 +120,14 @@ class Stats
 
     /**
      * 返回指定日期的日统计数据
-     * @param modelObj $obj
+     * @param ModelObj $obj
      * @param mixed $day
      * @param string $title
      * @param callable|null $fn
      * @return array
      */
     public static function chartDataOfDay(
-        modelObj $obj,
+        ModelObj $obj,
         DateTimeInterface $day,
         string $title = '',
         callable $fn = null
@@ -163,14 +175,14 @@ class Stats
 
     /**
      * 返回指定月份的月统计数据
-     * @param modelObj $obj
+     * @param ModelObj $obj
      * @param DateTimeInterface $month
      * @param string $title
      * @param callable|null $fn
      * @return array
      */
     public static function chartDataOfMonth(
-        modelObj $obj,
+        ModelObj $obj,
         DateTimeInterface $month,
         string $title = '',
         callable $fn = null
@@ -698,12 +710,12 @@ class Stats
     }
 
     /**
-     * @param modelObj $obj
+     * @param ModelObj $obj
      * @param mixed $day
      * @param string $w
      * @return array
      */
-    public static function daysOfMonth(modelObj $obj, $day = null, string $w = 'goods'): array
+    public static function daysOfMonth(ModelObj $obj, $day = null, string $w = 'goods'): array
     {
         if (is_string($day)) {
             try {
@@ -767,12 +779,12 @@ class Stats
 
 
     /**
-     * @param modelObj $obj
+     * @param ModelObj $obj
      * @param mixed $day
      * @param string $w
      * @return array
      */
-    public static function hoursOfDay(modelObj $obj, $day = null, string $w = 'goods'): array
+    public static function hoursOfDay(ModelObj $obj, $day = null, string $w = 'goods'): array
     {
         try {
             if (is_string($day)) {

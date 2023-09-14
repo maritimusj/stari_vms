@@ -6,7 +6,7 @@
 
 namespace zovye\model;
 
-use zovye\base\modelObj;
+use zovye\base\ModelObj;
 use function zovye\tb;
 
 /**
@@ -14,7 +14,7 @@ use function zovye\tb;
  * @method getCate()
  * @method getUserId()
  */
-class device_recordModelObj extends modelObj
+class device_recordModelObj extends ModelObj
 {
     public static function getTableName($read_or_write): string
     {

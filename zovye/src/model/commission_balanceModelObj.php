@@ -6,7 +6,7 @@
 
 namespace zovye\model;
 
-use zovye\base\modelObj;
+use zovye\base\ModelObj;
 use zovye\We7;
 use function zovye\getArray;
 use function zovye\tb;
@@ -21,7 +21,7 @@ use function zovye\tb;
  * @method getUpdatetime()
  * @method getCreatetime()
  */
-class commission_balanceModelObj extends modelObj
+class commission_balanceModelObj extends ModelObj
 {
     /** @var int */
     protected $id;

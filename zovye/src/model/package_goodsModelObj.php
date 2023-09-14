@@ -6,8 +6,8 @@
 
 namespace zovye\model;
 
-use zovye\base\modelObj;
-use zovye\Goods;
+use zovye\base\ModelObj;
+use zovye\domain\Goods;
 use function zovye\tb;
 
 /**
@@ -15,7 +15,7 @@ use function zovye\tb;
  * @method getNum()
  * @method getGoodsId()
  */
-class package_goodsModelObj extends modelObj
+class package_goodsModelObj extends ModelObj
 {
     public static function getTableName($read_or_write): string
     {

@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+use zovye\domain\Inventory;
+
 defined('IN_IA') or exit('Access Denied');
 
 $tpl_data = [];

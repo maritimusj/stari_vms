@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+use zovye\domain\GoodsVoucher;
+
 defined('IN_IA') or exit('Access Denied');
 
 $params = [];

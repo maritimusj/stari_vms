@@ -6,7 +6,7 @@
 
 namespace zovye\model;
 
-use zovye\base\modelObj;
+use zovye\base\ModelObj;
 use zovye\traits\ExtraDataGettersAndSetters;
 use function zovye\tb;
 
@@ -14,7 +14,7 @@ use function zovye\tb;
  * @method setName($getName)
  * @method setEnabled(true $true)
  */
-class principalModelObj extends modelObj
+class principalModelObj extends ModelObj
 {
     public static function getTableName($read_or_write): string
     {

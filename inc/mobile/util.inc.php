@@ -9,6 +9,16 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 use Exception;
+use zovye\domain\Advertising;
+use zovye\domain\Agent;
+use zovye\domain\Balance;
+use zovye\domain\CommissionBalance;
+use zovye\domain\Device;
+use zovye\domain\LoginData;
+use zovye\domain\User;
+use zovye\util\DBUtil;
+use zovye\util\DeviceUtil;
+use zovye\util\Util;
 
 $op = Request::op('default');
 if ($op == 'default') {

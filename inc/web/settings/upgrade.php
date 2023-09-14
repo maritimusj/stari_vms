@@ -6,6 +6,9 @@
 
 namespace zovye;
 
+use zovye\util\HttpUtil;
+use zovye\util\Util;
+
 defined('IN_IA') or exit('Access Denied');
 
 $back_url = Util::url('settings', ['page' => 'upgrade']);

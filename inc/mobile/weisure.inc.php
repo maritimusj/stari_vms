@@ -10,6 +10,9 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 use zovye\account\WeiSureAccount;
+use zovye\domain\Account;
+use zovye\util\TemplateUtil;
+use zovye\util\Util;
 
 if (Request::is_post()) {
     Log::debug('weisure', [

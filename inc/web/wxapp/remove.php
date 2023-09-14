@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+use zovye\domain\WxApp;
+
 defined('IN_IA') or exit('Access Denied');
 
 $wxapp = WxApp::get(Request::int('id'));

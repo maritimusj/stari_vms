@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+use zovye\util\DBUtil;
+
 defined('IN_IA') or exit('Access Denied');
 
 $balance_obj = Helper::getAndCheckWithdraw(Request::int('id'));

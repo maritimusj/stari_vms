@@ -8,6 +8,8 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\domain\Balance;
+use zovye\domain\User;
 use zovye\model\userModelObj;
 
 $op = Request::op('default');

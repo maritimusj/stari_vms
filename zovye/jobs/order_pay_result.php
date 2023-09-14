@@ -11,11 +11,11 @@ defined('IN_IA') or exit('Access Denied');
 //订单支付结果检查
 
 use zovye\CtrlServ;
-use zovye\Device;
+use zovye\domain\Device;
+use zovye\domain\Order;
 use zovye\Job;
 use zovye\JobException;
 use zovye\Log;
-use zovye\Order;
 use zovye\Pay;
 use zovye\Request;
 use function zovye\is_error;

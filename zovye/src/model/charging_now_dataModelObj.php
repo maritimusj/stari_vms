@@ -7,10 +7,10 @@
 
 namespace zovye\model;
 
-use zovye\base\modelObj;
-use zovye\Device;
+use zovye\base\ModelObj;
+use zovye\domain\Device;
+use zovye\domain\User;
 use zovye\traits\ExtraDataGettersAndSetters;
-use zovye\User;
 use function zovye\tb;
 
 /**
@@ -20,7 +20,7 @@ use function zovye\tb;
  * @method getChargerId();
  * @method getCreatetime();
  */
-class charging_now_dataModelObj extends modelObj
+class charging_now_dataModelObj extends ModelObj
 {
     public static function getTableName($read_or_write): string
     {

@@ -6,6 +6,7 @@
 
 namespace zovye;
 
+use zovye\business\GDCVMachine;
 use zovye\model\orderModelObj;
 
 class JobEventHandler

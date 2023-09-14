@@ -6,7 +6,9 @@
 
 namespace zovye;
 
+use zovye\domain\Device;
 use zovye\model\deviceModelObj;
+use zovye\util\Util;
 
 defined('IN_IA') or exit('Access Denied');
 

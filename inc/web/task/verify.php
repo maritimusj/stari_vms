@@ -6,6 +6,11 @@
  
 namespace zovye;
 
+use zovye\domain\Balance;
+use zovye\domain\Task;
+use zovye\domain\User;
+use zovye\util\DBUtil;
+
 defined('IN_IA') or exit('Access Denied');
 
 $result = DBUtil::transactionDo(function () {

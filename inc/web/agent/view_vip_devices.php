@@ -6,6 +6,9 @@
 
 namespace zovye;
 
+use zovye\business\VIP;
+use zovye\domain\Device;
+
 defined('IN_IA') or exit('Access Denied');
 
 $vip = VIP::get(Request::int('id'));

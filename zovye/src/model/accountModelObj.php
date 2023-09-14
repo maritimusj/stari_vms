@@ -6,15 +6,15 @@
 
 namespace zovye\model;
 
-use zovye\Account;
-use zovye\Agent;
 use zovye\App;
-use zovye\base\modelObj;
-use zovye\base\modelObjFinder;
-use zovye\Goods;
+use zovye\base\ModelObj;
+use zovye\base\ModelObjFinder;
+use zovye\domain\Account;
+use zovye\domain\Agent;
+use zovye\domain\Goods;
 use zovye\State;
 use zovye\traits\ExtraDataGettersAndSetters;
-use zovye\Util;
+use zovye\util\Util;
 use zovye\WxPlatform;
 use function zovye\m;
 use function zovye\tb;
@@ -57,7 +57,7 @@ use function zovye\tb;
  * @method setShared($shared)
  * @method getExtraData(string $string, int $int)
  */
-class accountModelObj extends modelObj
+class accountModelObj extends ModelObj
 {
     /** @var int */
     protected $id;
@@ -305,7 +305,7 @@ class accountModelObj extends modelObj
         return $this->getName();
     }
 
-    public function logQuery($cond = []): modelObjFinder
+    public function logQuery($cond = []): ModelObjFinder
     {
         return m('account_logs')->where($cond);
     }

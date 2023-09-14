@@ -6,14 +6,14 @@
 
 namespace zovye\model;
 
-use zovye\base\modelObj;
-use zovye\base\modelObjFinder;
-use zovye\Inventory;
-use zovye\InventoryGoods;
-use zovye\InventoryLog;
-use zovye\Locker;
+use zovye\base\ModelObj;
+use zovye\base\ModelObjFinder;
+use zovye\domain\Inventory;
+use zovye\domain\InventoryGoods;
+use zovye\domain\InventoryLog;
+use zovye\domain\Locker;
+use zovye\domain\User;
 use zovye\traits\ExtraDataGettersAndSetters;
-use zovye\User;
 use function zovye\tb;
 
 /**
@@ -22,7 +22,7 @@ use function zovye\tb;
  * @method getUid()
  * @method setTitle(string $trim)
  */
-class inventoryModelObj extends modelObj
+class inventoryModelObj extends ModelObj
 {
     public static function getTableName($read_or_write): string
     {
@@ -84,7 +84,7 @@ class inventoryModelObj extends modelObj
         return $data;
     }
 
-    public function query($cond = []): modelObjFinder
+    public function query($cond = []): ModelObjFinder
     {
         $cond['inventory_id'] = $this->id;
 
@@ -96,7 +96,7 @@ class inventoryModelObj extends modelObj
         return InventoryGoods::findOne(['inventory_id' => $this->id, 'goods_id' => $goods_id]);
     }
 
-    public function logQuery(): modelObjFinder
+    public function logQuery(): ModelObjFinder
     {
         return InventoryLog::query(['inventory_id' => $this->id]);
     }

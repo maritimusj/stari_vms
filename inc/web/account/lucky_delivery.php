@@ -8,6 +8,7 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\business\FlashEgg;
 use zovye\model\lucky_logModelObj;
 
 $id = Request::int('id');

@@ -32,7 +32,7 @@ class goods
             $params['agent_id'] = $agent->getId();
         }
 
-        $result = \zovye\Goods::getList($params);
+        $result = \zovye\domain\Goods::getList($params);
         $result['goods_edit'] = boolval(settings('goods.agent.edit', 0));
         $result['lottery'] = [
             'enabled' => App::isLotteryGoodsSupported(),
@@ -48,12 +48,12 @@ class goods
         $goods_id = Request::int('id');
 
         $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
-        $goods = \zovye\Goods::get($goods_id);
+        $goods = \zovye\domain\Goods::get($goods_id);
         if (empty($goods) || $goods->getAgentId() !== $agent->getId()) {
             return err('找不到这个商品！');
         }
 
-        return \zovye\Goods::data($goods_id, ['fullPath']);
+        return \zovye\domain\Goods::data($goods_id, ['fullPath']);
     }
 
     public static function delete(): array
@@ -62,7 +62,7 @@ class goods
 
         common::checkCurrentUserPrivileges('F_sp');
 
-        $goods = \zovye\Goods::get(Request::int('id'));
+        $goods = \zovye\domain\Goods::get(Request::int('id'));
         if (empty($goods)) {
             return err('找不到指定的商品');
         }
@@ -92,22 +92,22 @@ class goods
         $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
 
         $s1 = 0;
-        if (Request::bool(\zovye\Goods::AllowFree)) {
-            $s1 = \zovye\Goods::setFreeBitMask($s1);
+        if (Request::bool(\zovye\domain\Goods::AllowFree)) {
+            $s1 = \zovye\domain\Goods::setFreeBitMask($s1);
         }
-        if (Request::bool(\zovye\Goods::AllowPay)) {
-            $s1 = \zovye\Goods::setPayBitMask($s1);
+        if (Request::bool(\zovye\domain\Goods::AllowPay)) {
+            $s1 = \zovye\domain\Goods::setPayBitMask($s1);
         }
-        if (Request::bool(\zovye\Goods::AllowBalance)) {
-            $s1 = \zovye\Goods::setBalanceBitMask($s1);
+        if (Request::bool(\zovye\domain\Goods::AllowBalance)) {
+            $s1 = \zovye\domain\Goods::setBalanceBitMask($s1);
         }
-        if (Request::bool(\zovye\Goods::AllowDelivery)) {
-            $s1 = \zovye\Goods::setDeliveryBitMask($s1);
+        if (Request::bool(\zovye\domain\Goods::AllowDelivery)) {
+            $s1 = \zovye\domain\Goods::setDeliveryBitMask($s1);
         }
 
         $goods_id = Request::int('goodsId');
         if ($goods_id > 0) {
-            $goods = \zovye\Goods::get($goods_id);
+            $goods = \zovye\domain\Goods::get($goods_id);
             if (empty($goods)) {
                 return err('找不到这个商品！');
             }
@@ -213,7 +213,7 @@ class goods
 
             $goods_data['extra']['type'] = Request::str('type');
 
-            $goods = \zovye\Goods::create($goods_data);
+            $goods = \zovye\domain\Goods::create($goods_data);
         }
         
         if ($goods && $goods->save()) {

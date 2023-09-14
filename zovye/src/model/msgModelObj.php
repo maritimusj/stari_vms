@@ -6,7 +6,7 @@
 
 namespace zovye\model;
 
-use zovye\base\modelObj;
+use zovye\base\ModelObj;
 use function zovye\tb;
 
 /**
@@ -16,7 +16,7 @@ use function zovye\tb;
  * @method setContent($content)
  * @method setTitle(string $title)
  */
-class msgModelObj extends modelObj
+class msgModelObj extends ModelObj
 {
     /** @var int */
     protected $id;

@@ -8,8 +8,12 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\domain\Advertising;
+use zovye\domain\Agent;
 use zovye\model\advertisingModelObj;
 use zovye\model\agentModelObj;
+use zovye\util\PlaceHolder;
+use zovye\util\Util;
 
 $type = Request::int('type', Advertising::SCREEN);
 

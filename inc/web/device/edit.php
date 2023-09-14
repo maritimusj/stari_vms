@@ -10,7 +10,11 @@ defined('IN_IA') or exit('Access Denied');
 
 use zovye\account\MoscaleAccount;
 use zovye\account\ZhiJinBaoAccount;
+use zovye\domain\Device;
+use zovye\domain\DeviceTypes;
+use zovye\domain\Group;
 use zovye\model\device_groupsModelObj;
+use zovye\util\Util;
 
 $id = Request::int('id');
 $device_types = [];
@@ -78,23 +82,23 @@ if (isset($device) && App::isZJBaoEnabled() && ZhiJinBaoAccount::isAssigned($dev
 $module_url = MODULE_URL;
 if ($model == Device::VIRTUAL_DEVICE) {
     $icon_html = <<<HTML
-    <img src="{$module_url}static/img/vdevice.svg" class="icon" title="虚拟设备">
+    <img src="{$module_url}static/img/vdevice.svg" class="icon" title="虚拟设备" alt="">
 HTML;
 } elseif ($model == Device::BLUETOOTH_DEVICE) {
     $icon_html = <<<HTML
-    <img src="{$module_url}static/img/bluetooth.svg" class="icon" title="蓝牙设备">
+    <img src="{$module_url}static/img/bluetooth.svg" class="icon" title="蓝牙设备" alt="">
 HTML;
 } elseif ($model == Device::CHARGING_DEVICE) {
     $icon_html = <<<HTML
-    <img src="{$module_url}static/img/charging.svg" class="icon" title="充电桩">
+    <img src="{$module_url}static/img/charging.svg" class="icon" title="充电桩" alt="">
 HTML;
 } elseif ($model == Device::FUELING_DEVICE) {
     $icon_html = <<<HTML
-    <img src="{$module_url}static/img/fueling.svg" class="icon" title="尿素加注设备">
+    <img src="{$module_url}static/img/fueling.svg" class="icon" title="尿素加注设备" alt="">
 HTML;
 } else {
     $icon_html = <<<HTML
-    <img src="{$module_url}static/img/machine.svg" class="icon">
+    <img src="{$module_url}static/img/machine.svg" class="icon" alt="">
 HTML;
 }
 

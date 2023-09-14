@@ -7,10 +7,10 @@
 namespace bluetooth\grid;
 
 use zovye\BlueToothProtocol;
-use zovye\Contract\bluetooth\IBlueToothProtocol;
-use zovye\Contract\bluetooth\ICmd;
-use zovye\Contract\bluetooth\IResponse;
-use zovye\Device;
+use zovye\contract\bluetooth\IBlueToothProtocol;
+use zovye\contract\bluetooth\ICmd;
+use zovye\contract\bluetooth\IResponse;
+use zovye\domain\Device;
 
 class protocol implements IBlueToothProtocol
 {

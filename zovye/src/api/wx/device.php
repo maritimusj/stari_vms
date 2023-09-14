@@ -9,26 +9,25 @@ namespace zovye\api\wx;
 use DateTime;
 use Exception;
 use zovye\App;
-use zovye\base\modelObjFinder;
-use zovye\CacheUtil;
+use zovye\base\ModelObjFinder;
+use zovye\business\GDCVMachine;
+use zovye\business\TKPromoting;
 use zovye\CtrlServ;
-use zovye\DeviceTypes;
-use zovye\DeviceUtil;
-use zovye\GDCVMachine;
-use zovye\Goods;
-use zovye\GoodsExpireAlert;
-use zovye\Group as ZovyeGroup;
+use zovye\domain\DeviceTypes;
+use zovye\domain\Goods;
+use zovye\domain\Group as ZovyeGroup;
+use zovye\domain\Inventory;
+use zovye\domain\Locker;
+use zovye\domain\Order;
 use zovye\Helper;
-use zovye\Inventory;
-use zovye\Locker;
 use zovye\model\agentModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
-use zovye\Order;
 use zovye\Request;
 use zovye\Stats;
-use zovye\TKPromoting;
-use zovye\Util;
+use zovye\util\CacheUtil;
+use zovye\util\DeviceUtil;
+use zovye\util\Util;
 use function zovye\err;
 use function zovye\is_error;
 use function zovye\isEmptyArray;
@@ -76,7 +75,7 @@ class device
                     'way' => $way,
                 ],
                 'extra' => [
-                    'is_down' => isset($extra['isDown']) && $extra['isDown'] == \zovye\Device::STATUS_MAINTENANCE ? 1 : 0,
+                    'is_down' => isset($extra['isDown']) && $extra['isDown'] == \zovye\domain\Device::STATUS_MAINTENANCE ? 1 : 0,
                 ],
             ];
             if (!isEmptyArray($location)) {
@@ -105,7 +104,7 @@ class device
             'extra' => [
                 'iccid' => $device->getICCID(),
                 'volume' => intval($extra['volume']),
-                'is_down' => isset($extra['isDown']) && $extra['isDown'] == \zovye\Device::STATUS_MAINTENANCE ? 1 : 0,
+                'is_down' => isset($extra['isDown']) && $extra['isDown'] == \zovye\domain\Device::STATUS_MAINTENANCE ? 1 : 0,
             ],
             'status' => [
                 'lastOnline' => date('Y-m-d H:i:s', $device->getlastOnline()),
@@ -187,7 +186,7 @@ class device
         }
 
         if (App::isDeviceScheduleTaskEnabled()) {
-            $result['device']['schedule'] = \zovye\Device::getScheduleTaskTotal($device);
+            $result['device']['schedule'] = \zovye\domain\Device::getScheduleTaskTotal($device);
         }
 
         if (App::isGoodsExpireAlertEnabled()) {
@@ -255,9 +254,9 @@ class device
             }
         }
 
-        $result['status'][\zovye\Device::V0_STATUS_VOLTAGE] = $device->getV0Status(\zovye\Device::V0_STATUS_VOLTAGE);
-        $result['status'][\zovye\Device::V0_STATUS_COUNT] = (int)$device->getV0Status(\zovye\Device::V0_STATUS_COUNT);
-        $result['status'][\zovye\Device::V0_STATUS_ERROR] = $device->getV0ErrorDescription();
+        $result['status'][\zovye\domain\Device::V0_STATUS_VOLTAGE] = $device->getV0Status(\zovye\domain\Device::V0_STATUS_VOLTAGE);
+        $result['status'][\zovye\domain\Device::V0_STATUS_COUNT] = (int)$device->getV0Status(\zovye\domain\Device::V0_STATUS_COUNT);
+        $result['status'][\zovye\domain\Device::V0_STATUS_ERROR] = $device->getV0ErrorDescription();
 
         //信号强度
         $sig = $device->getSig();
@@ -292,7 +291,7 @@ class device
         }
 
         //findDevice可以查找到使用shadowId的设备
-        $device = \zovye\Device::find($id, ['imei', 'shadow_id']);
+        $device = \zovye\domain\Device::find($id, ['imei', 'shadow_id']);
         if (empty($device)) {
             $params = [];
 
@@ -302,13 +301,13 @@ class device
             }
 
             /** @var deviceModelObj $device */
-            $device = \zovye\Device::activate($id, $params);
+            $device = \zovye\domain\Device::activate($id, $params);
             if (is_error($device)) {
                 return err('找不到这个设备，请重新扫描二维码！');
             }
 
             if (App::isFuelingDeviceEnabled()) {
-                $device->setDeviceModel(\zovye\Device::FUELING_DEVICE);
+                $device->setDeviceModel(\zovye\domain\Device::FUELING_DEVICE);
                 $device->save();
             }
 
@@ -320,7 +319,7 @@ class device
         if ($device->getAgentId() > 0) {
             if ($owner && !$owner->hasFactoryPermission()) {
                 $agent = $owner->isPartner() ? $owner->getPartnerAgent() : $owner;
-                if (!\zovye\Device::isOwner($device, $agent)) {
+                if (!\zovye\domain\Device::isOwner($device, $agent)) {
                     return err('没有权限管理这个设备！');
                 }
             }
@@ -351,7 +350,7 @@ class device
             }
             $reason = '代理商补货';
         } elseif ($user->isKeeper()) {
-            $device = \zovye\Device::find(request('id'), ['imei', 'shadow_id']);
+            $device = \zovye\domain\Device::find(request('id'), ['imei', 'shadow_id']);
             if (empty($device)) {
                 return err('找不到这个设备！');
             }
@@ -360,7 +359,7 @@ class device
                 empty($keeper) ||
                 $device->getAgentId() != $keeper->getAgentId() ||
                 !$device->hasKeeper($keeper) ||
-                $device->getKeeperKind($keeper) != \zovye\Keeper::OP
+                $device->getKeeperKind($keeper) != \zovye\domain\Keeper::OP
             ) {
                 return err('没有权限执行这个操作！');
             }
@@ -507,7 +506,7 @@ class device
             }
 
             //设备列表
-            $devices_query = \zovye\Device::query();
+            $devices_query = \zovye\domain\Device::query();
             $devices_query->where(['agent_id' => $agent->getId()]);
 
             /** @var  deviceModelObj $item */
@@ -541,7 +540,7 @@ class device
 
             //指定了设备
             if ($params['deviceid']) {
-                $device = \zovye\Device::get($params['deviceid']);
+                $device = \zovye\domain\Device::get($params['deviceid']);
                 if (empty($device)) {
                     return err('找不到这个设备！');
                 }
@@ -566,11 +565,11 @@ class device
             $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
 
             //首页
-            $low_query = \zovye\Device::query([
+            $low_query = \zovye\domain\Device::query([
                 'remain <' => App::getRemainWarningNum($agent),
                 'agent_id' => $agent->getId(),
             ]);
-            $error_query = \zovye\Device::query([
+            $error_query = \zovye\domain\Device::query([
                 'error_code <>' => 0,
                 'agent_id' => $agent->getId(),
             ]);
@@ -614,7 +613,7 @@ class device
     {
         if (Request::has('id')) {
             /** @var deviceModelObj|array $device */
-            $device = \zovye\Device::find(Request::str('id'), ['imei', 'shadow_id']);
+            $device = \zovye\domain\Device::find(Request::str('id'), ['imei', 'shadow_id']);
             if (is_error($device)) {
                 return $device;
             }
@@ -664,12 +663,12 @@ class device
 
     /**
      * @param userModelObj $user
-     * @param modelObjFinder $query
+     * @param ModelObjFinder $query
      * @param bool $onlineStatus
      * @return array
      * @throws Exception
      */
-    public static function getDeviceList(userModelObj $user, modelObjFinder $query, bool $onlineStatus = null): array
+    public static function getDeviceList(userModelObj $user, ModelObjFinder $query, bool $onlineStatus = null): array
     {
         if (Request::has('keyword')) {
             $keyword = Request::trim('keyword');
@@ -920,7 +919,7 @@ class device
     public static function getDeviceInfo(): array
     {
         $imei = Request::trim('imei');
-        $res = \zovye\Device::get($imei, true);
+        $res = \zovye\domain\Device::get($imei, true);
         if ($res) {
             $data = [
                 'id' => $res->getId(),
@@ -961,12 +960,12 @@ class device
             'list' => [],
         ];
 
-        $agent_ids = \zovye\Agent::getAllSubordinates($agent);
+        $agent_ids = \zovye\domain\Agent::getAllSubordinates($agent);
         if (empty($agent_ids)) {
             return $result;
         }
 
-        $query = \zovye\Device::query(['agent_id' => $agent_ids]);
+        $query = \zovye\domain\Device::query(['agent_id' => $agent_ids]);
 
         if (Request::has('keyword')) {
             $keyword = Request::trim('keyword');
@@ -1060,7 +1059,7 @@ class device
         $app_id = Request::trim('id');
 
         if ($app_id) {
-            $device = \zovye\Device::getFromAppId($app_id);
+            $device = \zovye\domain\Device::getFromAppId($app_id);
             if (empty($device)) {
                 return err('找不到设备！');
             }
@@ -1088,11 +1087,11 @@ class device
             if (is_error($device)) {
                 return $device;
             }
-            if (!\zovye\Device::isOwner($device, $agent)) {
+            if (!\zovye\domain\Device::isOwner($device, $agent)) {
                 return err('没有权限执行这个操作！');
             }
         } elseif ($user->isKeeper()) {
-            $device = \zovye\Device::find(request('id'), ['imei', 'shadow_id']);
+            $device = \zovye\domain\Device::find(request('id'), ['imei', 'shadow_id']);
             if (!$device) {
                 return err('找不到这个设备！');
             }

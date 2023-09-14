@@ -9,6 +9,10 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 //分组表
+use zovye\business\ChargingServ;
+use zovye\domain\Agent;
+use zovye\domain\Device;
+use zovye\domain\Group;
 use zovye\model\device_groupsModelObj;
 
 $query = Group::query(Group::CHARGING);

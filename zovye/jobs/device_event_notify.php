@@ -11,7 +11,7 @@ defined('IN_IA') or exit('Access Denied');
 //设备上线通知
 
 use zovye\CtrlServ;
-use zovye\Device;
+use zovye\domain\Device;
 use zovye\JobException;
 use zovye\Log;
 use zovye\Request;

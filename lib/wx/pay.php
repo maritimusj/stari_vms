@@ -7,7 +7,7 @@
 namespace wx;
 
 use we7\ihttp;
-use zovye\Util;
+use zovye\util\Util;
 use zovye\We7;
 use function zovye\err;
 use function zovye\error;

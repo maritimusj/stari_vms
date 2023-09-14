@@ -7,6 +7,9 @@
 
 namespace zovye;
 
+use zovye\domain\Delivery;
+use zovye\domain\Mall;
+
 defined('IN_IA') or exit('Access Denied');
 
 $user = Session::getCurrentUser();

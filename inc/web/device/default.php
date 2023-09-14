@@ -6,6 +6,12 @@
  
 namespace zovye;
 
+use zovye\domain\Agent;
+use zovye\domain\Device;
+use zovye\domain\DeviceTypes;
+use zovye\domain\Tags;
+use zovye\util\Util;
+
 defined('IN_IA') or exit('Access Denied');
 
 if (Request::is_ajax()) {

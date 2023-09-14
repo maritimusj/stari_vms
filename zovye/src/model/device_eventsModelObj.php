@@ -6,8 +6,8 @@
 
 namespace zovye\model;
 
-use zovye\base\modelObj;
-use zovye\Device;
+use zovye\base\ModelObj;
+use zovye\domain\Device;
 use zovye\traits\ExtraDataGettersAndSetters;
 use function zovye\tb;
 
@@ -19,7 +19,7 @@ use function zovye\tb;
  * @method getCreatetime()
  * @method getExtra()
  */
-class device_eventsModelObj extends modelObj
+class device_eventsModelObj extends ModelObj
 {
     /** @var int */
     protected $id;

@@ -8,11 +8,11 @@ namespace zovye\api\wxweb;
 
 use zovye\api\wx\common;
 use zovye\Config;
-use zovye\Device;
+use zovye\domain\Device;
+use zovye\domain\Order;
+use zovye\domain\User;
 use zovye\Helper;
-use zovye\Order;
 use zovye\Request;
-use zovye\User;
 use function zovye\err;
 
 class fueling
@@ -35,7 +35,7 @@ class fueling
         }
 
         $data = $device->profile(true);
-        $data['vip'] = \zovye\Fueling::isVIP($user, $device);
+        $data['vip'] = \zovye\business\Fueling::isVIP($user, $device);
 
         $fuelingNOWData = $user->fuelingNOWData();
         if ($fuelingNOWData) {
@@ -80,9 +80,9 @@ class fueling
 
         $chargerID = Request::int('chargerID');
 
-        $card = \zovye\Fueling::isVIP($user, $device) ? $user->getVIPCard() : $user->getCommissionBalanceCard();
+        $card = \zovye\business\Fueling::isVIP($user, $device) ? $user->getVIPCard() : $user->getCommissionBalanceCard();
 
-        return \zovye\Fueling::start('', $card, $device, $chargerID);
+        return \zovye\business\Fueling::start('', $card, $device, $chargerID);
     }
 
     /**
@@ -92,7 +92,7 @@ class fueling
     {
         $user = common::getWXAppUser();
 
-        return \zovye\Fueling::stop($user);
+        return \zovye\business\Fueling::stop($user);
     }
 
     /**
@@ -102,7 +102,7 @@ class fueling
     {
         $serial = Request::str('serial');
 
-        return \zovye\Fueling::orderStatus($serial);
+        return \zovye\business\Fueling::orderStatus($serial);
     }
 
     public static function payForFueling(): array

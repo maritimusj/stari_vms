@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+use zovye\domain\DeviceTypes;
+
 defined('IN_IA') or exit('Access Denied');
 
 $type_id = Request::int('id');

@@ -8,7 +8,11 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\domain\Advertising;
+use zovye\domain\User;
 use zovye\model\advertisingModelObj;
+use zovye\util\QRCodeUtil;
+use zovye\util\Util;
 
 $qrcode = settings('misc.qrcode', []);
 if (empty($qrcode['url'])) {

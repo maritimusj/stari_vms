@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+use zovye\domain\Keeper;
+
 defined('IN_IA') or exit('Access Denied');
 
 $keeper_id = Request::int('id');

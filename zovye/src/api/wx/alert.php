@@ -10,8 +10,8 @@ namespace zovye\api\wx;
 use DateTime;
 use Exception;
 use zovye\App;
-use zovye\Device;
-use zovye\GoodsExpireAlert;
+use zovye\business\GoodsExpireAlert;
+use zovye\domain\Device;
 use zovye\model\goods_expire_alertModelObj;
 use zovye\Request;
 use function zovye\err;
@@ -43,7 +43,7 @@ class alert
 
                 if ($device->getAgentId() != $keeper->getAgentId() ||
                     !$device->hasKeeper($keeper) ||
-                    $device->getKeeperKind($keeper) != \zovye\Keeper::OP
+                    $device->getKeeperKind($keeper) != \zovye\domain\Keeper::OP
                 ) {
                     return err('没有权限！');
                 }

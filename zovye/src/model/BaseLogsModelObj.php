@@ -6,7 +6,7 @@
 
 namespace zovye\model;
 
-use zovye\base\modelObj;
+use zovye\base\ModelObj;
 use zovye\traits\DataGetterAndSetter;
 
 /**
@@ -18,7 +18,7 @@ use zovye\traits\DataGetterAndSetter;
  * @method setTitle($title);
  * @method getCreatetime();
  */
-class BaseLogsModelObj extends modelObj
+class BaseLogsModelObj extends ModelObj
 {
     protected $id;
     protected $uniacid;

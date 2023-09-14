@@ -7,8 +7,8 @@
 
 namespace bluetooth\ld;
 
-use zovye\Contract\bluetooth\ICmd;
-use zovye\Contract\bluetooth\IResponse;
+use zovye\contract\bluetooth\ICmd;
+use zovye\contract\bluetooth\IResponse;
 
 class response implements IResponse
 {

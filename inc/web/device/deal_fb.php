@@ -9,6 +9,7 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 //处理反馈
+use zovye\domain\DeviceFeedback;
 use zovye\model\device_feedbackModelObj;
 
 $id = Request::int('id');

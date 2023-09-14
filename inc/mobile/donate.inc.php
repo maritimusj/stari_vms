@@ -6,6 +6,12 @@
 
 namespace zovye;
 
+use zovye\business\DonatePay;
+use zovye\domain\Device;
+use zovye\domain\Locker;
+use zovye\domain\Order;
+use zovye\util\Util;
+
 defined('IN_IA') or exit('Access Denied');
 
 if (!App::isDonatePayEnabled()) {

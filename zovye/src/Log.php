@@ -6,7 +6,7 @@
 
 namespace zovye;
 
-use zovye\Contract\ILogWriter;
+use zovye\contract\ILogWriter;
 
 class Log
 {

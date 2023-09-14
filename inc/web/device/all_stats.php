@@ -11,6 +11,10 @@ defined('IN_IA') or exit('Access Denied');
 //全部出货统计
 use DateTime;
 use Exception;
+use zovye\domain\Device;
+use zovye\domain\Order;
+use zovye\util\CacheUtil;
+use zovye\util\OrderCounter;
 
 $device = Device::get(Request::int('id'));
 if (empty($device)) {

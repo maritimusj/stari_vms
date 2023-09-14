@@ -8,12 +8,12 @@
 namespace zovye\api\wx;
 
 use zovye\api\wx\keeper as WxKeeper;
+use zovye\domain\Keeper;
+use zovye\domain\Principal;
+use zovye\domain\User;
 use zovye\Helper;
-use zovye\Keeper;
 use zovye\model\userModelObj;
-use zovye\Principal;
 use zovye\Request;
-use zovye\User;
 use function zovye\err;
 
 class promoter

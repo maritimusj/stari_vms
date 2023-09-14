@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+use zovye\domain\Device;
+
 defined('IN_IA') or exit('Access Denied');
 
 JSON::result(Device::search());

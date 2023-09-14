@@ -7,6 +7,9 @@
 
 namespace zovye;
 
+use zovye\util\PlaceHolder;
+use zovye\util\Util;
+
 /**
  * @method static void devicePreparePage(array $tpl_data)
  * @method static void devicePage(array $tpl_data)

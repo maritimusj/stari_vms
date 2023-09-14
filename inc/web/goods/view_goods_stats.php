@@ -9,6 +9,8 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 use DateTime;
+use zovye\domain\Goods;
+use zovye\util\Util;
 
 $goods = Goods::get(Request::int('id'));
 if (empty($goods)) {

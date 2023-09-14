@@ -6,7 +6,7 @@
 
 namespace zovye;
 
-use zovye\Contract\bluetooth\IBlueToothProtocol;
+use zovye\contract\bluetooth\IBlueToothProtocol;
 
 class BlueToothProtocol
 {

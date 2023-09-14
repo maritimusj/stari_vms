@@ -6,6 +6,9 @@
  
 namespace zovye;
 
+use zovye\business\FlashEgg;
+use zovye\domain\Locker;
+
 defined('IN_IA') or exit('Access Denied');
 
 if (!App::isFlashEggEnabled()) {

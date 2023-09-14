@@ -6,9 +6,9 @@
 
 namespace zovye\model;
 
-use zovye\Agent;
-use zovye\base\modelObj;
-use zovye\Device;
+use zovye\base\ModelObj;
+use zovye\domain\Agent;
+use zovye\domain\Device;
 use function zovye\tb;
 
 /**
@@ -22,7 +22,7 @@ use function zovye\tb;
  * @method getLaneId()
  * @method setLaneId($lane_id)
  */
-class goods_expire_alertModelObj extends modelObj
+class goods_expire_alertModelObj extends ModelObj
 {
     public static function getTableName($read_or_write): string
     {

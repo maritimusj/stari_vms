@@ -10,6 +10,9 @@ defined('IN_IA') or exit('Access Denied');
 
 use DateTime;
 use Exception;
+use zovye\domain\Goods;
+use zovye\domain\GoodsVoucher;
+use zovye\util\DBUtil;
 
 $res = DBUtil::transactionDo(function () {
     $goods_id = Request::int('goodsId');

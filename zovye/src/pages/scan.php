@@ -6,6 +6,9 @@
 
 namespace zovye;
 
+use zovye\util\TemplateUtil;
+use zovye\util\Util;
+
 defined('IN_IA') or exit('Access Denied');
 
 //以下为页面数据

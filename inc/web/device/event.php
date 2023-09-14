@@ -8,7 +8,9 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\domain\Device;
 use zovye\model\device_eventsModelObj;
+use zovye\util\Util;
 
 $device = Device::get(Request::int('id'));
 if (empty($device)) {

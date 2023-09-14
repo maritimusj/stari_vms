@@ -8,7 +8,9 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\domain\Device;
 use zovye\model\deviceModelObj;
+use zovye\util\CacheUtil;
 
 $ids = Request::has('id') ? [Request::int('id')] : request('ids');
 

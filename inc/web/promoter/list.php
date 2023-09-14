@@ -8,6 +8,8 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\domain\Keeper;
+use zovye\domain\Principal;
 use zovye\model\userModelObj;
 
 if (!App::isPromoterEnabled()) {

@@ -6,12 +6,12 @@
 
 namespace zovye\model;
 
-use zovye\Agent;
-use zovye\base\modelObj;
-use zovye\base\modelObjFinder;
-use zovye\Keeper;
+use zovye\base\ModelObj;
+use zovye\base\ModelObjFinder;
+use zovye\domain\Agent;
+use zovye\domain\Keeper;
+use zovye\domain\User;
 use zovye\traits\ExtraDataGettersAndSetters;
-use zovye\User;
 use function zovye\m;
 use function zovye\tb;
 
@@ -23,7 +23,7 @@ use function zovye\tb;
  * @method setName($name)
  * @method setMobile($mobile)
  */
-class keeperModelObj extends modelObj
+class keeperModelObj extends ModelObj
 {
     /** @var int */
     protected $id;
@@ -72,7 +72,7 @@ class keeperModelObj extends modelObj
         return Keeper::DEFAULT_COMMISSION_VAL;
     }
 
-    public function deviceQuery(): modelObjFinder
+    public function deviceQuery(): ModelObjFinder
     {
         return m('keeper_devices')->where(['keeper_id' => $this->getId()]);
     }

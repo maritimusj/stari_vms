@@ -10,7 +10,9 @@ defined('IN_IA') or exit('Access Denied');
 
 //简单的二维码导出功能
 use ZipArchive;
+use zovye\domain\Device;
 use zovye\model\deviceModelObj;
+use zovye\util\Util;
 
 $url_prefix = We7::attachment_set_attach_url();
 $attach_prefix = ATTACHMENT_ROOT;

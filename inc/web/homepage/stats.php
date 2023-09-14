@@ -9,6 +9,8 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 use DateTime;
+use zovye\domain\Device;
+use zovye\util\CacheUtil;
 
 $data = CacheUtil::cachedCall(30, function () {
     $rows = [

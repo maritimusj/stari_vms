@@ -6,11 +6,11 @@
 
 namespace zovye\model;
 
-use zovye\Account;
-use zovye\base\modelObj;
-use zovye\Goods;
+use zovye\base\ModelObj;
+use zovye\domain\Account;
+use zovye\domain\Goods;
 use zovye\traits\ExtraDataGettersAndSetters;
-use zovye\Util;
+use zovye\util\Util;
 use function zovye\tb;
 
 /**
@@ -30,7 +30,7 @@ use function zovye\tb;
  * @method setS1(int $v)
  * @method getS1()
  */
-class goodsModelObj extends modelObj
+class goodsModelObj extends ModelObj
 {
     /** @var int */
     protected $id;

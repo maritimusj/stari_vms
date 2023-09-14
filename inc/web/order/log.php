@@ -8,6 +8,9 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\domain\Device;
+use zovye\domain\User;
+use zovye\domain\UserLogs;
 use zovye\model\user_logsModelObj;
 
 $query = UserLogs::query();

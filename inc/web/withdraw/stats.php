@@ -9,6 +9,7 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 use DateTime;
+use zovye\domain\CommissionBalance;
 use zovye\model\commission_balanceModelObj;
 
 $query = CommissionBalance::query([

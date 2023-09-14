@@ -6,7 +6,7 @@
 
 namespace bluetooth\wx;
 
-use zovye\Contract\bluetooth\ICmd;
+use zovye\contract\bluetooth\ICmd;
 
 class cmd implements ICmd
 {

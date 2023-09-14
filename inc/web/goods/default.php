@@ -6,6 +6,10 @@
  
 namespace zovye;
 
+use zovye\domain\Agent;
+use zovye\domain\Goods;
+use zovye\util\Util;
+
 defined('IN_IA') or exit('Access Denied');
 
 $params = [

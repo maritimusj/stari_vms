@@ -7,7 +7,7 @@
 namespace we7;
 
 use CURLFile;
-use zovye\Util;
+use zovye\util\Util;
 use zovye\We7;
 use function zovye\_W;
 use function zovye\error;

@@ -8,6 +8,9 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\business\ChargingNowData;
+use zovye\domain\Principal;
+use zovye\domain\User;
 use zovye\model\keeperModelObj;
 use zovye\model\userModelObj;
 

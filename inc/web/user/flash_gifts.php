@@ -8,6 +8,8 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\business\FlashEgg;
+use zovye\domain\User;
 use zovye\model\giftModelObj;
 
 $user = User::get(Request::int('id'));

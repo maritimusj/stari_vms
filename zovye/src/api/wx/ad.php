@@ -7,19 +7,19 @@
 namespace zovye\api\wx;
 
 use Exception;
-use zovye\Advertising;
+use zovye\domain\Advertising;
+use zovye\domain\Device;
 use zovye\Log;
+use zovye\Media;
 use zovye\model\advertisingModelObj;
-use zovye\Device;
 use zovye\model\device_groupsModelObj;
 use zovye\Request;
-use zovye\Media;
 use zovye\ReviewResult;
-use zovye\Util;
+use zovye\util\Util;
 use zovye\We7;
 use function zovye\err;
-use function zovye\request;
 use function zovye\is_error;
+use function zovye\request;
 
 class ad
 {
@@ -379,7 +379,7 @@ class ad
 
         foreach ($groups as $id) {
             /** @var device_groupsModelObj $one */
-            $one = \zovye\Group::get($id);
+            $one = \zovye\domain\Group::get($id);
             if ($one) {
                 $query_arr = ['group_id' => $one->getId()];
                 if ($one->getAgentId() != $user->getAgentId()) {

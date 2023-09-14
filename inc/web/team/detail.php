@@ -8,7 +8,10 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\domain\Team;
+use zovye\domain\User;
 use zovye\model\team_memberModelObj;
+use zovye\util\Util;
 
 $user_id = Request::int('id');
 $user = User::get($user_id);

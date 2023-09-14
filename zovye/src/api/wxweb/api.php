@@ -8,37 +8,35 @@
 namespace zovye\api\wxweb;
 
 use DateTime;
-use zovye\Account;
-use zovye\Advertising;
-use zovye\DeviceFeedback;
-use zovye\DeviceUtil;
-use zovye\Goods;
+use zovye\api\wxx\common;
+use zovye\App;
+use zovye\Config;
+use zovye\domain\Account;
+use zovye\domain\Advertising;
+use zovye\domain\Balance;
+use zovye\domain\Delivery;
+use zovye\domain\Device;
+use zovye\domain\DeviceFeedback;
+use zovye\domain\Goods;
+use zovye\domain\Mall;
+use zovye\domain\Order;
+use zovye\domain\Questionnaire;
+use zovye\domain\Task;
+use zovye\domain\User;
 use zovye\Helper;
 use zovye\Job;
 use zovye\JSON;
-use zovye\LocationUtil;
+use zovye\Log;
 use zovye\model\balanceModelObj;
 use zovye\model\userModelObj;
-use zovye\Order;
-use zovye\Task;
-use zovye\User;
-use zovye\Util;
-use zovye\Device;
 use zovye\Request;
-use zovye\api\wxx\common;
-use zovye\App;
-use zovye\Balance;
-use zovye\Config;
-use zovye\Delivery;
-use zovye\Log;
-use zovye\Mall;
-use zovye\PlaceHolder;
-use zovye\Questionnaire;
-
+use zovye\util\DeviceUtil;
+use zovye\util\LocationUtil;
+use zovye\util\PlaceHolder;
+use zovye\util\Util;
 use function zovye\err;
 use function zovye\is_error;
 use function zovye\isEmptyArray;
-use function zovye\m;
 
 class api
 {

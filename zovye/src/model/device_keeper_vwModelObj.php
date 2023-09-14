@@ -6,8 +6,7 @@
 
 namespace zovye\model;
 
-use zovye\Keeper;
-
+use zovye\domain\Keeper;
 use function zovye\tb;
 
 /**

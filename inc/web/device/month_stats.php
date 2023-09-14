@@ -10,6 +10,9 @@ defined('IN_IA') or exit('Access Denied');
 
 use DateTime;
 use Exception;
+use zovye\domain\Device;
+use zovye\util\CacheUtil;
+use zovye\util\Util;
 
 $device = Device::get(Request::int('id'));
 if (empty($device)) {

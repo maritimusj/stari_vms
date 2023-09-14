@@ -9,6 +9,9 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 use DateTime;
+use zovye\domain\Agent;
+use zovye\util\CacheUtil;
+use zovye\util\Util;
 
 $agent = Agent::get(Request::int('id'));
 if (empty($agent)) {

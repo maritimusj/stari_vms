@@ -7,19 +7,19 @@
 namespace zovye\api\wx;
 
 use Exception;
-use zovye\model\agentModelObj;
 use zovye\App;
-use zovye\Request;
+use zovye\domain\LoginData;
+use zovye\domain\User;
+use zovye\domain\WxApp;
 use zovye\JSON;
 use zovye\Log;
+use zovye\model\agentModelObj;
 use zovye\model\keeperModelObj;
-use zovye\LoginData;
-use zovye\User;
 use zovye\model\userModelObj;
-use zovye\Util;
+use zovye\Request;
+use zovye\util\Util;
 use zovye\We7;
 use zovye\Wx;
-use zovye\WxApp;
 use function zovye\err;
 use function zovye\is_error;
 use function zovye\settings;
@@ -123,7 +123,7 @@ class common
         }
 
         if ($login_data->getSrc() == LoginData::KEEPER) {
-            $keeper = \zovye\Keeper::get($login_data->getUserId());
+            $keeper = \zovye\domain\Keeper::get($login_data->getUserId());
             if (empty($keeper)) {
                 JSON::fail('请先登录后再请求数据！[103]');
             }
@@ -203,7 +203,7 @@ class common
         }
 
         /** @var keeperModelObj $keeper */
-        $keeper = \zovye\Keeper::findOne(['id' => $login_data->getUserId()]);
+        $keeper = \zovye\domain\Keeper::findOne(['id' => $login_data->getUserId()]);
 
         return $keeper;
     }

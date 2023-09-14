@@ -9,6 +9,10 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 use RuntimeException;
+use zovye\domain\Goods;
+use zovye\domain\Inventory;
+use zovye\util\DBUtil;
+use zovye\util\Util;
 
 $inventory = Inventory::get(Request::int('id'));
 if (empty($inventory)) {

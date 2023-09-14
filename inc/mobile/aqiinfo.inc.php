@@ -9,6 +9,10 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 use zovye\account\AQIInfoAccount;
+use zovye\domain\Account;
+use zovye\domain\Device;
+use zovye\domain\User;
+use zovye\util\TemplateUtil;
 
 //如果是阿奇返回，则重新引导用户到设备页面
 if (Request::str('appResult') == 'nomore') {

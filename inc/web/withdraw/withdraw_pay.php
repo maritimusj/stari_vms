@@ -6,6 +6,9 @@
  
 namespace zovye;
 
+use zovye\domain\CommissionBalance;
+use zovye\util\DBUtil;
+
 defined('IN_IA') or exit('Access Denied');
 
 $balance_obj = Helper::getAndCheckWithdraw(Request::int('id'));

@@ -8,6 +8,8 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\domain\Agent;
+use zovye\domain\Device;
 use zovye\model\deviceModelObj;
 
 $result = [];

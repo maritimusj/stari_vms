@@ -5,17 +5,17 @@
  */
 namespace zovye\model;
 
-use zovye\base\modelObj;
-use zovye\FlashEgg;
+use zovye\base\ModelObj;
+use zovye\business\FlashEgg;
+use zovye\domain\User;
 use zovye\traits\ExtraDataGettersAndSetters;
-use zovye\User;
 use function zovye\tb;
 
 /**
  * @method setStatus(int $int)
  * @method getStatus()
  */
-class lucky_logModelObj extends modelObj
+class lucky_logModelObj extends ModelObj
 {
     public static function getTableName($read_or_write): string
     {

@@ -8,17 +8,17 @@ namespace zovye\job\order;
 
 defined('IN_IA') or exit('Access Denied');
 
-use zovye\Advertising;
 use zovye\App;
 use zovye\CtrlServ;
+use zovye\domain\Advertising;
+use zovye\domain\Locker;
+use zovye\domain\Order;
 use zovye\Helper;
 use zovye\Job;
 use zovye\JobException;
-use zovye\Locker;
 use zovye\Log;
-use zovye\Order;
 use zovye\Request;
-use zovye\Util;
+use zovye\util\Util;
 use function zovye\isEmptyArray;
 use function zovye\settings;
 

@@ -8,6 +8,7 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\domain\Tags;
 use zovye\model\tagsModelObj;
 
 $id = Request::int('id');

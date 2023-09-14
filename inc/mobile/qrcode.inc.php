@@ -10,12 +10,12 @@ defined('IN_IA') or exit('Access Denied');
 
 use DateTime;
 use SplPriorityQueue;
-use zovye\Advertising;
+use zovye\domain\Advertising;
+use zovye\domain\User;
 use zovye\model\advertisingModelObj;
-use zovye\PlaceHolder;
 use zovye\Response;
 use zovye\Session;
-use zovye\User;
+use zovye\util\PlaceHolder;
 use function zovye\settings;
 
 $params = [

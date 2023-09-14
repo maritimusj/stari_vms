@@ -10,12 +10,11 @@ namespace zovye\job\chargingTimeout;
 
 defined('IN_IA') or exit('Access Denied');
 
-use zovye\Charging;
+use zovye\business\Charging;
 use zovye\CtrlServ;
+use zovye\domain\Order;
 use zovye\JobException;
 use zovye\Log;
-
-use zovye\Order;
 use zovye\Request;
 
 $uid = Request::str('uid');

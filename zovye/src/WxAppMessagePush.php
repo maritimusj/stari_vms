@@ -9,6 +9,9 @@ namespace zovye;
 use RuntimeException;
 use wx\ErrorCode;
 use wx\Prpcrypt;
+use zovye\domain\User;
+use zovye\util\HttpUtil;
+use zovye\util\Util;
 
 class WxAppMessagePush
 {

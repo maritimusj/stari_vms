@@ -4,6 +4,7 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\domain\Goods;
 use zovye\model\goodsModelObj;
 
 $tb_name = APP_NAME;

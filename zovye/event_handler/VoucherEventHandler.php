@@ -7,8 +7,10 @@
 
 namespace zovye;
 
+use zovye\domain\GoodsVoucher;
 use zovye\model\deviceModelObj;
 use zovye\model\orderModelObj;
+use zovye\util\DeviceUtil;
 
 
 class VoucherEventHandler

@@ -8,26 +8,26 @@ namespace zovye\api\wx;
 
 use Exception;
 use zovye\App;
-use zovye\DBUtil;
-use zovye\FlashEgg;
-use zovye\Goods;
+use zovye\business\DouYin;
+use zovye\business\FlashEgg;
+use zovye\domain\Account;
+use zovye\domain\Device;
+use zovye\domain\Goods;
 use zovye\Log;
-use zovye\QRCodeUtil;
-use zovye\We7;
-use zovye\Util;
 use zovye\Media;
-use zovye\Device;
-use zovye\DouYin;
-use zovye\Schema;
-use zovye\Account;
+use zovye\model\accountModelObj;
+use zovye\model\agentModelObj;
+use zovye\model\device_groupsModelObj;
 use zovye\Request;
+use zovye\Schema;
+use zovye\util\DBUtil;
+use zovye\util\QRCodeUtil;
+use zovye\util\Util;
+use zovye\We7;
 use zovye\WxPlatform;
 use function zovye\err;
 use function zovye\is_error;
-use zovye\model\agentModelObj;
 use function zovye\toCamelCase;
-use zovye\model\accountModelObj;
-use zovye\model\device_groupsModelObj;
 
 class mp
 {
@@ -572,7 +572,7 @@ class mp
 
                 foreach ($groups as $id) {
                     /** @var device_groupsModelObj $one */
-                    $one = \zovye\Group::get($id);
+                    $one = \zovye\domain\Group::get($id);
                     if ($one) {
                         $query_arr = ['group_id' => $one->getId()];
                         if ($one->getAgentId() != $user->getAgentId()) {

@@ -8,6 +8,7 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\domain\GoodsVoucher;
 use zovye\model\goods_voucherModelObj;
 
 $query = GoodsVoucher::query();

@@ -6,7 +6,7 @@
 
 namespace zovye\model;
 
-use zovye\base\modelObj;
+use zovye\base\ModelObj;
 use function zovye\tb;
 
 /**
@@ -19,7 +19,7 @@ use function zovye\tb;
  * @method getLockedUid()
  * @method setLockedUid(string $UNLOCKED)
  */
-class weapp_configModelObj extends modelObj
+class weapp_configModelObj extends ModelObj
 {
     /** @var int */
     protected $id;

@@ -9,6 +9,11 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 use RuntimeException;
+use zovye\domain\Goods;
+use zovye\domain\Inventory;
+use zovye\domain\User;
+use zovye\util\DBUtil;
+use zovye\util\Util;
 
 $user = User::get(Request::int('userid'));
 if (empty($user)) {

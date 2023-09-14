@@ -7,6 +7,10 @@
 
 namespace zovye;
 
+use zovye\domain\Device;
+use zovye\domain\Task;
+use zovye\domain\User;
+
 defined('IN_IA') or exit('Access Denied');
 
 $op = Request::op('default');

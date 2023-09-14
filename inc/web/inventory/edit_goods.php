@@ -6,6 +6,9 @@
 
 namespace zovye;
 
+use zovye\domain\Goods;
+use zovye\domain\Inventory;
+
 defined('IN_IA') or exit('Access Denied');
 
 $inventory = Inventory::get(Request::int('id'));

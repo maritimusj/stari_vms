@@ -8,7 +8,10 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\business\VIP;
+use zovye\domain\Agent;
 use zovye\model\vipModelObj;
+use zovye\util\Util;
 
 $id = Request::int('id');
 

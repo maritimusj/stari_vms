@@ -9,31 +9,31 @@ namespace zovye\model;
 
 use DateTime;
 use DateTimeImmutable;
-use zovye\Account;
-use zovye\Agent;
 use zovye\App;
-use zovye\Balance;
-use zovye\base\modelObj;
-use zovye\CacheUtil;
-use zovye\ChargingNowData;
-use zovye\CommissionBalance;
-use zovye\Contract\ICard;
-use zovye\DBUtil;
-use zovye\Device;
-use zovye\Fueling;
-use zovye\Keeper;
-use zovye\Locker;
-use zovye\LoginData;
-use zovye\Order;
+use zovye\base\ModelObj;
+use zovye\business\ChargingNowData;
+use zovye\business\Fueling;
+use zovye\business\UserCommissionBalanceCard;
+use zovye\business\VIP;
+use zovye\business\VIPCard;
+use zovye\contract\ICard;
+use zovye\domain\Account;
+use zovye\domain\Agent;
+use zovye\domain\Balance;
+use zovye\domain\CommissionBalance;
+use zovye\domain\Device;
+use zovye\domain\Keeper;
+use zovye\domain\Locker;
+use zovye\domain\LoginData;
+use zovye\domain\Order;
+use zovye\domain\PayLogs;
+use zovye\domain\Principal;
+use zovye\domain\Referral;
+use zovye\domain\User;
 use zovye\Pay;
-use zovye\PayLogs;
-use zovye\Principal;
-use zovye\Referral;
-use zovye\User;
-use zovye\UserCommissionBalanceCard;
-use zovye\Util;
-use zovye\VIP;
-use zovye\VIPCard;
+use zovye\util\CacheUtil;
+use zovye\util\DBUtil;
+use zovye\util\Util;
 use zovye\We7;
 use zovye\We7credit;
 use zovye\WxMCHPay;
@@ -68,7 +68,7 @@ use function zovye\tb;
  *
  * @property login_dataModelObj $loginData
  */
-class userModelObj extends modelObj
+class userModelObj extends ModelObj
 {
     /** @var int */
     protected $id;
@@ -288,7 +288,7 @@ class userModelObj extends modelObj
     /**
      * @param $order_id
      *
-     * @return pay_logsModelObj|modelObj
+     * @return pay_logsModelObj|ModelObj
      */
     public function getPayLog($order_id)
     {
@@ -425,7 +425,7 @@ class userModelObj extends modelObj
     }
 
     /**
-     * @return modelObj|keeperModelObj
+     * @return ModelObj|keeperModelObj
      */
     public function getKeeper()
     {
@@ -857,7 +857,7 @@ class userModelObj extends modelObj
                     $data = [$v => null];
                 } elseif (is_array($v)) {
                     $data = $v;
-                } elseif ($v instanceof modelObj) {
+                } elseif ($v instanceof ModelObj) {
                     $data = [
                         get_class($v) => [
                             'id' => $v->getId(),

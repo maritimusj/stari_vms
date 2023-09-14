@@ -6,9 +6,9 @@
 
 namespace zovye\model;
 
-use zovye\Agent;
-use zovye\base\modelObj;
-use zovye\User;
+use zovye\base\ModelObj;
+use zovye\domain\Agent;
+use zovye\domain\User;
 use function zovye\tb;
 
 /**
@@ -18,7 +18,7 @@ use function zovye\tb;
  * @method getCode()
  * @method getCreatetime()
  */
-class referralModelObj extends modelObj
+class referralModelObj extends ModelObj
 {
     /** @var int */
     protected $id;

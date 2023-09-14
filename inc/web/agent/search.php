@@ -8,6 +8,7 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\domain\Principal;
 use zovye\model\userModelObj;
 
 $query = Principal::agent();

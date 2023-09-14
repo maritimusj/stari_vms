@@ -6,6 +6,9 @@
  
 namespace zovye;
 
+use zovye\business\GDCVMachine;
+use zovye\domain\Order;
+
 defined('IN_IA') or exit('Access Denied');
 
 $order_id = Request::int('id');

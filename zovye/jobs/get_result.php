@@ -11,11 +11,11 @@ defined('IN_IA') or exit('Access Denied');
 //出货
 
 use zovye\CtrlServ;
+use zovye\domain\Order;
+use zovye\domain\User;
 use zovye\JobException;
 use zovye\Log;
-use zovye\Order;
 use zovye\Request;
-use zovye\User;
 
 $log = [
     'openid' => Request::str('openid'),

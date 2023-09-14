@@ -8,17 +8,17 @@ namespace zovye\account;
 
 use Exception;
 use RuntimeException;
-use zovye\Account;
 use zovye\App;
-use zovye\Contract\IAccountProvider;
-use zovye\HttpUtil;
+use zovye\contract\IAccountProvider;
+use zovye\domain\Account;
 use zovye\Log;
 use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
-use zovye\QRCodeUtil;
 use zovye\Session;
-use zovye\Util;
+use zovye\util\HttpUtil;
+use zovye\util\QRCodeUtil;
+use zovye\util\Util;
 use function zovye\is_error;
 
 class AQIInfoAccount extends AQIInfo implements IAccountProvider

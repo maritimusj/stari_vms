@@ -6,12 +6,11 @@
 
 namespace zovye\model;
 
-use zovye\DBUtil;
-use zovye\GSP;
-use zovye\Principal;
-use zovye\User;
-use zovye\Device;
-
+use zovye\domain\Device;
+use zovye\domain\GSP;
+use zovye\domain\Principal;
+use zovye\domain\User;
+use zovye\util\DBUtil;
 use function zovye\err;
 use function zovye\is_error;
 use function zovye\m;

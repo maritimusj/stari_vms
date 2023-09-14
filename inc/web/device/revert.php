@@ -6,6 +6,9 @@
  
 namespace zovye;
 
+use zovye\domain\Device;
+use zovye\util\DBUtil;
+
 defined('IN_IA') or exit('Access Denied');
 
 $confirm_code = Request::trim('code');

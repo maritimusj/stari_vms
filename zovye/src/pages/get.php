@@ -14,8 +14,11 @@ defined('IN_IA') or exit('Access Denied');
  * @param array $params
  */
 
+use zovye\domain\Advertising;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
+use zovye\util\TemplateUtil;
+use zovye\util\Util;
 
 $params = TemplateUtil::getTemplateVar();
 $tpl = is_array($params) ? $params : [];

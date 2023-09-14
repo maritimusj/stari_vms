@@ -7,7 +7,7 @@
 
 namespace bluetooth\hm;
 
-use zovye\Contract\bluetooth\ICmd;
+use zovye\contract\bluetooth\ICmd;
 
 class startR implements ICmd
 {

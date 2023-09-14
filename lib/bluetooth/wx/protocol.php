@@ -7,9 +7,9 @@
 namespace bluetooth\wx;
 
 use zovye\BlueToothProtocol;
-use zovye\Contract\bluetooth\IBlueToothProtocol;
-use zovye\Contract\bluetooth\ICmd;
-use zovye\Contract\bluetooth\IResponse;
+use zovye\contract\bluetooth\IBlueToothProtocol;
+use zovye\contract\bluetooth\ICmd;
+use zovye\contract\bluetooth\IResponse;
 use function zovye\err;
 
 class protocol implements IBlueToothProtocol

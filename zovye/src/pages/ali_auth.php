@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+use zovye\util\TemplateUtil;
+
 defined('IN_IA') or exit('Access Denied');
 
 /** @var string $cb_url */

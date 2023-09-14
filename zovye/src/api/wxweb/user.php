@@ -3,7 +3,7 @@
 namespace zovye\api\wxweb;
 
 use zovye\api\wx\common;
-use zovye\CommissionBalance;
+use zovye\domain\CommissionBalance;
 use zovye\Helper;
 use zovye\Pay;
 use zovye\Request;
@@ -15,7 +15,7 @@ class user
     {
         $user = common::getWXAppUser();
 
-        if (!$user->acquireLocker(\zovye\User::BALANCE_LOCKER)) {
+        if (!$user->acquireLocker(\zovye\domain\User::BALANCE_LOCKER)) {
             return err('无法锁定用户，请稍后再试！');
         }
 

@@ -6,9 +6,9 @@
 
 namespace zovye\model;
 
-use zovye\base\modelObj;
-use zovye\Team;
-use zovye\User;
+use zovye\base\ModelObj;
+use zovye\domain\Team;
+use zovye\domain\User;
 use function zovye\tb;
 
 /**
@@ -20,7 +20,7 @@ use function zovye\tb;
  * @method getRemark();
  * @method setRemark(string $remark);
  */
-class team_memberModelObj extends modelObj
+class team_memberModelObj extends ModelObj
 {
     public static function getTableName($read_or_write): string
     {

@@ -8,7 +8,10 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\domain\Advertising;
 use zovye\model\deviceModelObj;
+use zovye\util\TemplateUtil;
+use zovye\util\Util;
 
 /** @var deviceModelObj $device */
 $device = TemplateUtil::getTemplateVar('device');

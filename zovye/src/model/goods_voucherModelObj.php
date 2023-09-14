@@ -6,7 +6,7 @@
 
 namespace zovye\model;
 
-use zovye\base\modelObj;
+use zovye\base\ModelObj;
 use zovye\traits\ExtraDataGettersAndSetters;
 use function zovye\m;
 use function zovye\tb;
@@ -37,7 +37,7 @@ use function zovye\tb;
  * @method getVoucherId()
  * @method getDeviceId()
  */
-class goods_voucherModelObj extends modelObj
+class goods_voucherModelObj extends ModelObj
 {
     /** @var int */
     protected $id;

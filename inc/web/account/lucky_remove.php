@@ -6,6 +6,9 @@
 
 namespace zovye;
 
+use zovye\business\FlashEgg;
+use zovye\util\DBUtil;
+
 defined('IN_IA') or exit('Access Denied');
 
 $result = DBUtil::transactionDo(function () {

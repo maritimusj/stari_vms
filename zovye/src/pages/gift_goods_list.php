@@ -10,6 +10,8 @@ defined('IN_IA') or exit('Access Denied');
 
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
+use zovye\util\TemplateUtil;
+use zovye\util\Util;
 
 /** @var deviceModelObj $device */
 $device = TemplateUtil::getTemplateVar('device');

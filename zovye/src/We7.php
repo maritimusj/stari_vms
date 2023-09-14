@@ -7,6 +7,7 @@
 namespace zovye;
 
 use we7\db;
+use zovye\util\Util;
 
 /**
  * Class We7

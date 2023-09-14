@@ -8,9 +8,9 @@ namespace zovye\job\authAccount;
 
 defined('IN_IA') or exit('Access Denied');
 
-use zovye\Account;
-use zovye\Agent;
 use zovye\CtrlServ;
+use zovye\domain\Account;
+use zovye\domain\Agent;
 use zovye\Job;
 use zovye\JobException;
 use zovye\Log;

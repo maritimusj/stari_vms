@@ -11,6 +11,10 @@ defined('IN_IA') or exit('Access Denied');
 use RuntimeException;
 use zovye\api\wx\balance;
 use zovye\api\wx\common;
+use zovye\domain\Principal;
+use zovye\domain\Referral;
+use zovye\util\DBUtil;
+use zovye\util\Util;
 
 if (!App::isPromoterEnabled()) {
     Response::alert('这个功能没有启用，谢谢！', 'error');

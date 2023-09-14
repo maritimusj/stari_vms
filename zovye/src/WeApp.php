@@ -7,8 +7,13 @@
 namespace zovye;
 
 use Exception;
-use zovye\base\modelObj;
+use zovye\base\ModelObj;
+use zovye\business\ChargingServ;
+use zovye\domain\LogObj;
 use zovye\model\weapp_configModelObj;
+use zovye\util\DBUtil;
+use zovye\util\TemplateUtil;
+use zovye\util\Util;
 
 class WeApp extends Settings
 {
@@ -62,7 +67,7 @@ class WeApp extends Settings
     public function forceUnlock(): bool
     {
         return We7::pdo_update(
-            weapp_configModelObj::getTableName(modelObj::OP_WRITE),
+            weapp_configModelObj::getTableName(ModelObj::OP_WRITE),
             [
                 OBJ_LOCKED_UID => UNLOCKED,
             ],

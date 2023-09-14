@@ -14,7 +14,7 @@ use function zovye\tb;
  * @method getCreatetime()
  * @method setCount(int $param)
  */
-class tagsModelObj extends \zovye\base\modelObj
+class tagsModelObj extends \zovye\base\ModelObj
 {
     /** @var int */
     protected $id;

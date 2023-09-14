@@ -11,27 +11,25 @@ use ali\aop\request\AlipaySystemOauthTokenRequest;
 use DateTime;
 use DateTimeImmutable;
 use Exception;
-use zovye\AgentApplication;
 use zovye\App;
-use zovye\Cache;
-use zovye\CacheUtil;
-use zovye\CommissionBalance;
+use zovye\business\Fueling;
+use zovye\business\GDCVMachine;
 use zovye\Config;
-use zovye\Cron;
-use zovye\DBUtil;
-use zovye\Device;
-use zovye\DeviceTypes;
-use zovye\DeviceUtil;
-use zovye\Fueling;
-use zovye\GDCVMachine;
-use zovye\GoodsExpireAlert;
+use zovye\domain\AgentApplication;
+use zovye\domain\CommissionBalance;
+use zovye\domain\Cron;
+use zovye\domain\Device;
+use zovye\domain\DeviceTypes;
+use zovye\domain\Inventory;
+use zovye\domain\Keeper;
+use zovye\domain\LoginData;
+use zovye\domain\Order;
+use zovye\domain\Principal;
+use zovye\domain\User;
 use zovye\Helper;
-use zovye\Inventory;
 use zovye\Job;
 use zovye\JSON;
-use zovye\Keeper;
 use zovye\Log;
-use zovye\LoginData;
 use zovye\model\agentModelObj;
 use zovye\model\cronModelObj;
 use zovye\model\device_groupsModelObj;
@@ -40,13 +38,13 @@ use zovye\model\keeperModelObj;
 use zovye\model\login_dataModelObj;
 use zovye\model\orderModelObj;
 use zovye\model\userModelObj;
-use zovye\Order;
-use zovye\Principal;
 use zovye\Request;
 use zovye\Schema;
-use zovye\User;
-use zovye\Util;
-use zovye\We7;
+use zovye\util\Cache;
+use zovye\util\CacheUtil;
+use zovye\util\DBUtil;
+use zovye\util\DeviceUtil;
+use zovye\util\Util;
 use function zovye\err;
 use function zovye\error;
 use function zovye\is_error;
@@ -1308,7 +1306,7 @@ class agent
             'name' => $user->getName(),
         ];
 
-        if (\zovye\Maintenance::create($data) && $device->save()) {
+        if (\zovye\domain\Maintenance::create($data) && $device->save()) {
             $device->remove('lastErrorData');
 
             return [
@@ -1532,7 +1530,7 @@ class agent
                         function () use ($user_id) {
                             $user = agent::getUserByGUID($user_id);
                             if ($user) {
-                                return \zovye\Agent::remove($user);
+                                return \zovye\domain\Agent::remove($user);
                             }
 
                             return err('找不到个代理商！');
@@ -1561,11 +1559,11 @@ class agent
                 $agent = $agent->getPartnerAgent();
             }
 
-            $agent_ids = \zovye\Agent::getAllSubordinates($agent);
+            $agent_ids = \zovye\domain\Agent::getAllSubordinates($agent);
 
             $result = [];
             if (!empty($agent_ids)) {
-                $query = \zovye\Agent::query();
+                $query = \zovye\domain\Agent::query();
                 $keyword = Request::trim('keyword');
 
                 $query->where('id IN('.implode(',', $agent_ids).')');

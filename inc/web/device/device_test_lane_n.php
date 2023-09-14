@@ -6,6 +6,9 @@
  
 namespace zovye;
 
+use zovye\domain\Device;
+use zovye\util\DeviceUtil;
+
 defined('IN_IA') or exit('Access Denied');
 
 $device = Device::get(Request::int('id'));

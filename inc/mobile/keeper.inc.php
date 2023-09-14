@@ -6,6 +6,9 @@
 
 namespace zovye;
 
+use zovye\domain\Keeper;
+use zovye\domain\User;
+
 defined('IN_IA') or exit('Access Denied');
 
 //用户参数

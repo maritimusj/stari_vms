@@ -6,6 +6,9 @@
 
 namespace zovye;
 
+use zovye\util\TemplateUtil;
+use zovye\util\Util;
+
 defined('IN_IA') or exit('Access Denied');
 
 $api_url1 = Util::murl('util', ['op' => 'upload_pic']);

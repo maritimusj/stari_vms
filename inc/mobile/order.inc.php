@@ -8,6 +8,10 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\domain\Device;
+use zovye\domain\Goods;
+use zovye\domain\Order;
+use zovye\domain\User;
 use zovye\model\orderModelObj;
 use zovye\model\pay_logsModelObj;
 

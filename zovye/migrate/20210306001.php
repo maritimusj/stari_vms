@@ -4,6 +4,8 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\domain\Agent;
+use zovye\domain\GSP;
 use zovye\model\agentModelObj;
 
 $tb_name = APP_NAME;

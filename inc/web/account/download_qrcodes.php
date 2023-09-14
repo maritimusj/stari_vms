@@ -20,6 +20,9 @@ $num = Request::int('num', 10);
 
 //简单的二维码导出功能
 use ZipArchive;
+use zovye\business\FlashEgg;
+use zovye\util\QRCodeUtil;
+use zovye\util\Util;
 
 $attach_prefix = ATTACHMENT_ROOT;
 

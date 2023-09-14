@@ -6,6 +6,11 @@
 
 namespace zovye;
 
+use zovye\business\FlashEgg;
+use zovye\domain\Agent;
+use zovye\domain\Goods;
+use zovye\util\Util;
+
 defined('IN_IA') or exit('Access Denied');
 
 $agent_id = Request::int('agent_id');

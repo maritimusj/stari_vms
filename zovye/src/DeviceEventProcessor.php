@@ -6,6 +6,14 @@
 
 namespace zovye;
 
+use zovye\business\Charging;
+use zovye\business\Fueling;
+use zovye\domain\Device;
+use zovye\domain\DeviceEvents;
+use zovye\domain\Order;
+use zovye\util\QRCodeUtil;
+use zovye\util\Util;
+
 class DeviceEventProcessor
 {
     const EVENT_V0_PING = 'ping';

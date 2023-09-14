@@ -6,8 +6,8 @@
 
 namespace zovye\api\wx;
 
-use zovye\Device;
-use zovye\Group as ZovyeGroup;
+use zovye\domain\Device;
+use zovye\domain\Group as ZovyeGroup;
 use zovye\model\device_groupsModelObj;
 use zovye\Request;
 use function zovye\err;

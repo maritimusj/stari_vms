@@ -6,12 +6,16 @@ use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Exception;
-use zovye\base\modelObj;
+use zovye\base\ModelObj;
+use zovye\domain\Balance;
+use zovye\domain\CommissionBalance;
+use zovye\domain\Order;
 use zovye\model\accountModelObj;
 use zovye\model\agentModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\goodsModelObj;
 use zovye\model\userModelObj;
+use zovye\util\OrderCounter;
 
 class Statistics
 {
@@ -182,7 +186,7 @@ class Statistics
         return $result;
     }
 
-    public static function monthData(modelObj $obj, $month = '', $day = 0): array
+    public static function monthData(ModelObj $obj, $month = '', $day = 0): array
     {
         $fn = function (DateTimeInterface $begin, $w = 'day') use ($obj) {
             $result = [];

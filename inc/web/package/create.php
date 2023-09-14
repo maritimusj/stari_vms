@@ -9,6 +9,11 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 use RuntimeException;
+use zovye\domain\Device;
+use zovye\domain\Goods;
+use zovye\domain\Package;
+use zovye\domain\PackageGoods;
+use zovye\util\DBUtil;
 
 $device_id = Request::int('deviceId');
 if ($device_id) {

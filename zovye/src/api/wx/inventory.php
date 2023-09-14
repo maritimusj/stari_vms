@@ -6,7 +6,7 @@
 
 namespace zovye\api\wx;
 
-use zovye\Goods;
+use zovye\domain\Goods;
 use zovye\model\inventory_goodsModelObj;
 use zovye\model\inventory_logModelObj;
 use zovye\Request;
@@ -18,7 +18,7 @@ class inventory
     {
         $user = common::getAgentOrPartner();
 
-        $inventory = \zovye\Inventory::for($user);
+        $inventory = \zovye\domain\Inventory::for($user);
         if (empty($inventory)) {
             return err('无法打开该用户的库存数据！');
         }
@@ -58,7 +58,7 @@ class inventory
     {
         $user = common::getAgentOrPartner();
 
-        $inventory = \zovye\Inventory::for($user);
+        $inventory = \zovye\domain\Inventory::for($user);
         if (empty($inventory)) {
             return err('无法打开该用户的库存数据！');
         }

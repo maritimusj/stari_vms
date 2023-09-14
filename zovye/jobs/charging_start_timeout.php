@@ -9,15 +9,14 @@ namespace zovye\job\chargingTimeout;
 
 defined('IN_IA') or exit('Access Denied');
 
-use zovye\Charging;
+use zovye\business\Charging;
 use zovye\CtrlServ;
-use zovye\Device;
+use zovye\domain\Device;
+use zovye\domain\Order;
 use zovye\Job;
 use zovye\JobException;
 use zovye\Log;
-
 use zovye\model\orderModelObj;
-use zovye\Order;
 use zovye\Pay;
 use zovye\Request;
 

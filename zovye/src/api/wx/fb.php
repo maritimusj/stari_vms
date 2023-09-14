@@ -7,16 +7,15 @@
 namespace zovye\api\wx;
 
 use Exception;
-use zovye\Device;
-use zovye\DeviceFeedback;
+use zovye\domain\Device;
+use zovye\domain\DeviceFeedback;
+use zovye\domain\LoginData;
+use zovye\domain\User;
 use zovye\Log;
 use zovye\Request;
-use zovye\LoginData;
-use zovye\User;
 use zovye\We7;
 use function zovye\err;
 use function zovye\is_error;
-use function zovye\m;
 
 class fb
 {

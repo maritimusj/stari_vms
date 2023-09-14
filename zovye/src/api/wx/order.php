@@ -8,15 +8,15 @@ namespace zovye\api\wx;
 
 use DateTime;
 use zovye\App;
-use zovye\Balance;
-use zovye\ChargingNowData;
-use zovye\Device;
-use zovye\Goods;
+use zovye\business\ChargingNowData;
+use zovye\domain\Balance;
+use zovye\domain\Device;
+use zovye\domain\Goods;
+use zovye\domain\User;
 use zovye\Helper;
-use zovye\Request;
 use zovye\model\orderModelObj;
-use zovye\User;
-use zovye\Util;
+use zovye\Request;
+use zovye\util\Util;
 use function zovye\err;
 use function zovye\is_error;
 
@@ -25,7 +25,7 @@ class order
     public static function detail(): array
     {
         $order_id = Request::int('orderid');
-        $order = \zovye\Order::get($order_id);
+        $order = \zovye\domain\Order::get($order_id);
         if (empty($order)) {
             return err('找不到这个订单!');
         }
@@ -98,7 +98,7 @@ class order
 
         $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
 
-        $query = \zovye\Order::query(['agent_id' => $agent->getId()]);
+        $query = \zovye\domain\Order::query(['agent_id' => $agent->getId()]);
 
         if (Request::has('deviceid')) {
             $device_id = Request::int('deviceid');
@@ -145,16 +145,16 @@ class order
         if ($way == 'free') {
             if (App::isBalanceEnabled() && Balance::isFreeOrder()) {
                 $query->where([
-                    'src' => [\zovye\Order::ACCOUNT, \zovye\Order::FREE, \zovye\Order::BALANCE],
+                    'src' => [\zovye\domain\Order::ACCOUNT, \zovye\domain\Order::FREE, \zovye\domain\Order::BALANCE],
                 ]);
             } else {
-                $query->where(['src' => [\zovye\Order::ACCOUNT, \zovye\Order::FREE]]);
+                $query->where(['src' => [\zovye\domain\Order::ACCOUNT, \zovye\domain\Order::FREE]]);
             }
         } elseif ($way == 'pay') {
             if (App::isBalanceEnabled() && Balance::isPayOrder()) {
-                $query->where(['src' => [\zovye\Order::PAY, \zovye\Order::BALANCE]]);
+                $query->where(['src' => [\zovye\domain\Order::PAY, \zovye\domain\Order::BALANCE]]);
             } else {
-                $query->where(['src' => \zovye\Order::PAY]);
+                $query->where(['src' => \zovye\domain\Order::PAY]);
             }
         } elseif ($way == 'refund') {
             $query->where(['refund' => 1]);
@@ -306,7 +306,7 @@ class order
 
     public static function getOrderExportHeaders(): array
     {
-        $headers = \zovye\Order::getExportHeaders();
+        $headers = \zovye\domain\Order::getExportHeaders();
         unset($headers['ID']);
 
         return $headers;
@@ -324,7 +324,7 @@ class order
             'end' => Request::str('end'),
         ];
 
-        $query = \zovye\Order::getExportQuery($params);
+        $query = \zovye\domain\Order::getExportQuery($params);
         if (is_error($query)) {
             return $query;
         }
@@ -347,7 +347,7 @@ class order
 
             if ($step == 'load') {
                 $query = $query->where(['id >' => Request::int('last')])->limit(100)->orderBy('id ASC');
-                $last_id = \zovye\Order::export($full_filename, $query, Request::array('headers'));
+                $last_id = \zovye\domain\Order::export($full_filename, $query, Request::array('headers'));
 
                 return [
                     'num' => 100,

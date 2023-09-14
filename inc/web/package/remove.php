@@ -9,6 +9,8 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 use RuntimeException;
+use zovye\domain\Package;
+use zovye\util\DBUtil;
 
 $result = DBUtil::transactionDo(function () {
     $id = Request::int('id');

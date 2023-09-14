@@ -9,11 +9,11 @@ namespace zovye\job\refund;
 defined('IN_IA') or exit('Access Denied');
 
 use zovye\CtrlServ;
-use zovye\Device;
+use zovye\domain\Device;
+use zovye\domain\Order;
 use zovye\Helper;
 use zovye\JobException;
 use zovye\Log;
-use zovye\Order;
 use zovye\Request;
 use zovye\Wx;
 

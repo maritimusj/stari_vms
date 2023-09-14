@@ -10,6 +10,9 @@ defined('IN_IA') or exit('Access Denied');
 
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
+use zovye\util\TemplateUtil;
+use zovye\util\Util;
+
 /**
  * 抖音页面
  * @param deviceModelObj $device

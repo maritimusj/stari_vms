@@ -10,6 +10,10 @@ defined('IN_IA') or exit('Access Denied');
 
 use Exception;
 use RuntimeException;
+use zovye\business\TKPromoting;
+use zovye\domain\Device;
+use zovye\domain\Order;
+use zovye\domain\User;
 
 $app_id = Request::header('HTTP_X_APP_ID');
 $ts = Request::header('HTTP_X_TIMESTAMP');

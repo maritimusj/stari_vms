@@ -10,9 +10,10 @@ use DateTimeInterface;
 use ReflectionException;
 use ReflectionFunction;
 use ReflectionMethod;
-use zovye\base\model;
-use zovye\base\modelFactory;
-use zovye\base\modelObj;
+use zovye\base\ClassLoader;
+use zovye\base\Model;
+use zovye\base\ModelFactory;
+use zovye\base\ModelObj;
 
 /**
  * 返回全局唯一的APP
@@ -31,13 +32,13 @@ function app(): WeApp
 /**
  * 加载指定的数据模型类
  * @param string $name
- * @return modelFactory
+ * @return ModelFactory
  */
-function m(string $name): modelFactory
+function m(string $name): ModelFactory
 {
     static $loader = null;
     if (empty($loader)) {
-        $loader = new model();
+        $loader = new Model();
     }
 
     if (empty($name)) {
@@ -385,7 +386,7 @@ function hashFN(callable $fn, ...$val): string
         foreach ($val as $v) {
             if ($v instanceof DateTimeInterface) {
                 $data[] = 'datetime:'.$v->getTimestamp();
-            } elseif ($v instanceof modelObj) {
+            } elseif ($v instanceof ModelObj) {
                 $data[] = get_class($v).':'.$v->getId();
             } elseif (is_scalar($v)) {
                 $data[] = strval($v);

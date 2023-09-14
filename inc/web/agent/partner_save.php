@@ -6,6 +6,11 @@
  
 namespace zovye;
 
+use zovye\domain\Agent;
+use zovye\domain\User;
+use zovye\util\DBUtil;
+use zovye\util\Util;
+
 defined('IN_IA') or exit('Access Denied');
 
 $from = Request::str('from') ?: 'partnerAdd';

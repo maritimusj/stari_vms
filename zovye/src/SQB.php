@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+use zovye\util\Util;
+
 class SQB
 {
     const RESPONSE = 'success';

@@ -9,6 +9,7 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 use DateTime;
+use zovye\domain\User;
 
 $user = User::get(Request::int('id'));
 $year = Request::str('year', (new DateTime())->format('Y'));

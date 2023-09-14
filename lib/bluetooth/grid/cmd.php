@@ -6,7 +6,7 @@
 
 namespace bluetooth\grid;
 
-use zovye\Contract\bluetooth\ICmd;
+use zovye\contract\bluetooth\ICmd;
 
 abstract class cmd implements ICmd
 {

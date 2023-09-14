@@ -6,6 +6,10 @@
 
 namespace zovye;
 
+use zovye\domain\Device;
+use zovye\domain\Goods;
+use zovye\util\Util;
+
 defined('IN_IA') or exit('Access Denied');
 
 $user = Session::getCurrentUser();

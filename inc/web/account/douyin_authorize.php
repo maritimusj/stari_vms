@@ -6,6 +6,11 @@
 
 namespace zovye;
 
+use zovye\business\DouYin;
+use zovye\domain\Account;
+use zovye\util\QRCodeUtil;
+use zovye\util\Util;
+
 defined('IN_IA') or exit('Access Denied');
 
 $id = Request::int('id');

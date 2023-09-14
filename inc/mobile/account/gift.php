@@ -6,6 +6,9 @@
 
 namespace zovye;
 
+use zovye\business\FlashEgg;
+use zovye\domain\Device;
+
 defined('IN_IA') or exit('Access Denied');
 
 if (!App::isFlashEggEnabled()) {

@@ -6,10 +6,10 @@
 
 namespace zovye\model;
 
-use zovye\Account;
-use zovye\base\modelObj;
+use zovye\base\ModelObj;
+use zovye\domain\Account;
+use zovye\domain\User;
 use zovye\traits\ExtraDataGettersAndSetters;
-use zovye\User;
 use function zovye\tb;
 
 /**
@@ -19,7 +19,7 @@ use function zovye\tb;
  * @method getState()
  * @method setS1(int $INIT)
  */
-class task_vwModelObj extends modelObj
+class task_vwModelObj extends ModelObj
 {
     public static function getTableName($read_or_write): string
     {

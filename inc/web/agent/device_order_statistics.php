@@ -10,6 +10,8 @@ defined('IN_IA') or exit('Access Denied');
 
 use DateTimeImmutable;
 use Exception;
+use zovye\domain\Agent;
+use zovye\domain\Device;
 use zovye\model\deviceModelObj;
 
 $agent_id = Request::int('id');

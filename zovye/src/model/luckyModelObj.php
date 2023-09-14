@@ -5,10 +5,10 @@
  */
 namespace zovye\model;
 
-use zovye\Agent;
-use zovye\base\modelObj;
+use zovye\base\ModelObj;
+use zovye\domain\Agent;
 use zovye\traits\ExtraDataGettersAndSetters;
-use zovye\Util;
+use zovye\util\Util;
 use function zovye\tb;
 
 /**
@@ -19,7 +19,7 @@ use function zovye\tb;
  * @method setDescription(mixed $description)
  * @method setImage(mixed $image)
  */
-class luckyModelObj extends modelObj
+class luckyModelObj extends ModelObj
 {
     public static function getTableName($read_or_write): string
     {

@@ -6,7 +6,7 @@
 
 namespace zovye\model;
 
-use zovye\base\modelObj;
+use zovye\base\ModelObj;
 use function zovye\tb;
 
 /**
@@ -17,7 +17,7 @@ use function zovye\tb;
  * @method setUsedTime($time)
  * @method getCode()
  */
-class goods_voucher_logsModelObj extends modelObj
+class goods_voucher_logsModelObj extends ModelObj
 {
     /** @var int */
     protected $id;

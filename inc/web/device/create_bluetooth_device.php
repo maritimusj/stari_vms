@@ -6,6 +6,11 @@
 
 namespace zovye;
 
+use zovye\domain\Agent;
+use zovye\domain\Device;
+use zovye\domain\DeviceTypes;
+use zovye\domain\Locker;
+
 defined('IN_IA') or exit('Access Denied');
 
 $data = [

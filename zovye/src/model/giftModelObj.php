@@ -5,11 +5,11 @@
  */
 namespace zovye\model;
 
-use zovye\Agent;
-use zovye\base\modelObj;
-use zovye\Goods;
+use zovye\base\ModelObj;
+use zovye\domain\Agent;
+use zovye\domain\Goods;
 use zovye\traits\ExtraDataGettersAndSetters;
-use zovye\Util;
+use zovye\util\Util;
 use function zovye\tb;
 
 /**
@@ -20,7 +20,7 @@ use function zovye\tb;
  * @method bool isEnabled()
  * @method setEnabled(mixed $enabled)
  */
-class giftModelObj extends modelObj
+class giftModelObj extends ModelObj
 {
     public static function getTableName($read_or_write): string
     {

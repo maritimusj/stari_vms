@@ -8,42 +8,42 @@
 namespace zovye\model;
 
 use Exception;
-use zovye\Account;
-use zovye\AdStats;
-use zovye\Advertising;
-use zovye\Agent;
 use zovye\App;
-use zovye\Balance;
-use zovye\base\modelObj;
-use zovye\base\modelObjFinder;
+use zovye\base\ModelObj;
+use zovye\base\ModelObjFinder;
 use zovye\BlueToothProtocol;
-use zovye\Contract\bluetooth\IBlueToothProtocol;
+use zovye\contract\bluetooth\IBlueToothProtocol;
 use zovye\CtrlServ;
-use zovye\Device;
-use zovye\DeviceEvents;
 use zovye\DeviceLocker;
-use zovye\DeviceLogs;
-use zovye\DeviceTypes;
-use zovye\DeviceUtil;
-use zovye\Goods;
-use zovye\Group;
+use zovye\domain\Account;
+use zovye\domain\AdStats;
+use zovye\domain\Advertising;
+use zovye\domain\Agent;
+use zovye\domain\Balance;
+use zovye\domain\Device;
+use zovye\domain\DeviceEvents;
+use zovye\domain\DeviceLogs;
+use zovye\domain\DeviceTypes;
+use zovye\domain\Goods;
+use zovye\domain\Group;
+use zovye\domain\Keeper;
+use zovye\domain\Locker;
+use zovye\domain\Maintenance;
+use zovye\domain\Order;
+use zovye\domain\Package;
+use zovye\domain\PayloadLogs;
+use zovye\domain\Tags;
+use zovye\domain\User;
 use zovye\Helper;
 use zovye\Job;
-use zovye\Keeper;
-use zovye\Locker;
-use zovye\Maintenance;
-use zovye\Order;
-use zovye\Package;
 use zovye\Pay;
-use zovye\PayloadLogs;
-use zovye\PlaceHolder;
-use zovye\QRCodeUtil;
 use zovye\SIM;
 use zovye\Stats;
-use zovye\Tags;
 use zovye\Topic;
-use zovye\User;
-use zovye\Util;
+use zovye\util\DeviceUtil;
+use zovye\util\PlaceHolder;
+use zovye\util\QRCodeUtil;
+use zovye\util\Util;
 use zovye\We7;
 use function zovye\err;
 use function zovye\error;
@@ -86,7 +86,7 @@ use function zovye\tb;
  * @method setS2(int $param)
  * @method getS2()
  */
-class deviceModelObj extends modelObj
+class deviceModelObj extends ModelObj
 {
     /** @var int */
     protected $id;
@@ -1029,7 +1029,7 @@ class deviceModelObj extends modelObj
     public function resetLock(): bool
     {
         if (We7::pdo_update(
-            self::getTableName(modelObj::OP_WRITE),
+            self::getTableName(ModelObj::OP_WRITE),
             [OBJ_LOCKED_UID => UNLOCKED],
             ['id' => $this->getId()]
         )) {
@@ -1334,7 +1334,7 @@ class deviceModelObj extends modelObj
         $uid = strval($uid) ?: Util::random(6);
         $uid = "$uid:".time();
         $res = We7::pdo_update(
-            self::getTableName(modelObj::OP_WRITE),
+            self::getTableName(ModelObj::OP_WRITE),
             [OBJ_LOCKED_UID => $uid],
             ['id' => $this->getId(), OBJ_LOCKED_UID => UNLOCKED]
         );
@@ -1356,7 +1356,7 @@ class deviceModelObj extends modelObj
     {
         if ($uid) {
             return We7::pdo_update(
-                self::getTableName(modelObj::OP_WRITE),
+                self::getTableName(ModelObj::OP_WRITE),
                 [OBJ_LOCKED_UID => UNLOCKED],
                 ['id' => $this->getId(), OBJ_LOCKED_UID => $uid]
             );
@@ -2833,17 +2833,17 @@ class deviceModelObj extends modelObj
         return $this->save();
     }
 
-    public function payloadQuery($cond = []): modelObjFinder
+    public function payloadQuery($cond = []): ModelObjFinder
     {
         return PayloadLogs::query(['device_id' => $this->getId()])->where($cond);
     }
 
-    public function logQuery($cond = []): modelObjFinder
+    public function logQuery($cond = []): ModelObjFinder
     {
         return DeviceLogs::query(['title' => $this->getImei()])->where($cond);
     }
 
-    public function eventQuery($cond = []): modelObjFinder
+    public function eventQuery($cond = []): ModelObjFinder
     {
         return DeviceEvents::query(['device_uid' => $this->getUid()])->where($cond);
     }

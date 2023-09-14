@@ -27,7 +27,7 @@ class article
 
         $id = Request::int('id');
         /** @var articleModelObj $article */
-        $article = \zovye\Article::findOne(['id' => $id]);
+        $article = \zovye\domain\Article::findOne(['id' => $id]);
         if ($article) {
             $article->setTotal(intval($article->getTotal()) + 1);
             $article->save();
@@ -55,7 +55,7 @@ class article
         $page = max(1, Request::int('page'));
         $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
 
-        $query = \zovye\Article::query(['type' => 'article']);
+        $query = \zovye\domain\Article::query(['type' => 'article']);
         $total = $query->count();
 
         $result = [
@@ -137,7 +137,7 @@ class article
         $page = max(1, Request::int('page'));
         $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
 
-        $query = \zovye\Article::query(['type' => 'faq']);
+        $query = \zovye\domain\Article::query(['type' => 'faq']);
         $total = $query->count();
 
         $result = [

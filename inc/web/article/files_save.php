@@ -9,6 +9,7 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 use zovye\model\filesModelObj;
+use zovye\util\Util;
 
 $id = Request::int('id');
 if ($id) {

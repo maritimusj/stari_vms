@@ -6,17 +6,17 @@
 
 namespace zovye\model;
 
-use zovye\Account;
-use zovye\Agent;
 use zovye\App;
-use zovye\Balance;
-use zovye\base\modelObj;
-use zovye\Device;
-use zovye\Goods;
-use zovye\LocationUtil;
-use zovye\Order;
+use zovye\base\ModelObj;
+use zovye\domain\Account;
+use zovye\domain\Agent;
+use zovye\domain\Balance;
+use zovye\domain\Device;
+use zovye\domain\Goods;
+use zovye\domain\Order;
+use zovye\domain\User;
 use zovye\traits\ExtraDataGettersAndSetters;
-use zovye\User;
+use zovye\util\LocationUtil;
 use function zovye\is_error;
 use function zovye\tb;
 
@@ -46,7 +46,7 @@ use function zovye\tb;
  * @method setSrc(int $CHARGING)
  * @method setNum(int $amount)
  */
-class orderModelObj extends modelObj
+class orderModelObj extends ModelObj
 {
     /** @var int */
     protected $id;

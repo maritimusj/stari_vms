@@ -6,7 +6,7 @@
 
 namespace zovye\model;
 
-use zovye\base\modelObj;
+use zovye\base\ModelObj;
 use zovye\Wx;
 use function zovye\tb;
 
@@ -21,7 +21,7 @@ use function zovye\tb;
  * @method setState($state)
  * @method getCreatetime()
  */
-class agent_appModelObj extends modelObj
+class agent_appModelObj extends ModelObj
 {
     /** @var int */
     protected $id;

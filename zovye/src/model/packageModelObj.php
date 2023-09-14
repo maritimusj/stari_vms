@@ -6,9 +6,9 @@
 
 namespace zovye\model;
 
-use zovye\base\modelObj;
-use zovye\PackageGoods;
-use zovye\Util;
+use zovye\base\ModelObj;
+use zovye\domain\PackageGoods;
+use zovye\util\Util;
 use function zovye\tb;
 
 /**
@@ -16,7 +16,7 @@ use function zovye\tb;
  * @method getPrice()
  * @method setDeviceId($id)
  */
-class packageModelObj extends modelObj
+class packageModelObj extends ModelObj
 {
     public static function getTableName($read_or_write): string
     {

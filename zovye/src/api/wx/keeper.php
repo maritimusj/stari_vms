@@ -11,36 +11,34 @@ use DateTime;
 use DateTimeImmutable;
 use Exception;
 use zovye\App;
-use zovye\CommissionBalance;
+use zovye\business\GDCVMachine;
 use zovye\Config;
-use zovye\DBUtil;
-use zovye\Device;
-use zovye\DeviceUtil;
-use zovye\GDCVMachine;
-use zovye\GoodsExpireAlert;
+use zovye\domain\CommissionBalance;
+use zovye\domain\Device;
+use zovye\domain\Goods;
+use zovye\domain\Group as ZovyeGroup;
+use zovye\domain\Inventory;
+use zovye\domain\Locker;
+use zovye\domain\LoginData;
+use zovye\domain\Order;
+use zovye\domain\Replenish;
+use zovye\domain\User;
 use zovye\Helper;
-use zovye\Inventory;
-use zovye\Locker;
+use zovye\JSON;
 use zovye\Log;
 use zovye\model\deviceModelObj;
-use zovye\Goods;
-use zovye\Group as ZovyeGroup;
-use zovye\Order;
-use zovye\Replenish;
-use zovye\Request;
-use zovye\JSON;
 use zovye\model\keeperModelObj;
-use zovye\LoginData;
 use zovye\model\replenishModelObj;
+use zovye\Request;
 use zovye\Stats;
-use zovye\User;
-use zovye\Util;
+use zovye\util\DBUtil;
+use zovye\util\DeviceUtil;
+use zovye\util\Util;
 use zovye\We7;
 use function zovye\err;
 use function zovye\error;
-use function zovye\request;
 use function zovye\is_error;
-use function zovye\m;
+use function zovye\request;
 use function zovye\settings;
 
 class keeper
@@ -52,7 +50,7 @@ class keeper
     public static function getKeeper(): keeperModelObj
     {
         $user = common::getUser();
-        if (!\zovye\Keeper::exists($user)) {
+        if (!\zovye\domain\Keeper::exists($user)) {
             JSON::fail(['msg' => '不是运营人员！']);
         }
 
@@ -112,7 +110,7 @@ class keeper
             JSON::fail(['msg' => "手机号码{$mobile}还没有绑定用户，请立即绑定！", 'url' => $url]);
         }
 
-        $query = \zovye\Keeper::query(['mobile' => $mobile]);
+        $query = \zovye\domain\Keeper::query(['mobile' => $mobile]);
         if (empty($query->count())) {
             return err("手机号码{$mobile}没有对应的运营人员信息！");
         }
@@ -199,11 +197,11 @@ class keeper
         }
 
         if ($id) {
-            if (\zovye\Keeper::findOne(['mobile' => $mobile, 'id <>' => $id])) {
+            if (\zovye\domain\Keeper::findOne(['mobile' => $mobile, 'id <>' => $id])) {
                 return err('手机号码已经被其它运营人员使用！');
             }
             /** @var keeperModelObj $keeper */
-            $keeper = \zovye\Keeper::findOne(['id' => $id, 'agent_id' => $user->getAgentId()]);
+            $keeper = \zovye\domain\Keeper::findOne(['id' => $id, 'agent_id' => $user->getAgentId()]);
             if ($keeper) {
                 if ($name != $keeper->getName()) {
                     $keeper->setName($name);
@@ -213,11 +211,11 @@ class keeper
                 }
             }
         } else {
-            if (\zovye\Keeper::findOne(['mobile' => $mobile])) {
+            if (\zovye\domain\Keeper::findOne(['mobile' => $mobile])) {
                 return err('手机号码已经被其它运营人员使用！');
             }
             /** @var keeperModelObj $keeper */
-            $keeper = \zovye\Keeper::create([
+            $keeper = \zovye\domain\Keeper::create([
                 'agent_id' => $user->getAgentId(),
                 'name' => $name,
                 'mobile' => $mobile,
@@ -254,7 +252,7 @@ class keeper
             $id = Request::int('id');
 
             /** @var keeperModelObj $keeper */
-            $keeper = \zovye\Keeper::findOne(['id' => $id, 'agent_id' => $user->getAgentId()]);
+            $keeper = \zovye\domain\Keeper::findOne(['id' => $id, 'agent_id' => $user->getAgentId()]);
             if (empty($keeper)) {
                 return err('找不到这个运营人员！');
             }
@@ -305,7 +303,7 @@ class keeper
         }
 
         $keepers = [];
-        $query = \zovye\Keeper::query(['agent_id' => $agent->getAgentId()]);
+        $query = \zovye\domain\Keeper::query(['agent_id' => $agent->getAgentId()]);
 
         if (Request::has('keyword')) {
             $keyword = Request::trim('keyword');
@@ -345,7 +343,7 @@ class keeper
         return DBUtil::transactionDo(function () use ($user) {
             $keeper_id = Request::int('keeperid');
 
-            $keeper = \zovye\Keeper::get($keeper_id);
+            $keeper = \zovye\domain\Keeper::get($keeper_id);
             if (empty($keeper) || $keeper->getAgentId() != $user->getAgentId()) {
                 return err('找不到这个运营人员！');
             }
@@ -438,7 +436,7 @@ class keeper
             $kind = Request::int('kind', -1);
 
             $keeper_id = Request::int('keeperid');
-            $keeper = \zovye\Keeper::get($keeper_id);
+            $keeper = \zovye\domain\Keeper::get($keeper_id);
             if (empty($keeper) || $keeper->getAgentId() != $user->getAgentId()) {
                 return err('找不到这个运营人员！');
             }
@@ -619,11 +617,11 @@ class keeper
             $remainWarning = settings('device.remainWarning', 0);
         }
 
-        $lowQuery = Device::keeper($keeper, \zovye\Keeper::OP)->where(
+        $lowQuery = Device::keeper($keeper, \zovye\domain\Keeper::OP)->where(
             ['agent_id' => $keeper->getAgentId(), 'remain <' => $remainWarning]
         );
 
-        $errorQuery = Device::keeper($keeper, \zovye\Keeper::OP)->where(
+        $errorQuery = Device::keeper($keeper, \zovye\domain\Keeper::OP)->where(
             ['agent_id' => $keeper->getAgentId(), 'error_code <>' => 0]
         );
 
@@ -743,7 +741,7 @@ class keeper
         $page = max(1, Request::int('page'));
         $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
 
-        $query = Device::keeper($keeper, \zovye\Keeper::OP)->where(['remain <' => $remainWarning]);
+        $query = Device::keeper($keeper, \zovye\domain\Keeper::OP)->where(['remain <' => $remainWarning]);
         $query->where(['agent_id' => $keeper->getAgentId()]);
 
         $total = $query->count();
@@ -790,7 +788,7 @@ class keeper
         $page = max(1, Request::int('page'));
         $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
 
-        $query = Device::keeper($keeper, \zovye\Keeper::OP)->where(['error_code <>' => 0]);
+        $query = Device::keeper($keeper, \zovye\domain\Keeper::OP)->where(['error_code <>' => 0]);
         $query->where(['agent_id' => $keeper->getAgentId()]);
 
         $total = $query->count();
@@ -932,7 +930,7 @@ class keeper
 
         if ($device->getAgentId() != $keeper->getAgentId() ||
             !$device->hasKeeper($keeper) ||
-            $device->getKeeperKind($keeper) != \zovye\Keeper::OP) {
+            $device->getKeeperKind($keeper) != \zovye\domain\Keeper::OP) {
             return err('没有权限执行这个操作！');
         }
 
@@ -951,7 +949,7 @@ class keeper
         };
 
         list($v, $way, $is_percent) = $keeper->getCommissionValue($device);
-        if ($way == \zovye\Keeper::COMMISSION_RELOAD) {
+        if ($way == \zovye\domain\Keeper::COMMISSION_RELOAD) {
             if ($is_percent) {
                 $commission_price_calc = function ($num, $goods_id) use ($v) {
                     $goods = Goods::get($goods_id);
@@ -1044,7 +1042,7 @@ class keeper
                 $total = 0;
                 foreach ($result as $entry) {
                     //创建补货记录
-                    \zovye\Keeper::createReplenish(
+                    \zovye\domain\Keeper::createReplenish(
                         $keeper,
                         $device,
                         $entry['goodsId'],
@@ -1105,7 +1103,7 @@ class keeper
 
         if ($device->getAgentId() != $keeper->getAgentId() ||
             !$device->hasKeeper($keeper) ||
-            $device->getKeeperKind($keeper) != \zovye\Keeper::OP) {
+            $device->getKeeperKind($keeper) != \zovye\domain\Keeper::OP) {
             return err('没有权限！');
         }
 
@@ -1263,7 +1261,7 @@ class keeper
         $id = Request::int('id');
         if ($id) {
             /** @var keeperModelObj $keeper */
-            $keeper = \zovye\Keeper::get($id);
+            $keeper = \zovye\domain\Keeper::get($id);
             if (empty($keeper)) {
                 return err('找不到这个运营人员！');
             }
@@ -1295,7 +1293,7 @@ class keeper
         }
 
         $device = $order->getDevice();
-        if (empty($device) || !$device->hasKeeper($keeper) || $device->getKeeperKind($keeper) != \zovye\Keeper::OP) {
+        if (empty($device) || !$device->hasKeeper($keeper) || $device->getKeeperKind($keeper) != \zovye\domain\Keeper::OP) {
             return err('没有权限管理这个订单！');
         }
 

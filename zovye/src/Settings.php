@@ -6,7 +6,7 @@
 
 namespace zovye;
 
-use zovye\Contract\ISettings;
+use zovye\contract\ISettings;
 use function unserialize;
 
 class Settings implements ISettings

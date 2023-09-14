@@ -7,6 +7,7 @@
 namespace zovye;
 
 use Exception;
+use zovye\util\Util;
 
 //定义常量REQUEST_ID
 define('REQUEST_ID', Util::generateUID());

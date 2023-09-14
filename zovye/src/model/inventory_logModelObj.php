@@ -6,16 +6,16 @@
 
 namespace zovye\model;
 
-use zovye\base\modelObj;
-use zovye\Goods;
-use zovye\Inventory;
+use zovye\base\ModelObj;
+use zovye\domain\Goods;
+use zovye\domain\Inventory;
 use zovye\traits\ExtraDataGettersAndSetters;
 use function zovye\tb;
 
 /**
  * @method getNum()
  */
-class inventory_logModelObj extends modelObj
+class inventory_logModelObj extends ModelObj
 {
     public static function getTableName($read_or_write): string
     {

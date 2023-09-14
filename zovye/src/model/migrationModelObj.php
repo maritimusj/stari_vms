@@ -6,13 +6,13 @@
 
 namespace zovye\model;
 
-use zovye\base\modelObj;
+use zovye\base\ModelObj;
 use function zovye\tb;
 
 /**
  * @method string getName()
  */
-class migrationModelObj extends modelObj
+class migrationModelObj extends ModelObj
 {
     public static function getTableName($read_or_write): string
     {

@@ -9,7 +9,10 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 //分配设备控件查询代理详情
+use zovye\domain\Agent;
+use zovye\domain\Principal;
 use zovye\model\agent_vwModelObj;
+use zovye\util\Util;
 
 if (Request::is_ajax() && Request::has('id')) {
     $agent = Agent::get(Request::int('id'));

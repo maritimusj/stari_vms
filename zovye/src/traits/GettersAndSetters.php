@@ -6,7 +6,7 @@
 
 namespace zovye\traits;
 
-use zovye\Util;
+use zovye\util\Util;
 use function zovye\toSnakeCase;
 
 trait GettersAndSetters

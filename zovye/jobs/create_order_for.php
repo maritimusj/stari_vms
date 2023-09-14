@@ -11,13 +11,13 @@ defined('IN_IA') or exit('Access Denied');
 //创建订单
 use Exception;
 use zovye\CtrlServ;
+use zovye\domain\Locker;
+use zovye\domain\Order;
 use zovye\EventBus;
 use zovye\Helper;
 use zovye\Job;
 use zovye\JobException;
-use zovye\Locker;
 use zovye\Log;
-use zovye\Order;
 use zovye\Request;
 use function zovye\err;
 use function zovye\is_error;

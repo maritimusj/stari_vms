@@ -12,9 +12,9 @@ defined('IN_IA') or exit('Access Denied');
 //充值支付结果检查
 
 use zovye\CtrlServ;
+use zovye\domain\Locker;
 use zovye\Job;
 use zovye\JobException;
-use zovye\Locker;
 use zovye\Log;
 use zovye\Pay;
 use zovye\Request;

@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+use zovye\domain\Team;
+
 defined('IN_IA') or exit('Access Denied');
 
 $member_id = Request::int('id');

@@ -6,6 +6,14 @@
 
 namespace zovye;
 
+use zovye\business\DouYin;
+use zovye\domain\Account;
+use zovye\domain\Device;
+use zovye\domain\User;
+use zovye\util\LocationUtil;
+use zovye\util\TemplateUtil;
+use zovye\util\Util;
+
 defined('IN_IA') or exit('Access Denied');
 
 $op = Request::op();

@@ -7,7 +7,7 @@
 
 namespace bluetooth\hlb;
 
-use zovye\Contract\bluetooth\ICmd;
+use zovye\contract\bluetooth\ICmd;
 
 class unlock implements ICmd
 {

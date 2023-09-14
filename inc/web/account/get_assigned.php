@@ -6,6 +6,10 @@
 
 namespace zovye;
 
+use zovye\domain\Account;
+use zovye\domain\Agent;
+use zovye\domain\Device;
+
 defined('IN_IA') or exit('Access Denied');
 
 $result = [

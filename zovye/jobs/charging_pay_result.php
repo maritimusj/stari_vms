@@ -10,13 +10,13 @@ defined('IN_IA') or exit('Access Denied');
 
 //订单支付结果检查
 
-use zovye\Charging as IotCharging;
+use zovye\business\Charging as IotCharging;
 use zovye\CtrlServ;
+use zovye\domain\Locker;
+use zovye\domain\Order;
 use zovye\Job;
 use zovye\JobException;
-use zovye\Locker;
 use zovye\Log;
-use zovye\Order;
 use zovye\Pay;
 use zovye\Request;
 use function zovye\is_error;

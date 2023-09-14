@@ -8,6 +8,10 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\domain\Account;
+use zovye\domain\BalanceLog;
+use zovye\domain\Device;
+use zovye\domain\User;
 use zovye\model\account_queryModelObj;
 
 $tpl_data = [];

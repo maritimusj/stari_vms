@@ -7,9 +7,10 @@
 namespace zovye;
 
 use Exception;
+use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
-use zovye\model\accountModelObj;
+use zovye\util\LocationUtil;
 
 class LocationEventHandler
 {

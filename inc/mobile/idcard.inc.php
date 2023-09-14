@@ -8,7 +8,11 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\domain\Account;
+use zovye\domain\Goods;
 use zovye\model\userModelObj;
+use zovye\util\IDCardUtil;
+use zovye\util\Util;
 
 //确定用户身份
 $user = Session::getCurrentUser();

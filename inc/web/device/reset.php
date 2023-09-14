@@ -9,6 +9,9 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 use RuntimeException;
+use zovye\domain\Device;
+use zovye\util\DBUtil;
+use zovye\util\Util;
 
 $id = Request::int('id');
 $device = Device::get($id);

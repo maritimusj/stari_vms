@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+use zovye\util\Util;
+
 defined('IN_IA') or exit('Access Denied');
 
 $title = Request::trim('title');

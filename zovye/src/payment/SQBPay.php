@@ -7,13 +7,13 @@
 namespace zovye\payment;
 
 use SQB\pay;
-use zovye\Contract\IPay;
+use zovye\contract\IPay;
 use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 use zovye\Request;
 use zovye\Session;
-use zovye\Util;
+use zovye\util\Util;
 use function zovye\_W;
 use function zovye\err;
 use function zovye\error;

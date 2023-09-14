@@ -6,6 +6,11 @@
  
 namespace zovye;
 
+use zovye\domain\Advertising;
+use zovye\domain\Device;
+use zovye\util\TemplateUtil;
+use zovye\util\Util;
+
 defined('IN_IA') or exit('Access Denied');
 
 /**

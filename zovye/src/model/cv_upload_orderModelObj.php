@@ -5,11 +5,11 @@
  */
 namespace zovye\model;
 
-use zovye\base\modelObj;
-use zovye\Order;
+use zovye\base\ModelObj;
+use zovye\domain\Order;
 use function zovye\tb;
 
-class cv_upload_orderModelObj extends modelObj
+class cv_upload_orderModelObj extends ModelObj
 {
     public static function getTableName($read_or_write): string
     {

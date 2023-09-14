@@ -6,7 +6,7 @@
 
 namespace zovye\model;
 
-use zovye\base\modelObj;
+use zovye\base\ModelObj;
 use zovye\traits\ExtraDataGettersAndSetters;
 use function zovye\tb;
 
@@ -15,7 +15,7 @@ use function zovye\tb;
  * @method getNum()
  * @method getGoodsId()
  */
-class payload_logsModelObj extends modelObj
+class payload_logsModelObj extends ModelObj
 {
     public static function getTableName($read_or_write): string
     {

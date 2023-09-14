@@ -6,7 +6,7 @@
 
 namespace zovye\model;
 
-use zovye\base\modelObj;
+use zovye\base\ModelObj;
 use function zovye\tb;
 
 /**
@@ -20,7 +20,7 @@ use function zovye\tb;
  * @method getResult()
  * @method getCreatetime()
  */
-class maintenanceModelObj extends modelObj
+class maintenanceModelObj extends ModelObj
 {
     /** @var int */
     protected $id;

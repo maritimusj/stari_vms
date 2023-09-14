@@ -7,7 +7,15 @@
 namespace zovye;
 
 use Exception;
-use zovye\Contract\IPay;
+use zovye\business\Charging;
+use zovye\business\Fueling;
+use zovye\contract\IPay;
+use zovye\domain\Agent;
+use zovye\domain\Device;
+use zovye\domain\Locker;
+use zovye\domain\Order;
+use zovye\domain\PayLogs;
+use zovye\domain\User;
 use zovye\model\deviceModelObj;
 use zovye\model\pay_logsModelObj;
 use zovye\model\userModelObj;

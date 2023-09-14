@@ -8,6 +8,9 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\domain\Account;
+use zovye\domain\Task;
+use zovye\domain\User;
 use zovye\model\task_vwModelObj;
 
 $tpl_data = [];

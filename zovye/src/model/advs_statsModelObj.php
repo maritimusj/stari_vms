@@ -6,7 +6,7 @@
 
 namespace zovye\model;
 
-use zovye\base\modelObj;
+use zovye\base\ModelObj;
 use zovye\traits\ExtraDataGettersAndSetters;
 use function zovye\tb;
 
@@ -25,7 +25,7 @@ use function zovye\tb;
  * @method setIp($ip)
  * @method getCreatetime()
  */
-class advs_statsModelObj extends modelObj
+class advs_statsModelObj extends ModelObj
 {
     /** @var int */
     protected $id;

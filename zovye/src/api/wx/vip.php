@@ -6,10 +6,10 @@
 
 namespace zovye\api\wx;
 
+use zovye\domain\User;
 use zovye\Helper;
 use zovye\model\vipModelObj;
 use zovye\Request;
-use zovye\User;
 use function zovye\err;
 
 class vip
@@ -23,13 +23,13 @@ class vip
             return err('手机号码格式不正确！');
         }
 
-        if (\zovye\VIP::existsByMobile($agent, $mobile)) {
+        if (\zovye\business\VIP::existsByMobile($agent, $mobile)) {
             return err('该手机号码的用户已经是VIP用户！');
         }
 
         $user = User::findOne(['mobile' => $mobile, 'app' => User::WxAPP]);
         if ($user) {
-            if (\zovye\VIP::exists($agent, $user)) {
+            if (\zovye\business\VIP::exists($agent, $user)) {
                 return err('该用户已经是VIP用户！');
             }
 
@@ -66,17 +66,17 @@ class vip
             if (!$locker) {
                 return err('锁定用户失败，请重试！');
             }
-            if (\zovye\VIP::exists($agent, $user) || \zovye\VIP::existsByMobile($agent, $user->getMobile())) {
+            if (\zovye\business\VIP::exists($agent, $user) || \zovye\business\VIP::existsByMobile($agent, $user->getMobile())) {
                 return err('这个用户已经是VIP用户！');
             }
 
-            if (\zovye\VIP::addUser($agent, $user, $name)) {
+            if (\zovye\business\VIP::addUser($agent, $user, $name)) {
                 return ['msg' => '创建成功！'];
             }
         }
 
         if (isset($mobile)) {
-            if (\zovye\VIP::addMobile($agent, $name, $mobile)) {
+            if (\zovye\business\VIP::addMobile($agent, $name, $mobile)) {
                 return ['msg' => '手机号码添加成功！'];
             }
         }
@@ -88,7 +88,7 @@ class vip
     {
         $agent = common::getAgent();
 
-        $vip = \zovye\VIP::get(Request::int('id'));
+        $vip = \zovye\business\VIP::get(Request::int('id'));
         if (empty($vip)) {
             return err('找不到指定的vip用户！');
         }
@@ -106,7 +106,7 @@ class vip
     {
         $agent = common::getAgent();
 
-        $query = \zovye\VIP::query(['agent_id' => $agent->getId()]);
+        $query = \zovye\business\VIP::query(['agent_id' => $agent->getId()]);
 
         $result = [];
         /** @var vipModelObj $vip */
@@ -126,7 +126,7 @@ class vip
 
             $ids = $vip->getDeviceIds();
             foreach ($ids as $id) {
-                $device = \zovye\Device::get($id);
+                $device = \zovye\domain\Device::get($id);
                 if ($device) {
                     $profile = [
                         'id' => $device->getImei(),
@@ -147,7 +147,7 @@ class vip
     {
         $agent = common::getAgent();
 
-        $vip = \zovye\VIP::get(Request::int('vip'));
+        $vip = \zovye\business\VIP::get(Request::int('vip'));
         if ($vip->getAgentId() != $agent->getId()) {
             return err('没有权限管理这个VIP用户！');
         }
@@ -157,7 +157,7 @@ class vip
         $ids = [];
 
         foreach ($imei_list as $imei) {
-            $device = \zovye\Device::get(strval($imei), true);
+            $device = \zovye\domain\Device::get(strval($imei), true);
             if (empty($device)) {
                 return err('找不到这个设备！');
             }
@@ -181,7 +181,7 @@ class vip
     {
         $agent = common::getAgentOrPartner();
 
-        $device = \zovye\Device::get(Request::str('id'), true);
+        $device = \zovye\domain\Device::get(Request::str('id'), true);
         if (empty($device)) {
             return err('找不到这个设备！');
         }

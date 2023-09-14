@@ -9,6 +9,8 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 use DateTime;
+use zovye\domain\CommissionBalance;
+use zovye\domain\Order;
 use zovye\model\commission_balanceModelObj;
 use zovye\model\orderModelObj;
 

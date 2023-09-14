@@ -6,6 +6,11 @@
 
 namespace zovye;
 
+use zovye\domain\Agent;
+use zovye\domain\GSP;
+use zovye\domain\User;
+use zovye\util\Util;
+
 defined('IN_IA') or exit('Access Denied');
 
 $result_msg = function ($msg, $status) {

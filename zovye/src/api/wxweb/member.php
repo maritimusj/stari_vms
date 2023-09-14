@@ -4,15 +4,15 @@ namespace zovye\api\wxweb;
 
 use zovye\api\wx\common;
 use zovye\App;
-use zovye\CommissionBalance;
-use zovye\DBUtil;
+use zovye\domain\CommissionBalance;
+use zovye\domain\Order;
+use zovye\domain\Team;
+use zovye\domain\User;
 use zovye\model\orderModelObj;
 use zovye\model\team_memberModelObj;
 use zovye\model\teamModelObj;
-use zovye\Order;
 use zovye\Request;
-use zovye\Team;
-use zovye\User;
+use zovye\util\DBUtil;
 use function zovye\err;
 use function zovye\is_error;
 
@@ -255,7 +255,7 @@ class member
                 return err('转帐金额不正确！');
             }
 
-            if ($total + \zovye\Charging::getUnpaidOrderPriceTotal($user) > $user->getCommissionBalance()->total()) {
+            if ($total + \zovye\business\Charging::getUnpaidOrderPriceTotal($user) > $user->getCommissionBalance()->total()) {
                 return err('帐户有效余额不足，请充值再操作！');
             }
 

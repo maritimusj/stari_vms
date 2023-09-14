@@ -4,8 +4,8 @@
 namespace zovye\model;
 
 
-use zovye\base\modelObj;
-use zovye\GSP;
+use zovye\base\ModelObj;
+use zovye\domain\GSP;
 use function zovye\tb;
 
 /**
@@ -13,7 +13,7 @@ use function zovye\tb;
  * @method getVal()
  * @method getValType()
  */
-class gsp_userModelObj extends modelObj
+class gsp_userModelObj extends ModelObj
 {
     /** @var int */
     protected $id;

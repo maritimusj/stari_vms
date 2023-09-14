@@ -6,6 +6,9 @@
  
 namespace zovye;
 
+use zovye\domain\Principal;
+use zovye\domain\User;
+
 defined('IN_IA') or exit('Access Denied');
 
 if (!App::isPromoterEnabled()) {

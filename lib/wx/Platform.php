@@ -7,9 +7,9 @@
 
 namespace wx;
 
-use zovye\HttpUtil;
 use zovye\Log;
-use zovye\Util;
+use zovye\util\HttpUtil;
+use zovye\util\Util;
 use zovye\We7;
 use function zovye\err;
 

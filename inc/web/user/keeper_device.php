@@ -8,6 +8,8 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\domain\Device;
+use zovye\domain\User;
 use zovye\model\keeper_devicesModelObj;
 
 $user = User::get(Request::int('id'));

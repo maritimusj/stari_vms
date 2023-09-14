@@ -7,9 +7,9 @@
 namespace zovye\model;
 
 use DateTimeInterface;
-use zovye\Agent;
-use zovye\base\modelObj;
-use zovye\Group;
+use zovye\base\ModelObj;
+use zovye\domain\Agent;
+use zovye\domain\Group;
 use zovye\traits\ExtraDataGettersAndSetters;
 use function zovye\tb;
 
@@ -27,7 +27,7 @@ use function zovye\tb;
  * @method getCreatetime()
  * @method setAgentId(int $agentId)
  */
-class device_groupsModelObj extends modelObj
+class device_groupsModelObj extends ModelObj
 {
     /** @var int */
     protected $id;

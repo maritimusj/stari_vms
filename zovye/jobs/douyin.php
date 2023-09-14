@@ -8,17 +8,17 @@ namespace zovye\job\douyin;
 
 defined('IN_IA') or exit('Access Denied');
 
-use zovye\Account;
+use zovye\business\DouYin;
 use zovye\CtrlServ;
-use zovye\Device;
-use zovye\DouYin;
+use zovye\domain\Account;
+use zovye\domain\Device;
+use zovye\domain\Locker;
+use zovye\domain\Order;
+use zovye\domain\User;
 use zovye\Job;
 use zovye\JobException;
-use zovye\Locker;
 use zovye\Log;
-use zovye\Order;
 use zovye\Request;
-use zovye\User;
 use function zovye\is_error;
 
 $log = [

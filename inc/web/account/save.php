@@ -6,6 +6,13 @@
 
 namespace zovye;
 
+use zovye\business\FlashEgg;
+use zovye\domain\Account;
+use zovye\domain\Agent;
+use zovye\util\DBUtil;
+use zovye\util\QRCodeUtil;
+use zovye\util\Util;
+
 defined('IN_IA') or exit('Access Denied');
 
 $res = DBUtil::transactionDo(function () {

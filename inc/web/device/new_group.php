@@ -9,6 +9,9 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 //新分组管理
+use zovye\domain\Agent;
+use zovye\domain\Device;
+use zovye\domain\Group;
 use zovye\model\device_groupsModelObj;
 
 $tpl_data = [];

@@ -6,9 +6,9 @@
 
 namespace zovye\model;
 
-use zovye\Agent;
-use zovye\base\modelObj;
-use zovye\DeviceTypes;
+use zovye\base\ModelObj;
+use zovye\domain\Agent;
+use zovye\domain\DeviceTypes;
 use zovye\traits\ExtraDataGettersAndSetters;
 use function zovye\tb;
 
@@ -20,7 +20,7 @@ use function zovye\tb;
  * @method setAgentId(int $agentId)
  * @method getDeviceId()
  */
-class device_typesModelObj extends modelObj
+class device_typesModelObj extends ModelObj
 {
     /** @var int */
     protected $id;

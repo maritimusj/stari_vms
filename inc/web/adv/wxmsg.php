@@ -8,6 +8,7 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\domain\Advertising;
 use zovye\model\advertisingModelObj;
 
 $id = Request::int('id');

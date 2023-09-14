@@ -7,6 +7,7 @@
 namespace zovye;
 
 use DateTimeImmutable;
+use zovye\domain\Locker;
 use zovye\model\agentModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\orderModelObj;

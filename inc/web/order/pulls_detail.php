@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+use zovye\domain\Order;
+
 defined('IN_IA') or exit('Access Denied');
 
 $id = Request::int('id');

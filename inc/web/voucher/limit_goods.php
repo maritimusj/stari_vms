@@ -6,6 +6,9 @@
  
 namespace zovye;
 
+use zovye\domain\Goods;
+use zovye\domain\GoodsVoucher;
+
 defined('IN_IA') or exit('Access Denied');
 
 $id = Request::int('id');

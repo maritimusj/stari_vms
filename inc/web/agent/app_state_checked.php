@@ -15,7 +15,7 @@ $id = Request::int('id');
 /** @var agent_appModelObj $app */
 $app = AgentApplication::findOne(['id' => $id]);
 if ($app) {
-    $state = $app->getState() != AgentApp::CHECKED ? AgentApp::CHECKED : AgentApp::WAIT;
+    $state = $app->getState() != AgentApplication::CHECKED ? AgentApplication::CHECKED : AgentApplication::WAIT;
     $app->setState($state);
     if ($app->save()) {
         Response::toast('设置成功！', Util::url('agent', ['op' => 'app']), 'success');

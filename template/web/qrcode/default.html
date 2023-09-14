@@ -56,7 +56,7 @@
             </thead>
             <tbody>
             {loop $qrcodes $index $item}
-            <tr data-id="{$item['id']}" {if $item['state'] == \\zovye\domain\Advertising::BANNED}class="banned" title="已禁用！"{/if}>
+            <tr data-id="{$item['id']}" {if $item['state'] == \zovye\domain\Advertising::BANNED}class="banned" title="已禁用！"{/if}>
             <td>{php echo $index + 1}</td>
             <td>{$item['title']}</td>
             <td class="operate">
@@ -68,7 +68,7 @@
             <td>{$item['createtime_formatted']}</td>
             <td class="operate">
                 <a href="{php echo $this->createWebUrl('qrcode', array('op'=>'edit', 'id'=>$item['id']));}"><i class="fa fa-edit" title="编辑"></i></a>
-                {if $item['state'] == \\zovye\domain\Advertising::NORMAL}
+                {if $item['state'] == \zovye\domain\Advertising::NORMAL}
                 <a href="{php echo $this->createWebUrl('qrcode', array('op'=>'ban', 'id'=>$item['id']));}"><i class="fa fa-eye-slash" title="禁用"></i></a>
                 {else}
                 <a href="{php echo $this->createWebUrl('qrcode', array('op'=>'ban', 'id'=>$item['id']));}"><i class="fa fa-eye" title="启用"></i></a>

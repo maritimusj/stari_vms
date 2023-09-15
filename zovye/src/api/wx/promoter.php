@@ -11,9 +11,9 @@ use zovye\api\wx\keeper as WxKeeper;
 use zovye\domain\Keeper;
 use zovye\domain\Principal;
 use zovye\domain\User;
-use zovye\Helper;
 use zovye\model\userModelObj;
 use zovye\Request;
+use zovye\util\Helper;
 use function zovye\err;
 
 class promoter

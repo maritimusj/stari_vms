@@ -9,7 +9,6 @@ namespace zovye\model;
 use zovye\base\ModelObj;
 use zovye\domain\Advertising;
 use zovye\domain\Agent;
-use zovye\ReviewResult;
 use zovye\traits\ExtraDataGettersAndSetters;
 use zovye\We7;
 use function zovye\getArray;
@@ -108,7 +107,7 @@ class advertisingModelObj extends ModelObj
             return true;
         }
 
-        return $this->getReviewResult() === ReviewResult::PASSED;
+        return $this->getReviewResult() === Advertising::REVIEW_PASSED;
     }
 
     /**
@@ -124,7 +123,7 @@ class advertisingModelObj extends ModelObj
             }
         }
 
-        return ReviewResult::WAIT;
+        return Advertising::REVIEW_WAIT;
     }
 
     public function getExtra()

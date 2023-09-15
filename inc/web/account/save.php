@@ -32,11 +32,11 @@ $res = DBUtil::transactionDo(function () {
         'order_limits' => max(0, Request::int('orderlimits')),
         'order_no' => min(999, Request::int('orderno')),
         'group_name' => Request::str('groupname'),
-        'scname' => Request::str('scname', Schema::DAY),
+        'scname' => Request::str('scname', Account::DAY),
         'shared' => Request::has('commission_share') ? 1 : 0,
     ];
 
-    if (!Schema::has($data['scname'])) {
+    if (!Account::has($data['scname'])) {
         return err('领取频率只是每天/每周/每月！');
     }
 

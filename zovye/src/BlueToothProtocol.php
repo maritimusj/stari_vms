@@ -12,6 +12,9 @@ class BlueToothProtocol
 {
     const QOE = 'qoe'; //电量
 
+    const BASE64 = '\base64_encode';
+    const HEX = '\bin2hex';
+
     public static function all(): array
     {
         $protocols = [];

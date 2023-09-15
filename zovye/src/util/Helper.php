@@ -5,16 +5,19 @@
  * @url www.stariture.com
  */
 
-namespace zovye;
+namespace zovye\util;
 
 use DateTime;
 use DateTimeImmutable;
 use RuntimeException;
+use zovye\App;
 use zovye\business\GoodsExpireAlert;
+use zovye\Config;
 use zovye\domain\Account;
 use zovye\domain\Balance;
 use zovye\domain\BalanceLog;
 use zovye\domain\CommissionBalance;
+use zovye\domain\Counter;
 use zovye\domain\Device;
 use zovye\domain\DeviceLogs;
 use zovye\domain\Goods;
@@ -22,6 +25,9 @@ use zovye\domain\Locker;
 use zovye\domain\Order;
 use zovye\domain\Questionnaire;
 use zovye\domain\User;
+use zovye\Job;
+use zovye\JSON;
+use zovye\Log;
 use zovye\model\accountModelObj;
 use zovye\model\agentModelObj;
 use zovye\model\commission_balanceModelObj;
@@ -30,12 +36,17 @@ use zovye\model\deviceModelObj;
 use zovye\model\goods_expire_alertModelObj;
 use zovye\model\orderModelObj;
 use zovye\model\userModelObj;
-use zovye\util\CacheUtil;
-use zovye\util\Counter;
-use zovye\util\DBUtil;
-use zovye\util\DeviceUtil;
-use zovye\util\LocationUtil;
-use zovye\util\Util;
+use zovye\Pay;
+use zovye\Request;
+use zovye\Session;
+use zovye\We7;
+use zovye\Wx;
+use function zovye\err;
+use function zovye\getArray;
+use function zovye\is_error;
+use function zovye\isEmptyArray;
+use function zovye\request;
+use function zovye\settings;
 
 class Helper
 {
@@ -1369,11 +1380,11 @@ include './index.php';
 
         $sc_name = $account->getScname();
 
-        if ($sc_name == Schema::DAY) {
+        if ($sc_name == Account::DAY) {
             $time = new DateTimeImmutable('00:00');
-        } elseif ($sc_name == Schema::WEEK) {
+        } elseif ($sc_name == Account::WEEK) {
             $time = date('D') == 'Mon' ? new DateTimeImmutable('00:00') : new DateTimeImmutable('last Mon 00:00');
-        } elseif ($sc_name == Schema::MONTH) {
+        } elseif ($sc_name == Account::MONTH) {
             $time = new DateTimeImmutable('first day of this month 00:00');
         } else {
             return err('任务设置不正确！');
@@ -1383,9 +1394,9 @@ include './index.php';
         $count = $account->getCount();
         if ($count > 0) {
             $desc = [
-                Schema::DAY => '今天已经领过了，明天再来吧！',
-                Schema::WEEK => '下个星期再来试试吧！',
-                Schema::MONTH => '这个月的免费额度已经用完啦！',
+                Account::DAY => '今天已经领过了，明天再来吧！',
+                Account::WEEK => '下个星期再来试试吧！',
+                Account::MONTH => '这个月的免费额度已经用完啦！',
             ];
 
             if (!$is_new_user && Helper::checkLimit(
@@ -1449,12 +1460,12 @@ include './index.php';
             return false;
         }
 
-        if (in_array($limit['scname'], [Schema::DAY, Schema::WEEK, Schema::MONTH])) {
-            if ($limit['scname'] == Schema::DAY) {
+        if (in_array($limit['scname'], [Account::DAY, Account::WEEK, Account::MONTH])) {
+            if ($limit['scname'] == Account::DAY) {
                 $time = new DateTimeImmutable('00:00');
-            } elseif ($limit['scname'] == Schema::WEEK) {
+            } elseif ($limit['scname'] == Account::WEEK) {
                 $time = date('D') == 'Mon' ? new DateTimeImmutable('00:00') : new DateTimeImmutable('last Mon 00:00');
-            } elseif ($limit['scname'] == Schema::MONTH) {
+            } elseif ($limit['scname'] == Account::MONTH) {
                 $time = new DateTimeImmutable('first day of this month 00:00');
             } else {
                 $time = null;

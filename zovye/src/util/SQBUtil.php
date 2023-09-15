@@ -4,17 +4,17 @@
  * @url www.stariture.com
  */
 
-namespace zovye;
+namespace zovye\util;
 
-use zovye\util\Util;
+use SQB\pay;
 
-class SQB
+class SQBUtil
 {
     const RESPONSE = 'success';
 
     public static function activate($app_id, $vendor_sn, $vendor_key, $code)
     {
-        $pay = new \SQB\pay([
+        $pay = new pay([
             'sn' => $vendor_sn,
             'key' => $vendor_key,
             'app_id' => $app_id,

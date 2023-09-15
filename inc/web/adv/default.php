@@ -131,7 +131,7 @@ if ($total > 0) {
                 $reviewResult = $ad->getReviewResult();
                 $data['review'] = [
                     'result' => $reviewResult,
-                    'title' => ReviewResult::desc($reviewResult),
+                    'title' => Advertising::getReviewResultTitle($reviewResult),
                 ];
             }
         }

@@ -10,11 +10,9 @@ use Exception;
 use zovye\domain\Advertising;
 use zovye\domain\Device;
 use zovye\Log;
-use zovye\Media;
 use zovye\model\advertisingModelObj;
 use zovye\model\device_groupsModelObj;
 use zovye\Request;
-use zovye\ReviewResult;
 use zovye\util\Util;
 use zovye\We7;
 use function zovye\err;
@@ -141,7 +139,7 @@ class ad
                     'title' => strval($adv->getTitle()),
                     'createtime_formatted' => date('Y-m-d H:i:s', $adv->getCreatetime()),
                     'reviewResult' => $reviewResult,
-                    'reviewState' => ReviewResult::desc($reviewResult),
+                    'reviewState' => Advertising::getReviewResultTitle($reviewResult),
                     'assigned' => $devices,
                     'groups' => $groups,
                 ];
@@ -149,18 +147,18 @@ class ad
                 if ($type == Advertising::SCREEN) {
 
                     $media = $adv->getExtraData('media');
-                    if ($media == Media::SRT) {
+                    if ($media == Advertising::MEDIA_SRT) {
                         $data['text'] = $adv->getExtraData('text');
                     } else {
                         $data['filename'] = strval($adv->getExtraData('url'));
                         $data['url'] = Util::toMedia($data['filename']);
-                        if ($media == Media::IMAGE) {
+                        if ($media == Advertising::MEDIA_IMAGE) {
                             $data['duration'] = $adv->getExtraData('duration', 10);
                         }
                     }
                     $data['media'] = $media;
                     $data['area'] = $adv->getExtraData('area', 0);
-                    $data['media_formatted'] = Media::desc($media);
+                    $data['media_formatted'] = Advertising::desc($media);
                     $data['type_formatted'] .= "({$data['media']})";
 
                 } elseif (in_array($type, [advertising::WELCOME_PAGE, Advertising::GET_PAGE])) {
@@ -192,7 +190,7 @@ class ad
                 } elseif ($type == Advertising::PUSH_MSG) {
 
                     $data['msg_type'] = $adv->getExtraData('msg.type');
-                    $data['msg_typename'] = Media::desc($data['msg_type']);
+                    $data['msg_typename'] = Advertising::desc($data['msg_type']);
                     $data['delay'] = $adv->getExtraData('delay');
                     $data['msg'] = $adv->getExtraData('msg');
 
@@ -321,7 +319,7 @@ class ad
             return err('只有代理商能使用该功能！');
         }
 
-        $type = request('type') ?: Media::IMAGE;
+        $type = request('type') ?: Advertising::MEDIA_IMAGE;
 
         if ($_FILES['file']) {
             We7::load()->func('file');

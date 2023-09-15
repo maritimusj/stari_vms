@@ -10,6 +10,7 @@ use DateTimeImmutable;
 use Exception;
 use zovye\App;
 use zovye\base\ModelObjFinder;
+use zovye\BlueToothProtocol;
 use zovye\business\GoodsExpireAlert;
 use zovye\Config;
 use zovye\contract\bluetooth\IBlueToothProtocol;
@@ -17,7 +18,6 @@ use zovye\contract\bluetooth\ICmd;
 use zovye\contract\bluetooth\IResponse;
 use zovye\CtrlServ;
 use zovye\DeviceEventProcessor;
-use zovye\Helper;
 use zovye\Log;
 use zovye\model\agentModelObj;
 use zovye\model\cronModelObj;
@@ -26,6 +26,7 @@ use zovye\model\keeperModelObj;
 use zovye\model\userModelObj;
 use zovye\Request;
 use zovye\State;
+use zovye\util\Helper;
 use zovye\util\HttpUtil;
 use zovye\util\Util;
 use zovye\We7;
@@ -706,7 +707,7 @@ class Device extends State
                         'id' => $cmd->getId(),
                         'data' => base64_encode($str),
                         'message' => $cmd->getMessage(),
-                        'raw' => $cmd->getEncoded(IBlueToothProtocol::HEX),
+                        'raw' => $cmd->getEncoded(BlueToothProtocol::HEX),
                     ],
                 ];
 

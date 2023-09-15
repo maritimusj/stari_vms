@@ -4,15 +4,13 @@
  * @url www.stariture.com
  */
 
-namespace zovye\util;
+namespace zovye\domain;
 
 use Closure;
 use DateTimeImmutable;
 use Exception;
 use zovye\base\ModelObj;
 use zovye\base\ModelObjFinder;
-use zovye\domain\base;
-use zovye\domain\Locker;
 use zovye\model\cacheModelObj;
 use zovye\We7;
 use function zovye\err;

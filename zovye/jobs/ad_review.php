@@ -18,7 +18,6 @@ use zovye\domain\User;
 use zovye\JobException;
 use zovye\Log;
 use zovye\Request;
-use zovye\ReviewResult;
 use zovye\util\Util;
 use zovye\Wx;
 
@@ -50,7 +49,7 @@ if (empty($ad)) {
     throw new JobException('找不到这个广告！', $log);
 }
 
-if ($ad->getReviewResult() != ReviewResult::WAIT) {
+if ($ad->getReviewResult() != Advertising::REVIEW_WAIT) {
     throw new JobException('这个广告已审核！', $log);
 }
 

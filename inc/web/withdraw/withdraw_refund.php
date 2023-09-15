@@ -12,6 +12,7 @@ use zovye\domain\CommissionBalance;
 use zovye\domain\User;
 use zovye\model\commission_balanceModelObj;
 use zovye\util\DBUtil;
+use zovye\util\Helper;
 
 $balance_obj = Helper::getAndCheckWithdraw(Request::int('id'));
 if (is_error($balance_obj)) {

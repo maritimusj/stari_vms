@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+use zovye\util\SIMUtil;
+
 defined('IN_IA') or exit('Access Denied');
 
 $iccid = Request::str('iccid');
@@ -13,7 +15,7 @@ if (empty($iccid)) {
     JSON::fail('错误：iccid 为空！');
 }
 
-$result = SIM::get($iccid);
+$result = SIMUtil::get($iccid);
 if (is_error($result)) {
     JSON::fail($result);
 }

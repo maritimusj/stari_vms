@@ -9,7 +9,6 @@ namespace zovye\util;
 
 use Exception;
 use QRcode;
-use zovye\Helper;
 use zovye\Log;
 use zovye\We7;
 use function zovye\err;

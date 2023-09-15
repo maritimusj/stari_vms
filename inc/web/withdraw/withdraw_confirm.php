@@ -7,6 +7,7 @@
 namespace zovye;
 
 use zovye\util\DBUtil;
+use zovye\util\Helper;
 
 defined('IN_IA') or exit('Access Denied');
 

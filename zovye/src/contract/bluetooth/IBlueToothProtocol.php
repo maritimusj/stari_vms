@@ -8,9 +8,6 @@ namespace zovye\contract\bluetooth;
 
 interface IBlueToothProtocol
 {
-    const BASE64 = '\base64_encode';
-    const HEX = '\bin2hex';
-
     /**
      * 返回协议的功能是否支持
      * @param $fn

@@ -16,7 +16,6 @@ use zovye\domain\CommissionBalance;
 use zovye\domain\User;
 use zovye\model\accountModelObj;
 use zovye\Request;
-use zovye\Schema;
 use zovye\Stats;
 use zovye\util\Util;
 use function zovye\err;
@@ -76,7 +75,7 @@ class commission
                     'img' => strval(Util::toMedia($entry->getImg())),
                     'qrcode' => strval(Util::toMedia($entry->getQrcode())),
                     'clr' => strval($entry->getClr()),
-                    'scname' => Schema::desc($entry->getScname()),
+                    'scname' => Account::desc($entry->getScname()),
                     'url' => strval($entry->getUrl()),
                 ];
 

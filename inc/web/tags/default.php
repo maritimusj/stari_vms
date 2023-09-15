@@ -11,6 +11,7 @@ defined('IN_IA') or exit('Access Denied');
 //分配设备控件查询标签详情
 use zovye\domain\Tags;
 use zovye\model\tagsModelObj;
+use zovye\util\Helper;
 
 if (Request::is_ajax() && Request::has('id')) {
     /** @var tagsModelObj $res */

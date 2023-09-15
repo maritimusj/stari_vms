@@ -329,11 +329,11 @@ class CtrlServ
 
         if ($data['all']) {
             if (!$original['all']) {
-                $topics[] = 'tag/'.Topic::encrypt();
+                $topics[] = 'tag/'.Util::encryptTopic();
             }
         } else {
             if ($original['all']) {
-                $topics[] = 'tag/'.Topic::encrypt();
+                $topics[] = 'tag/'.Util::encryptTopic();
             } else {
                 if (isset($data['all']) && $data['all'] === false) {
                     $all = $original;
@@ -352,22 +352,22 @@ class CtrlServ
 
                 if ($all['agents']) {
                     foreach ($all['agents'] as $id) {
-                        $topics[] = 'tag/'.Topic::encrypt("agent$id");
+                        $topics[] = 'tag/'.Util::encryptTopic("agent$id");
                     }
                 }
                 if ($all['groups']) {
                     foreach ($all['groups'] as $id) {
-                        $topics[] = 'tag/'.Topic::encrypt("group$id");
+                        $topics[] = 'tag/'.Util::encryptTopic("group$id");
                     }
                 }
                 if ($all['tags']) {
                     foreach ($all['tags'] as $id) {
-                        $topics[] = 'tag/'.Topic::encrypt("tag$id");
+                        $topics[] = 'tag/'.Util::encryptTopic("tag$id");
                     }
                 }
                 if ($all['devices']) {
                     foreach ($all['devices'] as $id) {
-                        $topics[] = 'tag/'.Topic::encrypt("device$id");
+                        $topics[] = 'tag/'.Util::encryptTopic("device$id");
                     }
                 }
             }

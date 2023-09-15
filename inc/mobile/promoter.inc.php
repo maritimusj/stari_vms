@@ -14,6 +14,7 @@ use zovye\api\wx\common;
 use zovye\domain\Principal;
 use zovye\domain\Referral;
 use zovye\util\DBUtil;
+use zovye\util\Helper;
 use zovye\util\Util;
 
 if (!App::isPromoterEnabled()) {

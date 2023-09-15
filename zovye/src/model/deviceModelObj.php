@@ -34,15 +34,14 @@ use zovye\domain\Package;
 use zovye\domain\PayloadLogs;
 use zovye\domain\Tags;
 use zovye\domain\User;
-use zovye\Helper;
 use zovye\Job;
 use zovye\Pay;
-use zovye\SIM;
 use zovye\Stats;
-use zovye\Topic;
 use zovye\util\DeviceUtil;
+use zovye\util\Helper;
 use zovye\util\PlaceHolder;
 use zovye\util\QRCodeUtil;
+use zovye\util\SIMUtil;
 use zovye\util\Util;
 use zovye\We7;
 use function zovye\err;
@@ -542,7 +541,7 @@ class deviceModelObj extends ModelObj
             return err('ICCID为空！');
         }
 
-        return SIM::get($this->getICCID());
+        return SIMUtil::get($this->getICCID());
     }
 
     public function getCapacity(): int
@@ -1714,23 +1713,23 @@ class deviceModelObj extends ModelObj
         $tags = [];
 
         //同一个平台的设备会订阅同一个主题
-        $tags[] = ['name' => Topic::encrypt()];
+        $tags[] = ['name' => Util::encryptTopic()];
 
         if ($this->getId()) {
 
-            $tags[] = ['name' => Topic::encrypt('device'.$this->getId())];
+            $tags[] = ['name' => Util::encryptTopic('device'.$this->getId())];
 
             if ($this->agent_id) {
-                $tags[] = ['name' => Topic::encrypt('agent'.$this->getAgentId())];
+                $tags[] = ['name' => Util::encryptTopic('agent'.$this->getAgentId())];
             }
 
             if ($this->getGroupId()) {
-                $tags[] = ['name' => Topic::encrypt('group'.$this->getGroupId())];
+                $tags[] = ['name' => Util::encryptTopic('group'.$this->getGroupId())];
             }
         }
 
         foreach ($this->getTagsAsId() as $id) {
-            $tags[] = ['name' => Topic::encrypt('tag'.$id)];
+            $tags[] = ['name' => Util::encryptTopic('tag'.$id)];
         }
 
         return $tags;
@@ -2292,7 +2291,7 @@ class deviceModelObj extends ModelObj
             $cmd = $protocol->open($this->getBUID(), $option);
             if ($cmd) {
                 Device::createBluetoothCmdLog($this, $cmd);
-                $result = $cmd->getEncoded(IBlueToothProtocol::BASE64);
+                $result = $cmd->getEncoded(BlueToothProtocol::BASE64);
 
                 if (Helper::NeedAutoRefund($this)) {
                     $order = Order::getLastOrderOfDevice($this);

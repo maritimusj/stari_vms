@@ -24,7 +24,6 @@ use zovye\domain\GoodsVoucher;
 use zovye\domain\LoginData;
 use zovye\domain\Order;
 use zovye\domain\User;
-use zovye\Helper;
 use zovye\Job;
 use zovye\JSON;
 use zovye\Log;
@@ -34,6 +33,7 @@ use zovye\model\orderModelObj;
 use zovye\model\userModelObj;
 use zovye\Request;
 use zovye\util\DeviceUtil;
+use zovye\util\Helper;
 use zovye\util\LocationUtil;
 use zovye\util\TemplateUtil;
 use zovye\util\Util;
@@ -212,8 +212,8 @@ class common
             Device::createBluetoothCmdLog($device, $cmd);
 
             return [
-                'data' => $cmd->getEncoded(IBlueToothProtocol::BASE64),
-                'hex' => $cmd->getEncoded(IBlueToothProtocol::HEX),
+                'data' => $cmd->getEncoded(BlueToothProtocol::BASE64),
+                'hex' => $cmd->getEncoded(BlueToothProtocol::HEX),
             ];
         }
 
@@ -263,8 +263,8 @@ class common
         Device::createBluetoothCmdLog($device, $cmd);
 
         return [
-            'data' => $cmd->getEncoded(IBlueToothProtocol::BASE64),
-            'hex' => $cmd->getEncoded(IBlueToothProtocol::HEX),
+            'data' => $cmd->getEncoded(BlueToothProtocol::BASE64),
+            'hex' => $cmd->getEncoded(BlueToothProtocol::HEX),
         ];
     }
 
@@ -363,8 +363,8 @@ class common
         if ($cmd) {
             Device::createBluetoothCmdLog($device, $cmd);
 
-            $data['data'] = $cmd->getEncoded(IBlueToothProtocol::BASE64);
-            $data['hex'] = $cmd->getEncoded(IBlueToothProtocol::HEX);
+            $data['data'] = $cmd->getEncoded(BlueToothProtocol::BASE64);
+            $data['hex'] = $cmd->getEncoded(BlueToothProtocol::HEX);
         }
 
         return $data;

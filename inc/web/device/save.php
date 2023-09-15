@@ -16,12 +16,14 @@ use zovye\business\Fueling;
 use zovye\business\GDCVMachine;
 use zovye\business\GoodsExpireAlert;
 use zovye\business\TKPromoting;
+use zovye\domain\Account;
 use zovye\domain\Agent;
 use zovye\domain\Device;
 use zovye\domain\DeviceTypes;
 use zovye\domain\Package;
 use zovye\model\packageModelObj;
 use zovye\util\DBUtil;
+use zovye\util\Helper;
 use zovye\util\LocationUtil;
 use zovye\util\Util;
 
@@ -84,7 +86,7 @@ $result = DBUtil::transactionDo(function () use ($id, &$device) {
     if (App::isFlashEggEnabled()) {
         setArray($extra, 'ad.device.uid', Request::trim('adDeviceUID'));
         $extra['limit'] = [
-            'scname' => Request::trim('scname', Schema::DAY),
+            'scname' => Request::trim('scname', Account::DAY),
             'count' => Request::int('count'),
             'sccount' => Request::int('sccount'),
             'total' => Request::int('total'),

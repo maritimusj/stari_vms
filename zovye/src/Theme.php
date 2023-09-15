@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+use zovye\util\Helper;
+
 class Theme
 {
     /**

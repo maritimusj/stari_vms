@@ -109,7 +109,7 @@ class protocol implements IBlueToothProtocol
 
         Log::debug($device_id, [
             'data' => $data,
-            'hex' => $cmd->getEncoded(IBlueToothProtocol::HEX),
+            'hex' => $cmd->getEncoded(BlueToothProtocol::HEX),
         ]);
 
         return $cmd;

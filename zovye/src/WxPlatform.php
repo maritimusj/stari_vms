@@ -16,6 +16,7 @@ use zovye\domain\User;
 use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
+use zovye\util\Helper;
 use zovye\util\HttpUtil;
 
 class WxPlatform

@@ -7,9 +7,9 @@
 namespace zovye\api\wx;
 
 use zovye\domain\User;
-use zovye\Helper;
 use zovye\model\vipModelObj;
 use zovye\Request;
+use zovye\util\Helper;
 use function zovye\err;
 
 class vip

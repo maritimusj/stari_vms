@@ -6,6 +6,9 @@
 
 namespace zovye;
 
+use zovye\util\Helper;
+use zovye\util\SQBUtil;
+
 defined('IN_IA') or exit('Access Denied');
 
 $app_id = Request::trim('app_id');
@@ -13,7 +16,7 @@ $vendor_sn = Request::trim('vendor_sn');
 $vendor_key = Request::trim('vendor_key');
 $code = Request::trim('code');
 
-$result = SQB::activate($app_id, $vendor_sn, $vendor_key, $code);
+$result = SQBUtil::activate($app_id, $vendor_sn, $vendor_key, $code);
 
 if (is_error($result)) {
     JSON::fail($result);

@@ -9,6 +9,7 @@ namespace zovye\util;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Exception;
+use zovye\domain\Counter;
 use zovye\domain\Locker;
 use zovye\model\counterModelObj;
 

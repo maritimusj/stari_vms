@@ -15,7 +15,9 @@ use zovye\App;
 use zovye\business\Fueling;
 use zovye\business\GDCVMachine;
 use zovye\Config;
+use zovye\domain\Account;
 use zovye\domain\AgentApplication;
+use zovye\domain\Cache;
 use zovye\domain\CommissionBalance;
 use zovye\domain\Cron;
 use zovye\domain\Device;
@@ -26,7 +28,6 @@ use zovye\domain\LoginData;
 use zovye\domain\Order;
 use zovye\domain\Principal;
 use zovye\domain\User;
-use zovye\Helper;
 use zovye\Job;
 use zovye\JSON;
 use zovye\Log;
@@ -39,11 +40,10 @@ use zovye\model\login_dataModelObj;
 use zovye\model\orderModelObj;
 use zovye\model\userModelObj;
 use zovye\Request;
-use zovye\Schema;
-use zovye\util\Cache;
 use zovye\util\CacheUtil;
 use zovye\util\DBUtil;
 use zovye\util\DeviceUtil;
+use zovye\util\Helper;
 use zovye\util\Util;
 use function zovye\err;
 use function zovye\error;
@@ -635,7 +635,7 @@ class agent
         if (App::isFlashEggEnabled()) {
             setArray($extra, 'ad.device.uid', Request::trim('adDeviceUID'));
             $extra['limit'] = [
-                'scname' => Request::trim('scname', Schema::DAY),
+                'scname' => Request::trim('scname', Account::DAY),
                 'count' => Request::int('count'),
                 'sccount' => Request::int('sccount'),
                 'total' => Request::int('total'),

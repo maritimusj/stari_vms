@@ -18,6 +18,7 @@ use zovye\domain\LoginData;
 use zovye\domain\User;
 use zovye\util\DBUtil;
 use zovye\util\DeviceUtil;
+use zovye\util\Helper;
 use zovye\util\Util;
 
 $op = Request::op('default');
@@ -94,11 +95,11 @@ if ($op == 'default') {
         Response::alert('找不到这个广告！', 'error');
     }
 
-    if ($ad->getReviewResult() == ReviewResult::PASSED) {
+    if ($ad->getReviewResult() == Advertising::REVIEW_PASSED) {
         Request::is_ajax() ? JSON::success('已通过审核！') : Response::alert('已通过审核！');
     }
 
-    if ($ad->getReviewResult() == ReviewResult::REJECTED) {
+    if ($ad->getReviewResult() == Advertising::REVIEW_REJECTED) {
         Request::is_ajax() ? JSON::success('已拒绝广告通过审核！') : Response::alert('已拒绝广告通过审核！', 'warning');
     }
 

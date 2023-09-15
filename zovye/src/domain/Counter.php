@@ -4,13 +4,11 @@
  * @url www.stariture.com
  */
 
-namespace zovye\util;
+namespace zovye\domain;
 
-use zovye\base\ModelFactory;
 use zovye\base\ModelObjFinder;
-use zovye\domain\base;
-use zovye\domain\Locker;
 use zovye\model\counterModelObj;
+use zovye\util\DBUtil;
 use zovye\We7;
 use function zovye\err;
 use function zovye\is_error;

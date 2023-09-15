@@ -6,14 +6,13 @@
 
 namespace zovye\domain;
 
+use zovye\App;
 use zovye\base\ModelObjFinder;
 use zovye\CtrlServ;
 use zovye\Job;
-use zovye\Media;
 use zovye\model\advertisingModelObj;
 use zovye\model\agentModelObj;
 use zovye\model\deviceModelObj;
-use zovye\ReviewResult;
 use zovye\State;
 use zovye\util\Util;
 use zovye\We7;
@@ -44,6 +43,15 @@ class Advertising extends State
     const PASSWD = 12; //用于推广的口令
     const WX_APP_URL_CODE = 13; //微信小程序URL识别码
     const SPONSOR = 14; //赞助商轮播文字
+
+    const MEDIA_IMAGE = 'image';
+    const MEDIA_AUDIO = 'audio';
+    const MEDIA_VIDEO = 'video';
+    const MEDIA_SRT = "srt";
+
+    const REVIEW_WAIT = 0;
+    const REVIEW_PASSED = 1;
+    const REVIEW_REJECTED = 2;
 
     public static $names = [
         self::UNKNOWN => 'default',
@@ -77,7 +85,23 @@ class Advertising extends State
         self::PASSWD => '口令',
         self::WX_APP_URL_CODE => '微信小程序识别码',
         self::SPONSOR => '赞助商轮播文字',
+
+        self::MEDIA_IMAGE => '图片',
+        self::MEDIA_AUDIO => '音频',
+        self::MEDIA_VIDEO => '视频',
+        self::MEDIA_SRT => "字幕",
     ];
+
+    protected static $review_title = [
+        self::REVIEW_WAIT => '审核中',
+        self::REVIEW_PASSED => '通过',
+        self::REVIEW_REJECTED => '拒绝',
+    ];
+
+    public static function getReviewResultTitle($result): string
+    {
+        return self::$review_title[$result] ?? '未知';
+    }
 
     /**
      * @param array $data
@@ -278,6 +302,26 @@ class Advertising extends State
         ];
     }
 
+    public static function sign($url): string
+    {
+        return sha1(App::uid().CLIENT_IP.$url).'@'.$url;
+    }
+
+    public static function verify($signature_url): bool
+    {
+        list($sha1val, $url) = explode('@', $signature_url, 2);
+        return !empty($sha1val) && !empty($url) && sha1(App::uid().CLIENT_IP.$url) == $sha1val;
+    }
+
+    public static function strip($signature_url)
+    {
+        list($sha1val, $url) = explode('@', $signature_url, 2);
+        if (!empty($sha1val) && !empty($url) && sha1(App::uid().CLIENT_IP.$url) == $sha1val) {
+            return $url;
+        }
+        return false;
+    }
+
     /**
      * 格式化广告数据
      * @param advertisingModelObj $ad
@@ -314,17 +358,18 @@ class Advertising extends State
         $extra = [];
 
         if ($type == Advertising::SCREEN) {
+
             $extra['media'] = $params['media'];
 
-            if (!Media::has($extra['media'])) {
+            if (!Advertising::has($extra['media'])) {
                 return err('不正确的广告类型！');
             }
 
-            if (in_array($extra['media'], [Media::IMAGE, Media::VIDEO, Media::SRT])) {
+            if (in_array($extra['media'], [Advertising::MEDIA_IMAGE, Advertising::MEDIA_VIDEO, Advertising::MEDIA_SRT])) {
                 $extra['area'] = intval($params['area']);
             }
 
-            if ($extra['media'] == Media::SRT) {
+            if ($extra['media'] == Advertising::MEDIA_SRT) {
                 $extra['text'] = trim($params['text']);
                 if (empty($extra['text'])) {
                     return err('请指定字幕文字内容！');
@@ -341,7 +386,7 @@ class Advertising extends State
 
                 $extra['url'] = $url;
 
-                if ($extra['media'] == Media::IMAGE) {
+                if ($extra['media'] == Advertising::MEDIA_IMAGE) {
                     $extra['duration'] = intval($params['duration']) ?: DEFAULT_IMAGE_DURATION;
                 }
             }
@@ -461,7 +506,7 @@ class Advertising extends State
                 $ad->updateSettings(
                     "reviewData.$content_md5",
                     [
-                        'result' => ReviewResult::WAIT,
+                        'result' => Advertising::REVIEW_WAIT,
                         'adv' => [
                             'title' => $ad->getTitle(),
                             'type' => $ad->getType(),
@@ -519,7 +564,7 @@ class Advertising extends State
             $current = $ad->settings('reviewData.current');
             if ($current) {
                 $data = $ad->settings("reviewData.$current", []);
-                $data['result'] = ReviewResult::PASSED;
+                $data['result'] = Advertising::REVIEW_PASSED;
                 $data['reviewer'] = [
                     'username' => $admin,
                     'ip' => CLIENT_IP,
@@ -554,7 +599,7 @@ class Advertising extends State
                 }
                 if ($ad->updateSettings(
                         "reviewData.$current.result",
-                        ReviewResult::REJECTED
+                        Advertising::REVIEW_REJECTED
                     ) && Advertising::update($ad)) {
                     return true;
                 }

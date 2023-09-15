@@ -27,16 +27,15 @@ use zovye\App;
 use zovye\base\ModelObjFinder;
 use zovye\business\DouYin;
 use zovye\contract\IAccountProvider;
-use zovye\Helper;
 use zovye\Job;
 use zovye\Log;
 use zovye\model\account_queryModelObj;
 use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
-use zovye\Schema;
 use zovye\Session;
 use zovye\State;
+use zovye\util\Helper;
 use zovye\util\PlaceHolder;
 use zovye\util\QRCodeUtil;
 use zovye\util\Util;
@@ -186,9 +185,17 @@ class Account extends State
     const PSEUDO_NAME = '虚拟公众号';
     const PSEUDO_HEAD_IMG = MODULE_URL.'static/img/pseudo.svg';
 
+    const DAY = 'd';
+    const WEEK = 'w';
+    const MONTH = 'm';
+    
     protected static $title = [
         self::BANNED => '已禁用',
         self::NORMAL => '正常',
+
+        self::DAY => '天',
+        self::WEEK => '周',
+        self::MONTH => '月',
     ];
 
     /**
@@ -259,7 +266,7 @@ class Account extends State
             'img' => self::PSEUDO_HEAD_IMG,
             'qrcode' => '',
             'clr' => Util::randColor(),
-            'scname' => Schema::DAY,
+            'scname' => Account::DAY,
             'count' => 0,
             'total' => 0,
             'group_name' => '',
@@ -812,7 +819,7 @@ class Account extends State
         $result = self::create([
             'uid' => $uid,
             'type' => $type,
-            'scname' => Schema::DAY,
+            'scname' => Account::DAY,
             'name' => $name,
             'title' => $name,
             'url' => $url,
@@ -1050,7 +1057,7 @@ class Account extends State
                 'img' => getArray($profile, 'authorizer_info.head_img', ''),
                 'qrcode' => $qrcode_url,
                 'clr' => Util::randColor(),
-                'scname' => Schema::DAY,
+                'scname' => Account::DAY,
                 'count' => 1,
                 'total' => 1,
                 'group_name' => '',

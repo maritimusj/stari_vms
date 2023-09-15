@@ -41,14 +41,14 @@
                     <td>
                         {if $item['review']}
                         <div class="review">
-                            {if $item['review']['result'] == zovye\ReviewResult::WAIT}
+                            {if $item['review']['result'] == zovye\Advertising::REVIEW_WAIT}
                             <a href="{php echo $this->createWebUrl('adv', array('op'=>'reviewPass', 'type'=>$item['type'], 'id'=>$item['id']));}"><i class="fa fa-check" title="通过审核"></i></a>
                             <a href="{php echo $this->createWebUrl('adv', array('op'=>'reviewReject', 'type'=>$item['type'], 'id'=>$item['id']));}"><i class="fa fa-close" title="拒绝发布"></i></a>
                             {/if}
                         </div>
                         {/if}
-                        {if $item['review'] && $item['review']['result'] != zovye\ReviewResult::PASSED}
-                             {if $item['review']['result'] == zovye\ReviewResult::REJECTED}
+                        {if $item['review'] && $item['review']['result'] != zovye\Advertising::REVIEW_PASSED}
+                             {if $item['review']['result'] == zovye\Advertising::REVIEW_REJECTED}
                                 <i class="fa fa-times" style="color:#f44336" title="已拒绝"></i>
                             {/if}
                         {else}

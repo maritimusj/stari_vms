@@ -14,6 +14,7 @@ use zovye\domain\Device;
 use zovye\domain\Goods;
 use zovye\domain\User;
 use zovye\model\userModelObj;
+use zovye\util\Helper;
 use zovye\util\Util;
 
 if (!App::isFlashEggEnabled()) {

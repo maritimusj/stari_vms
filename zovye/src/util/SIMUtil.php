@@ -4,9 +4,13 @@
  * @url www.stariture.com
  */
 
-namespace zovye;
+namespace zovye\util;
 
-class SIM
+use zovye\CtrlServ;
+use function zovye\err;
+use function zovye\is_error;
+
+class SIMUtil
 {
     private static $status_title = [
         "00" => '正常使用',

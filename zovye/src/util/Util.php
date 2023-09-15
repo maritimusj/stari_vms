@@ -9,13 +9,13 @@ namespace zovye\util;
 use DateTime;
 use Throwable;
 use zovye\App;
-use zovye\Helper;
 use zovye\Log;
 use zovye\Request;
 use zovye\Response;
 use zovye\We7;
 use function zovye\_W;
 use function zovye\getArray;
+use function zovye\settings;
 use function zovye\setW;
 
 class Util
@@ -119,6 +119,21 @@ class Util
         }
 
         return $interval->format('%S秒');
+    }
+
+    /**
+     * 返回指定频道的平台相关值
+     * @param string $name
+     * @return string
+     */
+    public static function encryptTopic(string $name = 'all'): string
+    {
+        static $app_key = null;
+        if (is_null($app_key)) {
+            $app_key = settings('ctrl.appKey');
+        }
+
+        return md5("$app_key$name");
     }
 
     /**

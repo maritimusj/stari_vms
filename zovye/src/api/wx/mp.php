@@ -11,15 +11,14 @@ use zovye\App;
 use zovye\business\DouYin;
 use zovye\business\FlashEgg;
 use zovye\domain\Account;
+use zovye\domain\Advertising;
 use zovye\domain\Device;
 use zovye\domain\Goods;
 use zovye\Log;
-use zovye\Media;
 use zovye\model\accountModelObj;
 use zovye\model\agentModelObj;
 use zovye\model\device_groupsModelObj;
 use zovye\Request;
-use zovye\Schema;
 use zovye\util\DBUtil;
 use zovye\util\QRCodeUtil;
 use zovye\util\Util;
@@ -113,11 +112,11 @@ class mp
         $user = common::getAgentOrPartner();
 
         if ($more) {
-            $data['img_signatured'] = Media::sign($account->getImg());
+            $data['img_signatured'] = Advertising::sign($account->getImg());
             if ($account->isVideo()) {
-                $data['media_signatured'] = Media::sign($account->getMedia());
+                $data['media_signatured'] = Advertising::sign($account->getMedia());
             } else {
-                $data['qrcode_signatured'] = Media::sign($account->getQrcode());
+                $data['qrcode_signatured'] = Advertising::sign($account->getQrcode());
             }
 
             $data['assigned'] = [];
@@ -214,7 +213,7 @@ class mp
         }
 
         $media = $_FILES['pic'] ?? $_FILES['video'];
-        $type = isset($_FILES['pic']) ? Media::IMAGE : Media::VIDEO;
+        $type = isset($_FILES['pic']) ? Advertising::MEDIA_IMAGE : Advertising::MEDIA_VIDEO;
 
         if ($media) {
             We7::load()->func('file');
@@ -237,7 +236,7 @@ class mp
                     return err($e->getMessage());
                 }
 
-                return ['file' => Media::sign($filename), 'fullpath' => Util::toMedia($filename)];
+                return ['file' => Advertising::sign($filename), 'fullpath' => Util::toMedia($filename)];
             }
         }
 
@@ -388,7 +387,7 @@ class mp
                 'group_name' => Request::str('groupname'),
                 'order_no' => min(999, Request::int('orderno')),
                 'clr' => Request::has('clr') ? Request::trim('clr') : 'gray',
-                'scname' => Request::has('scname') ? Request::trim('scname') : Schema::DAY,
+                'scname' => Request::has('scname') ? Request::trim('scname') : Account::DAY,
                 'count' => Request::int('count'),
                 'total' => Request::int('total'),
             ];
@@ -402,19 +401,19 @@ class mp
                 }
             }
 
-            if (!Schema::has($data['scname'])) {
+            if (!Account::has($data['scname'])) {
                 return err('领取频率只是每天/每周/每月！');
             }
 
             if (Request::has('qrcode')) {
                 $type = Account::NORMAL;
-                $url = Media::strip(Request::str('qrcode'));
+                $url = Advertising::strip(Request::str('qrcode'));
                 if ($url === false) {
                     return err('请上传正确的二维码文件！');
                 }
             } elseif (Request::has('media')) {
                 $type = Account::VIDEO;
-                $url = Media::strip(Request::str('media'));
+                $url = Advertising::strip(Request::str('media'));
                 if ($url === false) {
                     return err('请上传正确的视频文件！');
                 }
@@ -428,7 +427,7 @@ class mp
                 return err('请指定正确的文件网址！');
             }
 
-            $img_url = Media::strip(Request::str('img'));
+            $img_url = Advertising::strip(Request::str('img'));
             if ($img_url === false) {
                 return err('请上传正确的头像文件！');
             }

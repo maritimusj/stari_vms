@@ -10,6 +10,7 @@ defined('IN_IA') or exit('Access Denied');
 
 use zovye\model\accountModelObj;
 use zovye\model\userModelObj;
+use zovye\util\Helper;
 use zovye\util\TemplateUtil;
 use zovye\util\Util;
 

@@ -92,9 +92,9 @@
                         <label for="scname" class="col-md-2 control-label">领取周期</label>
                         <div class="col-md-10">
                             <select  class="form-control" name="scname" id="scname">
-                                <option value="{php echo zovye\Account::DAY}" {if $account && $account->getScname() == zovye\Account::DAY}selected{/if}>每天</option>
-                                <option value="{php echo zovye\Account::WEEK}" {if $account && $account->getScname() == zovye\Account::WEEK}selected{/if}>每周</option>
-                                <option value="{php echo zovye\Account::MONTH}" {if $account && $account->getScname() == zovye\Account::MONTH}selected{/if}>每月</option>
+                                <option value="{php echo zovye\domain\Account::DAY}" {if $account && $account->getScname() == zovye\domain\Account::DAY}selected{/if}>每天</option>
+                                <option value="{php echo zovye\domain\Account::WEEK}" {if $account && $account->getScname() == zovye\domain\Account::WEEK}selected{/if}>每周</option>
+                                <option value="{php echo zovye\domain\Account::MONTH}" {if $account && $account->getScname() == zovye\domain\Account::MONTH}selected{/if}>每月</option>
                             </select>
                             <span class="help-block">* 每天/每周/每月可领取一次奖励</span>
                         </div>

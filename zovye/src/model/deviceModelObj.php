@@ -210,7 +210,7 @@ class deviceModelObj extends ModelObj
 
     public function getLastOnline()
     {
-        if ($this->isVDevice()) {
+        if ($this->isVDevice() || $this->isDummyDevice()) {
             return TIMESTAMP;
         }
 

@@ -419,7 +419,7 @@ class DeviceEventProcessor
                 $device->setLastOnline(TIMESTAMP);
 
                 $device->resetLock();
-                $device->firstMsgStatistic();
+                $device->updateFirstMsgStats();
 
                 Job::deviceEventNotify($device, 'online');
             }
@@ -617,7 +617,7 @@ class DeviceEventProcessor
                 $device->reportMcbStatus($data['code']);
             }
 
-            $device->firstMsgStatistic();
+            $device->updateFirstMsgStats();
 
             $device->save();
 

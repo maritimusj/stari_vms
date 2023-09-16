@@ -2772,7 +2772,7 @@ class deviceModelObj extends ModelObj
     /**
      * 统计设备上线次数
      */
-    public function firstMsgStatistic(): bool
+    public function updateFirstMsgStats(): bool
     {
         $statistic = $this->get('firstMsgStatistic', []);
 

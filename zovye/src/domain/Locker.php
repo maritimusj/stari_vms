@@ -79,16 +79,22 @@ class Locker
 
     public static function flock($uid, callable $callback)
     {
-        $dir = ATTACHMENT_ROOT.'lock'.DIRECTORY_SEPARATOR;
+        $hash_val = sha1($uid);
+
+        $first = substr($hash_val, 0, 6);
+        $second = substr($hash_val, 6);
+
+        $dir = ATTACHMENT_ROOT.'lock'.DIRECTORY_SEPARATOR.$first.DIRECTORY_SEPARATOR;
+
         We7::make_dirs($dir);
 
-        $fp = fopen($dir.sha1($uid).'.lock', 'w+');
+        $fp = fopen($dir.$second.'.lock', 'w+');
         if ($fp) {
             if (flock($fp, LOCK_EX)) {
                 if (DEBUG) {
-                    fwrite($fp, REQUEST_ID . "\r\n");
-                    fwrite($fp, date('Y-m-d H:i:s') . "\r\n");
-                    fwrite($fp, $uid . "\r\n");
+                    fwrite($fp, REQUEST_ID."\r\n");
+                    fwrite($fp, date('Y-m-d H:i:s')."\r\n");
+                    fwrite($fp, $uid."\r\n");
                 }
                 if ($callback) {
                     $result = $callback();

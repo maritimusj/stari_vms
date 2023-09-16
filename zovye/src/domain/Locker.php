@@ -88,7 +88,8 @@ class Locker
 
         We7::make_dirs($dir);
 
-        $fp = fopen($dir.$second.'.lock', 'w+');
+        $filename = $dir.$second.'.lock';
+        $fp = fopen($filename, 'w+');
         if ($fp) {
             if (flock($fp, LOCK_EX)) {
                 if (DEBUG) {
@@ -101,7 +102,11 @@ class Locker
                 }
                 flock($fp, LOCK_UN);
             }
+
             fclose($fp);
+
+            unlink($filename);
+            rmdir($dir);
         }
 
         return $result ?? null;

@@ -49,7 +49,6 @@ $result = DBUtil::transactionDo(function () use ($id, &$device) {
             'lng' => floatval(request('location')['lng']),
             'lat' => floatval(request('location')['lat']),
         ],
-        'txt' => [Request::trim('first_txt'), Request::trim('second_txt'), Request::trim('third_txt')],
         'theme' => Request::str('theme'),
     ];
 

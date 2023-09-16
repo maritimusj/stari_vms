@@ -71,7 +71,7 @@ class GDCVMachine
             'agentCode' => strval($this->config['agent']),
             'location' => isset($location['lat']) && isset($location['lng']) ? "{$location['lat']},{$location['lng']}" : '',
             'connectionStatus' => $device->isMcbOnline() ? 1 : 2,   // 在线状态？1,正常，2,离线
-            'machineStatus' => $device->isDown() ? 2 : 1,           // 设备状态？1,正常， 2,故障
+            'machineStatus' => $device->isMaintenance() ? 2 : 1,           // 设备状态？1,正常， 2,故障
             'stockStatus' => $device->getS2() ? 2 : 1,              // 是否缺货？1,正常，2，缺货
             'channels' => [],
         ];

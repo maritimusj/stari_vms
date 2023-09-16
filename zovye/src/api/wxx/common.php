@@ -126,7 +126,7 @@ class common
             $result['device'] = [
                 'buid' => $device->getBUID(),
                 'mac' => $device->getMAC(),
-                'is_down' => isset($extra['isDown']) && $extra['isDown'] == Device::STATUS_MAINTENANCE ? 1 : 0,
+                'is_down' => $device->isMaintenance() ? 1 : 0,
             ];
         }
         $agent = $device->getAgent();

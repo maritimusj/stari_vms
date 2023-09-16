@@ -65,7 +65,7 @@ if (is_array($ids)) {
                 'web' => $device->settings('extra.location.baidu.address', ''),
                 'agent' => $device->settings('extra.location.tencent.address', ''),
             ],
-            'isDown' => $device->settings('extra.isDown', Device::STATUS_NORMAL),
+            'isDown' => $device->isMaintenance() ? 1 : 0,
             'logging' => $device->isEventLogEnabled(),
         ];
 

@@ -38,11 +38,11 @@ $result = DBUtil::transactionDo(function () use ($id, &$device) {
         'group_id' => Request::int('group'),
         'capacity' => max(0, Request::int('capacity')),
         'remain' => max(0, Request::int('remain')),
+        's3' => Request::bool('isDown') ? Device::STATUS_MAINTENANCE : Device::STATUS_NORMAL,
     ];
 
     $extra = [
         'pushAccountMsg' => Request::trim('pushAccountMsg'),
-        'isDown' => Request::bool('isDown') ? Device::STATUS_MAINTENANCE : Device::STATUS_NORMAL,
         'activeQrcode' => Request::bool('activeQrcode') ? 1 : 0,
         'address' => Request::trim('address'),
         'grantloc' => [
@@ -185,6 +185,8 @@ $result = DBUtil::transactionDo(function () use ($id, &$device) {
                 $extra['volume'] = $vol;
             }
         }
+
+        $device->setMaintenance($data['s3']);
 
     } else {
         if (Device::exists(['imei' => $data['imei']])) {

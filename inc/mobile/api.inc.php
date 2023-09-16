@@ -93,7 +93,7 @@ if (empty($device)) {
     JSON::fail('找不到这个设备！');
 }
 
-if ($device->isDown()) {
+if ($device->isMaintenance()) {
     JSON::fail('设备维护中，请稍后再试！');
 }
 

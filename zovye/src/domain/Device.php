@@ -1051,7 +1051,7 @@ class Device extends State
 
             //维护状态
             if (Request::bool('maintenance')) {
-                $query->where(['status' => Device::STATUS_MAINTENANCE]);
+                $query->where(['s3' => Device::STATUS_MAINTENANCE]);
             }
 
             //App未绑定

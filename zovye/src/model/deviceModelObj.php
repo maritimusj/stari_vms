@@ -84,6 +84,8 @@ use function zovye\tb;
  * @method setS1(int $int)
  * @method setS2(int $param)
  * @method getS2()
+ * @method setS3(bool $v)
+ * @method getS3()
  */
 class deviceModelObj extends ModelObj
 {
@@ -162,6 +164,9 @@ class deviceModelObj extends ModelObj
 
     /** @var int */
     protected $s2; //是否缺货
+
+    /** @var int */
+    protected $s3; //是否维护中
 
     protected $last_order;
 
@@ -2377,9 +2382,13 @@ class deviceModelObj extends ModelObj
         return false;
     }
 
-    public function isDown(): bool
+    public function setMaintenance($v) {
+        $this->setS3($v);
+    }
+
+    public function isMaintenance(): bool
     {
-        if ($this->settings('extra.isDown') == Device::STATUS_MAINTENANCE) {
+        if ($this->getS3() == Device::STATUS_MAINTENANCE) {
             return true;
         }
 

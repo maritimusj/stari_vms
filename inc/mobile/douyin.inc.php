@@ -169,7 +169,7 @@ if ($device->isActiveQrcodeEnabled() && $device->getShadowId() !== $device_id) {
     Response::alert('设备二维码不匹配！', 'error');
 }
 
-if ($device->isDown()) {
+if ($device->isMaintenance()) {
     Response::alert('设备维护中，请稍后再试！', 'error');
 }
 

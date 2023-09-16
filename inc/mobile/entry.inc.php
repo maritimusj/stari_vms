@@ -60,7 +60,7 @@ if ($device_id) {
         Response::alert('请重新扫描设备上的二维码！', 'error');
     }
 
-    if ($device->isDown()) {
+    if ($device->isMaintenance()) {
         Response::alert('设备维护中，请稍后再试！', 'error');
     }
 

@@ -75,7 +75,7 @@ class device
                     'way' => $way,
                 ],
                 'extra' => [
-                    'is_down' => isset($extra['isDown']) && $extra['isDown'] == \zovye\domain\Device::STATUS_MAINTENANCE ? 1 : 0,
+                    'is_down' => $device->isMaintenance() ? 1 : 0,
                 ],
             ];
             if (!isEmptyArray($location)) {
@@ -104,7 +104,7 @@ class device
             'extra' => [
                 'iccid' => $device->getICCID(),
                 'volume' => intval($extra['volume']),
-                'is_down' => isset($extra['isDown']) && $extra['isDown'] == \zovye\domain\Device::STATUS_MAINTENANCE ? 1 : 0,
+                'is_down' => $device->isMaintenance() ? 1 : 0,
             ],
             'status' => [
                 'lastOnline' => date('Y-m-d H:i:s', $device->getlastOnline()),

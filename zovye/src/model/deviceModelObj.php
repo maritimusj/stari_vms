@@ -211,7 +211,7 @@ class deviceModelObj extends ModelObj
     public function getLastOnline()
     {
         if ($this->isVDevice()) {
-            return date('Y-m-d H:i:s');
+            return TIMESTAMP;
         }
 
         return $this->settings('extra.v0.status.last_online', $this->last_online);

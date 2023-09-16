@@ -1972,7 +1972,7 @@ class deviceModelObj extends ModelObj
 
         if ($subs) {
             return [
-                'speed' => intval(settings('advs.srt.speed', 1)),
+                'speed' => intval(settings('ads.srt.speed', 1)),
                 'subs' => $subs,
             ];
         }

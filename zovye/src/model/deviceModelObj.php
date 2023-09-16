@@ -1181,7 +1181,7 @@ class deviceModelObj extends ModelObj
      */
     public function getQrcode(): string
     {
-        $url = Util::toMedia(parent::getQrcode());
+        $url = Util::toMedia($this->qrcode);
         $f = stripos($url, '?') !== false ? '&' : '?';
         $ts = microtime(true);
 

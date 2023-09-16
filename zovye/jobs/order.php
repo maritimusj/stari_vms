@@ -19,6 +19,7 @@ use zovye\Log;
 use zovye\Request;
 use zovye\util\Helper;
 use zovye\util\Util;
+use zovye\We7;
 use function zovye\isEmptyArray;
 use function zovye\settings;
 
@@ -47,7 +48,10 @@ if (settings('device.clearErrorCode') && $order->isResultOk()) {
     $device->cleanLastError();
 }
 
-$device->setLastOrder($order->getCreatetime());
+if (We7::pdo_field_exists(APP_NAME.'_device', 'last_order')) {
+    $device->setLastOrder($order->getCreatetime());
+}
+
 $device->save();
 
 //检查剩余商品数量

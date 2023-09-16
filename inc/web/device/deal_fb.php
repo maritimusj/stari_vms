@@ -20,7 +20,7 @@ if (empty($remark)) {
 }
 
 /** @var device_feedbackModelObj $res */
-$res = DeviceFeedback::findOne(['id' => $id]);
+$res = DeviceFeedback::get($id);
 
 if ($res) {
     $res->setRemark($remark);

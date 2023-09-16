@@ -56,6 +56,11 @@ class Base
         return static::model()->query($condition);
     }
 
+    public static function get($id)
+    {
+        return self::findOne(['id' => intval($id)]);
+    }
+
     public static function findOne($condition = [])
     {
         return self::query($condition)->findOne();

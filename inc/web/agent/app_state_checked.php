@@ -15,7 +15,7 @@ use zovye\util\Util;
 $id = Request::int('id');
 
 /** @var agent_appModelObj $app */
-$app = AgentApplication::findOne(['id' => $id]);
+$app = AgentApplication::get($id);
 if ($app) {
     $state = $app->getState() != AgentApplication::CHECKED ? AgentApplication::CHECKED : AgentApplication::WAIT;
     $app->setState($state);

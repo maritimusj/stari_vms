@@ -35,7 +35,7 @@ if ($agent_id) {
 
 $tags_id = Request::int('tag_id');
 if ($tags_id) {
-    $tag = Tags::findOne(['id' => $tags_id]);
+    $tag = Tags::get($tags_id);
     if (empty($tag)) {
         Response::toast('找不到这个标签！', Util::url('device'), 'error');
     }

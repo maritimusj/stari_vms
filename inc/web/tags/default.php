@@ -15,7 +15,7 @@ use zovye\util\Helper;
 
 if (Request::is_ajax() && Request::has('id')) {
     /** @var tagsModelObj $res */
-    $res = Tags::findOne(['id' => Request::int('id')]);
+    $res = Tags::get(Request::int('id'));
     if ($res) {
         $tag = [
             'id' => $res->getId(),

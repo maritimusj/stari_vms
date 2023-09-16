@@ -27,7 +27,7 @@ class article
 
         $id = Request::int('id');
         /** @var articleModelObj $article */
-        $article = \zovye\domain\Article::findOne(['id' => $id]);
+        $article = \zovye\domain\Article::get($id);
         if ($article) {
             $article->setTotal(intval($article->getTotal()) + 1);
             $article->save();

@@ -1089,7 +1089,7 @@ class deviceModelObj extends ModelObj
 
         $diff_tags = array_diff($org_ids, $ids);
         foreach ($diff_tags as $id) {
-            $tag = Tags::findOne(['id' => $id]);
+            $tag = Tags::get($id);
             if ($tag) {
                 $count = Device::query("tags_data REGEXP '<{$tag->getId()}>'")->count();
                 $tag->setCount($count - 1);
@@ -1410,7 +1410,7 @@ class deviceModelObj extends ModelObj
             if ($tags) {
                 foreach (explode('><', $tags) as $id) {
                     /** @var tagsModelObj $tag */
-                    $tag = Tags::findOne(['id' => $id]);
+                    $tag = Tags::get($id);
                     if ($tag) {
                         $titles[$tag->getId()] = $tag->getTitle();
                     }

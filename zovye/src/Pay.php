@@ -487,7 +487,7 @@ class Pay
 
     public static function getPayLogById(int $id): ?pay_logsModelObj
     {
-        return PayLogs::findOne(['id' => $id]);
+        return PayLogs::get($id);
     }
 
     /**

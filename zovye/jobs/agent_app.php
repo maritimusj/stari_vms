@@ -27,7 +27,7 @@ if (!CtrlServ::checkJobSign($log)) {
 }
 
 /** @var agent_appModelObj $app */
-$app = AgentApplication::findOne(['id' => $log['id']]);
+$app = AgentApplication::get($log['id']);
 
 if (empty($app)) {
     throw new JobException('找不到这个申请记录！', $log);

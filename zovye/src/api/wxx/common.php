@@ -466,7 +466,7 @@ class common
             return err('设备不在线！');
         }
 
-        if ($device->lockAcquire(3)) {
+        if (!$device->lockAcquire(3)) {
             return err('设备正忙，请稍后再试！');
         }
 

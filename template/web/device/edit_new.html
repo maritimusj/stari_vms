@@ -283,7 +283,7 @@
                             <div class="col-md-10">
                                 <select name="blueToothProtocol" id="select_protocols" style="width:100%;" data-device="{php echo $device ? $device->getId() : 0}">
                                     {if empty($device)}
-                                    <option value="{php echo  \zovye\DeviceTypes::UNKNOWN_TYPE}" selected disabled>
+                                    <option value="{php echo  \zovye\domain\DeviceTypes::UNKNOWN_TYPE}" selected disabled>
                                         &lt;请选择蓝牙协议&gt;
                                     </option>
                                     {/if}

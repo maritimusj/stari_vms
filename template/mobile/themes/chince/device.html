@@ -229,9 +229,9 @@
 					<div class="circle"></div>
 				</div>
 				<div class="card">
-					<img class="avatar" src="{php echo \zovye\Util::tomedia(current($tpl['accounts'])['img']);}" />
+					<img class="avatar" src="{php echo \zovye\util\Util::tomedia(current($tpl['accounts'])['img']);}" />
 					<span class="name">{php echo current($tpl['accounts'])['title'];}</span>
-					<img class="qrcode" src="{php echo \zovye\Util::tomedia(current($tpl['accounts'])['qrcode']);}" />
+					<img class="qrcode" src="{php echo \zovye\util\Util::tomedia(current($tpl['accounts'])['qrcode']);}" />
 					<span class="desc">「 {php echo html_entity_decode(current($tpl['accounts'])['descr'])} 」</span>
 				</div>
 			</div>

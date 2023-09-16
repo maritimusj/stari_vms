@@ -152,7 +152,7 @@
 			<span class="way-num">{php echo $button_index++;}</span>
 			<span class="way-desc">免费领取</span>
 		</div>
-		<img class="qrcode" src="{php echo \zovye\Util::tomedia(current($tpl['accounts'])['qrcode']);}" />
+		<img class="qrcode" src="{php echo \zovye\util\Util::tomedia(current($tpl['accounts'])['qrcode']);}" />
 		<span class="qrcode-desc">长按识别二维码免费领取</span>
 {/if}
 {if $tpl['purchase']}

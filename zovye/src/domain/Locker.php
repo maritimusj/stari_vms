@@ -81,8 +81,8 @@ class Locker
     {
         $hash_val = sha1($uid);
 
-        $first = substr($hash_val, 0, 6);
-        $second = substr($hash_val, 6);
+        $first = substr($hash_val, 0, 4);
+        $second = substr($hash_val, 4);
 
         $dir = ATTACHMENT_ROOT.'lock'.DIRECTORY_SEPARATOR.$first.DIRECTORY_SEPARATOR;
 

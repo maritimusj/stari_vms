@@ -177,8 +177,10 @@ class deviceModelObj extends ModelObj
     public function support($key): bool
     {
         switch ($key) {
-            case 'last_order': return boolval(settings('migration.device.last_order'));
-            default: return false;
+            case 'last_order':
+                return boolval(settings('migration.device.last_order'));
+            default:
+                return false;
         }
     }
 
@@ -1889,6 +1891,17 @@ class deviceModelObj extends ModelObj
         return $this->mcbNotify('params', $code, $data);
     }
 
+    /**
+     * 通知mcb更新配置
+     * @param $code
+     * @param array $data
+     * @return void
+     */
+    public function updateMcbConfig($code, array $data = [])
+    {
+        $this->mcbNotify('config', $code, $data);
+    }
+
     public function getRemainNum(): int
     {
         $data = Device::getPayload($this);
@@ -1937,17 +1950,6 @@ class deviceModelObj extends ModelObj
     public function enableActiveQrcode(bool $enable = true): bool
     {
         return $this->updateSettings('extra.activeQrcode', $enable ? 1 : 0);
-    }
-
-    /**
-     * 通知mcb更新配置
-     * @param $code
-     * @param array $data
-     * @return void
-     */
-    public function updateMcbConfig($code, array $data = [])
-    {
-        $this->mcbNotify('config', $code, $data);
     }
 
     public function isMcbStatusExpired(): bool
@@ -2190,7 +2192,8 @@ class deviceModelObj extends ModelObj
         return false;
     }
 
-    public function setMaintenance($v) {
+    public function setMaintenance($v)
+    {
         $this->setS3($v);
     }
 
@@ -2324,7 +2327,6 @@ class deviceModelObj extends ModelObj
         $ads = $this->getAds(Advertising::REDIRECT_URL);
         if ($ads) {
             foreach ($ads as $ad) {
-
                 if ($ad['extra']['when'][$when]) {
                     $url = $ad['extra']['url'];
                     $delay = $ad['extra']['delay'];

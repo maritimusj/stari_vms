@@ -33,6 +33,8 @@ if ($id > 0) {
     $tpl_data['app'] = $device->getAppId();
 
     $extra = $device->get('extra');
+    //兼容以前
+    $extra['isDown'] = $device->isMaintenance();
 
     $loc = empty($extra['location']['baidu']) ? [] : $extra['location']['baidu'];
     $tpl_data['loc'] = $loc;

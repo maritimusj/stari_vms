@@ -2424,7 +2424,10 @@ class deviceModelObj extends ModelObj
             $keeper_id = intval($keeper);
         }
 
-        $res = m('keeper_devices')->findOne(['keeper_id' => $keeper_id, 'device_id' => $this->getId()]);
+        $res = m('keeper_devices')->findOne([
+            'keeper_id' => $keeper_id,
+            'device_id' => $this->getId(),
+        ]);
         if ($res) {
             return $res->destroy();
         }
@@ -2926,7 +2929,7 @@ class deviceModelObj extends ModelObj
                 return $c['data'];
             }
         }
-
+        /** @var  device_logsModelObj $entry */
         foreach ($all as $entry) {
             $result = $entry->getData();
             if ($result) {

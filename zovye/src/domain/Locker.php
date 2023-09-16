@@ -84,7 +84,7 @@ class Locker
         $first = substr($hash_val, 0, 4);
         $second = substr($hash_val, 4);
 
-        $dir = RUNTIME_DIR.'locker'.DIRECTORY_SEPARATOR.$first.DIRECTORY_SEPARATOR;
+        $dir = DATA_DIR.'locker'.DIRECTORY_SEPARATOR.$first.DIRECTORY_SEPARATOR;
 
         We7::make_dirs($dir);
 

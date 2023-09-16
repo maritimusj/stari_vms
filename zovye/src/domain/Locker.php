@@ -79,16 +79,10 @@ class Locker
 
     public static function flock($uid, callable $fn)
     {
-        $hash_val = sha1($uid);
-
-        $first = substr($hash_val, 0, 4);
-        $second = substr($hash_val, 4);
-
-        $dir = DATA_DIR.'locker'.DIRECTORY_SEPARATOR.$first.DIRECTORY_SEPARATOR;
-
+        $dir = DATA_DIR.'locker'.DIRECTORY_SEPARATOR;
         We7::make_dirs($dir);
 
-        $filename = $dir.$second.'.lock';
+        $filename = $dir.sha1($uid).'.lock';
         $fp = fopen($filename, 'w+');
         if ($fp) {
             if (flock($fp, LOCK_EX)) {
@@ -102,9 +96,7 @@ class Locker
                 }
                 flock($fp, LOCK_UN);
             }
-
             fclose($fp);
-
             unlink($filename);
             rmdir($dir);
         }

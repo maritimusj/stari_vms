@@ -48,7 +48,7 @@ if (settings('device.clearErrorCode') && $order->isResultOk()) {
     $device->cleanLastError();
 }
 
-if (We7::pdo_field_exists(APP_NAME.'_device', 'last_order')) {
+if ($device->support('last_order')) {
     $device->setLastOrder($order->getCreatetime());
 }
 

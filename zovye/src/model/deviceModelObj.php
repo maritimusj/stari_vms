@@ -190,6 +190,14 @@ class deviceModelObj extends ModelObj
         return $this->getImei();
     }
 
+    public function support($key): bool
+    {
+        switch ($key) {
+            case 'last_order': return boolval(settings('migration.device.last_order'));
+            default: return false;
+        }
+    }
+
     /**
      * 出货记录
      * @param int $level

@@ -20,4 +20,6 @@ if (!We7::pdo_field_exists($tb_name.'_device', 'last_order')) {
 ALTER TABLE `ims_zovye_vms_device` ADD `last_order` INT NULL AFTER `s3`, ADD INDEX (`last_order`);
 SQL;
     Migrate::execSQL($sql);
+    //升级完成标志
+    updateSettings('migration.device.last_order', 1);
 }

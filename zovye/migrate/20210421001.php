@@ -14,3 +14,10 @@ ALTER TABLE `ims_zovye_vms_device` ADD `s1` TINYINT(1) NOT NULL DEFAULT '0' AFTE
 SQL;
     Migrate::execSQL($sql);
 }
+
+if (!We7::pdo_field_exists($tb_name.'_device', 'last_order')) {
+    $sql = <<<SQL
+ALTER TABLE `ims_zovye_vms_device` ADD `last_order` INT NULL AFTER `s3`, ADD INDEX (`last_order`);
+SQL;
+    Migrate::execSQL($sql);
+}

@@ -13,7 +13,6 @@ use zovye\base\ModelObjFinder;
 use zovye\BlueToothProtocol;
 use zovye\business\GoodsExpireAlert;
 use zovye\Config;
-use zovye\contract\bluetooth\IBlueToothProtocol;
 use zovye\contract\bluetooth\ICmd;
 use zovye\contract\bluetooth\IResponse;
 use zovye\CtrlServ;

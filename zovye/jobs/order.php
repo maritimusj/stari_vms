@@ -45,8 +45,10 @@ if (!$device) {
 //是否自动清除错误代码
 if (settings('device.clearErrorCode') && $order->isResultOk()) {
     $device->cleanLastError();
-    $device->save();
 }
+
+$device->setLastOrder($order->getCreatetime());
+$device->save();
 
 //检查剩余商品数量
 $device->checkRemain();

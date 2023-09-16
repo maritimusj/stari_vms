@@ -86,6 +86,7 @@ use function zovye\tb;
  * @method getS2()
  * @method setS3(bool $v)
  * @method getS3()
+ * @method setLastOrder($ts)
  */
 class deviceModelObj extends ModelObj
 {

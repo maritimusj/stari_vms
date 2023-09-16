@@ -78,7 +78,7 @@ class db
      * 执行一条非查询语句.
      *
      * @param string $sql
-     * @param array or string $params
+     * @param array $params or string $params
      *
      * @return mixed
      *               成功返回受影响的行数
@@ -462,7 +462,7 @@ class db
      */
     public function fieldexists($tablename, $fieldname)
     {
-        $isexists = $this->fetch('DESCRIBE ' . $this->tablename($tablename) . " `{$fieldname}`", array());
+        $isexists = $this->fetch('DESCRIBE ' . $this->tablename($tablename) . " `$fieldname`");
 
         return !empty($isexists);
     }
@@ -485,7 +485,7 @@ class db
     public function fieldmatch($tablename, $fieldname, $datatype = '', $length = '')
     {
         $datatype = strtolower($datatype);
-        $field_info = $this->fetch('DESCRIBE ' . $this->tablename($tablename) . " `{$fieldname}`", array());
+        $field_info = $this->fetch('DESCRIBE ' . $this->tablename($tablename) . " `$fieldname`");
         if (empty($field_info)) {
             return false;
         }
@@ -518,7 +518,7 @@ class db
     public function indexexists($tablename, $indexname)
     {
         if (!empty($indexname)) {
-            $indexs = $this->fetchall('SHOW INDEX FROM ' . $this->tablename($tablename), array(), '');
+            $indexs = $this->fetchall('SHOW INDEX FROM ' . $this->tablename($tablename));
             if (!empty($indexs) && is_array($indexs)) {
                 foreach ($indexs as $row) {
                     if ($row['Key_name'] == $indexname) {
@@ -539,7 +539,7 @@ class db
      */
     public function tablename($table)
     {
-        return (0 === strpos($table, $this->tablepre) || 0 === strpos($table, 'ims_')) ? $table : "`{$this->tablepre}{$table}`";
+        return (0 === strpos($table, $this->tablepre) || 0 === strpos($table, 'ims_')) ? $table : "`$this->tablepre$table`";
     }
 
     /**
@@ -552,7 +552,7 @@ class db
     public function tableexists($table)
     {
         if (!empty($table)) {
-            $data = $this->fetch("SHOW TABLES LIKE '{$this->tablepre}{$table}'", array());
+            $data = $this->fetch("SHOW TABLES LIKE '{$this->tablepre}$table'");
             if (!empty($data)) {
                 $data = array_values($data);
                 $tablename = $this->tablepre . $table;

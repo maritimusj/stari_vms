@@ -1886,16 +1886,6 @@ class deviceModelObj extends ModelObj
             'num' => $this->getRemainNum(),
         ];
 
-        $txt = $this->settings('extra.txt', []);
-        if (!isEmptyArray($txt)) {
-            $data['txt'] = [
-                '123', //固定数据，主板要求
-                strval($txt[0]),
-                strval($txt[1]),
-                strval($txt[2]),
-            ];
-        }
-
         return $this->mcbNotify('params', $code, $data);
     }
 

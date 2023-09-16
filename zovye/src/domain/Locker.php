@@ -77,7 +77,7 @@ class Locker
         });
     }
 
-    public static function flock($uid, callable $callback)
+    public static function flock($uid, callable $fn)
     {
         $hash_val = sha1($uid);
 
@@ -97,8 +97,8 @@ class Locker
                     fwrite($fp, date('Y-m-d H:i:s')."\r\n");
                     fwrite($fp, $uid."\r\n");
                 }
-                if ($callback) {
-                    $result = $callback();
+                if ($fn) {
+                    $result = call_user_func($fn);
                 }
                 flock($fp, LOCK_UN);
             }

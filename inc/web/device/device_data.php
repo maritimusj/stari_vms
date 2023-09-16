@@ -48,7 +48,6 @@ if (is_array($ids)) {
             ],
             'capacity' => $device->getCapacity(),
             'remain' => $device->getRemainNum(),
-            'reset' => $device->getReset(),
             'lastError' => $device->getLastError(),
             'lastOnlineIp' => $device->getLastOnlineIp(),
             'lastOnline' => $device->getLastOnline() ? date('Y-m-d H:i:s', $device->getLastOnline()) : '',

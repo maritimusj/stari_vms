@@ -56,7 +56,6 @@ if ($op == 'default') {
                             'name' => $res['title'],
                             'capacity' => DEFAULT_DEVICE_CAPACITY,
                             'remain' => DEFAULT_DEVICE_CAPACITY,
-                            'reset' => 0,
                             'imei' => $res['mcbUID'],
                             'app_id' => $res['appUID'] ?: $app_id,
                         ];

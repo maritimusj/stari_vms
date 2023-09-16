@@ -110,20 +110,11 @@ class deviceModelObj extends ModelObj
     /** @var int */
     protected $remain;
 
-    /** @var int */
-    protected $reset;
-
     /** @var string */
     protected $imei;
 
     /** @var string */
     protected $iccid;
-
-    /** @var int */
-    protected $sig;
-
-    /** @var int */
-    protected $qoe; //电量
 
     /** @var string */
     protected $qrcode;
@@ -140,9 +131,6 @@ class deviceModelObj extends ModelObj
 
     /** @var int */
     protected $app_last_online;
-
-    /** @var string */
-    protected $app_version;
 
     /** @var int */
     protected $agent_id;
@@ -731,23 +719,6 @@ class deviceModelObj extends ModelObj
         $qoe = $this->getQoe();
 
         return $qoe != -1 && $qoe != 0 && $qoe < 10;
-    }
-
-    public function getReset(): int
-    {
-        $reset = $this->settings('extra.v0.status.reset');
-        if (isset($reset)) {
-            return intval($reset);
-        }
-
-        $this->setReset($this->reset);
-
-        return $this->reset;
-    }
-
-    public function setReset($n): bool
-    {
-        return $this->updateSettings('extra.v0.status.reset', $n);
     }
 
     public function getArea($default = []): array
@@ -1656,21 +1627,14 @@ class deviceModelObj extends ModelObj
         return $ids;
     }
 
-    public function getAppVersion()
+    public function getAppVersion(): string
     {
-        $ver = $this->settings('extra.v0.status.appversion');
-        if (isset($ver)) {
-            return $ver;
-        }
-
-        $this->setAppVersion($this->app_version);
-
-        return $this->app_version;
+        return strval($this->settings('extra.v0.status.app.version'));
     }
 
     public function setAppVersion($ver): bool
     {
-        return $this->updateSettings('extra.v0.status.appversion', $ver);
+        return $this->updateSettings('extra.v0.status.app.version', $ver);
     }
 
     /**
@@ -1997,11 +1961,6 @@ class deviceModelObj extends ModelObj
      */
     public function getSrcConfig(): array
     {
-        //app版本需要大于等于3.1才能处理字幕
-        if ($this->getAppVersion() < 3.1) {
-            return [];
-        }
-
         $subs = [];
         foreach ($this->getAds(Advertising::SCREEN) as $adv) {
             if ($adv['extra']['media'] == 'srt') {
@@ -2613,29 +2572,6 @@ class deviceModelObj extends ModelObj
         }
 
         return $result;
-    }
-
-    /**
-     * @param bool $detail
-     * @return array
-     */
-    public function getTypeData(bool $detail = false): array
-    {
-        $type = DeviceTypes::from($this);
-        if ($type) {
-            return DeviceTypes::format($type, $detail);
-        }
-
-        return [];
-    }
-
-    /**
-     * 未知类型设备
-     * @return bool
-     */
-    public function isUnknownType(): bool
-    {
-        return $this->device_type < 1;
     }
 
     public function removeKeeper($keeper): bool

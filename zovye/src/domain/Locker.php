@@ -98,7 +98,6 @@ class Locker
             }
             fclose($fp);
             unlink($filename);
-            rmdir($dir);
         }
 
         return $result ?? null;

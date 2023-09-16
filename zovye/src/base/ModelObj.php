@@ -429,7 +429,7 @@ class ModelObj implements ISettings
             }
         } else {
             if ($seg === null) {
-                if (Util::traitUsed($this, 'DirtyChecker')) {
+                if (Util::traitUsed($this, DirtyChecker::class)) {
                     $isOk = function ($key) {
                         return $this->isDirty($key);
                     };

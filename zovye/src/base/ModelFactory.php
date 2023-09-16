@@ -6,6 +6,7 @@
 
 namespace zovye\base;
 
+use zovye\traits\DirtyChecker;
 use zovye\util\Util;
 use zovye\We7;
 use function zovye\is_error;
@@ -303,7 +304,7 @@ class ModelFactory
         if ($res !== false) {
             $data_keys = array_keys($data);
 
-            if (Util::traitUsed($obj, 'DirtyChecker')) {
+            if (Util::traitUsed($obj, DirtyChecker::class)) {
                 $obj->clearDirty($data_keys);
             }
 

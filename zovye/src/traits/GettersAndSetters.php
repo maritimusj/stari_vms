@@ -53,7 +53,7 @@ trait GettersAndSetters
                     $prop
                 ) && $this->$prop !== $params[0]) {
                 $this->$prop = $params[0];
-                if (Util::traitUsed($this, 'DirtyChecker')) {
+                if (Util::traitUsed($this, DirtyChecker::class)) {
                     $this->setDirty($prop);
                 }
             }

@@ -50,7 +50,7 @@ class Util
             $traits = array_merge($traits, class_uses($classname));
         }
 
-        return $traits && in_array(__NAMESPACE__.'\\traits\\'.$traitName, $traits);
+        return $traits && in_array($traitName, $traits);
     }
 
     public static function getTokenValue(): string

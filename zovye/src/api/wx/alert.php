@@ -42,9 +42,7 @@ class alert
                 }
 
                 if ($device->getAgentId() != $keeper->getAgentId() ||
-                    !$device->hasKeeper($keeper) ||
-                    $device->getKeeperKind($keeper) != \zovye\domain\Keeper::OP
-                ) {
+                    !$device->hasKeeper($keeper, \zovye\domain\Keeper::OP)) {
                     return err('没有权限！');
                 }
             }

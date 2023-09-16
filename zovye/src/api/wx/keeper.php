@@ -929,8 +929,7 @@ class keeper
         }
 
         if ($device->getAgentId() != $keeper->getAgentId() ||
-            !$device->hasKeeper($keeper) ||
-            $device->getKeeperKind($keeper) != \zovye\domain\Keeper::OP) {
+            !$device->hasKeeper($keeper, \zovye\domain\Keeper::OP)) {
             return err('没有权限执行这个操作！');
         }
 
@@ -1102,8 +1101,7 @@ class keeper
         }
 
         if ($device->getAgentId() != $keeper->getAgentId() ||
-            !$device->hasKeeper($keeper) ||
-            $device->getKeeperKind($keeper) != \zovye\domain\Keeper::OP) {
+            !$device->hasKeeper($keeper, \zovye\domain\Keeper::OP)) {
             return err('没有权限！');
         }
 
@@ -1293,7 +1291,7 @@ class keeper
         }
 
         $device = $order->getDevice();
-        if (empty($device) || !$device->hasKeeper($keeper) || $device->getKeeperKind($keeper) != \zovye\domain\Keeper::OP) {
+        if (empty($device) || !$device->hasKeeper($keeper, \zovye\domain\Keeper::OP)) {
             return err('没有权限管理这个订单！');
         }
 

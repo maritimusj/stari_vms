@@ -2578,24 +2578,32 @@ class deviceModelObj extends ModelObj
         return false;
     }
 
-    public function hasKeeper($keeper): bool
+    public function hasKeeper($keeper, $op = null): bool
     {
-        if (!empty($keeper)) {
-            if ($keeper instanceof keeperModelObj) {
-                $keeper_id = $keeper->getId();
-            } else {
-                $keeper_id = intval($keeper);
-            }
-
-            $res = m('keeper_devices')->findOne([
-                'keeper_id' => $keeper_id,
-                'device_id' => $this->getId(),
-            ]);
-
-            return !empty($res);
+        if (empty($keeper)) {
+            return false;
         }
 
-        return false;
+        if ($keeper instanceof keeperModelObj) {
+            $keeper_id = $keeper->getId();
+        } else {
+            $keeper_id = intval($keeper);
+        }
+
+        $exists = m('keeper_devices')->exists([
+            'keeper_id' => $keeper_id,
+            'device_id' => $this->getId(),
+        ]);
+
+        if (!$exists) {
+            return false;
+        }
+
+        if (isset($op)) {
+            return $this->getKeeperKind($keeper) === $op;
+        }
+
+        return true;
     }
 
     /**

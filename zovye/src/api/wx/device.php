@@ -199,6 +199,7 @@ class device
             $result['status']['cargo_lanes'] = array_map(function ($lane) {
                 $lane['goods_price'] = intval($lane['goods_price']);
                 $lane['goods_img'] = Util::toMedia($lane['goods_img']);
+
                 return $lane;
             }, $payload['cargo_lanes']);
         } else {
@@ -254,8 +255,12 @@ class device
             }
         }
 
-        $result['status'][\zovye\domain\Device::V0_STATUS_VOLTAGE] = $device->getV0Status(\zovye\domain\Device::V0_STATUS_VOLTAGE);
-        $result['status'][\zovye\domain\Device::V0_STATUS_COUNT] = (int)$device->getV0Status(\zovye\domain\Device::V0_STATUS_COUNT);
+        $result['status'][\zovye\domain\Device::V0_STATUS_VOLTAGE] = $device->getV0Status(
+            \zovye\domain\Device::V0_STATUS_VOLTAGE
+        );
+        $result['status'][\zovye\domain\Device::V0_STATUS_COUNT] = (int)$device->getV0Status(
+            \zovye\domain\Device::V0_STATUS_COUNT
+        );
         $result['status'][\zovye\domain\Device::V0_STATUS_ERROR] = $device->getV0ErrorDescription();
 
         //信号强度
@@ -355,12 +360,9 @@ class device
                 return err('找不到这个设备！');
             }
             $keeper = $user->getKeeper();
-            if (
-                empty($keeper) ||
+            if (empty($keeper) ||
                 $device->getAgentId() != $keeper->getAgentId() ||
-                !$device->hasKeeper($keeper) ||
-                $device->getKeeperKind($keeper) != \zovye\domain\Keeper::OP
-            ) {
+                !$device->hasKeeper($keeper, \zovye\domain\Keeper::OP)) {
                 return err('没有权限执行这个操作！');
             }
             $reason = '运营人员补货';
@@ -1095,7 +1097,9 @@ class device
             if (!$device) {
                 return err('找不到这个设备！');
             }
-            if (!$device->hasKeeper($user->getKeeper())) {
+
+            $keeper = $user->getKeeper();
+            if (empty($keeper) || !$device->hasKeeper($keeper, \zovye\domain\Keeper::OP)) {
                 return err('没有权限管理这个设备！');
             }
         } else {

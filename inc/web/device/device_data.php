@@ -46,7 +46,6 @@ if (is_array($ids)) {
                 Device::V0_STATUS_COUNT => (int)$device->getV0Status(Device::V0_STATUS_COUNT),
                 Device::V0_STATUS_ERROR => $device->getV0ErrorDescription(),
             ],
-            'capacity' => $device->getCapacity(),
             'remain' => $device->getRemainNum(),
             'lastError' => $device->getLastError(),
             'lastOnlineIp' => $device->getLastOnlineIp(),

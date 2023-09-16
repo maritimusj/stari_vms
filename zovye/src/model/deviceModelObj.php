@@ -105,9 +105,6 @@ class deviceModelObj extends ModelObj
     protected $name;
 
     /** @var int */
-    protected $capacity;
-
-    /** @var int */
     protected $remain;
 
     /** @var string */
@@ -546,23 +543,6 @@ class deviceModelObj extends ModelObj
         return SIMUtil::get($this->getICCID());
     }
 
-    public function getCapacity(): int
-    {
-        $c = $this->settings('extra.v0.status.capacity');
-        if (isset($c)) {
-            return intval($c);
-        }
-
-        $this->setCapacity($this->capacity);
-
-        return $this->capacity;
-    }
-
-    public function setCapacity($capacity): bool
-    {
-        return $this->updateSettings('extra.v0.status.capacity', $capacity);
-    }
-
     /**
      * 获取设备信号强度
      * @param bool $raw
@@ -607,21 +587,6 @@ class deviceModelObj extends ModelObj
     public function setV0Status($name, $val): bool
     {
         return $this->updateSettings("extra.v0.status.$name", $val);
-    }
-
-    public function setSensorData($type, $data): bool
-    {
-        return $this->updateSettings("extra.sensor.$type", $data);
-    }
-
-    public function getSensorData($type, $default = null)
-    {
-        return $this->settings("extra.sensor.$type", $default);
-    }
-
-    public function getWaterLevel()
-    {
-        return $this->getSensorData(Device::SENSOR_WATER_LEVEL);
     }
 
     public function getV0ErrorDescription(): string

@@ -718,7 +718,6 @@ class agent
                     'name' => $device->getName(),
                     'sig' => $device->getSig(),
                     'qrcode' => Util::toMedia($device->getQrcode()),
-                    'capacity' => $device->getCapacity(),
                 ],
             ];
         }
@@ -979,7 +978,6 @@ class agent
                     'name' => $entry->getName(),
                     'address' => $address,
                     'remain' => intval($entry->getRemainNum()),
-                    'capacity' => intval($entry->getCapacity()),
                 ];
             }
         }

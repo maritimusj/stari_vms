@@ -73,9 +73,6 @@ class Device extends State
 
     const DUMMY_DEVICE_PREFIX = 'B#';
 
-    const SENSOR_WATER_LEVEL = 'waterLevel';
-    const SENSOR_INFRARED = 'infrared';
-
     private static $cache = [];
 
     public static function objClassname(): string
@@ -427,7 +424,7 @@ class Device extends State
                 $data = [
                     'name' => $imei,
                     'imei' => $imei,
-                    'remain' => DEFAULT_DEVICE_CAPACITY,
+                    'remain' => 0,
                 ];
 
                 $defaultType = DeviceTypes::getDefault();
@@ -437,7 +434,6 @@ class Device extends State
 
                 $device = Device::create($data);
                 if ($device) {
-                    $device->setCapacity(DEFAULT_DEVICE_CAPACITY);
                     $device->updateQrcode(true);
 
                     $extra = [];

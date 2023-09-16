@@ -769,13 +769,6 @@ class DeviceEventProcessor
             $device->setV0Status(Device::V0_STATUS_ERROR, $extra['error']);
         }
 
-        if (isset($extra['sensor'])) {
-            $sensors = isset($extra['sensor']['type']) ? [$extra['sensor']] : $extra['sensor'];
-            foreach ($sensors as $sensor) {
-                $device->setSensorData($sensor['type'], $sensor['data']);
-            }
-        }
-
         if ($device->isNormalDevice()) {
             $device->updateMcbStatus($extra);
             //用户扫码购买

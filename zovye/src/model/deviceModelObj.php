@@ -96,6 +96,9 @@ class deviceModelObj extends ModelObj
     protected $uniacid;
 
     /** @var int */
+    protected $agent_id;
+
+    /** @var int */
     protected $group_id;
 
     /** @var int */
@@ -109,6 +112,8 @@ class deviceModelObj extends ModelObj
 
     /** @var string */
     protected $imei;
+
+    protected $app_id;
 
     /** @var string */
     protected $iccid;
@@ -124,13 +129,8 @@ class deviceModelObj extends ModelObj
 
     protected $mcb_online;
 
-    protected $app_id;
-
     /** @var int */
     protected $app_last_online;
-
-    /** @var int */
-    protected $agent_id;
 
     protected $rank;
 

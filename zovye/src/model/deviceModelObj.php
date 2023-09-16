@@ -2587,7 +2587,10 @@ class deviceModelObj extends ModelObj
                 $keeper_id = intval($keeper);
             }
 
-            $res = m('keeper_devices')->findOne(['keeper_id' => $keeper_id, 'device_id' => $this->getId()]);
+            $res = m('keeper_devices')->findOne([
+                'keeper_id' => $keeper_id,
+                'device_id' => $this->getId(),
+            ]);
 
             return !empty($res);
         }

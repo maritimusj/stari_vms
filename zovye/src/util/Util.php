@@ -45,9 +45,9 @@ class Util
      */
     public static function traitUsed($class, string $traitName): bool
     {
-        $traits = class_uses($class);
+        $traits = (array)class_uses($class);
         foreach (class_parents($class) as $classname) {
-            $traits = array_merge($traits, class_uses($classname));
+            $traits = array_merge($traits, (array)class_uses($classname));
         }
 
         return $traits && in_array($traitName, $traits);

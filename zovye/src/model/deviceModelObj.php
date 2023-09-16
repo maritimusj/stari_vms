@@ -14,7 +14,6 @@ use zovye\base\ModelObjFinder;
 use zovye\BlueToothProtocol;
 use zovye\contract\bluetooth\IBlueToothProtocol;
 use zovye\CtrlServ;
-use zovye\DeviceLocker;
 use zovye\domain\Account;
 use zovye\domain\AdStats;
 use zovye\domain\Advertising;
@@ -887,7 +886,6 @@ class deviceModelObj extends ModelObj
         Device::unbind($this);
         $this->setAgent();
 
-        $this->resetLock();
         $this->setTagsFromText('');
         $this->updateQrcode(true);
 
@@ -970,24 +968,6 @@ class deviceModelObj extends ModelObj
         }
 
         return err('找不到指定的商品！');
-    }
-
-    /**
-     * 重置设备锁
-     */
-    public function resetLock(): bool
-    {
-        if (We7::pdo_update(
-            self::getTableName(ModelObj::OP_WRITE),
-            [OBJ_LOCKED_UID => UNLOCKED],
-            ['id' => $this->getId()]
-        )) {
-            $this->locked_uid = UNLOCKED;
-
-            return true;
-        }
-
-        return false;
     }
 
     /**
@@ -1260,58 +1240,6 @@ class deviceModelObj extends ModelObj
             'type' => $type,
             'style' => $style ?? $styles[$type],
         ]);
-    }
-
-    /**
-     * 设备是否已经锁定
-     * @return bool
-     */
-    public function isLocked(): bool
-    {
-        $this->checkLockerExpired();
-
-        return $this->locked_uid != UNLOCKED;
-    }
-
-    /**
-     * 尝试锁定设备
-     * @param null $uid
-     * @return string
-     */
-    public function lock($uid = null): string
-    {
-        $uid = strval($uid) ?: Util::random(6);
-        $uid = "$uid:".time();
-        $res = We7::pdo_update(
-            self::getTableName(ModelObj::OP_WRITE),
-            [OBJ_LOCKED_UID => $uid],
-            ['id' => $this->getId(), OBJ_LOCKED_UID => UNLOCKED]
-        );
-        if ($res) {
-            $this->locked_uid = $uid;
-
-            return $uid;
-        }
-
-        return '';
-    }
-
-    /**
-     * 解除设备锁定
-     * @param $uid
-     * @return bool
-     */
-    public function unlock($uid): bool
-    {
-        if ($uid) {
-            return We7::pdo_update(
-                self::getTableName(ModelObj::OP_WRITE),
-                [OBJ_LOCKED_UID => UNLOCKED],
-                ['id' => $this->getId(), OBJ_LOCKED_UID => $uid]
-            );
-        }
-
-        return false;
     }
 
     /**
@@ -2114,63 +2042,20 @@ class deviceModelObj extends ModelObj
         return $this->shadow_id;
     }
 
-    protected function checkLockerExpired(): bool
-    {
-        $wait_timeout = intval(settings('device.waitTimeout'));
-        $lock_timeout = intval(settings('device.lockTimeout'));
-
-        if ($lock_timeout > 0) {
-            $locked_time = $this->getLockedTime();
-            if ($locked_time > 0 && time() - $this->getLockedTime() > $wait_timeout + $lock_timeout) {
-                return $this->resetLock();
-            }
-        }
-
-        return false;
-    }
-
     /**
      * 尝试锁定设备，超过系统设置的超时时长后，自动解锁
      * @param int $retries
      * @param int $delay_seconds
-     * @return bool
+     * @return lockerModelObj|null
      */
-    public function lockAcquire(int $retries = 0, int $delay_seconds = 1): bool
+    public function lockAcquire(int $retries = 0, int $delay_seconds = 1): ?lockerModelObj
     {
-        $this->checkLockerExpired();
-
-        for (; ;) {
-            if ((new DeviceLocker($this))->isLocked()) {
-                return true;
-            }
-
-            $retries--;
-
-            if ($retries <= 0) {
-                return false;
-            }
-
-            sleep($delay_seconds);
-        }
+        return Locker::try("device:{$this->getImei()}", REQUEST_ID, $retries, $delay_seconds);
     }
 
     public function payloadLockAcquire(int $retries = 0, int $delay_seconds = 1): ?lockerModelObj
     {
         return Locker::try("payload:{$this->getImei()}", REQUEST_ID, $retries, $delay_seconds);
-    }
-
-    /**
-     * 获取设备当前锁定时间戳, 返回 0 则表示设备未锁定
-     * @return int
-     */
-    public function getLockedTime(): int
-    {
-        list(, $timestamp) = explode(':', $this->locked_uid);
-        if (is_numeric($timestamp)) {
-            return intval($timestamp);
-        }
-
-        return 0;
     }
 
     /**

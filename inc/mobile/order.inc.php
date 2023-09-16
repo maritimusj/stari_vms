@@ -40,7 +40,7 @@ if ($op === 'create') {
         JSON::fail('对不起，设备已离线！');
     }
 
-    if ($device->isLocked()) {
+    if ($device->lockAcquire(3)) {
         JSON::fail('设备正忙，请稍后再试！');
     }
 

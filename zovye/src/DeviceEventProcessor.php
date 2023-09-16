@@ -417,8 +417,6 @@ class DeviceEventProcessor
 
                 $device->setMcbOnline(Device::ONLINE);
                 $device->setLastOnline(TIMESTAMP);
-
-                $device->resetLock();
                 $device->updateFirstMsgStats();
 
                 Job::deviceEventNotify($device, 'online');
@@ -605,9 +603,7 @@ class DeviceEventProcessor
             $device->setMcbOnline(Device::ONLINE);
             $device->setLastOnline(TIMESTAMP);
             $device->setLastPing(TIMESTAMP);
-
-            //重置设置锁
-            $device->resetLock();
+            $device->updateFirstMsgStats();
 
             if ($data['code']) {
                 $device->setProtocolV1Code($data['code']);
@@ -616,8 +612,6 @@ class DeviceEventProcessor
             if ($device->isMcbStatusExpired()) {
                 $device->reportMcbStatus($data['code']);
             }
-
-            $device->updateFirstMsgStats();
 
             $device->save();
 
@@ -850,8 +844,6 @@ class DeviceEventProcessor
             if (isset($data['extra']['ICCID'])) {
                 $device->setICCID($data['extra']['ICCID']);
             }
-            //重置设置锁
-            $device->resetLock();
 
             $device->setMcbOnline(Device::ONLINE);
             $device->setLastOnline(TIMESTAMP);

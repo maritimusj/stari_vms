@@ -308,18 +308,13 @@
                                 <input type="checkbox" id="downloadQRCode" :value="o.id" v-model="selectedInputCtrl" :disabled="o.deleted">                                
                             </template>
                             <template v-else>
-                                <template v-if="o.lockedTime">
-                                    <i class="fa fa-lock" :title="'锁定时间：' + o.lockedTime" data-op="unlock" :data-index="index + 1"></i>
-                                </template>
-                                <template v-else>
-                                    <template v-if="o.s1">
+                                <template v-if="o.s1">
                                         <span class="operate">
                                             <i class="fa fa-map-marker" title="设备位置已变动" data-op="confirmLAC" :data-index="index + 1"></i>
-                                        </span>                                    
-                                    </template>
-                                    <template v-else>
-                                        {{index + 1}}
-                                    </template>
+                                        </span>
+                                </template>
+                                <template v-else>
+                                    {{index + 1}}
                                 </template>
                             </template>
                         </td>

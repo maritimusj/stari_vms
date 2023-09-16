@@ -12,7 +12,6 @@ use DateTime;
 use Exception;
 use zovye\App;
 use zovye\BlueToothProtocol;
-use zovye\contract\bluetooth\IBlueToothProtocol;
 use zovye\domain\Account;
 use zovye\domain\Advertising;
 use zovye\domain\Agent;
@@ -467,7 +466,7 @@ class common
             return err('设备不在线！');
         }
 
-        if ($device->isLocked()) {
+        if ($device->lockAcquire(3)) {
             return err('设备正忙，请稍后再试！');
         }
 

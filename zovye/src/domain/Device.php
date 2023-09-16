@@ -764,7 +764,6 @@ class Device extends State
         //绑定appId
         $device->updateAppId();
 
-        $device->resetLock();
         $device->resetShadowId();
 
         $device->set('refresh', time());

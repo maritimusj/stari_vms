@@ -52,7 +52,6 @@ if (is_array($ids)) {
             'lastOnline' => $device->getLastOnline() ? date('Y-m-d H:i:s', $device->getLastOnline()) : '',
             'lastPing' => $device->getLastPing() ? date('Y-m-d H:i:s', $device->getLastPing()) : '',
             'createtime' => date('Y-m-d H:i:s', $device->getCreatetime()),
-            'lockedTime' => $device->isLocked() ? date('Y-m-d H:i:s', $device->getLockedTime()) : '',
             'appId' => $device->getAppId(),
             'appVersion' => $device->getAppVersion(),
             'total' => 'n/a',

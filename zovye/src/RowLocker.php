@@ -81,9 +81,4 @@ class RowLocker
     {
         return $this->locked;
     }
-
-    public function restore(): bool
-    {
-        return $this->unlock();
-    }
 }

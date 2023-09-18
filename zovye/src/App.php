@@ -31,13 +31,13 @@ class App
 
     public static function secret(): string
     {
-        return _W('config.setting.authkey');
+        return _W('config.setting.authkey', '');
     }
 
     public static function isLocationValidateEnabled(): bool
     {
         return onceCall(function () {
-            return !empty(settings('user.location.validate.enabled'));
+            return settings('user.location.validate.enabled', false);
         });
     }
 
@@ -55,7 +55,7 @@ class App
     public static function isVDeviceSupported(): bool
     {
         return onceCall(function () {
-            return !empty(settings('device.v-device.enabled'));
+            return settings('device.v-device.enabled', false);
         });
     }
 
@@ -66,7 +66,7 @@ class App
     public static function isLotteryGoodsSupported(): bool
     {
         return onceCall(function () {
-            return !empty(settings('goods.lottery.enabled'));
+            return settings('goods.lottery.enabled', false);
         });
     }
 
@@ -77,14 +77,14 @@ class App
     public static function isIDCardVerifyEnabled(): bool
     {
         return onceCall(function () {
-            return self::isIDCardVerifySupported() && settings('user.verify.enabled');
+            return self::isIDCardVerifySupported() && settings('user.verify.enabled', false);
         });
     }
 
     public static function isIDCardVerifySupported(): bool
     {
         return onceCall(function () {
-            return !empty(settings('idcard.verify.enabled'));
+            return settings('idcard.verify.enabled', false);
         });
     }
 
@@ -95,7 +95,7 @@ class App
     public static function isBluetoothDeviceSupported(): bool
     {
         return onceCall(function () {
-            return !empty(settings('device.bluetooth.enabled'));
+            return settings('device.bluetooth.enabled', false);
         });
     }
 
@@ -106,7 +106,7 @@ class App
     public static function isGoodsVoucherEnabled(): bool
     {
         return onceCall(function () {
-            return !empty(settings('goods.voucher.enabled'));
+            return settings('goods.voucher.enabled', false);
         });
     }
 
@@ -117,7 +117,7 @@ class App
     public static function isJfbEnabled(): bool
     {
         return onceCall(function () {
-            return !empty(settings('jfb.fan.enabled'));
+            return settings('jfb.fan.enabled', false);
         });
     }
 
@@ -128,7 +128,7 @@ class App
     public static function isMoscaleEnabled(): bool
     {
         return onceCall(function () {
-            return !empty(settings('moscale.fan.enabled'));
+            return settings('moscale.fan.enabled', false);
         });
     }
 
@@ -139,7 +139,7 @@ class App
     public static function isYunfenbaEnabled(): bool
     {
         return onceCall(function () {
-            return !empty(settings('yunfenba.fan.enabled'));
+            return settings('yunfenba.fan.enabled', false);
         });
     }
 
@@ -150,7 +150,7 @@ class App
     public static function isAQiinfoEnabled(): bool
     {
         return onceCall(function () {
-            return !empty(settings('AQiinfo.fan.enabled'));
+            return settings('AQiinfo.fan.enabled', false);
         });
     }
 
@@ -161,7 +161,7 @@ class App
     public static function isZJBaoEnabled(): bool
     {
         return onceCall(function () {
-            return !empty(settings('zjbao.fan.enabled'));
+            return settings('zjbao.fan.enabled', false);
         });
     }
 
@@ -172,7 +172,7 @@ class App
     public static function isMeiPaEnabled(): bool
     {
         return onceCall(function () {
-            return !empty(settings('meipa.fan.enabled'));
+            return settings('meipa.fan.enabled', false);
         });
     }
 
@@ -183,7 +183,7 @@ class App
     public static function isKingFansEnabled(): bool
     {
         return onceCall(function () {
-            return !empty(settings('king.fan.enabled'));
+            return settings('king.fan.enabled', false);
         });
     }
 
@@ -194,7 +194,7 @@ class App
     public static function isSNTOEnabled(): bool
     {
         return onceCall(function () {
-            return !empty(settings('snto.fan.enabled'));
+            return settings('snto.fan.enabled', false);
         });
     }
 
@@ -205,7 +205,7 @@ class App
     public static function isYFBEnabled(): bool
     {
         return onceCall(function () {
-            return !empty(settings('yfb.fan.enabled'));
+            return settings('yfb.fan.enabled', false);
         });
     }
 
@@ -216,7 +216,7 @@ class App
     public static function isWxWorkEnabled(): bool
     {
         return onceCall(function () {
-            return !empty(settings('wxWork.fan.enabled'));
+            return settings('wxWork.fan.enabled', false);
         });
     }
 
@@ -227,7 +227,7 @@ class App
     public static function isYouFenEnabled(): bool
     {
         return onceCall(function () {
-            return !empty(settings('YouFen.fan.enabled'));
+            return settings('YouFen.fan.enabled', false);
         });
     }
 
@@ -238,7 +238,7 @@ class App
     public static function isMengMoEnabled(): bool
     {
         return onceCall(function () {
-            return !empty(settings('MengMo.fan.enabled'));
+            return settings('MengMo.fan.enabled', false);
         });
     }
 
@@ -249,7 +249,7 @@ class App
     public static function isYiDaoEnabled(): bool
     {
         return onceCall(function () {
-            return !empty(settings('YiDao.fan.enabled'));
+            return settings('YiDao.fan.enabled', false);
         });
     }
 
@@ -260,7 +260,7 @@ class App
     public static function isWeiSureEnabled(): bool
     {
         return onceCall(function () {
-            return !empty(settings('weiSure.fan.enabled'));
+            return settings('weiSure.fan.enabled', false);
         });
     }
 
@@ -271,35 +271,35 @@ class App
     public static function isCloudFIEnabled(): bool
     {
         return onceCall(function () {
-            return !empty(settings('cloudFI.fan.enabled'));
+            return settings('cloudFI.fan.enabled', false);
         });
     }
 
     public static function isCommissionEnabled(): bool
     {
         return onceCall(function () {
-            return !empty(settings('commission.enabled'));
+            return settings('commission.enabled', false);
         });
     }
 
     public static function isAgentGSPEnabled(): bool
     {
         return onceCall(function () {
-            return !empty(settings('agent.reg.rel_gsp.enabled'));
+            return settings('agent.reg.rel_gsp.enabled', false);
         });
     }
 
     public static function isAgentBonusEnabled(): bool
     {
         return onceCall(function () {
-            return !empty(settings('agent.reg.bonus.enabled'));
+            return settings('agent.reg.bonus.enabled', false);
         });
     }
 
     public static function isAgentReferralEnabled(): bool
     {
         return onceCall(function () {
-            return !empty(settings('agent.reg.referral'));
+            return settings('agent.reg.referral', false);
         });
     }
 
@@ -313,21 +313,21 @@ class App
     public static function getUserLocationValidateDistance($default = 0): int
     {
         return onceCall(function () use ($default) {
-            return intval(settings('user.location.validate.distance', $default));
+            return settings('user.location.validate.distance', $default);
         }, $default);
     }
 
     public static function getAgentDefaultCommissionFeeType(): int
     {
         return onceCall(function () {
-            return intval(settings('agent.reg.commission_fee_type'));
+            return settings('agent.reg.commission_fee_type', 0);
         });
     }
 
     public static function getAgentDefaultCommissionFee(): int
     {
         return onceCall(function () {
-            return intval(settings('agent.reg.commission_fee'));
+            return settings('agent.reg.commission_fee', 0);
         });
     }
 
@@ -369,28 +369,28 @@ class App
     public static function isDeviceAutoJoin(): bool
     {
         return onceCall(function () {
-            return !empty(settings('device.autoJoin'));
+            return settings('device.autoJoin', false);
         });
     }
 
     public static function getDeviceWaitTimeout(): int
     {
         return onceCall(function () {
-            return intval(settings('device.waitTimeout')) ?: DEFAULT_DEVICE_WAIT_TIMEOUT;
+            return settings('device.waitTimeout', DEFAULT_DEVICE_WAIT_TIMEOUT);
         });
     }
 
     public static function isUserVerify18Enabled(): bool
     {
         return onceCall(function () {
-            return !empty(settings('user.verify18.enabled'));
+            return settings('user.verify18.enabled', false);
         });
     }
 
     public static function isWe7CreditEnabled(): bool
     {
         return onceCall(function () {
-            return !empty(settings('we7credit.enabled'));
+            return settings('we7credit.enabled', false);
         });
     }
 
@@ -427,21 +427,21 @@ class App
     public static function getOrderMaxGoodsNum(): int
     {
         return onceCall(function () {
-            return intval(settings('order.goods.maxNum')) ?: 10;
+            return settings('order.goods.maxNum', 10);
         });
     }
 
     public static function getImageProxyURL(): string
     {
         return onceCall(function () {
-            return strval(settings('goods.image.proxy.url'));
+            return settings('goods.image.proxy.url', '');
         });
     }
 
     public static function getImageProxySecretKey(): string
     {
         return onceCall(function () {
-            return strval(settings('goods.image.proxy.secret'));
+            return settings('goods.image.proxy.secret', '');
         });
     }
 
@@ -465,56 +465,56 @@ class App
     public static function isWxPlatformEnabled(): bool
     {
         return onceCall(function () {
-            return boolval(settings('account.wx.platform.enabled'));
+            return settings('account.wx.platform.enabled', false);
         });
     }
 
     public static function isGoodsPackageEnabled(): bool
     {
         return onceCall(function () {
-            return boolval(settings('custom.goodsPackage.enabled'));
+            return settings('custom.goodsPackage.enabled', false);
         });
     }
 
     public static function isMustFollowAccountEnabled(): bool
     {
         return onceCall(function () {
-            return boolval(settings('custom.mustFollow.enabled'));
+            return settings('custom.mustFollow.enabled', false);
         });
     }
 
     public static function isCustomWxAppEnabled(): bool
     {
         return onceCall(function () {
-            return boolval(settings('agent.wx.app.enabled'));
+            return settings('agent.wx.app.enabled', false);
         });
     }
 
     public static function isUseAccountQRCode(): bool
     {
         return onceCall(function () {
-            return boolval(settings('custom.useAccountQRCode.enabled'));
+            return settings('custom.useAccountQRCode.enabled', false);
         });
     }
 
     public static function isInventoryEnabled(): bool
     {
         return onceCall(function () {
-            return boolval(settings('inventory.enabled'));
+            return settings('inventory.enabled', false);
         });
     }
 
     public static function isAccountLogEnabled(): bool
     {
         return onceCall(function () {
-            return boolval(settings('account.log.enabled'));
+            return settings('account.log.enabled', false);
         });
     }
 
     public static function isDonatePayEnabled(): bool
     {
         return onceCall(function () {
-            return boolval(settings('custom.DonatePay.enabled'));
+            return settings('custom.DonatePay.enabled', false);
         });
     }
 
@@ -571,84 +571,84 @@ class App
     public static function isSmsPromoEnabled(): bool
     {
         return onceCall(function () {
-            return boolval(settings('custom.smsPromo.enabled'));
+            return settings('custom.smsPromo.enabled', false);
         });
     }
 
     public static function isTeamEnabled(): bool
     {
         return onceCall(function () {
-            return boolval(settings('custom.team.enabled'));
+            return settings('custom.team.enabled', false);
         });
     }
 
     public static function isCZTVEnabled(): bool
     {
         return onceCall(function () {
-            return boolval(settings('custom.cztv.enabled'));
+            return settings('custom.cztv.enabled', false);
         });
     }
 
     public static function isFlashEggEnabled(): bool
     {
         return onceCall(function () {
-            return boolval(settings('custom.flashEgg.enabled'));
+            return settings('custom.flashEgg.enabled', false);
         });
     }
 
     public static function isPromoterEnabled(): bool
     {
         return onceCall(function () {
-            return boolval(settings('custom.promoter.enabled'));
+            return settings('custom.promoter.enabled', false);
         });
     }
 
     public static function isGDCVMachineEnabled(): bool
     {
         return onceCall(function () {
-            return boolval(settings('custom.GDCVMachine.enabled'));
+            return settings('custom.GDCVMachine.enabled', false);
         });
     }
 
     public static function isMultiGoodsItemEnabled(): bool
     {
         return onceCall(function () {
-            return boolval(settings('custom.MultiGoodsItem.enabled'));
+            return settings('custom.MultiGoodsItem.enabled', false);
         });
     }
 
     public static function getUserBalanceByMobileEnabled(): bool
     {
         return onceCall(function () {
-            return boolval(settings('custom.getUserBalanceByMobile.enabled'));
+            return settings('custom.getUserBalanceByMobile.enabled', false);
         });
     }
 
     public static function isTKPromotingEnabled(): bool
     {
         return onceCall(function () {
-            return boolval(settings('custom.TKPromoting.enabled'));
+            return settings('custom.TKPromoting.enabled', false);
         });
     }
 
     public static function isDeviceScheduleTaskEnabled(): bool
     {
         return onceCall(function () {
-            return boolval(Config::device('schedule.enabled'));
+            return Config::device('schedule.enabled', false);
         });
     }
 
     public static function isGoodsExpireAlertEnabled(): bool
     {
         return onceCall(function () {
-            return boolval(Config::app('misc.GoodsExpireAlert.enabled'));
+            return Config::app('misc.GoodsExpireAlert.enabled', false);
         });
     }
 
     public static function isLongPressOrderEnabled(): bool
     {
         return onceCall(function () {
-            return boolval(settings('custom.longPressOrder.enabled'));
+            return settings('custom.longPressOrder.enabled', false);
         });
-    } 
+    }
 }

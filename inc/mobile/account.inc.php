@@ -508,7 +508,7 @@ if ($op == 'default') {
         'user' => $user->getId(),
         'orderUID' => Order::makeUID($user, $device, $code),
         'ignoreGoodsNum' => 1,
-    ])) {
+    ], $account->getLongPressSeconds())) {
         JSON::fail('创建任务失败！');
     }
 

@@ -358,10 +358,7 @@ class Account extends State
         if (App::isLongPressOrderEnabled()) {
             $seconds = $account->getLongPressSeconds();
             if ($seconds > 0) {
-                $data['long_press_order'] = [
-                    'seconds' => $seconds,
-                    'code' => $code,
-                ];
+                $data['long_press'] = $code;
             }
         }
 

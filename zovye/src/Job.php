@@ -200,7 +200,7 @@ class Job
         return self::createAccountOrder($params);
     }
 
-    public static function createAccountOrder($params = []): bool
+    public static function createAccountOrder($params = [], $delay = 0): bool
     {
         $params = array_merge([
             'account' => '',
@@ -211,6 +211,10 @@ class Job
             'ignoreGoodsNum' => 0,
             'ip' => '',
         ], $params);
+
+        if ($delay > 0) {
+            return CtrlServ::scheduleDelayJob('create_order_account', $params, $delay);
+        }
 
         return CtrlServ::scheduleJob('create_order_account', $params);
     }

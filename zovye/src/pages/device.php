@@ -341,6 +341,16 @@ zovye_fn.balancePay = function(goods, num) {
 JSCODE;
 }
 
+if (App::isLongPressOrderEnabled()) {
+    $api_url = Util::murl('account', ['op' => 'order']);
+    $tpl['js']['code'] .= <<<JSCODE
+\r\n
+zovye_fn.getLongPressOrder = function(uid, code) {
+    return $.get("$api_url", {uid, code});
+}
+JSCODE;
+}
+
 $tpl['js']['code'] .= "\r\n</script>";
 
 if (Session::isSnapshot()) {

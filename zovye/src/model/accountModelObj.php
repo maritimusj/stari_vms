@@ -753,4 +753,12 @@ class accountModelObj extends ModelObj
             'createtime' => $order->getCreatetime(),
         ]);
     }
+
+    public function setLongPressSeconds($seconds) {
+        return $this->updateSettings('custom.longPressOrder.seconds', intval($seconds));
+    }
+
+    public function getLongPressSeconds() : int {
+        return $this->settings('custom.longPressOrder.seconds', 0);
+    }
 }

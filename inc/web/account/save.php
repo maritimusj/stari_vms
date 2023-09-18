@@ -467,6 +467,10 @@ $res = DBUtil::transactionDo(function () {
             }
         }
 
+        if (App::isLongPressOrderEnabled()) {
+            $account->setLongPressSeconds(Request::int('longPressSeconds'));
+        }
+
         $commission_data = [];
 
         $original_bonus_type = $account->getBonusType();

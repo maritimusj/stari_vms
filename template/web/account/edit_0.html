@@ -193,6 +193,15 @@
                             </button>
                         </div>
                     </div>
+                    {if \zovye\App::isLongPressOrderEnabled()}
+                    <div class="form-group">
+                        <label for="longPressSeconds" class="col-md-2 control-label">长按出货（秒）</label>
+                        <div class="col-md-10">
+                            <input type="number" class="form-control" name="longPressSeconds" id="longPressSeconds" value="{php echo $account?$account->getLongPressSeconds():''}">
+                            <span class="help-block">* 长按指定时间后直接出货，0表示不启用这个功能</span>
+                        </div>
+                    </div>
+                    {/if}
                 </div>
                 <!-- 其它设置 结束 -->
                 <div v-show="active === 'reward'">

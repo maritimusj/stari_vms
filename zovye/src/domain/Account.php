@@ -188,7 +188,7 @@ class Account extends State
     const DAY = 'd';
     const WEEK = 'w';
     const MONTH = 'm';
-    
+
     protected static $title = [
         self::BANNED => '已禁用',
         self::NORMAL => '正常',
@@ -291,7 +291,7 @@ class Account extends State
         return self::findOne(['uid' => $uid]);
     }
 
-    public static function format(accountModelObj $account): array
+    public static function format(accountModelObj $account, userModelObj $user = null): array
     {
         //特殊吸粉的img路径中包含addon/{APP_NAME}，不能使用Util::toMedia()转换，否则会出错
         $data = [
@@ -353,6 +353,16 @@ class Account extends State
             $data['balance'] = $account->getBalancePrice();
         } else {
             $data['commission'] = $account->getCommissionPrice();
+        }
+
+        if (App::isLongPressOrderEnabled()) {
+            $seconds = $account->getLongPressSeconds();
+            if ($seconds > 0) {
+                $data['long_press_order'] = [
+                    'seconds' => $seconds,
+                    'code' => sha1($user->getOpenid() . $account->getUid()),
+                ];
+            }
         }
 
         return $data;
@@ -483,8 +493,8 @@ class Account extends State
         }
 
         foreach ($accounts as $entry) {
-            $join(['id' => $entry['id']], function (accountModelObj $acc) {
-                return [$acc->format()];
+            $join(['id' => $entry['id']], function (accountModelObj $acc, userModelObj $user) {
+                return [self::format($acc, $user)];
             });
         }
 

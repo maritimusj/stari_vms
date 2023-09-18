@@ -467,4 +467,46 @@ if ($op == 'default') {
     }
 
     JSON::success(['msg' => '完成！']);
+
+} elseif ($op == 'order') {
+
+    $user = Session::getCurrentUser();
+    if (empty($user) || $user->isBanned()) {
+        JSON::fail('找不到用户或者用户无法领取！');
+    }
+
+    $uid = Request::str('uid');
+    $code = Request::str('code');
+
+    if (empty($uid) || empty($code)) {
+        JSON::fail('请求参数不正确！');
+    }
+
+    $account = Account::findOneFromUID($uid);
+    if (empty($account)) {
+        JSON::fail('找不到这个公众号！');
+    }
+
+    $device = $user->getLastActiveDevice();
+    if (empty($device)) {
+        JSON::fail('请先扫描设备上的二维码！');
+    }
+
+    $res = Helper::checkAvailable($user, $account, $device);
+    if (is_error($res)) {
+        JSON::fail($res);
+    }
+
+    $ticket_data = [
+        'id' => Util::random(16),
+        'time' => time(),
+        'deviceId' => $device->getId(),
+        'shadowId' => $device->getShadowId(),
+        'accountId' => $account->getId(),
+    ];
+
+    //准备领取商品的ticket
+    $user->setLastActiveData('ticket', $ticket_data);
+
+    JSON::success(['redirect' => Util::murl('account', ['op' => 'get'])]);
 }

@@ -160,7 +160,7 @@ function toSnakeCase($str): string
  * @param mixed $default
  * @return mixed
  */
-function ifEmpty($data, $default)
+function ifEmpty($data, $default, $convert = true)
 {
     if (!isset($data) && isset($default)) {
         if (is_callable($default)) {
@@ -170,7 +170,7 @@ function ifEmpty($data, $default)
         return $default;
     }
 
-    return convert($data, gettype($default));
+    return $convert ? convert($data, gettype($default)) : $data;
 }
 
 function convert($val, $type_hints)
@@ -260,7 +260,7 @@ function setArray(array &$array, $key, $val = null): array
  * @param mixed $default
  * @return mixed
  */
-function getArray($array, $key = '', $default = null)
+function getArray($array, $key = '', $default = null, $convert = true)
 {
     if (!is_array($array) || empty($key)) {
         return ifEmpty($array, $default);
@@ -287,7 +287,7 @@ function getArray($array, $key = '', $default = null)
         }
     }
 
-    return ifEmpty($val, $default);
+    return ifEmpty($val, $default, $convert);
 }
 
 /**

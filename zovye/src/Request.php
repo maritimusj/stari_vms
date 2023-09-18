@@ -115,19 +115,19 @@ class Request
 
     public static function int(string $name, int $default = 0): int
     {
-        return intval(getArray(self::$data, $name, $default));
+        return getArray(self::$data, $name, $default);
     }
 
-    public static function float(string $name, float $default = 0, int $precision = -1): float
+    public static function float(string $name, float $default = 0.0, int $precision = -1): float
     {
-        $v = floatval(getArray(self::$data, $name, $default));
+        $v = getArray(self::$data, $name, $default);
 
         return $precision > -1 ? round($v, $precision) : $v;
     }
 
     public static function bool(string $name, bool $default = false): bool
     {
-        $v = getArray(self::$data, $name, $default);
+        $v = getArray(self::$data, $name, $default, false);
         if (empty($v)) {
             return false;
         }
@@ -139,7 +139,7 @@ class Request
 
     public static function str(string $name, string $default = '', $url_decode = false): string
     {
-        $str = strval(getArray(self::$data, $name, $default));
+        $str = getArray(self::$data, $name, $default);
         if ($url_decode) {
             $str = urldecode($str);
         }
@@ -154,7 +154,7 @@ class Request
 
     public static function array(string $name, array $default = []): array
     {
-        return is_array(self::$data[$name]) ? self::$data[$name] : $default;
+        return getArray(self::$data, $name, $default);
     }
 
     public static function op(string $default = ''): string

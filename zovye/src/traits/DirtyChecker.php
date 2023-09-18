@@ -8,35 +8,30 @@ namespace zovye\traits;
 
 trait DirtyChecker
 {
-    private $__dirtyRec = [];
+    private $__dirty_props = [];
 
     public function setDirty($props)
     {
-        $now = time();
         $props = is_array($props) ? $props : [$props];
-        foreach ($props as $prop) {
-            $this->__dirtyRec[$prop] = $now;
-        }
+        $this->__dirty_props = array_unique(array_merge($this->__dirty_props, $props));
     }
 
     public function clearDirty($props = null)
     {
         if (isset($props)) {
             $props = is_array($props) ? $props : [$props];
-            foreach ($props as $prop) {
-                unset($this->__dirtyRec[$prop]);
-            }
+            $this->__dirty_props = array_diff($this->__dirty_props, $props);
         } else {
-            $this->__dirtyRec = [];
+            $this->__dirty_props = [];
         }
     }
 
     public function isDirty($prop = null): bool
     {
         if (isset($prop)) {
-            return isset($this->__dirtyRec[$prop]);
+            return in_array($prop, $this->__dirty_props);
         }
 
-        return !empty(current($this->__dirtyRec));
+        return !empty($this->__dirty_props);
     }
 }

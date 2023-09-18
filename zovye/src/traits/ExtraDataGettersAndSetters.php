@@ -16,7 +16,7 @@ use function zovye\setArray;
  */
 trait ExtraDataGettersAndSetters
 {
-    private $__extraData = null;
+    private $__extra_data = null;
 
     /**
      * @param $data
@@ -38,10 +38,10 @@ trait ExtraDataGettersAndSetters
         $this->deserializeExtra();
 
         if ($key) {
-            return getArray($this->__extraData, $key, $default);
+            return getArray($this->__extra_data, $key, $default);
         }
 
-        return $this->__extraData;
+        return $this->__extra_data;
     }
 
     /**
@@ -54,26 +54,26 @@ trait ExtraDataGettersAndSetters
     {
         $this->deserializeExtra();
 
-        if (is_array($this->__extraData)) {
+        if (is_array($this->__extra_data)) {
             if (is_string($key)) {
-                setArray($this->__extraData, $key, $val);
+                setArray($this->__extra_data, $key, $val);
             } else {
-                setArray($this->__extraData, '', $key);
+                setArray($this->__extra_data, '', $key);
             }
         }
 
-        return static::setExtra(json_encode($this->__extraData));
+        return static::setExtra(json_encode($this->__extra_data));
     }
 
     public function deserializeExtra()
     {
-        if (is_null($this->__extraData)) {
+        if (is_null($this->__extra_data)) {
             if ($this->extra) {
-                $this->__extraData = json_decode($this->extra, true);
+                $this->__extra_data = json_decode($this->extra, true);
             }
 
-            if (empty($this->__extraData)) {
-                $this->__extraData = [];
+            if (empty($this->__extra_data)) {
+                $this->__extra_data = [];
             }
         }
     }

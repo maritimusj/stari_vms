@@ -11,8 +11,8 @@ use function zovye\toSnakeCase;
 
 trait GettersAndSetters
 {
-    private $__setterFilters = [];
-    private $__getterFilters = [];
+    private $__setter_filters = [];
+    private $__getter_filters = [];
 
     public static function __callStatic($name, $params)
     {
@@ -29,9 +29,9 @@ trait GettersAndSetters
     {
         $filters = is_array($filters) ? $filters : [$filters];
         if ($setterOrGetter == 'set') {
-            $this->__setterFilters = array_merge($this->__setterFilters, $filters);
+            $this->__setter_filters = array_merge($this->__setter_filters, $filters);
         } elseif ($setterOrGetter == 'get') {
-            $this->__getterFilters = array_merge($this->__getterFilters, $filters);
+            $this->__getter_filters = array_merge($this->__getter_filters, $filters);
         }
     }
 
@@ -39,7 +39,7 @@ trait GettersAndSetters
     {
         if (strncasecmp($name, 'get', 3) == 0) {
             $prop = toSnakeCase(ltrim($name, 'get'));
-            if (!in_array($prop, $this->__getterFilters) && property_exists($this, $prop)) {
+            if (!in_array($prop, $this->__getter_filters) && property_exists($this, $prop)) {
                 if ($params && $params[0] === true && method_exists($this, 'forceReloadPropertyValue')) {
                     return $this->forceReloadPropertyValue($prop, $params);
                 }
@@ -48,7 +48,7 @@ trait GettersAndSetters
             }
         } elseif (strncasecmp($name, 'set', 3) == 0) {
             $prop = toSnakeCase(ltrim($name, 'set'));
-            if (!in_array($prop, $this->__setterFilters) && property_exists(
+            if (!in_array($prop, $this->__setter_filters) && property_exists(
                     $this,
                     $prop
                 ) && $this->$prop !== $params[0]) {

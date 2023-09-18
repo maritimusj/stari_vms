@@ -35,7 +35,7 @@ if (empty($op)) {
         'jssdk' => Util::jssdk(),
     ]);
 
-} elseif ($op == "detail") {
+} elseif ($op == 'detail') {
     $imei = Request::trim('imei');
 
     $device = Device::get($imei, true);
@@ -62,7 +62,7 @@ if (empty($op)) {
 
     Response::json($detail['status'], $detail['data']);
 
-} elseif ($op == "test") {
+} elseif ($op == 'test') {
     $imei = Request::trim('imei');
     $channel = Request::int('channel');
 

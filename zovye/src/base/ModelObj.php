@@ -16,6 +16,7 @@ use zovye\Settings;
 use zovye\traits\DirtyChecker;
 use zovye\traits\GettersAndSetters;
 use zovye\util\Util;
+use function zovye\convert;
 use function zovye\getArray;
 use function zovye\ifEmpty;
 use function zovye\setArray;
@@ -158,9 +159,7 @@ class ModelObj implements ISettings
             $this->get($index, []);
         }
 
-        $result = getArray($this->settings_container[$index], $keys, $default);
-
-        return $this->convert($result, gettype($default));
+        return getArray($this->settings_container[$index], $keys, $default);
     }
 
     public function get($key, $default = null)
@@ -330,31 +329,6 @@ class ModelObj implements ISettings
         return false;
     }
 
-    public static function convert($val, $type_hints)
-    {
-        switch ($type_hints) {
-            case 'int':
-            case 'integer':
-                return intval($val);
-            case 'string':
-            case 'str':
-                return strval($val);
-            case 'bool':
-            case 'boolean':
-                return boolval($val);
-            case 'float':
-                return floatval($val);
-            case 'double':
-                return doubleval($val);
-            case 'array':
-                return (array)$val;
-            case 'json':
-                return json_decode($val, true);
-            default:
-                return $val;
-        }
-    }
-
     public static function parseType($doc): string
     {
         if (preg_match('/@var\s+(\w+)[\s|*]+/', $doc, $matches)) {
@@ -371,7 +345,7 @@ class ModelObj implements ISettings
     public function __setData(array $data): ModelObj
     {
         foreach (self::getProps(true) as $prop => $type_hints) {
-            $this->$prop = self::convert($data[$prop], $type_hints);
+            $this->$prop = convert($data[$prop], $type_hints);
         }
 
         return $this;

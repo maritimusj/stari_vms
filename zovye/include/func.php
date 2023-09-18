@@ -170,7 +170,32 @@ function ifEmpty($data, $default)
         return $default;
     }
 
-    return $data;
+    return convert($data, gettype($default));
+}
+
+function convert($val, $type_hints)
+{
+    switch ($type_hints) {
+        case 'int':
+        case 'integer':
+            return intval($val);
+        case 'string':
+        case 'str':
+            return strval($val);
+        case 'bool':
+        case 'boolean':
+            return boolval($val);
+        case 'float':
+            return floatval($val);
+        case 'double':
+            return doubleval($val);
+        case 'array':
+            return (array)$val;
+        case 'json':
+            return json_decode($val, true);
+        default:
+            return $val;
+    }
 }
 
 /**

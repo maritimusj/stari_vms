@@ -64,11 +64,6 @@ CODE;
         return $this->tb_name;
     }
 
-    public function cleanCache()
-    {
-        We7::cache_clean($this->cacheKey(''));
-    }
-
     protected function cacheKey($name): string
     {
         return APP_NAME.":settings:".We7::uniacid().":$this->title:$name";
@@ -156,7 +151,7 @@ CODE;
                 }
             }
 
-            $res = We7::pdo_get($this->getTableName(), ['uniacid' => We7::uniacid(), 'name' => $entry]);
+            $res = We7::pdo_get($this->getTableName(), We7::uniacid(['name' => $entry]));
 
             if ($res) {
                 $ret[$entry] = unserialize($res['data']);
@@ -166,7 +161,7 @@ CODE;
             }
         }
 
-        return is_array($key) ? $ret : ($ret[$key] ?? $default);
+        return is_array($key) ? $ret : ifEmpty($ret[$key], $default);
     }
 
     /**

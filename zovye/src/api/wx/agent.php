@@ -387,7 +387,7 @@ class agent
      * @return array
      * @throws Exception
      */
-    public static function deviceList(): array
+    public static function deviceList(agentModelObj $user): array
     {
         $user = common::getAgentOrPartner();
 
@@ -668,9 +668,9 @@ class agent
      *
      * @return array
      */
-    public static function deviceInfo(): array
+    public static function deviceInfo(agentModelObj $user): array
     {
-        $user = common::getAgentOrPartner();
+        //$user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_sb');
 

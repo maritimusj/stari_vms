@@ -9,38 +9,39 @@ namespace zovye\api;
 use Exception;
 use ReflectionMethod;
 use zovye\api\wx\common;
-use zovye\domain\Agent;
-use zovye\domain\Keeper;
-use zovye\domain\User;
 use zovye\JSON;
+use zovye\Log;
+use zovye\model\agentModelObj;
+use zovye\model\keeperModelObj;
+use zovye\model\userModelObj;
 
 class router
 {
     public static function exec($op, $map)
     {
         $fn = $map[$op];
-
         if (is_callable($fn)) {
             try {
                 $args = [];
-
-                $ref = new ReflectionMethod($fn);
+                $ref = new ReflectionMethod($fn[0], $fn[1]);
                 foreach ($ref->getParameters() as $arg) {
-                    if ($arg instanceof User) {
+                    $type = $arg->getType();
+                    if ($type->getName() == userModelObj::class) {
                         $args[] = common::getUser();
-                    } elseif ($arg instanceof Agent) {
+                    } elseif ($type->getName() == agentModelObj::class) {
                         $args[] = common::getAgent();
-                    } elseif ($arg instanceof Keeper) {
+                    } elseif ($type->getName() == keeperModelObj::class) {
                         $args[] = common::getKeeper();
                     } else {
                         trigger_error("can't resolve args of method", E_USER_ERROR);
                     }
                 }
-
                 $result = call_user_func_array($fn, $args);
                 JSON::result($result);
-
             } catch (Exception $e) {
+                Log::error('router', [
+                    'error' => $e->getMessage(),
+                ]);
                 JSON::fail($e);
             }
         }

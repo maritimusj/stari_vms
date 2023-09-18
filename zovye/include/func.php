@@ -164,7 +164,7 @@ function ifEmpty($data, $default)
 {
     if (!isset($data) && isset($default)) {
         if (is_callable($default)) {
-            return $default();
+            return call_user_func($default);
         }
 
         return $default;

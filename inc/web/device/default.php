@@ -3,7 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
- 
+
 namespace zovye;
 
 use zovye\domain\Agent;
@@ -19,8 +19,8 @@ if (Request::is_ajax()) {
 }
 
 $tpl_data = [
-    'lost_offset_day' => intval(settings('device.lost', 1)),
-    'issuing_offset_day' => intval(settings('device.issuing', 1)),
+    'lost_offset_day' => settings('device.lost', 1),
+    'issuing_offset_day' => settings('device.issuing', 1),
 ];
 
 //指定代理商
@@ -41,9 +41,9 @@ if ($tags_id) {
     }
     $tpl_data['s_tags'] = [
         [
-            'id' => intval($tag->getId()),
-            'title' => strval($tag->getTitle()),
-            'count' => intval($tag->getCount()),
+            'id' => $tag->getId(),
+            'title' => $tag->getTitle(),
+            'count' => $tag->getCount(),
         ],
     ];
 }
@@ -64,7 +64,7 @@ if (Request::has('types')) {
 }
 
 $tpl_data['page'] = Request::int('page', 1);
-$tpl_data['upload'] = (bool)settings('device.upload.url', '');
+$tpl_data['upload'] = settings('device.upload.url', false);
 $tpl_data['gate'] = CtrlServ::status();
 
 Response::showTemplate('web/device/default_new', $tpl_data);

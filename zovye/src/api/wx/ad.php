@@ -150,7 +150,7 @@ class ad
                     if ($media == Advertising::MEDIA_SRT) {
                         $data['text'] = $adv->getExtraData('text');
                     } else {
-                        $data['filename'] = strval($adv->getExtraData('url'));
+                        $data['filename'] = $adv->getExtraData('url', '');
                         $data['url'] = Util::toMedia($data['filename']);
                         if ($media == Advertising::MEDIA_IMAGE) {
                             $data['duration'] = $adv->getExtraData('duration', 10);
@@ -196,7 +196,7 @@ class ad
 
                 } elseif ($type == Advertising::LINK) {
 
-                    $data['link'] = strval($adv->getExtraData('url'));
+                    $data['link'] = $adv->getExtraData('url', '');
                     $data['app_id'] = $adv->getExtraData('app_id');
                     $data['app_path'] = $adv->getExtraData('app_path');
                     $data['images'] = [];

@@ -451,7 +451,7 @@ class userModelObj extends ModelObj
      */
     public function setAgent($level): bool
     {
-        $levels = settings('agent.levels');
+        $levels = settings('agent.levels', []);
         if ($level) {
             if (array_key_exists($level, $levels)) {
                 if ($this->isAgent()) {

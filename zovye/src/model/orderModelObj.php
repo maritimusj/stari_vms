@@ -187,7 +187,7 @@ class orderModelObj extends ModelObj
 
     public function getDeviceChannelId(): int
     {
-        return intval($this->getExtraData('device.ch', 0));
+        return $this->getExtraData('device.ch', 0);
     }
 
     public function getAgent(): ?agentModelObj
@@ -215,7 +215,7 @@ class orderModelObj extends ModelObj
 
     public function getPackageId(): int
     {
-        return intval($this->getExtraData('package.id'));
+        return $this->getExtraData('package.id', 0);
     }
 
     public function getGoods(): ?goodsModelObj
@@ -235,7 +235,7 @@ class orderModelObj extends ModelObj
 
     public function getBluetoothDeviceBUID(): string
     {
-        return strval($this->getExtraData('bluetooth.deviceBUID'));
+        return $this->getExtraData('bluetooth.deviceBUID', '');
     }
 
     public function setBluetoothDeviceBUID($buid)
@@ -261,7 +261,7 @@ class orderModelObj extends ModelObj
 
     public function isBluetoothResultOk(): bool
     {
-        return intval($this->getExtraData('bluetooth.result')) === 1;
+        return $this->getExtraData('bluetooth.result', 0) === 1;
     }
 
     public function isBluetoothResultFail(): bool
@@ -425,7 +425,7 @@ class orderModelObj extends ModelObj
 
     public function getDiscount(): int
     {
-        return intval($this->getExtraData('discount.total', 0));
+        return $this->getExtraData('discount.total', 0);
     }
 
     public function getChargingSF(): int
@@ -461,7 +461,7 @@ class orderModelObj extends ModelObj
 
     public function getGoodsPrice(): int
     {
-        return intval($this->getExtraData('goods.price', 0));
+        return $this->getExtraData('goods.price', 0);
     }
 
     public function getIpAddress(): array

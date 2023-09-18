@@ -130,7 +130,7 @@ class Util
     {
         static $app_key = null;
         if (is_null($app_key)) {
-            $app_key = settings('ctrl.appKey');
+            $app_key = settings('ctrl.appKey', '');
         }
 
         return md5("$app_key$name");

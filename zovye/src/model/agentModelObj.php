@@ -92,7 +92,7 @@ class agentModelObj extends userModelObj
 
     public function isCommissionEnabled(): bool
     {
-        return $this->settings('agentData.commission.enabled') ?? false;
+        return $this->settings('agentData.commission.enabled', false);
     }
 
     /**

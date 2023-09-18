@@ -13,6 +13,7 @@ use zovye\domain\Balance;
 use zovye\domain\Device;
 use zovye\domain\Goods;
 use zovye\domain\Locker;
+use zovye\domain\Order;
 use zovye\domain\Questionnaire;
 use zovye\model\balanceModelObj;
 use zovye\util\DBUtil;
@@ -497,16 +498,17 @@ if ($op == 'default') {
         JSON::fail($res);
     }
 
-    $ticket_data = [
-        'id' => Util::random(16),
-        'time' => time(),
-        'deviceId' => $device->getId(),
-        'shadowId' => $device->getShadowId(),
-        'accountId' => $account->getId(),
-    ];
+    if (!Job::createAccountOrder([
+        'account' => $account->getId(),
+        'device' => $device->getId(),
+        'user' => $user->getId(),
+        'orderUID' => Order::makeUID($user, $device, $code),
+        'ignoreGoodsNum' => 1,
+    ])) {
+        JSON::fail('创建任务失败！');
+    }
 
-    //准备领取商品的ticket
-    $user->setLastActiveData('ticket', $ticket_data);
+    $device->resetShadowId();
 
-    JSON::success(['redirect' => Util::murl('account', ['op' => 'get'])]);
+    JSON::success('正在出货中，请稍等！');
 }

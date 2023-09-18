@@ -643,5 +643,12 @@ class App
         return onceCall(function () {
             return boolval(Config::app('misc.GoodsExpireAlert.enabled'));
         });
-    }    
+    }
+
+    public static function isLongPressOrderEnabled(): bool
+    {
+        return onceCall(function () {
+            return boolval(settings('custom.longPressOrder.enabled'));
+        });
+    } 
 }

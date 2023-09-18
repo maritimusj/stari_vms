@@ -493,7 +493,7 @@ class Account extends State
         }
 
         foreach ($accounts as $entry) {
-            $join(['id' => $entry['id']], function (accountModelObj $acc, deviceModelObj $device, userModelObj $user) {
+            $join(['id' => $entry['id']], function (accountModelObj $acc) use ($device, $user) {
                 return [self::format($acc, sha1("{$acc->getId()}:{$device->getShadowId()}:{$user->getId()}"))];
             });
         }

@@ -493,6 +493,10 @@ if ($op == 'default') {
         JSON::fail('请先扫描设备上的二维码！');
     }
 
+    if (sha1("{$account->getId()}:{$device->getShadowId()}:{$user->getId()}") !== $code) {
+        JSON::fail('签名不正确，请重试！');
+    }
+
     $res = Helper::checkAvailable($user, $account, $device);
     if (is_error($res)) {
         JSON::fail($res);

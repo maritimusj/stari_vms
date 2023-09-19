@@ -370,7 +370,7 @@ class balance
                                     'id' => $device->getId(),
                                 ];
                             }
-                            $device_name = $device ? $device->getName() : '<未知设备>';
+                            $device_name = $device ? $device->getName() : '未知设备';
                             $subtitle = '佣金';
                             if ($entry->getSrc() == CommissionBalance::BONUS) {
                                 $subtitle = '奖励';
@@ -382,7 +382,7 @@ class balance
                                 $subtitle .= '（已退回）';
                             }
 
-                            $username = $user ? $user->getNickname() : '未知';
+                            $username = $user ? ($user->getNickname() ?: '匿名用户') : '未知用户';
                             $data['memo'] = "<$username>{$account_info}在设备[ $device_name ]上{$spec}，获得{$subtitle}！";
                         }
                     }

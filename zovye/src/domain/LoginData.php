@@ -14,9 +14,9 @@ class LoginData
 {
     const AGENT = 0;
     const KEEPER = 1;
-    const USER = 2;
-
+    const WX_APP_USER = 2;
     const AGENT_WEB = 3;
+    const ALI_APP_USER = 4;
 
     /**
      * @param $token
@@ -66,9 +66,14 @@ class LoginData
         return self::query(['src' => LoginData::KEEPER])->where($cond);
     }
 
-    public static function user(array $cond = []): ModelObjFinder
+    public static function WxUser(array $cond = []): ModelObjFinder
     {
-        return self::query(['src' => LoginData::USER])->where($cond);
+        return self::query(['src' => LoginData::WX_APP_USER])->where($cond);
+    }
+
+    public static function AliUser(array $cond = []): ModelObjFinder
+    {
+        return self::query(['src' => LoginData::ALI_APP_USER])->where($cond);
     }
 
     /**

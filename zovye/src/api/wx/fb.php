@@ -7,6 +7,7 @@
 namespace zovye\api\wx;
 
 use Exception;
+use zovye\api\common;
 use zovye\domain\Device;
 use zovye\domain\DeviceFeedback;
 use zovye\domain\LoginData;

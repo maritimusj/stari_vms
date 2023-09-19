@@ -6,6 +6,7 @@
 
 namespace zovye\api\wx;
 
+use zovye\api\common;
 use zovye\domain\Device;
 use zovye\domain\Group as ZovyeGroup;
 use zovye\model\agentModelObj;
@@ -86,7 +87,7 @@ class group
      */
     public static function detail(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_sp');
+        common::checkPrivileges($agent, 'F_sp');
 
         //分组id
         $group_id = Request::int('id');
@@ -176,7 +177,7 @@ class group
      */
     public static function delete(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_gg');
+        common::checkPrivileges($agent, 'F_gg');
 
         $group_id = Request::trim('id');
 

@@ -8,6 +8,7 @@
 namespace zovye\api\wxweb;
 
 use DateTime;
+use zovye\api\wx\misc;
 use zovye\api\wxx\common;
 use zovye\App;
 use zovye\Config;
@@ -40,45 +41,9 @@ use function zovye\isEmptyArray;
 
 class api
 {
-    /**
-     * 用户登录，小程序必须提交code,encryptedData和iv值
-     *
-     * @return array
-     */
-    public static function login(): array
-    {
-        $res = \zovye\api\wx\common::getDecryptedWxUserData();
-        if (is_error($res)) {
-            Log::error('wxweb', $res);
-
-            return err('用户登录失败，请稍后再试！[103]');
-        }
-
-        //如果小程序请求中携带了H5页面的openid，则使用该openid的H5用户登录小程序
-        $h5_openid = '';
-        if (Request::has('openId')) {
-            $h5_openid = Request::str('openId');
-        }
-
-        return common::doUserLogin(
-            $res,
-            Request::array('userInfo'),
-            $h5_openid,
-            Request::str('device'),
-            Request::str('from')
-        );
-    }
-
     public static function nearBy(): array
     {
         return DeviceUtil::getNearBy();
-    }
-
-    public static function migrateUrl(): array
-    {
-        $url = Util::murl('util', ['op' => 'migrate', 'token' => \zovye\api\wx\common::getToken()]);
-
-        return ['url' => $url];
     }
 
     /**
@@ -766,7 +731,7 @@ class api
      */
     public static function getUserBank(userModelObj $user): array
     {
-        return \zovye\api\wx\common::getUserBank($user);
+        return misc::getUserBank($user);
     }
 
     /**
@@ -774,18 +739,18 @@ class api
      */
     public static function setUserBank(userModelObj $user): array
     {
-        return \zovye\api\wx\common::setUserBank($user);
+        return misc::setUserBank($user);
     }
 
     public static function getUserQRCode(userModelObj $user): array
     {
-        return \zovye\api\wx\common::getUserQRCode($user);
+        return misc::getUserQRCode($user);
     }
 
     public static function updateUserQRCode(userModelObj $user): array
     {
         $type = Request::str('type');
 
-        return \zovye\api\wx\common::updateUserQRCode($user, $type);
+        return misc::updateUserQRCode($user, $type);
     }
 }

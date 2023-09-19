@@ -7,6 +7,7 @@
 namespace zovye\api\wx;
 
 use DateTimeImmutable;
+use zovye\api\common;
 use zovye\App;
 use zovye\domain\Account;
 use zovye\domain\CommissionBalance;
@@ -40,7 +41,7 @@ class balance
             ],
         ];
 
-        if (!common::checkCurrentUserPrivileges($agent, 'F_cm', true)) {
+        if (!common::checkPrivileges($agent, 'F_cm', true)) {
             return $result;
         }
 
@@ -262,7 +263,7 @@ class balance
      */
     public static function withdraw(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_cm');
+        common::checkPrivileges($agent, 'F_cm');
 
         if (!empty(settings('commission.withdraw.bank_card'))) {
             if (empty($agent->settings('agentData.bank'))) {
@@ -399,7 +400,7 @@ class balance
      */
     public static function log(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_cm');
+        common::checkPrivileges($agent, 'F_cm');
 
         return balance::getUserBalanceLog(
             $agent,

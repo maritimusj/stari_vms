@@ -3,7 +3,6 @@
 namespace zovye\api\wxweb;
 
 use zovye\api\wx\balance;
-use zovye\api\wx\common;
 use zovye\App;
 use zovye\business\Charging as IotCharging;
 use zovye\business\ChargingNowData;
@@ -15,6 +14,7 @@ use zovye\domain\User;
 use zovye\model\charging_now_dataModelObj;
 use zovye\model\device_groupsModelObj;
 use zovye\model\deviceModelObj;
+use zovye\model\userModelObj;
 use zovye\Request;
 use zovye\util\CacheUtil;
 use zovye\util\Helper;
@@ -25,23 +25,21 @@ use function zovye\isEmptyArray;
 
 class charging
 {
-    public static function chargingUserInfo(): array
+    public static function chargingUserInfo(userModelObj $wx_app_user): array
     {
-        $user = common::getWXAppUser();
-
-        $data = $user->profile();
-        $data['banned'] = $user->isBanned();
-        $data['commission_balance'] = $user->getCommissionBalance()->total();
+        $data = $wx_app_user->profile();
+        $data['banned'] = $wx_app_user->isBanned();
+        $data['commission_balance'] = $wx_app_user->getCommissionBalance()->total();
 
         if (App::isTeamEnabled()) {
-            $team = Team::getFor($user);
+            $team = Team::getFor($wx_app_user);
             if ($team) {
                 $data['team'] = $team->profile();
             }
         }
 
         if (App::isChargingDeviceEnabled()) {
-            $list = ChargingNowData::getAllByUser($user);
+            $list = ChargingNowData::getAllByUser($wx_app_user);
 
             if ($list) {
                 $data['charging_now_data'] = [];
@@ -232,11 +230,9 @@ class charging
         return $result;
     }
 
-    public static function start()
+    public static function start(userModelObj $wx_app_user)
     {
-        $user = common::getWXAppUser();
-
-        if ($user->isBanned()) {
+        if ($wx_app_user->isBanned()) {
             return err('对不起，用户暂时无法使用！');
         }
 
@@ -254,20 +250,18 @@ class charging
 
         $serial = $device->generateChargingSerial($chargerID);
 
-        return IotCharging::start($serial, $user->getCommissionBalanceCard(), $limit, $remark, $device, $chargerID);
+        return IotCharging::start($serial, $wx_app_user->getCommissionBalanceCard(), $limit, $remark, $device, $chargerID);
     }
 
-    public static function stop()
+    public static function stop(userModelObj $wx_app_user)
     {
-        $user = common::getWXAppUser();
-
         $serial = Request::str('serial');
 
         if (!empty($serial)) {
-            return IotCharging::stop($user, $serial);
+            return IotCharging::stop($wx_app_user, $serial);
         }
 
-        $result = IotCharging::stopUserAllCharging($user);
+        $result = IotCharging::stopUserAllCharging($wx_app_user);
 
         if (empty($result)) {
             return '已通知所有设备停止充电，请稍候！';
@@ -283,15 +277,11 @@ class charging
         return IotCharging::orderStatus($serial);
     }
 
-    /** chargingStatus api */
     /**
      * 返回设备指定充电枪的状态
-     * @return array
      */
-    public static function status(): array
+    public static function status(userModelObj $wx_app_user): array
     {
-        $user = common::getWXAppUser();
-
         $device_uid = Request::trim('deviceId');
         $charger_id = Request::int('chargerID');
 
@@ -306,7 +296,7 @@ class charging
 
         $charging_now_data = ChargingNowData::getByDevice($device, $charger_id);
         if ($charging_now_data) {
-            if ($charging_now_data->getUserId() != $user->getId()) {
+            if ($charging_now_data->getUserId() != $wx_app_user->getId()) {
                 return err('设备正在使用中！');
             }
 
@@ -319,12 +309,10 @@ class charging
         return [];
     }
 
-    public static function orderList(): array
+    public static function orderList(userModelObj $wx_app_user): array
     {
-        $user = common::getWXAppUser();
-
         $query = Order::query([
-            'openid' => $user->getOpenid(),
+            'openid' => $wx_app_user->getOpenid(),
             'result_code' => 0,
             'src' => [Order::CHARGING, Order::CHARGING_UNPAID],
         ]);
@@ -350,10 +338,8 @@ class charging
         return $list;
     }
 
-    public static function orderDetail(): array
+    public static function orderDetail(userModelObj $wx_app_user): array
     {
-        $user = common::getWXAppUser();
-
         $serial = Request::str('serial');
 
         $order = Order::get($serial, true);
@@ -362,7 +348,7 @@ class charging
         }
 
         $orderOwner = $order->getUser();
-        if ($orderOwner && $orderOwner->getId() != $user->getId()) {
+        if ($orderOwner && $orderOwner->getId() != $wx_app_user->getId()) {
             return err('无法查看该订单！');
         }
 
@@ -379,11 +365,9 @@ class charging
         return Order::format($order, true);
     }
 
-    public static function payForCharging(): array
+    public static function payForCharging(userModelObj $wx_app_user): array
     {
-        $user = common::getWXAppUser();
-
-        if (!$user->acquireLocker(User::ORDER_LOCKER)) {
+        if (!$wx_app_user->acquireLocker(User::ORDER_LOCKER)) {
             return err('无法锁定用户，请稍后再试！');
         }
 
@@ -411,7 +395,7 @@ class charging
         $price = intval(round(Request::float('price', 0, 2) * 100));
 
         return Helper::createChargingOrder(
-            $user,
+            $wx_app_user,
             $device,
             $chargerID,
             $price,
@@ -420,13 +404,11 @@ class charging
         );
     }
 
-    public static function withdraw(): array
+    public static function withdraw(userModelObj $wx_app_user): array
     {
-        $user = common::getWXAppUser();
-
         $total = intval(round(Request::float('amount', 0, 2) * 100));
 
-        return balance::balanceWithdraw($user, $total, Request::str('memo'), [
+        return balance::balanceWithdraw($wx_app_user, $total, Request::str('memo'), [
             'charging' => true,
         ]);
     }

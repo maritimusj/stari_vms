@@ -10,6 +10,7 @@ namespace zovye\api\wx;
 use DateTime;
 use DateTimeImmutable;
 use Exception;
+use zovye\api\common;
 use zovye\App;
 use zovye\business\GDCVMachine;
 use zovye\Config;
@@ -167,7 +168,7 @@ class keeper
      */
     public static function setKeeper(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_yy');
+        common::checkPrivileges($agent, 'F_yy');
 
         $id = Request::int('id');
         $name = Request::trim('name');
@@ -223,7 +224,7 @@ class keeper
      */
     public static function deleteKeeper(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_yy');
+        common::checkPrivileges($agent, 'F_yy');
 
         return DBUtil::transactionDo(function () use ($agent) {
             $id = Request::int('id');
@@ -259,7 +260,7 @@ class keeper
      */
     public static function keepers(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_yy');
+        common::checkPrivileges($agent, 'F_yy');
 
         if (Request::has('deviceId')) {
             $device = \zovye\api\wx\device::getDevice(Request::int('deviceId'));
@@ -309,7 +310,7 @@ class keeper
 
     public static function removeDevicesFromKeeper(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_yy');
+        common::checkPrivileges($agent, 'F_yy');
 
         return DBUtil::transactionDo(function () use ($agent) {
             $keeper_id = Request::int('keeperid');
@@ -346,7 +347,7 @@ class keeper
      */
     public static function assignDevicesToKeeper(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_yy');
+        common::checkPrivileges($agent, 'F_yy');
 
         return DBUtil::transactionDo(function () use ($agent) {
             $device_ids = [];
@@ -475,7 +476,7 @@ class keeper
 
         $user = $keeper->getUser();
         if ($user) {
-            return common::getUserBank($user);
+            return misc::getUserBank($user);
         }
 
         return $result;
@@ -488,7 +489,7 @@ class keeper
     {
         $user = $keeper->getUser();
         if ($user) {
-            return common::setUserBank($user);
+            return misc::setUserBank($user);
         }
 
         return err('无法保存，请联系管理员！');
@@ -1164,7 +1165,7 @@ class keeper
      */
     public static function viewKeeperStats(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_yy');
+        common::checkPrivileges($agent, 'F_yy');
 
         $id = Request::int('id');
         if ($id) {

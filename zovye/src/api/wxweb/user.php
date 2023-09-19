@@ -2,8 +2,8 @@
 
 namespace zovye\api\wxweb;
 
-use zovye\api\wx\common;
 use zovye\domain\CommissionBalance;
+use zovye\model\userModelObj;
 use zovye\Pay;
 use zovye\Request;
 use zovye\util\Helper;
@@ -11,11 +11,9 @@ use function zovye\err;
 
 class user
 {
-    public static function payForRecharge(): array
+    public static function payForRecharge(userModelObj $wx_app_user): array
     {
-        $user = common::getWXAppUser();
-
-        if (!$user->acquireLocker(\zovye\domain\User::BALANCE_LOCKER)) {
+        if (!$wx_app_user->acquireLocker(\zovye\domain\User::BALANCE_LOCKER)) {
             return err('无法锁定用户，请稍后再试！');
         }
 
@@ -24,7 +22,7 @@ class user
             return err('充值金额不正确！');
         }
 
-        return Helper::createRechargeOrder($user, $price);
+        return Helper::createRechargeOrder($wx_app_user, $price);
     }
 
     public static function rechargeResult(): array
@@ -59,11 +57,9 @@ class user
         return ['msg' => '正在查询..'];
     }
 
-    public static function rechargeList(): array
+    public static function rechargeList(userModelObj $wx_app_user): array
     {
-        $user = common::getWXAppUser();
-
-        $query = $user->getCommissionBalance()->log();
+        $query = $wx_app_user->getCommissionBalance()->log();
         $query->where([
             'src' => [
                 CommissionBalance::ADJUST,

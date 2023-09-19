@@ -10,6 +10,7 @@ namespace zovye\api\wx;
 use DateTime;
 use DateTimeImmutable;
 use Exception;
+use zovye\api\common;
 use zovye\App;
 use zovye\domain\Account;
 use zovye\domain\CommissionBalance;
@@ -30,7 +31,7 @@ class commission
      */
     public static function sharedAccount(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, ['F_cm', 'F_pt']);
+        common::checkPrivileges($agent, ['F_cm', 'F_pt']);
 
         //检查用户是否已同意平台协议
         if (settings('commission.agreement.freq')) {
@@ -93,7 +94,7 @@ class commission
      */
     public static function accountAssign(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, ['F_cm', 'F_pt']);
+        common::checkPrivileges($agent, ['F_cm', 'F_pt']);
 
         //检查用户是否已同意平台协议
         if (settings('commission.agreement.freq')) {
@@ -134,7 +135,7 @@ class commission
      */
     public static function ptAgreement(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, ['F_cm', 'F_pt']);
+        common::checkPrivileges($agent, ['F_cm', 'F_pt']);
 
         $agreement = settings('commission.agreement');
         if (Request::has('acquire')) {
@@ -174,7 +175,7 @@ class commission
 
     public static function level(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_cm');
+        common::checkPrivileges($agent, 'F_cm');
 
         $guid = Request::trim('guid');
         $val = min(10000, max(0, Request::float('val', 0, 2) * 100));

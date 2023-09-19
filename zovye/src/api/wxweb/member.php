@@ -2,7 +2,6 @@
 
 namespace zovye\api\wxweb;
 
-use zovye\api\wx\common;
 use zovye\App;
 use zovye\domain\CommissionBalance;
 use zovye\domain\Order;
@@ -11,6 +10,7 @@ use zovye\domain\User;
 use zovye\model\orderModelObj;
 use zovye\model\team_memberModelObj;
 use zovye\model\teamModelObj;
+use zovye\model\userModelObj;
 use zovye\Request;
 use zovye\util\DBUtil;
 use function zovye\err;
@@ -18,18 +18,17 @@ use function zovye\is_error;
 
 class member
 {
-    public static function getMemberList(): array
+    public static function getMemberList(userModelObj $wx_app_user): array
     {
-        $user = common::getWXAppUser();
-        $locker = $user->acquireLocker('team');
+        $locker = $wx_app_user->acquireLocker('team');
         try {
             if (empty($locker)) {
                 return err('用户被占用，请重试！');
             }
 
-            $team = Team::getFor($user);
+            $team = Team::getFor($wx_app_user);
             if (empty($team)) {
-                $team = Team::createFor($user, '默认车队');
+                $team = Team::createFor($wx_app_user, '默认车队');
             }
 
             if (empty($team)) {
@@ -60,10 +59,10 @@ class member
             /** @var team_memberModelObj $member */
             foreach ($query->findAll() as $member) {
                 $data = $member->profile();
-                $user = $member->getAssociatedUser();
-                if ($user) {
-                    $data['user'] = $user->profile();
-                    $data['balance'] = $user->getCommissionBalance()->total();
+                $wx_app_user = $member->getAssociatedUser();
+                if ($wx_app_user) {
+                    $data['user'] = $wx_app_user->profile();
+                    $data['balance'] = $wx_app_user->getCommissionBalance()->total();
                 }
                 $list[] = $data;
             }
@@ -109,15 +108,13 @@ class member
         return true;
     }
 
-    public static function memberUserInfo(): array
+    public static function memberUserInfo(userModelObj $wx_app_user): array
     {
-        $user = common::getWXAppUser();
-
         $mobile = Request::str('mobile');
 
-        $team = Team::getOrCreateFor($user);
+        $team = Team::getOrCreateFor($wx_app_user);
         if (empty($team)) {
-            $team = Team::createFor($user, '默认车队');
+            $team = Team::createFor($wx_app_user, '默认车队');
         }
 
         if (empty($team)) {
@@ -137,13 +134,11 @@ class member
         return [];
     }
 
-    public static function createMember()
+    public static function createMember(userModelObj $wx_app_user)
     {
-        $user = common::getWXAppUser();
-
-        $team = Team::getOrCreateFor($user);
+        $team = Team::getOrCreateFor($wx_app_user);
         if (empty($team)) {
-            $team = Team::createFor($user, '默认车队');
+            $team = Team::createFor($wx_app_user, '默认车队');
         }
 
         if (empty($team)) {
@@ -176,10 +171,8 @@ class member
         return $member->profile();
     }
 
-    public static function editMember()
+    public static function editMember(userModelObj $wx_app_user)
     {
-        $user = common::getWXAppUser();
-
         $id = Request::int('id');
         $member = Team::getMember($id);
         if (empty($member)) {
@@ -187,7 +180,7 @@ class member
         }
 
         $team = $member->team();
-        if (empty($team) || $team->getOwnerId() != $user->getId()) {
+        if (empty($team) || $team->getOwnerId() != $wx_app_user->getId()) {
             return err('没有权限管理这个队员');
         }
 
@@ -215,10 +208,8 @@ class member
         return $member->profile();
     }
 
-    public static function removeMember()
+    public static function removeMember(userModelObj $wx_app_user)
     {
-        $user = common::getWXAppUser();
-
         $id = Request::int('id');
         $member = Team::getMember($id);
         if (empty($member)) {
@@ -226,7 +217,7 @@ class member
         }
 
         $team = $member->team();
-        if (empty($team) || $team->getOwnerId() != $user->getId()) {
+        if (empty($team) || $team->getOwnerId() != $wx_app_user->getId()) {
             return err('没有权限管理这个队员');
         }
 
@@ -235,27 +226,25 @@ class member
         return true;
     }
 
-    public static function transfer()
+    public static function transfer(userModelObj $wx_app_user)
     {
-        $user = common::getWXAppUser();
-
         if (!App::isTeamEnabled()) {
             return err('车队功能没有启用！');
         }
 
         //先锁定用户，防止恶意重复提交
-        if (!$user->acquireLocker(User::COMMISSION_BALANCE_LOCKER)) {
+        if (!$wx_app_user->acquireLocker(User::COMMISSION_BALANCE_LOCKER)) {
             return err('锁定用户失败，请重试！');
         }
 
-        return DBUtil::transactionDo(function () use ($user) {
+        return DBUtil::transactionDo(function () use ($wx_app_user) {
             $id = Request::int('id');
             $total = Request::int('total');
             if ($total < 1) {
                 return err('转帐金额不正确！');
             }
 
-            if ($total + \zovye\business\Charging::getUnpaidOrderPriceTotal($user) > $user->getCommissionBalance()->total()) {
+            if ($total + \zovye\business\Charging::getUnpaidOrderPriceTotal($wx_app_user) > $wx_app_user->getCommissionBalance()->total()) {
                 return err('帐户有效余额不足，请充值再操作！');
             }
 
@@ -265,7 +254,7 @@ class member
             }
 
             $team = $member->team();
-            if (empty($team) || $team->getOwnerId() != $user->getId()) {
+            if (empty($team) || $team->getOwnerId() != $wx_app_user->getId()) {
                 return err('没有权限管理这个队员！');
             }
 
@@ -274,11 +263,11 @@ class member
                 return err('找不到这个成员对应的用户！');
             }
 
-            if ($user->getId() == $u->getId()) {
+            if ($wx_app_user->getId() == $u->getId()) {
                 return err('无法给自己转账！');
             }
 
-            $from = $user->getCommissionBalance()->change(
+            $from = $wx_app_user->getCommissionBalance()->change(
                 -$total, CommissionBalance::TRANSFER_OUT,
                 [
                     'to' => [
@@ -297,7 +286,7 @@ class member
                 'from' => [
                     'team' => $team->profile(),
                     'member' => $member->profile(false),
-                    'user' => $user->profile(false),
+                    'user' => $wx_app_user->profile(false),
                 ],
             ]);
 
@@ -316,10 +305,8 @@ class member
         });
     }
 
-    public static function orderList(): array
+    public static function orderList(userModelObj $wx_app_user): array
     {
-        $user = common::getWXAppUser();
-
         if (Request::has('id')) {
             $id = Request::int('id');
 
@@ -329,7 +316,7 @@ class member
             }
 
             $team = $member->team();
-            if (empty($team) || $team->getOwnerId() != $user->getId()) {
+            if (empty($team) || $team->getOwnerId() != $wx_app_user->getId()) {
                 return err('没有权限管理这个队员！');
             }
 
@@ -341,7 +328,7 @@ class member
             $member_openid = $u->getOpenid();
 
         } else {
-            $team = Team::getFor($user);
+            $team = Team::getFor($wx_app_user);
             if (empty($team)) {
                 return err('找不到用户的车队信息！');
             }
@@ -350,11 +337,11 @@ class member
             $member_query = Team::findAllMember($team);
             /** @var team_memberModelObj $member */
             foreach ($member_query->findAll() as $member) {
-                $user = $member->getAssociatedUser();
-                if (empty($user)) {
+                $wx_app_user = $member->getAssociatedUser();
+                if (empty($wx_app_user)) {
                     continue;
                 }
-                $member_openid[] = $user->getOpenid();
+                $member_openid[] = $wx_app_user->getOpenid();
             }
         }
 
@@ -381,9 +368,9 @@ class member
         /** @var orderModelObj $order */
         foreach ($query->findAll() as $order) {
             $data = Order::format($order, true);
-            $user = $order->getUser();
-            if ($user) {
-                $member = Team::getMemberFor($team, $user);
+            $wx_app_user = $order->getUser();
+            if ($wx_app_user) {
+                $member = Team::getMemberFor($team, $wx_app_user);
                 if ($member) {
                     $data['member'] = $member->profile(false);
                 }
@@ -417,10 +404,8 @@ class member
     }
 
 
-    public static function chargingList(): array
+    public static function chargingList(userModelObj $wx_app_user): array
     {
-        $user = common::getWXAppUser();
-
         $id = Request::int('id');
         $member = Team::getMember($id);
         if (empty($member)) {
@@ -428,7 +413,7 @@ class member
         }
 
         $team = $member->team();
-        if (empty($team) || $team->getOwnerId() != $user->getId()) {
+        if (empty($team) || $team->getOwnerId() != $wx_app_user->getId()) {
             return err('没有权限管理这个队员！');
         }
 

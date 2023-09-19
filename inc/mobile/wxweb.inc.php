@@ -22,7 +22,7 @@ Request::extraAjaxJsonData();
 $op = Request::op('default');
 
 router::exec($op, [
-    'login' => [api::class, 'login'],
+    'login' => [\zovye\api\common::class, 'login'],
     'nearBy' => [api::class, 'nearBy'],
     'advs' => [api::class, 'ads'],
     'accounts' => [api::class, 'accounts'],

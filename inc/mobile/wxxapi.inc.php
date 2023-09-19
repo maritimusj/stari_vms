@@ -15,7 +15,7 @@ use zovye\Request;
 $op = ucfirst(Request::op('default'));
 
 router::exec($op, [
-    'Login' => [common::class, 'login'],
+    'Login' => [\zovye\api\common::class, 'login'],
     'VoucherList' => [common::class, 'voucherList'],
     'PageInfo' => [common::class, 'pageInfo'],
     'GetGoodsList' => [common::class, 'getGoodsList'],

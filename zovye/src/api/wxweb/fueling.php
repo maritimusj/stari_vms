@@ -6,11 +6,11 @@
 
 namespace zovye\api\wxweb;
 
-use zovye\api\wx\common;
 use zovye\Config;
 use zovye\domain\Device;
 use zovye\domain\Order;
 use zovye\domain\User;
+use zovye\model\userModelObj;
 use zovye\Request;
 use zovye\util\Helper;
 use function zovye\err;
@@ -24,10 +24,8 @@ class fueling
     /**
      * 设备详情
      */
-    public static function deviceDetail(): array
+    public static function deviceDetail(userModelObj $wx_app_user): array
     {
-        $user = common::getWXAppUser();
-
         $device_id = Request::str('deviceId');
         $device = Device::get($device_id, true);
         if (empty($device)) {
@@ -35,9 +33,9 @@ class fueling
         }
 
         $data = $device->profile(true);
-        $data['vip'] = \zovye\business\Fueling::isVIP($user, $device);
+        $data['vip'] = \zovye\business\Fueling::isVIP($wx_app_user, $device);
 
-        $fuelingNOWData = $user->fuelingNOWData();
+        $fuelingNOWData = $wx_app_user->fuelingNOWData();
         if ($fuelingNOWData) {
             $data['fueling'] = [
                 'serial' => $fuelingNOWData['serial'],
@@ -46,7 +44,7 @@ class fueling
 
         $chargerID = Request::int('chargerID');
         $deviceFuelingNOWData = $device->fuelingNOWData($chargerID);
-        if ($deviceFuelingNOWData && $deviceFuelingNOWData['user'] != $user->getId()) {
+        if ($deviceFuelingNOWData && $deviceFuelingNOWData['user'] != $wx_app_user->getId()) {
             $data['fueling'] = [
                 'error' =>  '设备正在使用中!',
             ];
@@ -65,11 +63,9 @@ class fueling
     /**
      * 开始加注
      */
-    public static function start()
+    public static function start(userModelObj $wx_app_user)
     {
-        $user = common::getWXAppUser();
-
-        if ($user->isBanned()) {
+        if ($wx_app_user->isBanned()) {
             return err('对不起，用户暂时无法使用！');
         }
 
@@ -80,7 +76,7 @@ class fueling
 
         $chargerID = Request::int('chargerID');
 
-        $card = \zovye\business\Fueling::isVIP($user, $device) ? $user->getVIPCard() : $user->getCommissionBalanceCard();
+        $card = \zovye\business\Fueling::isVIP($wx_app_user, $device) ? $wx_app_user->getVIPCard() : $wx_app_user->getCommissionBalanceCard();
 
         return \zovye\business\Fueling::start('', $card, $device, $chargerID);
     }
@@ -88,11 +84,9 @@ class fueling
     /**
      * 停止加注
      */
-    public static function stop()
+    public static function stop(userModelObj $wx_app_user)
     {
-        $user = common::getWXAppUser();
-
-        return \zovye\business\Fueling::stop($user);
+        return \zovye\business\Fueling::stop($wx_app_user);
     }
 
     /**
@@ -105,11 +99,9 @@ class fueling
         return \zovye\business\Fueling::orderStatus($serial);
     }
 
-    public static function payForFueling(): array
+    public static function payForFueling(userModelObj $wx_app_user): array
     {
-        $user = common::getWXAppUser();
-
-        if (!$user->acquireLocker(User::ORDER_LOCKER)) {
+        if (!$wx_app_user->acquireLocker(User::ORDER_LOCKER)) {
             return err('无法锁定用户，请稍后再试！');
         }
 
@@ -135,18 +127,16 @@ class fueling
 
         $price = intval(round(Request::float('price', 0, 2) * 100));
 
-        return Helper::createFuelingOrder($user, $device, $chargerID, $price, Order::makeSerial($user));
+        return Helper::createFuelingOrder($wx_app_user, $device, $chargerID, $price, Order::makeSerial($wx_app_user));
     }
 
     /**
      * 订单列表
      */
-    public static function orderList(): array
+    public static function orderList(userModelObj $wx_app_user): array
     {
-        $user = common::getWXAppUser();
-
         $query = Order::query([
-            'openid' => $user->getOpenid(),
+            'openid' => $wx_app_user->getOpenid(),
             'result_code' => 0,
             'src' => [Order::FUELING, Order::FUELING_UNPAID],
         ]);
@@ -175,10 +165,9 @@ class fueling
     /**
      * 订单详情
      */
-    public static function orderDetail(): array
+    public static function orderDetail(userModelObj $wx_app_user): array
     {
         $serial = Request::str('serial');
-        $user = common::getWXAppUser();
 
         $order = Order::get($serial, true);
         if (empty($order)) {
@@ -186,7 +175,7 @@ class fueling
         }
 
         $orderOwner = $order->getUser();
-        if ($orderOwner && $orderOwner->getId() != $user->getId()) {
+        if ($orderOwner && $orderOwner->getId() != $wx_app_user->getId()) {
             return err('无法查看该订单！');
         }
 

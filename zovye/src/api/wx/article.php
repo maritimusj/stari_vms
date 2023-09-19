@@ -6,6 +6,7 @@
 
 namespace zovye\api\wx;
 
+use zovye\api\common;
 use zovye\model\agentModelObj;
 use zovye\model\articleModelObj;
 use zovye\model\filesModelObj;
@@ -22,7 +23,7 @@ class article
      */
     public static function detail(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_wd');
+        common::checkPrivileges($agent, 'F_wd');
 
         $id = Request::int('id');
         /** @var articleModelObj $article */
@@ -47,7 +48,7 @@ class article
      */
     public static function list(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_wd');
+        common::checkPrivileges($agent, 'F_wd');
 
         $page = max(1, Request::int('page'));
         $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
@@ -83,7 +84,7 @@ class article
      */
     public static function archive(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_wd');
+        common::checkPrivileges($agent, 'F_wd');
 
         $archive_types = settings('doc.types');
         $page = max(1, Request::int('page'));
@@ -125,7 +126,7 @@ class article
      */
     public static function faq(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_wt');
+        common::checkPrivileges($agent, 'F_wt');
 
         $page = max(1, Request::int('page'));
         $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));

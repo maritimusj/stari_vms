@@ -8,7 +8,7 @@ namespace zovye\api;
 
 use Exception;
 use ReflectionMethod;
-use zovye\api\wx\common;
+use zovye\domain\LoginData;
 use zovye\JSON;
 use zovye\Log;
 use zovye\model\agentModelObj;
@@ -27,7 +27,13 @@ class router
                 foreach ($ref->getParameters() as $arg) {
                     $type = $arg->getType();
                     if ($type->getName() == userModelObj::class) {
-                        $args[] = common::getUser();
+                        if ($arg->getName() == 'wx_app_user') {
+                            $args[] = common::getWXAppUser();
+                        } elseif ($arg->getName() == 'ali_user') {
+                            $args[] = common::getUser(LoginData::ALI_APP_USER);
+                        } else {
+                            $args[] = common::getUser();
+                        }
                     } elseif ($type->getName() == agentModelObj::class) {
                         $args[] = common::getAgent();
                     } elseif ($type->getName() == keeperModelObj::class) {

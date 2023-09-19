@@ -6,6 +6,7 @@
 
 namespace zovye\api\wx;
 
+use zovye\api\common;
 use zovye\App;
 use zovye\model\agentModelObj;
 use zovye\Request;
@@ -52,7 +53,7 @@ class goods
 
     public static function delete(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_sp');
+        common::checkPrivileges($agent, 'F_sp');
 
         $goods = \zovye\domain\Goods::get(Request::int('id'));
         if (empty($goods)) {
@@ -76,7 +77,7 @@ class goods
 
     public static function create(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_sp');
+        common::checkPrivileges($agent, 'F_sp');
 
         $s1 = 0;
         if (Request::bool(\zovye\domain\Goods::AllowFree)) {

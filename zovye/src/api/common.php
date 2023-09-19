@@ -4,10 +4,12 @@
  * @url www.stariture.com
  */
 
-namespace zovye\api\wx;
+namespace zovye\api;
 
-use Exception;
 use zovye\App;
+use zovye\domain\Balance;
+use zovye\domain\Device;
+use zovye\domain\Keeper;
 use zovye\domain\LoginData;
 use zovye\domain\User;
 use zovye\domain\WxApp;
@@ -18,7 +20,6 @@ use zovye\model\keeperModelObj;
 use zovye\model\userModelObj;
 use zovye\Request;
 use zovye\util\Util;
-use zovye\We7;
 use zovye\Wx;
 use function zovye\err;
 use function zovye\is_error;
@@ -27,6 +28,141 @@ use function zovye\settings;
 class common
 {
     static $user = null;
+
+    /**
+     * 用户登录，小程序必须提交code,encryptedData和iv值
+     *
+     * @return array
+     */
+    public static function login(): array
+    {
+        $res = common::getDecryptedWxUserData();
+        if (is_error($res)) {
+            Log::error('wxapi', $res);
+
+            return err('用户登录失败，请稍后再试！[103]');
+        }
+
+        //如果小程序请求中携带了H5页面的openid，则使用该openid的H5用户登录小程序
+        $h5_openid = '';
+        if (Request::has('openId')) {
+            $h5_openid = Request::str('openId');
+        }
+
+        return self::doUserLogin(
+            $res,
+            Request::array('userInfo'),
+            $h5_openid,
+            Request::str('device'),
+            Request::str('from')
+        );
+    }
+
+    public static function doUserLogin(
+        $res,
+        $user_info,
+        $h5_openid = '',
+        $device_uid = '',
+        $ref_user_openid = ''
+    ): array {
+        $openid = strval($res['openId']);
+        $user = User::get($openid, true);
+        if (empty($user)) {
+            $user = User::create([
+                'app' => User::WxAPP,
+                'openid' => $openid,
+                'nickname' => $user_info['nickName'] ?? '',
+                'avatar' => $user_info['avatarUrl'] ?? '',
+                'mobile' => $res['phoneNumber'] ?? '',
+                'createtime' => time(),
+            ]);
+
+            if (empty($user)) {
+                return err('创建用户失败！');
+            }
+
+            if ($ref_user_openid) {
+                $ref_user = User::get($ref_user_openid, true);
+            }
+
+            if (App::isBalanceEnabled()) {
+                Balance::onUserCreated($user, $ref_user ?? null);
+            }
+
+        } else {
+            if ($user_info['nickName']) {
+                $user->setNickname($user_info['nickName']);
+            }
+
+            if ($user_info['avatarUrl']) {
+                $user->setAvatar($user_info['avatarUrl']);
+            }
+
+            if ($res['phoneNumber']) {
+                $user->setMobile($res['phoneNumber']);
+            }
+
+            $user->save();
+        }
+
+        $user->set('fansData', $user_info);
+
+        if ($device_uid) {
+            $device = Device::get($device_uid, true);
+            if ($device) {
+                $user->setLastActiveDevice($device);
+                $user->setLastActiveData('from', 'wxapp');
+            }
+        }
+
+        if ($h5_openid) {
+            $user->updateSettings('customData.wx.openid', $h5_openid);
+        } else {
+            $h5_openid = $user->settings('customData.wx.openid', '');
+        }
+
+        if ($h5_openid) {
+            $user = User::get($h5_openid, true, User::WX);
+            if (empty($user)) {
+                return err('没有找到关联的微信用户！');
+            }
+            if (isset($device)) {
+                $user->setLastActiveDevice($device);
+                $user->setLastActiveData('from', 'wxapp');
+            }
+            if ($res['phoneNumber']) {
+                $user->setMobile($res['phoneNumber']);
+                $user->save();
+            }
+        }
+
+        if ($user->isBanned()) {
+            return err('登录失败，请稍后再试！');
+        }
+
+        //清除原来的登录信息
+        foreach (LoginData::WxUser(['user_id' => $user->getId()])->findAll() as $entry) {
+            $entry->destroy();
+        }
+
+        $token = Util::getTokenValue();
+
+        $data = [
+            'src' => LoginData::WX_APP_USER,
+            'user_id' => $user->getId(),
+            'session_key' => '',
+            'openid_x' => $openid,
+            'token' => $token,
+        ];
+
+        if (LoginData::create($data)) {
+            return [
+                'token' => $token,
+            ];
+        }
+
+        return err('登录失败，请稍后再试！');
+    }
 
     public static function getDecryptedWxUserData(): array
     {
@@ -77,7 +213,13 @@ class common
 
     public static function getToken(): string
     {
-        return Request::str('token');
+        $token = Request::str('token');
+        if (empty($token)) {
+            //兼容支付宝小程序
+            $token = Request::str('user_id');
+        }
+
+        return $token;
     }
 
     public static function getWXAppUser(): ?userModelObj
@@ -112,7 +254,8 @@ class common
                 LoginData::AGENT,
                 LoginData::AGENT_WEB,
                 LoginData::KEEPER,
-                LoginData::USER,
+                LoginData::WX_APP_USER,
+                LoginData::ALI_APP_USER,
             ];
         }
 
@@ -123,12 +266,16 @@ class common
         }
 
         if ($login_data->getSrc() == LoginData::KEEPER) {
-            $keeper = \zovye\domain\Keeper::get($login_data->getUserId());
+            $keeper = Keeper::get($login_data->getUserId());
             if (empty($keeper)) {
                 JSON::fail('请先登录后再请求数据！[103]');
             }
             self::$user = $keeper->getUser();
 
+        } elseif ($login_data->getSrc() == LoginData::WX_APP_USER) {
+            self::$user = User::get($login_data->getUserId(), false, User::WxAPP);
+        } elseif ($login_data->getSrc() == LoginData::ALI_APP_USER) {
+            self::$user = User::get($login_data->getUserId(), false, User::ALI);
         } else {
             self::$user = User::get($login_data->getUserId());
         }
@@ -143,20 +290,6 @@ class common
         }
 
         return self::$user;
-    }
-
-    /**
-     * 获取当前已登录的用户.
-     */
-    public static function getAgentOrPartner(): agentModelObj
-    {
-        $user = self::getUser();
-
-        if (!$user->isAgent() && !$user->isPartner()) {
-            JSON::fail('您还不是我们的代理商，请联系我们！');
-        }
-
-        return $user->agent();
     }
 
     /**
@@ -207,7 +340,7 @@ class common
         }
 
         /** @var keeperModelObj $keeper */
-        $keeper = \zovye\domain\Keeper::findOne(['id' => $login_data->getUserId()]);
+        $keeper = Keeper::findOne(['id' => $login_data->getUserId()]);
 
         if (empty($keeper) && !$return_error) {
             JSON::fail('请先登录后再请求数据![206]');
@@ -262,7 +395,7 @@ class common
     /**
      * 代理商功能权限检查，没有设置禁止时，默认为允许
      */
-    public static function checkCurrentUserPrivileges(agentModelObj $agent, $fn, bool $get_result = false): bool
+    public static function checkPrivileges(agentModelObj $agent, $fn, bool $get_result = false): bool
     {
         $commission_state = App::isCommissionEnabled() && $agent->isCommissionEnabled();
 
@@ -286,77 +419,4 @@ class common
         return false;
     }
 
-    public static function getUserBank(userModelObj $user): array
-    {
-        return $user->settings(
-            'agentData.bank',
-            [
-                'realname' => '',
-                'bank' => '',
-                'branch' => '',
-                'account' => '',
-                'address' => [
-                    'province' => '',
-                    'city' => '',
-                ],
-            ]
-        );
-    }
-
-    public static function setUserBank(userModelObj $user): array
-    {
-        $bankData = [
-            'realname' => Request::trim('realname'),
-            'bank' => Request::trim('bank'),
-            'branch' => Request::trim('branch'),
-            'account' => Request::trim('account'),
-            'address' => [
-                'province' => Request::trim('province'),
-                'city' => Request::trim('city'),
-            ],
-        ];
-
-        $result = $user->updateSettings('agentData.bank', $bankData);
-
-        return $result ? ['msg' => '保存成功！'] : err('保存失败！');
-    }
-
-    public static function getUserQRCode(userModelObj $user): array
-    {
-        $user_qrcode = $user->settings('qrcode', []);
-        if (isset($user_qrcode['wx'])) {
-            $user_qrcode['wx'] = Util::toMedia($user_qrcode['wx']);
-        }
-        if (isset($user_qrcode['ali'])) {
-            $user_qrcode['ali'] = Util::toMedia($user_qrcode['ali']);
-        }
-
-        return (array)$user_qrcode;
-    }
-
-    public static function updateUserQRCode(userModelObj $user, $type): array
-    {
-        We7::load()->func('file');
-        $res = We7::file_upload($_FILES['pic']);
-
-        if (!is_error($res)) {
-            $filename = $res['path'];
-            if ($res['success'] && $filename) {
-                try {
-                    We7::file_remote_upload($filename);
-                } catch (Exception $e) {
-                    Log::error('doPageUserQRcode', $e->getMessage());
-                }
-            }
-
-            $user_qrcode = $user->settings('qrcode', []);
-            $user_qrcode[$type] = $filename;
-
-            if ($user->updateSettings('qrcode', $user_qrcode)) {
-                return ['status' => 'success', 'msg' => '上传成功！'];
-            }
-        }
-
-        return err('上传失败！');
-    }
 }

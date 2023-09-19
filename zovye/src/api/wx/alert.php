@@ -12,7 +12,6 @@ use Exception;
 use zovye\App;
 use zovye\business\GoodsExpireAlert;
 use zovye\domain\Device;
-use zovye\model\agentModelObj;
 use zovye\model\goods_expire_alertModelObj;
 use zovye\model\userModelObj;
 use zovye\Request;

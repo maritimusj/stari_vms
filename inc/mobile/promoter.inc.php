@@ -9,8 +9,8 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 use RuntimeException;
+use zovye\api\common;
 use zovye\api\wx\balance;
-use zovye\api\wx\common;
 use zovye\domain\Principal;
 use zovye\domain\Referral;
 use zovye\util\DBUtil;
@@ -162,10 +162,10 @@ JSCODE;
 
     $fn = Request::trim('fn');
     if ($fn == 'bank') {
-        JSON::result(common::setUserBank($user));
+        JSON::result(api\wx\misc::setUserBank($user));
     } elseif ($fn == 'qrcode') {
         $type = Request::str('type');
-        JSON::result(common::updateUserQRCode($user, $type));
+        JSON::result(api\wx\misc::updateUserQRCode($user, $type));
     }
 
     JSON::fail('请求不正确！');
@@ -173,8 +173,8 @@ JSCODE;
 } elseif ($op == 'getData') {
 
     JSON::success([
-        'bank' => common::getUserBank($user),
-        'qrcode' => common::getUserQRCode($user),
+        'bank' => api\wx\misc::getUserBank($user),
+        'qrcode' => api\wx\misc::getUserQRCode($user),
     ]);
 
 } elseif ($op == 'brief') {

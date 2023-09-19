@@ -8,6 +8,7 @@ namespace zovye\api\wx;
 
 use DateTime;
 use Exception;
+use zovye\api\common;
 use zovye\App;
 use zovye\base\ModelObjFinder;
 use zovye\business\GDCVMachine;
@@ -762,7 +763,7 @@ class device
 
     public static function deleteDeviceTypes(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_xh');
+        common::checkPrivileges($agent, 'F_xh');
 
         $device_type = DeviceTypes::get(Request::int('id'));
         if (empty($device_type)) {
@@ -792,7 +793,7 @@ class device
 
     public static function updateDeviceTypes(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_xh');
+        common::checkPrivileges($agent, 'F_xh');
 
         $data = Request::is_string('data') ? json_decode(urldecode(Request::str('data')), true) : [];
 
@@ -999,7 +1000,7 @@ class device
      */
     public static function appRestart(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_sb');
+        common::checkPrivileges($agent, 'F_sb');
 
         $app_id = Request::trim('id');
         if ($app_id) {
@@ -1024,7 +1025,7 @@ class device
     {
         if ($user->isAgent() || $user->isPartner()) {
             $agent = $user->isAgent() ? $user->getAgent() : $user->getPartnerAgent();
-            common::checkCurrentUserPrivileges($agent, 'F_sb');
+            common::checkPrivileges($agent, 'F_sb');
             $device = device::getDevice(Request::str('id'), $agent);
             if (is_error($device)) {
                 return $device;

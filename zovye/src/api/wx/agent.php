@@ -11,6 +11,7 @@ use ali\aop\request\AlipaySystemOauthTokenRequest;
 use DateTime;
 use DateTimeImmutable;
 use Exception;
+use zovye\api\common;
 use zovye\App;
 use zovye\business\Fueling;
 use zovye\business\GDCVMachine;
@@ -29,7 +30,6 @@ use zovye\domain\Order;
 use zovye\domain\Principal;
 use zovye\domain\User;
 use zovye\Job;
-use zovye\JSON;
 use zovye\Log;
 use zovye\model\agentModelObj;
 use zovye\model\cronModelObj;
@@ -309,7 +309,7 @@ class agent
      */
     public static function setAgentBank(agentModelObj $agent): array
     {
-        return common::setUserBank($agent);
+        return misc::setUserBank($agent);
     }
 
     /**
@@ -337,7 +337,7 @@ class agent
      */
     public static function deviceList(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_sb');
+        common::checkPrivileges($agent, 'F_sb');
 
         $query = Device::query();
         $group_id = Request::int('group_id');
@@ -358,7 +358,7 @@ class agent
 
     public static function keeperDeviceList(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_sb');
+        common::checkPrivileges($agent, 'F_sb');
 
         $keeperId = Request::int('keeperid');
         $keeper = Keeper::get($keeperId);
@@ -405,7 +405,7 @@ class agent
      */
     public static function deviceUpdate(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_sb');
+        common::checkPrivileges($agent, 'F_sb');
 
         /** @var deviceModelObj|array $device */
         $device = \zovye\api\wx\device::getDevice(request('id'));
@@ -607,7 +607,7 @@ class agent
      */
     public static function deviceInfo(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_sb');
+        common::checkPrivileges($agent, 'F_sb');
 
         /** @var deviceModelObj|array $device */
         $device = \zovye\api\wx\device::getDevice(Request::str('id'));
@@ -669,7 +669,7 @@ class agent
      */
     public static function deviceBind(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_sb');
+        common::checkPrivileges($agent, 'F_sb');
 
         /** @var deviceModelObj|array $device */
         $device = \zovye\api\wx\device::getDevice(Request::trim('id'), $agent);
@@ -707,7 +707,7 @@ class agent
      */
     public static function deviceTest(agentModelObj $agent)
     {
-        common::checkCurrentUserPrivileges($agent, 'F_sb');
+        common::checkPrivileges($agent, 'F_sb');
 
         /** @var deviceModelObj|array $device */
         $device = \zovye\api\wx\device::getDevice(request('id'), $agent);
@@ -748,7 +748,7 @@ class agent
      */
     public static function deviceReset(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_sb');
+        common::checkPrivileges($agent, 'F_sb');
 
         $device = \zovye\api\wx\device::getDevice(request('id'), $agent);
         if (is_error($device)) {
@@ -802,7 +802,7 @@ class agent
      */
     public static function deviceAssign(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_sb');
+        common::checkPrivileges($agent, 'F_sb');
 
         $target = agent::getUserByGUID(request::str('guid'));
         if (empty($target)) {
@@ -849,7 +849,7 @@ class agent
      */
     public static function deviceLowRemain(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_qz');
+        common::checkPrivileges($agent, 'F_qz');
 
         if (Request::has('remain')) {
             $remain_warning = max(1, Request::int('remain'));
@@ -898,7 +898,7 @@ class agent
      */
     public static function deviceError(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_gz');
+        common::checkPrivileges($agent, 'F_gz');
 
         $page = max(1, Request::int('page'));
         $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
@@ -945,7 +945,7 @@ class agent
 
     public static function DeviceScheduleList(agentModelObj $agent)
     {
-        common::checkCurrentUserPrivileges($agent, 'F_sb');
+        common::checkPrivileges($agent, 'F_sb');
 
         $device = \zovye\api\wx\device::getDevice(request('id'), $agent);
         if (is_error($device)) {
@@ -977,7 +977,7 @@ class agent
 
     public static function deviceScheduleCreate(agentModelObj $agent)
     {
-        common::checkCurrentUserPrivileges($agent, 'F_sb');
+        common::checkPrivileges($agent, 'F_sb');
 
         $device = \zovye\api\wx\device::getDevice(request('id'), $agent);
         if (is_error($device)) {
@@ -1134,7 +1134,7 @@ class agent
      */
     public static function orderList(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_sb');
+        common::checkPrivileges($agent, 'F_sb');
 
         $condition = [];
 
@@ -1165,7 +1165,7 @@ class agent
      */
     public static function deviceSetErrorCode(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_sb');
+        common::checkPrivileges($agent, 'F_sb');
 
         $device = \zovye\api\wx\device::getDevice(request('id'));
         if (is_error($device)) {
@@ -1210,7 +1210,7 @@ class agent
      */
     public static function agentSearch(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_xj');
+        common::checkPrivileges($agent, 'F_xj');
 
         $page = max(1, Request::int('page'));
         $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
@@ -1778,13 +1778,13 @@ class agent
 
     public static function getUserQRCode(userModelObj $user): array
     {
-        return common::getUserQRCode($user);
+        return misc::getUserQRCode($user);
     }
 
     public static function updateUserQRCode(userModelObj $user): array
     {
         $type = Request::str('type');
-        return common::updateUserQRCode($user, $type);
+        return misc::updateUserQRCode($user, $type);
     }
 
     public static function aliAuthCode()

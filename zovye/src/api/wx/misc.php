@@ -10,10 +10,14 @@ use DateTime;
 use Exception;
 use zovye\App;
 use zovye\domain\Goods;
+use zovye\Log;
 use zovye\model\agentModelObj;
 use zovye\model\userModelObj;
 use zovye\Request;
+use zovye\util\Util;
+use zovye\We7;
 use function zovye\err;
+use function zovye\is_error;
 
 class misc
 {
@@ -128,5 +132,79 @@ class misc
         }
 
         return $result;
+    }
+
+    public static function setUserBank(userModelObj $user): array
+    {
+        $bankData = [
+            'realname' => Request::trim('realname'),
+            'bank' => Request::trim('bank'),
+            'branch' => Request::trim('branch'),
+            'account' => Request::trim('account'),
+            'address' => [
+                'province' => Request::trim('province'),
+                'city' => Request::trim('city'),
+            ],
+        ];
+
+        $result = $user->updateSettings('agentData.bank', $bankData);
+
+        return $result ? ['msg' => '保存成功！'] : err('保存失败！');
+    }
+
+    public static function updateUserQRCode(userModelObj $user, $type): array
+    {
+        We7::load()->func('file');
+        $res = We7::file_upload($_FILES['pic']);
+
+        if (!is_error($res)) {
+            $filename = $res['path'];
+            if ($res['success'] && $filename) {
+                try {
+                    We7::file_remote_upload($filename);
+                } catch (Exception $e) {
+                    Log::error('doPageUserQRcode', $e->getMessage());
+                }
+            }
+
+            $user_qrcode = $user->settings('qrcode', []);
+            $user_qrcode[$type] = $filename;
+
+            if ($user->updateSettings('qrcode', $user_qrcode)) {
+                return ['status' => 'success', 'msg' => '上传成功！'];
+            }
+        }
+
+        return err('上传失败！');
+    }
+
+    public static function getUserQRCode(userModelObj $user): array
+    {
+        $user_qrcode = $user->settings('qrcode', []);
+        if (isset($user_qrcode['wx'])) {
+            $user_qrcode['wx'] = Util::toMedia($user_qrcode['wx']);
+        }
+        if (isset($user_qrcode['ali'])) {
+            $user_qrcode['ali'] = Util::toMedia($user_qrcode['ali']);
+        }
+
+        return (array)$user_qrcode;
+    }
+
+    public static function getUserBank(userModelObj $user): array
+    {
+        return $user->settings(
+            'agentData.bank',
+            [
+                'realname' => '',
+                'bank' => '',
+                'branch' => '',
+                'account' => '',
+                'address' => [
+                    'province' => '',
+                    'city' => '',
+                ],
+            ]
+        );
     }
 }

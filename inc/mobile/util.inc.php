@@ -255,7 +255,7 @@ if ($op == 'default') {
         JSON::fail('用户已经是运营人员！');
     }
 
-    $original = api\wx\common::getUser();
+    $original = api\common::getUser();
 
     if ($user->getId() == $original->getId()) {
         JSON::fail('已完成迁移！');

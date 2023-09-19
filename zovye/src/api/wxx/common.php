@@ -26,6 +26,7 @@ use zovye\domain\User;
 use zovye\Job;
 use zovye\JSON;
 use zovye\Log;
+use zovye\model\agentModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\goods_voucher_logsModelObj;
 use zovye\model\orderModelObj;
@@ -43,37 +44,6 @@ use function zovye\settings;
 
 class common
 {
-    static $user;
-
-    /**
-     * 用户登录，小程序必须提交code,encryptedData和iv值
-     *
-     * @return array
-     */
-    public static function login(): array
-    {
-        $res = \zovye\api\wx\common::getDecryptedWxUserData();
-        if (is_error($res)) {
-            Log::error('wxapi', $res);
-
-            return err('用户登录失败，请稍后再试！[103]');
-        }
-
-        //如果小程序请求中携带了H5页面的openid，则使用该openid的H5用户登录小程序
-        $h5_openid = '';
-        if (Request::has('openId')) {
-            $h5_openid = Request::str('openId');
-        }
-
-        return self::doUserLogin(
-            $res,
-            Request::array('userInfo'),
-            $h5_openid,
-            '',
-            Request::str('from')
-        );
-    }
-
     public static function getDeviceInfo(): array
     {
         $device_id = Request::str('device');
@@ -371,9 +341,8 @@ class common
 
     /**
      * 取货码 出货
-     * @return array
      */
-    public static function voucherGet(): array
+    public static function voucherGet(userModelObj $user): array
     {
         $device_id = Request::str('device');
         $device = Device::get($device_id, true);
@@ -398,7 +367,6 @@ class common
             return err('无法领取这个商品！');
         }
 
-        $user = self::getUser();
         if ($device->isBlueToothDevice()) {
             try {
                 $result = DeviceUtil::open(
@@ -439,10 +407,8 @@ class common
     /**
      * 创建支付订单
      */
-    public static function orderCreate(): array
+    public static function orderCreate(userModelObj $user): array
     {
-        $user = self::getUser();
-
         if ($user->isBanned()) {
             return err('用户暂时无法使用！');
         }
@@ -571,8 +537,10 @@ class common
         return $result;
     }
 
-    public static function FBPic(): array
+    public static function FBPic(userModelObj $user): array
     {
+        unset($user);
+
         We7::load()->func('file');
         $res = We7::file_upload($_FILES['pic']);
 
@@ -596,10 +564,8 @@ class common
         return ['data' => $url];
     }
 
-    public static function feedback(): array
+    public static function feedback(userModelObj $user): array
     {
-        $user = self::getUser();
-
         $device_id = Request::str('device');
 
         $device = Device::get($device_id, true);
@@ -644,14 +610,9 @@ class common
         return DeviceUtil::getAds($device, $type, $num);
     }
 
-    public static function orderDefault(): array
+    public static function orderDefault(agentModelObj $agent): array
     {
-        $user = self::getUser();
-
-        $query = Order::query();
         $condition = [];
-
-        $agent = $user->getAgent();
         $condition['agent_id'] = $agent->getId();
 
         $devices = [];
@@ -699,7 +660,7 @@ class common
         $page = max(1, Request::int('page'));
         $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
 
-        $query->where($condition);
+        $query = Order::query($condition);
         $total = $query->count();
         if (ceil($total / $page_size) < $page) {
             $page = 1;
@@ -846,12 +807,9 @@ class common
         ];
     }
 
-    public static function homepageDefault(): array
+    public static function homepageDefault(agentModelObj $agent): array
     {
-        $user = self::getUser();
-
         $condition = [];
-        $agent = $user->getAgent();
         $condition['agent_id'] = $agent->getId();
 
         $device_stat = [];
@@ -921,11 +879,8 @@ class common
         return ['device_stat' => $device_stat, 'data' => $data];
     }
 
-    public static function homepageOrderStat(): array
+    public static function homepageOrderStat(agentModelObj $agent): array
     {
-        $user = self::getUser();
-        $agent = $user->getAgent();
-
         $date_limit = Request::array('datelimit');
         if ($date_limit['start']) {
             $s_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_limit['start'].' 00:00:00');
@@ -1042,8 +997,6 @@ class common
 
     public static function aliAuthCode(): array
     {
-        $auth_code = Request::str('authcode');
-
         $aop = new AopClient();
         $aop->appId = settings('alixapp.id');
         $aop->rsaPrivateKey = settings('alixapp.prikey');
@@ -1051,7 +1004,7 @@ class common
 
         $request = new AlipaySystemOauthTokenRequest();
         $request->setGrantType('authorization_code');
-        $request->setCode($auth_code);
+        $request->setCode(Request::str('authcode'));
 
         try {
             $result = $aop->execute($request);
@@ -1064,7 +1017,6 @@ class common
 
             $user_info = [];
             if ($user) {
-                $user_info['user_id'] = $user_id;
                 if (!(empty($user->getNickname()) && empty($user->getAvatar()))) {
                     $user_info['user_info'] = [
                         'nickname' => $user->getNickname(),
@@ -1072,11 +1024,24 @@ class common
                     ];
                 }
             } else {
-                if (User::create(['openid' => $user_id, 'app' => User::ALI])) {
-                    $user_info['user_id'] = $user_id;
-                } else {
+                $user = User::create(['openid' => $user_id, 'app' => User::ALI]);
+                if (!$user) {
                     return err('保存用户失败!');
                 }
+            }
+
+            $token = Util::getTokenValue();
+
+            $data = [
+                'src' => LoginData::ALI_APP_USER,
+                'user_id' => $user->getId(),
+                'session_key' => '',
+                'openid_x' => $user->getOpenid(),
+                'token' => $token,
+            ];
+
+            if (LoginData::create($data)) {
+                $user_info['user_id'] = $token;
             }
 
             return $user_info;
@@ -1086,28 +1051,23 @@ class common
         }
     }
 
-    public static function aliUserInfo(): array
+    public static function aliUserInfo(userModelObj $ali_user): array
     {
-        $user = self::getUser();
-
         $nickname = Request::str('nickname');
         $avatar = Request::str('avatar');
 
-        $user->setNickname($nickname);
-        $user->setAvatar($avatar);
+        $ali_user->setNickname($nickname);
+        $ali_user->setAvatar($avatar);
 
-        if ($user->save()) {
+        if ($ali_user->save()) {
             return ['msg' => '保存成功！', 'status' => true];
         }
 
         return err('保存失败!');
     }
 
-    public static function userOrders(): array
+    public static function userOrders(userModelObj $user): array
     {
-        //用户订单
-        $user = self::getUser();
-
         $query = Order::query();
         $condition = [];
 
@@ -1203,162 +1163,11 @@ class common
         ];
     }
 
-
-    /**
-     * 获取当前已登录的用户.
-     *
-     * @return userModelObj
-     */
-    public static function getUser(): userModelObj
-    {
-        if (self::$user) {
-            return self::$user;
-        }
-
-        if (Request::has('token')) {
-            $login_data = LoginData::get(Request::str('token'));
-            if (empty($login_data)) {
-                JSON::fail('请先登录后再请求数据！[101]');
-            }
-            self::$user = User::get($login_data->getUserId());
-
-        } elseif (Request::has('user_id')) {
-
-            $user_id = Request::str('user_id');
-            self::$user = User::get($user_id, true, User::ALI);
-
-        } else {
-            JSON::fail('请先登录后再请求数据！[102]');
-        }
-
-        if (empty(self::$user)) {
-            JSON::fail('请先登录后再请求数据！[103]');
-        }
-
-        if (self::$user->isBanned()) {
-            if (isset($login_data)) {
-                $login_data->destroy();
-            }
-            JSON::fail('暂时无法使用，请联系管理员！');
-        }
-
-        return self::$user;
-    }
-
-    public static function doUserLogin(
-        $res,
-        $user_info,
-        $h5_openid = '',
-        $device_uid = '',
-        $ref_user_openid = ''
-    ): array {
-        $openid = strval($res['openId']);
-        $user = User::get($openid, true);
-        if (empty($user)) {
-            $user = User::create([
-                'app' => User::WxAPP,
-                'openid' => $openid,
-                'nickname' => $user_info['nickName'] ?? '',
-                'avatar' => $user_info['avatarUrl'] ?? '',
-                'mobile' => $res['phoneNumber'] ?? '',
-                'createtime' => time(),
-            ]);
-
-            if (empty($user)) {
-                return err('创建用户失败！');
-            }
-
-            if ($ref_user_openid) {
-                $ref_user = User::get($ref_user_openid, true);
-            }
-
-            if (App::isBalanceEnabled()) {
-                Balance::onUserCreated($user, $ref_user ?? null);
-            }
-
-        } else {
-            if ($user_info['nickName']) {
-                $user->setNickname($user_info['nickName']);
-            }
-
-            if ($user_info['avatarUrl']) {
-                $user->setAvatar($user_info['avatarUrl']);
-            }
-
-            if ($res['phoneNumber']) {
-                $user->setMobile($res['phoneNumber']);
-            }
-
-            $user->save();
-        }
-
-        $user->set('fansData', $user_info);
-
-        if ($device_uid) {
-            $device = Device::get($device_uid, true);
-            if ($device) {
-                $user->setLastActiveDevice($device);
-                $user->setLastActiveData('from', 'wxapp');
-            }
-        }
-
-        if ($h5_openid) {
-            $user->updateSettings('customData.wx.openid', $h5_openid);
-        } else {
-            $h5_openid = $user->settings('customData.wx.openid', '');
-        }
-
-        if ($h5_openid) {
-            $user = User::get($h5_openid, true, User::WX);
-            if (empty($user)) {
-                return err('没有找到关联的微信用户！');
-            }
-            if (isset($device)) {
-                $user->setLastActiveDevice($device);
-                $user->setLastActiveData('from', 'wxapp');
-            }
-            if ($res['phoneNumber']) {
-                $user->setMobile($res['phoneNumber']);
-                $user->save();
-            }
-        }
-
-        if ($user->isBanned()) {
-            return err('登录失败，请稍后再试！');
-        }
-
-        //清除原来的登录信息
-        foreach (LoginData::user(['user_id' => $user->getId()])->findAll() as $entry) {
-            $entry->destroy();
-        }
-
-        $token = Util::getTokenValue();
-
-        $data = [
-            'src' => LoginData::USER,
-            'user_id' => $user->getId(),
-            'session_key' => '',
-            'openid_x' => $openid,
-            'token' => $token,
-        ];
-
-        if (LoginData::create($data)) {
-            return [
-                'token' => $token,
-            ];
-        }
-
-        return err('登录失败，请稍后再试！');
-    }
-
     /**
      * 获取用户的取货码列表
-     * @return array
      */
-    public static function voucherList(): array
+    public static function voucherList(userModelObj $user): array
     {
-        $user = self::getUser();
-
         $params = [
             'owner_id' => $user->getId(),
         ];
@@ -1381,7 +1190,6 @@ class common
 
     /**
      * 获取设备相关的商品列表
-     * @return array
      */
     public static function getGoodsList(): array
     {

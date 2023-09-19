@@ -7,6 +7,7 @@
 namespace zovye\api\wx;
 
 use Exception;
+use zovye\api\common;
 use zovye\App;
 use zovye\business\DouYin;
 use zovye\business\FlashEgg;
@@ -36,7 +37,7 @@ class mp
      */
     public static function detail(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_xf');
+        common::checkPrivileges($agent, 'F_xf');
 
         $uid = Request::trim('uid');
         if ($uid) {
@@ -159,7 +160,7 @@ class mp
      */
     public static function assign(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_xf');
+        common::checkPrivileges($agent, 'F_xf');
 
         $devices = Request::is_array('devices') ? Request::array('devices') : [];
         $uid = Request::trim('uid');
@@ -197,7 +198,7 @@ class mp
      */
     public static function upload(agentModelObj $agent): array
     {
-        if (!common::checkCurrentUserPrivileges($agent, 'F_xf', true) && !common::checkCurrentUserPrivileges($agent, 'F_sp', true)) {
+        if (!common::checkPrivileges($agent, 'F_xf', true) && !common::checkPrivileges($agent, 'F_sp', true)) {
             return err('没有权限上传文件，请联系管理员！');
         }
 
@@ -237,7 +238,7 @@ class mp
      */
     public static function accounts(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_xf');
+        common::checkPrivileges($agent, 'F_xf');
 
         $page = max(1, Request::int('page'));
         $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
@@ -285,7 +286,7 @@ class mp
      */
     public static function ban(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_xf');
+        common::checkPrivileges($agent, 'F_xf');
 
         $uid = Request::trim('uid');
         if ($uid) {
@@ -315,7 +316,7 @@ class mp
      */
     public static function delete(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_xf');
+        common::checkPrivileges($agent, 'F_xf');
 
         return DBUtil::transactionDo(function () use ($agent) {
             $uid = Request::trim('uid');
@@ -351,7 +352,7 @@ class mp
      */
     public static function save(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_xf');
+        common::checkPrivileges($agent, 'F_xf');
 
         return DBUtil::transactionDo(function () use ($agent) {
             $data = [
@@ -522,7 +523,7 @@ class mp
 
     public static function groupAssign(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_xf');
+        common::checkPrivileges($agent, 'F_xf');
 
         $uid = Request::trim('uid');
         if ($uid) {
@@ -571,7 +572,7 @@ class mp
 
     public static function mpAuthUrl(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges($agent, 'F_xf');
+        common::checkPrivileges($agent, 'F_xf');
 
         $url = WxPlatform::getPreAuthUrl([
             'agent' => $agent->getId(),

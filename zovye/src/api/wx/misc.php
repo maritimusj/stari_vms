@@ -133,24 +133,6 @@ class misc
         return $result;
     }
 
-    public static function setUserBank(userModelObj $user): array
-    {
-        $bankData = [
-            'realname' => Request::trim('realname'),
-            'bank' => Request::trim('bank'),
-            'branch' => Request::trim('branch'),
-            'account' => Request::trim('account'),
-            'address' => [
-                'province' => Request::trim('province'),
-                'city' => Request::trim('city'),
-            ],
-        ];
-
-        $result = $user->updateSettings('agentData.bank', $bankData);
-
-        return $result ? ['msg' => '保存成功！'] : err('保存失败！');
-    }
-
     public static function updateUserQRCode(userModelObj $user, $type): array
     {
         $res = Helper::upload('pic', $type);
@@ -179,6 +161,24 @@ class misc
         }
 
         return (array)$user_qrcode;
+    }
+
+    public static function setUserBank(userModelObj $user): array
+    {
+        $bankData = [
+            'realname' => Request::trim('realname'),
+            'bank' => Request::trim('bank'),
+            'branch' => Request::trim('branch'),
+            'account' => Request::trim('account'),
+            'address' => [
+                'province' => Request::trim('province'),
+                'city' => Request::trim('city'),
+            ],
+        ];
+
+        $result = $user->updateSettings('agentData.bank', $bankData);
+
+        return $result ? ['msg' => '保存成功！'] : err('保存失败！');
     }
 
     public static function getUserBank(userModelObj $user): array

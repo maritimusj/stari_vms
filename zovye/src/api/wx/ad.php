@@ -11,6 +11,7 @@ use zovye\domain\Advertising;
 use zovye\domain\Device;
 use zovye\Log;
 use zovye\model\advertisingModelObj;
+use zovye\model\agentModelObj;
 use zovye\model\device_groupsModelObj;
 use zovye\Request;
 use zovye\util\Util;
@@ -22,28 +23,24 @@ use function zovye\request;
 class ad
 {
     /**
-     * 保存广告分配.
-     *
-     * @return array
+     * 保存广告分配
      */
-    public static function assign(): array
+    public static function assign(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-
         common::checkCurrentUserPrivileges('F_gg');
 
         $guid = Request::trim('id');
-        $adv = Advertising::findOne("SHA1(CONCAT(id,'{$user->getOpenid()}'))='$guid'");
+        $ad = Advertising::findOne("SHA1(CONCAT(id,'{$agent->getOpenid()}'))='$guid'");
 
-        if (empty($adv)) {
+        if (empty($ad)) {
             return err('找不到这条广告！');
         }
 
-        if ($adv->getAgentId() != $user->getAgentId()) {
+        if ($ad->getAgentId() != $agent->getId()) {
             return err('没有权限执行这个操作！');
         }
 
-        if (!$adv->isReviewPassed()) {
+        if (!$ad->isReviewPassed()) {
             return err('这个广告还没有通过审核，无法分配！');
         }
 
@@ -54,14 +51,14 @@ class ad
             //检查设备ID是否合法，并保存设备内部ＩＤ
             foreach ($devices as $uid) {
                 $device = Device::get($uid, true);
-                if ($device && $device->getAgentId() == $user->getAgentId()) {
+                if ($device && $device->getAgentId() == $agent->getId()) {
                     $data['devices'][] = $device->getId();
                 }
             }
         }
 
-        $origin_data = $adv->get('assigned', []);
-        if ($adv->updateSettings('assigned', $data) && Advertising::update($adv)) {
+        $origin_data = $ad->get('assigned', []);
+        if ($ad->updateSettings('assigned', $data) && Advertising::update($ad)) {
             if (Advertising::notifyAll($origin_data, $data)) {
                 return ['msg' => '保存成功！！'];
             }
@@ -73,14 +70,10 @@ class ad
     }
 
     /**
-     * 获取广告列表.
-     *
-     * @return array
+     * 获取广告列表
      */
-    public static function list(): array
+    public static function list(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-
         common::checkCurrentUserPrivileges('F_gg');
 
         $type = Request::int('type') ?: Advertising::SCREEN;
@@ -93,7 +86,7 @@ class ad
                 $query->where(['agent_id' => $device->getAgentId()]);
             }
         } else {
-            $query->where(['agent_id' => $user->getAgentId()]);
+            $query->where(['agent_id' => $agent->getId()]);
         }
 
         $total = $query->count();
@@ -113,15 +106,15 @@ class ad
             $query->page($page, $page_size);
             $query->orderBy('id DESC');
 
-            /** @var advertisingModelObj $adv */
-            foreach ($query->findAll() as $adv) {
+            /** @var advertisingModelObj $ad */
+            foreach ($query->findAll() as $ad) {
                 //设备分配情况
-                $assign_data = $adv->get('assigned', []);
+                $assign_data = $ad->get('assigned', []);
                 $devices = [];
                 if (is_array($assign_data['devices'])) {
                     foreach ($assign_data['devices'] as $id) {
                         $device = Device::get($id);
-                        if ($device && $device->getAgentId() == $user->getAgentId()) {
+                        if ($device && $device->getAgentId() == $agent->getId()) {
                             $devices[] = $device->getImei();
                         }
                     }
@@ -129,15 +122,15 @@ class ad
 
                 $groups = is_array($assign_data['groups']) ? $assign_data['groups'] : [];
 
-                $reviewResult = $adv->getReviewResult() ?: 0;
+                $reviewResult = $ad->getReviewResult() ?: 0;
 
                 $data = [
-                    'id' => sha1($adv->getId().$user->getOpenid()),
-                    'type' => intval($adv->getType()),
-                    'state' => intval($adv->getState()),
-                    'type_formatted' => Advertising::desc(intval($adv->getType())),
-                    'title' => strval($adv->getTitle()),
-                    'createtime_formatted' => date('Y-m-d H:i:s', $adv->getCreatetime()),
+                    'id' => sha1($ad->getId().$agent->getOpenid()),
+                    'type' => intval($ad->getType()),
+                    'state' => intval($ad->getState()),
+                    'type_formatted' => Advertising::desc(intval($ad->getType())),
+                    'title' => strval($ad->getTitle()),
+                    'createtime_formatted' => date('Y-m-d H:i:s', $ad->getCreatetime()),
                     'reviewResult' => $reviewResult,
                     'reviewState' => Advertising::getReviewResultTitle($reviewResult),
                     'assigned' => $devices,
@@ -146,40 +139,40 @@ class ad
 
                 if ($type == Advertising::SCREEN) {
 
-                    $media = $adv->getExtraData('media');
+                    $media = $ad->getExtraData('media');
                     if ($media == Advertising::MEDIA_SRT) {
-                        $data['text'] = $adv->getExtraData('text');
+                        $data['text'] = $ad->getExtraData('text');
                     } else {
-                        $data['filename'] = $adv->getExtraData('url', '');
+                        $data['filename'] = $ad->getExtraData('url', '');
                         $data['url'] = Util::toMedia($data['filename']);
                         if ($media == Advertising::MEDIA_IMAGE) {
-                            $data['duration'] = $adv->getExtraData('duration', 10);
+                            $data['duration'] = $ad->getExtraData('duration', 10);
                         }
                     }
                     $data['media'] = $media;
-                    $data['area'] = $adv->getExtraData('area', 0);
+                    $data['area'] = $ad->getExtraData('area', 0);
                     $data['media_formatted'] = Advertising::desc($media);
                     $data['type_formatted'] .= "({$data['media']})";
 
                 } elseif (in_array($type, [advertising::WELCOME_PAGE, Advertising::GET_PAGE])) {
 
-                    $images = $adv->getExtraData('images', []);
+                    $images = $ad->getExtraData('images', []);
                     $data['filename'] = $images;
                     $data['images'] = array_map(function ($url) {
                         return Util::toMedia($url);
                     }, $images);
 
-                    $data['link'] = $adv->getExtraData('link');
+                    $data['link'] = $ad->getExtraData('link');
                     if ($type == Advertising::WELCOME_PAGE) {
-                        $data['app_id'] = $adv->getExtraData('app_id');
-                        $data['app_path'] = $adv->getExtraData('app_path');
+                        $data['app_id'] = $ad->getExtraData('app_id');
+                        $data['app_path'] = $ad->getExtraData('app_path');
                     }
 
                 } elseif ($type == Advertising::REDIRECT_URL) {
 
-                    $data['url'] = $adv->getExtraData('url', '');
-                    $data['delay'] = $adv->getExtraData('delay', 10);
-                    $data['when'] = $adv->getExtraData(
+                    $data['url'] = $ad->getExtraData('url', '');
+                    $data['delay'] = $ad->getExtraData('delay', 10);
+                    $data['when'] = $ad->getExtraData(
                         'when',
                         [
                             'success' => 0,
@@ -189,19 +182,19 @@ class ad
 
                 } elseif ($type == Advertising::PUSH_MSG) {
 
-                    $data['msg_type'] = $adv->getExtraData('msg.type');
+                    $data['msg_type'] = $ad->getExtraData('msg.type');
                     $data['msg_typename'] = Advertising::desc($data['msg_type']);
-                    $data['delay'] = $adv->getExtraData('delay');
-                    $data['msg'] = $adv->getExtraData('msg');
+                    $data['delay'] = $ad->getExtraData('delay');
+                    $data['msg'] = $ad->getExtraData('msg');
 
                 } elseif ($type == Advertising::LINK) {
 
-                    $data['link'] = $adv->getExtraData('url', '');
-                    $data['app_id'] = $adv->getExtraData('app_id');
-                    $data['app_path'] = $adv->getExtraData('app_path');
+                    $data['link'] = $ad->getExtraData('url', '');
+                    $data['app_id'] = $ad->getExtraData('app_id');
+                    $data['app_path'] = $ad->getExtraData('app_path');
                     $data['images'] = [];
                     $data['filename'] = [];
-                    $image = $adv->getExtraData('image', "");
+                    $image = $ad->getExtraData('image', "");
                     if ($image) {
                         $data['images'][] = Util::toMedia($image);
                         $data['filename'][] = $image;
@@ -210,22 +203,22 @@ class ad
                     $data['images'] = [];
                     $data['filename'] = [];
 
-                    $image = $adv->getExtraData('image', '');
+                    $image = $ad->getExtraData('image', '');
                     if (!empty($image)) {
                         $data['images'][] = Util::toMedia($image);
                         $data['filename'][] = $image;
                     }
 
-                    $data['link'] = $adv->getExtraData('url');
-                    $data['price'] = $adv->getExtraData('price');
-                    $data['discount_price'] = $adv->getExtraData('discount_price');
-                    $data['app_id'] = $adv->getExtraData('app_id');
-                    $data['app_path'] = $adv->getExtraData('app_path');
+                    $data['link'] = $ad->getExtraData('url');
+                    $data['price'] = $ad->getExtraData('price');
+                    $data['discount_price'] = $ad->getExtraData('discount_price');
+                    $data['app_id'] = $ad->getExtraData('app_id');
+                    $data['app_path'] = $ad->getExtraData('app_path');
 
                 } elseif ($type == Advertising::QRCODE) {
 
-                    $data['text'] = $adv->getExtraData('text');
-                    $data['image'] = $adv->getExtraData('image');
+                    $data['text'] = $ad->getExtraData('text');
+                    $data['image'] = $ad->getExtraData('image');
 
                 }
 
@@ -238,64 +231,57 @@ class ad
 
     /**
      * 创建广告
-     * @return array|string[]
      */
-    public static function createOrUpdate(): array
+    public static function createOrUpdate(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-
         common::checkCurrentUserPrivileges('F_gg');
 
-        $adv = null;
+        $ad = null;
 
         $guid = Request::trim('id');
         if (!empty($guid)) {
             $query = Advertising::query([
-                'agent_id' => $user->getAgentId(),
+                'agent_id' => $agent->getId(),
                 'state' => Advertising::NORMAL,
             ]);
 
-            $query->where("SHA1(CONCAT(id,'{$user->getOpenid()}'))='$guid'");
+            $query->where("SHA1(CONCAT(id,'{$agent->getOpenid()}'))='$guid'");
 
-            $adv = $query->findOne();
-            if (empty($adv)) {
+            $ad = $query->findOne();
+            if (empty($ad)) {
                 return err('找不到这个广告！');
             }
         }
 
-        return Advertising::createOrUpdate($user, $adv, Request::all());
+        return Advertising::createOrUpdate($agent, $ad, Request::all());
     }
 
     /**
-     * 删除广告.
-     *
-     * @return array
+     * 删除广告
      */
-    public static function delete(): array
+    public static function delete(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-
         common::checkCurrentUserPrivileges('F_gg');
 
         $guid = Request::trim('id');
 
-        /** @var advertisingModelObj $adv */
-        $adv = Advertising::query(['state' => Advertising::NORMAL])
-            ->where("SHA1(CONCAT(id,'{$user->getOpenid()}'))='$guid'")
+        /** @var advertisingModelObj $ad */
+        $ad = Advertising::query(['state' => Advertising::NORMAL])
+            ->where("SHA1(CONCAT(id,'{$agent->getOpenid()}'))='$guid'")
             ->findOne();
 
-        if (empty($adv)) {
+        if (empty($ad)) {
             return err('找不到这条广告！');
         }
 
-        if ($adv->getAgentId() != $user->getAgentId()) {
+        if ($ad->getAgentId() != $agent->getId()) {
             return err('没有权限执行这个操作！');
         }
 
-        $title = $adv->getTitle();
-        $assign_data = $adv->settings('assigned', []);
+        $title = $ad->getTitle();
+        $assign_data = $ad->settings('assigned', []);
 
-        if (Advertising::update($adv) && $adv->destroy()) {
+        if (Advertising::update($ad) && $ad->destroy()) {
             Advertising::notifyAll($assign_data);
 
             return ['msg' => "{$title}删除成功！"];
@@ -305,19 +291,13 @@ class ad
     }
 
     /**
-     * 上传广告资源.
-     *
-     * @return array
+     * 上传广告资源
      */
-    public static function uploadFile(): array
+    public static function uploadFile(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
+        unset($agent);
 
         common::checkCurrentUserPrivileges('F_gg');
-
-        if (!($user->isAgent() || $user->isPartner())) {
-            return err('只有代理商能使用该功能！');
-        }
 
         $type = request('type') ?: Advertising::MEDIA_IMAGE;
 
@@ -349,24 +329,22 @@ class ad
         return err('上传失败！');
     }
 
-    public static function groupAssign(): array
+    public static function groupAssign(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-
         common::checkCurrentUserPrivileges('F_gg');
 
         $guid = Request::trim('id');
-        $adv = Advertising::findOne("SHA1(CONCAT(id,'{$user->getOpenid()}'))='$guid'");
+        $ad = Advertising::findOne("SHA1(CONCAT(id,'{$agent->getOpenid()}'))='$guid'");
 
-        if (empty($adv)) {
+        if (empty($ad)) {
             return err('找不到这条广告！');
         }
 
-        if ($adv->getAgentId() != $user->getAgentId()) {
+        if ($ad->getAgentId() != $agent->getId()) {
             return err('没有权限执行这个操作！');
         }
 
-        if (!$adv->isReviewPassed()) {
+        if (!$ad->isReviewPassed()) {
             return err('这个广告还没有通过审核，无法分配！');
         }
 
@@ -380,9 +358,9 @@ class ad
             $one = \zovye\domain\Group::get($id);
             if ($one) {
                 $query_arr = ['group_id' => $one->getId()];
-                if ($one->getAgentId() != $user->getAgentId()) {
+                if ($one->getAgentId() != $agent->getId()) {
                     //平台的
-                    $query_arr['agent_id'] = $user->getAgentId();
+                    $query_arr['agent_id'] = $agent->getId();
                 } else {
                     $group_arr[] = $one->getId();
                 }
@@ -399,8 +377,8 @@ class ad
             'devices' => $device_arr,
         ];
 
-        $origin_data = $adv->get('assigned', []);
-        if ($adv->updateSettings('assigned', $data) && Advertising::update($adv)) {
+        $origin_data = $ad->get('assigned', []);
+        if ($ad->updateSettings('assigned', $data) && Advertising::update($ad)) {
             if (Advertising::notifyAll($origin_data, $data)) {
                 return ['msg' => '保存成功！'];
             }

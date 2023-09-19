@@ -13,6 +13,7 @@ use zovye\domain\Balance;
 use zovye\domain\Device;
 use zovye\domain\Goods;
 use zovye\domain\User;
+use zovye\model\agentModelObj;
 use zovye\model\orderModelObj;
 use zovye\Request;
 use zovye\util\Helper;
@@ -22,8 +23,10 @@ use function zovye\is_error;
 
 class order
 {
-    public static function detail(): array
+    public static function detail(agentModelObj $agent): array
     {
+        unset($agent);
+
         $order_id = Request::int('orderid');
         $order = \zovye\domain\Order::get($order_id);
         if (empty($order)) {
@@ -84,7 +87,7 @@ class order
         return $result;
     }
 
-    public static function default(): array
+    public static function default(agentModelObj $user): array
     {
         if (Request::has('guid')) {
             $guid = Request::str('guid');
@@ -92,8 +95,6 @@ class order
             if (empty($user)) {
                 return err('找不到这个用户！');
             }
-        } else {
-            $user = common::getAgentOrPartner();
         }
 
         $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
@@ -263,9 +264,9 @@ class order
             //出货结果
             $data['result'] = $entry->getExtraData('pull.result', []);
 
-            if (is_error( $data['result'])) {
+            if (is_error($data['result'])) {
                 $data['status'] = [
-                    'title' =>  $data['result']['message'],
+                    'title' => $data['result']['message'],
                     'clr' => '#F56C6C',
                 ];
             } else {
@@ -312,10 +313,8 @@ class order
         return $headers;
     }
 
-    public static function orderExportDo(): array
+    public static function orderExportDo(agentModelObj $agent): array
     {
-        $agent = common::getAgent();
-
         $params = [
             'agent_openid' => $agent->getOpenid(),
             'account_id' => Request::int('account_id'),

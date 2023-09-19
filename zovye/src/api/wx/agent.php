@@ -55,30 +55,8 @@ use function zovye\settings;
 class agent
 {
     /**
-     * 获取当前登录的代理商身份，如果当前登录用户是合伙人，则返回合伙人对应的代理商身份
-     * @return agentModelObj|null
-     */
-    public static function getAgent(): ?agentModelObj
-    {
-        $user = common::getAgentOrPartner();
-        if ($user->isAgent()) {
-            return $user;
-        }
-
-        if ($user->isPartner()) {
-            return $user->getPartnerAgent();
-        }
-
-        JSON::fail('操作失败，无法获取代理商身份！');
-    }
-
-    /**
      *  通过guid搜索用户
      *  GUID 通过绑定当前用户与下级ＩＤ生成一个只对当前用户有效的下级用户名ＩＤ.
-     *
-     * @param $guid
-     *
-     * @return agentModelObj|userModelObj
      */
     public static function getUserByGUID($guid)
     {
@@ -152,6 +130,7 @@ class agent
 
         if (!($user->isAgent() || $user->isPartner())) {
             $mobile = $user->getMobile();
+
             return err("您还不是我们的代理商，立即注册?! [ $mobile ]");
         }
 
@@ -215,8 +194,7 @@ class agent
         return $result;
     }
 
-    public
-    static function preLogin(): array
+    public static function preLogin(): array
     {
         $result = [
             'secret' => sha1(App::uid(10)),
@@ -273,8 +251,6 @@ class agent
 
     /**
      * 用户登录，小程序必须提交code,encryptedData和iv值
-     *
-     * @return array
      */
     public static function login(): array
     {
@@ -300,8 +276,6 @@ class agent
 
     /**
      * 代理商申请提交.
-     *
-     * @return array
      */
     public static function application(): array
     {
@@ -312,7 +286,7 @@ class agent
             return err('对不起，请填写姓名和手机号码！');
         }
 
-        $data =             [
+        $data = [
             'name' => $name,
             'mobile' => $mobile,
             'address' => htmlspecialchars(Request::trim('address')),
@@ -332,65 +306,37 @@ class agent
 
     /**
      * 设置代理商提现银行信息.
-     *
-     * @return array
      */
-    public static function setAgentBank(): array
+    public static function setAgentBank(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-        if ($user->isAgent() || $user->isPartner()) {
-            $agent = $user->isPartner() ? $user->getPartnerAgent() : $user;
-            if ($agent) {
-                return common::setUserBank($agent);
-            }
-        }
-
-        return err('无法保存，请联系管理员！');
+        return common::setUserBank($agent);
     }
 
     /**
      * 获取代理商的银行信息.
-     *
-     * @return array
      */
-    public static function getAgentBank(): array
+    public static function getAgentBank(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-
-        $result = [];
-
-        if ($user->isAgent() || $user->isPartner()) {
-            $agent = $user->isPartner() ? $user->getPartnerAgent() : $user;
-            if ($agent) {
-                return $agent->settings(
-                    'agentData.bank',
-                    [
-                        'realname' => '',
-                        'bank' => '',
-                        'branch' => '',
-                        'account' => '',
-                        'address' => [
-                            'province' => '',
-                            'city' => '',
-                        ],
-                    ]
-                );
-            }
-        }
-
-        return $result;
+        return $agent->settings(
+            'agentData.bank',
+            [
+                'realname' => '',
+                'bank' => '',
+                'branch' => '',
+                'account' => '',
+                'address' => [
+                    'province' => '',
+                    'city' => '',
+                ],
+            ]
+        );
     }
 
     /**
      * 获取设备列表.
-     *
-     * @return array
-     * @throws Exception
      */
-    public static function deviceList(agentModelObj $user): array
+    public static function deviceList(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-
         common::checkCurrentUserPrivileges('F_sb');
 
         $query = Device::query();
@@ -398,27 +344,25 @@ class agent
         if (!empty($group_id)) {
             $query->where(['group_id' => $group_id]);
         }
-        $agent_id = $user->getAgentId();
+        $agent_id = $agent->getId();
         if (Request::has('agent')) {
-            $agent = agent::getUserByGUID(Request::str('agent'));
-            if ($agent) {
-                $agent_id = $agent->getId();
+            $v = agent::getUserByGUID(Request::str('agent'));
+            if ($v) {
+                $agent_id = $v->getId();
             }
         }
         $query->where(['agent_id' => $agent_id]);
 
-        return \zovye\api\wx\device::getDeviceList($user, $query);
+        return \zovye\api\wx\device::getDeviceList($agent, $query);
     }
 
-    public static function keeperDeviceList(): array
+    public static function keeperDeviceList(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-
         common::checkCurrentUserPrivileges('F_sb');
 
         $keeperId = Request::int('keeperid');
         $keeper = Keeper::get($keeperId);
-        if (empty($keeper) || $user->getAgentId() != $keeper->getAgentId()) {
+        if (empty($keeper) || $agent->getId() != $keeper->getAgentId()) {
             return err('找不到这个运营人员！');
         }
 
@@ -449,7 +393,7 @@ class agent
 
         /** @var deviceModelObj $entry */
         foreach ($query->findAll() as $entry) {
-            $data = \zovye\api\wx\device::formatDeviceInfo($user, $entry, true, $keeperId);
+            $data = \zovye\api\wx\device::formatDeviceInfo($agent, $entry, true, $keeperId);
             $result['list'][] = $data;
         }
 
@@ -458,13 +402,9 @@ class agent
 
     /**
      * 更新设备设置.
-     *
-     * @return array
      */
-    public static function deviceUpdate(): array
+    public static function deviceUpdate(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-
         common::checkCurrentUserPrivileges('F_sb');
 
         /** @var deviceModelObj|array $device */
@@ -482,7 +422,7 @@ class agent
         }
 
         //管理员登记不能修改设备参数
-        if (!$device->isOwnerOrSuperior($user)) {
+        if (!$device->isOwnerOrSuperior($agent)) {
             return err('没有权限管理这个设备！');
         }
 
@@ -576,9 +516,8 @@ class agent
         }
 
         if (App::isInventoryEnabled()) {
-            $user = $user->isPartner() ? $user->getPartnerAgent() : $user;
             foreach ($payload as $result) {
-                $v = Inventory::syncDevicePayloadLog($user, $device, $result, '代理商编辑设备');
+                $v = Inventory::syncDevicePayloadLog($agent, $device, $result, '代理商编辑设备');
                 if (is_error($v)) {
                     return $v;
                 }
@@ -665,13 +604,9 @@ class agent
 
     /**
      * 请求设备信息.
-     *
-     * @return array
      */
-    public static function deviceInfo(agentModelObj $user): array
+    public static function deviceInfo(agentModelObj $agent): array
     {
-        //$user = common::getAgentOrPartner();
-
         common::checkCurrentUserPrivileges('F_sb');
 
         /** @var deviceModelObj|array $device */
@@ -685,8 +620,8 @@ class agent
 
         if ($device->getAgentId()) {
             //已绑定设备
-            if ($device->isOwnerOrSuperior($user)) {
-                $result = \zovye\api\wx\device::formatDeviceInfo($user, $device);
+            if ($device->isOwnerOrSuperior($agent)) {
+                $result = \zovye\api\wx\device::formatDeviceInfo($agent, $device);
 
                 if ($group) {
                     $result['group']['id'] = $group->getId();
@@ -732,16 +667,15 @@ class agent
     /**
      * 绑定和解绑设备.
      *
+     * @param agentModelObj $agent
      * @return array
      */
-    public static function deviceBind(): array
+    public static function deviceBind(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-
         common::checkCurrentUserPrivileges('F_sb');
 
         /** @var deviceModelObj|array $device */
-        $device = \zovye\api\wx\device::getDevice(Request::trim('id'), $user);
+        $device = \zovye\api\wx\device::getDevice(Request::trim('id'), $agent);
         if (is_error($device)) {
             return $device;
         }
@@ -750,23 +684,17 @@ class agent
             return err('锁定设备失败，请稍后再试！');
         }
 
-        $agent = $user->getPartnerAgent() ?: $user;
-
         $agent_id = $device->getAgentId();
         if (empty($agent_id)) {
             //绑定
-            if ($agent->isAgent()) {
-                if (!Device::bind($device, $agent)) {
-                    return err('绑定失败，请联系管理员！');
-                }
-
-                return ['op' => 'bind', 'result' => true];
+            if (!Device::bind($device, $agent)) {
+                return err('绑定失败，请联系管理员！');
             }
 
-            return err('只能绑定到代理商账号！');
+            return ['op' => 'bind', 'result' => true];
         }
 
-        if (!$user->hasFactoryPermission() && $device->getAgentId() != $user->getAgentId()) {
+        if (!$agent->hasFactoryPermission() && $device->getAgentId() != $agent->getId()) {
             return err('没有权限管理这个设备！');
         }
 
@@ -782,24 +710,22 @@ class agent
      *
      * @return array
      */
-    public static function deviceTest()
+    public static function deviceTest(agentModelObj $agent)
     {
-        $user = common::getAgentOrPartner();
-
         common::checkCurrentUserPrivileges('F_sb');
 
         /** @var deviceModelObj|array $device */
-        $device = \zovye\api\wx\device::getDevice(request('id'), $user);
+        $device = \zovye\api\wx\device::getDevice(request('id'), $agent);
         if (is_error($device)) {
             return $device;
         }
 
-        if (!$device->isOwnerOrSuperior($user)) {
+        if (!$device->isOwnerOrSuperior($agent)) {
             return err('没有权限执行这个操作！');
         }
 
         $lane = Request::int('lane');
-        $res = DeviceUtil::test($device, $user, $lane);
+        $res = DeviceUtil::test($device, $agent, $lane);
 
         if (is_error($res)) {
             return err($res['message']);
@@ -825,20 +751,19 @@ class agent
     /**
      * 重置库存.
      *
+     * @param agentModelObj $agent
      * @return array
      */
-    public static function deviceReset(): array
+    public static function deviceReset(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-
         common::checkCurrentUserPrivileges('F_sb');
 
-        $device = \zovye\api\wx\device::getDevice(request('id'), $user);
+        $device = \zovye\api\wx\device::getDevice(request('id'), $agent);
         if (is_error($device)) {
             return $device;
         }
 
-        if (!$device->isOwnerOrSuperior($user)) {
+        if (!$device->isOwnerOrSuperior($agent)) {
             return err('没有权限执行这个操作！');
         }
 
@@ -847,7 +772,7 @@ class agent
             return err('设备正忙，请稍后再试！');
         }
 
-        DBUtil::transactionDo(function () use ($device, $user) {
+        DBUtil::transactionDo(function () use ($device, $agent) {
             if (Request::isset('lane')) {
                 $num = Request::int('num');
                 $data = [
@@ -863,8 +788,7 @@ class agent
             }
 
             if (App::isInventoryEnabled()) {
-                $user = $user->isPartner() ? $user->getPartnerAgent() : $user;
-                $v = Inventory::syncDevicePayloadLog($user, $device, $res, '代理商补货');
+                $v = Inventory::syncDevicePayloadLog($agent, $device, $res, '代理商补货');
                 if (is_error($v)) {
                     return $v;
                 }
@@ -886,10 +810,8 @@ class agent
      *
      * @return array
      */
-    public static function deviceAssign(): array
+    public static function deviceAssign(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-
         common::checkCurrentUserPrivileges('F_sb');
 
         $target = agent::getUserByGUID(request::str('guid'));
@@ -907,7 +829,7 @@ class agent
         $group_id = Request::int('group');
         if ($group_id > 0) {
             $query = Device::query([
-                'agent_id' => $user->getAgentId(),
+                'agent_id' => $agent->getId(),
                 'group_id' => $group_id,
             ]);
             /** @var deviceModelObj $entry */
@@ -917,7 +839,7 @@ class agent
         }
 
         foreach ($device_ids as $device_id) {
-            $device = \zovye\api\wx\device::getDevice($device_id, $user);
+            $device = \zovye\api\wx\device::getDevice($device_id, $agent);
             if (is_error($device)) {
                 return $device;
             }
@@ -935,12 +857,11 @@ class agent
     /**
      * 缺货设备列表.
      *
+     * @param agentModelObj $agent
      * @return array
      */
-    public static function deviceLowRemain(): array
+    public static function deviceLowRemain(agentModelObj $agent): array
     {
-        $agent = common::getAgent();
-
         common::checkCurrentUserPrivileges('F_qz');
 
         if (Request::has('remain')) {
@@ -988,18 +909,17 @@ class agent
     /**
      * 获取故障设备.
      *
+     * @param agentModelObj $agent
      * @return array
      */
-    public static function deviceError(): array
+    public static function deviceError(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-
         common::checkCurrentUserPrivileges('F_gz');
 
         $page = max(1, Request::int('page'));
         $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
 
-        $query = Device::query(['agent_id' => $user->getAgentId()]);
+        $query = Device::query(['agent_id' => $agent->getId()]);
 
         $error_code = Request::int('error');
         if ($error_code > 0) {
@@ -1039,10 +959,8 @@ class agent
         return $result;
     }
 
-    public static function DeviceScheduleList()
+    public static function DeviceScheduleList(agentModelObj $agent)
     {
-        $agent = common::getAgent();
-
         common::checkCurrentUserPrivileges('F_sb');
 
         $device = \zovye\api\wx\device::getDevice(request('id'), $agent);
@@ -1073,10 +991,8 @@ class agent
     }
 
 
-    public static function deviceScheduleCreate()
+    public static function deviceScheduleCreate(agentModelObj $agent)
     {
-        $agent = common::getAgent();
-
         common::checkCurrentUserPrivileges('F_sb');
 
         $device = \zovye\api\wx\device::getDevice(request('id'), $agent);
@@ -1117,11 +1033,8 @@ class agent
         return ['msg' => '删除成功！'];
     }
 
-    public static function orderRefund(): array
+    public static function orderRefund(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-        $agent = $user->isPartner() ? $user->getPartnerAgent() : $user;
-
         if (!settings('agent.order.refund')) {
             return err('不允许退款，请联系管理员！');
         }
@@ -1237,7 +1150,7 @@ class agent
      *
      * @return array
      */
-    public static function orderList(): array
+    public static function orderList(agentModelObj $agent): array
     {
         common::checkCurrentUserPrivileges('F_sb');
 
@@ -1259,7 +1172,6 @@ class agent
         }
 
         if (empty($condition)) {
-            $agent = self::getAgent();
             $condition['agent_id'] = $agent->getId();
         }
 
@@ -1271,10 +1183,8 @@ class agent
      *
      * @return array
      */
-    public static function deviceSetErrorCode(): array
+    public static function deviceSetErrorCode(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-
         common::checkCurrentUserPrivileges('F_sb');
 
         $device = \zovye\api\wx\device::getDevice(request('id'));
@@ -1282,7 +1192,7 @@ class agent
             return $device;
         }
 
-        if (!$device->isOwnerOrSuperior($user)) {
+        if (!$device->isOwnerOrSuperior($agent)) {
             return err('没有权限执行这个操作！');
         }
 
@@ -1300,8 +1210,8 @@ class agent
             'error_code' => $device->getErrorCode(),
             'result_code' => $resultCode,
             'result' => $resultDesc,
-            'mobile' => $user->getMobile(),
-            'name' => $user->getName(),
+            'mobile' => $agent->getMobile(),
+            'name' => $agent->getName(),
         ];
 
         if (\zovye\domain\Maintenance::create($data) && $device->save()) {
@@ -1320,10 +1230,8 @@ class agent
      *
      * @return array
      */
-    public static function agentSearch(): array
+    public static function agentSearch(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-
         common::checkCurrentUserPrivileges('F_xj');
 
         $page = max(1, Request::int('page'));
@@ -1343,7 +1251,7 @@ class agent
 
         $guid = Request::trim('guid');
         if (empty($guid)) {
-            $query->where(['superior_id' => $user->getAgentId()]);
+            $query->where(['superior_id' => $agent->getId()]);
         } else {
             $res = agent::getUserByGUID($guid);
             if (empty($res)) {
@@ -1352,9 +1260,9 @@ class agent
                 $query->where(['superior_id' => $res->getAgentId()]);
             }
 
-            if ($res->getId() != $user->getId()) {
+            if ($res->getId() != $agent->getId()) {
                 $superior = $res->getSuperior();
-                if ($superior && $superior->getId() != $user->getAgentId()) {
+                if ($superior && $superior->getId() != $agent->getId()) {
                     $superior_guid = common::getGUID($superior);
                 }
             }
@@ -1368,7 +1276,7 @@ class agent
             'total' => $total,
             'sup_guid' => "$superior_guid",
             'list' => [],
-            'remove' => $user->hasFactoryPermission(),
+            'remove' => $agent->hasFactoryPermission(),
         ];
 
         if ($total > 0) {
@@ -1377,25 +1285,25 @@ class agent
 
             /** @var  userModelObj $entry */
             foreach ($query->findAll() as $entry) {
-                $agent = $entry->agent();
+                $x = $entry->agent();
 
-                $agent_data = $agent->getAgentData();
+                $agent_data = $x->getAgentData();
 
                 $data = [
-                    'guid' => common::getGUID($agent),
-                    'name' => $agent->getName(),
-                    'avatar' => $agent->getAvatar(),
-                    'mobile' => substr_replace($agent->getMobile(), '****', 3, 4),
+                    'guid' => common::getGUID($x),
+                    'name' => $x->getName(),
+                    'avatar' => $x->getAvatar(),
+                    'mobile' => substr_replace($x->getMobile(), '****', 3, 4),
                     'address' => is_array($agent_data['area']) ? implode(
                         '-',
                         array_values($agent_data['area'])
                     ) : '',
                     'level' => $agent_levels[$agent_data['level']],
-                    'device_count' => Device::query(['agent_id' => $agent->getAgentId()])->count(),
-                    'hasB' => User::findOne(['superior_id' => $agent->getAgentId()]) ? 1 : 0,
+                    'device_count' => Device::query(['agent_id' => $x->getAgentId()])->count(),
+                    'hasB' => User::findOne(['superior_id' => $x->getAgentId()]) ? 1 : 0,
                 ];
 
-                $gsp = $agent->settings('agentData.gsp', []);
+                $gsp = $x->settings('agentData.gsp', []);
                 if ($gsp['enabled'] && $gsp['mode'] == 'rel') {
                     foreach ((array)$gsp['rel'] as $level => $val) {
                         $gsp['rel'][$level] = number_format($val / 100, 2);
@@ -1414,9 +1322,9 @@ class agent
     /**
      * 修改下级代理商名称
      */
-    public static function agentUpdate(): array
+    public static function agentUpdate(agentModelObj $agent): array
     {
-        common::getAgentOrPartner();
+        unset($agent);
 
         $guid = Request::trim('guid');
 
@@ -1433,10 +1341,8 @@ class agent
         return ['msg' => '修改成功！'];
     }
 
-    public static function getAgentKeepers(): array
+    public static function getAgentKeepers(agentModelObj $agent): array
     {
-        $agent = common::getAgent();
-
         $query = Keeper::query(['agent_id' => $agent->getId()]);
 
         $list = [];
@@ -1489,10 +1395,8 @@ class agent
         return $result;
     }
 
-    public static function agentStats(): array
+    public static function agentStats(agentModelObj $agent): array
     {
-        $agent = common::getAgentOrPartner();
-
         if (Request::has('guid')) {
             $guid = Request::trim('guid');
 
@@ -1515,130 +1419,110 @@ class agent
         return err('没有权限！');
     }
 
-    public static function removeAgent(): array
+    public static function removeAgent(agentModelObj $agent): array
     {
-        $op_user = common::getAgentOrPartner();
+        if ($agent->hasFactoryPermission()) {
+            $user_id = request('agent');
 
-        if ($op_user->isAgent() || $op_user->isPartner()) {
-            if ($op_user->hasFactoryPermission()) {
-                $user_id = request('agent');
-
-                if ($user_id) {
-                    $res = DBUtil::transactionDo(
-                        function () use ($user_id) {
-                            $user = agent::getUserByGUID($user_id);
-                            if ($user) {
-                                return \zovye\domain\Agent::remove($user);
-                            }
-
-                            return err('找不到个代理商！');
+            if ($user_id) {
+                $res = DBUtil::transactionDo(
+                    function () use ($user_id) {
+                        $user = agent::getUserByGUID($user_id);
+                        if ($user) {
+                            return \zovye\domain\Agent::remove($user);
                         }
-                    );
 
-                    if (!is_error($res)) {
-                        return ['msg' => '已取消用户代理身份！'];
+                        return err('找不到个代理商！');
                     }
-                }
+                );
 
-                return err(empty($res['message']) ? '操作失败！' : $res['message']);
+                if (!is_error($res)) {
+                    return ['msg' => '已取消用户代理身份！'];
+                }
             }
 
-            return err('没有操作权限！');
+            return err(empty($res['message']) ? '操作失败！' : $res['message']);
         }
 
-        return err('只有代理商才能保存运营人员信息！');
+        return err('没有操作权限！');
     }
 
-    public static function agentSub(): array
+    public static function agentSub(agentModelObj $agent): array
     {
-        $agent = common::getAgentOrPartner();
-        if ($agent->isAgent() || $agent->isPartner()) {
-            if ($agent->isPartner()) {
-                $agent = $agent->getPartnerAgent();
-            }
+        $agent_ids = \zovye\domain\Agent::getAllSubordinates($agent);
 
-            $agent_ids = \zovye\domain\Agent::getAllSubordinates($agent);
+        $result = [];
+        if (!empty($agent_ids)) {
+            $query = \zovye\domain\Agent::query();
+            $keyword = Request::trim('keyword');
 
-            $result = [];
-            if (!empty($agent_ids)) {
-                $query = \zovye\domain\Agent::query();
-                $keyword = Request::trim('keyword');
+            $query->where('id IN('.implode(',', $agent_ids).')');
 
-                $query->where('id IN('.implode(',', $agent_ids).')');
+            $total = $query->count();
+            $result = [
+                'total' => $total,
+                'list' => [],
+                'remove' => $agent->hasFactoryPermission(),
+            ];
 
-                $total = $query->count();
-                $result = [
-                    'total' => $total,
-                    'list' => [],
-                    'remove' => $agent->hasFactoryPermission(),
-                ];
-
-                if ($total > 0) {
-                    $agent_levels = settings('agent.levels');
-                    /** @var  userModelObj $entry */
-                    foreach ($query->findAll() as $entry) {
-                        $agent = $entry->agent();
-                        $agent_data = $agent->getAgentData();
-                        if ($keyword) {
-                            $h_key = false;
-                            if (strpos($entry->getNickname(), $keyword) !== false) {
-                                $h_key = true;
-                            }
-                            if (strpos($entry->getMobile(), $keyword) !== false) {
-                                $h_key = true;
-                            }
-                            $a_name = $agent_data['name'] ?: $agent->getNickname();
-                            if (strpos($a_name, $keyword) !== false) {
-                                $h_key = true;
-                            }
-                        } else {
+            if ($total > 0) {
+                $agent_levels = settings('agent.levels');
+                /** @var  userModelObj $entry */
+                foreach ($query->findAll() as $entry) {
+                    $x = $entry->agent();
+                    $agent_data = $x->getAgentData();
+                    if ($keyword) {
+                        $h_key = false;
+                        if (strpos($entry->getNickname(), $keyword) !== false) {
                             $h_key = true;
                         }
-                        if ($h_key) {
-                            $data = [
-                                'guid' => common::getGUID($agent),
-                                'name' => $agent->getName(),
-                                'avatar' => $agent->getAvatar(),
-                                'mobile' => substr_replace($agent->getMobile(), '****', 3, 4),
-                                'address' => is_array($agent_data['area']) ? implode(
-                                    '-',
-                                    array_values($agent_data['area'])
-                                ) : '',
-                                'level' => $agent_levels[$agent_data['level']] ?? [],
-                                'device_count' => Device::query(['agent_id' => $agent->getAgentId()])->count(),
-                                'hasB' => User::findOne(['superior_id' => $agent->getAgentId()]) ? 1 : 0,
-                            ];
-
-                            $gsp = $agent->settings('agentData.gsp', []);
-                            if ($gsp['enabled'] && $gsp['mode'] == 'rel') {
-                                foreach ((array)$gsp['rel'] as $level => $val) {
-                                    $gsp['rel'][$level] = number_format($val / 100, 2);
-                                }
-                                $data['gsp_rel_mode_type'] = $gsp['mode_type'] ?? 'percent';
-                            }
-
-                            $result['list'][] = $data;
+                        if (strpos($entry->getMobile(), $keyword) !== false) {
+                            $h_key = true;
                         }
+                        $a_name = $agent_data['name'] ?: $x->getNickname();
+                        if (strpos($a_name, $keyword) !== false) {
+                            $h_key = true;
+                        }
+                    } else {
+                        $h_key = true;
+                    }
+                    if ($h_key) {
+                        $data = [
+                            'guid' => common::getGUID($x),
+                            'name' => $x->getName(),
+                            'avatar' => $x->getAvatar(),
+                            'mobile' => substr_replace($x->getMobile(), '****', 3, 4),
+                            'address' => is_array($agent_data['area']) ? implode(
+                                '-',
+                                array_values($agent_data['area'])
+                            ) : '',
+                            'level' => $agent_levels[$agent_data['level']] ?? [],
+                            'device_count' => Device::query(['agent_id' => $x->getAgentId()])->count(),
+                            'hasB' => User::findOne(['superior_id' => $x->getAgentId()]) ? 1 : 0,
+                        ];
+
+                        $gsp = $x->settings('agentData.gsp', []);
+                        if ($gsp['enabled'] && $gsp['mode'] == 'rel') {
+                            foreach ((array)$gsp['rel'] as $level => $val) {
+                                $gsp['rel'][$level] = number_format($val / 100, 2);
+                            }
+                            $data['gsp_rel_mode_type'] = $gsp['mode_type'] ?? 'percent';
+                        }
+
+                        $result['list'][] = $data;
                     }
                 }
             }
-
-            return $result;
         }
 
-        return err('获取列表失败！');
+        return $result;
     }
 
-    public static function setAgentProfile(): array
+    public static function setAgentProfile(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-        $agent = $user->isAgent() ? $user->Agent() : $user->getPartnerAgent();
-
-        if ($agent) {
-            $agent->updateSettings('agentData.misc.siteTitle', Request::trim('siteTitle'));
-            $agent->updateSettings('agentData.misc.auto_ref', Request::trim('auto_ref'));
-            $agent->updateSettings('agentData.device.remainWarning', Request::trim('remainWarning'));
-        }
+        $agent->updateSettings('agentData.misc.siteTitle', Request::trim('siteTitle'));
+        $agent->updateSettings('agentData.misc.auto_ref', Request::trim('auto_ref'));
+        $agent->updateSettings('agentData.device.remainWarning', Request::trim('remainWarning'));
 
         if ($agent->save()) {
             return ['status' => true, 'msg' => '操作成功！'];
@@ -1647,18 +1531,13 @@ class agent
         }
     }
 
-    public static function getAgentProfile(): array
+    public static function getAgentProfile(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-        $agent = $user->isAgent() ? $user->Agent() : $user->getPartnerAgent();
-
         $result = [];
 
-        if ($agent) {
-            $result['siteTitle'] = strval($agent->settings('agentData.misc.siteTitle'));
-            $result['auto_ref'] = intval($agent->settings('agentData.misc.auto_ref'));
-            $result['remainWarning'] = intval($agent->settings('agentData.device.remainWarning'));
-        }
+        $result['siteTitle'] = $agent->settings('agentData.misc.siteTitle', '');
+        $result['auto_ref'] = $agent->settings('agentData.misc.auto_ref', 0);
+        $result['remainWarning'] = $agent->settings('agentData.device.remainWarning', 0);
 
         return $result;
     }
@@ -1919,25 +1798,15 @@ class agent
         return err('获取列表失败！');
     }
 
-    public static function getUserQRCode(): array
+    public static function getUserQRCode(userModelObj $user): array
     {
-        $keeper = common::getKeeper(true);
-        if ($keeper) {
-            return common::getUserQRCode($keeper->getUser());
-        }
-
-        return common::getUserQRCode(common::getUser());
+        return common::getUserQRCode($user);
     }
 
-    public static function updateUserQRCode(): array
+    public static function updateUserQRCode(userModelObj $user): array
     {
         $type = Request::str('type');
-        $keeper = common::getKeeper(true);
-        if ($keeper) {
-            return common::updateUserQRCode($keeper->getUser(), $type);
-        }
-
-        return common::updateUserQRCode(common::getUser(), $type);
+        return common::updateUserQRCode($user, $type);
     }
 
     public static function aliAuthCode()
@@ -1962,10 +1831,9 @@ class agent
         }
     }
 
-    public static function homepageOrderStats(): array
+    public static function homepageOrderStats(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-        $agent_id = $user->getAgentId();
+        $agent_id = $agent->getId();
         if (Request::has('start')) {
             $s_date = DateTime::createFromFormat('Y-m-d H:i:s', Request::str('start').' 00:00:00');
         } else {
@@ -2101,14 +1969,12 @@ class agent
         }, $agent_id, $s_date->getTimestamp(), $e_date->getTimestamp(), $device_id);
     }
 
-    public static function homepageDefault(): array
+    public static function homepageDefault(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-
-        return CacheUtil::cachedCall(30, function () use ($user) {
+        return CacheUtil::cachedCall(30, function () use ($agent) {
 
             $condition = [];
-            $condition['agent_id'] = $user->getAgentId();
+            $condition['agent_id'] = $agent->getId();
 
             $device_stat = [];
 
@@ -2125,12 +1991,12 @@ class agent
             $uid_data = [
                 'api' => 'homepage',
                 'name' => 'order_stats',
-                'agent' => $user->getAgentId(),
+                'agent' => $agent->getId(),
             ];
 
-            $countFN = function ($begin = null, $end = null) use ($user) {
+            $countFN = function ($begin = null, $end = null) use ($agent) {
                 $cond = [
-                    'agent_id' => $user->getAgentId(),
+                    'agent_id' => $agent->getId(),
                 ];
                 if ($begin) {
                     $cond['createtime >='] = $begin->getTimestamp();
@@ -2195,7 +2061,7 @@ class agent
             $data['all']['n'] += $res;
 
             return ['device_stat' => $device_stat, 'data' => $data];
-        }, $user->getId());
+        }, $agent->getId());
     }
 
     public static function repair(): array
@@ -2203,9 +2069,8 @@ class agent
         return ['msg' => '缓存已经刷新！'];
     }
 
-    public static function stats(): array
+    public static function stats(agentModelObj $agent): array
     {
-        $agent = common::getAgent();
         try {
             $res = explode('-', Request::str('date'), 3);
             if (empty($res)) {

@@ -7,17 +7,17 @@
 namespace zovye\api\wx;
 
 use zovye\domain\Goods;
+use zovye\model\agentModelObj;
 use zovye\model\inventory_goodsModelObj;
 use zovye\model\inventory_logModelObj;
+use zovye\model\userModelObj;
 use zovye\Request;
 use function zovye\err;
 
 class inventory
 {
-    public static function list(): array
+    public static function list(userModelObj $user): array
     {
-        $user = common::getAgentOrPartner();
-
         $inventory = \zovye\domain\Inventory::for($user);
         if (empty($inventory)) {
             return err('无法打开该用户的库存数据！');
@@ -54,10 +54,8 @@ class inventory
         return $result;
     }
 
-    public static function logs(): array
+    public static function logs(userModelObj $user): array
     {
-        $user = common::getAgentOrPartner();
-
         $inventory = \zovye\domain\Inventory::for($user);
         if (empty($inventory)) {
             return err('无法打开该用户的库存数据！');

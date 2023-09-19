@@ -179,22 +179,6 @@ SQL;
     Migrate::execSQL($sql);
 }
 
-if (!We7::pdo_table_exists($tb_name.'_device_record')) {
-    $sql = <<<SQL
-CREATE TABLE `ims_zovye_vms_device_record` (
-`id` int(11) NOT NULL AUTO_INCREMENT,
-  `uniacid` int(11) NOT NULL,
-  `deviceId` int(11) NOT NULL,
-  `userId` int(11) NOT NULL,
-  `cate` tinyint(11) NOT NULL,
-  `agentId` int(11) NOT NULL,
-  `createtime` int(11) NOT NULL,
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-SQL;
-    Migrate::execSQL($sql);
-}
-
 if (!We7::pdo_table_exists($tb_name.'_device_feedback')) {
     $sql = <<<SQL
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_device_feedback` (

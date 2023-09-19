@@ -87,15 +87,6 @@ SQL;
     Migrate::execSQL($sql);
 }
 
-if (!We7::pdo_field_exists($tb_name.'_device_record', 'device_id')) {
-    $sql = <<<SQL
-ALTER TABLE `ims_zovye_vms_device_record` CHANGE `deviceId` `device_id` INT(11) NOT NULL;
-ALTER TABLE `ims_zovye_vms_device_record` CHANGE `userId` `user_id` INT(11) NOT NULL;
-ALTER TABLE `ims_zovye_vms_device_record` CHANGE `agentId` `agent_id` INT(11) NOT NULL;
-SQL;
-    Migrate::execSQL($sql);
-}
-
 if (!We7::pdo_field_exists($tb_name.'_device_types', 'agent_id')) {
     $sql = <<<SQL
 ALTER TABLE `ims_zovye_vms_device_types` CHANGE `agentId` `agent_id` INT(11) NOT NULL;

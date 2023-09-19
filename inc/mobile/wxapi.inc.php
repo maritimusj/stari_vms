@@ -22,7 +22,6 @@ use zovye\api\wx\goods;
 use zovye\api\wx\group;
 use zovye\api\wx\inventory;
 use zovye\api\wx\keeper;
-use zovye\api\wx\maintenance;
 use zovye\api\wx\misc;
 use zovye\api\wx\mp;
 use zovye\api\wx\order;
@@ -171,10 +170,6 @@ router::exec($op, [
     'GroupCreate' => [group::class, 'create'],
     'GroupUpdate' => [group::class, 'update'],
     'GroupDelete' => [group::class, 'delete'],
-    'MaintainRecord' => [maintenance::class, 'record'],
-    'KeeperMaintainRecord' => [maintenance::class, 'keeperMaintainRecord'],
-    'MRList' => [maintenance::class, 'MRList'],
-    'KeeperMRList' => [maintenance::class, 'keeperMRList'],
     'FBPic' => [fb::class, 'pic'],
     'FeedBack' => [fb::class, 'feedback'],
     'DeviceStats' => [misc::class, 'deviceStats'],

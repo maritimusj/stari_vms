@@ -49,17 +49,10 @@ if (empty($protocol)) {
     $protocol = 'wx';
 }
 
-$blue_tooth_screen = Request::bool('screen') ? 0 : 1;
-$power = Request::bool('power') ? 0 : 1;
-$blue_tooth_disinfectant = Request::bool('disinfect') ? 0 : 1;
-
 $extra['bluetooth'] = [
     'protocol' => $protocol,
     'uid' => Request::trim('buid'),
     'mac' => Request::trim('mac'),
-    'screen' => $blue_tooth_screen,
-    'power' => $power,
-    'disinfectant' => $blue_tooth_disinfectant,
 ];
 
 if ($data['agent_id']) {

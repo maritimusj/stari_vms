@@ -18,6 +18,7 @@ use zovye\Log;
 use zovye\model\accountModelObj;
 use zovye\model\agentModelObj;
 use zovye\model\device_groupsModelObj;
+use zovye\model\userModelObj;
 use zovye\Request;
 use zovye\util\DBUtil;
 use zovye\util\QRCodeUtil;
@@ -31,32 +32,28 @@ use function zovye\toCamelCase;
 class mp
 {
     /**
-     * 公众号详情.
-     *
-     * @return array
+     * 公众号详情
      */
-    public static function detail(): array
+    public static function detail(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-
         common::checkCurrentUserPrivileges('F_xf');
 
         $uid = Request::trim('uid');
         if ($uid) {
             $account = Account::findOneFromUID($uid);
-            $agent_id = $user->getAgentId();
+            $agent_id = $agent->getId();
 
             if (empty($account) || $account->getAgentId() != $agent_id) {
                 return err('没有权限操作！');
             }
 
-            return self::formatAccountInfo($account, true);
+            return self::formatAccountInfo($agent, $account, true);
         }
 
         return err('操作失败！');
     }
 
-    public static function formatAccountInfo(accountModelObj $account, $more = false): array
+    public static function formatAccountInfo(userModelObj $user, accountModelObj $account, $more = false): array
     {
         $data = [
             'uid' => $account->getUid(),
@@ -109,8 +106,6 @@ class mp
 
         $data['bonus_type'] = $account->getBonusType();
 
-        $user = common::getAgentOrPartner();
-
         if ($more) {
             $data['img_signatured'] = Advertising::sign($account->getImg());
             if ($account->isVideo()) {
@@ -160,21 +155,17 @@ class mp
     }
 
     /**
-     * 分配公众号.
-     *
-     * @return array
+     * 分配公众号
      */
-    public static function assign(): array
+    public static function assign(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-
         common::checkCurrentUserPrivileges('F_xf');
 
         $devices = Request::is_array('devices') ? Request::array('devices') : [];
         $uid = Request::trim('uid');
         if ($uid) {
             $account = Account::findOneFromUID($uid);
-            $agent_id = $user->getAgentId();
+            $agent_id = $agent->getId();
 
             if (empty($account) || $account->getAgentId() != $agent_id) {
                 return err('没有权限操作！');
@@ -183,7 +174,7 @@ class mp
             $assign_data = [$account];
 
             if (Request::bool('all')) {
-                $assign_data[] = $user->isAgent() ? $user : $user->getPartnerAgent();
+                $assign_data[] = $agent;
             } else {
                 foreach ($devices as $id) {
                     $device = \zovye\api\wx\device::getDevice($id);
@@ -202,9 +193,7 @@ class mp
     }
 
     /**
-     * 上传文件或者视频.
-     *
-     * @return array
+     * 上传文件或者视频
      */
     public static function upload(): array
     {
@@ -244,21 +233,17 @@ class mp
     }
 
     /**
-     * 公众号列表.
-     *
-     * @return array
+     * 公众号列表
      */
-    public static function accounts(): array
+    public static function accounts(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-
         common::checkCurrentUserPrivileges('F_xf');
 
         $page = max(1, Request::int('page'));
         $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
 
         $query = Account::query();
-        $query->where(['agent_id' => $user->getAgentId()]);
+        $query->where(['agent_id' => $agent->getId()]);
 
         if (Request::has('keyword')) {
             $keyword = Request::trim('keyword');
@@ -282,7 +267,7 @@ class mp
         if ($total > 0) {
             $query->page($page, $page_size)->orderBy('order_no desc');
             foreach ($query->findAll() as $account) {
-                $result['list'][] = mp::formatAccountInfo($account, true);
+                $result['list'][] = mp::formatAccountInfo($agent, $account, true);
             }
         }
 
@@ -296,21 +281,17 @@ class mp
     }
 
     /**
-     * 禁用公众号.
-     *
-     * @return array
+     * 禁用公众号
      */
-    public static function ban(): array
+    public static function ban(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-
         common::checkCurrentUserPrivileges('F_xf');
 
         $uid = Request::trim('uid');
         if ($uid) {
             $account = Account::findOneFromUID($uid);
             if ($account) {
-                if ($account->getAgentId() == $user->getAgentId()) {
+                if ($account->getAgentId() == $agent->getId()) {
                     if ($account->isThirdPartyPlatform() || $account->isAuth()) {
                         return ['msg' => '第三方平台或者授权接入的公众号无法禁用！'];
                     }
@@ -330,23 +311,20 @@ class mp
     }
 
     /**
-     * 删除公众号.
-     *
-     * @return array
+     * 删除公众号
      */
-    public static function delete(): array
+    public static function delete(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
         common::checkCurrentUserPrivileges('F_xf');
 
-        return DBUtil::transactionDo(function () use ($user) {
+        return DBUtil::transactionDo(function () use ($agent) {
             $uid = Request::trim('uid');
             $account = Account::findOneFromUID($uid);
             if (empty($account)) {
                 return err('找不到指定的公众号！');
             }
 
-            if ($account->getAgentId() != $user->getAgentId()) {
+            if ($account->getAgentId() != $agent->getId()) {
                 return err('没有权限操作这个公众号！');
             }
 
@@ -369,19 +347,15 @@ class mp
     }
 
     /**
-     * 新建或者编辑公众号.
-     *
-     * @return array
+     * 新建或者编辑公众号
      */
-    public static function save(): array
+    public static function save(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-
         common::checkCurrentUserPrivileges('F_xf');
 
-        return DBUtil::transactionDo(function () use ($user) {
+        return DBUtil::transactionDo(function () use ($agent) {
             $data = [
-                'agent_id' => $user->getAgentId(),
+                'agent_id' => $agent->getId(),
                 'title' => Request::trim('title'),
                 'descr' => Request::str('descr'),
                 'group_name' => Request::str('groupname'),
@@ -395,7 +369,7 @@ class mp
             if (Request::has('uid')) {
                 $account = Account::findOneFromUID(Request::str('uid'));
                 if ($account) {
-                    if ($account->getAgentId() != $user->getAgentId()) {
+                    if ($account->getAgentId() != $agent->getId()) {
                         return err('公众号账号不能重复！');
                     }
                 }
@@ -485,7 +459,7 @@ class mp
                 } else {
                     $account = Account::findOneFromName($data['name']);
                     if ($account) {
-                        if ($account->getAgentId() != $user->getAgentId()) {
+                        if ($account->getAgentId() != $agent->getId()) {
                             return err('公众号账号不能重复！');
                         }
                     }
@@ -502,7 +476,7 @@ class mp
 
             $account->setExtraData('update', [
                 'time' => time(),
-                'user' => $user->profile(),
+                'user' => $agent->profile(),
             ]);
 
             if ($account->save() && $account->set('limits', $limits) && Account::updateAccountData()) {
@@ -546,16 +520,14 @@ class mp
         });
     }
 
-    public static function groupAssign(): array
+    public static function groupAssign(agentModelObj $agent): array
     {
-        $user = agent::getAgent();
-
         common::checkCurrentUserPrivileges('F_xf');
 
         $uid = Request::trim('uid');
         if ($uid) {
             $account = Account::findOneFromUID($uid);
-            $agent_id = $user->getAgentId();
+            $agent_id = $agent->getId();
 
             if (empty($account) || $account->getAgentId() != $agent_id) {
                 return err('没有权限操作这个公众号！');
@@ -564,7 +536,7 @@ class mp
             $assign_data = [$account];
 
             if (Request::bool('all')) {
-                $assign_data[] = $user;
+                $assign_data[] = $agent;
             } else {
 
                 $groups = Request::is_array('groups') ? Request::array('groups') : [];
@@ -574,9 +546,9 @@ class mp
                     $one = \zovye\domain\Group::get($id);
                     if ($one) {
                         $query_arr = ['group_id' => $one->getId()];
-                        if ($one->getAgentId() != $user->getAgentId()) {
+                        if ($one->getAgentId() != $agent->getId()) {
                             //平台的
-                            $query_arr['agent_id'] = $user->getAgentId();
+                            $query_arr['agent_id'] = $agent->getId();
                         } else {
                             $assign_data[] = $one;
                         }
@@ -597,15 +569,12 @@ class mp
         return err('操作失败！');
     }
 
-    public static function mpAuthUrl(): array
+    public static function mpAuthUrl(agentModelObj $agent): array
     {
-        /** @var agentModelObj $user */
-        $user = agent::getAgent();
-
         common::checkCurrentUserPrivileges('F_xf');
 
         $url = WxPlatform::getPreAuthUrl([
-            'agent' => $user->getId(),
+            'agent' => $agent->getId(),
         ]);
 
         if (empty($url)) {

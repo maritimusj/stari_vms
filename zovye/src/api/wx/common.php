@@ -147,9 +147,6 @@ class common
 
     /**
      * 获取当前已登录的用户.
-     *
-     *
-     * @return agentModelObj
      */
     public static function getAgentOrPartner(): agentModelObj
     {
@@ -162,7 +159,10 @@ class common
         return $user->agent();
     }
 
-    public static function getAgent($return_error = false): ?agentModelObj
+    /**
+     * 获取当前登录的代理商身份，如果当前登录用户是合伙人，则返回合伙人对应的代理商身份
+     */
+    public static function getAgent(bool $return_error = false): ?agentModelObj
     {
         $login_data = LoginData::get(common::getToken(), [LoginData::AGENT, LoginData::AGENT_WEB]);
         if (empty($login_data)) {
@@ -188,7 +188,11 @@ class common
             return self::$user->getPartnerAgent();
         }
 
-        return null;
+        if ($return_error) {
+            return null;
+        }
+
+        JSON::fail('请先登录后再请求数据![204]');
     }
 
     public static function getKeeper($return_error = false): ?keeperModelObj
@@ -199,21 +203,21 @@ class common
                 return null;
             }
 
-            JSON::fail('请先登录后再请求数据![204]');
+            JSON::fail('请先登录后再请求数据![205]');
         }
 
         /** @var keeperModelObj $keeper */
         $keeper = \zovye\domain\Keeper::findOne(['id' => $login_data->getUserId()]);
 
+        if (empty($keeper) && !$return_error) {
+            JSON::fail('请先登录后再请求数据![206]');
+        }
+
         return $keeper;
     }
 
     /**
-     * 生成用户的GUID.
-     *
-     * @param userModelObj|null $target
-     *
-     * @return string
+     * 生成用户的GUID
      */
     public static function getGUID(userModelObj $target = null): string
     {
@@ -229,13 +233,6 @@ class common
         return self::getToken();
     }
 
-    /**
-     * @param $assign_data
-     * @param array|string $fn
-     * @param callable|null $cb
-     *
-     * @return bool
-     */
     public static function checkEnabledFunctions($assign_data, $fn, callable $cb = null): bool
     {
         //空$assign_data认为是拥有全部权限
@@ -263,12 +260,7 @@ class common
     }
 
     /**
-     * 代理商功能权限检查，没有设置禁止时，默认为允许.
-     *
-     * @param $fn
-     * @param bool $get_result
-     *
-     * @return bool
+     * 代理商功能权限检查，没有设置禁止时，默认为允许
      */
     public static function checkCurrentUserPrivileges($fn, bool $get_result = false): bool
     {
@@ -314,11 +306,6 @@ class common
         );
     }
 
-    /**
-     * @param userModelObj $user
-     *
-     * @return array
-     */
     public static function setUserBank(userModelObj $user): array
     {
         $bankData = [

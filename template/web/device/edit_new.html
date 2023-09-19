@@ -550,47 +550,6 @@
                         </div>
                     </div>
                 </div>
-                <div v-if="active === 'func'"  v-if="navExists('func')">
-                    <div class="form-group">
-                        <label class="col-xs-12 col-md-2 col-md-2 control-label">屏幕</label>
-                        <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
-                            <label for="blueToothScreen1" class="radio-inline">
-                                <input name="blueToothScreen" id="blueToothScreen1" type="radio" value="1" {if $bluetooth['screen'] == 1}checked="checked"{/if}>
-                                有
-                            </label>
-                            <label for="blueToothScreen0" class="radio-inline">
-                                <input name="blueToothScreen" id="blueToothScreen0" type="radio" value="0"  {if $bluetooth['screen'] == 0}checked="checked"{/if} >
-                                无
-                            </label>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-xs-12 col-md-2 col-md-2 control-label">消毒功能</label>
-                        <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
-                            <label for="blueToothDisinfectant1" class="radio-inline">
-                                <input name="blueToothDisinfectant" id="blueToothDisinfectant1" type="radio" value="1" {if $bluetooth['disinfectant'] == 1}checked="checked"{/if}>
-                                有
-                            </label>
-                            <label for="blueToothDisinfectant0" class="radio-inline">
-                                <input name="blueToothDisinfectant" id="blueToothDisinfectant0" type="radio" value="0"  {if $bluetooth['disinfectant'] == 0}checked="checked"{/if} >
-                                无
-                            </label>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-xs-12 col-md-2 col-md-2 control-label">供电</label>
-                        <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
-                            <label for="blueToothPowerSupply1" class="radio-inline">
-                                <input name="blueToothPowerSupply" id="blueToothPowerSupply1" type="radio" value="1" {if $bluetooth['power'] == 1}checked="checked"{/if}>
-                                电池供电
-                            </label>
-                            <label for="blueToothPowerSupply0" class="radio-inline">
-                                <input name="blueToothPowerSupply" id="blueToothPowerSupply0" type="radio" value="0"  {if $bluetooth['power'] == 0}checked="checked"{/if} >
-                                外接电源
-                            </label>
-                        </div>
-                    </div>
-                </div>
                 <div v-show="active === 'egg'">
                     <div class="form-group">
                         <label for="adDeviceUID" class="col-md-2 control-label">广告设备UID</label>
@@ -1057,10 +1016,6 @@
                         'content': `{$icon} 基本设置`,
                     },
                     {
-                        'op': 'func',
-                        'content': `功能设置`,
-                    },
-                    {
                         'op': 'egg',
                         'content': `闪蛋设置`,
                     },
@@ -1133,9 +1088,6 @@
                         this.config.is_charging_device ||
                         this.config.is_fueling_device) {
                         ops_removed.push('alert');
-                    }
-                    if (!this.config.is_bluetooth_device) {
-                        ops_removed.push('func');
                     }
                     if (!this.config.app) {
                         ops_removed.push('app', 'schedule');

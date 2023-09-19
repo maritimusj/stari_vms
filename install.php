@@ -291,20 +291,6 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_device_logs` (
   KEY `createtime` (`uniacid`, `createtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zovye_vms_device_record` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `uniacid` int(11) NOT NULL,
-  `device_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `cate` tinyint(11) NOT NULL,
-  `agent_id` int(11) NOT NULL,
-  `createtime` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `device_id` (`uniacid`, `device_id`),
-  KEY `user_id` (`uniacid`, `user_id`),
-  KEY `agent_id` (`uniacid`, `agent_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_device_types` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) DEFAULT NULL,

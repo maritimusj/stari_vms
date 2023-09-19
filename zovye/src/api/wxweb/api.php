@@ -83,7 +83,6 @@ class api
 
     /**
      * 获取设备相关的广告
-     * @return array
      */
     public static function ads(): array
     {
@@ -117,10 +116,8 @@ class api
         return $list;
     }
 
-    public static function accounts(): array
+    public static function accounts(userModelObj $user): array
     {
-        $user = \zovye\api\wx\common::getUser();
-
         if (Request::has('deviceId')) {
             $device = Device::get(Request::str('deviceId'), true);
             if (empty($device)) {
@@ -179,10 +176,8 @@ class api
         return Account::getAvailableList($device, $user, $params);
     }
 
-    public static function goods(): array
+    public static function goods(userModelObj $user): array
     {
-        $user = \zovye\api\wx\common::getUser();
-
         $device = Device::get(Request::str('deviceId'), true);
         if (empty($device)) {
             return err('找不到这个设备！');
@@ -201,10 +196,8 @@ class api
         return $result;
     }
 
-    public static function get(): array
+    public static function get(userModelObj $user): array
     {
-        $user = \zovye\api\wx\common::getUser();
-
         if (!$user->acquireLocker(User::ORDER_LOCKER)) {
             JSON::fail('无法锁定用户，请稍后再试！');
         }
@@ -291,10 +284,8 @@ class api
         return err('请求出货失败！');
     }
 
-    public static function rewardOrderData(): array
+    public static function rewardOrderData(userModelObj $user): array
     {
-        $user = \zovye\api\wx\common::getUser();
-
         $reward = Config::app('wxapp.advs.reward', []);
         if (empty($reward['allowFree']) || empty($reward['id'])) {
             return err('没有设置激励广告！');
@@ -330,10 +321,8 @@ class api
         ];
     }
 
-    public static function exchange(): array
+    public static function exchange(userModelObj $user): array
     {
-        $user = \zovye\api\wx\common::getUser();
-
         $device_uid = Request::str('deviceId');
         $goods_id = Request::int('goodsId');
         $num = Request::int('num');
@@ -346,10 +335,8 @@ class api
         return ['orderUID' => $res];
     }
 
-    public static function pay(): array
+    public static function pay(userModelObj $user): array
     {
-        $user = \zovye\api\wx\common::getWXAppUser();
-
         if (!$user->acquireLocker(User::ORDER_LOCKER)) {
             return err('无法锁定用户，请稍后再试！');
         }
@@ -423,10 +410,8 @@ class api
         ];
     }
 
-    public static function userInfo(): array
+    public static function userInfo(userModelObj $user): array
     {
-        $user = \zovye\api\wx\common::getUser();
-
         $data = $user->profile();
         $data['banned'] = $user->isBanned();
 
@@ -459,10 +444,8 @@ class api
     }
 
 
-    public static function feedback(): array
+    public static function feedback(userModelObj $user): array
     {
-        $user = \zovye\api\wx\common::getUser();
-
         $imei = Request::str('deviceId');
 
         $text = Request::str('text');
@@ -488,10 +471,8 @@ class api
         return err('反馈失败，请稍后重试！');
     }
 
-    public static function signIn(): array
+    public static function signIn(userModelObj $user): array
     {
-        $user = \zovye\api\wx\common::getUser();
-
         $res = Balance::dailySignIn($user);
         if (is_error($res)) {
             return $res;
@@ -503,10 +484,8 @@ class api
         ];
     }
 
-    public static function bonus(): array
+    public static function bonus(userModelObj $user): array
     {
-        $user = \zovye\api\wx\common::getUser();
-
         $account = Account::findOneFromUID(Request::str('uid'));
         if (empty($account)) {
             return err('找不到这个公众号！');
@@ -592,10 +571,8 @@ class api
         return $bonus;
     }
 
-    public static function rewardQuota(): array
+    public static function rewardQuota(userModelObj $user): array
     {
-        $user = \zovye\api\wx\common::getUser();
-
         if (!$user->acquireLocker(User::BALANCE_GIVE_LOCKER)) {
             return err('无法锁定用户！');
         }
@@ -608,10 +585,8 @@ class api
         return ['msg' => 'Ok'];
     }
 
-    public static function reward(): array
+    public static function reward(userModelObj $user): array
     {
-        $user = \zovye\api\wx\common::getUser();
-
         if (!$user->acquireLocker(User::BALANCE_GIVE_LOCKER)) {
             return err('无法锁定用户！');
         }
@@ -632,10 +607,8 @@ class api
         ];
     }
 
-    public static function balanceLog(): array
+    public static function balanceLog(userModelObj $user): array
     {
-        $user = \zovye\api\wx\common::getUser();
-
         $query = $user->getBalance()->log();
 
         $last_id = Request::int('lastId');
@@ -654,10 +627,8 @@ class api
         return $result;
     }
 
-    public static function orderList(): array
+    public static function orderList(userModelObj $user): array
     {
-        $user = \zovye\api\wx\common::getUser();
-
         $way = Request::str('way');
         $page = Request::int('page');
         $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
@@ -665,22 +636,19 @@ class api
         return Order::getList($user, $way, $page, $page_size);
     }
 
-    public static function task(): array
+    public static function task(userModelObj $user): array
     {
-        $user = \zovye\api\wx\common::getUser();
-
         $max = Request::int('max', 10);
 
         return Task::getList($user, $max);
     }
 
-    public static function detail(): array
+    public static function detail(userModelObj $user): array
     {
         $uid = Request::str('uid');
 
         $account = Account::findOneFromUID($uid);
         if ($account && $account->isQuestionnaire()) {
-            $user = \zovye\api\wx\common::getUser();
             $data = $account->format();
             $data['questions'] = $account->getQuestions($user);
 
@@ -690,9 +658,8 @@ class api
         return Task::detail($account ?? $uid);
     }
 
-    public static function submit(): array
+    public static function submit(userModelObj $user): array
     {
-        $user = \zovye\api\wx\common::getUser();
         if (!$user->acquireLocker(User::TASK_LOCKER)) {
             return err('用户无法锁定，请重试！');
         }
@@ -717,10 +684,8 @@ class api
         return ['msg' => '提交成功！'];
     }
 
-    public static function getRecipient()
+    public static function getRecipient(userModelObj $user)
     {
-        $user = \zovye\api\wx\common::getUser();
-
         $recipient = $user->getRecipientData();
         if (empty($recipient)) {
             $recipient = [
@@ -733,10 +698,8 @@ class api
         return $recipient;
     }
 
-    public static function updateRecipient(): array
+    public static function updateRecipient(userModelObj $user): array
     {
-        $user = \zovye\api\wx\common::getUser();
-
         $name = Request::trim('name');
         $phone_num = Request::trim('phoneNum');
         $address = Request::trim('address');
@@ -750,10 +713,8 @@ class api
         return err('保存失败！');
     }
 
-    public static function getMallOrderList(): array
+    public static function getMallOrderList(userModelObj $user): array
     {
-        $user = \zovye\api\wx\common::getUser();
-
         $params = [
             'last_id' => Request::int('lastId'),
             'pagesize' => Request::int('pagesize'),
@@ -775,19 +736,16 @@ class api
         ]);
     }
 
-    public static function createMallOrder()
+    public static function createMallOrder(userModelObj $user)
     {
-        $user = \zovye\api\wx\common::getUser();
-
         return Mall::createOrder($user, [
             'goods_id' => Request::int('goods'),
             'num' => Request::int('num'),
         ]);
     }
 
-    public static function validateLocation()
+    public static function validateLocation(userModelObj $user)
     {
-        $user = \zovye\api\wx\common::getUser();
         $device = Device::get(Request::str('deviceId'), true);
         if (empty($device)) {
             return err('找不到这个设备！');
@@ -804,39 +762,28 @@ class api
     }
 
     /**
-     * 获取银行信息.
-     *
-     * @return array
+     * 获取银行信息
      */
-    public static function getUserBank(): array
+    public static function getUserBank(userModelObj $user): array
     {
-        $user = \zovye\api\wx\common::getUser();
-
         return \zovye\api\wx\common::getUserBank($user);
     }
 
     /**
-     * 设置提现银行信息.
-     *
-     * @return array
+     * 设置提现银行信息
      */
-    public static function setUserBank(): array
+    public static function setUserBank(userModelObj $user): array
     {
-        $user = \zovye\api\wx\common::getUser();
-
         return \zovye\api\wx\common::setUserBank($user);
     }
 
-    public static function getUserQRCode(): array
+    public static function getUserQRCode(userModelObj $user): array
     {
-        $user = \zovye\api\wx\common::getUser();
-
         return \zovye\api\wx\common::getUserQRCode($user);
     }
 
-    public static function updateUserQRCode(): array
+    public static function updateUserQRCode(userModelObj $user): array
     {
-        $user = \zovye\api\wx\common::getUser();
         $type = Request::str('type');
 
         return \zovye\api\wx\common::updateUserQRCode($user, $type);

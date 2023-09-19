@@ -7,10 +7,11 @@
 
 namespace zovye\api\wx;
 
-use zovye\api\wx\keeper as WxKeeper;
 use zovye\domain\Keeper;
 use zovye\domain\Principal;
 use zovye\domain\User;
+use zovye\model\agentModelObj;
+use zovye\model\keeperModelObj;
 use zovye\model\userModelObj;
 use zovye\Request;
 use zovye\util\Helper;
@@ -18,10 +19,8 @@ use function zovye\err;
 
 class promoter
 {
-    public static function getPromoterList(): array
+    public static function getPromoterList(agentModelObj $agent): array
     {
-        $agent = common::getAgent();
-
         $keeper_id = Request::int('id');
         $keeper = Keeper::get($keeper_id);
         if (empty($keeper) || $keeper->getAgentId() != $agent->getId()) {
@@ -52,10 +51,8 @@ class promoter
         ];
     }
 
-    public static function removePromoter(): array
+    public static function removePromoter(agentModelObj $agent): array
     {
-        $agent = common::getAgent();
-
         $user = User::get(Request::int('id'));
         if (empty($user)) {
             return err('推广员不存在！');
@@ -73,10 +70,8 @@ class promoter
         return err('删除失败！');
     }
 
-    public static function getPromoterLogs(): array
+    public static function getPromoterLogs(agentModelObj $agent): array
     {
-        $agent = common::getAgent();
-
         $user = User::get(Request::int('id'));
         if (empty($user)) {
             return err('推广员不存在！');
@@ -96,10 +91,8 @@ class promoter
         return Helper::getUserCommissionLogs($user);
     }
 
-    public static function getPromoterConfig(): array
+    public static function getPromoterConfig(agentModelObj $agent): array
     {
-        $agent = common::getAgent();
-
         $keeper_id = Request::int('id');
         $keeper = Keeper::get($keeper_id);
         if (empty($keeper) || $keeper->getAgentId() != $agent->getId()) {
@@ -116,10 +109,8 @@ class promoter
         return $config;
     }
 
-    public static function updatePromoterConfig(): array
+    public static function updatePromoterConfig(agentModelObj $agent): array
     {
-        $agent = common::getAgent();
-
         $keeper_id = Request::int('id');
         $keeper = Keeper::get($keeper_id);
         if (empty($keeper) || $keeper->getAgentId() != $agent->getId()) {
@@ -153,10 +144,8 @@ class promoter
         return $config;
     }
 
-    public static function keeperGetPromoterList(): array
+    public static function keeperGetPromoterList(keeperModelObj $keeper): array
     {
-        $keeper = WxKeeper::getKeeper();
-
         $query = Principal::promoter(['superior_id' => $keeper->getId()]);
 
         $total = $query->count();
@@ -181,10 +170,8 @@ class promoter
         ];
     }
 
-    public static function keeperGetPromoterLogs(): array
+    public static function keeperGetPromoterLogs(keeperModelObj $keeper): array
     {
-        $keeper = WxKeeper::getKeeper();
-
         $user = User::get(Request::int('id'));
         if (empty($user)) {
             return err('推广员不存在！');
@@ -201,10 +188,8 @@ class promoter
         return Helper::getUserCommissionLogs($user);
     }
 
-    public static function keeperRemovePromoter(): array
+    public static function keeperRemovePromoter(keeperModelObj $keeper): array
     {
-        $keeper = WxKeeper::getKeeper();
-
         $user = User::get(Request::int('id'));
         if (empty($user)) {
             return err('推广员不存在！');

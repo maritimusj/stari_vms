@@ -41,7 +41,7 @@
             <div class="seg">
                 <div class="form-group">
                     <div class="title">蓝牙设备批量导入</div> 
-                    <label for="excel_file" class="col-md-6 control-label">请选择要上传文件</label>
+                    <label class="col-md-6 control-label">请选择要上传文件</label>
                     <input type="file" ref="upload" @change="importFile(event)" style="display: none;">
                     <button class="btn btn-success" @click="uploadClick">
                         选择excel文件
@@ -58,9 +58,6 @@
                                 <td v-text="o.protocol"></td>
                                 <td v-text="o.mac"></td>
                                 <td v-text="o.typeid"></td>
-                                <td v-text="o.screen"></td>
-                                <td v-text="o.disinfect"></td>
-                                <td v-text="o.power"></td>
                                 <td v-text="o.group"></td>
                                 <td>
                                     <div v-if="o.result">{{ o.result.data.msg }}</div>
@@ -83,7 +80,7 @@
             <div class="seg">
                 <div class="title">蓝牙电机批量设置</div>
                 <div class="form-group">
-                    <label for="excel_file" class="col-md-6 control-label">上传文件</label>
+                    <label class="col-md-6 control-label">上传文件</label>
                     <div class="col-md-5">
                     </div>
                     <div class="col-md-3">
@@ -113,7 +110,6 @@
         window.location.href = "{php echo $this->createWebUrl('device');}";
     }
     const apiURL = "{php echo $this->createWebUrl('device', ['op' => 'create_bluetooth_device']);}";
-
     require(["{php \zovye\url(false, JS_VUE_URL);}", "{php \zovye\url(false, JS_XLSX_URL);}"], function (Vue, XLSX) {
         const X = XLSX;
         const rABS = typeof FileReader !== "undefined" && (FileReader.prototype || {}).readAsBinaryString;
@@ -129,7 +125,7 @@
                 process(workbook) {
                     const self = this;
                     workbook.SheetNames.forEach(function (sheetName) {
-                        const json = X.utils.sheet_to_json(workbook.Sheets[sheetName], {header: ["name", "imei", "agent", "buid", "protocol", "mac", "typeid", "screen", "disinfect", "power", "group"]});
+                        const json = X.utils.sheet_to_json(workbook.Sheets[sheetName], {header: ["name", "imei", "agent", "buid", "protocol", "mac", "typeid", "group"]});
 
                         fn = function () {
                             const obj = json.pop();
@@ -153,7 +149,7 @@
                         reader.onload = function (e) {
                             const data = e.target.result;
                             const z = X.read(data, {type: rABS ? 'binary' : 'array'});
-                            const csv = self.process(z);
+                            self.process(z);
                         }
                         reader.readAsBinaryString(file);
                     }

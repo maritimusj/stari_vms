@@ -15,6 +15,7 @@ use zovye\domain\Account;
 use zovye\domain\CommissionBalance;
 use zovye\domain\User;
 use zovye\model\accountModelObj;
+use zovye\model\agentModelObj;
 use zovye\Request;
 use zovye\Stats;
 use zovye\util\Util;
@@ -25,19 +26,15 @@ class commission
 {
 
     /**
-     * 广告联盟，公众号列表.
-     *
-     * @return array
+     * 广告联盟，公众号列表
      */
-    public static function sharedAccount(): array
+    public static function sharedAccount(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-
         common::checkCurrentUserPrivileges(['F_cm', 'F_pt']);
 
         //检查用户是否已同意平台协议
         if (settings('commission.agreement.freq')) {
-            $agreement = $user->get('commissionAgreementData', []);
+            $agreement = $agent->get('commissionAgreementData', []);
             if (empty($agreement['version']) || $agreement['version'] != settings('commission.agreement.version')) {
                 return err('用户必须要先同意平台协议后，才能使用该功能！');
             }
@@ -61,7 +58,6 @@ class commission
         ];
 
         if ($total > 0) {
-            $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
 
             $query->page($page, $page_size);
             $query->orderBy('id DESC');
@@ -93,25 +89,19 @@ class commission
     }
 
     /**
-     * 广告联盟，分配公众号.
-     *
-     * @return array
+     * 广告联盟，分配公众号
      */
-    public static function accountAssign(): array
+    public static function accountAssign(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-
         common::checkCurrentUserPrivileges(['F_cm', 'F_pt']);
 
         //检查用户是否已同意平台协议
         if (settings('commission.agreement.freq')) {
-            $agreement = $user->settings('commissionAgreementData', []);
+            $agreement = $agent->settings('commissionAgreementData', []);
             if (empty($agreement['version']) || $agreement['version'] != settings('commission.agreement.version')) {
                 return err('用户必须要先同意平台协议后，才能使用该功能！');
             }
         }
-
-        $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
 
         $uid = Request::trim('uid');
         if ($uid) {
@@ -140,19 +130,15 @@ class commission
     }
 
     /**
-     * 广告联盟，协议.
-     *
-     * @return array
+     * 广告联盟，协议
      */
-    public static function ptAgreement(): array
+    public static function ptAgreement(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-
         common::checkCurrentUserPrivileges(['F_cm', 'F_pt']);
 
         $agreement = settings('commission.agreement');
         if (Request::has('acquire')) {
-            $userData = $user->settings('commissionAgreementData', []);
+            $userData = $agent->settings('commissionAgreementData', []);
             if ($agreement['freq'] && $userData['version'] != $agreement['version']) {
                 return [
                     'must' => true,
@@ -166,7 +152,7 @@ class commission
             $version = Request::trim('version');
 
             if (Request::str('attitude') == 'yes' && $version == $agreement['version']) {
-                $user->updateSettings(
+                $agent->updateSettings(
                     'commissionAgreementData',
                     [
                         'datetime' => time(),
@@ -177,7 +163,7 @@ class commission
 
                 return ['msg' => '已同意！'];
             } else {
-                $user->remove('commissionAgreementData');
+                $agent->remove('commissionAgreementData');
 
                 return ['msg' => '已拒绝！'];
             }
@@ -235,15 +221,11 @@ class commission
         return ['data' => Stats::getUserCommissionStats($user)];
     }
 
-    public static function chargingMonthStats(): array
+    public static function chargingMonthStats(agentModelObj $agent): array
     {
         if (!App::isChargingDeviceEnabled()) {
             return err('没有开启这个功能！');
         }
-
-        $user = common::getAgentOrPartner();
-
-        $agent = $user->isPartner() ? $user->getPartnerAgent() : $user;
 
         $result = [];
 
@@ -268,20 +250,17 @@ class commission
             }
 
         } catch (Exception $e) {
+            return err($e->getMessage());
         }
 
         return $result;
     }
 
-    public static function chargingStats(): array
+    public static function chargingStats(agentModelObj $agent): array
     {
         if (!App::isChargingDeviceEnabled()) {
             return err('没有开启这个功能！');
         }
-
-        $user = common::getAgentOrPartner();
-
-        $agent = $user->isPartner() ? $user->getPartnerAgent() : $user;
 
         $balance = $agent->getCommissionBalance();
 

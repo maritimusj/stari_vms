@@ -8,6 +8,7 @@ namespace zovye\api\wx;
 
 use zovye\domain\Device;
 use zovye\domain\Group as ZovyeGroup;
+use zovye\model\agentModelObj;
 use zovye\model\device_groupsModelObj;
 use zovye\Request;
 use function zovye\err;
@@ -15,14 +16,10 @@ use function zovye\err;
 class group
 {
     /**
-     * 设备分组列表.
-     *
-     * @return array
+     * 设备分组列表
      */
-    public static function list(): array
+    public static function list(agentModelObj $agent): array
     {
-        $user = agent::getAgent();
-
         $page = max(1, Request::int('page'));
         $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
@@ -43,7 +40,7 @@ class group
             }
         } else {
             //代理商分组
-            $query->where(['agent_id' => $user->getAgentId()]);
+            $query->where(['agent_id' => $agent->getId()]);
         }
 
         $total = $query->count();
@@ -72,7 +69,7 @@ class group
 
                 $cond = ['group_id' => $entry->getId()];
                 if ($guid) {
-                    $cond['agent_id'] = $user->getAgentId();
+                    $cond['agent_id'] = $agent->getId();
                 }
 
                 $data['count'] = Device::query($cond)->count();
@@ -85,15 +82,11 @@ class group
     }
 
     /**
-     * 设备分组详情.
-     *
-     * @return array
+     * 设备分组详情
      */
-    public static function detail(): array
+    public static function detail(agentModelObj $agent): array
     {
         common::checkCurrentUserPrivileges('F_sp');
-
-        $user = agent::getAgent();
 
         //分组id
         $group_id = Request::int('id');
@@ -101,7 +94,7 @@ class group
         /** @var device_groupsModelObj $one */
         $one = ZovyeGroup::findOne([
             'id' => $group_id,
-            'agent_id' => $user->getAgentId(),
+            'agent_id' => $agent->getId(),
         ]);
 
         if (empty($one)) {
@@ -117,11 +110,9 @@ class group
     }
 
     /**
-     * 保存设备分组.
-     *
-     * @return array
+     * 保存设备分组
      */
-    public static function create(): array
+    public static function create(agentModelObj $agent): array
     {
         $title = Request::trim('title');
         $clr = Request::trim('clr');
@@ -130,13 +121,11 @@ class group
             return err('对不起，请填写分组名称！');
         }
 
-        $agent = agent::getAgent();
-
         $data = [
             'type_id' => ZovyeGroup::NORMAL,
             'title' => $title,
             'clr' => $clr,
-            'agent_id' => $agent->getAgentId(),
+            'agent_id' => $agent->getId(),
             'createtime' => time(),
         ];
 
@@ -149,11 +138,9 @@ class group
     }
 
     /**
-     * 更新设备分组.
-     *
-     * @return array
+     * 更新设备分组
      */
-    public static function update(): array
+    public static function update(agentModelObj $agent): array
     {
         $title = Request::trim('title');
         $clr = Request::trim('clr');
@@ -164,12 +151,10 @@ class group
             return err('对不起，请填写分组名称！');
         }
 
-        $user = agent::getAgent();
-
         /** @var device_groupsModelObj $one */
         $one = ZovyeGroup::findOne([
             'id' => $group_id,
-            'agent_id' => $user->getAgentId(),
+            'agent_id' => $agent->getId(),
         ]);
 
         if (empty($one)) {
@@ -187,22 +172,18 @@ class group
     }
 
     /**
-     * 删除广告.
-     *
-     * @return array
+     * 删除广告
      */
-    public static function delete(): array
+    public static function delete(agentModelObj $agent): array
     {
         common::checkCurrentUserPrivileges('F_gg');
-
-        $user = agent::getAgent();
 
         $group_id = Request::trim('id');
 
         /** @var device_groupsModelObj $one */
         $one = ZovyeGroup::findOne([
             'id' => $group_id,
-            'agent_id' => $user->getAgentId(),
+            'agent_id' => $agent->getId(),
         ]);
 
         if (empty($one)) {
@@ -216,13 +197,13 @@ class group
         return err('删除失败！');
     }
 
-    public static function getDeviceGroup($id, $typeid = ZovyeGroup::NORMAL): array
+    public static function getDeviceGroup($id, $type_id = ZovyeGroup::NORMAL): array
     {
         static $cache = [];
 
         if (empty($cache[$id])) {
             /** @var device_groupsModelObj $res */
-            $res = ZovyeGroup::get($id, $typeid);
+            $res = ZovyeGroup::get($id, $type_id);
             if ($res) {
                 $data = [
                     'id' => $res->getId(),
@@ -231,7 +212,7 @@ class group
                     'clr' => $res->getClr(),
                 ];
 
-                if ($typeid == ZovyeGroup::CHARGING) {
+                if ($type_id == ZovyeGroup::CHARGING) {
                     $data['description'] = $res->getDescription();
                     $data['address'] = $res->getAddress();
                     $data['loc'] = $res->getLoc();

@@ -7,24 +7,21 @@
 namespace zovye\api\wx;
 
 use zovye\App;
+use zovye\model\agentModelObj;
 use zovye\Request;
 use function zovye\err;
 use function zovye\settings;
 
 class goods
 {
-    public static function list(): array
+    public static function list(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-
         $params = [
             'page' => Request::int('page'),
             'pagesize' => Request::int('pagesize', DEFAULT_PAGE_SIZE),
             'keywords' => Request::trim('keywords', '', true),
             'default_goods' => true,
         ];
-
-        $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
 
         if (Request::bool('all')) {
             $params['agent_id'] = "*{$agent->getId()}";
@@ -41,13 +38,10 @@ class goods
         return $result;
     }
 
-    public static function detail(): array
+    public static function detail(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-
         $goods_id = Request::int('id');
 
-        $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
         $goods = \zovye\domain\Goods::get($goods_id);
         if (empty($goods) || $goods->getAgentId() !== $agent->getId()) {
             return err('找不到这个商品！');
@@ -56,10 +50,8 @@ class goods
         return \zovye\domain\Goods::data($goods_id, ['fullPath']);
     }
 
-    public static function delete(): array
+    public static function delete(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-
         common::checkCurrentUserPrivileges('F_sp');
 
         $goods = \zovye\domain\Goods::get(Request::int('id'));
@@ -67,7 +59,6 @@ class goods
             return err('找不到指定的商品');
         }
 
-        $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
         if ($goods->getAgentId() !== $agent->getId()) {
             return err('没有权限管理这个商品');
         }
@@ -83,13 +74,9 @@ class goods
         return err('商品删除失败！');
     }
 
-    public static function create(): array
+    public static function create(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-
         common::checkCurrentUserPrivileges('F_sp');
-
-        $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
 
         $s1 = 0;
         if (Request::bool(\zovye\domain\Goods::AllowFree)) {

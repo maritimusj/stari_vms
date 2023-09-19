@@ -12,39 +12,39 @@ use Exception;
 use zovye\App;
 use zovye\business\GoodsExpireAlert;
 use zovye\domain\Device;
+use zovye\model\agentModelObj;
 use zovye\model\goods_expire_alertModelObj;
+use zovye\model\userModelObj;
 use zovye\Request;
 use function zovye\err;
 use function zovye\is_error;
 
 class alert
 {
-    public static function update(): array
+    public static function update(userModelObj $user): array
     {
         if (!App::isGoodsExpireAlertEnabled()) {
             return err('没有启用这个功能！');
         }
 
-        $agent = common::getAgent(true);
-        if ($agent) {
+        if ($user->isAgent() || $user->isPartner()) {
+            $agent = $user->isAgent() ? $user->getAgent() : $user->getPartnerAgent();
             $device = \zovye\api\wx\device::getDevice(Request::str('id'), $agent);
             if (is_error($device)) {
                 return $device;
             }
         }
 
-        if (empty($agent)) {
-            $keeper = common::getKeeper(true);
-            if ($keeper) {
-                $device = Device::find(Request::str('id'), ['imei', 'shadow_id']);
-                if (empty($device)) {
-                    return err('找不到这个设备！');
-                }
+        if ($user->isKeeper()) {
+            $keeper = $user->getKeeper();
+            $device = Device::find(Request::str('id'), ['imei', 'shadow_id']);
+            if (empty($device)) {
+                return err('找不到这个设备！');
+            }
 
-                if ($device->getAgentId() != $keeper->getAgentId() ||
-                    !$device->hasKeeper($keeper, \zovye\domain\Keeper::OP)) {
-                    return err('没有权限！');
-                }
+            if ($device->getAgentId() != $keeper->getAgentId() ||
+                !$device->hasKeeper($keeper, \zovye\domain\Keeper::OP)) {
+                return err('没有权限！');
             }
         }
 
@@ -104,26 +104,28 @@ class alert
         return ['msg' => '保存成功！'];
     }
 
-    public static function count()
+    public static function count(userModelObj $user)
     {
         if (!App::isGoodsExpireAlertEnabled()) {
             return 0;
         }
 
-        $agent = common::getAgent(true);
-        if ($agent) {
+        if ($user->isAgent() || $user->isPartner()) {
+            $agent = $user->isAgent() ? $user->getAgent() : $user->getPartnerAgent();
+
             return GoodsExpireAlert::getAllExpiredForAgent($agent, true);
         }
 
-        $keeper = common::getKeeper(true);
-        if ($keeper) {
+        if ($user->isKeeper()) {
+            $keeper = $user->getKeeper();
+
             return GoodsExpireAlert::getAllExpiredForKeeper($keeper, true);
         }
 
         return 0;
     }
 
-    public static function list(): array
+    public static function list(userModelObj $user): array
     {
         if (!App::isGoodsExpireAlertEnabled()) {
             return [];
@@ -131,11 +133,11 @@ class alert
 
         $all = [];
 
-        $agent = common::getAgent(true);
-        if ($agent) {
+        if ($user->isAgent() || $user->isPartner()) {
+            $agent = $user->isAgent() ? $user->getAgent() : $user->getPartnerAgent();
             $all = GoodsExpireAlert::getAllExpiredForAgent($agent);
-        } else {
-            $keeper = common::getKeeper(true);
+        } elseif ($user->isKeeper()) {
+            $keeper = $user->getKeeper();
             if ($keeper) {
                 $all = GoodsExpireAlert::getAllExpiredForKeeper($keeper);
             }

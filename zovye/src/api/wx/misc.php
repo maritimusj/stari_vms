@@ -10,6 +10,7 @@ use DateTime;
 use Exception;
 use zovye\App;
 use zovye\domain\Goods;
+use zovye\model\agentModelObj;
 use zovye\model\userModelObj;
 use zovye\Request;
 use function zovye\err;
@@ -23,12 +24,9 @@ class misc
         return \zovye\domain\Device::query(['agent_id' => $agent->getId(), 'remain <' => $remainWarning])->count();
     }
 
-    public static function deviceStats(): array
+    public static function deviceStats(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-        $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
-
-        $total = $user->getDeviceCount();
+        $total = $agent->getDeviceCount();
         $all_devices = $total;
         $low_remain_total = self::getLowRemainDeviceTotal($agent);
 
@@ -50,11 +48,8 @@ class misc
         ];
     }
 
-    public static function orderStats(): array
+    public static function orderStats(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-        $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
-
         $query = \zovye\domain\Order::query();
         if (Request::bool('all')) {
             $ids = \zovye\domain\Agent::getAllSubordinates($agent);

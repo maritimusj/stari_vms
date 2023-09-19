@@ -36,15 +36,7 @@ use function zovye\request;
 class device
 {
     /**
-     * 格式化设备信息.
-     *
-     * @param userModelObj $user
-     * @param deviceModelObj $device
-     * @param bool $simple
-     * @param int $keeper_id
-     * @param bool $online
-     *
-     * @return array
+     * 格式化设备信息
      */
     public static function formatDeviceInfo(
         userModelObj $user,
@@ -278,17 +270,11 @@ class device
         return $result;
     }
 
-    public static function deviceNearBy(): array
+    public static function deviceNearBy(agentModelObj $agent): array
     {
-        return DeviceUtil::getNearBy(common::getAgent());
+        return DeviceUtil::getNearBy($agent);
     }
 
-    /**
-     * @param $id
-     * @param agentModelObj|null $owner
-     *
-     * @return array|deviceModelObj
-     */
     public static function getDevice($id, agentModelObj $owner = null)
     {
         if (empty($id)) {
@@ -333,11 +319,9 @@ class device
         return $device;
     }
 
-    public static function deviceReset(): array
+    public static function deviceReset(userModelObj $user): array
     {
         $device = null;
-
-        $user = common::getUser();
 
         if (!Locker::try("user:{$user->getId()}")) {
             return err('无法锁定用户，请稍后再试！');
@@ -448,7 +432,7 @@ class device
                     'name' => '全部设备',
                 ],
             ],
-            'goods_expired_alert' => alert::count(),
+            'goods_expired_alert' => alert::count($user),
         ];
 
         if ($params['date']) {
@@ -592,13 +576,10 @@ class device
     }
 
     /**
-     * 获取统计信息.
-     *
-     * @return array
+     * 获取统计信息
      */
-    public static function statistics(): array
+    public static function statistics(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
         $params = [
             'date' => request('date'),
             'guid' => request('guid'),
@@ -606,9 +587,9 @@ class device
             'w' => Request::str('w', 'goods'),
         ];
 
-        return CacheUtil::cachedCall(6, function () use ($user, $params) {
-            return self::getStatisticsData($user, $params);
-        }, $user->getId(), http_build_query($params));
+        return CacheUtil::cachedCall(6, function () use ($agent, $params) {
+            return self::getStatisticsData($agent, $params);
+        }, $agent->getId(), http_build_query($params));
     }
 
     public static function getDeviceOnline(): array
@@ -663,13 +644,6 @@ class device
         return [];
     }
 
-    /**
-     * @param userModelObj $user
-     * @param ModelObjFinder $query
-     * @param bool $onlineStatus
-     * @return array
-     * @throws Exception
-     */
     public static function getDeviceList(userModelObj $user, ModelObjFinder $query, bool $onlineStatus = null): array
     {
         if (Request::has('keyword')) {
@@ -784,10 +758,8 @@ class device
         return $result;
     }
 
-    public static function deviceTypes(): array
+    public static function deviceTypes(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-
         $params = [
             'page' => Request::int('page'),
             'pagesize' => Request::int('pagesize'),
@@ -795,17 +767,14 @@ class device
             'goods' => false,
         ];
 
-        $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
         $params['agent_id'] = $agent->getId();
         $params['platform_types'] = true;
 
         return DeviceTypes::getList($params);
     }
 
-    public static function deleteDeviceTypes(): array
+    public static function deleteDeviceTypes(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-
         common::checkCurrentUserPrivileges('F_xh');
 
         $device_type = DeviceTypes::get(Request::int('id'));
@@ -813,7 +782,6 @@ class device
             return err('找不到这个设备型号！');
         }
 
-        $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
         if ($device_type->getAgentId() != $agent->getId()) {
             return err('没有权限管理');
         }
@@ -835,14 +803,11 @@ class device
         return DeviceTypes::format($device_type);
     }
 
-    public static function updateDeviceTypes(): array
+    public static function updateDeviceTypes(agentModelObj $agent): array
     {
-        $data = Request::is_string('data') ? json_decode(urldecode(Request::str('data')), true) : [];
-
-        $user = common::getAgentOrPartner();
-        $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
-
         common::checkCurrentUserPrivileges('F_xh');
+
+        $data = Request::is_string('data') ? json_decode(urldecode(Request::str('data')), true) : [];
 
         $check_goods = function ($goods_id) use ($agent) {
             $goods = Goods::get($goods_id);
@@ -939,14 +904,8 @@ class device
         }
     }
 
-    public static function deviceSub(): array
+    public static function deviceSub(agentModelObj $agent): array
     {
-        $agent = common::getAgentOrPartner();
-
-        if ($agent->isPartner()) {
-            $agent = $agent->getPartnerAgent();
-        }
-
         //简单信息
         $simple = Request::bool('simple');
 
@@ -1049,24 +1008,20 @@ class device
     }
 
     /**
-     * 发送app重启消息.
-     *
-     * @return array
+     * 发送app重启消息
      */
-    public static function appRestart(): array
+    public static function appRestart(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-
         common::checkCurrentUserPrivileges('F_sb');
-        $app_id = Request::trim('id');
 
+        $app_id = Request::trim('id');
         if ($app_id) {
             $device = \zovye\domain\Device::getFromAppId($app_id);
             if (empty($device)) {
                 return err('找不到设备！');
             }
 
-            if (!$device->isOwnerOrSuperior($user)) {
+            if (!$device->isOwnerOrSuperior($agent)) {
                 return err('没有权限管理这个设备！');
             }
 
@@ -1078,10 +1033,8 @@ class device
         return err('操作失败，请联系管理员！');
     }
 
-    public static function openDoor(): array
+    public static function openDoor(userModelObj $user): array
     {
-        $user = common::getUser();
-
         if ($user->isAgent() || $user->isPartner()) {
             common::checkCurrentUserPrivileges('F_sb');
             $agent = $user->isAgent() ? $user->getAgent() : $user->getPartnerAgent();
@@ -1113,11 +1066,8 @@ class device
         return ['msg' => $msg];
     }
 
-    public static function deviceKeepers(): array
+    public static function deviceKeepers(agentModelObj $agent): array
     {
-        $user = common::getUser();
-
-        $agent = $user->isAgent() ? $user->getAgent() : $user->getPartnerAgent();
         $device = device::getDevice(Request::str('id'), $agent);
         if (is_error($device)) {
             return $device;

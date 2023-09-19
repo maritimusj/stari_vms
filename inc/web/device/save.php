@@ -115,9 +115,6 @@ $result = DBUtil::transactionDo(function () use ($id, &$device) {
             'uid' => Request::trim('BUID'),
             'mac' => Request::trim('MAC'),
             'motor' => Request::int('Motor'),
-            'screen' => Request::int('blueToothScreen') ? 1 : 0,
-            'power' => Request::int('blueToothPowerSupply') ? 1 : 0,
-            'disinfectant' => Request::int('blueToothDisinfectant') ? 1 : 0,
         ];
     }
 

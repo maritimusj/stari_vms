@@ -15,6 +15,7 @@ use zovye\domain\Goods;
 use zovye\domain\Order;
 use zovye\domain\User;
 use zovye\Job;
+use zovye\model\agentModelObj;
 use zovye\model\commission_balanceModelObj;
 use zovye\model\userModelObj;
 use zovye\Request;
@@ -27,10 +28,8 @@ class balance
 {
     /**
      * 佣金统计
-     *
-     * @return array
      */
-    public static function brief(): array
+    public static function brief(agentModelObj $agent): array
     {
         $result = [
             'balance' => [
@@ -45,10 +44,7 @@ class balance
             return $result;
         }
 
-        $user = common::getAgentOrPartner();
-
-        $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
-        if (App::isCommissionEnabled() && $agent) {
+        if (App::isCommissionEnabled()) {
             $agent_data = $agent->getAgentData();
             if ($agent_data['commission']['enabled']) {
                 //余额
@@ -148,107 +144,107 @@ class balance
         }
 
         $res = DBUtil::transactionDo(function () use ($amount, $memo, $balance, $user, $extra) {
-                //计算手续费
-                $fee = 0;
-                $config = settings('commission.withdraw.fee', []);
-                if ($config) {
-                    if (isset($config['permille'])) {
-                        $ratio = intval($config['permille']);
-                    } else {
-                        $ratio = intval($config['percent']) * 10;
-                    }
-
-                    if ($ratio > 0) {
-                        $fee = intval(round($amount * $ratio / 1000));
-
-                        if (!empty($config['min']) && $fee < $config['min']) {
-                            $fee = intval($config['min']);
-                        }
-
-                        if (!empty($config['max']) && $fee > $config['max']) {
-                            $fee = intval($config['max']);
-                        }
-                    }
+            //计算手续费
+            $fee = 0;
+            $config = settings('commission.withdraw.fee', []);
+            if ($config) {
+                if (isset($config['permille'])) {
+                    $ratio = intval($config['permille']);
+                } else {
+                    $ratio = intval($config['percent']) * 10;
                 }
 
-                $balance_total = $balance->total();
-                $fee_rec = null;
+                if ($ratio > 0) {
+                    $fee = intval(round($amount * $ratio / 1000));
 
-                if ($fee > 0) {
-                    //尽量从提现后的余额中扣除手续费，余额不够的话减少提现金额
-                    if ($fee + $amount > $balance_total) {
-                        $amount -= ($fee + $amount - $balance_total);
-                        if ($amount <= 0) {
-                            return err('扣除手续费后提现金额为零！');
-                        }
+                    if (!empty($config['min']) && $fee < $config['min']) {
+                        $fee = intval($config['min']);
                     }
 
-                    $fee_rec = $balance->change(-$fee, CommissionBalance::FEE);
-                    if (empty($fee_rec)) {
-                        return err('创建手续费失败！');
+                    if (!empty($config['max']) && $fee > $config['max']) {
+                        $fee = intval($config['max']);
                     }
                 }
-
-                //整额提现
-                $times = settings('commission.withdraw.times', 0);
-                if ($times > 0 && $amount % ($times * 100) > 0) {
-                    return err("提现金额必须是{$times}的整倍数！");
-                }
-
-                $r = $balance->change(
-                    -$amount,
-                    CommissionBalance::WITHDRAW,
-                    array_merge($extra, [
-                        'openid' => $user->getOpenid(),
-                        'mobile' => $user->getMobile(),
-                        'ip' => CLIENT_IP,
-                        'user-agent' => $_SERVER['HTTP_USER_AGENT'],
-                        'current' => $balance_total,
-                        'remain' => $balance_total - $amount - $fee,
-                        'fee' => $fee,
-                        'memo' => $memo,
-                    ])
-                );
-
-                if (empty($r)) {
-                    return err('创建提现数据失败！');
-                }
-
-                if ($fee_rec) {
-                    if (!$r->update(
-                        [
-                            'gcr' => [$fee_rec->getId()],
-                        ]
-                    )) {
-                        return err('更新提现手续费数据失败！');
-                    }
-
-                    if (!$fee_rec->update(
-                        [
-                            'openid' => $user->getOpenid(),
-                            'gid' => $r->getId(), //gid => ground id,相关联的记录以主纪录ＩＤ为组ＩＤ
-                        ]
-                    )) {
-                        return err('更新手续费数据失败！');
-                    }
-                }
-
-                $msg = '提现申请提交成功，请等待管理员审核！';
-
-                Job::withdraw($user->getId());
-
-                //自动打款
-                if (settings('commission.withdraw.pay_type') == WITHDRAW_AUTO) {
-                    $result = CommissionBalance::MCHPay($r);
-                    if (is_error($result)) {
-                        return err('自动打款失败，请联系管理员！');
-                    } else {
-                        $msg = '成功，提现已经完成，请注意确认收款！';
-                    }
-                }
-
-                return ['message' => $msg];
             }
+
+            $balance_total = $balance->total();
+            $fee_rec = null;
+
+            if ($fee > 0) {
+                //尽量从提现后的余额中扣除手续费，余额不够的话减少提现金额
+                if ($fee + $amount > $balance_total) {
+                    $amount -= ($fee + $amount - $balance_total);
+                    if ($amount <= 0) {
+                        return err('扣除手续费后提现金额为零！');
+                    }
+                }
+
+                $fee_rec = $balance->change(-$fee, CommissionBalance::FEE);
+                if (empty($fee_rec)) {
+                    return err('创建手续费失败！');
+                }
+            }
+
+            //整额提现
+            $times = settings('commission.withdraw.times', 0);
+            if ($times > 0 && $amount % ($times * 100) > 0) {
+                return err("提现金额必须是{$times}的整倍数！");
+            }
+
+            $r = $balance->change(
+                -$amount,
+                CommissionBalance::WITHDRAW,
+                array_merge($extra, [
+                    'openid' => $user->getOpenid(),
+                    'mobile' => $user->getMobile(),
+                    'ip' => CLIENT_IP,
+                    'user-agent' => $_SERVER['HTTP_USER_AGENT'],
+                    'current' => $balance_total,
+                    'remain' => $balance_total - $amount - $fee,
+                    'fee' => $fee,
+                    'memo' => $memo,
+                ])
+            );
+
+            if (empty($r)) {
+                return err('创建提现数据失败！');
+            }
+
+            if ($fee_rec) {
+                if (!$r->update(
+                    [
+                        'gcr' => [$fee_rec->getId()],
+                    ]
+                )) {
+                    return err('更新提现手续费数据失败！');
+                }
+
+                if (!$fee_rec->update(
+                    [
+                        'openid' => $user->getOpenid(),
+                        'gid' => $r->getId(), //gid => ground id,相关联的记录以主纪录ＩＤ为组ＩＤ
+                    ]
+                )) {
+                    return err('更新手续费数据失败！');
+                }
+            }
+
+            $msg = '提现申请提交成功，请等待管理员审核！';
+
+            Job::withdraw($user->getId());
+
+            //自动打款
+            if (settings('commission.withdraw.pay_type') == WITHDRAW_AUTO) {
+                $result = CommissionBalance::MCHPay($r);
+                if (is_error($result)) {
+                    return err('自动打款失败，请联系管理员！');
+                } else {
+                    $msg = '成功，提现已经完成，请注意确认收款！';
+                }
+            }
+
+            return ['message' => $msg];
+        }
         );
 
         if (is_error($res)) {
@@ -262,42 +258,25 @@ class balance
     }
 
     /**
-     * 提现.
-     *
-     * @return array
+     * 提现
      */
-    public static function withdraw(): array
+    public static function withdraw(agentModelObj $agent): array
     {
         common::checkCurrentUserPrivileges('F_cm');
 
-        $user = common::getAgentOrPartner();
-
-        $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
-        if ($agent) {
-            if (!empty(settings('commission.withdraw.bank_card'))) {
-                if (empty($agent->settings('agentData.bank'))) {
-                    return err('请先绑定银行卡！');
-                }
+        if (!empty(settings('commission.withdraw.bank_card'))) {
+            if (empty($agent->settings('agentData.bank'))) {
+                return err('请先绑定银行卡！');
             }
-
-            if ($agent->isPaymentConfigEnabled()) {
-                return err('提现申请被拒绝，请联系管理员！');
-            }
-
-            return balance::balanceWithdraw($agent, Request::float('amount', 0, 2) * 100);
         }
 
-        return err('提现失败，请联系客服！');
+        if ($agent->isPaymentConfigEnabled()) {
+            return err('提现申请被拒绝，请联系管理员！');
+        }
+
+        return balance::balanceWithdraw($agent, Request::float('amount', 0, 2) * 100);
     }
 
-    /**
-     * @param userModelObj $user
-     * @param string $type
-     * @param int $page
-     * @param int $page_size
-     *
-     * @return array
-     */
     public static function getUserBalanceLog(
         userModelObj $user,
         string $type,
@@ -416,27 +395,18 @@ class balance
     }
 
     /**
-     * 记录.
-     *
-     * @return array
+     * 记录
      */
-    public static function log(): array
+    public static function log(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-
         common::checkCurrentUserPrivileges('F_cm');
 
-        $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
-        if ($agent) {
-            return balance::getUserBalanceLog(
-                $agent,
-                Request::str('type'),
-                Request::int('page'),
-                Request::int('pagesize')
-            );
-        }
-
-        return err('获取列表失败！');
+        return balance::getUserBalanceLog(
+            $agent,
+            Request::str('type'),
+            Request::int('page'),
+            Request::int('pagesize')
+        );
     }
 
     public static function userBalanceLog(): array

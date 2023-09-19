@@ -25,6 +25,7 @@ use zovye\domain\Replenish;
 use zovye\domain\User;
 use zovye\JSON;
 use zovye\Log;
+use zovye\model\agentModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\keeperModelObj;
 use zovye\model\replenishModelObj;
@@ -44,23 +45,7 @@ use function zovye\settings;
 class keeper
 {
     /**
-     *
-     * @return keeperModelObj
-     */
-    public static function getKeeper(): keeperModelObj
-    {
-        $user = common::getUser();
-        if (!\zovye\domain\Keeper::exists($user)) {
-            JSON::fail(['msg' => '不是运营人员！']);
-        }
-
-        return $user->getKeeper();
-    }
-
-    /**
-     * 运营人员登录.
-     *
-     * @return array
+     * 运营人员登录
      */
     public static function keeperLogin(): array
     {
@@ -178,14 +163,10 @@ class keeper
     }
 
     /**
-     * 保存运营人员信息.
-     *
-     * @return array
+     * 保存运营人员信息
      */
-    public static function setKeeper(): array
+    public static function setKeeper(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-
         common::checkCurrentUserPrivileges('F_yy');
 
         $id = Request::int('id');
@@ -201,7 +182,7 @@ class keeper
                 return err('手机号码已经被其它运营人员使用！');
             }
             /** @var keeperModelObj $keeper */
-            $keeper = \zovye\domain\Keeper::findOne(['id' => $id, 'agent_id' => $user->getAgentId()]);
+            $keeper = \zovye\domain\Keeper::findOne(['id' => $id, 'agent_id' => $agent->getId()]);
             if ($keeper) {
                 if ($name != $keeper->getName()) {
                     $keeper->setName($name);
@@ -216,7 +197,7 @@ class keeper
             }
             /** @var keeperModelObj $keeper */
             $keeper = \zovye\domain\Keeper::create([
-                'agent_id' => $user->getAgentId(),
+                'agent_id' => $agent->getAgentId(),
                 'name' => $name,
                 'mobile' => $mobile,
             ]);
@@ -238,26 +219,22 @@ class keeper
     }
 
     /**
-     * 删除运营人员.
-     *
-     * @return array
+     * 删除运营人员
      */
-    public static function deleteKeeper(): array
+    public static function deleteKeeper(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-
         common::checkCurrentUserPrivileges('F_yy');
 
-        return DBUtil::transactionDo(function () use ($user) {
+        return DBUtil::transactionDo(function () use ($agent) {
             $id = Request::int('id');
 
             /** @var keeperModelObj $keeper */
-            $keeper = \zovye\domain\Keeper::findOne(['id' => $id, 'agent_id' => $user->getAgentId()]);
+            $keeper = \zovye\domain\Keeper::findOne(['id' => $id, 'agent_id' => $agent->getId()]);
             if (empty($keeper)) {
                 return err('找不到这个运营人员！');
             }
 
-            $query = Device::keeper($keeper)->where(['agent_id' => $user->getAgentId()]);
+            $query = Device::keeper($keeper)->where(['agent_id' => $agent->getId()]);
 
             /** @var deviceModelObj $entry */
             foreach ($query->findAll() as $entry) {
@@ -278,14 +255,10 @@ class keeper
     }
 
     /**
-     * 获取运营人员列表.
-     *
-     * @return array
+     * 获取运营人员列表
      */
-    public static function keepers(): array
+    public static function keepers(agentModelObj $agent): array
     {
-        $agent = common::getAgentOrPartner();
-
         common::checkCurrentUserPrivileges('F_yy');
 
         if (Request::has('deviceId')) {
@@ -303,7 +276,7 @@ class keeper
         }
 
         $keepers = [];
-        $query = \zovye\domain\Keeper::query(['agent_id' => $agent->getAgentId()]);
+        $query = \zovye\domain\Keeper::query(['agent_id' => $agent->getId()]);
 
         if (Request::has('keyword')) {
             $keyword = Request::trim('keyword');
@@ -334,17 +307,15 @@ class keeper
         return $keepers;
     }
 
-    public static function removeDevicesFromKeeper(): array
+    public static function removeDevicesFromKeeper(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-
         common::checkCurrentUserPrivileges('F_yy');
 
-        return DBUtil::transactionDo(function () use ($user) {
+        return DBUtil::transactionDo(function () use ($agent) {
             $keeper_id = Request::int('keeperid');
 
             $keeper = \zovye\domain\Keeper::get($keeper_id);
-            if (empty($keeper) || $keeper->getAgentId() != $user->getAgentId()) {
+            if (empty($keeper) || $keeper->getAgentId() != $agent->getId()) {
                 return err('找不到这个运营人员！');
             }
 
@@ -356,7 +327,7 @@ class keeper
             if (!empty($device_ids)) {
                 $query = Device::query([
                     'keeper_id' => $keeper->getId(),
-                    'agent_id' => $user->getAgentId(),
+                    'agent_id' => $agent->getId(),
                     'imei' => $device_ids,
                 ]);
 
@@ -371,17 +342,13 @@ class keeper
     }
 
     /**
-     * 分配设备到指定的运营人员.
-     *
-     * @return array
+     * 分配设备到指定的运营人员
      */
-    public static function assignDevicesToKeeper(): array
+    public static function assignDevicesToKeeper(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-
         common::checkCurrentUserPrivileges('F_yy');
 
-        return DBUtil::transactionDo(function () use ($user) {
+        return DBUtil::transactionDo(function () use ($agent) {
             $device_ids = [];
 
             if (Request::is_array('devices')) {
@@ -391,7 +358,7 @@ class keeper
             if (Request::is_array('groups')) {
                 $group_ids = array_values(Request::array('groups'));
                 if ($group_ids) {
-                    $query = Device::query(['group_id' => $group_ids, 'agent_id' => $user->getAgentId()]);
+                    $query = Device::query(['group_id' => $group_ids, 'agent_id' => $agent->getId()]);
 
                     /** @var deviceModelObj $entry */
                     foreach ($query->findAll() as $entry) {
@@ -437,12 +404,12 @@ class keeper
 
             $keeper_id = Request::int('keeperid');
             $keeper = \zovye\domain\Keeper::get($keeper_id);
-            if (empty($keeper) || $keeper->getAgentId() != $user->getAgentId()) {
+            if (empty($keeper) || $keeper->getAgentId() != $agent->getId()) {
                 return err('找不到这个运营人员！');
             }
 
             $query = Device::query([
-                'agent_id' => $user->getAgentId(),
+                'agent_id' => $agent->getId(),
                 'imei' => $device_ids,
             ]);
 
@@ -463,13 +430,10 @@ class keeper
     }
 
     /**
-     * 提现.
-     *
-     * @return array
+     * 提现
      */
-    public static function keeperWithdraw(): array
+    public static function keeperWithdraw(keeperModelObj $keeper): array
     {
-        $keeper = keeper::getKeeper();
         $user = $keeper->getUser();
 
         if (!$user) {
@@ -503,15 +467,12 @@ class keeper
     }
 
     /**
-     * 获取银行信息.
-     *
-     * @return array
+     * 获取银行信息
      */
-    public static function getKeeperBank(): array
+    public static function getKeeperBank(keeperModelObj $keeper): array
     {
         $result = [];
 
-        $keeper = keeper::getKeeper();
         $user = $keeper->getUser();
         if ($user) {
             return common::getUserBank($user);
@@ -521,13 +482,10 @@ class keeper
     }
 
     /**
-     * 设置提现银行信息.
-     *
-     * @return array
+     * 设置提现银行信息
      */
-    public static function setKeeperBank(): array
+    public static function setKeeperBank(keeperModelObj $keeper): array
     {
-        $keeper = keeper::getKeeper();
         $user = $keeper->getUser();
         if ($user) {
             return common::setUserBank($user);
@@ -536,9 +494,8 @@ class keeper
         return err('无法保存，请联系管理员！');
     }
 
-    public static function getOrders(): array
+    public static function getOrders(keeperModelObj $keeper): array
     {
-        $keeper = keeper::getKeeper();
         $condition = [
             'agent_id' => $keeper->getAgentId(),
         ];
@@ -562,14 +519,10 @@ class keeper
     }
 
     /**
-     * 运营人员统计信息.
-     *
-     * @return array
+     * 运营人员统计信息
      */
-    public static function brief(): array
+    public static function brief(keeperModelObj $keeper): array
     {
-        $keeper = keeper::getKeeper();
-
         $result = [
             'devices' => [
                 'low' => 0,
@@ -581,11 +534,11 @@ class keeper
                 'all' => 0,
             ],
             'logs' => [],
-            'goods_expired_alert' => alert::count(),
         ];
 
         $user = $keeper->getUser();
         if ($user) {
+            $result['goods_expired_alert'] = alert::count($user);
             $result['balance_formatted'] = number_format($user->getCommissionBalance()->total() / 100, 2, '.', '');
 
             if (App::isPromoterEnabled()) {
@@ -690,26 +643,18 @@ class keeper
         return $result;
     }
 
-    /**
-     * @return array
-     * @throws Exception
-     */
-    public static function deviceList(): array
+    public static function deviceList(keeperModelObj $keeper): array
     {
-        $keeper = keeper::getKeeper();
         $query = Device::keeper($keeper);
 
         return \zovye\api\wx\device::getDeviceList($keeper->getUser(), $query);
     }
 
     /**
-     * 记录.
-     *
-     * @return array
+     * 记录
      */
-    public static function balanceLog(): array
+    public static function balanceLog(keeperModelObj $keeper): array
     {
-        $keeper = keeper::getKeeper();
         $user = $keeper->getUser();
 
         if (!$user) {
@@ -724,14 +669,10 @@ class keeper
     }
 
     /**
-     * 运营人员缺货设备.
-     *
-     * @return array
+     * 运营人员缺货设备
      */
-    public static function lowDevices(): array
+    public static function lowDevices(keeperModelObj $keeper): array
     {
-        $keeper = keeper::getKeeper();
-
         if (Request::has('remain')) {
             $remainWarning = max(1, Request::int('remain'));
         } else {
@@ -777,14 +718,10 @@ class keeper
     }
 
     /**
-     * 运营人员故障设备.
-     *
-     * @return array
+     * 运营人员故障设备
      */
-    public static function errorDevices(): array
+    public static function errorDevices(keeperModelObj $keeper): array
     {
-        $keeper = keeper::getKeeper();
-
         $page = max(1, Request::int('page'));
         $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
 
@@ -819,14 +756,10 @@ class keeper
     }
 
     /**
-     * 运营人员设备详情.
-     *
-     * @return array
+     * 运营人员设备详情
      */
-    public static function deviceDetail(): array
+    public static function deviceDetail(keeperModelObj $keeper): array
     {
-        $keeper = keeper::getKeeper();
-
         $device = Device::find(request('id'), ['imei', 'shadow_id']);
         if (empty($device)) {
             return err('找不到这个设备！');
@@ -910,15 +843,10 @@ class keeper
     }
 
     /**
-     * 运营人员补货.
-     *
-     * @return array
-     * @throws Exception
+     * 运营人员补货
      */
-    public static function deviceReset(): array
+    public static function deviceReset(keeperModelObj $keeper): array
     {
-        $keeper = keeper::getKeeper();
-
         if (!Locker::try("keeper:{$keeper->getId()}")) {
             return err('无法锁定用户，请稍后再试！');
         }
@@ -1087,14 +1015,10 @@ class keeper
     }
 
     /**
-     * 运营人员测试设备.
-     *
-     * @return array
+     * 运营人员测试设备
      */
-    public static function deviceTest(): array
+    public static function deviceTest(keeperModelObj $keeper): array
     {
-        $keeper = keeper::getKeeper();
-
         $device = Device::find(request('id'), ['imei', 'shadow_id']);
         if (empty($device)) {
             return err('找不到这个设备！');
@@ -1143,19 +1067,9 @@ class keeper
 
     /**
      * 运营人员统计
-     *
-     * @param $keeper keeperModelObj|null
-     *
-     * @return array
-     *
-     * @throws
      */
-    public static function stats(keeperModelObj $keeper = null): array
+    public static function stats(keeperModelObj $keeper): array
     {
-        if (is_null($keeper)) {
-            $keeper = keeper::getKeeper();
-        }
-
         list($y, $m, $d) = explode('-', request('date'), 3);
         if (!checkdate($m, $d ?: 1, $y)) {
             return err('时间不正确！');
@@ -1247,13 +1161,9 @@ class keeper
 
     /**
      * 查看运营人员统计
-     *
-     * @return array
      */
-    public static function viewKeeperStats(): array
+    public static function viewKeeperStats(agentModelObj $agent): array
     {
-        $user = common::getAgentOrPartner();
-
         common::checkCurrentUserPrivileges('F_yy');
 
         $id = Request::int('id');
@@ -1264,7 +1174,7 @@ class keeper
                 return err('找不到这个运营人员！');
             }
 
-            if ($keeper->getAgentId() != $user->getAgentId()) {
+            if ($keeper->getAgentId() != $agent->getId()) {
                 return err('代理商不匹配！');
             }
 
@@ -1274,13 +1184,11 @@ class keeper
         return err('请求出错！');
     }
 
-    public static function orderRefund(): array
+    public static function orderRefund(keeperModelObj $keeper): array
     {
         if (!settings('agent.order.refund')) {
             return err('不允许退款，请联系管理员！');
         }
-
-        $keeper = keeper::getKeeper();
 
         $order_id = Request::int('orderid');
 
@@ -1309,10 +1217,8 @@ class keeper
         return ['msg' => '退款成功！'];
     }
 
-    public static function userStats(): array
+    public static function userStats(keeperModelObj $keeper): array
     {
-        $keeper = keeper::getKeeper();
-
         $user = $keeper->getUser();
         if (empty($user)) {
             return [];
@@ -1361,10 +1267,8 @@ class keeper
         return agent::getUserStats($user->getOpenid(), $begin->getTimestamp(), $end->getTimestamp(), $cond);
     }
 
-    public static function commissionStats(): array
+    public static function commissionStats(keeperModelObj $keeper): array
     {
-        $keeper = keeper::getKeeper();
-
         $user = $keeper->getUser();
         if (empty($user)) {
             return [];

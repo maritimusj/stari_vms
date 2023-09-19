@@ -135,7 +135,7 @@ class misc
 
     public static function updateUserQRCode(userModelObj $user, $type): array
     {
-        $res = Helper::upload('pic', $type);
+        $res = Helper::upload('pic');
         if (is_error($res)) {
             return $res;
         }

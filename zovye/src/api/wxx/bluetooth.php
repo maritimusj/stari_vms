@@ -952,9 +952,9 @@ class bluetooth
             $user_id = $result->alipay_system_oauth_token_response->user_id;
             $user = User::get($user_id, true);
 
-            $user_info = [];
+            $result = [];
             if ($user) {
-                $user_info['user_info'] = [
+                $result['user_info'] = [
                     'nickname' => $user->getNickname(),
                     'avatar' => $user->getAvatar(),
                 ];
@@ -976,10 +976,10 @@ class bluetooth
             ];
 
             if (LoginData::create($data)) {
-                $user_info['user_id'] = $token;
+                $result['user_id'] = $token;
             }
 
-            return $user_info;
+            return $result;
 
         } catch (Exception $e) {
             return err('获取用户信息失败：'.$e->getMessage());

@@ -24,6 +24,9 @@ use function zovye\is_error;
 
 class order
 {
+    /**
+     * 代理商和运营人员都要请求这个接口
+     */
     public static function detail(userModelObj $user): array
     {
         unset($user);

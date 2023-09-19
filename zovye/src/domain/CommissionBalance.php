@@ -52,7 +52,7 @@ class CommissionBalance extends State
     protected static $unknown = 'n/a';
 
     protected static $title = [
-        self::ORDER_FREE => '免费赠送佣金',
+        self::ORDER_FREE => '免费领取佣金',
         self::ORDER_BALANCE => '积分兑换佣金',
         self::ORDER_WX_PAY => '支付购买分成',
         self::WITHDRAW => '佣金提现',

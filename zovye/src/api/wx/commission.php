@@ -210,10 +210,6 @@ class commission
             return err('找不到这个用户！');
         }
 
-        if ($user->isPartner()) {
-            $user = $user->getPartnerAgent();
-        }
-
         return ['data' => Stats::getUserCommissionStats($user)];
     }
 

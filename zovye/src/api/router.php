@@ -21,37 +21,41 @@ class router
     {
         $fn = $map[$op];
         if (is_callable($fn)) {
-            try {
-                $args = [];
-                $ref = new ReflectionMethod($fn[0], $fn[1]);
-                foreach ($ref->getParameters() as $arg) {
-                    $type = $arg->getType();
-                    if ($type->getName() == userModelObj::class) {
-                        if ($arg->getName() == 'wx_app_user') {
-                            $args[] = common::getWXAppUser();
-                        } elseif ($arg->getName() == 'ali_user') {
-                            $args[] = common::getUser(LoginData::ALI_APP_USER);
-                        } else {
-                            $args[] = common::getUser();
-                        }
-                    } elseif ($type->getName() == agentModelObj::class) {
-                        $args[] = common::getAgent();
-                    } elseif ($type->getName() == keeperModelObj::class) {
-                        $args[] = common::getKeeper();
-                    } else {
-                        trigger_error("can't resolve args of method", E_USER_ERROR);
-                    }
-                }
-                $result = call_user_func_array($fn, $args);
-                JSON::result($result);
-            } catch (Exception $e) {
-                Log::error('router', [
-                    'error' => $e->getMessage(),
-                ]);
-                JSON::fail($e);
-            }
+            JSON::fail('不正确的调用:'.$op);
         }
 
-        JSON::fail('不正确的调用:'.$op);
+        try {
+            $args = [];
+            $ref = new ReflectionMethod($fn[0], $fn[1]);
+            foreach ($ref->getParameters() as $arg) {
+                $type = $arg->getType();
+                if ($type->getName() == userModelObj::class) {
+                    if ($arg->getName() == 'wx_app_user') {
+                        $args[] = common::getWXAppUser();
+                    } elseif ($arg->getName() == 'ali_user') {
+                        $args[] = common::getUser(LoginData::ALI_APP_USER);
+                    } else {
+                        $args[] = common::getUser();
+                    }
+                } elseif ($type->getName() == agentModelObj::class) {
+                    $args[] = common::getAgent();
+                } elseif ($type->getName() == keeperModelObj::class) {
+                    $args[] = common::getKeeper();
+                } else {
+                    trigger_error("can't resolve args of method", E_USER_ERROR);
+                }
+            }
+
+            $result = call_user_func_array($fn, $args);
+            JSON::result($result);
+
+        } catch (Exception $e) {
+
+            Log::error('router', [
+                'error' => $e->getMessage(),
+            ]);
+
+            JSON::fail($e);
+        }
     }
 }

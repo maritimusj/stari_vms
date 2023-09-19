@@ -147,7 +147,7 @@ function prepare(string $order_no)
     }
 
     //事件：设备已锁定
-    EventBus::on('device.locked', $eventData);
+    EventBus::on(EventBus::Locked, $eventData);
 
     $log_data = [
         'user' => $user->profile(),
@@ -191,7 +191,7 @@ function prepare(string $order_no)
     });
 
     //事件：出货成功
-    EventBus::on('device.openSuccess', $params);
+    EventBus::on(EventBus::OpenSuccess, $params);
 
     $device->updateAppRemain();
 
@@ -284,7 +284,7 @@ function createOrder(array $params, string $order_no, array $goods): array
 
     try {
         //事件：订单已经创建
-        EventBus::on('device.orderCreated', $params);
+        EventBus::on(EventBus::OrderCreated, $params);
     } catch (Exception $e) {
         return [err($e->getMessage())];
     }
@@ -327,7 +327,7 @@ function createOrder(array $params, string $order_no, array $goods): array
     if (is_error($result)) {
         try {
             //事件：出货失败
-            EventBus::on('device.openFail', $params);
+            EventBus::on(EventBus::OpenFail, $params);
         } catch (Exception $e) {
         }
     } else {

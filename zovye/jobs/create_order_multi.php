@@ -139,7 +139,7 @@ function process($order_no): bool
     }
 
     //事件：设备已锁定
-    EventBus::on('device.locked', [
+    EventBus::on(EventBus::Locked, [
         'device' => $device,
         'user' => $user,
     ]);
@@ -219,7 +219,7 @@ function process($order_no): bool
         $device->appShowMessage('出货完成，欢迎下次使用！');
 
         //事件：出货成功，目前用于统计数据
-        EventBus::on('device.openSuccess', [
+        EventBus::on(EventBus::OpenSuccess, [
             'device' => $device,
             'user' => $user,
             'order' => $order,
@@ -341,7 +341,7 @@ function createOrder(
     }
 
     //事件：订单已经创建
-    EventBus::on('device.orderCreated', [
+    EventBus::on(EventBus::OrderCreated, [
         'device' => $device,
         'user' => $user,
         'order' => $order,

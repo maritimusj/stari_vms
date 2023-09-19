@@ -12,6 +12,12 @@ use ReflectionMethod;
 
 class EventBus
 {
+    const BeforeLock = 'device.beforeLock';
+    const Locked = 'device.locked';
+    const OpenSuccess = 'device.openSuccess';
+    const OpenFail = 'device.openFail';
+    const OrderCreated = 'device.orderCreated';
+    
     static $events_data = [];
 
     /**

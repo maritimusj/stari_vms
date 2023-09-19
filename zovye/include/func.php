@@ -263,11 +263,11 @@ function setArray(array &$array, $key, $val = null): array
 function getArray($array, $key = '', $default = null, $convert = true)
 {
     if (!is_array($array) || empty($key)) {
-        return ifEmpty($array, $default);
+        return ifEmpty($array, $default, $convert);
     }
 
     if (is_scalar($key) && isset($array[$key])) {
-        return $array[$key];
+        return ifEmpty($array[$key], $default, $convert);
     }
 
     $val = $array;

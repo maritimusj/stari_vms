@@ -273,15 +273,14 @@ class common
             } else {
                 return 'n/a';
             }
-        }
-        );
+        });
 
         if ($get_result) {
             return $res;
-        } else {
-            if (!$res) {
-                JSON::fail('没有权限访问这个功能，请联系管理员！');
-            }
+        }
+
+        if (!$res) {
+            JSON::fail('没有权限访问这个功能，请联系管理员！');
         }
 
         return false;

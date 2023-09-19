@@ -67,8 +67,6 @@ class EventBus
 
     /**
      * 通知处理程序进行事件处理
-     * @param $name
-     * @param array $params
      * @throws Exception
      */
     public static function on($name, array $params = [])
@@ -87,9 +85,6 @@ class EventBus
     }
 
     /**
-     * @param $classname
-     * @param $method_name
-     * @param array $params
      * @throws
      */
     protected static function handle($classname, $method_name, array $params = [])
@@ -110,11 +105,6 @@ class EventBus
         }
     }
 
-    /**
-     * @param array $params
-     * @param ReflectionClass $class
-     * @return mixed
-     */
     protected static function match(array $params, ReflectionClass $class)
     {
         foreach ($params as $entry) {

@@ -1937,7 +1937,7 @@ include './index.php';
 
     public static function upload($name, $type = 'image')
     {
-        if ($_FILES[$name]) {
+        if (empty($_FILES[$name])) {
             return err('上传失败！');
         }
 

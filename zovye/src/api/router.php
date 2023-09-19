@@ -20,7 +20,7 @@ class router
     public static function exec($op, $map)
     {
         $fn = $map[$op];
-        if (is_callable($fn)) {
+        if (!is_callable($fn)) {
             JSON::fail('不正确的调用:'.$op);
         }
 

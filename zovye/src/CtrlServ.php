@@ -33,13 +33,6 @@ class CtrlServ
         self::$config = $config;
     }
 
-    /**
-     * @param $app_key
-     * @param $app_secret
-     * @param $nostr
-     * @param $payload
-     * @return string
-     */
     public static function makeNotifierSign($app_key, $app_secret, $nostr, $payload): string
     {
         return hash_hmac("sha256", "$app_key$nostr$payload", $app_secret);
@@ -47,11 +40,6 @@ class CtrlServ
 
     /**
      * 通知设备mcb更新设置
-     * @param $mcbUID
-     * @param $code
-     * @param string $op
-     * @param array $payloadData
-     * @return bool
      */
     public static function mcbNotify($mcbUID, $code, string $op = 'params', array $payloadData = []): bool
     {
@@ -78,12 +66,6 @@ class CtrlServ
 
     /**
      * 与控制中心交互 api版本v1
-     * @param string $path
-     * @param array $params
-     * @param mixed $body
-     * @param string $contentType
-     * @param string $method
-     * @return mixed
      */
     public static function query(
         string $path = '',
@@ -97,13 +79,6 @@ class CtrlServ
 
     /**
      * 与控制中心交互
-     * @param $version
-     * @param $path
-     * @param array $params
-     * @param mixed $body
-     * @param string $contentType
-     * @param string $method
-     * @return mixed
      */
     public static function queryData(
         $version,
@@ -187,11 +162,6 @@ class CtrlServ
 
     /**
      * 生成控制中心通信签名
-     * @param $app_key
-     * @param $app_secret
-     * @param $method
-     * @param array $params
-     * @return string
      */
     public static function makeCtrlServerSignV1($app_key, $app_secret, $method, array $params): string
     {
@@ -206,10 +176,6 @@ class CtrlServ
 
     /**
      * 生成控制中心通信签名
-     * @param $app_key
-     * @param $app_secret
-     * @param string $nostr
-     * @return string
      */
     public static function makeCtrlServerSign($app_key, $app_secret, string $nostr = TIMESTAMP): string
     {
@@ -250,10 +216,6 @@ class CtrlServ
 
     /**
      * 通知设备app更新设置
-     * @param $app_id
-     * @param string $op
-     * @param array $payload
-     * @return bool
      */
     public static function appNotify($app_id, string $op = 'config', array $payload = []): bool
     {
@@ -313,11 +275,6 @@ class CtrlServ
 
     /**
      * 根据设备分配数据，计算需要通知的APP, 并推送通知
-     * @param array $original 原分配数据
-     * @param array $data 新的分配数据
-     * @param string $op 命令
-     * @param array $payload 数据
-     * @return bool
      */
     public static function appNotifyAll(
         array $original,
@@ -398,8 +355,6 @@ class CtrlServ
 
     /**
      * 检查job参数的签名
-     * @param array $params
-     * @return bool
      */
     public static function checkJobSign(array $params = []): bool
     {
@@ -420,8 +375,6 @@ class CtrlServ
 
     /**
      * 生成签名
-     * @param array $params
-     * @return string
      */
     public static function makeSign(array $params = []): string
     {
@@ -444,10 +397,6 @@ class CtrlServ
 
     /**
      * 创建一个延时回调任务
-     * @param $op
-     * @param array $params
-     * @param int $delay
-     * @return bool|mixed
      */
     public static function scheduleDelayJob($op, array $params = [], int $delay = 0)
     {
@@ -461,10 +410,6 @@ class CtrlServ
 
     /**
      * 加入一个延时回调任务
-     * @param $delay
-     * @param $url
-     * @param string $data
-     * @return mixed
      */
     public static function httpDelayCallback($delay, $url, string $data = '')
     {
@@ -480,10 +425,6 @@ class CtrlServ
 
     /**
      * 创建一个优先级回调任务
-     * @param $op
-     * @param array $params
-     * @param string $level
-     * @return mixed
      */
     public static function scheduleJob($op, array $params = [], string $level = LEVEL_NORMAL)
     {
@@ -498,10 +439,6 @@ class CtrlServ
 
     /**
      * 在队列中加入一个回调任务
-     * @param $level
-     * @param $url
-     * @param string $data
-     * @return mixed
      */
     public static function httpQueuedCallback($level, $url, string $data = '')
     {
@@ -519,12 +456,6 @@ class CtrlServ
 
     /**
      * 在队列中加入一个回调任务
-     * @param string $url
-     * @param string $type
-     * @param int $delay
-     * @param int $freq
-     * @param mixed $data
-     * @return mixed
      */
     public static function httpCallback(
         string $url,
@@ -553,11 +484,6 @@ class CtrlServ
 
     /**
      * 在队列中加入一个回调任务
-     * @param string $url
-     * @param string $type
-     * @param string $spec
-     * @param mixed $data
-     * @return mixed
      */
     public static function httpCallbackCron(string $url, string $type, string $spec = '', $data = '')
     {

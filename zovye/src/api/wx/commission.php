@@ -16,8 +16,10 @@ use zovye\domain\CommissionBalance;
 use zovye\domain\User;
 use zovye\model\accountModelObj;
 use zovye\model\agentModelObj;
+use zovye\model\userModelObj;
 use zovye\Request;
 use zovye\Stats;
+use zovye\util\Helper;
 use zovye\util\Util;
 use function zovye\err;
 use function zovye\settings;
@@ -208,14 +210,8 @@ class commission
             return err('找不到这个用户！');
         }
 
-        if (Request::has('keeper')) {
-            if (!$user->isKeeper()) {
-                return err('用户不是运营人员！');
-            }
-        } else {
-            if ($user->isPartner()) {
-                $user = $user->getPartnerAgent();
-            }
+        if ($user->isPartner()) {
+            $user = $user->getPartnerAgent();
         }
 
         return ['data' => Stats::getUserCommissionStats($user)];

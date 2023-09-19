@@ -42,7 +42,7 @@ class router
                 } elseif ($type->getName() == keeperModelObj::class) {
                     $args[] = common::getKeeper();
                 } else {
-                    trigger_error("can't resolve args of method", E_USER_ERROR);
+                    throw new Exception('无法解析参数类型！');
                 }
             }
 

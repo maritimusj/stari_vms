@@ -15,6 +15,7 @@ use zovye\domain\Goods;
 use zovye\domain\User;
 use zovye\model\agentModelObj;
 use zovye\model\orderModelObj;
+use zovye\model\userModelObj;
 use zovye\Request;
 use zovye\util\Helper;
 use zovye\util\Util;
@@ -23,9 +24,9 @@ use function zovye\is_error;
 
 class order
 {
-    public static function detail(agentModelObj $agent): array
+    public static function detail(userModelObj $user): array
     {
-        unset($agent);
+        unset($user);
 
         $order_id = Request::int('orderid');
         $order = \zovye\domain\Order::get($order_id);

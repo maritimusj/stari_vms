@@ -33,8 +33,6 @@ class common
 
     /**
      * 用户登录，小程序必须提交code,encryptedData和iv值
-     *
-     * @return array
      */
     public static function login(): array
     {

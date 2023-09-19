@@ -85,13 +85,6 @@ class balance
         return $result;
     }
 
-    /**
-     * @param $user userModelObj
-     * @param int $amount
-     * @param string $memo
-     * @param mixed $extra
-     * @return array
-     */
     public static function balanceWithdraw(userModelObj $user, int $amount, string $memo = '', $extra = []): array
     {
         //先锁定用户，防止恶意重复提交

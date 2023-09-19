@@ -400,11 +400,6 @@ class device
 
     protected static function getStatisticsData($user, $params = []): array
     {
-        /**
-         * @param deviceModelObj $device
-         *
-         * @return array
-         */
         $locationFN = function (deviceModelObj $device) {
             return CacheUtil::cachedCall(300, function () use ($device) {
                 $extra = $device->get('extra', []);

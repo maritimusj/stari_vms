@@ -77,7 +77,6 @@ class bluetooth
 
     /**
      * 获取设备相关的广告
-     * @return array
      */
     public static function ads(): array
     {
@@ -113,7 +112,6 @@ class bluetooth
 
     /**
      * 手机小程序蓝牙设备连接成功
-     * @return array
      */
     public static function onConnected(): array
     {
@@ -203,7 +201,6 @@ class bluetooth
 
     /**
      * 收到蓝牙设备的数据
-     * @return array
      */
     public static function onDeviceData(): array
     {
@@ -449,7 +446,6 @@ class bluetooth
 
     /**
      * 查询订单状态
-     * @return array
      */
     public static function orderStats(): array
     {

@@ -954,12 +954,10 @@ class bluetooth
 
             $user_info = [];
             if ($user) {
-                if (!(empty($user->getNickname()) && empty($user->getAvatar()))) {
-                    $user_info['user_info'] = [
-                        'nickname' => $user->getNickname(),
-                        'avatar' => $user->getAvatar(),
-                    ];
-                }
+                $user_info['user_info'] = [
+                    'nickname' => $user->getNickname(),
+                    'avatar' => $user->getAvatar(),
+                ];
             } else {
                 $user = User::create(['openid' => $user_id, 'app' => User::ALI]);
                 if (!$user) {

@@ -32,7 +32,7 @@ use zovye\domain\Package;
 use zovye\domain\PayloadLogs;
 use zovye\domain\Tags;
 use zovye\domain\User;
-use zovye\event\domain\DeviceTypes;
+use zovye\domain\DeviceTypes;
 use zovye\Job;
 use zovye\Pay;
 use zovye\Stats;
@@ -166,8 +166,7 @@ class deviceModelObj extends ModelObj
     }
 
     /**
-     * 返回设备ＵＩＤ
-     * return string
+     * 返回设备UID
      */
     public function getUid()
     {
@@ -186,9 +185,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 出货记录
-     * @param int $level
-     * @param array $data
-     * @return bool
      */
     public function goodsLog(int $level, array $data = []): bool
     {
@@ -239,7 +235,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 是不是普通设备?
-     * @return bool
      */
     public function isNormalDevice(): bool
     {
@@ -248,7 +243,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 是不是虚拟设备?
-     * @return bool
      */
     public function isVDevice(): bool
     {
@@ -258,7 +252,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 是不是蓝牙设备?
-     * @return bool
      */
     public function isBlueToothDevice(): bool
     {
@@ -267,7 +260,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 是不是充电桩?
-     * @return bool
      */
     public function isChargingDevice(): bool
     {
@@ -276,7 +268,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 是不是尿素加注机?
-     * @return bool
      */
     public function isFuelingDevice(): bool
     {
@@ -300,7 +291,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 蓝牙mac
-     * @return mixed|string
      */
     public function getMAC(): string
     {
@@ -342,9 +332,6 @@ class deviceModelObj extends ModelObj
         return $this->getBluetoothStatus() == Device::BLUETOOTH_READY;
     }
 
-    /**
-     * @return ?IBlueToothProtocol
-     */
     public function getBlueToothProtocol(): ?IBlueToothProtocol
     {
         return BlueToothProtocol::get($this->getBlueToothProtocolName());
@@ -430,9 +417,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 设置当前加注状态
-     * @param $chargerID
-     * @param array $data
-     * @return bool
      */
     public function setFuelingStatusData($chargerID, array $data): bool
     {
@@ -448,8 +432,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 获取当前加注状态
-     * @param $chargerID
-     * @return array
      */
     public function getFuelingStatusData($chargerID): array
     {
@@ -546,8 +528,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 获取设备信号强度
-     * @param bool $raw
-     * @return int
      */
     public function getSig(bool $raw = false): int
     {
@@ -733,9 +713,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 迁移货道数据
-     * @param string $path
-     * @param null $default
-     * @return mixed
      */
     private function getMigratedLanesData(string $path = '', $default = null)
     {
@@ -855,7 +832,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 重置设备相关的设置数据
-     * @return bool
      */
     public function resetAllData(): bool
     {
@@ -907,10 +883,6 @@ class deviceModelObj extends ModelObj
     /**
      * 重置多货道商品数量，@开头表示增加指定数量，正值表示增加指定数量，负值表示减少指定数量，0值表示重置到最大数量
      * 空数组则重置所有货道商品数量到最大值
-     * @param array $data
-     * @param string $reason
-     * @param int $now
-     * @return array
      */
     public function resetPayload(array $data = [], string $reason = '', int $now = 0): array
     {
@@ -974,7 +946,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 设置设备标签，文本形式指定
-     * @param $tags
      */
     public function setTagsFromText($tags)
     {
@@ -1021,8 +992,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 生成二维码并通知APP
-     * @param bool $force
-     * @return bool
      */
     public function updateQrcode(bool $force = false): bool
     {
@@ -1045,7 +1014,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 重置设备shadowId
-     * @return bool
      */
     public function resetShadowId(): bool
     {
@@ -1061,7 +1029,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 是否启用了动态二维码
-     * @return bool
      */
     public function isActiveQrcodeEnabled(): bool
     {
@@ -1070,7 +1037,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 创建二维码文件
-     * @return bool
      */
     public function createQrcodeFile(): bool
     {
@@ -1117,7 +1083,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 获取领货链接
-     * @return string
      */
     public function getUrl(): string
     {
@@ -1159,7 +1124,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 通知app更新二维码
-     * @return bool
      */
     public function updateAppQrcode(): bool
     {
@@ -1177,7 +1141,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 获取设备二维码
-     * @return string
      */
     public function getQrcode(): string
     {
@@ -1203,9 +1166,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 给app发送通知
-     * @param string $op
-     * @param array $data
-     * @return bool
      */
     public function appNotify(string $op = 'config', array $data = []): bool
     {
@@ -1264,8 +1224,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 以文本形式获取设备标签
-     * @param bool $str
-     * @return string|array
      */
     public function getTagsAsText(bool $str = true)
     {
@@ -1310,7 +1268,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 获取设备的App配置
-     * @return array
      */
     public function getAppConfig(): array
     {
@@ -1413,10 +1370,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 获取一个指定类型的广告
-     * @param $type
-     * @param bool $random
-     * @param callable|null $filterFN
-     * @return array|null
      */
     public function getOneAdv($type, bool $random = false, callable $filterFN = null): ?array
     {
@@ -1443,9 +1396,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 获取相关广告
-     * @param $type
-     * @param bool $ignore_cache
-     * @return array
      */
     public function getAds($type, bool $ignore_cache = false): array
     {
@@ -1492,8 +1442,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 判断assigned数据是否包括当前设备
-     * @param $assign_data
-     * @return bool
      */
     public function isMatched($assign_data): bool
     {
@@ -1502,7 +1450,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 获取设备标签ID
-     * @return array
      */
     public function getTagsAsId(): array
     {
@@ -1534,7 +1481,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 设备每天免费送货数量限制
-     * @return bool
      */
     public function isFreeLimitsReached(): bool
     {
@@ -1556,7 +1502,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 获取设备所属的代理商
-     * @return agentModelObj|null
      */
     public function getAgent(): ?agentModelObj
     {
@@ -1569,7 +1514,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 设置设备代理商
-     * @param agentModelObj|null $agent
      */
     public function setAgent(agentModelObj $agent = null)
     {
@@ -1579,7 +1523,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 获取相关topics
-     * @return array
      */
     public function getTopics(): array
     {
@@ -1610,9 +1553,8 @@ class deviceModelObj extends ModelObj
 
     /**
      * 通知设备更新屏幕广告
-     * @return bool
      */
-    public function updateScreenAdvsData(): bool
+    public function updateScreenAdsData(): bool
     {
         if ($this->isAdsUpdated(Advertising::SCREEN)) {
             return $this->appNotify('update');
@@ -1623,8 +1565,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 广告是否已经更新
-     * @param $type
-     * @return bool
      */
     public function isAdsUpdated($type): bool
     {
@@ -1642,9 +1582,6 @@ class deviceModelObj extends ModelObj
         return array_keys($cachedData) != array_keys($ads);
     }
 
-    /**
-     * @return bool
-     */
     public function updateAccountData(): bool
     {
         return $this->accountsUpdated();
@@ -1652,7 +1589,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 公众号是否已更新
-     * @return bool
      */
     public function accountsUpdated(): bool
     {
@@ -1685,8 +1621,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 获取已经分配到这个设备的相关公众号
-     * @param bool $ignore_cache
-     * @return array
      */
     public function getAssignedAccounts(bool $ignore_cache = false): array
     {
@@ -1766,7 +1700,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 设备关联的app是否在线
-     * @return bool
      */
     public function isAppOnline(): bool
     {
@@ -1783,8 +1716,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 通知app更新音量
-     * @param null $vol
-     * @return bool
      */
     public function updateAppVolume($vol = null): bool
     {
@@ -1808,7 +1739,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 通知app更新剩余数量
-     * @return bool
      */
     public function updateAppRemain(): bool
     {
@@ -1827,18 +1757,12 @@ class deviceModelObj extends ModelObj
 
     /**
      * 是否为自定义型号设备
-     * @return bool
      */
     public function isCustomizedType(): bool
     {
         return $this->device_type == 0;
     }
 
-    /**
-     * @param bool $detail
-     * @param bool $available_restrict
-     * @return array
-     */
     public function getPayload(bool $detail = false, bool $available_restrict = false): array
     {
         return Device::getPayload($this, $detail, $available_restrict);
@@ -1851,9 +1775,6 @@ class deviceModelObj extends ModelObj
         return $device_type ? $device_type->getCargoLanesNum() : 0;
     }
 
-    /**
-     * @return array
-     */
     public function getSrcConfig(): array
     {
         $subs = [];
@@ -1877,8 +1798,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 通知mcb更新参数
-     * @param $code
-     * @return bool
      */
     public function updateMcbParams($code): bool
     {
@@ -1893,9 +1812,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 通知mcb更新配置
-     * @param $code
-     * @param array $data
-     * @return void
      */
     public function updateMcbConfig($code, array $data = [])
     {
@@ -1924,10 +1840,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 给mcb发送通知
-     * @param string $op
-     * @param string $code
-     * @param array $data
-     * @return bool
      */
     public function mcbNotify(string $op = 'params', string $code = '', array $data = []): bool
     {
@@ -1944,8 +1856,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 启用/禁用动态二维码
-     * @param bool $enable
-     * @return bool
      */
     public function enableActiveQrcode(bool $enable = true): bool
     {
@@ -1961,8 +1871,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 请求mcb报告状态
-     * @param string $code
-     * @return void
      */
     public function reportMcbStatus(string $code = '')
     {
@@ -1971,8 +1879,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 保存mcb报告的状态
-     * @param array $data
-     * @return void
      */
     public function updateMcbStatus(array $data = [])
     {
@@ -1982,7 +1888,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 获取上次app更新推送信息
-     * @return mixed
      */
     public function getLastApkUpgrade()
     {
@@ -1991,10 +1896,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 通知app更新APK
-     * @param $title
-     * @param $version
-     * @param $url
-     * @return bool
      */
     public function upgradeApk($title, $version, $url): bool
     {
@@ -2023,7 +1924,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 重置设备shadowId
-     * @return string
      */
     public function getShadowId(): string
     {
@@ -2036,9 +1936,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 尝试锁定设备，超过系统设置的超时时长后，自动解锁
-     * @param int $retries
-     * @param int $delay_seconds
-     * @return lockerModelObj|null
      */
     public function lockAcquire(int $retries = 0, int $delay_seconds = 1): ?lockerModelObj
     {
@@ -2053,8 +1950,6 @@ class deviceModelObj extends ModelObj
     /**
      * 出货操作
      * 蓝牙设备出货操作可能会返回字符串，普通设备则返回成功或error()
-     * @param array $options
-     * @return array|string|null
      */
     public function pull(array $options = [])
     {
@@ -2170,8 +2065,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 设备关联的出货主板是否在线
-     * @param bool $use_cache
-     * @return bool
      */
     public function isMcbOnline(bool $use_cache = true): bool
     {
@@ -2225,11 +2118,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 出货操作
-     * @param array $extra
-     * @param int $channel
-     * @param int $num
-     * @param int $timeout
-     * @return array
      */
     public function open(
         int $channel = Device::CHANNEL_DEFAULT,
@@ -2265,8 +2153,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 设备上次故障通知是否已经超时
-     * @param string $event
-     * @return bool
      */
     public function isNotificationTimeout(string $event): bool
     {
@@ -2277,8 +2163,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 设备上次故障通知
-     * @param string $event
-     * @return bool
      */
     public function setLastNotification(string $event): bool
     {
@@ -2287,8 +2171,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 设备上次故障通知
-     * @param string $event
-     * @return array
      */
     public function getLastNotification(string $event): array
     {
@@ -2297,7 +2179,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 从控制中心获取AppId并绑定
-     * @return bool
      */
     public function updateAppId(): bool
     {
@@ -2318,8 +2199,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 获取出货成功或者失败的转跳设置
-     * @param string $when
-     * @return array
      */
     public function getRedirectUrl(string $when = 'success'): array
     {
@@ -2364,8 +2243,7 @@ class deviceModelObj extends ModelObj
     }
 
     /**
-     * 设备需要定位吗？
-     * @return bool
+     * 设备需要定位吗
      */
     public function needValidateLocation(): bool
     {
@@ -2390,18 +2268,13 @@ class deviceModelObj extends ModelObj
 
     /**
      * 获取指定的商品
-     * @param int $goods_id
-     * @param bool $available_restrict
-     * @return array
      */
     public function getGoods(int $goods_id, bool $available_restrict = true): array
     {
         return Device::getGoods($this, $goods_id, $available_restrict);
     }
 
-    /**
-     * @return keeperModelObj[]
-     */
+
     public function getKeepers(): array
     {
         $result = [];
@@ -2612,9 +2485,6 @@ class deviceModelObj extends ModelObj
 
     /**
      * 因为device_view继承device，所以在这里要绑定settings一些参数
-     * @param $key
-     * @param string $classname
-     * @return string
      */
     protected function getSettingsKey($key, string $classname = ''): string
     {

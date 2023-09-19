@@ -23,7 +23,7 @@ if ($group && $group->destroy()) {
     foreach ($result as $entry) {
         $entry->setGroupId(0);
         //更新广告
-        $entry->updateScreenAdvsData();
+        $entry->updateScreenAdsData();
         //更新公众号
         $entry->updateAccountData();
     }

@@ -374,7 +374,7 @@ $result = DBUtil::transactionDo(function () use ($id, &$device) {
 
         //更新公众号缓存
         $device->updateAccountData();
-        $device->updateScreenAdvsData();
+        $device->updateScreenAdsData();
         $device->updateAppVolume();
         $device->updateAppRemain();
     }

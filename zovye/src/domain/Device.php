@@ -660,7 +660,7 @@ class Device extends State
 
             //更新公众号缓存
             $device->updateAccountData();
-            $device->updateScreenAdvsData();
+            $device->updateScreenAdsData();
 
             $device->updateAppId();
 

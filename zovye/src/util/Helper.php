@@ -1938,7 +1938,7 @@ include './index.php';
     public static function upload($name, $type = 'image')
     {
         if (empty($_FILES[$name])) {
-            return err('上传失败[01]！');
+            return err('上传失败[01]');
         }
 
         We7::load()->func('file');
@@ -1946,7 +1946,7 @@ include './index.php';
         $res = We7::file_upload($_FILES[$name], $type);
 
         if (is_error($res)) {
-            return err('上传失败[02]！');
+            return err('上传失败[02]');
         }
 
         if ($res['success'] && $res['path']) {

@@ -22,7 +22,6 @@ use zovye\domain\Balance;
 use zovye\domain\Device;
 use zovye\domain\DeviceEvents;
 use zovye\domain\DeviceLogs;
-use zovye\domain\DeviceTypes;
 use zovye\domain\Goods;
 use zovye\domain\Group;
 use zovye\domain\Keeper;
@@ -33,6 +32,7 @@ use zovye\domain\Package;
 use zovye\domain\PayloadLogs;
 use zovye\domain\Tags;
 use zovye\domain\User;
+use zovye\event\domain\DeviceTypes;
 use zovye\Job;
 use zovye\Pay;
 use zovye\Stats;
@@ -2111,13 +2111,14 @@ class deviceModelObj extends ModelObj
                 if (Helper::NeedAutoRefund($this)) {
                     $order = Order::getLastOrderOfDevice($this);
                     if ($order) {
+                        $delay = max(15, max(settings('order.rollback.delay', 0), $timeout));
                         //超时后检查订单是否成功，否则退款
                         Job::refund(
                             $order->getOrderNO(),
                             '设备响应超时',
                             0,
                             true,
-                            max(settings('order.rollback.delay', 0), $timeout)
+                            $delay
                         );
                     }
                 }

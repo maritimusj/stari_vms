@@ -10,12 +10,11 @@ use DateTime;
 use Exception;
 use zovye\App;
 use zovye\domain\Goods;
-use zovye\Log;
 use zovye\model\agentModelObj;
 use zovye\model\userModelObj;
 use zovye\Request;
+use zovye\util\Helper;
 use zovye\util\Util;
-use zovye\We7;
 use function zovye\err;
 use function zovye\is_error;
 
@@ -154,28 +153,19 @@ class misc
 
     public static function updateUserQRCode(userModelObj $user, $type): array
     {
-        We7::load()->func('file');
-        $res = We7::file_upload($_FILES['pic']);
-
-        if (!is_error($res)) {
-            $filename = $res['path'];
-            if ($res['success'] && $filename) {
-                try {
-                    We7::file_remote_upload($filename);
-                } catch (Exception $e) {
-                    Log::error('doPageUserQRcode', $e->getMessage());
-                }
-            }
-
-            $user_qrcode = $user->settings('qrcode', []);
-            $user_qrcode[$type] = $filename;
-
-            if ($user->updateSettings('qrcode', $user_qrcode)) {
-                return ['status' => 'success', 'msg' => '上传成功！'];
-            }
+        $res = Helper::upload('pic', $type);
+        if (is_error($res)) {
+            return $res;
         }
 
-        return err('上传失败！');
+        $user_qrcode = $user->settings('qrcode', []);
+        $user_qrcode[$type] = $res;
+
+        if ($user->updateSettings('qrcode', $user_qrcode)) {
+            return ['status' => 'success', 'msg' => '上传成功！'];
+        }
+
+        return err('保存用户信息失败！');
     }
 
     public static function getUserQRCode(userModelObj $user): array

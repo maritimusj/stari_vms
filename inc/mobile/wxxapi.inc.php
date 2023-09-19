@@ -8,33 +8,34 @@ namespace zovye\wxxApi;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\api\common;
 use zovye\api\router;
-use zovye\api\wxx\common;
+use zovye\api\wxx\bluetooth;
 use zovye\Request;
 
 $op = ucfirst(Request::op('default'));
 
 router::exec($op, [
-    'Login' => [\zovye\api\common::class, 'login'],
-    'VoucherList' => [common::class, 'voucherList'],
+    'Login' => [common::class, 'login'],
+    'FBPic' => [common::class, 'upload'],
     'PageInfo' => [common::class, 'pageInfo'],
-    'GetGoodsList' => [common::class, 'getGoodsList'],
-    'Advs' => [common::class, 'ads'],
-    'OnConnected' => [common::class, 'onConnected'],
-    'DeviceStatus' => [common::class, 'deviceStatus'],
-    'OnDeviceData' => [common::class, 'onDeviceData'],
-    'VoucherGet' => [common::class, 'voucherGet'],
-    'OrderCreate' => [common::class, 'orderCreate'],
-    'OrderGet' => [common::class, 'orderGet'],
-    'OrderStats' => [common::class, 'orderStats'],
-    'GetDeviceInfo' => [common::class, 'getDeviceInfo'],
-    'FBPic' => [common::class, 'FBPic'],
-    'FeedBack' => [common::class, 'feedback'],
-    'DeviceAdvs' => [common::class, 'deviceAds'],
-    'OrderDefault' => [common::class, 'orderDefault'],
-    'HomepageDefault' => [common::class, 'homepageDefault'],
-    'HomepageOrderStat' => [common::class, 'homepageOrderStat'],
-    'AliAuthCode' => [common::class, 'aliAuthCode'],
-    'AliUserInfo' => [common::class, 'aliUserInfo'],
-    'UserOrders' => [common::class, 'userOrders'],
+    'VoucherList' => [bluetooth::class, 'voucherList'],
+    'GetGoodsList' => [bluetooth::class, 'getGoodsList'],
+    'Advs' => [bluetooth::class, 'ads'],
+    'OnConnected' => [bluetooth::class, 'onConnected'],
+    'DeviceStatus' => [bluetooth::class, 'deviceStatus'],
+    'OnDeviceData' => [bluetooth::class, 'onDeviceData'],
+    'VoucherGet' => [bluetooth::class, 'voucherGet'],
+    'OrderCreate' => [bluetooth::class, 'orderCreate'],
+    'OrderGet' => [bluetooth::class, 'orderGet'],
+    'OrderStats' => [bluetooth::class, 'orderStats'],
+    'GetDeviceInfo' => [bluetooth::class, 'getDeviceInfo'],
+    'FeedBack' => [bluetooth::class, 'feedback'],
+    'DeviceAdvs' => [bluetooth::class, 'deviceAds'],
+    'OrderDefault' => [bluetooth::class, 'orderDefault'],
+    'HomepageDefault' => [bluetooth::class, 'homepageDefault'],
+    'HomepageOrderStat' => [bluetooth::class, 'homepageOrderStat'],
+    'AliAuthCode' => [bluetooth::class, 'aliAuthCode'],
+    'AliUserInfo' => [bluetooth::class, 'aliUserInfo'],
+    'UserOrders' => [bluetooth::class, 'userOrders'],
 ]);

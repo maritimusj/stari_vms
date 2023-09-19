@@ -6,6 +6,7 @@
 
 namespace zovye\api;
 
+use Exception;
 use zovye\App;
 use zovye\domain\Balance;
 use zovye\domain\Device;
@@ -19,7 +20,10 @@ use zovye\model\agentModelObj;
 use zovye\model\keeperModelObj;
 use zovye\model\userModelObj;
 use zovye\Request;
+use zovye\util\Helper;
+use zovye\util\TemplateUtil;
 use zovye\util\Util;
+use zovye\We7;
 use zovye\Wx;
 use function zovye\err;
 use function zovye\is_error;
@@ -419,4 +423,48 @@ class common
         return false;
     }
 
+    /**
+     * 获取设备相关的设置
+     */
+    public static function pageInfo(): array
+    {
+        $device_id = Request::str('device');
+
+        $device = Device::get($device_id, true);
+        if (empty($device)) {
+            return err('找不到这个设备！');
+        }
+
+        $result = TemplateUtil::getTplData();
+        if ($device->isBlueToothDevice()) {
+            $result['device'] = [
+                'buid' => $device->getBUID(),
+                'mac' => $device->getMAC(),
+                'is_down' => $device->isMaintenance() ? 1 : 0,
+            ];
+        }
+        $agent = $device->getAgent();
+        if ($agent) {
+            if ($agent->settings('agentData.misc.siteTitle') || $agent->settings('agentData.misc.siteLogo')) {
+                $result['agent'] = [
+                    'title' => $agent->settings('agentData.misc.siteTitle'),
+                    'logo' => Util::toMedia($agent->settings('agentData.misc.siteLogo')),
+                ];
+            }
+        }
+
+        return $result;
+    }
+
+    public static function upload(userModelObj $user): array
+    {
+        unset($user);
+
+        $res = Helper::upload('pic');
+        if (is_error($res)) {
+            return $res;
+        }
+
+        return ['data' => $res];
+    }
 }

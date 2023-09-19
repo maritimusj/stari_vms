@@ -15,6 +15,7 @@ use zovye\model\advertisingModelObj;
 use zovye\model\agentModelObj;
 use zovye\model\device_groupsModelObj;
 use zovye\Request;
+use zovye\util\Helper;
 use zovye\util\Util;
 use zovye\We7;
 use function zovye\err;
@@ -298,34 +299,15 @@ class ad
     {
         common::checkPrivileges($agent, 'F_gg');
 
-        $type = request('type') ?: Advertising::MEDIA_IMAGE;
-
-        if ($_FILES['file']) {
-            We7::load()->func('file');
-            $res = We7::file_upload($_FILES['file'], $type);
-
-            if (is_error($res)) {
-                return $res;
-            }
-
-            $filename = $res['path'];
-            if ($res['success'] && $filename) {
-                try {
-                    We7::file_remote_upload($filename);
-                } catch (Exception $e) {
-                    Log::error('doPageUploadFile', $e->getMessage());
-
-                    return err($e->getMessage());
-                }
-
-                return [
-                    'filename' => $filename,
-                    'url' => Util::toMedia($filename),
-                ];
-            }
+        $res = Helper::upload('pic', Request::str('type') ?: Advertising::MEDIA_IMAGE);
+        if (is_error($res)) {
+            return $res;
         }
 
-        return err('上传失败！');
+        return [
+            'filename' => $res,
+            'url' => Util::toMedia($res),
+        ];
     }
 
     public static function groupAssign(agentModelObj $agent): array

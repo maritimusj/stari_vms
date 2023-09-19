@@ -42,7 +42,7 @@ use function zovye\err;
 use function zovye\is_error;
 use function zovye\settings;
 
-class common
+class bluetooth
 {
     public static function getDeviceInfo(): array
     {
@@ -74,41 +74,6 @@ class common
         }
 
         return ['data' => $data];
-    }
-
-    /**
-     * 获取设备相关的设置
-     * @return array
-     */
-    public static function pageInfo(): array
-    {
-        $device_id = Request::str('device');
-
-        $device = Device::get($device_id, true);
-        if (empty($device)) {
-            return err('找不到这个设备！');
-        }
-
-        $result = TemplateUtil::getTplData();
-        if ($device->isBlueToothDevice()) {
-            $extra = $device->get('extra', []);
-            $result['device'] = [
-                'buid' => $device->getBUID(),
-                'mac' => $device->getMAC(),
-                'is_down' => $device->isMaintenance() ? 1 : 0,
-            ];
-        }
-        $agent = $device->getAgent();
-        if ($agent) {
-            if ($agent->settings('agentData.misc.siteTitle') || $agent->settings('agentData.misc.siteLogo')) {
-                $result['agent'] = [
-                    'title' => $agent->settings('agentData.misc.siteTitle'),
-                    'logo' => Util::toMedia($agent->settings('agentData.misc.siteLogo')),
-                ];
-            }
-        }
-
-        return $result;
     }
 
     /**
@@ -535,33 +500,6 @@ class common
         }
 
         return $result;
-    }
-
-    public static function FBPic(userModelObj $user): array
-    {
-        unset($user);
-
-        We7::load()->func('file');
-        $res = We7::file_upload($_FILES['pic']);
-
-        if (is_error($res)) {
-            Log::error('FBPic', $res);
-
-            return err('上传失败！');
-        }
-
-        $filename = $res['path'];
-        if ($res['success'] && $filename) {
-            try {
-                We7::file_remote_upload($filename);
-            } catch (Exception $e) {
-                return err($e->getMessage());
-            }
-        }
-
-        $url = $filename;
-
-        return ['data' => $url];
     }
 
     public static function feedback(userModelObj $user): array

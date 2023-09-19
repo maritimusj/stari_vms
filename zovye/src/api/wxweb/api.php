@@ -9,7 +9,6 @@ namespace zovye\api\wxweb;
 
 use DateTime;
 use zovye\api\wx\misc;
-use zovye\api\wxx\common;
 use zovye\App;
 use zovye\Config;
 use zovye\domain\Account;
@@ -26,7 +25,6 @@ use zovye\domain\Task;
 use zovye\domain\User;
 use zovye\Job;
 use zovye\JSON;
-use zovye\Log;
 use zovye\model\balanceModelObj;
 use zovye\model\userModelObj;
 use zovye\Request;
@@ -34,7 +32,6 @@ use zovye\util\DeviceUtil;
 use zovye\util\Helper;
 use zovye\util\LocationUtil;
 use zovye\util\PlaceHolder;
-use zovye\util\Util;
 use function zovye\err;
 use function zovye\is_error;
 use function zovye\isEmptyArray;
@@ -148,7 +145,7 @@ class api
             return err('找不到这个设备！');
         }
 
-        $type = Request::str('type'); //free or pay or balance
+        $type = Request::str('type');
 
         if ($type == 'balance' || $type == 'exchange') {
             $result = $device->getGoodsList($user, [Goods::AllowBalance]);

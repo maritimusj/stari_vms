@@ -6,51 +6,16 @@
 
 namespace zovye\api\wx;
 
-use Exception;
 use zovye\api\common;
 use zovye\domain\Device;
 use zovye\domain\DeviceFeedback;
 use zovye\domain\LoginData;
 use zovye\domain\User;
-use zovye\Log;
 use zovye\Request;
-use zovye\We7;
 use function zovye\err;
-use function zovye\is_error;
 
 class fb
 {
-    public static function pic(): array
-    {
-        if (empty($token)) {
-            $token = common::getToken();
-        }
-        if (empty($token)) {
-            return err('请先登录后再请求数据！[101]');
-        }
-
-        We7::load()->func('file');
-        $res = We7::file_upload($_FILES['pic']);
-
-        if (!is_error($res)) {
-
-            $filename = $res['path'];
-            if ($res['success'] && $filename) {
-                try {
-                    We7::file_remote_upload($filename);
-                } catch (Exception $e) {
-                    Log::error('doPageFeedBack', $e->getMessage());
-                }
-
-            }
-            $url = $filename;
-
-            return ['data' => $url];
-        } else {
-            return err('上传失败！');
-        }
-    }
-
     public static function feedback(): array
     {
         if (empty($token)) {

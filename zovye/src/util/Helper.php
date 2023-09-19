@@ -9,11 +9,13 @@ namespace zovye\util;
 
 use DateTime;
 use DateTimeImmutable;
+use Exception;
 use RuntimeException;
 use zovye\App;
 use zovye\business\GoodsExpireAlert;
 use zovye\Config;
 use zovye\domain\Account;
+use zovye\domain\Advertising;
 use zovye\domain\Balance;
 use zovye\domain\BalanceLog;
 use zovye\domain\CommissionBalance;
@@ -1931,5 +1933,32 @@ include './index.php';
         } else {
             GoodsExpireAlert::remove(['device_id' => $device->getId()]);
         }
+    }
+
+    public static function upload($name, $type = 'image')
+    {
+        if ($_FILES[$name]) {
+            return err('上传失败！');
+        }
+
+        We7::load()->func('file');
+
+        $res = We7::file_upload($_FILES[$name], $type);
+
+        if (is_error($res)) {
+            return err('上传失败！');
+        }
+
+        $filename = $res['path'];
+        if ($res['success'] && $filename) {
+            try {
+                We7::file_remote_upload($filename);
+            } catch (Exception $e) {
+                Log::error('upload', [
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+        return $filename;
     }
 }

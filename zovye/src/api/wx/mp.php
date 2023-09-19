@@ -22,6 +22,7 @@ use zovye\model\device_groupsModelObj;
 use zovye\model\userModelObj;
 use zovye\Request;
 use zovye\util\DBUtil;
+use zovye\util\Helper;
 use zovye\util\QRCodeUtil;
 use zovye\util\Util;
 use zovye\We7;
@@ -205,32 +206,12 @@ class mp
         $media = $_FILES['pic'] ?? $_FILES['video'];
         $type = isset($_FILES['pic']) ? Advertising::MEDIA_IMAGE : Advertising::MEDIA_VIDEO;
 
-        if ($media) {
-            We7::load()->func('file');
-
-            $res = We7::file_upload($media, $type);
-            if (is_error($res)) {
-                return $res;
-            }
-
-            $filename = $res['path'];
-            if ($res['success'] && $filename) {
-                try {
-                    We7::file_remote_upload($filename);
-                } catch (Exception $e) {
-                    Log::error('doPageMpUpload', [
-                        'file' => $filename,
-                        'error' => $e->getMessage(),
-                    ]);
-
-                    return err($e->getMessage());
-                }
-
-                return ['file' => Advertising::sign($filename), 'fullpath' => Util::toMedia($filename)];
-            }
+        $res = Helper::upload($media, $type);
+        if (is_error($res)) {
+            return $res;
         }
 
-        return err('上传失败！');
+        return ['file' => Advertising::sign($res), 'fullpath' => Util::toMedia($res)];
     }
 
     /**

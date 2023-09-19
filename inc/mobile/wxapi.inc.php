@@ -8,6 +8,7 @@ namespace zovye\wxApi;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\api\common;
 use zovye\api\router;
 use zovye\api\wx\ad;
 use zovye\api\wx\agent;
@@ -28,7 +29,6 @@ use zovye\api\wx\order;
 use zovye\api\wx\promoter;
 use zovye\api\wx\vip;
 use zovye\api\wxweb\api;
-use zovye\api\wxx\common;
 use zovye\Request;
 
 $op = ucfirst(Request::op('default'));
@@ -36,6 +36,8 @@ $op = ucfirst(Request::op('default'));
 router::exec($op, [
     'DebugMode' => [debug::class, 'mode'],
     'DemoLogin' => [debug::class, 'login'],
+    'UserLogin' => [common::class, 'login'],
+    'FBPic' => [common::class, 'upload'],
     'DeviceSetNum' => [device::class, 'deviceReset'],
     'DeviceNearBy' => [device::class, 'deviceNearBy'],
     'Reg' => [agent::class, 'reg'],
@@ -45,7 +47,6 @@ router::exec($op, [
     'LoginQR' => [agent::class, 'loginQR'],
     'LoginScan' => [agent::class, 'loginScan'],
     'LoginPoll' => [agent::class, 'loginPoll'],
-    'UserLogin' => [common::class, 'login'],
     'AgentApplication' => [agent::class, 'application'],
     'SetAgentBank' => [agent::class, 'setAgentBank'],
     'GetAgentBank' => [agent::class, 'getAgentBank'],
@@ -170,7 +171,6 @@ router::exec($op, [
     'GroupCreate' => [group::class, 'create'],
     'GroupUpdate' => [group::class, 'update'],
     'GroupDelete' => [group::class, 'delete'],
-    'FBPic' => [fb::class, 'pic'],
     'FeedBack' => [fb::class, 'feedback'],
     'DeviceStats' => [misc::class, 'deviceStats'],
     'OrderStats' => [misc::class, 'orderStats'],

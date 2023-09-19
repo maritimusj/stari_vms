@@ -8,13 +8,13 @@ namespace zovye\wxWebApi;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\api\common;
 use zovye\api\router;
 use zovye\api\wxweb\api;
 use zovye\api\wxweb\charging;
 use zovye\api\wxweb\fueling;
 use zovye\api\wxweb\member;
 use zovye\api\wxweb\user;
-use zovye\api\wxx\common;
 use zovye\Request;
 
 Request::extraAjaxJsonData();
@@ -22,7 +22,9 @@ Request::extraAjaxJsonData();
 $op = Request::op('default');
 
 router::exec($op, [
-    'login' => [\zovye\api\common::class, 'login'],
+    'login' => [common::class, 'login'],
+    'upload' => [common::class, 'upload'],
+    'pageInfo' => [common::class, 'pageInfo'],
     'nearBy' => [api::class, 'nearBy'],
     'advs' => [api::class, 'ads'],
     'accounts' => [api::class, 'accounts'],
@@ -47,13 +49,11 @@ router::exec($op, [
     'task' => [api::class, 'task'],
     'detail' => [api::class, 'detail'],
     'submit' => [api::class, 'submit'],
-    'upload' => [common::class, 'FBPic'],
     'recipient' => [api::class, 'getRecipient'],
     'updateRecipient' => [api::class, 'updateRecipient'],
     'mallOrderList' => [api::class, 'getMallOrderList'],
     'mallGoodsList' => [api::class, 'getMallGoodsList'],
     'createMallOrder' => [api::class, 'createMallOrder'],
-    'pageInfo' => [common::class, 'pageInfo'],
     'rewardOrderData' => [api::class, 'rewardOrderData'],
     'validateLocation' => [api::class, 'validateLocation'],
     'chargingUserInfo' => [charging::class, 'chargingUserInfo'],

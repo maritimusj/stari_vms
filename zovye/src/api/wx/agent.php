@@ -806,9 +806,7 @@ class agent
     }
 
     /**
-     * 转移设备给自己的下级代理商.
-     *
-     * @return array
+     * 转移设备给自己的下级代理商
      */
     public static function deviceAssign(agentModelObj $agent): array
     {
@@ -855,10 +853,7 @@ class agent
     }
 
     /**
-     * 缺货设备列表.
-     *
-     * @param agentModelObj $agent
-     * @return array
+     * 缺货设备列表
      */
     public static function deviceLowRemain(agentModelObj $agent): array
     {
@@ -907,10 +902,7 @@ class agent
     }
 
     /**
-     * 获取故障设备.
-     *
-     * @param agentModelObj $agent
-     * @return array
+     * 获取故障设备
      */
     public static function deviceError(agentModelObj $agent): array
     {
@@ -1180,8 +1172,6 @@ class agent
 
     /**
      * 清除设备故障代码
-     *
-     * @return array
      */
     public static function deviceSetErrorCode(agentModelObj $agent): array
     {
@@ -1226,9 +1216,7 @@ class agent
     }
 
     /**
-     * 搜索用户名的下级代理商.
-     *
-     * @return array
+     * 搜索用户名的下级代理商
      */
     public static function agentSearch(agentModelObj $agent): array
     {

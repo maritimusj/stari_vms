@@ -16,10 +16,8 @@ use zovye\domain\CommissionBalance;
 use zovye\domain\User;
 use zovye\model\accountModelObj;
 use zovye\model\agentModelObj;
-use zovye\model\userModelObj;
 use zovye\Request;
 use zovye\Stats;
-use zovye\util\Helper;
 use zovye\util\Util;
 use function zovye\err;
 use function zovye\settings;
@@ -208,6 +206,10 @@ class commission
         $user = User::get(Request::int('id'));
         if (empty($user)) {
             return err('找不到这个用户！');
+        }
+
+        if (!Request::bool('keeper') && $user->isPartner()) {
+            $user = $user->getPartnerAgent();
         }
 
         return ['data' => Stats::getUserCommissionStats($user)];

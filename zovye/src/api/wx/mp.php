@@ -201,7 +201,7 @@ class mp
             return err('没有权限上传文件，请联系管理员！');
         }
 
-        $media = $_FILES['pic'] ?? $_FILES['video'];
+        $media = isset($_FILES['pic']) ? 'pic' : 'video';
         $type = isset($_FILES['pic']) ? Advertising::MEDIA_IMAGE : Advertising::MEDIA_VIDEO;
 
         $res = Helper::upload($media, $type);

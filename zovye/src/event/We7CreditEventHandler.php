@@ -4,10 +4,13 @@
  * @url www.stariture.com
  */
 
-namespace zovye;
+namespace zovye\event;
 
 use Exception;
+use zovye\App;
 use zovye\model\userModelObj;
+use zovye\State;
+use function zovye\settings;
 
 class We7CreditEventHandler
 {

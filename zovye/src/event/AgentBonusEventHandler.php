@@ -4,8 +4,9 @@
  * @url www.stariture.com
  */
 
-namespace zovye;
+namespace zovye\event;
 
+use zovye\App;
 use zovye\domain\CommissionBalance;
 use zovye\model\deviceModelObj;
 use zovye\model\orderModelObj;

@@ -5,13 +5,14 @@
  */
 
 
-namespace zovye;
+namespace zovye\event;
 
+use zovye\App;
 use zovye\domain\GoodsVoucher;
+use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\model\orderModelObj;
 use zovye\util\DeviceUtil;
-
 
 class VoucherEventHandler
 {

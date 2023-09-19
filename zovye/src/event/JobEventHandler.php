@@ -4,9 +4,13 @@
  * @url www.stariture.com
  */
 
-namespace zovye;
+namespace zovye\event;
 
+use zovye\App;
 use zovye\business\GDCVMachine;
+use zovye\Config;
+use zovye\CtrlServ;
+use zovye\Job;
 use zovye\model\orderModelObj;
 
 class JobEventHandler

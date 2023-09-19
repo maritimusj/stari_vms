@@ -4,12 +4,13 @@
  * @url www.stariture.com
  */
 
-namespace zovye;
+namespace zovye\event;
 
 use Exception;
 use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
+use zovye\State;
 use zovye\util\LocationUtil;
 
 class LocationEventHandler

@@ -5,17 +5,23 @@
  * @url www.stariture.com
  */
 
-namespace zovye;
+namespace zovye\event;
 
 use Error;
 use Exception;
+use zovye\App;
+use zovye\Config;
 use zovye\domain\Account;
 use zovye\domain\Balance;
+use zovye\Log;
 use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\orderModelObj;
 use zovye\model\userModelObj;
 use zovye\util\Helper;
+use zovye\ZovyeException;
+use function zovye\is_error;
+use function zovye\settings;
 
 class AccountEventHandler
 {

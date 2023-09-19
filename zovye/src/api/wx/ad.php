@@ -295,7 +295,7 @@ class ad
     {
         common::checkPrivileges($agent, 'F_gg');
 
-        $res = Helper::upload('pic', Request::str('type') ?: Advertising::MEDIA_IMAGE);
+        $res = Helper::upload('file', Request::str('type') ?: Advertising::MEDIA_IMAGE);
         if (is_error($res)) {
             return $res;
         }

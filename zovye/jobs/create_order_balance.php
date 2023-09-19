@@ -155,7 +155,7 @@ try {
             }
 
             //事件：设备已锁定
-            EventBus::on(EventBus::LOCKED, [
+            EventBus::on(EVENT_LOCKED, [
                 'device' => $device,
                 'user' => $user,
             ]);
@@ -185,7 +185,7 @@ try {
     $order = $orderResult;
 
     //事件：出货成功，目前用于统计数据
-    EventBus::on(EventBus::OPEN_SUCCESS, [
+    EventBus::on(EVENT_OPEN_SUCCESS, [
         'device' => $device,
         'user' => $user,
         'order' => $order,
@@ -319,7 +319,7 @@ function createOrder(
     }
 
     //事件：订单已经创建
-    EventBus::on(EventBus::ORDER_CREATED, [
+    EventBus::on(EVENT_ORDER_CREATED, [
         'device' => $device,
         'user' => $user,
         'order' => $order,

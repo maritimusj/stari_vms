@@ -480,7 +480,7 @@ class Fueling
                 if ($card_type != VIPCard::getTypename()) {
                     try {
                         //事件：订单已经创建
-                        EventBus::on(EventBus::ORDER_CREATED, [
+                        EventBus::on(EVENT_ORDER_CREATED, [
                             'device' => $device,
                             'user' => $user,
                             'order' => $order,

@@ -536,7 +536,7 @@ class Charging
                     Job::refund($serial, '充电订单结算退款');
                 }
                 //事件：订单已经创建
-                EventBus::on(EventBus::ORDER_CREATED, [
+                EventBus::on(EVENT_ORDER_CREATED, [
                     'device' => $device,
                     'user' => $user,
                     'order' => $order,
@@ -552,7 +552,7 @@ class Charging
                     ];
                     if ($balance->change(0 - $totalPrice, CommissionBalance::CHARGING_FEE, $extra)) {
                         //事件：订单已经创建
-                        EventBus::on(EventBus::ORDER_CREATED, [
+                        EventBus::on(EVENT_ORDER_CREATED, [
                             'device' => $device,
                             'user' => $user,
                             'order' => $order,

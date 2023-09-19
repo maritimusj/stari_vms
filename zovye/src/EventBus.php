@@ -9,45 +9,17 @@ namespace zovye;
 use Exception;
 use ReflectionClass;
 use ReflectionMethod;
-use zovye\event\AccountEventHandler;
-use zovye\event\AgentBonusEventHandler;
-use zovye\event\CommissionEventHandler;
-use zovye\event\GoodsQuotaEventHandler;
-use zovye\event\JobEventHandler;
-use zovye\event\LocationEventHandler;
-use zovye\event\VoucherEventHandler;
-use zovye\event\We7CreditEventHandler;
 
 class EventBus
 {
-    const BEFORE_LOCK = 'device.beforeLock';
-    const LOCKED = 'device.locked';
-    const OPEN_SUCCESS = 'device.openSuccess';
-    const OPEN_FAIL = 'device.openFail';
-    const ORDER_CREATED = 'device.orderCreated';
-
     static $events_data = [];
 
     /**
      * 初始化事件处理器
      * @throws
      */
-    public static function init()
+    public static function init(array $events)
     {
-        $events = [
-            'device' =>
-                [
-                    AccountEventHandler::class, //公众号检查
-                    CommissionEventHandler::class, //处理佣金
-                    AgentBonusEventHandler::class, //佣金奖励
-                    LocationEventHandler::class, //定位检查
-                    We7CreditEventHandler::class, //处理微擎积分
-                    JobEventHandler::class, //订单后续处理Job
-                    VoucherEventHandler::class, //提货券
-                    GoodsQuotaEventHandler::class,//商品限额
-                ],
-        ];
-
         foreach ($events as $w => $classes) {
             if (!isset(self::$events_data[$w])) {
                 self::$events_data[$w] = [];

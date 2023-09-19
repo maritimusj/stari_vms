@@ -69,6 +69,12 @@ define('LOG_DEVICE_RENEWAL_PAY', 123);
 
 define('LOG_SMS', 30);
 
+define('EVENT_BEFORE_LOCK', 'device.beforeLock');
+define('EVENT_LOCKED', 'device.locked');
+define('EVENT_OPEN_SUCCESS', 'device.openSuccess');
+define('EVENT_OPEN_FAIL', 'device.openFail');
+define('EVENT_ORDER_CREATED', 'device.orderCreated');
+
 define('DEFAULT_PAGE_SIZE', 20);
 define('DEFAULT_DEVICE_CAPACITY', 10);
 define('DEFAULT_DEVICE_WAIT_TIMEOUT', 15);

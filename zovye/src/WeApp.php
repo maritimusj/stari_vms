@@ -10,6 +10,14 @@ use Exception;
 use zovye\base\ModelObj;
 use zovye\business\ChargingServ;
 use zovye\domain\LogObj;
+use zovye\event\AccountEventHandler;
+use zovye\event\AgentBonusEventHandler;
+use zovye\event\CommissionEventHandler;
+use zovye\event\GoodsQuotaEventHandler;
+use zovye\event\JobEventHandler;
+use zovye\event\LocationEventHandler;
+use zovye\event\VoucherEventHandler;
+use zovye\event\We7CreditEventHandler;
 use zovye\model\weapp_configModelObj;
 use zovye\util\DBUtil;
 use zovye\util\TemplateUtil;
@@ -49,7 +57,19 @@ class WeApp extends Settings
         Util::setErrorHandler();
 
         //初始化事件驱动
-        EventBus::init();
+        EventBus::init([
+            'device' =>
+                [
+                    AccountEventHandler::class, //公众号检查
+                    CommissionEventHandler::class, //处理佣金
+                    AgentBonusEventHandler::class, //佣金奖励
+                    LocationEventHandler::class, //定位检查
+                    We7CreditEventHandler::class, //处理微擎积分
+                    JobEventHandler::class, //订单后续处理Job
+                    VoucherEventHandler::class, //提货券
+                    GoodsQuotaEventHandler::class,//商品限额
+                ],
+        ]);
 
         $http_client = new we7HttpClient();
 

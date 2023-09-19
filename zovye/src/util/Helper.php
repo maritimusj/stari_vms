@@ -15,7 +15,6 @@ use zovye\App;
 use zovye\business\GoodsExpireAlert;
 use zovye\Config;
 use zovye\domain\Account;
-use zovye\domain\Advertising;
 use zovye\domain\Balance;
 use zovye\domain\BalanceLog;
 use zovye\domain\CommissionBalance;

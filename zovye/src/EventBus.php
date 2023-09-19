@@ -53,14 +53,12 @@ class EventBus
                 self::$events_data[$w] = [];
             }
             foreach ($classes as $classname) {
-                if (class_exists($classname)) {
-                    $reflection = new ReflectionClass($classname);
-                    $methods = $reflection->getMethods(ReflectionMethod::IS_STATIC | ReflectionMethod::IS_PUBLIC);
-                    $prefix = 'on'.ucfirst($w);
-                    foreach ($methods as $method) {
-                        if (substr($method->name, 0, strlen($prefix)) == $prefix) {
-                            self::$events_data[$w][$method->name][] = $method->class;
-                        }
+                $reflection = new ReflectionClass($classname);
+                $methods = $reflection->getMethods(ReflectionMethod::IS_STATIC | ReflectionMethod::IS_PUBLIC);
+                $prefix = 'on'.ucfirst($w);
+                foreach ($methods as $method) {
+                    if (substr($method->name, 0, strlen($prefix)) == $prefix) {
+                        self::$events_data[$w][$method->name][] = $method->class;
                     }
                 }
             }

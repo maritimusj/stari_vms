@@ -256,7 +256,7 @@ class DeviceUtil
         ];
 
         //事件：设备已锁定
-        EventBus::on(EventBus::BeforeLock, $params);
+        EventBus::on(EventBus::BEFORE_LOCK, $params);
 
         //锁定设备
         $retries = intval(settings('device.lockRetries', 0));
@@ -276,7 +276,7 @@ class DeviceUtil
         }
 
         //事件：设备已锁定
-        EventBus::on(EventBus::Locked, $params);
+        EventBus::on(EventBus::LOCKED, $params);
 
         $log_data = [
             'user' => $user->profile(),
@@ -406,7 +406,7 @@ class DeviceUtil
 
                     try {
                         //事件：订单已经创建
-                        EventBus::on(EventBus::OrderCreated, $params);
+                        EventBus::on(EventBus::ORDER_CREATED, $params);
                     } catch (Exception $e) {
                         return err($e->getMessage());
                     }
@@ -440,7 +440,7 @@ class DeviceUtil
 
                     try {
                         //事件：出货失败
-                        EventBus::on(EventBus::OpenFail, $params);
+                        EventBus::on(EventBus::OPEN_FAIL, $params);
                     } catch (Exception $e) {
                         //return error($e->getCode(), $e->getMessage());
                     }
@@ -498,7 +498,7 @@ class DeviceUtil
         $device->updateAppRemain();
 
         //事件：出货成功
-        EventBus::on(EventBus::OpenSuccess, $params);
+        EventBus::on(EventBus::OPEN_SUCCESS, $params);
 
         $order = $params['order'];
 

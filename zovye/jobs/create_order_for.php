@@ -70,7 +70,7 @@ if (!$device->lockAcquire($retries, $delay)) {
 
 //事件：设备已锁定
 try {
-    EventBus::on(EventBus::Locked, [
+    EventBus::on(EventBus::LOCKED, [
         'device' => $device,
         'user' => $user,
     ]);
@@ -135,13 +135,13 @@ $device->appShowMessage('出货完成，欢迎下次使用！');
 
 //事件：出货成功，目前用于统计数据
 try {
-    EventBus::on(EventBus::OpenSuccess, [
+    EventBus::on(EventBus::OPEN_SUCCESS, [
         'device' => $device,
         'user' => $user,
         'order' => $order,
     ]);
 } catch (Exception $e) {
-    $log[EventBus::OpenSuccess] = $e->getMessage();
+    $log[EventBus::OPEN_SUCCESS] = $e->getMessage();
 }
 
 Log::debug('create_order_for', $log);

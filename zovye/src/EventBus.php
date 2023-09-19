@@ -20,11 +20,11 @@ use zovye\event\We7CreditEventHandler;
 
 class EventBus
 {
-    const BeforeLock = 'device.beforeLock';
-    const Locked = 'device.locked';
-    const OpenSuccess = 'device.openSuccess';
-    const OpenFail = 'device.openFail';
-    const OrderCreated = 'device.orderCreated';
+    const BEFORE_LOCK = 'device.beforeLock';
+    const LOCKED = 'device.locked';
+    const OPEN_SUCCESS = 'device.openSuccess';
+    const OPEN_FAIL = 'device.openFail';
+    const ORDER_CREATED = 'device.orderCreated';
 
     static $events_data = [];
 

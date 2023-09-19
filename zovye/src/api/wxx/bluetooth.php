@@ -944,22 +944,23 @@ class bluetooth
         $request->setCode(Request::str('authcode'));
 
         try {
-            $result = $aop->execute($request);
-            if ($result->error_response) {
-                return err('获取用户信息失败：'.$result->error_response->sub_msg);
+            $response = $aop->execute($request);
+            if ($response->error_response) {
+                return err('获取用户信息失败：'.$response->error_response->sub_msg);
             }
 
-            $user_id = $result->alipay_system_oauth_token_response->user_id;
-            $user = User::get($user_id, true);
-
             $result = [];
+
+            $openid = $response->alipay_system_oauth_token_response->user_id;
+            $user = User::get($openid, true);
+
             if ($user) {
                 $result['user_info'] = [
                     'nickname' => $user->getNickname(),
                     'avatar' => $user->getAvatar(),
                 ];
             } else {
-                $user = User::create(['openid' => $user_id, 'app' => User::ALI]);
+                $user = User::create(['openid' => $openid, 'app' => User::ALI]);
                 if (!$user) {
                     return err('保存用户失败!');
                 }

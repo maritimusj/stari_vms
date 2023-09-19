@@ -7,7 +7,6 @@
 namespace zovye\api\wx;
 
 use zovye\domain\Goods;
-use zovye\model\agentModelObj;
 use zovye\model\inventory_goodsModelObj;
 use zovye\model\inventory_logModelObj;
 use zovye\model\userModelObj;

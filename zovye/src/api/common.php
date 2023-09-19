@@ -6,7 +6,6 @@
 
 namespace zovye\api;
 
-use Exception;
 use zovye\App;
 use zovye\domain\Balance;
 use zovye\domain\Device;
@@ -23,7 +22,6 @@ use zovye\Request;
 use zovye\util\Helper;
 use zovye\util\TemplateUtil;
 use zovye\util\Util;
-use zovye\We7;
 use zovye\Wx;
 use function zovye\err;
 use function zovye\is_error;

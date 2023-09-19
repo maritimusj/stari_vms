@@ -6,7 +6,6 @@
 
 namespace zovye\api\wx;
 
-use Exception;
 use zovye\api\common;
 use zovye\App;
 use zovye\business\DouYin;
@@ -15,7 +14,6 @@ use zovye\domain\Account;
 use zovye\domain\Advertising;
 use zovye\domain\Device;
 use zovye\domain\Goods;
-use zovye\Log;
 use zovye\model\accountModelObj;
 use zovye\model\agentModelObj;
 use zovye\model\device_groupsModelObj;

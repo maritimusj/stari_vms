@@ -35,7 +35,6 @@ use zovye\Request;
 use zovye\util\DeviceUtil;
 use zovye\util\Helper;
 use zovye\util\LocationUtil;
-use zovye\util\TemplateUtil;
 use zovye\util\Util;
 use zovye\We7;
 use function zovye\err;

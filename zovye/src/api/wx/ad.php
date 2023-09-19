@@ -6,21 +6,17 @@
 
 namespace zovye\api\wx;
 
-use Exception;
 use zovye\api\common;
 use zovye\domain\Advertising;
 use zovye\domain\Device;
-use zovye\Log;
 use zovye\model\advertisingModelObj;
 use zovye\model\agentModelObj;
 use zovye\model\device_groupsModelObj;
 use zovye\Request;
 use zovye\util\Helper;
 use zovye\util\Util;
-use zovye\We7;
 use function zovye\err;
 use function zovye\is_error;
-use function zovye\request;
 
 class ad
 {

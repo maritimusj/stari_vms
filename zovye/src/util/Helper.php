@@ -1655,11 +1655,11 @@ include './index.php';
             },
         ];
 
-        $createtime = $order->getCreatetime();
-        $counters[$uid.':order:month:'.date('Y-m', $createtime)] = function () use ($createtime) {
-            $start = new DateTime("@$createtime");
+        $create_time = $order->getCreatetime();
+        $counters[$uid.':order:month:'.date('Y-m', $create_time)] = function () use ($create_time) {
+            $start = new DateTime("@$create_time");
             $start->modify('first day of this month 00:00');
-            $end = new DateTime("@$createtime");
+            $end = new DateTime("@$create_time");
             $end->modify('first day of next month 00:00');
 
             return Order::query([
@@ -1667,10 +1667,10 @@ include './index.php';
                 'createtime <' => $end->getTimestamp(),
             ])->count();
         };
-        $counters[$uid.':order:day:'.date('Y-m-d', $createtime)] = function () use ($createtime) {
-            $start = new DateTime("@$createtime");
+        $counters[$uid.':order:day:'.date('Y-m-d', $create_time)] = function () use ($create_time) {
+            $start = new DateTime("@$create_time");
             $start->modify('00:00');
-            $end = new DateTime("@$createtime");
+            $end = new DateTime("@$create_time");
             $end->modify('next day 00:00');
 
             return Order::query([
@@ -1686,13 +1686,13 @@ include './index.php';
                     'device_id' => $device->getId(),
                 ])->count();
             };
-            $counters["device:{$device->getId()}:order:month:".date('Y-m', $createtime)] = function () use (
+            $counters["device:{$device->getId()}:order:month:".date('Y-m', $create_time)] = function () use (
                 $device,
-                $createtime
+                $create_time
             ) {
-                $start = new DateTime("@$createtime");
+                $start = new DateTime("@$create_time");
                 $start->modify('first day of this month 00:00');
-                $end = new DateTime("@$createtime");
+                $end = new DateTime("@$create_time");
                 $end->modify('first day of next month 00:00');
 
                 return Order::query([
@@ -1701,13 +1701,13 @@ include './index.php';
                     'createtime <' => $end->getTimestamp(),
                 ])->count();
             };
-            $counters["device:{$device->getId()}:order:day:".date('Y-m-d', $createtime)] = function () use (
+            $counters["device:{$device->getId()}:order:day:".date('Y-m-d', $create_time)] = function () use (
                 $device,
-                $createtime
+                $create_time
             ) {
-                $start = new DateTime("@$createtime");
+                $start = new DateTime("@$create_time");
                 $start->modify('00:00');
-                $end = new DateTime("@$createtime");
+                $end = new DateTime("@$create_time");
                 $end->modify('next day 00:00');
 
                 return Order::query([
@@ -1725,13 +1725,13 @@ include './index.php';
                     'agent_id' => $agent->getId(),
                 ])->count();
             };
-            $counters["agent:{$agent->getId()}:order:month:".date('Y-m', $createtime)] = function () use (
+            $counters["agent:{$agent->getId()}:order:month:".date('Y-m', $create_time)] = function () use (
                 $agent,
-                $createtime
+                $create_time
             ) {
-                $start = new DateTime("@$createtime");
+                $start = new DateTime("@$create_time");
                 $start->modify('first day of this month 00:00');
-                $end = new DateTime("@$createtime");
+                $end = new DateTime("@$create_time");
                 $end->modify('first day of next month 00:00');
 
                 return Order::query([
@@ -1740,13 +1740,13 @@ include './index.php';
                     'createtime <' => $end->getTimestamp(),
                 ])->count();
             };
-            $counters["agent:{$agent->getId()}:order:day:".date('Y-m-d', $createtime)] = function () use (
+            $counters["agent:{$agent->getId()}:order:day:".date('Y-m-d', $create_time)] = function () use (
                 $agent,
-                $createtime
+                $create_time
             ) {
-                $start = new DateTime("@$createtime");
+                $start = new DateTime("@$create_time");
                 $start->modify('00:00');
-                $end = new DateTime("@$createtime");
+                $end = new DateTime("@$create_time");
                 $end->modify('next day 00:00');
 
                 return Order::query([

@@ -167,7 +167,7 @@ class keeper
      */
     public static function setKeeper(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges('F_yy');
+        common::checkCurrentUserPrivileges($agent, 'F_yy');
 
         $id = Request::int('id');
         $name = Request::trim('name');
@@ -223,7 +223,7 @@ class keeper
      */
     public static function deleteKeeper(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges('F_yy');
+        common::checkCurrentUserPrivileges($agent, 'F_yy');
 
         return DBUtil::transactionDo(function () use ($agent) {
             $id = Request::int('id');
@@ -259,7 +259,7 @@ class keeper
      */
     public static function keepers(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges('F_yy');
+        common::checkCurrentUserPrivileges($agent, 'F_yy');
 
         if (Request::has('deviceId')) {
             $device = \zovye\api\wx\device::getDevice(Request::int('deviceId'));
@@ -309,7 +309,7 @@ class keeper
 
     public static function removeDevicesFromKeeper(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges('F_yy');
+        common::checkCurrentUserPrivileges($agent, 'F_yy');
 
         return DBUtil::transactionDo(function () use ($agent) {
             $keeper_id = Request::int('keeperid');
@@ -346,7 +346,7 @@ class keeper
      */
     public static function assignDevicesToKeeper(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges('F_yy');
+        common::checkCurrentUserPrivileges($agent, 'F_yy');
 
         return DBUtil::transactionDo(function () use ($agent) {
             $device_ids = [];
@@ -1164,7 +1164,7 @@ class keeper
      */
     public static function viewKeeperStats(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges('F_yy');
+        common::checkCurrentUserPrivileges($agent, 'F_yy');
 
         $id = Request::int('id');
         if ($id) {

@@ -262,13 +262,11 @@ class common
     /**
      * 代理商功能权限检查，没有设置禁止时，默认为允许
      */
-    public static function checkCurrentUserPrivileges($fn, bool $get_result = false): bool
+    public static function checkCurrentUserPrivileges(agentModelObj $agent, $fn, bool $get_result = false): bool
     {
-        $user = common::getAgentOrPartner();
+        $commission_state = App::isCommissionEnabled() && $agent->isCommissionEnabled();
 
-        $commission_state = App::isCommissionEnabled() && $user->isCommissionEnabled();
-
-        $funcs = $user->settings('agentData.funcs');
+        $funcs = $agent->settings('agentData.funcs');
         $res = common::checkEnabledFunctions($funcs, $fn, function ($name) use ($commission_state) {
             if ($name == 'F_cm') {
                 return $commission_state;

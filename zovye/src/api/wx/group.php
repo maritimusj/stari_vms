@@ -86,7 +86,7 @@ class group
      */
     public static function detail(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges('F_sp');
+        common::checkCurrentUserPrivileges($agent, 'F_sp');
 
         //分组id
         $group_id = Request::int('id');
@@ -176,7 +176,7 @@ class group
      */
     public static function delete(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges('F_gg');
+        common::checkCurrentUserPrivileges($agent, 'F_gg');
 
         $group_id = Request::trim('id');
 

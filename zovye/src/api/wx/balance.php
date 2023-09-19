@@ -40,7 +40,7 @@ class balance
             ],
         ];
 
-        if (!common::checkCurrentUserPrivileges('F_cm', true)) {
+        if (!common::checkCurrentUserPrivileges($agent, 'F_cm', true)) {
             return $result;
         }
 
@@ -262,7 +262,7 @@ class balance
      */
     public static function withdraw(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges('F_cm');
+        common::checkCurrentUserPrivileges($agent, 'F_cm');
 
         if (!empty(settings('commission.withdraw.bank_card'))) {
             if (empty($agent->settings('agentData.bank'))) {
@@ -399,7 +399,7 @@ class balance
      */
     public static function log(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges('F_cm');
+        common::checkCurrentUserPrivileges($agent, 'F_cm');
 
         return balance::getUserBalanceLog(
             $agent,

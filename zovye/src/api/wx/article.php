@@ -6,6 +6,7 @@
 
 namespace zovye\api\wx;
 
+use zovye\model\agentModelObj;
 use zovye\model\articleModelObj;
 use zovye\model\filesModelObj;
 use zovye\Request;
@@ -17,13 +18,11 @@ use function zovye\settings;
 class article
 {
     /**
-     * 读取文件详情.
-     *
-     * @return array
+     * 读取文件详情
      */
-    public static function detail(): array
+    public static function detail(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges('F_wd');
+        common::checkCurrentUserPrivileges($agent, 'F_wd');
 
         $id = Request::int('id');
         /** @var articleModelObj $article */
@@ -44,13 +43,11 @@ class article
     }
 
     /**
-     * 文件列表.
-     *
-     * @return array
+     * 文件列表
      */
-    public static function list(): array
+    public static function list(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges('F_wd');
+        common::checkCurrentUserPrivileges($agent, 'F_wd');
 
         $page = max(1, Request::int('page'));
         $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
@@ -82,13 +79,11 @@ class article
     }
 
     /**
-     * 获取附件列表.
-     *
-     * @return array
+     * 获取附件列表
      */
-    public static function archive(): array
+    public static function archive(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges('F_wd');
+        common::checkCurrentUserPrivileges($agent, 'F_wd');
 
         $archive_types = settings('doc.types');
         $page = max(1, Request::int('page'));
@@ -126,13 +121,11 @@ class article
     }
 
     /**
-     * 常见问题.
-     *
-     * @return array
+     * 常见问题
      */
-    public static function faq(): array
+    public static function faq(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges('F_wt');
+        common::checkCurrentUserPrivileges($agent, 'F_wt');
 
         $page = max(1, Request::int('page'));
         $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));

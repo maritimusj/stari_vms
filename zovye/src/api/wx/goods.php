@@ -52,7 +52,7 @@ class goods
 
     public static function delete(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges('F_sp');
+        common::checkCurrentUserPrivileges($agent, 'F_sp');
 
         $goods = \zovye\domain\Goods::get(Request::int('id'));
         if (empty($goods)) {
@@ -76,7 +76,7 @@ class goods
 
     public static function create(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges('F_sp');
+        common::checkCurrentUserPrivileges($agent, 'F_sp');
 
         $s1 = 0;
         if (Request::bool(\zovye\domain\Goods::AllowFree)) {

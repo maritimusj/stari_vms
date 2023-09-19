@@ -329,8 +329,8 @@ class device
 
         $reason = '??';
         if ($user->isAgent() || $user->isPartner()) {
-            common::checkCurrentUserPrivileges('F_sb');
-            $device = self::getDevice(request('id'), $user->isAgent() ? $user->getAgent() : $user->getPartnerAgent());
+            $agent = $user->isAgent() ? $user->getAgent() : $user->getPartnerAgent();
+            $device = self::getDevice(request('id'), $agent);
             if (is_error($device)) {
                 return $device;
             }
@@ -436,19 +436,6 @@ class device
         ];
 
         if ($params['date']) {
-            common::checkCurrentUserPrivileges('F_tj');
-
-            //统计修复状态
-            $v = $user->isAgent() ? $user : $user->getPartnerAgent();
-            if ($v) {
-                $repair = $v->settings('repair', []);
-                if ($repair) {
-                    $result['repair'] = [
-                        'state' => $repair['status'],
-                    ];
-                }
-            }
-
             $date_str = $params['date'];
             $arr = explode('-', $date_str);
             if (count($arr) == 2) {
@@ -775,7 +762,7 @@ class device
 
     public static function deleteDeviceTypes(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges('F_xh');
+        common::checkCurrentUserPrivileges($agent, 'F_xh');
 
         $device_type = DeviceTypes::get(Request::int('id'));
         if (empty($device_type)) {
@@ -805,7 +792,7 @@ class device
 
     public static function updateDeviceTypes(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges('F_xh');
+        common::checkCurrentUserPrivileges($agent, 'F_xh');
 
         $data = Request::is_string('data') ? json_decode(urldecode(Request::str('data')), true) : [];
 
@@ -1012,7 +999,7 @@ class device
      */
     public static function appRestart(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges('F_sb');
+        common::checkCurrentUserPrivileges($agent, 'F_sb');
 
         $app_id = Request::trim('id');
         if ($app_id) {
@@ -1036,8 +1023,8 @@ class device
     public static function openDoor(userModelObj $user): array
     {
         if ($user->isAgent() || $user->isPartner()) {
-            common::checkCurrentUserPrivileges('F_sb');
             $agent = $user->isAgent() ? $user->getAgent() : $user->getPartnerAgent();
+            common::checkCurrentUserPrivileges($agent, 'F_sb');
             $device = device::getDevice(Request::str('id'), $agent);
             if (is_error($device)) {
                 return $device;

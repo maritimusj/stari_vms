@@ -27,7 +27,7 @@ class ad
      */
     public static function assign(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges('F_gg');
+        common::checkCurrentUserPrivileges($agent, 'F_gg');
 
         $guid = Request::trim('id');
         $ad = Advertising::findOne("SHA1(CONCAT(id,'{$agent->getOpenid()}'))='$guid'");
@@ -74,7 +74,7 @@ class ad
      */
     public static function list(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges('F_gg');
+        common::checkCurrentUserPrivileges($agent, 'F_gg');
 
         $type = Request::int('type') ?: Advertising::SCREEN;
 
@@ -234,7 +234,7 @@ class ad
      */
     public static function createOrUpdate(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges('F_gg');
+        common::checkCurrentUserPrivileges($agent, 'F_gg');
 
         $ad = null;
 
@@ -261,7 +261,7 @@ class ad
      */
     public static function delete(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges('F_gg');
+        common::checkCurrentUserPrivileges($agent, 'F_gg');
 
         $guid = Request::trim('id');
 
@@ -295,9 +295,7 @@ class ad
      */
     public static function uploadFile(agentModelObj $agent): array
     {
-        unset($agent);
-
-        common::checkCurrentUserPrivileges('F_gg');
+        common::checkCurrentUserPrivileges($agent, 'F_gg');
 
         $type = request('type') ?: Advertising::MEDIA_IMAGE;
 
@@ -331,7 +329,7 @@ class ad
 
     public static function groupAssign(agentModelObj $agent): array
     {
-        common::checkCurrentUserPrivileges('F_gg');
+        common::checkCurrentUserPrivileges($agent, 'F_gg');
 
         $guid = Request::trim('id');
         $ad = Advertising::findOne("SHA1(CONCAT(id,'{$agent->getOpenid()}'))='$guid'");

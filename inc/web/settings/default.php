@@ -32,7 +32,7 @@ if ($page == 'device') {
     $tpl_data['loc_url'] = Util::murl('util');
     $tpl_data['test_url'] = Util::murl('testing');
     $tpl_data['theme'] = settings('device.get.theme');
-    $tpl_data['themes'] = Theme::all();
+    $tpl_data['themes'] = Theme::valid();
     $tpl_data['lbs_limits'] = Config::location('tencent.lbs.limits', []);
 
 } elseif ($page == 'agent') {
@@ -267,6 +267,7 @@ if ($page == 'device') {
     }
 
     $tpl_data['migrate'] = Migrate::detect();
+    $tpl_data['themes'] = Theme::all();
 
 } elseif ($page == 'notice') {
 

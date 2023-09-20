@@ -176,7 +176,7 @@ if (in_array(
     ];
 
     if ($op == 'agent_misc') {
-        $tpl_data['themes'] = Theme::all();
+        $tpl_data['themes'] = Theme::valid();
     }
 
     Response::showTemplate('web/agent/edit', $tpl_data);

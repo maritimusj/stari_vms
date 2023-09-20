@@ -119,7 +119,7 @@ foreach ($group_query->findAll() as $val) {
 $tpl_data['groups'] = $groups;
 $tpl_data['icon'] = $icon_html;
 $tpl_data['from'] = Request::str('from', 'base');
-$tpl_data['themes'] = Theme::all();
+$tpl_data['themes'] = Theme::valid();
 
 $tpl_data['is_normal_device'] = $model == Device::NORMAL_DEVICE;
 $tpl_data['is_bluetooth_device'] = $model == Device::BLUETOOTH_DEVICE;

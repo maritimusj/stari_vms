@@ -144,6 +144,11 @@ if ($page == 'device') {
         ], true);
     }
 
+    $themes = Request::array('theme');
+    foreach(Theme::all() as $theme) {
+        Config::app("theme.{$theme['name']}.enabled", $themes[$theme['name']] ?? 0, true);
+    }
+
     $settings['device']['v-device']['enabled'] = Request::bool('vDevice') ? 1 : 0;
     $settings['goods']['lottery']['enabled'] = Request::bool('lotteryGoods') ? 1 : 0;
     $settings['idcard']['verify']['enabled'] = Request::bool('idCardVerify') ? 1 : 0;

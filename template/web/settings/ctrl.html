@@ -145,9 +145,19 @@
                     <div class="col-md-offset-2 col-md-10">
                         <div class="checkbox">
                             <label>
-                                <input type="checkbox" name="ZovyeAppFirstEnable" id="" value="1" {if $settings['app']['first']['enabled']}checked{/if}>
+                                <input type="checkbox" name="ZovyeAppFirstEnable" value="1" {if $settings['app']['first']['enabled']}checked{/if}>
                                 用户登录后直接进入模块首页
                             </label>
+                        </div>
+                    </div>
+                    <div class="col-md-offset-2 col-md-10">
+                        <div class="checkbox">
+                            {loop $themes $index $theme}
+                            <label>
+                                <input type="checkbox" name="theme[{$theme['name']}]" value="1" {if \zovye\Config::app('theme.'.$theme['name'].'.enabled', true)}checked{/if}>
+                                {$theme['name']}
+                            </label>
+                            {/loop}
                         </div>
                     </div>
                 </div>

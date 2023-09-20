@@ -6,6 +6,7 @@
 
 namespace zovye;
 
+use zovye\api\wx\fb;
 use zovye\util\Helper;
 
 class Theme
@@ -53,6 +54,17 @@ class Theme
         }
 
         return array_values($themes);
+    }
+
+    public static function valid(): array 
+    {
+        $list = self::all();
+        foreach($list as $index => $theme) {
+            if (!Config::app("theme.{$theme['name']}.enabled", true)) {
+                unset($list[$index]);
+            }
+        }
+        return $list;
     }
 
     public static function getThemeFile($device, $name): string

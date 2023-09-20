@@ -25,12 +25,9 @@ class Job
 
     /**
      * 启动一个退款任务，如果订单符合退款条件，就会发起退款操作
-     * @param $order_no
-     * @param $message
      * @param int $num 退货数量，0表示全部， -1表示退出错商品
      * @param false $reset_payload
      * @param int $delay 指定时间后才开始检查
-     * @return bool
      */
     public static function refund($order_no, $message, int $num = 0, bool $reset_payload = false, int $delay = 0): bool
     {
@@ -78,11 +75,6 @@ class Job
             ], LEVEL_HIGH) !== false;
     }
 
-    /**
-     * @param $order_no
-     * @param deviceModelObj|null $device
-     * @return mixed
-     */
     public static function createOrder($order_no, deviceModelObj $device = null)
     {
         if ($device && $device->isBlueToothDevice()) {

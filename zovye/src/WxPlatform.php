@@ -63,7 +63,6 @@ class WxPlatform
 
     /**
      * @param callable|null $fn
-     * @return array
      */
     public static function parseEncryptedData(callable $fn = null): array
     {
@@ -114,11 +113,6 @@ class WxPlatform
 
     /**
      * 获取公众号网页授权URL
-     * @param accountModelObj $account
-     * @param $redirect_url
-     * @param string $scope
-     * @param string $state
-     * @return string
      */
     public static function getAuthorizationCodeRedirectUrl(
         accountModelObj $account,
@@ -347,8 +341,6 @@ class WxPlatform
 
     /**
      * 获取授权接入的授权页面网址
-     * @param array $params
-     * @return string
      */
     public static function getPreAuthUrl(array $params = []): string
     {
@@ -570,11 +562,7 @@ class WxPlatform
 
     /**
      * 创建一个推送给指定用户的图文消息
-     * @param string $from_user
-     * @param string $to_user
      * @param array $params 参数：['title'] 标题，['desc'] 描述，['image']图片，['url']链接
-     * @param int $timestamp
-     * @return string
      */
     public static function createToUserNewsMsg(
         string $from_user,

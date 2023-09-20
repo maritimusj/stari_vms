@@ -17,7 +17,6 @@ class JobEventHandler
 {
     /**
      * 事件：device.openSuccess 处理程序
-     * @param orderModelObj|null $order
      */
     public static function onDeviceOpenSuccess(orderModelObj $order = null)
     {

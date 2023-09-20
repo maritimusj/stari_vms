@@ -12,9 +12,6 @@ class GoodsQuotaEventHandler
 {
     /**
      * 事件：device.order.created
-     * @param deviceModelObj $device
-     * @param userModelObj $user
-     * @param orderModelObj $order
      */
     public static function onDeviceOrderCreated(deviceModelObj $device, userModelObj $user, orderModelObj $order)
     {

@@ -29,11 +29,6 @@ class CommissionEventHandler
 {
     /**
      * 事件：device.orderCreated
-     * @param deviceModelObj $device
-     * @param orderModelObj $order
-     * @param accountModelObj|null $account
-     * @param balanceModelObj|null $balance
-     * @return bool
      * @throws Exception
      */
     public static function onDeviceOrderCreated(
@@ -142,9 +137,6 @@ class CommissionEventHandler
     }
 
     /**
-     * @param deviceModelObj $device
-     * @param orderModelObj $order
-     * @return bool
      * @throws Exception
      */
     protected static function reward(deviceModelObj $device, orderModelObj $order): bool
@@ -161,9 +153,6 @@ class CommissionEventHandler
     }
 
     /**
-     * @param deviceModelObj $device
-     * @param orderModelObj $order
-     * @return bool
      * @throws Exception
      */
     protected static function balance(deviceModelObj $device, orderModelObj $order): bool
@@ -181,10 +170,6 @@ class CommissionEventHandler
 
     /**
      * 免费订单分佣
-     * @param deviceModelObj $device
-     * @param orderModelObj $order
-     * @param accountModelObj|null $account
-     * @return bool
      * @throws Exception
      */
     protected static function free(deviceModelObj $device, orderModelObj $order, accountModelObj $account): bool
@@ -208,9 +193,6 @@ class CommissionEventHandler
      *          1*）处理推广员佣金
      * 第4步，成本及剩余利润分配给代理商
      *
-     * @param deviceModelObj $device
-     * @param orderModelObj $order
-     * @return bool
      * @throws Exception
      */
     protected static function pay(deviceModelObj $device, orderModelObj $order): bool
@@ -271,11 +253,6 @@ class CommissionEventHandler
     }
 
     /**
-     * @param deviceModelObj $device
-     * @param orderModelObj $order
-     * @param int $commission_total
-     * @param int $remaining_total
-     * @return bool
      * @throws Exception
      */
     protected static function processCommissions(
@@ -376,12 +353,6 @@ class CommissionEventHandler
 
     /**
      * 处理运营人员佣金
-     * @param int $commission_total
-     * @param int $remaining_total
-     * @param deviceModelObj $device
-     * @param orderModelObj $order
-     * @param int $src
-     * @return int
      * @throws Exception
      */
     protected static function processKeeperCommissions(
@@ -463,12 +434,6 @@ class CommissionEventHandler
 
     /**
      * 处理佣金分享用户佣金
-     * @param int $commission_total
-     * @param int $remaining_total
-     * @param agentModelObj $agent
-     * @param orderModelObj $order
-     * @param int $src
-     * @return int
      * @throws Exception
      */
     protected static function processGSP(
@@ -606,13 +571,6 @@ class CommissionEventHandler
 
     /**
      * 对商品利润进行佣金分配
-     * @param deviceModelObj $device
-     * @param orderModelObj $order
-     * @param agentModelObj $agent
-     * @param int $commission_total
-     * @param int $remaining_total
-     * @param int $src
-     * @return int
      * @throws Exception
      */
     protected static function processProfit(
@@ -636,10 +594,6 @@ class CommissionEventHandler
 
     /**
      * 处理平台手续费
-     * @param int $commission_total
-     * @param int $remaining_total
-     * @param agentModelObj $agent
-     * @param orderModelObj $order
      * @return int
      */
     protected static function ProcessFee(

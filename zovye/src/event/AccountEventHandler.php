@@ -27,10 +27,6 @@ class AccountEventHandler
 {
     /**
      * 事件：device.beforeLock
-     * @param deviceModelObj $device
-     * @param userModelObj $user
-     * @param accountModelObj|null $account
-     * @param orderModelObj|null $order
      */
     public static function onDeviceBeforeLock(
         deviceModelObj $device,

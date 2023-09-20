@@ -16,11 +16,6 @@ use zovye\util\DeviceUtil;
 
 class VoucherEventHandler
 {
-    /**
-     * @param deviceModelObj $device
-     * @param orderModelObj $order
-     * @return bool
-     */
     public static function onDeviceOrderCreated(deviceModelObj $device, orderModelObj $order): bool
     {
         if (!App::isGoodsVoucherEnabled()) {

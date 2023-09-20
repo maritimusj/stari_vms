@@ -16,7 +16,6 @@ class We7CreditEventHandler
 {
     /**
      * 事件：device.orderCreated
-     * @param userModelObj $user
      * @throws Exception
      */
     public static function onDeviceOrderCreated(userModelObj $user)

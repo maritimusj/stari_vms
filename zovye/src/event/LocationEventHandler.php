@@ -17,9 +17,6 @@ class LocationEventHandler
 {
     /**
      * 事件：device.locked
-     * @param deviceModelObj $device
-     * @param userModelObj $user
-     * @param accountModelObj|null $account
      * @throws Exception
      */
     public static function onDeviceLocked(deviceModelObj $device, userModelObj $user, accountModelObj $account = null)

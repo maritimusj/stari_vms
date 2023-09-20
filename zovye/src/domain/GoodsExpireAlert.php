@@ -4,15 +4,12 @@
  * @url www.stariture.com
  */
 
-namespace zovye\business;
+namespace zovye\domain;
 
 use DateTimeImmutable;
 use Exception;
 use zovye\App;
 use zovye\base\ModelFactory;
-use zovye\base\ModelObjFinder;
-use zovye\domain\Base;
-use zovye\domain\Keeper;
 use zovye\model\deviceModelObj;
 use zovye\model\goods_expire_alertModelObj;
 use zovye\model\keeperModelObj;

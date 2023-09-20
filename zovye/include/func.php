@@ -433,6 +433,7 @@ function hashFN(callable $fn, ...$val): string
 function onceCall(callable $fn, ...$params)
 {
     static $cache = [];
+
     $v = hashFN($fn, ...$params);
     if (!isset($cache[$v])) {
         $result = $fn(...$params);

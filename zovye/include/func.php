@@ -17,7 +17,6 @@ use zovye\base\ModelObj;
 
 /**
  * 返回全局唯一的APP
- * @return WeApp
  */
 function app(): WeApp
 {
@@ -31,8 +30,6 @@ function app(): WeApp
 
 /**
  * 加载指定的数据模型类
- * @param string $name
- * @return ModelFactory
  */
 function m(string $name): ModelFactory
 {
@@ -61,9 +58,6 @@ function tb(string $name): string
 
 /**
  * 获取系统相关设置
- * @param string $key
- * @param mixed $default
- * @return mixed
  */
 class __ZOVYE_SETTINGS__
 {
@@ -88,10 +82,6 @@ function updateSettings(string $key, $val): bool
 
 /**
  * 其它全局设置
- * @param string $name
- * @param string $path
- * @param null $default
- * @return mixed|null
  */
 class __ZOVYE_CONFIG__
 {
@@ -127,8 +117,6 @@ function updateGlobalConfig(string $name, $path, $val): bool
 
 /**
  * 下划线转驼峰
- * @param $str
- * @return string
  */
 function toCamelCase($str): string
 {
@@ -141,8 +129,6 @@ function toCamelCase($str): string
 
 /**
  * 驼峰转下划线
- * @param $str
- * @return string
  */
 function toSnakeCase($str): string
 {
@@ -156,9 +142,6 @@ function toSnakeCase($str): string
 
 /**
  * 返回默认值
- * @param mixed $data
- * @param mixed $default
- * @return mixed
  */
 function ifEmpty($data, $default, $convert = true)
 {
@@ -200,10 +183,6 @@ function convert($val, $type_hints)
 
 /**
  *  更新数组中指定值，可以使用key.sub.child格式指定键
- * @param array $array
- * @param string|array $key
- * @param mixed $val
- * @return array
  */
 function setArray(array &$array, $key, $val = null): array
 {
@@ -255,10 +234,6 @@ function setArray(array &$array, $key, $val = null): array
 
 /**
  * 获取数组指定路径的值
- * @param mixed $array
- * @param string|array $key
- * @param mixed $default
- * @return mixed
  */
 function getArray($array, $key = '', $default = null, $convert = true)
 {
@@ -292,8 +267,6 @@ function getArray($array, $key = '', $default = null, $convert = true)
 
 /**
  * 判断数组是否是个全空数组
- * @param mixed $arr
- * @return bool
  */
 function isEmptyArray($arr): bool
 {
@@ -317,11 +290,6 @@ function isEmptyArray($arr): bool
     return true;
 }
 
-/**
- * @param int $errno
- * @param string $message
- * @return array
- */
 function error(int $errno, string $message = ''): array
 {
     return [
@@ -338,10 +306,6 @@ function err(string $message = ''): array
     ];
 }
 
-/**
- * @param mixed $data
- * @return bool
- */
 function is_error($data): bool
 {
     return is_array($data) && isset($data['errno']) && $data['errno'] != 0;

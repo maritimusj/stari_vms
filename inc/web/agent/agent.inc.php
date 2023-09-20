@@ -49,7 +49,7 @@ if (in_array(
 
     if (!isset($agent_data['location']['validate']['enabled'])) {
         setArray($agent_data, 'location.validate', [
-            'enabled' =>  App::isLocationValidateEnabled(),
+            'enabled' => App::isLocationValidateEnabled(),
             'distance' => App::getUserLocationValidateDistance(1),
         ]);
     }
@@ -77,22 +77,22 @@ if (in_array(
                     if ($entry['percent']) {
                         $data['gsp'] = [
                             'title' => '百分比%',
-                            'val' => number_format($entry['percent'] / 100, 2) . '%',
+                            'val' => number_format($entry['percent'] / 100, 2).'%',
                         ];
                     } elseif ($entry['percent/goods']) {
                         $data['gsp'] = [
                             'title' => '百分比% x 商品数量',
-                            'val' => number_format($entry['percent/goods'] / 100, 2) . '%',
+                            'val' => number_format($entry['percent/goods'] / 100, 2).'%',
                         ];
                     } elseif ($entry['amount']) {
                         $data['gsp'] = [
                             'title' => '固定金额',
-                            'val' => '¥' . number_format($entry['amount'] / 100, 2),
+                            'val' => '¥'.number_format($entry['amount'] / 100, 2),
                         ];
                     } elseif ($entry['amount/goods']) {
                         $data['gsp'] = [
                             'title' => '固定金额 x 商品数量',
-                            'val' => '¥' . number_format($entry['amount/goods'] / 100, 2),
+                            'val' => '¥'.number_format($entry['amount/goods'] / 100, 2),
                         ];
                     }
                     $data['order_type'] = is_array($entry['order']) ? $entry['order'] : [

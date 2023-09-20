@@ -20,14 +20,30 @@ class Theme
         if (empty($themes)) {
             foreach (glob(MODULE_ROOT.'/template/mobile/themes/*', GLOB_ONLYDIR) as $name) {
                 $name = basename($name);
-                $themes[] = [
+                $themes[$name] = [
                     'name' => $name,
                     'helper' => self::$helper[$name] ?? '',
                 ];
             }
         }
 
-        return $themes;
+        if (!App::isFlashEggEnabled()) {
+            unset($themes['shandan']);
+        }
+
+        if (!App::isCZTVEnabled()) {
+            unset($themes['cztv']);
+        }
+
+        if (!App::isGDCVMachineEnabled()) {
+            unset($themes['CVMachine']);
+        }
+
+        if (!App::isPromoterEnabled()) {
+            unset($themes['promo']);
+        }
+
+        return array_values($themes);
     }
 
     public static function getThemeFile($device, $name): string

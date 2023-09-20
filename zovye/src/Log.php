@@ -39,9 +39,7 @@ class Log
     }
 
     /**
-     * @param $topic
      * @param mixed $data
-     * @return never-return
      */
     public static function fatal($topic, $data)
     {

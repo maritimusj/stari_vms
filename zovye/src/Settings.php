@@ -71,9 +71,6 @@ CODE;
 
     /**
      * 设置并保存一个值到指定名称下
-     * @param $key
-     * @param $val
-     * @return bool
      */
     public function set($key, $val): bool
     {
@@ -121,7 +118,6 @@ CODE;
      * 获取并删除指定键名称的值
      * @param mixed $key
      * @param mixed $default
-     * @return mixed
      */
     public function pop($key, $default = null)
     {
@@ -135,7 +131,6 @@ CODE;
      * 获取指定键名称的值
      * @param mixed $key
      * @param mixed $default
-     * @return mixed
      */
     public function get($key, $default = null)
     {
@@ -167,7 +162,6 @@ CODE;
     /**
      * 删除指定键值
      * @param mixed $key
-     * @return bool
      */
     public function remove($key): bool
     {
@@ -192,7 +186,6 @@ CODE;
     /**
      * 判断指定键名称是否存在
      * @param mixed $key
-     * @return bool
      */
     public function has($key): bool
     {

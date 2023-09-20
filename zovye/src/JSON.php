@@ -17,8 +17,6 @@ class JSON
     }
     /**
      * 向请求者返回JSON数据
-     * @param $data
-     * @return never-return
      */
     public static function result($data)
     {
@@ -31,7 +29,6 @@ class JSON
     /**
      * 向请求者返回成功的JSON数据
      * @param mixed $data
-     * @return never-return
      */
     public static function success($data = [])
     {
@@ -45,7 +42,6 @@ class JSON
     /**
      * 向请求者返回失败的JSON数据，支持直接传入error结构，Exception对象等等
      * @param mixed $data
-     * @return never-return
      */
     public static function fail($data = [])
     {

@@ -41,9 +41,6 @@ class Statistics
 
     /**
      * @param deviceModelObj|agentModelObj|goodsModelObj|accountModelObj $obj
-     * @param DateTimeInterface $begin
-     * @param DateTimeInterface $end
-     * @return array
      */
     public static function calc($obj, DateTimeInterface $begin, DateTimeInterface $end): array
     {

@@ -55,9 +55,6 @@ class Pay
 
     /**
      * 获取支付需要的Js，函数会根据指定的设备和用户，获取特定的支付配置
-     * @param deviceModelObj $device
-     * @param userModelObj $user
-     * @return mixed
      */
     public static function getPayJs(deviceModelObj $device, userModelObj $user)
     {
@@ -73,11 +70,6 @@ class Pay
      * $pay_data['total']指定商品数量，未指定则默认为1
      * $pay_data['price']指定总价格，未指定则使用单个商品价格
      *
-     * @param deviceModelObj $device
-     * @param userModelObj $user
-     * @param array $goods
-     * @param array $pay_data
-     * @return array
      */
     private static function prepareData(
         deviceModelObj $device,
@@ -203,7 +195,6 @@ class Pay
      * @param deviceModelObj $device 设备
      * @param userModelObj $user 用户
      * @param array $goods 商品信息
-     * @param array $pay_data
      * @return mixed error或者支付数据
      */
     public static function createXAppPay(
@@ -220,7 +211,6 @@ class Pay
      * @param deviceModelObj $device 设备
      * @param userModelObj $user 用户
      * @param array $goods 商品信息
-     * @param array $pay_data
      * @return mixed error或者支付数据
      */
     public static function createJsPay(
@@ -244,8 +234,6 @@ class Pay
     /**
      * 处理支付的通知数据
      * @param string $name 支付类型名称
-     * @param string $input
-     * @return array|string
      */
     public static function notify(string $name, string $input)
     {
@@ -349,8 +337,6 @@ class Pay
 
     /**
      * 关闭订单
-     * @param string $order_no
-     * @return mixed
      */
     public static function close(string $order_no)
     {
@@ -369,10 +355,6 @@ class Pay
 
     /**
      * 请求退款
-     * @param string $order_no
-     * @param int $total
-     * @param array $data
-     * @return mixed
      */
     public static function refund(string $order_no, int &$total = 0, array $data = [])
     {
@@ -455,8 +437,6 @@ class Pay
 
     /**
      * 查询指定支付信息
-     * @param string $order_no
-     * @return mixed
      */
     public static function query(string $order_no)
     {
@@ -470,10 +450,6 @@ class Pay
 
     /**
      * 为用户创建一条支付记录
-     * @param userModelObj $user
-     * @param string $order_no
-     * @param array $data
-     * @return mixed
      */
     public static function createPayLog(userModelObj $user, string $order_no, array $data = []): ?pay_logsModelObj
     {
@@ -494,7 +470,6 @@ class Pay
      * 获取支付记录
      * @param string $order_no 订单编号
      * @param int $level 支付类型
-     * @return pay_logsModelObj|null
      */
     public static function getPayLog(string $order_no, int $level = 0): ?pay_logsModelObj
     {
@@ -572,10 +547,6 @@ class Pay
     /*  以下为内部函数
      * ****************************************************************************************************************/
 
-    /**
-     * @param string $name
-     * @return mixed
-     */
     public static function getDefaultPayParams(string $name = ''): array
     {
         $params = settings('pay', []);
@@ -586,8 +557,6 @@ class Pay
     /**
      * 获取设备关联的支付配置
      * @param mixed $device
-     * @param string $name
-     * @return array
      */
     public static function getPayParams($device = null, string $name = ''): array
     {
@@ -624,11 +593,6 @@ class Pay
 
     /**
      * 保存证书到文件并返回路径
-     *
-     * @param array $pem
-     * @param bool $force
-     *
-     * @return array
      */
     public static function getPEMFile(array $pem, bool $force = false): array
     {
@@ -667,8 +631,6 @@ class Pay
 
     /**
      * 获取一个临时的支付对象
-     * @param string $name
-     * @return array|IPay
      */
     private static function makePayObj(string $name)
     {
@@ -699,8 +661,6 @@ class Pay
     /**
      * 根据设备和名称获取已配置好的支付对象
      * @param string|deviceModelObj $device
-     * @param string $name
-     * @return array|IPay
      */
     public static function getActivePayObj($device, string $name = '')
     {

@@ -75,9 +75,6 @@ class Response
 
     /**
      * 重定向客户端浏览器
-     * @param string $url
-     * @param array $params
-     * @param int $response_code
      */
     public static function redirect(string $url, array $params = [], int $response_code = 302)
     {
@@ -88,12 +85,6 @@ class Response
         header("Location:$url", true, $response_code);
     }
 
-    /**
-     * @param $msg
-     * @param string $redirect
-     * @param string $type
-     * @return never-return
-     */
     public static function message($msg, string $redirect = '', string $type = ''): void
     {
         We7::message($msg, $redirect ? We7::referer() : $redirect, $type);
@@ -110,12 +101,6 @@ class Response
         exit();
     }
 
-    /**
-     * @param $msg
-     * @param string $redirect
-     * @param string $type
-     * @return never-return
-     */
     public static function toast($msg, string $redirect = '', string $type = ''): void
     {
         We7::itoast($msg, $redirect, $type);
@@ -149,7 +134,6 @@ class Response
      *
      * @param bool $status 结果
      * @param mixed $data 数据
-     * @return never-return
      */
     public static function json(bool $status, $data = [])
     {
@@ -166,11 +150,6 @@ class Response
 
     /**
      * 手机端显示错误信息.
-     *
-     * @param string $msg
-     * @param string $type
-     * @param string $redirect
-     * @return never-return
      */
     public static function alert(string $msg, string $type = 'success', string $redirect = '')
     {

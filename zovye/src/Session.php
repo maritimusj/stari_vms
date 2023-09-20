@@ -23,11 +23,7 @@ use zovye\util\CacheUtil;
 class Session
 {
     /**
-     * 获取当前用户信息.
-     *
-     * @param array $params
-     *
-     * @return userModelObj|null
+     * 获取当前用户信息
      */
     public static function getCurrentUser(array $params = []): ?userModelObj
     {
@@ -85,10 +81,7 @@ class Session
 
 
     /**
-     * 获取fans数据.
-     *
-     * @param bool $update
-     * @return array
+     * 获取fans数据
      */
     public static function fansInfo(bool $update = false): array
     {
@@ -135,8 +128,6 @@ class Session
 
     /**
      * 简单获取用户手机系统类型.
-     *
-     * @return string
      */
     public static function getUserPhoneOS(): string
     {
@@ -151,9 +142,6 @@ class Session
         return 'unknown';
     }
 
-    /**
-     * @return string
-     */
     public static function getClientIp(): string
     {
         return We7::get_ip();
@@ -215,7 +203,6 @@ class Session
 
     /**
      * 是否在支付宝APP中
-     * @return bool
      */
     public static function isAliAppContainer(): bool
     {

@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+use Exception;
+use RuntimeException;
 use zovye\business\Charging;
 use zovye\business\Fueling;
 use zovye\domain\Device;
@@ -300,35 +302,32 @@ class DeviceEventProcessor
     }
 
     /**
-     * 处理实体硬件的事件.
-     *
-     * @param string $event
-     * @param array $data
+     * 处理实体硬件的事件
      */
     public static function handle(string $event, array $data)
     {
-        $e = self::$events[$event];
+        try {
+            $e = self::$events[$event];
+            if (!$e) {
+                throw new RuntimeException('找不到这个消息处理程序！');
+            }
 
-        if (isset($e)) {
+            // 消息日志
             self::log($e, $data);
 
             $fn = $e['handler'];
+
             if (!empty($fn)) {
-                if (is_callable($fn)) {
-                    call_user_func($fn, $data);
-                } else {
-                    Log::warning('events', [
-                        'event' => $event,
-                        'data' => $data,
-                        'error' => 'handler is not function!',
-                    ]);
+                if (!is_callable($fn)) {
+                    throw new RuntimeException('指定的处理程序不正确！');
                 }
+                call_user_func($fn, $data);
             }
-        } else {
+        } catch (Exception $e) {
             Log::warning('events', [
                 'event' => $event,
                 'data' => $data,
-                'error' => 'unhandled event!',
+                'error' => $e->getMessage(),
             ]);
         }
 
@@ -336,10 +335,7 @@ class DeviceEventProcessor
     }
 
     /**
-     * 记录设备日志.
-     *
-     * @param array $event
-     * @param array $data
+     * 记录设备日志
      */
     public static function log(array $event, array $data = [])
     {
@@ -380,7 +376,6 @@ class DeviceEventProcessor
 
     /**
      * ping 事件处理
-     * @param array $data
      */
     public static function onPingMsg(array $data)
     {
@@ -400,7 +395,6 @@ class DeviceEventProcessor
 
     /**
      * first 事件处理
-     * @param array $data
      */
     public static function onFirstMsg(array $data)
     {
@@ -427,7 +421,6 @@ class DeviceEventProcessor
 
     /**
      * reset 事件处理
-     * @param array $data
      */
     public static function onResetMsg(array $data)
     {
@@ -443,9 +436,7 @@ class DeviceEventProcessor
     }
 
     /**
-     * result 事件处理.
-     *
-     * @param array $data
+     * result 事件处理
      */
     public static function onResultMsg(array $data)
     {
@@ -453,7 +444,6 @@ class DeviceEventProcessor
 
     /**
      * app::adv　事件处理
-     * @param array $data
      */
     public static function onAppAdvMsg(array $data)
     {
@@ -461,7 +451,6 @@ class DeviceEventProcessor
 
     /**
      * app::qrcode 事件处理
-     * @param $data
      */
     public static function onAppQrcodeMsg($data)
     {
@@ -474,7 +463,6 @@ class DeviceEventProcessor
 
     /**
      * app::info 事件处理
-     * @param array $data
      */
     public static function onAppInfoMsg(array $data)
     {
@@ -504,9 +492,6 @@ class DeviceEventProcessor
 
     /**
      * app::init 事件处理
-     * @param array $data
-     * @param bool $fetch
-     * @return array|bool
      */
     public static function onAppConfigMsg(array $data, bool $fetch = false)
     {
@@ -538,7 +523,6 @@ class DeviceEventProcessor
 
     /**
      * app::init 事件处理
-     * @param array $data
      */
     public static function onAppInitMsg(array $data)
     {
@@ -590,7 +574,6 @@ class DeviceEventProcessor
 
     /**
      * v1版本 mcb::online 事件处理
-     * @param array $data
      */
     public static function onMcbOnline(array $data = [])
     {
@@ -626,7 +609,6 @@ class DeviceEventProcessor
 
     /**
      * v1版本 mcb::offline 事件处理
-     * @param array $data
      */
     public static function onMcbOffline(array $data = [])
     {
@@ -650,7 +632,6 @@ class DeviceEventProcessor
 
     /**
      * v1版本 mcb::result 事件处理
-     * @param array $data
      */
     public static function onMcbResult(array $data = [])
     {
@@ -683,7 +664,6 @@ class DeviceEventProcessor
 
     /**
      * v1版本 m-report上报
-     * @param array $data
      */
     public static function onMcbMReport(array $data = [])
     {
@@ -691,7 +671,6 @@ class DeviceEventProcessor
 
     /**
      * v1版本  客户机刷卡事件
-     * @param array $data
      */
     public static function onMcbNewCard(array $data = [])
     {
@@ -699,14 +678,12 @@ class DeviceEventProcessor
 
     /**
      * v1版本 mcb::report 事件处理
-     * @param array $data
-     * @return array|void
      */
     public static function onMcbReport(array $data = [])
     {
         $device = Device::get($data['uid'], true);
         if (empty($device)) {
-            return err('找不到这个设备！');
+            throw new RuntimeException('找不到这个设备！');
         }
 
         $device->setLastPing(time());
@@ -780,25 +757,20 @@ class DeviceEventProcessor
 
     /**
      * v1版本 mcb::reload 事件处理
-     * @param array $data
      */
     public static function onMcbReload(array $data = [])
     {
     }
 
     /**
-     * v1版本 mcb::record 事件处理.
-     *
-     * @param array $data
+     * v1版本 mcb::record 事件处理
      */
     public static function onMcbRecord(array $data = [])
     {
     }
 
     /**
-     * v1版本 mcb::reset 事件处理.
-     *
-     * @param array $data
+     * v1版本 mcb::reset 事件处理
      */
     public static function onMcbReset(array $data = [])
     {
@@ -806,9 +778,7 @@ class DeviceEventProcessor
 
 
     /**
-     * v1版本 mcb::ping 事件处理.
-     *
-     * @param array $data
+     * v1版本 mcb::ping 事件处理
      */
     public static function onMcbPing(array $data = [])
     {

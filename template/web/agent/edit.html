@@ -1066,15 +1066,16 @@
             </div>
             <div class="seg">
                 <div class="title">设备</div>
-                <div class="form-group">
+                <div class="form-group theme-list">
                     <label for="theme" class="col-md-2 control-label">手机端界面</label>
                     <div class="col-md-10">
                         <select name="theme" class="form-control" id="theme">
                             <option value=""{if empty($agent_data['device']['theme'])} selected{/if}> 系统默认界面 </option>
                             {loop $themes $index $item}
-                            <option value="{$item}"{if $agent_data['device']['theme'] == $item} selected{/if}> {$item} </option>
+                            <option value="{$item}"{if $agent_data['device']['theme'] == $item['name']} selected{/if}> {$item['name']} </option>
                             {/loop}
                         </select>
+                        <span class="help-block"></span>
                     </div>
                 </div>
                 <div class="form-group">

@@ -10,6 +10,7 @@ use zovye\util\Helper;
 
 class Theme
 {
+    static $helper = [];
     /**
      * 获取设备页面schema列表
      */
@@ -18,7 +19,10 @@ class Theme
         static $themes = [];
         if (empty($themes)) {
             foreach (glob(MODULE_ROOT.'/template/mobile/themes/*', GLOB_ONLYDIR) as $name) {
-                $themes[] = basename($name);
+                $themes[] = [
+                    'name' => basename($name),
+                    'helper' => self::$helper[$name] ?? '',
+                ];
             }
         }
 

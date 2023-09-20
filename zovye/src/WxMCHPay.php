@@ -22,11 +22,6 @@ class WxMCHPay
 
     /**
      * 给指定的微信用户打款
-     * @param $openid
-     * @param $trade_no
-     * @param $money
-     * @param string $desc
-     * @return mixed
      */
     public function transferTo($openid, $trade_no, $money, string $desc = ''): array
     {
@@ -129,9 +124,6 @@ class WxMCHPay
 
     /**
      * 解析微信返回的xml
-     * @param $req
-     * @param $input
-     * @return mixed
      */
     public function parseResult($req, $input): array
     {
@@ -158,9 +150,6 @@ class WxMCHPay
 
     /**
      * 转帐订单信息
-     * @param $transaction
-     * @param $trade_no
-     * @return mixed
      */
     public function transferInfo($transaction, $trade_no): array
     {

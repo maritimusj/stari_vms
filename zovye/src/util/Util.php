@@ -36,12 +36,11 @@ class Util
     }
 
     /**
-     * 检查指定trait是否可用.
+     * 检查指定trait是否可用
      *
      * @param mixed $class 要检查的类
      * @param string $traitName trait名称
      *
-     * @return bool
      */
     public static function traitUsed($class, string $traitName): bool
     {
@@ -90,12 +89,7 @@ class Util
 
 
     /**
-     * 格式化时间.
-     *
-     * @param $ts
-     *
-     * @return string
-     *
+     * 格式化时间
      * @throws
      */
     public static function getFormattedPeriod($ts): string
@@ -123,8 +117,6 @@ class Util
 
     /**
      * 返回指定频道的平台相关值
-     * @param string $name
-     * @return string
      */
     public static function encryptTopic(string $name = 'all'): string
     {
@@ -137,13 +129,7 @@ class Util
     }
 
     /**
-     * 修正微擎payResult回调时，toMedia函数工作不正常的问题.
-     *
-     * @param $src
-     * @param bool $use_image_proxy
-     * @param bool $local_path
-     *
-     * @return mixed
+     * 修正微擎payResult回调时，toMedia函数工作不正常的问题
      */
     public static function toMedia($src, bool $use_image_proxy = false, bool $local_path = false): string
     {
@@ -170,12 +156,6 @@ class Util
         return getmypid().'-'.time().'-'.Util::random(6, true);
     }
 
-    /**
-     * @param $length
-     * @param bool $numeric
-     *
-     * @return string
-     */
     public static function random($length, bool $numeric = false): string
     {
         return We7::random($length, $numeric);
@@ -183,8 +163,6 @@ class Util
 
     /**
      * 随机颜色值
-     *
-     * @return string
      */
     public static function randColor(): string
     {
@@ -211,12 +189,6 @@ class Util
         return "$scheme$user$pass$host$port$path$query$fragment";
     }
 
-    /**
-     * @param string $do
-     * @param array $params
-     * @param bool $eid
-     * @return string
-     */
     public static function url(string $do = '', array $params = [], bool $eid = true): string
     {
         $params['m'] = APP_NAME;
@@ -228,12 +200,6 @@ class Util
         return We7::url("site/entry/$do", $params);
     }
 
-    /**
-     * @param string $do
-     * @param array $params
-     * @param bool $full_url
-     * @return string
-     */
     public static function murl(string $do = '', array $params = [], bool $full_url = true): string
     {
         $params['do'] = $do;
@@ -294,11 +260,7 @@ class Util
     }
 
     /**
-     * 导出excel.
-     *
-     * @param string $name
-     * @param array $header
-     * @param array $data
+     * 导出csv
      */
     public static function exportCSV(string $name = '', array $header = [], array $data = [])
     {
@@ -314,8 +276,6 @@ class Util
 
     /**
      * 获取指定图片的由压缩服务器代理后的URL
-     * @param $image_url
-     * @return string
      */
     public static function getImageProxyURL($image_url): string
     {
@@ -347,11 +307,7 @@ class Util
     }
 
     /**
-     * 获取返回js sdk字符串.
-     *
-     * @param bool $debug
-     *
-     * @return string
+     * 获取返回js sdk字符串
      */
     public static function jssdk(bool $debug = false): string
     {

@@ -73,7 +73,6 @@ class Helper
     /**
      * 如果当前皮肤需要tpl_data中获取任务列表，否返回true
      * @param deviceModelObj|null $device
-     * @return bool
      */
     public static function needsTplAccountsData(deviceModelObj $device = null): bool
     {
@@ -85,7 +84,6 @@ class Helper
     /**
      * 设备故障时，订单是否需要自动退款
      * @param null $obj
-     * @return bool
      */
     public static function NeedAutoRefund($obj = null): bool
     {
@@ -112,8 +110,6 @@ class Helper
 
     /**
      * 是否设置必须关注公众号以后才能购买商品
-     * @param deviceModelObj $device
-     * @return bool
      */
     public static function MustFollowAccount(deviceModelObj $device): bool
     {
@@ -241,13 +237,6 @@ class Helper
         return false;
     }
 
-    /**
-     * @param orderModelObj|null $order
-     * @param deviceModelObj $device
-     * @param userModelObj|null $user
-     * @param array $goods
-     * @return array
-     */
     public static function preparePullData(
         ?orderModelObj $order,
         deviceModelObj $device,
@@ -296,14 +285,6 @@ class Helper
         return $pull_data;
     }
 
-    /**
-     * @param orderModelObj $order
-     * @param deviceModelObj $device
-     * @param userModelObj $user
-     * @param int $level
-     * @param $data
-     * @return array
-     */
     public static function pullGoods(
         orderModelObj $order,
         deviceModelObj $device,
@@ -940,7 +921,6 @@ class Helper
 
     /**
      * 返回省份列表
-     * @return string[]
      */
     public static function getProvinceList(): array
     {
@@ -1080,11 +1060,7 @@ class Helper
     }
 
     /**
-     * 获取需要通知的openid list.
-     *
-     * @param agentModelObj $agent
-     * @param string $event
-     * @return array
+     * 获取需要通知的openid list
      */
     public static function getNotifyOpenIds(agentModelObj $agent, string $event): array
     {
@@ -1111,10 +1087,6 @@ class Helper
 
     /**
      * 获取控制服务器回调网址
-     *
-     * @param array $params
-     *
-     * @return mixed
      */
     public static function getCtrlServCallbackUrl(array $params = []): string
     {
@@ -1215,11 +1187,6 @@ include './index.php';
 
     /**
      * 检查订单数量是否达到指定数量，true 表示已达到，false表示没有
-     * @param accountModelObj $account
-     * @param userModelObj|null $user
-     * @param array $params
-     * @param int $limit
-     * @return bool
      */
     public static function checkLimit(
         accountModelObj $account,
@@ -1296,10 +1263,6 @@ include './index.php';
 
     /**
      * 检查用户是否符合公众号设置的限制条件
-     * @param userModelObj $user
-     * @param accountModelObj $account
-     * @param array $params
-     * @return array|bool|mixed
      */
     public static function checkAccountLimits(userModelObj $user, accountModelObj $account, array $params = [])
     {
@@ -1450,9 +1413,6 @@ include './index.php';
 
     /**
      * 检查用户是否被限制，则返回true，否则返回false
-     * @param deviceModelObj $device
-     * @param userModelObj $user
-     * @return bool
      */
     public static function checkFlashEggDeviceLimit(deviceModelObj $device, userModelObj $user): bool
     {
@@ -1530,14 +1490,13 @@ include './index.php';
     }
 
     /**
-     * 判断用户在指定公众号以及指定设备是否还有免费额度.
+     * 判断用户在指定公众号以及指定设备是否还有免费额度
      *
      * @param userModelObj $user 用户
      * @param accountModelObj $account 公众号
      * @param deviceModelObj $device 设备
      * @param array $params 更多条件
      *
-     * @return bool|array
      */
     public static function checkAvailable(
         userModelObj $user,
@@ -1803,14 +1762,7 @@ include './index.php';
     }
 
     /**
-     * 返回用户还需要关注的公众号列表.
-     *
-     * @param deviceModelObj $device
-     * @param userModelObj $user
-     * @param accountModelObj $account
-     * @param array $excepts
-     *
-     * @return array
+     * 返回用户还需要关注的公众号列表
      */
     public static function getRequireAccounts(
         deviceModelObj $device,
@@ -1866,12 +1818,7 @@ include './index.php';
     }
 
     /**
-     * 获取用户今日免费可领取的数量.
-     *
-     * @param userModelObj $user
-     * @param deviceModelObj $device
-     *
-     * @return int|mixed|null
+     * 获取用户今日免费可领取的数量
      */
     public static function getUserTodayFreeNum(userModelObj $user, deviceModelObj $device): int
     {

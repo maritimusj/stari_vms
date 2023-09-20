@@ -17,11 +17,7 @@ use function zovye\is_error;
 class DBUtil
 {
     /**
-     * 返回一个表结构描述.
-     *
-     * @param string $tab_name
-     *
-     * @return array
+     * 返回一个表结构描述
      */
     public static function tableSchema(string $tab_name): array
     {
@@ -53,11 +49,8 @@ class DBUtil
     }
 
     /**
-     * 在事务中执行指定函数.
-     *
+     * 在事务中执行指定函数
      * @param callable $cb 要执行的函数, return error(..)或者抛出异常会回退事务
-     *
-     * @return mixed
      */
     public static function transactionDo(callable $cb)
     {
@@ -96,13 +89,12 @@ class DBUtil
     }
 
     /**
-     * 通过写入唯一值，锁定数据库中某一行数据，成功返回锁对象，失败返回null.
+     * 通过写入唯一值，锁定数据库中某一行数据，成功返回锁对象，失败返回null
      *
      * @param ModelObj $obj 数据对象，必须是modelObj子类
      * @param array $cond 条件数组，用于判断是否可以锁定对象
      * @param bool $auto_unlock 是否自动解锁
      *
-     * @return ?RowLocker
      */
     public static function lockObject(ModelObj $obj, array $cond, bool $auto_unlock = false): ?RowLocker
     {

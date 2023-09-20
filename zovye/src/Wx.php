@@ -136,11 +136,6 @@ class Wx
 
     /**
      * 微信模板消息通知
-     * @param $openid
-     * @param $tpl_id
-     * @param $content
-     * @param string $url
-     * @return mixed
      */
     public static function sendTplNotice($openid, $tpl_id, $content, string $url = '')
     {
@@ -149,8 +144,6 @@ class Wx
 
     /**
      * 微信客服消息
-     * @param $msg
-     * @return mixed
      */
     public static function sendCustomNotice($msg): bool
     {

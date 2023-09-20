@@ -25,10 +25,7 @@ class LocationUtil
     }
 
     /**
-     * 获取ip地址定位信息.
-     *
-     * @param $ip
-     * @return array
+     * 获取ip地址定位信息
      */
     public static function getIpInfo($ip)
     {
@@ -123,10 +120,7 @@ class LocationUtil
     }
 
     /**
-     * 是否需要对用户进行定位操作.
-     * @param userModelObj $user
-     * @param deviceModelObj $device
-     * @return bool
+     * 是否需要对用户进行定位操作
      */
     public static function mustValidate(userModelObj $user, deviceModelObj $device): bool
     {

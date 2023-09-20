@@ -109,9 +109,6 @@ class WxMCHPayV3
 
     /**
      * 转帐订单信息
-     * @param string $batch_id
-     * @param string $trade_no
-     * @return mixed
      */
     public function transferInfo(string $batch_id, string $trade_no = ''): array
     {

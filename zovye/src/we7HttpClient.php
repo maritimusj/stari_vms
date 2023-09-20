@@ -13,12 +13,8 @@ class we7HttpClient implements IHttpClient
 {
     /**
      * 请求指定网站，返回数据
-     * @param string $url
-     * @param string $method
      * @param string|array $headers
      * @param string|array $data
-     * @param int $timeout
-     * @return mixed
      */
     public function request(string $url, string $method = 'GET', $headers = '', $data = '', int $timeout = 60)
     {

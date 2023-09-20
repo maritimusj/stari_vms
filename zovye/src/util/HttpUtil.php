@@ -13,11 +13,6 @@ class HttpUtil
 {
     /**
      * 使用GET请求指定API
-     * @param string $url
-     * @param int $timeout
-     * @param array $params
-     * @param bool $json_result
-     * @return mixed
      */
     public static function get(string $url, int $timeout = 3, array $params = [], bool $json_result = false)
     {
@@ -37,12 +32,6 @@ class HttpUtil
 
     /**
      * 使用POST请求指定URL
-     * @param string $url
-     * @param array $data
-     * @param bool $json
-     * @param int $timeout
-     * @param array $params
-     * @return array
      */
     public static function post(
         string $url,

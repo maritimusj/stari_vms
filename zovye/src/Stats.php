@@ -31,10 +31,7 @@ class Stats
 {
     /**
      * 获取对象某天的统计数据
-     * @param ModelObj $obj
      * @param mixed $day
-     * @param string $w
-     * @return array
      */
     public static function getDayTotal(ModelObj $obj, $day = null, string $w = 'goods'): array
     {
@@ -76,10 +73,7 @@ class Stats
 
     /**
      * 获取对象某月的统计数据
-     * @param ModelObj $obj
      * @param mixed $month
-     * @param string $w
-     * @return array
      */
     public static function getMonthTotal(ModelObj $obj, $month = null, string $w = 'goods'): array
     {
@@ -120,11 +114,8 @@ class Stats
 
     /**
      * 返回指定日期的日统计数据
-     * @param ModelObj $obj
      * @param mixed $day
-     * @param string $title
      * @param callable|null $fn
-     * @return array
      */
     public static function chartDataOfDay(
         ModelObj $obj,
@@ -175,11 +166,7 @@ class Stats
 
     /**
      * 返回指定月份的月统计数据
-     * @param ModelObj $obj
-     * @param DateTimeInterface $month
-     * @param string $title
      * @param callable|null $fn
-     * @return array
      */
     public static function chartDataOfMonth(
         ModelObj $obj,
@@ -262,11 +249,6 @@ class Stats
 
     /**
      * 返回指定时间的日统计数据
-     * @param device_groupsModelObj $group
-     * @param $s_date
-     * @param $e_date
-     * @param string $title
-     * @return array
      */
     public static function dayChartOfChargingGroup(
         device_groupsModelObj $group,
@@ -328,9 +310,6 @@ class Stats
 
     /**
      * 返回指定月份的月统计数据
-     * @param device_groupsModelObj $group
-     * @param string $title
-     * @return array
      */
     public static function monthChartOfChargingGroup(device_groupsModelObj $group, string $title = ''): array
     {
@@ -430,11 +409,6 @@ class Stats
         return $chart;
     }
 
-    /**
-     * @param int $len
-     * @param int $max
-     * @return array
-     */
     public static function chartDataOfAgents(int $len = 7, int $max = 15): array
     {
         $first_day = new DateTime("-$len days 00:00");
@@ -473,11 +447,6 @@ class Stats
         ]);
     }
 
-    /**
-     * @param int $len
-     * @param int $max
-     * @return array
-     */
     public static function chartDataOfAccounts(int $len = 7, int $max = 15): array
     {
         $first_day = new DateTime("-$len days 00:00");
@@ -516,11 +485,6 @@ class Stats
         ]);
     }
 
-    /**
-     * @param int $len
-     * @param int $max
-     * @return array
-     */
     public static function chartDataOfDevices(int $len = 7, int $max = 15): array
     {
         $first_day = new DateTime("-$len days 00:00");
@@ -559,9 +523,6 @@ class Stats
         ]);
     }
 
-    /**
-     * @return array
-     */
     public static function brief(): array
     {
         $data = [
@@ -709,12 +670,6 @@ class Stats
         ];
     }
 
-    /**
-     * @param ModelObj $obj
-     * @param mixed $day
-     * @param string $w
-     * @return array
-     */
     public static function daysOfMonth(ModelObj $obj, $day = null, string $w = 'goods'): array
     {
         if (is_string($day)) {
@@ -777,13 +732,6 @@ class Stats
         return $result;
     }
 
-
-    /**
-     * @param ModelObj $obj
-     * @param mixed $day
-     * @param string $w
-     * @return array
-     */
     public static function hoursOfDay(ModelObj $obj, $day = null, string $w = 'goods'): array
     {
         try {
@@ -839,10 +787,6 @@ class Stats
         return $result;
     }
 
-    /**
-     * @param string $title
-     * @return array
-     */
     public static function getChartInitData(string $title): array
     {
         $chart = [

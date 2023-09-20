@@ -11,7 +11,7 @@ class Request
     private static $data = [];
 
     /**
-     * 将ajax请求中的的json数据合并到$GLOBALS['_GPC']中.
+     * 将ajax请求中的的json数据合并到$GLOBALS['_GPC']中
      */
     public static function extraAjaxJsonData()
     {

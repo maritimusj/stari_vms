@@ -63,12 +63,7 @@ class QRCodeUtil
     }
 
     /**
-     * 创建二维码 $id = type.uid形式指定.
-     *
-     * @param $id
-     * @param $text
-     * @param callable|null $cb
-     * @return string|array
+     * 创建二维码 $id = type.uid形式指定
      */
     public static function createFile($id, $text, callable $cb = null)
     {
@@ -131,8 +126,6 @@ class QRCodeUtil
 
     /**
      * 下载指定的二维码
-     * @param $url
-     * @return string
      */
     public static function downloadQRCode($url): string
     {

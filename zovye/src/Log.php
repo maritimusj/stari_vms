@@ -38,9 +38,6 @@ class Log
         self::append(L_ERROR, $topic, $data);
     }
 
-    /**
-     * @param mixed $data
-     */
     public static function fatal($topic, $data)
     {
         self::append(L_FATAL, $topic, $data);

@@ -130,7 +130,7 @@ class Response
     }
 
     /**
-     * 返回JSON响应.
+     * 返回JSON响应
      *
      * @param bool $status 结果
      * @param mixed $data 数据
@@ -149,7 +149,7 @@ class Response
     }
 
     /**
-     * 手机端显示错误信息.
+     * 手机端显示错误信息
      */
     public static function alert(string $msg, string $type = 'success', string $redirect = '')
     {
@@ -252,7 +252,7 @@ HTML_CONTENT;
             <div style="width: 80%;text-align: center;padding: 20px 20px;background: rgba(0,0,0,.5);">
             需要用户授权才能使用该功能，请点击右下角 <b style="color:#fc6;">“使用完整服务”</b>！</span>
             </div>
-            <img src="$gif_url" style="width:60px;bottom: 10px;right: 40px;position: absolute;">
+            <img src="$gif_url" style="width:60px;bottom: 10px;right: 40px;position: absolute;" alt="">
         </div>
         </div>
 HTML;

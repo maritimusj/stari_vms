@@ -201,10 +201,6 @@ class WeApp extends Settings
         return TemplateUtil::compile($filename);
     }
 
-    /**
-     * @param $filename
-     * @param array $tpl_data
-     */
     public function showTemplate($filename, array $tpl_data = [])
     {
         $tpl_data['_GPC'] = $GLOBALS['_GPC'];
@@ -219,10 +215,7 @@ class WeApp extends Settings
 
     /**
      * 加载并返回页面模板字符串.
-     *
      * @param string $name 模板名称
-     * @param array $tpl_data
-     * @return string
      */
     public function fetchTemplate(string $name, array $tpl_data = []): string
     {

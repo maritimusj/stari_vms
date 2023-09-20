@@ -49,9 +49,7 @@ class CacheUtil
     /**
      * 缓存指定函数的调用结果，指定时间内不再重复调用
      * @param $interval_seconds 0表示不过期
-     * @param callable $fn
      * @param mixed ...$params 用来区分同一个函数应用了不同的参数的情况
-     * @return mixed
      */
     public static function cachedCall($interval_seconds, callable $fn, ...$params)
     {

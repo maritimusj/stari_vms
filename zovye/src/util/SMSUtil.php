@@ -15,12 +15,6 @@ class SMSUtil
 {
     /**
      * 发送短信
-     *
-     * @param $mobile
-     * @param $tpl_id
-     * @param $msg
-     *
-     * @return bool|array
      */
     public static function send($mobile, $tpl_id, $msg)
     {

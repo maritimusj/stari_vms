@@ -45,8 +45,6 @@ class TemplateUtil
     /**
      * 获取页面参数
      * @param $name string 如果指定参数是数组，则取回数组中指定键值
-     * @param $throw_error bool
-     * @return mixed
      */
     public static function getTemplateVar(string $name = '', bool $throw_error = false)
     {
@@ -63,11 +61,7 @@ class TemplateUtil
     }
 
     /**
-     * 获取页面模板变量.
-     *
-     * @param mixed $objs
-     *
-     * @return array
+     * 获取页面模板变量
      */
     public static function getTplData(array $objs = []): array
     {

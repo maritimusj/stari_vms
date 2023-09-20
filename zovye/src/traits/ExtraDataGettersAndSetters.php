@@ -31,7 +31,6 @@ trait ExtraDataGettersAndSetters
      * 获取扩展数据
      * @param mixed $key
      * @param null $default
-     * @return mixed|null
      */
     public function getExtraData($key = '', $default = null)
     {
@@ -46,9 +45,7 @@ trait ExtraDataGettersAndSetters
 
     /**
      * 设置扩展数据
-     * @param $key
      * @param null $val
-     * @return mixed
      */
     public function setExtraData($key, $val = null)
     {

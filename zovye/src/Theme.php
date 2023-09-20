@@ -12,7 +12,6 @@ class Theme
 {
     /**
      * 获取设备页面schema列表
-     * @return array
      */
     public static function all(): array
     {
@@ -33,9 +32,6 @@ class Theme
 
     /**
      * 获取皮肤文件名，当前皮肤不包括指定文件时，则返回默认皮肤的相应文件
-     * @param string $theme
-     * @param $name
-     * @return string
      */
     public static function file($name, string $theme = ''): string
     {

@@ -16,6 +16,7 @@ class Theme
         'CVMachine' => '省避孕药具平台专用皮肤',
         'promo' => '国外短信领取专用皮肤',
     ];
+
     /**
      * 获取设备页面schema列表
      */
@@ -23,8 +24,8 @@ class Theme
     {
         static $themes = [];
         if (empty($themes)) {
-            foreach (glob(MODULE_ROOT.'/template/mobile/themes/*', GLOB_ONLYDIR) as $name) {
-                $name = basename($name);
+            foreach (glob(MODULE_ROOT.'/template/mobile/themes/*', GLOB_ONLYDIR) as $dir) {
+                $name = basename($dir);
                 $themes[$name] = [
                     'name' => $name,
                     'helper' => self::$helper[$name] ?? '',

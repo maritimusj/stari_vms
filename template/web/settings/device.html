@@ -32,6 +32,9 @@
     i.limits-warn .pv {
         color: #f44336;
     }
+    [v-cloak] {
+        display: none;
+    }
 </style>
 {template "web/settings/nav"}
 <form action="{php echo $this->createWebUrl('settings');}" method="post">
@@ -49,16 +52,7 @@
             {/if}
             <div class="seg">
                 <div class="title">界面</div>
-                <div class="form-group">
-                    <label for="theme" class="col-md-2 control-label">手机端界面</label>
-                    <div class="col-md-10">
-                        <select name="theme" class="form-control" id="theme">
-                            {loop $themes $index $item}
-                            <option value="{$item}"{if $theme == $item['name']} selected{/if}> {$item['name']} </option>
-                            {/loop}
-                        </select>
-                    </div>
-                </div>
+                {template 'web/common/theme'}
                 <div class="form-group">
                     <label for="siteTitle" class="col-md-2 control-label">页面标题</label>
                     <div class="col-md-10">
@@ -404,6 +398,9 @@
     $(function(){
         $('#special input[name=userLocationEnabled]').click(function(){
             $('#special fieldset').attr('disabled', !$(this).is(':checked'));
+        })
+        $('#theme').change(function() {
+            console.log($(this).find("option:selected").data('helper'));
         })
     })
 </script>

@@ -674,12 +674,15 @@
                     <div class="form-group" v-if="config.is_normal_device || config.is_vdevice">
                         <label for="theme" class="col-md-2 control-label">手机端界面</label>
                         <div class="col-md-10">
-                            <select name="theme" class="form-control" id="theme">
-                                <option value=""{if empty($extra['theme'])} selected{/if}> 系统默认界面 </option>
-                                {loop $themes $index $item}
-                                <option value="{$item}"{if $extra['theme'] == $item['name']} selected{/if}> {$item['name']} </option>
-                                {/loop}
+                            <select name="theme" class="form-control" id="theme" v-model="theme.selected" @change="handleThemeChange">
+                                <option value="" :selected="!theme.selected"> 系统默认界面 </option>
+                                <option :value="item.name"
+                                :selected="item.name==theme.selected"
+                                v-for="item in theme.list" :key="item.name">
+                                {{item.name}}
+                                </option>
                             </select>
+                            <span class="help-block" v-html="theme.helper"></span>
                         </div>
                     </div>
                     <div class="form-group" v-if="config.is_normal_device || config.is_vdevice">
@@ -1049,6 +1052,11 @@
                     },
                 ],
                 active: '{$from}',
+                theme: {
+                    selected: `{$extra['theme']}`,
+                    helper: '',
+                    list: JSON.parse(`{php echo json_encode($themes)}`),
+                },
             },
             watch: {
                 currentTypeID() {
@@ -1121,6 +1129,9 @@
                         }
                     })
                 }
+
+                this.handleThemeChange();
+
                 initLegacyJs();
             },
 
@@ -1128,6 +1139,12 @@
                 navExists(op) {
                     return this.navs.findIndex(nav => nav.op == op) !== -1;
                 },
+
+                handleThemeChange() {
+                    const item = this.theme.list.find(e => e.name === this.theme.selected);
+                    this.theme.helper = item && (item.helper || '');
+                },
+
                 search() {
                     const self = this;
                     self.searching = true;

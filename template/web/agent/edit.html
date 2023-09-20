@@ -50,6 +50,9 @@
     .checkbox-inline.fail {
         color: #9e9e9e;
     }
+    [v-cloak] {
+        display: none;
+    }
 </style>
 
 <div style="margin-bottom: 1em;display: block;">
@@ -1066,18 +1069,43 @@
             </div>
             <div class="seg">
                 <div class="title">设备</div>
-                <div class="form-group theme-list">
-                    <label for="theme" class="col-md-2 control-label">手机端界面</label>
-                    <div class="col-md-10">
-                        <select name="theme" class="form-control" id="theme">
-                            <option value=""{if empty($agent_data['device']['theme'])} selected{/if}> 系统默认界面 </option>
-                            {loop $themes $index $item}
-                            <option value="{$item}"{if $agent_data['device']['theme'] == $item['name']} selected{/if}> {$item['name']} </option>
-                            {/loop}
-                        </select>
-                        <span class="help-block"></span>
+                <div id="theme-list" v-cloak>
+                    <div class="form-group">
+                        <label for="theme" class="col-md-2 control-label">手机端界面</label>
+                        <div class="col-md-10">
+                            <select name="theme" class="form-control" id="theme" v-model="selected" @change="handleChange">
+                                <option value="" :selected="!selected"> 系统默认界面 </option>
+                                <option :value="item.name"
+                                :selected="item.name==selected"
+                                v-for="item in list" :key="item.name">
+                                {{item.name}}
+                                </option>
+                            </select>
+                            <span class="help-block" v-html="helper"></span>
+                        </div>
                     </div>
                 </div>
+                <script>
+                    require(["{php \zovye\url(false, JS_VUE_URL);}"], function (Vue) {
+                        new Vue({
+                            el: '#theme-list',
+                            data: {
+                                selected: `{$agent_data['device']['theme']}`,
+                                helper: '',
+                                list: JSON.parse(`{php echo json_encode($themes)}`),
+                            },
+                            mounted() {
+                                this.handleChange();
+                            },
+                            methods: {
+                                handleChange() {
+                                    const item = this.list.find(e => e.name === this.selected);
+                                    this.helper = item && (item.helper || '');
+                                }
+                            }
+                        })
+                    })
+                </script>
                 <div class="form-group">
                     <label for="siteTitle" class="col-md-2 control-label">设备领取页面标题</label>
                     <div class="col-md-10">

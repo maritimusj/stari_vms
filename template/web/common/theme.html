@@ -1,0 +1,36 @@
+<div id="theme-list" v-cloak>
+    <div class="form-group">
+        <label for="theme" class="col-md-2 control-label">手机端界面</label>
+        <div class="col-md-10">
+            <select name="theme" class="form-control" id="theme" v-model="selected" @change="handleChange">
+                <option :value="item.name"
+                :selected="item.name==selected"
+                v-for="item in list" :key="item.name">
+                {{item.name}}
+                </option>
+            </select>
+            <span class="help-block" v-html="helper"></span>
+        </div>
+    </div>
+</div>
+<script>
+    require(["{php \zovye\url(false, JS_VUE_URL);}"], function (Vue) {
+        new Vue({
+            el: '#theme-list',
+            data: {
+                selected: `{$theme}`,
+                helper: '',
+                list: JSON.parse(`{php echo json_encode($themes)}`),
+            },
+            mounted() {
+                this.handleChange();
+            },
+            methods: {
+                handleChange() {
+                    const item = this.list.find(e => e.name === this.selected);
+                    this.helper = item && (item.helper || '');
+                }
+            }
+        })
+    })
+</script>

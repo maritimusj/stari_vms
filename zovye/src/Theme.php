@@ -19,8 +19,9 @@ class Theme
         static $themes = [];
         if (empty($themes)) {
             foreach (glob(MODULE_ROOT.'/template/mobile/themes/*', GLOB_ONLYDIR) as $name) {
+                $name = basename($name);
                 $themes[] = [
-                    'name' => basename($name),
+                    'name' => $name,
                     'helper' => self::$helper[$name] ?? '',
                 ];
             }

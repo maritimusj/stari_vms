@@ -11,10 +11,10 @@ use zovye\util\Helper;
 class Theme
 {
     static $helper = [
-        'shandan' => '闪蛋专用皮肤',
-        'cztv' => '暖心小屋专用皮肤',
-        'CVMachine' => '省避孕药具平台专用皮肤',
-        'promo' => '国外短信领取专用皮肤',
+        'shandan' => '* 闪蛋系统专用皮肤',
+        'cztv' => '* 暖心小屋平台专用皮肤',
+        'CVMachine' => '* 省避孕药具平台专用皮肤',
+        'promo' => '* 国外短信领取专用皮肤',
     ];
 
     /**

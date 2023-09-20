@@ -324,7 +324,7 @@ class DeviceEventProcessor
                 call_user_func($fn, $data);
             }
         } catch (Exception $e) {
-            Log::warning('events', [
+            Log::error('events', [
                 'event' => $event,
                 'data' => $data,
                 'error' => $e->getMessage(),

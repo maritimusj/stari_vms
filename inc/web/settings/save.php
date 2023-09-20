@@ -144,6 +144,11 @@ if ($page == 'device') {
         ], true);
     }
 
+    $protocol = Request::array('protocol');
+    foreach(BlueToothProtocol::all() as $item) {
+        Config::app("theme.{$item['name']}.enabled", $protocol[$item['name']] ?? 0, true);
+    }
+
     $themes = Request::array('theme');
     foreach(Theme::all() as $theme) {
         Config::app("theme.{$theme['name']}.enabled", $themes[$theme['name']] ?? 0, true);

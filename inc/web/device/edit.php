@@ -62,7 +62,7 @@ if ($id > 0) {
 
 $tpl_data['device_model'] = $model;
 
-$tpl_data['bluetooth']['protocols'] = BlueToothProtocol::all();
+$tpl_data['bluetooth']['protocols'] = BlueToothProtocol::valid();
 $tpl_data['device_types'] = $device_types;
 
 if (isset($device) && App::isMoscaleEnabled() && MoscaleAccount::isAssigned($device)) {

@@ -152,6 +152,16 @@
                     </div>
                     <div class="col-md-offset-2 col-md-10">
                         <div class="checkbox">
+                            {loop $bluetooth $index $protocol}
+                            <label>
+                                <input type="checkbox" name="protocol[{$protocol['name']}]" value="1" {if \zovye\Config::app('bluetooth.'.$protocol['name'].'.enabled', true)}checked{/if}>
+                                {$protocol['title']}
+                            </label>
+                            {/loop}
+                        </div>
+                    </div>
+                    <div class="col-md-offset-2 col-md-10">
+                        <div class="checkbox">
                             {loop $themes $index $theme}
                             <label>
                                 <input type="checkbox" name="theme[{$theme['name']}]" value="1" {if \zovye\Config::app('theme.'.$theme['name'].'.enabled', true)}checked{/if}>

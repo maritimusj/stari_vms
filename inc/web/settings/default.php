@@ -267,6 +267,7 @@ if ($page == 'device') {
     }
 
     $tpl_data['migrate'] = Migrate::detect();
+    $tpl_data['bluetooth'] = BlueToothProtocol::all();
     $tpl_data['themes'] = Theme::all();
 
 } elseif ($page == 'notice') {

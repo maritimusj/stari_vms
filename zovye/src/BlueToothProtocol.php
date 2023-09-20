@@ -33,6 +33,19 @@ class BlueToothProtocol
         return $protocols;
     }
 
+    public static function valid(): array
+    {
+        $list = self::all();
+
+        foreach ($list as $index => $item) {
+            if (!Config::app("bluetooth.{$item['name']}.enabled", true)) {
+                unset($list[$index]);
+            }
+        }
+
+        return $list;
+    }
+
     public static function get($protocol): ?IBlueToothProtocol
     {
         $classname = "\\bluetooth\\$protocol\\protocol";

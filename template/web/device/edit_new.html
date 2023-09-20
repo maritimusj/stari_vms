@@ -677,7 +677,7 @@
                             <select name="theme" class="form-control" id="theme">
                                 <option value=""{if empty($extra['theme'])} selected{/if}> 系统默认界面 </option>
                                 {loop $themes $index $item}
-                                <option value="{$item}"{if $extra['theme'] == $item} selected{/if}> {$item} </option>
+                                <option value="{$item}"{if $extra['theme'] == $item['name']} selected{/if}> {$item['name']} </option>
                                 {/loop}
                             </select>
                         </div>

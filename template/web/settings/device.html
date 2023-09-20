@@ -54,7 +54,7 @@
                     <div class="col-md-10">
                         <select name="theme" class="form-control" id="theme">
                             {loop $themes $index $item}
-                            <option value="{$item}"{if $theme == $item} selected{/if}> {$item} </option>
+                            <option value="{$item}"{if $theme == $item['name']} selected{/if}> {$item['name']} </option>
                             {/loop}
                         </select>
                     </div>

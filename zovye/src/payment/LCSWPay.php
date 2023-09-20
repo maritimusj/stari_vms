@@ -125,14 +125,6 @@ class LCSWPay implements IPay
         return $lcsw->qrpay($params);
     }
 
-    /**
-     * @param string $user_uid
-     * @param string $device_uid
-     * @param string $order_no
-     * @param int $price
-     * @param string $body
-     * @return mixed
-     */
     public function createXAppPay(
         string $user_uid,
         string $device_uid,
@@ -145,15 +137,6 @@ class LCSWPay implements IPay
         }, $user_uid, $device_uid, $order_no, $price, $body);
     }
 
-    /**
-     * @param string $user_uid
-     * @param string $device_uid
-     * @param string $order_no
-     * @param int $price
-     * @param string $body
-     * @param array $goodsDetail
-     * @return mixed
-     */
     public function createJsPay(
         string $user_uid,
         string $device_uid,

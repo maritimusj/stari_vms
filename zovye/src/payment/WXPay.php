@@ -96,12 +96,6 @@ class WXPay implements IPay
 
     /**
      * 创建一个支付订单，并返回支付数据给前端js
-     * @param string $user_uid
-     * @param string $device_uid
-     * @param string $order_no
-     * @param int $price
-     * @param string $body
-     * @return mixed
      */
     public function createJsPay(
         string $user_uid,
@@ -148,9 +142,6 @@ class WXPay implements IPay
 
     /**
      * 获取页面支付时需要调用的js代码
-     * @param deviceModelObj $device
-     * @param userModelObj $user
-     * @return string
      */
     public function getPayJs(deviceModelObj $device, userModelObj $user): string
     {
@@ -321,8 +312,6 @@ JS_CODE;
 
     /**
      * 检验支付回调数据
-     * @param array $data
-     * @return bool
      */
     public function checkResult(array $data = []): bool
     {

@@ -308,7 +308,7 @@ class DeviceEventProcessor
     {
         try {
             $e = self::$events[$event];
-            if (!$e) {
+            if (!isset($e)) {
                 throw new RuntimeException('找不到这个消息处理程序！');
             }
 

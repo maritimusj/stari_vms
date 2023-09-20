@@ -150,26 +150,6 @@
                             </label>
                         </div>
                     </div>
-                    <div class="col-md-offset-2 col-md-10">
-                        <div class="checkbox">
-                            {loop $bluetooth $index $protocol}
-                            <label>
-                                <input type="checkbox" name="protocol[{$protocol['name']}]" value="1" {if \zovye\Config::app('bluetooth.'.$protocol['name'].'.enabled', true)}checked{/if}>
-                                {$protocol['title']}
-                            </label>
-                            {/loop}
-                        </div>
-                    </div>
-                    <div class="col-md-offset-2 col-md-10">
-                        <div class="checkbox">
-                            {loop $themes $index $theme}
-                            <label>
-                                <input type="checkbox" name="theme[{$theme['name']}]" value="1" {if \zovye\Config::app('theme.'.$theme['name'].'.enabled', true)}checked{/if}>
-                                {$theme['name']}
-                            </label>
-                            {/loop}
-                        </div>
-                    </div>
                 </div>
                 <!-- <div class="seg-divider"></div>
                 <div class="form-group" v-cloak>
@@ -207,6 +187,36 @@
                         <i class="fa fa-plus" @click="add" title="增加更多域名"></i>
                     </div>
                 </div> -->
+            </div>
+            <div class="seg">
+                <div class="title">蓝牙协议</div>
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <div class="checkbox">
+                            {loop $bluetooth $index $protocol}
+                            <label>
+                                <input type="checkbox" name="protocol[{$protocol['name']}]" value="1" {if \zovye\Config::app('bluetooth.'.$protocol['name'].'.enabled', true)}checked{/if}>
+                                {$protocol['title']}
+                            </label>
+                            {/loop}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="seg">
+                <div class="title">皮肤</div>
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <div class="checkbox">
+                            {loop $themes $index $theme}
+                            <label>
+                                <input type="checkbox" name="theme[{$theme['name']}]" value="1" {if \zovye\Config::app('theme.'.$theme['name'].'.enabled', true)}checked{/if}>
+                                {$theme['name']}
+                            </label>
+                            {/loop}
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="seg">
                 <div class="title">功能选项</div>

@@ -97,7 +97,7 @@ class Locker
                 flock($fp, LOCK_UN);
             }
             fclose($fp);
-            unlink($filename);
+            @unlink($filename);
         }
 
         return $result ?? null;

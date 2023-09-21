@@ -342,7 +342,7 @@ JSCODE;
 }
 
 if (App::isLongPressOrderEnabled()) {
-    $api_url = Util::murl('account', ['op' => 'order']);
+    $api_url = Util::murl('account', ['op' => 'order', 'code' => Util::random(16, true)]);
     $tpl['js']['code'] .= <<<JSCODE
 \r\n
 zovye_fn.getLongPressOrder = function(uid) {

@@ -480,8 +480,9 @@ if ($op == 'default') {
     }
 
     $uid = Request::str('uid');
+    $code = Request::str('code');
 
-    if (empty($uid)) {
+    if (empty($uid) || empty($code)) {
         JSON::fail('请求参数不正确！');
     }
 
@@ -504,7 +505,7 @@ if ($op == 'default') {
         'account' => $account->getId(),
         'device' => $device->getId(),
         'user' => $user->getId(),
-        'orderUID' => Order::makeUID($user, $device, date("YmdHis")),
+        'orderUID' => Order::makeUID($user, $device, $code),
         'ignoreGoodsNum' => 1,
     ], $account->getLongPressSeconds())) {
         JSON::fail('创建任务失败！');

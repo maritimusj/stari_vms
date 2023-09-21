@@ -163,10 +163,7 @@ class Util
 
     public static function flock($uid, callable $fn)
     {
-        $dir = DATA_DIR.'locker'.DIRECTORY_SEPARATOR;
-        We7::make_dirs($dir);
-
-        $filename = $dir.sha1($uid).'.lock';
+        $filename = DATA_DIR.sha1($uid).'.lock';
 
         $fp = fopen($filename, 'w+');
         if ($fp) {

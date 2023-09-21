@@ -254,17 +254,7 @@ class Util
 
     public static function shortMobileUrl(string $do, array $params = []): string
     {
-        $url = Util::murl($do, $params);
-
-        return self::shortUrl($url);
-    }
-
-    public static function shortUrl(string $url): string
-    {
-        return $url;
-        //微信短网址服务已于2021年3月15日下线，该功能暂停
-        //$res = Wx::shortUrl($url);
-        //return is_error($res) || empty($res['short_url']) ? $url : $res['short_url'];
+        return Util::murl($do, $params);
     }
 
     public static function exportCSVToFile($filename, array $header = [], array $data = [])

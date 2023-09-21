@@ -470,6 +470,9 @@ if ($op == 'default') {
     JSON::success(['msg' => '完成！']);
 
 } elseif ($op == 'order') {
+    if (!App::isLongPressOrderEnabled()) {
+        JSON::fail('没有启用这个功能！');
+    }
 
     $user = Session::getCurrentUser();
     if (empty($user) || $user->isBanned()) {
@@ -493,7 +496,8 @@ if ($op == 'default') {
         JSON::fail('请先扫描设备上的二维码！');
     }
 
-    if (sha1("{$account->getId()}:{$device->getShadowId()}:{$user->getId()}") !== $code) {
+    $rand_str = $user->getLastActiveData('rand.str', '');
+    if (sha1("{$account->getId()}:$rand_str:{$user->getId()}") !== $code) {
         JSON::fail('签名不正确，请重试！');
     }
 

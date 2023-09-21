@@ -491,7 +491,9 @@ class Account extends State
 
         foreach ($accounts as $entry) {
             $join(['id' => $entry['id']], function (accountModelObj $acc) use ($device, $user) {
-                return [self::format($acc, sha1("{$acc->getId()}:{$device->getShadowId()}:{$user->getId()}"))];
+                $rand_str =  Util::random(6);
+                $user->setLastActiveData('rand.str', $rand_str);
+                return [self::format($acc, sha1("{$acc->getId()}:$rand_str:{$user->getId()}"))];
             });
         }
 

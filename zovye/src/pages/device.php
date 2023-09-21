@@ -345,8 +345,8 @@ if (App::isLongPressOrderEnabled()) {
     $api_url = Util::murl('account', ['op' => 'order']);
     $tpl['js']['code'] .= <<<JSCODE
 \r\n
-zovye_fn.getLongPressOrder = function(uid, code) {
-    return $.get("$api_url", {uid, code});
+zovye_fn.getLongPressOrder = function(uid) {
+    return $.get("$api_url", {uid});
 }
 JSCODE;
 }

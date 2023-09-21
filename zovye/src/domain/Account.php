@@ -291,7 +291,7 @@ class Account extends State
         return self::findOne(['uid' => $uid]);
     }
 
-    public static function format(accountModelObj $account, $code = ''): array
+    public static function format(accountModelObj $account): array
     {
         //特殊吸粉的img路径中包含addon/{APP_NAME}，不能使用Util::toMedia()转换，否则会出错
         $data = [
@@ -358,7 +358,7 @@ class Account extends State
         if (App::isLongPressOrderEnabled()) {
             $seconds = $account->getLongPressSeconds();
             if ($seconds > 0) {
-                $data['long_press'] = $code;
+                $data['long_press'] = Util::random(6);
             }
         }
 
@@ -490,10 +490,8 @@ class Account extends State
         }
 
         foreach ($accounts as $entry) {
-            $join(['id' => $entry['id']], function (accountModelObj $acc) use ($device, $user) {
-                $rand_code =  Util::random(6);
-                $user->setLastActiveData('rand.code', $rand_code);
-                return [self::format($acc, $rand_code)];
+            $join(['id' => $entry['id']], function (accountModelObj $acc) {
+                return [self::format($acc)];
             });
         }
 

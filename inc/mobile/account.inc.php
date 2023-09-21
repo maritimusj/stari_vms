@@ -496,11 +496,6 @@ if ($op == 'default') {
         JSON::fail('请先扫描设备上的二维码！');
     }
 
-    $last_rand_code = $user->getLastActiveData('rand.code', Util::random(6));
-    if ($last_rand_code !== $code) {
-        JSON::fail('签名不正确，请重试！');
-    }
-
     $res = Helper::checkAvailable($user, $account, $device);
     if (is_error($res)) {
         JSON::fail($res);

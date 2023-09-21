@@ -182,7 +182,9 @@ class Util
                 flock($fp, LOCK_UN);
             }
             fclose($fp);
-            @unlink($filename);
+            if (file_exists($filename)) {
+                unlink($filename);
+            }
         }
 
         return $result ?? null;

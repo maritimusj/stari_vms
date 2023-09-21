@@ -23,6 +23,7 @@ class Util
     public static function config($sub = '')
     {
         static $config = null;
+
         if (!isset($config)) {
             $config_filename = ZOVYE_CORE_ROOT.'config.php';
             if (file_exists($config_filename)) {
@@ -96,18 +97,23 @@ class Util
     {
         $time = (new DateTime())->setTimestamp($ts);
         $interval = (new DateTime())->diff($time);
+
         if ($interval->y) {
             return $interval->format('%y年%m月%d天%h小时%i分钟%S秒');
         }
+
         if ($interval->m) {
             return $interval->format('%m月%d天%h小时%i分钟%S秒');
         }
+
         if ($interval->d) {
             return $interval->format('%d天%h小时%i分钟%S秒');
         }
+
         if ($interval->h) {
             return $interval->format('%h小时%i分钟%S秒');
         }
+
         if ($interval->i) {
             return $interval->format('%i分钟%S秒');
         }
@@ -121,6 +127,7 @@ class Util
     public static function encryptTopic(string $name = 'all'): string
     {
         static $app_key = null;
+
         if (is_null($app_key)) {
             $app_key = settings('ctrl.appKey', '');
         }
@@ -192,7 +199,8 @@ class Util
      */
     public static function randColor(): string
     {
-        $arr = array();
+        $arr = [];
+
         for ($i = 0; $i < 6; ++$i) {
             $arr[] = dechex(rand(0, 15));
         }

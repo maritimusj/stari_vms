@@ -11,15 +11,10 @@ use zovye\base\ModelObjFinder;
 use zovye\Log;
 use zovye\model\lockerModelObj;
 use zovye\util\Util;
-use zovye\We7;
 use function zovye\m;
 
 class Locker
 {
-    /**
-     * @param array $data
-     * @return ?lockerModelObj
-     */
     public static function create(array $data = []): ?lockerModelObj
     {
         return m('locker')->create($data);
@@ -27,7 +22,6 @@ class Locker
 
     /**
      * @param mixed $condition
-     * @return ModelObjFinder
      */
     public static function query($condition = []): ModelObjFinder
     {
@@ -36,7 +30,6 @@ class Locker
 
     /**
      * @param mixed $condition
-     * @return lockerModelObj|null
      */
     public static function findOne($condition = []): ?lockerModelObj
     {
@@ -45,18 +38,12 @@ class Locker
 
     /**
      * @param mixed $condition
-     * @return bool
      */
     public static function exists($condition = []): bool
     {
         return self::query($condition)->exists();
     }
 
-    /**
-     * @param $id
-     * @param bool $is_uid
-     * @return lockerModelObj|null
-     */
     public static function get($id, bool $is_uid = false): ?lockerModelObj
     {
         if ($is_uid) {
@@ -77,39 +64,9 @@ class Locker
         });
     }
 
-    public static function flock($uid, callable $fn)
-    {
-        $dir = DATA_DIR.'locker'.DIRECTORY_SEPARATOR;
-        We7::make_dirs($dir);
-
-        $filename = $dir.sha1($uid).'.lock';
-        $fp = fopen($filename, 'w+');
-        if ($fp) {
-            if (flock($fp, LOCK_EX)) {
-                if (DEBUG) {
-                    fwrite($fp, REQUEST_ID."\r\n");
-                    fwrite($fp, date('Y-m-d H:i:s')."\r\n");
-                    fwrite($fp, $uid."\r\n");
-                }
-                if ($fn) {
-                    $result = call_user_func($fn);
-                }
-                flock($fp, LOCK_UN);
-            }
-            fclose($fp);
-            @unlink($filename);
-        }
-
-        return $result ?? null;
-    }
-
     /**
      * @param string $uid 锁的全局唯一UID
-     * @param string $requestID
      * @param int $available 可用次数，即可重入的次数
-     * @param int $expired_at
-     * @param bool $auto_release
-     * @return lockerModelObj|null
      */
     public static function load(
         string $uid = '',
@@ -122,7 +79,7 @@ class Locker
             $uid = Util::generateUID();
         }
 
-        return self::flock($uid, function () use ($uid, $requestID, $auto_release, $available, $expired_at) {
+        return Util::flock($uid, function () use ($uid, $requestID, $auto_release, $available, $expired_at) {
             $locker = self::get($uid, true);
             if ($locker) {
                 if ($locker->isExpired()) {

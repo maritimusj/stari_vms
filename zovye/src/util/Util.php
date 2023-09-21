@@ -161,6 +161,33 @@ class Util
         return We7::random($length, $numeric);
     }
 
+    public static function flock($uid, callable $fn)
+    {
+        $dir = DATA_DIR.'locker'.DIRECTORY_SEPARATOR;
+        We7::make_dirs($dir);
+
+        $filename = $dir.sha1($uid).'.lock';
+
+        $fp = fopen($filename, 'w+');
+        if ($fp) {
+            if (flock($fp, LOCK_EX)) {
+                if (DEBUG) {
+                    fwrite($fp, REQUEST_ID."\r\n");
+                    fwrite($fp, date('Y-m-d H:i:s')."\r\n");
+                    fwrite($fp, $uid."\r\n");
+                }
+                if ($fn) {
+                    $result = call_user_func($fn);
+                }
+                flock($fp, LOCK_UN);
+            }
+            fclose($fp);
+            @unlink($filename);
+        }
+
+        return $result ?? null;
+    }
+
     /**
      * 随机颜色值
      */

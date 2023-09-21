@@ -841,61 +841,37 @@ class userModelObj extends ModelObj
         return err('参数不正确！');
     }
 
-    public function cleanLastActiveData(): bool
+    public function cleanLastActiveData($key = ''): bool
     {
-        return $this->remove('last');
-    }
-
-    public function setLastActiveData(): bool
-    {
-        switch (func_num_args()) {
-            case 0:
-                return $this->cleanLastActiveData();
-            case 1:
-                $v = func_get_arg(0);
-                if (is_string($v)) {
-                    $data = [$v => null];
-                } elseif (is_array($v)) {
-                    $data = $v;
-                } elseif ($v instanceof ModelObj) {
-                    $data = [
-                        get_class($v) => [
-                            'id' => $v->getId(),
-                            'time' => TIMESTAMP,
-                        ],
-                    ];
-                } else {
-                    return false;
-                }
-                break;
-            case 2:
-                $name = func_get_arg(0);
-                if (!is_string($name)) {
-                    return false;
-                }
-                $data = [
-                    $name => func_get_arg(1),
-                ];
-                break;
-            default:
-                return false;
-        }
-        foreach ($data as $name => $val) {
-            if (!$this->updateSettings("last.$name", $val)) {
-                return false;
-            }
+        if (empty($key)) {
+            return $this->remove('last');
         }
 
-        return true;
+        return $this->updateSettings("last.$key", null);
     }
 
-    public function getLastActiveData($name = '', $default = null)
+    /**
+     * 设置用户最后活动数据
+     */
+    public function setLastActiveData(string $key, $val): bool
     {
-        if (empty($name)) {
+        if ($val instanceof ModelObj) {
+            $val = [
+                'id' => $val->getId(),
+                'time' => TIMESTAMP,
+            ];
+        }
+
+        return $this->updateSettings("last.$key", $val);
+    }
+
+    public function getLastActiveData($key = '', $default = null)
+    {
+        if (empty($key)) {
             return $this->get('last', $default);
         }
 
-        return $this->settings("last.$name", $default);
+        return $this->settings("last.$key", $default);
     }
 
     public function getLastActiveIp(): string
@@ -906,10 +882,11 @@ class userModelObj extends ModelObj
     public function setLastActiveDevice(deviceModelObj $device = null): bool
     {
         if ($device) {
-            $this->setLastActiveData('ip', CLIENT_IP);
+            return $this->setLastActiveData('ip', CLIENT_IP)
+                && $this->setLastActiveData(deviceModelObj::class, $device);
         }
 
-        return $device ? $this->setLastActiveData($device) : $this->setLastActiveData(deviceModelObj::class);
+        return $this->cleanLastActiveData(deviceModelObj::class);
     }
 
     public function getLastActiveDevice($timeout = VISIT_DATA_TIMEOUT): ?deviceModelObj
@@ -925,10 +902,11 @@ class userModelObj extends ModelObj
     public function setLastActiveAccount(accountModelObj $account = null): bool
     {
         if ($account) {
-            $this->setLastActiveData('ip', CLIENT_IP);
+            return $this->setLastActiveData('ip', CLIENT_IP)
+                && $this->setLastActiveData(accountModelObj::class, $account);
         }
 
-        return $account ? $this->setLastActiveData($account) : $this->setLastActiveData(accountModelObj::class);
+        return $this->cleanLastActiveData(accountModelObj::class);
     }
 
     public function getLastActiveAccount($timeout = VISIT_DATA_TIMEOUT): ?accountModelObj

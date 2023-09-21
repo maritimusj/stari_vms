@@ -17,7 +17,6 @@ return [
         'waitTimeout' => DEFAULT_DEVICE_WAIT_TIMEOUT,
         'lockRetries' => 10,
         'lockRetryDelay' => 1,
-        'lockTimeout' => 30,
         'get' => [
             'theme' => 'rewatch',
         ],

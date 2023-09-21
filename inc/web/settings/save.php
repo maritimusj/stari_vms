@@ -54,7 +54,6 @@ if ($page == 'device') {
     $settings['device']['waitTimeout'] = max(10, Request::int('waitTimeout'));
     $settings['device']['lockRetries'] = Request::int('lockRetries');
     $settings['device']['lockRetryDelay'] = Request::int('lockRetryDelay');
-    $settings['device']['lockTimeout'] = Request::int('lockTimeout');
 
     $settings['device']['get'] = [
         'theme' => Request::str('theme', 'default'),

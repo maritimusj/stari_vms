@@ -265,17 +265,21 @@ class Util
 
         if (!file_exists($filename)) {
             $file = fopen($filename, 'w');
-            fwrite($file, chr(0xEF).chr(0xBB).chr(0xBF));
-            fputcsv($file, $header);
+            if ($file) {
+                fwrite($file, chr(0xEF).chr(0xBB).chr(0xBF));
+                fputcsv($file, $header);
+            }
         } else {
             $file = fopen($filename, 'a');
         }
 
-        foreach ($data as $row) {
-            fputcsv($file, $row);
-        }
+        if ($file) {
+            foreach ($data as $row) {
+                fputcsv($file, $row);
+            }
 
-        fclose($file);
+            fclose($file);
+        }
     }
 
     /**

@@ -512,7 +512,5 @@ if ($op == 'default') {
         JSON::fail('创建任务失败！');
     }
 
-    $device->resetShadowId();
-
     JSON::success('正在出货中，请稍等！');
 }

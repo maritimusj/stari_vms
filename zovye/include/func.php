@@ -11,7 +11,7 @@ use ReflectionException;
 use ReflectionFunction;
 use ReflectionMethod;
 use zovye\base\ClassLoader;
-use zovye\base\Model;
+use zovye\base\ModelFactoryBuilder;
 use zovye\base\ModelFactory;
 use zovye\base\ModelObj;
 
@@ -21,6 +21,7 @@ use zovye\base\ModelObj;
 function app(): WeApp
 {
     static $app = null;
+
     if (empty($app)) {
         $app = new WeApp();
     }
@@ -33,22 +34,23 @@ function app(): WeApp
  */
 function m(string $name): ModelFactory
 {
-    static $loader = null;
-    if (empty($loader)) {
-        $loader = new Model();
+    static $builder = null;
+
+    if (empty($builder)) {
+        $builder = new ModelFactoryBuilder();
     }
 
     if (empty($name)) {
         trigger_error('module name is empty', E_USER_ERROR);
     }
 
-    $model = $loader->load($name);
+    $factory = $builder->build($name);
 
-    if (empty($model)) {
-        trigger_error('module object is null', E_USER_ERROR);
+    if (empty($factory)) {
+        trigger_error('module factory is null', E_USER_ERROR);
     }
 
-    return $model;
+    return $factory;
 }
 
 function tb(string $name): string

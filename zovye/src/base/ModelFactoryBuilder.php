@@ -10,7 +10,7 @@ use zovye\util\DBUtil;
 use zovye\We7;
 use function zovye\tb;
 
-class Model
+class ModelFactoryBuilder
 {
     protected $cache = [];
 
@@ -18,7 +18,7 @@ class Model
      * @param $name
      * @return null|ModelFactory
      */
-    public function load($name): ?ModelFactory
+    public function build($name): ?ModelFactory
     {
         if (isset($this->cache[$name])) {
             return $this->cache[$name];

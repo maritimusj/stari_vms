@@ -15,6 +15,7 @@ class ClassLoader
     public function library($name)
     {
         $e = self::$alias[$name];
+
         $files = is_array($e) ? $e : [$e];
         foreach ($files as $file) {
             require_once($file);

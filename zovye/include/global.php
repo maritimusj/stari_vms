@@ -13,7 +13,6 @@ use zovye\util\Util;
 define('REQUEST_ID', Util::generateUID());
 
 try {
-
     //启动应用
     app()->run();
 

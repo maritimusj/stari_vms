@@ -112,6 +112,7 @@ function updateGlobalConfig(string $name, $path, $val): bool
     unset(__ZOVYE_CONFIG__::$cache[$name]);
 
     $config = app()->get($name, []);
+
     setArray($config, $path, $val);
 
     return app()->set($name, $config);
@@ -135,6 +136,7 @@ function toCamelCase($str): string
 function toSnakeCase($str): string
 {
     $str = str_replace('_', '', $str);
+
     $str = preg_replace_callback('/([A-Z])/', function ($matches) {
         return '_'.strtolower($matches[0]);
     }, $str);

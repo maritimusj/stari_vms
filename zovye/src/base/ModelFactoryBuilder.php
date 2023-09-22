@@ -14,10 +14,6 @@ class ModelFactoryBuilder
 {
     protected $cache = [];
 
-    /**
-     * @param $name
-     * @return null|ModelFactory
-     */
     public function build($name): ?ModelFactory
     {
         if (isset($this->cache[$name])) {
@@ -54,12 +50,6 @@ class ModelFactoryBuilder
         return null;
     }
 
-    /**
-     * @param $tb_name
-     * @param $classname
-     * @param $mod_filename
-     * @return bool
-     */
     protected function createClassFile($tb_name, $classname, $mod_filename): bool
     {
         //生成modelObj文件

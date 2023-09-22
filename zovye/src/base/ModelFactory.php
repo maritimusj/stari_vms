@@ -16,21 +16,12 @@ class ModelFactory
     private $objClassname;
     private $shortName;
 
-    /**
-     * modelFactory constructor.
-     * @param string $objClassname
-     * @param string $shortName
-     */
     public function __construct(string $objClassname, string $shortName)
     {
         $this->objClassname = $objClassname;
         $this->shortName = $shortName;
     }
 
-    /**
-     * @param null $mode
-     * @return string
-     */
     public function getTableName($mode = ModelObj::OP_UNKNOWN): string
     {
         /** @var ModelObj $objClassname */
@@ -39,26 +30,16 @@ class ModelFactory
         return $objClassname::getTableName($mode);
     }
 
-    /**
-     * @return string
-     */
     public function objClassname(): string
     {
         return $this->objClassname;
     }
 
-    /**
-     * @return string
-     */
     public function shortName(): string
     {
         return $this->shortName;
     }
 
-    /**
-     * @param array $data
-     * @return ModelObj|mixed
-     */
     public function create(array $data = [])
     {
         /** @var ModelObj $objClassname */
@@ -75,10 +56,6 @@ class ModelFactory
         return null;
     }
 
-    /**
-     * @param int $id
-     * @return ModelObj|mixed
-     */
     public function load(int $id)
     {
         if ($id > 0) {
@@ -92,12 +69,6 @@ class ModelFactory
         return null;
     }
 
-    /**
-     * @param mixed $obj
-     * @param array|mixed $seg_arr
-     * @param bool $ignoreCache
-     * @return array
-     */
     public function __loadFromDb($obj, $seg_arr = [], bool $ignoreCache = false): array
     {
         $seg_arr = is_array($seg_arr) ? $seg_arr : [$seg_arr];
@@ -155,10 +126,6 @@ class ModelFactory
         return $res;
     }
 
-    /**
-     * @param mixed $obj
-     * @return mixed
-     */
     protected function getCacheData($obj): array
     {
         $cache_data = We7::cache_read($this->getCacheKey($obj));
@@ -169,10 +136,6 @@ class ModelFactory
         return $cache_data;
     }
 
-    /**
-     * @param mixed $obj
-     * @return string
-     */
     protected function getCacheKey($obj): string
     {
         $id = is_object($obj) ? $obj->getId() : $obj;
@@ -180,11 +143,6 @@ class ModelFactory
         return APP_NAME.":$this->shortName:$id";
     }
 
-    /**
-     * @param $obj
-     * @param $data
-     * @return mixed
-     */
     protected function writeCacheData($obj, $data)
     {
         if ($data) {
@@ -194,10 +152,6 @@ class ModelFactory
         }
     }
 
-    /**
-     * @param ModelObj $obj
-     * @return bool
-     */
     public function remove(ModelObj $obj): bool
     {
         /** @var ModelObj $objClassname */
@@ -214,28 +168,29 @@ class ModelFactory
         return false;
     }
 
-    /**
-     * @param $id
-     */
     protected function removeCacheData($id)
     {
         We7::cache_delete($this->getCacheKey($id));
     }
-
     /**
      * @param array|mixed $condition
-     * @return int
      */
     public function count($condition = []): int
     {
         return (new ModelObjFinder($this))->where($condition)->count();
     }
 
+    /**
+     * @param array|mixed $condition
+     */
     public function delete($condition = []): bool
     {
         return (new ModelObjFinder($this))->where($condition)->delete();
     }
 
+    /**
+     * @param array|mixed $condition
+     */
     public function exists($condition = []): bool
     {
         $res = $this->where($condition);
@@ -245,8 +200,6 @@ class ModelFactory
 
     /**
      * @param array|mixed $condition
-     * @param bool $lazy
-     * @return ModelObjIterator|ModelObjIteratorLazy
      */
     public function findAll($condition = [], bool $lazy = false)
     {
@@ -255,8 +208,6 @@ class ModelFactory
 
     /**
      * @param array|mixed $condition
-     * @param bool $lazy
-     * @return mixed
      */
     public function findOne($condition = [], bool $lazy = false)
     {
@@ -265,7 +216,6 @@ class ModelFactory
 
     /**
      * @param array|mixed $condition
-     * @return ModelObjFinder
      */
     public function query($condition = []): ModelObjFinder
     {
@@ -274,7 +224,6 @@ class ModelFactory
 
     /**
      * @param array|mixed $condition
-     * @return ModelObjFinder
      */
     public function where($condition = []): ModelObjFinder
     {
@@ -282,10 +231,7 @@ class ModelFactory
     }
 
     /**
-     * @param ModelObj $obj
-     * @param null $seg_arr
      * @param array|mixed $condition
-     * @return mixed
      */
     public function __saveToDb(ModelObj $obj, $seg_arr = null, $condition = [])
     {

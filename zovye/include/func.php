@@ -187,16 +187,11 @@ function convert($val, $type_hints)
 function setArray(array &$array, $key, $val = null): array
 {
     if (empty($key)) {
-
         $array = $val;
-
     } else {
         if (is_scalar($key) && isset($array[$key])) {
-
             $array[$key] = $val;
-
         } else {
-
             $keys = is_array($key) ? $key : explode('.', $key);
 
             $arr = &$array;
@@ -207,22 +202,17 @@ function setArray(array &$array, $key, $val = null): array
             $key_name = array_pop($keys);
 
             foreach ($keys as $sub_key) {
-
                 if ($sub_key === '') {
                     continue;
                 }
-
                 if (!isset($arr[$sub_key]) || !is_array($arr[$sub_key])) {
                     $arr[$sub_key] = [];
                 }
-
                 $arr = &$arr[$sub_key];
             }
 
             if (empty($arr) || !is_array($arr)) {
-
                 $arr = [$key_name => $val];
-
             } else {
                 $arr[$key_name] = $val;
             }
@@ -246,17 +236,12 @@ function getArray($array, $key = '', $default = null, $convert = true)
     }
 
     $val = $array;
-
     $keys = is_array($key) ? $key : explode('.', $key);
 
     for ($i = 0; $i < count($keys); $i++) {
-
         $sub_key = $keys[$i];
-
         if ($sub_key !== '' && isset($val[$sub_key])) {
-
             $val = $val[$sub_key];
-
         } else {
             return $default;
         }

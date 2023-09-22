@@ -79,10 +79,12 @@ class FileLogWriter implements ILogWriter
     public static function logFileName(string $name, string $suffix = ''): string
     {
         $log_dir = self::logDir($name);
+
         $filename = $log_dir.DIRECTORY_SEPARATOR.date('Ymd');
         if ($suffix) {
             $filename .= ".$suffix";
         }
+
         $filename .= '.log';
 
         return $filename;

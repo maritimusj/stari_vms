@@ -22,6 +22,7 @@ class Statistics
     private static function parseMonth($month): ?DateTime
     {
         $date = null;
+
         try {
             if (is_int($month)) {
                 $date = new DateTime('@'.$month);
@@ -34,9 +35,7 @@ class Statistics
             return null;
         }
 
-        $date->modify('first day of this month 00:00');
-
-        return $date;
+        return $date->modify('first day of this month 00:00');
     }
 
     /**

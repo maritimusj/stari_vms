@@ -23,6 +23,7 @@ class JSON
         if (is_error($data) || $data instanceof Exception) {
             self::fail($data);
         }
+
         self::success($data);
     }
 

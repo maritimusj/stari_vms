@@ -105,6 +105,6 @@ class Theme
             'error' => 'theme file not found!',
         ]);
 
-        return 'not_found';
+        return 'file_not_found';
     }
 }

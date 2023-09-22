@@ -41,13 +41,13 @@ function m(string $name): ModelFactory
     }
 
     if (empty($name)) {
-        trigger_error('module name is empty', E_USER_ERROR);
+        trigger_error('model name is empty', E_USER_ERROR);
     }
 
     $factory = $builder->build($name);
 
     if (empty($factory)) {
-        trigger_error('module factory is null', E_USER_ERROR);
+        trigger_error('model factory is null', E_USER_ERROR);
     }
 
     return $factory;

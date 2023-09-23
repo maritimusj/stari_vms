@@ -7,17 +7,13 @@
 
 namespace zovye\domain;
 
-use RuntimeException;
 use zovye\base\ModelFactory;
 use zovye\base\ModelObjFinder;
 use zovye\We7;
 
-class Base
+abstract class Base
 {
-    public static function model(): ModelFactory
-    {
-        throw new RuntimeException('Base::model not implemented');
-    }
+    abstract public static function model(): ModelFactory;
 
     protected static function has($property): bool
     {

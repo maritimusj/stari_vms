@@ -9,7 +9,7 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 use zovye\domain\Principal;
-use zovye\model\userModelObj;
+use zovye\model\gspor_vwModelObj;
 
 $query = Principal::gspor();
 
@@ -25,7 +25,7 @@ if ($s_keyword) {
 $query->limit(20);
 
 $result = [];
-/** @var  userModelObj $entry */
+/** @var  gspor_vwModelObj $entry */
 foreach ($query->findAll() as $entry) {
     $result[] = [
         'id' => $entry->getId(),

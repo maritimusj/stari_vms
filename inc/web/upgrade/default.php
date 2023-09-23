@@ -8,13 +8,14 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\domain\Apk;
 use zovye\domain\Device;
 use zovye\model\versionModelObj;
 
 $device_id = Request::int('id');
 $all = [];
 /** @var versionModelObj $entry */
-foreach (m('version')->findAll(We7::uniacid([])) as $entry) {
+foreach (Apk::query()->findAll() as $entry) {
     $all[] = [
         'id' => $entry->getId(),
         'title' => $entry->getTitle(),

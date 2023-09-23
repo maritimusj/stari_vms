@@ -8,6 +8,7 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use zovye\domain\Apk;
 use zovye\domain\Device;
 use zovye\model\versionModelObj;
 
@@ -19,7 +20,7 @@ if (empty($device)) {
 }
 
 /** @var versionModelObj $version */
-$version = m('version')->findOne(We7::uniacid(['id' => $version_id]));
+$version = Apk::get($version_id);
 if (empty($version) || empty($version->getUrl())) {
     JSON::fail('版本信息不正确！');
 }

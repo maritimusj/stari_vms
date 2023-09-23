@@ -48,11 +48,6 @@ class CtrlServ
         return [];
     }
 
-    public static function detail($device_uid)
-    {
-        return self::query("device/$device_uid");
-    }
-
     public static function bind($device_uid, $app_uid)
     {
         $params = http_build_query(['appUID' => $app_uid]);
@@ -65,11 +60,47 @@ class CtrlServ
         return CtrlServ::query("device/$device_uid/active", [], '', '', 'PUT');
     }
 
+    public static function release($device_uid)
+    {
+        return CtrlServ::deleteV2("device/$device_uid");
+    }
+
+    public static function detail($device_uid)
+    {
+        return self::query("device/$device_uid");
+    }
+
+    public static function detailV2($device_uid)
+    {
+        if (is_array($device_uid)) {
+            return self::postV2('detail', $device_uid);
+        }
+        return self::getV2("device/$device_uid");
+    }
+
+    public static function onlineV2($device_uid, $use_cache = true)
+    {
+        if (is_array($device_uid)) {
+            return CtrlServ::postV2('online', $device_uid);
+        }
+        return self::getV2("device/$device_uid/online", ['nocache' => $use_cache ? 'false' : 'true']);
+    }
+
+    public static function mcbOnlineV2($device_uid, $use_cache = true)
+    {
+        return self::getV2("device/$device_uid/mcb/online", ['nocache' => $use_cache ? 'false' : 'true']);
+    }
+
+    public static function appOnlineV2($device_uid, $use_cache = true)
+    {
+        return self::getV2("device/$device_uid/app/online", ['nocache' => $use_cache ? 'false' : 'true']);
+    }
+
     public static function createOrder($order_no, $body)
     {
         $params = ['nostr' => microtime(true)];
 
-        return CtrlServ::query("order/$order_no", $params, http_build_query($body));
+        return self::query("order/$order_no", $params, http_build_query($body));
     }
 
     /**
@@ -262,6 +293,7 @@ class CtrlServ
     public static function scheduleDelayJob($op, array $params = [], int $delay = 0)
     {
         $result = self::httpDelayCallback($delay, self::makeJobUrl($op, $params));
+
         if (!is_error($result) && $result !== false) {
             return $result['queued'] ?? true;
         }
@@ -275,6 +307,7 @@ class CtrlServ
     public static function httpDelayCallback($delay, $url, string $data = '')
     {
         $uid = Util::random(16);
+
         $query = [
             'delay' => intval($delay),
             'url' => $url,

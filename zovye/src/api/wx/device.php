@@ -618,7 +618,7 @@ class device
         }
 
         if (!isEmptyArray($ids)) {
-            $res = CtrlServ::postV2('online', $ids);
+            $res = CtrlServ::onlineV2($ids);
             if (!empty($res) && $res['status'] === true && is_array($res['data'])) {
                 return $res['data'];
             }
@@ -702,7 +702,7 @@ class device
                 }
 
                 if ($onlineStatus) {
-                    $res = CtrlServ::postV2('online', $ids);
+                    $res = CtrlServ::onlineV2($ids);
                     if (!empty($res) && $res['status'] === true && is_array($res['data'])) {
                         $online_status = $res['data'];
                     }
@@ -961,7 +961,7 @@ class device
                     }
                 }
 
-                $res = CtrlServ::postV2('online', $ids);
+                $res = CtrlServ::onlineV2($ids);
                 if (!empty($res) && $res['status'] === true && is_array($res['data'])) {
                     $online_status = $res['data'];
                 }
@@ -1008,7 +1008,7 @@ class device
                 return err('没有权限管理这个设备！');
             }
 
-            $device->appNotify('restart');
+            $device->appPublish('restart');
 
             return ['msg' => 'APP重启消息已发送！'];
         }

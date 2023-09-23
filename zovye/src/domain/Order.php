@@ -187,11 +187,6 @@ class Order extends State
         return err('找不到支付记录！');
     }
 
-    public static function queryStatus($serialNO)
-    {
-        return CtrlServ::getV2("goods/$serialNO", ["nostr" => microtime(true)]);
-    }
-
     /**
      * 支持 deviceModelObj,agentModelObj,userModelObj,accountModelObj和全局WeApp
      * @param $obj

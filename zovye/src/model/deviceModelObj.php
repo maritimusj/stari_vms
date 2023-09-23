@@ -1136,7 +1136,7 @@ class deviceModelObj extends ModelObj
             $data['qrcode_url'] = $this->getUrl();
         }
 
-        return $this->appNotify('config', $data);
+        return $this->appPublish('config', $data);
     }
 
     /**
@@ -1167,7 +1167,7 @@ class deviceModelObj extends ModelObj
     /**
      * 给app发送通知
      */
-    public function appNotify(string $op = 'config', array $data = []): bool
+    public function appPublish(string $op = 'config', array $data = []): bool
     {
         if ($this->app_id) {
             return CtrlServ::appPublish($this->app_id, $op, $data);
@@ -1197,7 +1197,7 @@ class deviceModelObj extends ModelObj
             ],
         ];
 
-        return $this->appNotify('message', [
+        return $this->appPublish('message', [
             'content' => $msg,
             'type' => $type,
             'style' => $style ?? $styles[$type],
@@ -1557,7 +1557,7 @@ class deviceModelObj extends ModelObj
     public function updateScreenAdsData(): bool
     {
         if ($this->isAdsUpdated(Advertising::SCREEN)) {
-            return $this->appNotify('update');
+            return $this->appPublish('update');
         }
 
         return false;
@@ -1682,7 +1682,8 @@ class deviceModelObj extends ModelObj
             ];
         }
 
-        $res = CtrlServ::getV2("device/$this->imei/online", ['nocache' => $use_cache ? 'false' : 'true']);
+        $res = CtrlServ::onlineV2($this->imei, $use_cache);
+
         if (is_error($res)) {
             return $res;
         }
@@ -1705,7 +1706,7 @@ class deviceModelObj extends ModelObj
     {
         if ($this->app_id) {
             if ($this->imei) {
-                $res = CtrlServ::getV2("device/$this->imei/app/online", ['nocache' => false]);
+                $res = CtrlServ::appOnlineV2($this->imei, false);
 
                 return $res['status'] === true && $res['data']['app'] === true;
             }
@@ -1732,7 +1733,7 @@ class deviceModelObj extends ModelObj
 
         $data = ['volume' => $vol];
 
-        $res = $this->appNotify('config', $data);
+        $res = $this->appPublish('config', $data);
 
         return !is_error($res);
     }
@@ -1750,7 +1751,7 @@ class deviceModelObj extends ModelObj
             $data['srt'] = $srt;
         }
 
-        $res = $this->appNotify('config', $data);
+        $res = $this->appPublish('config', $data);
 
         return !is_error($res);
     }
@@ -1882,7 +1883,7 @@ class deviceModelObj extends ModelObj
             'url' => $url,
         ];
 
-        if ($this->appNotify('apk', $data)) {
+        if ($this->appPublish('apk', $data)) {
             //记录
             $this->set(
                 'lastApkUpdate',
@@ -2051,12 +2052,7 @@ class deviceModelObj extends ModelObj
         }
 
         if ($this->imei) {
-            $res = CtrlServ::getV2(
-                "device/$this->imei/mcb/online",
-                [
-                    'nocache' => !$use_cache ? 'true' : 'false',
-                ]
-            );
+            $res = CtrlServ::mcbOnlineV2($this->imei, $use_cache);
 
             return $res['status'] === true && $res['data']['mcb'] === true;
         }

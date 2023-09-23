@@ -38,7 +38,7 @@ if (is_array($ids)) {
 
     $ids_str = json_encode($online_ids);
     $devices_status = $ids_str ? CacheUtil::cachedCall(10, function () use ($ids_str) {
-        $res = CtrlServ::postV2('detail', $ids_str);
+        $res = CtrlServ::detailV2($ids_str);
         if (!empty($res) && $res['status'] === true && is_array($res['data'])) {
             return $res['data'];
         }

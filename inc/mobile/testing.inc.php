@@ -49,7 +49,7 @@ if (empty($op)) {
         ]);
     }
 
-    $detail = CtrlServ::getV2("device/$imei");
+    $detail = CtrlServ::detailV2($imei);
 
     if (is_error($detail)) {
         JSON::fail('获取设备详情失败！');

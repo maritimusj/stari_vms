@@ -15,6 +15,7 @@ use zovye\domain\CommissionBalance;
 use zovye\domain\GSP;
 use zovye\domain\User;
 use zovye\model\accountModelObj;
+use zovye\model\data_vwModelObj;
 use zovye\util\Helper;
 use zovye\util\Util;
 
@@ -841,6 +842,8 @@ if ($page == 'device') {
     $db_arr = [];
 
     $res = m('data_vw')->findAll();
+
+    /** @var data_vwModelObj $item */
     foreach ($res as $item) {
         $db_arr[$item->getK()] = $item->getV();
     }

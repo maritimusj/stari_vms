@@ -7,6 +7,7 @@
 namespace zovye;
 
 use zovye\domain\Device;
+use zovye\model\data_vwModelObj;
 use zovye\util\DBUtil;
 use zovye\util\Helper;
 use zovye\util\Util;
@@ -109,6 +110,7 @@ if ($op == 'default') {
     //title
     if ($type == 'title') {
         $query = m('data_vw');
+        /** @var data_vwModelObj $title */
         $title = $query->where(['k' => 'title'])->findOne();
         $value = '';
         if ($title) {
@@ -178,6 +180,7 @@ if ($op == 'default') {
         $dt = time();
         $res_arr = [];
 
+        /** @var data_vwModelObj $item */
         foreach ($res as $item) {
             $value = $item->getV();
             $value_arr = explode(';', $value);
@@ -250,6 +253,7 @@ if ($op == 'default') {
 
         $res_arr = [];
 
+        /** @var data_vwModelObj $item */
         foreach ($res as $item) {
             $value = $item->getV();
 
@@ -297,6 +301,7 @@ if ($op == 'default') {
 
         $res_arr = [];
 
+        /** @var data_vwModelObj $item */
         foreach ($res as $item) {
             $value = $item->getV();
             $value_arr = explode(';', $value);
@@ -317,6 +322,8 @@ function handlePCT($x, $y, $xx, $yy): array
     $arr2 = ['x' => $yy, 'y' => 0];
 
     $total_amount = 0;
+
+    /** @var data_vwModelObj $item */
     foreach ($res as $item) {
         if ($item->getK() == $x) {
             $arr1['y'] = $item->getV();
@@ -344,6 +351,7 @@ function handleFreq($k_init, $k_freq, $k_s1, $k_s2): int
     $arr = [];
     $init_data = null;
     $init_dt = null;
+    /** @var data_vwModelObj $item */
     foreach ($res as $item) {
         if ($item->getK() == $k_init) {
             $init_dt = $item->getCreatetime();

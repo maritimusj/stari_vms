@@ -11,6 +11,7 @@ defined('IN_IA') or exit('Access Denied');
 use DateTime;
 use zovye\business\ChargingServ;
 use zovye\domain\WxApp;
+use zovye\model\data_vwModelObj;
 use zovye\model\wx_appModelObj;
 use zovye\util\Helper;
 use zovye\util\HttpUtil;
@@ -209,6 +210,7 @@ if ($page == 'device') {
 
     $res = m('data_vw')->findAll();
 
+    /** @var data_vwModelObj $item */
     foreach ($res as $item) {
         if (in_array($item->getK(), $keys)) {
             $values[$item->getK()] = $item->getV();

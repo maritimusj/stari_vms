@@ -55,16 +55,6 @@ SQL;
     Migrate::execSQL($sql);
 }
 
-if (!We7::pdo_field_exists($tb_name.'_coupon', 'x_val')) {
-    $sql = <<<SQL
-ALTER TABLE `ims_zovye_vms_coupon` CHANGE `xval` `x_val` INT(11) NOT NULL DEFAULT '0';
-ALTER TABLE `ims_zovye_vms_coupon` CHANGE `xrequire` `x_require` INT(11) NULL DEFAULT '0';
-ALTER TABLE `ims_zovye_vms_coupon` CHANGE `usedtime` `used_time` INT(11) NULL DEFAULT NULL;
-ALTER TABLE `ims_zovye_vms_coupon` CHANGE `expiredtime` `expired_time` INT(11) NULL DEFAULT NULL;
-SQL;
-    Migrate::execSQL($sql);
-}
-
 if (!We7::pdo_field_exists($tb_name.'_device_events', 'device_uid')) {
     $sql = <<<SQL
 ALTER TABLE `ims_zovye_vms_device_events` CHANGE `deviceUID` `device_uid` VARCHAR(64) NOT NULL;

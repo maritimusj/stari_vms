@@ -181,23 +181,6 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_component_user` (
   KEY `openid` (`uniacid`, `openid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zovye_vms_coupon` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `uniacid` int(11) DEFAULT NULL,
-  `uid` varchar(64) NOT NULL,
-  `title` varchar(64) DEFAULT NULL,
-  `x_val` int(11) NOT NULL DEFAULT '0',
-  `x_require` int(11) DEFAULT '0',
-  `owner` varchar(64) DEFAULT NULL,
-  `used_time` int(11) DEFAULT NULL,
-  `expired_time` int(11) DEFAULT NULL,
-  `memo` text,
-  `createtime` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uid` (`uniacid`, `uid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_data_vw` (
   `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `k` varchar(60) NOT NULL,

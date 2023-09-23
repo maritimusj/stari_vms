@@ -611,6 +611,6 @@ class Advertising extends State
 
     public static function notifyAll(array $origin_data, array $data = []): bool
     {
-        return CtrlServ::appNotifyAll($origin_data, $data);
+        return CtrlServ::appPublishAll($origin_data, $data);
     }
 }

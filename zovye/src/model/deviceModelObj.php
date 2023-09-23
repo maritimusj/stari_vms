@@ -1170,7 +1170,7 @@ class deviceModelObj extends ModelObj
     public function appNotify(string $op = 'config', array $data = []): bool
     {
         if ($this->app_id) {
-            return CtrlServ::appNotify($this->app_id, $op, $data);
+            return CtrlServ::appPublish($this->app_id, $op, $data);
         }
 
         return false;
@@ -1819,14 +1819,14 @@ class deviceModelObj extends ModelObj
     /**
      * 给mcb发送通知
      */
-    public function mcbNotify(string $op = 'params', string $code = '', array $data = []): bool
+    public function mcbPublish(string $op = 'params', string $code = '', array $data = []): bool
     {
         if ($this->imei) {
             if (empty($code)) {
                 $code = $this->getProtocolV1Code();
             }
 
-            return CtrlServ::mcbNotify($this->imei, $code, $op, $data);
+            return CtrlServ::mcbPublish($this->imei, $code, $op, $data);
         }
 
         return false;
@@ -1852,7 +1852,7 @@ class deviceModelObj extends ModelObj
      */
     public function reportMcbStatus(string $code = '')
     {
-        $this->mcbNotify('report', $code);
+        $this->mcbPublish('report', $code);
     }
 
     /**
@@ -2112,7 +2112,7 @@ class deviceModelObj extends ModelObj
             $order_no = 'P'.We7::uniacid()."NO$no_str";
         }
 
-        $params = [
+        $data = [
             'deviceGUID' => $this->imei,
             'channel' => $channel,
             'timeout' => $timeout,
@@ -2120,13 +2120,11 @@ class deviceModelObj extends ModelObj
         ];
 
         if (isset($extra['index'])) {
-            $params['index'] = $extra['index'];
-            $params['unit'] = $extra['unit'];
+            $data['index'] = $extra['index'];
+            $data['unit'] = $extra['unit'];
         }
 
-        $content = http_build_query($params);
-
-        return CtrlServ::query("order/$order_no", ["nostr" => microtime(true)], $content);
+        return CtrlServ::createOrder($order_no, $data);
     }
 
     /**
@@ -2163,7 +2161,7 @@ class deviceModelObj extends ModelObj
         if (empty($this->getAppId())) {
             $imei = $this->getImei();
             if ($imei) {
-                $res = CtrlServ::query("device/$imei");
+                $res = CtrlServ::detail($imei);
                 if (!is_error($res) && $res['appUID']) {
                     $this->setAppId($res['appUID']);
 
@@ -2809,7 +2807,7 @@ class deviceModelObj extends ModelObj
 
     public function openDoor($index): bool
     {
-        return $this->mcbNotify('run', '', [
+        return $this->mcbPublish('run', '', [
             'ser' => Util::random(16, true),
             'sw' => $index,
         ]);

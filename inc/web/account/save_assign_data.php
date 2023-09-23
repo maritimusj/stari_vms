@@ -17,7 +17,7 @@ $data = is_string($raw) ? json_decode(htmlspecialchars_decode($raw), true) : $ra
 $account = Account::get($id);
 if ($account) {
     if ($account->useAccountQRCode()) {
-        CtrlServ::appNotifyAll($account->getAssignData(), $data);
+        CtrlServ::appPublishAll($account->getAssignData(), $data);
     }
     if ($account->set('assigned', $data) && Account::updateAccountData()) {
         JSON::success('设置已经保存成功！');

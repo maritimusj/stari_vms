@@ -516,7 +516,7 @@ class DeviceEventProcessor
             return $result;
         }
 
-        CtrlServ::appNotify($app_id, 'config', $result);
+        CtrlServ::appPublish($app_id, 'config', $result);
 
         return false;
     }
@@ -567,7 +567,7 @@ class DeviceEventProcessor
                 'title' => strval(settings('misc.siteTitle')),
             ];
 
-            CtrlServ::appNotify($app_id, 'config', $result);
+            CtrlServ::appPublish($app_id, 'config', $result);
         }
     }
 

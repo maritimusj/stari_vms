@@ -49,7 +49,7 @@ if ($op == 'default') {
 
                 $device = Device::find($device_id, ['id', 'imei']);
                 if (empty($device)) {
-                    $res = CtrlServ::query("device/$device_id");
+                    $res = CtrlServ::detail($device_id);
                     if (!is_error($res) && $res['id']) {
                         //创建设备
                         $data = [
@@ -77,10 +77,9 @@ if ($op == 'default') {
                         }
                     }
 
-                    $res = CtrlServ::query("device/{$device->getImei()}");
+                    $res = CtrlServ::detail($device->getImei());
                     if (!is_error($res) && empty($res['appUID'])) {
-                        $data = http_build_query(['appUID' => $app_id]);
-                        $res = CtrlServ::query("device/{$device->getImei()}/bind", [], $data, '', 'PUT');
+                        $res = CtrlServ::bind($device->getImei(), $app_id);
                         if (is_error($res)) {
                             return err('控制中心无法绑定appID，注册失败！');
                         }

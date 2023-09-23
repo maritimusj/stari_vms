@@ -24,4 +24,4 @@ $params = [
     "ch" => $chargerID,
 ];
 
-$device->mcbNotify('config', '', $params);
+$device->mcbPublish('config', '', $params);

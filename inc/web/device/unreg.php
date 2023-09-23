@@ -23,7 +23,7 @@ if ($id) {
 
             //通知app更新配置
             if ($app_id) {
-                CtrlServ::appNotify($app_id, 'update');
+                CtrlServ::appPublish($app_id, 'update');
             }
 
             Response::toast('清除AppId成功！', Util::url('device'), 'success');

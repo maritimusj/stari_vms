@@ -608,7 +608,7 @@ class Device extends State
      */
     public static function activate($imei, array $params = [])
     {
-        $res = CtrlServ::query("device/$imei/active", [], '', '', 'PUT');
+        $res = CtrlServ::active($imei);
         if (is_error($res)) {
             return $res;
         }

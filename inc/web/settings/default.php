@@ -236,13 +236,12 @@ if ($page == 'device') {
     $tpl_data['cb_url'] = Helper::getCtrlServCallbackUrl();
     $tpl_data['navs']['ctrl'] = '高级设置';
 
-    $res = CtrlServ::query();
+    $res = CtrlServ::status();
     if (!is_error($res)) {
         $data = empty($res['data']) ? $res : $res['data'];
 
         $tpl_data['version'] = $data['version'] ?: 'n/a';
         $tpl_data['build'] = $data['build'] ?: 'n/a';
-
 
         $tpl_data['formatted_duration'] = Util::getFormattedPeriod($data['start'] ?? $data['startTime']);
 

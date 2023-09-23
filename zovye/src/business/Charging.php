@@ -207,7 +207,7 @@ class Charging
                 return err('保存数据失败！');
             }
 
-            if (!$device->mcbNotify('run', '', [
+            if (!$device->mcbPublish('run', '', [
                 'ser' => $serial,
                 'ch' => $chargerID,
                 'timeout' => 60,
@@ -258,7 +258,7 @@ class Charging
 
         $serial = $last_charging_data->getSerial();
 
-        if (!$device->mcbNotify('config', '', [
+        if (!$device->mcbPublish('config', '', [
             'req' => 'stop',
             'ch' => $chargerID,
             'ser' => $serial,
@@ -273,7 +273,7 @@ class Charging
 
     public static function stopCharging(deviceModelObj $device, $chargerID, $serial)
     {
-        if (!$device->mcbNotify('config', '', [
+        if (!$device->mcbPublish('config', '', [
             'req' => 'stop',
             'ch' => $chargerID,
             'ser' => $serial,

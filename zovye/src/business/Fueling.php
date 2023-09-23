@@ -36,7 +36,7 @@ class Fueling
 
     public static function test(deviceModelObj $device, int $amount, $chargerID = Device::DEFAULT_CARGO_LANE): bool
     {
-        return $device->mcbNotify('run', '', [
+        return $device->mcbPublish('run', '', [
             'ser' => $serial ?? Util::random(16, true),
             'ch' => $chargerID,
             'amount' => $amount,
@@ -46,7 +46,7 @@ class Fueling
     public static function config(deviceModelObj $device)
     {
         $config = $device->getFuelingConfig();
-        $result = $device->mcbNotify('config', '', $config);
+        $result = $device->mcbPublish('config', '', $config);
         if (!$result) {
             return err('通知设备更新配置失败！');
         }
@@ -56,7 +56,7 @@ class Fueling
 
     public static function confirm(deviceModelObj $device, string $serial)
     {
-        $res = $device->mcbNotify('confirm', '', [
+        $res = $device->mcbPublish('confirm', '', [
             'ser' => $serial,
         ]);
 
@@ -186,7 +186,7 @@ class Fueling
                 return err('保存数据失败！');
             }
 
-            $result = $device->mcbNotify('run', '', [
+            $result = $device->mcbPublish('run', '', [
                 'ser' => $serial,
                 'ch' => $chargerID,
                 'card' => $card->getUID(),
@@ -249,7 +249,7 @@ class Fueling
 
     public static function stopFueling(deviceModelObj $device, $chargerID, $serial)
     {
-        if (!$device->mcbNotify('stop', '', [
+        if (!$device->mcbPublish('stop', '', [
             "ch" => $chargerID,
             "ser" => $serial,
         ])) {

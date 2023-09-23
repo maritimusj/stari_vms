@@ -25,7 +25,7 @@ if (!$account->isAuth() || !$account->isServiceAccount()) {
 
 $enable = $account->useAccountQRCode();
 if ($account->useAccountQRCode(!$enable)) {
-    CtrlServ::appNotifyAll($account->getAssignData());
+    CtrlServ::appPublishAll($account->getAssignData());
     JSON::success($enable ? '已取消成功！' : '已设置成功！');
 }
 

@@ -1796,28 +1796,6 @@ class deviceModelObj extends ModelObj
         return [];
     }
 
-    /**
-     * 通知mcb更新参数
-     */
-    public function updateMcbParams($code): bool
-    {
-        $this->resetShadowId();
-        $data = [
-            'qr' => str_replace('{imei}', $this->getImei(), DEVICE_FORWARDER_URL),
-            'num' => $this->getRemainNum(),
-        ];
-
-        return $this->mcbNotify('params', $code, $data);
-    }
-
-    /**
-     * 通知mcb更新配置
-     */
-    public function updateMcbConfig($code, array $data = [])
-    {
-        $this->mcbNotify('config', $code, $data);
-    }
-
     public function getRemainNum(): int
     {
         $data = Device::getPayload($this);

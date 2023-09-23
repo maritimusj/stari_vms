@@ -27,6 +27,7 @@ use zovye\domain\User;
 use zovye\JSON;
 use zovye\Log;
 use zovye\model\agentModelObj;
+use zovye\model\device_keeper_vwModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\keeperModelObj;
 use zovye\model\replenishModelObj;
@@ -237,7 +238,7 @@ class keeper
 
             $query = Device::keeper($keeper)->where(['agent_id' => $agent->getId()]);
 
-            /** @var deviceModelObj $entry */
+            /** @var device_keeper_vwModelObj $entry */
             foreach ($query->findAll() as $entry) {
                 if (!$entry->removeKeeper($keeper)) {
                     return err('删除运营人员设备失败！');
@@ -511,6 +512,8 @@ class keeper
             $condition['device_id'] = [];
 
             $query = Device::keeper($keeper)->where(['agent_id' => $keeper->getAgentId()]);
+
+            /** @var device_keeper_vwModelObj $device */
             foreach ($query->findAll() as $device) {
                 $condition['device_id'][] = $device->getId();
             }
@@ -611,6 +614,8 @@ class keeper
             ];
 
             $query = Device::keeper($keeper)->where(['agent_id' => $keeper->getAgentId()]);
+
+            /** @var device_keeper_vwModelObj $device */
             foreach ($query->findAll() as $device) {
                 $cond['device_id'][] = $device->getId();
             }
@@ -696,7 +701,7 @@ class keeper
         ];
 
         if ($total > 0) {
-            /** @var deviceModelObj $entry */
+            /** @var device_keeper_vwModelObj $entry */
             foreach ($query->page($page, $page_size)->findAll() as $entry) {
                 $data = [
                     'id' => $entry->getImei(),
@@ -739,7 +744,7 @@ class keeper
         ];
 
         if ($total > 0) {
-            /** @var deviceModelObj $entry */
+            /** @var device_keeper_vwModelObj $entry */
             foreach ($query->page($page, $page_size)->findAll() as $entry) {
                 $last_error = $entry->getLastError();
                 $result['list'][] = [
@@ -1253,6 +1258,8 @@ class keeper
         ];
 
         $query = Device::keeper($keeper)->where(['agent_id' => $keeper->getAgentId()]);
+
+        /** @var device_keeper_vwModelObj $device */
         foreach ($query->findAll() as $device) {
             $cond['device_id'][] = $device->getId();
         }

@@ -34,6 +34,7 @@ use zovye\Log;
 use zovye\model\agentModelObj;
 use zovye\model\cronModelObj;
 use zovye\model\device_groupsModelObj;
+use zovye\model\device_keeper_vwModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\keeperModelObj;
 use zovye\model\login_dataModelObj;
@@ -391,7 +392,7 @@ class agent
             'list' => [],
         ];
 
-        /** @var deviceModelObj $entry */
+        /** @var device_keeper_vwModelObj $entry */
         foreach ($query->findAll() as $entry) {
             $data = \zovye\api\wx\device::formatDeviceInfo($agent, $entry, true, $keeperId);
             $result['list'][] = $data;

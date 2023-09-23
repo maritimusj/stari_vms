@@ -75,6 +75,7 @@ class CtrlServ
         if (is_array($device_uid)) {
             return self::postV2('detail', $device_uid);
         }
+
         return self::getV2("device/$device_uid");
     }
 
@@ -83,6 +84,7 @@ class CtrlServ
         if (is_array($device_uid)) {
             return CtrlServ::postV2('online', $device_uid);
         }
+
         return self::getV2("device/$device_uid/online", ['nocache' => $use_cache ? 'false' : 'true']);
     }
 

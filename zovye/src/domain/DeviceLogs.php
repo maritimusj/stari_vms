@@ -10,7 +10,7 @@ namespace zovye\domain;
 use zovye\base\ModelFactory;
 use function zovye\m;
 
-class DeviceLogs extends Base
+class DeviceLogs extends AbstractBase
 {
     public static function model(): ModelFactory
     {

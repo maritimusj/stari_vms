@@ -10,7 +10,7 @@ namespace zovye\domain;
 use zovye\base\ModelFactory;
 use function zovye\m;
 
-class AgentApplication extends Base
+class AgentApplication extends AbstractBase
 {
     const WAIT = 0;
     const CHECKED = 1;

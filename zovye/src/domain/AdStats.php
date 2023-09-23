@@ -10,7 +10,7 @@ namespace zovye\domain;
 use zovye\base\ModelFactory;
 use function zovye\m;
 
-class AdStats extends Base
+class AdStats extends AbstractBase
 {
     public static function model(): ModelFactory
     {

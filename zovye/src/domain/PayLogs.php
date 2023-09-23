@@ -10,7 +10,7 @@ namespace zovye\domain;
 use zovye\base\ModelFactory;
 use function zovye\m;
 
-class PayLogs extends Base
+class PayLogs extends AbstractBase
 {
     public static function model(): ModelFactory
     {

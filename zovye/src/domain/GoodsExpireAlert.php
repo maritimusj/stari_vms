@@ -17,7 +17,7 @@ use zovye\model\userModelObj;
 use zovye\We7;
 use function zovye\m;
 
-class GoodsExpireAlert extends Base
+class GoodsExpireAlert extends AbstractBase
 {
     public static function model(): ModelFactory
     {

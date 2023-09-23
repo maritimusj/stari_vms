@@ -11,7 +11,7 @@ use zovye\base\ModelFactory;
 use zovye\base\ModelObjFinder;
 use zovye\We7;
 
-abstract class Base
+abstract class AbstractBase
 {
     abstract public static function model(): ModelFactory;
 

@@ -29,6 +29,11 @@ class BaseLogsModelObj extends ModelObj
 
     use DataGetterAndSetter;
 
+    static function getTableName($read_or_write): string
+    {
+        trigger_error("base log model obj not extended", E_USER_ERROR);
+    }
+
     function getRawData()
     {
         return parent::getData();

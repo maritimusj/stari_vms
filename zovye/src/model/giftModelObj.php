@@ -26,11 +26,6 @@ class giftModelObj extends ModelObj
     {
         return tb('gift');
     }
-    
-	public static function debugMode(): bool
-	{
-	    return true;
-	}
 
 	/** @var int */
 	protected $id;

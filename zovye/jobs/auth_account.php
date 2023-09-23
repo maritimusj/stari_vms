@@ -33,7 +33,7 @@ if (!CtrlServ::checkJobSign($log)) {
 
 $account = Account::findOneFromUID($account_uid);
 if ($account) {
-    /** @var agentModelObj $agent_id */
+    /** @var agentModelObj $agent */
     $agent = Agent::get($agent_id);
     if ($agent) {
         $account->setAgentId($agent->getId());

@@ -9,6 +9,7 @@ namespace zovye\domain;
 use DateTime;
 use Exception;
 use zovye\base;
+use zovye\model\account_logsModelObj;
 use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
@@ -58,6 +59,7 @@ class Questionnaire
             }
 
             //使用title保存user openid，Util::checkAccountLimits(..)用来统计
+            /** @var account_logsModelObj $log */
             $log = Questionnaire::log(['level' => $account->getId(), 'title' => REQUEST_ID])->findOne();
             if ($log) {
                 $log->setTitle($user->getOpenid());
@@ -97,6 +99,8 @@ class Questionnaire
         $filename = ATTACHMENT_ROOT.$short_filename;
         Util::exportCSVToFile($filename, ['#', '昵称', 'openid', '设备名称', '设备编号', '订单号', '问卷内容', '创建时间']);
 
+
+         /* @var account_logsModelObj $log */
         foreach ($query->findAll() as $index => $log) {
             $user = $log->getData('user', []);
             $device = $log->getData('device', []);

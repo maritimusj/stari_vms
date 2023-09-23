@@ -25,7 +25,7 @@ use function zovye\setArray;
  * @method getCreatetime()
  * @method hasCreatetime()
  */
-class ModelObj implements ISettings
+abstract class ModelObj implements ISettings
 {
     const OP_UNKNOWN = null;
     const OP_READ = 1;
@@ -54,6 +54,8 @@ class ModelObj implements ISettings
         $this->settingsUseCache = $settingsUseCache;
     }
 
+    abstract static function getTableName($read_or_write): string;
+
     /**
      * 返回指定字段从哪里读取数据,默认全部db
      * @param $obj
@@ -70,21 +72,6 @@ class ModelObj implements ISettings
             'db' => $seg_arr ?: '*',
             'cache' => [],
         ];
-    }
-
-    public static function getTableName($read_or_write): string
-    {
-        $tb_name = get_called_class().'::TB_NAME';
-        if (defined($tb_name)) {
-            return constant($tb_name);
-        }
-
-        unset($read_or_write);
-
-        trigger_error(
-            'tb_name() must be implemented or constant TB_NAME must be defined by '.get_called_class(),
-            E_USER_ERROR
-        );
     }
 
     public function log(int $level, string $title, $data): bool

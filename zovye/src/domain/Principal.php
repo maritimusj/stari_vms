@@ -14,8 +14,6 @@ use function zovye\m;
 
 class Principal
 {
-    const Admin = 100;
-
     const Agent = 1;
     const Partner = 2;
     const Keeper = 3;
@@ -53,14 +51,6 @@ class Principal
             'user_id' => $user->getId(),
             'principal_id' => $id,
         ]);
-    }
-    public static function admin($condition = []): base\ModelObjFinder
-    {
-        if (is_array($condition) && isset($condition['id'])) {
-            return m('admin_vw')->where($condition);
-        }
-
-        return m('admin_vw')->where(We7::uniacid([]))->where($condition);
     }
 
     public static function agent($condition = []): base\ModelObjFinder

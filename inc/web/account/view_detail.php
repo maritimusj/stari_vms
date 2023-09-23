@@ -7,10 +7,13 @@
 namespace zovye;
 
 use zovye\domain\Questionnaire;
+use zovye\model\account_logsModelObj;
 
 defined('IN_IA') or exit('Access Denied');
 
 $id = Request::int('id');
+
+/** @var account_logsModelObj $log */
 $log = Questionnaire::log(['id' => $id])->findOne();
 
 if (empty($log)) {

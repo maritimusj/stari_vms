@@ -10,6 +10,9 @@ use zovye\base\ModelObj;
 use zovye\traits\DataGetterAndSetter;
 use function zovye\tb;
 
+/**
+ * @method setTitle($getOpenid)
+ */
 class account_logsModelObj extends ModelObj
 {
     public static function getTableName($read_or_write): string

@@ -164,7 +164,7 @@ $result = DBUtil::transactionDo(function () use ($id, &$device) {
         }
 
         if ($data['device_type'] != $device->getDeviceType()) {
-            $res = $device->resetPayload(['*' => '@0'], '管理员改变型号', TIMESTAMP);
+            $res = $device->resetPayload(['*' => '@0'], '管理员改变型号');
             if (is_error($res)) {
                 throw new RuntimeException('保存库存失败！');
             }
@@ -256,16 +256,14 @@ $result = DBUtil::transactionDo(function () use ($id, &$device) {
                 ];
                 if ($old[$index] && $old[$index]['goods'] != intval($goods_id)) {
                     $device->resetPayload([$index => '@0'],
-                        $is_fueling ? '管理员更改加注枪商品' : '管理员更改货道商品',
-                        TIMESTAMP);
+                        $is_fueling ? '管理员更改加注枪商品' : '管理员更改货道商品');
                 }
                 unset($old[$index]);
             }
 
             foreach ($old as $index => $lane) {
                 $device->resetPayload([$index => '@0'],
-                    $is_fueling ? '管理员删除加注枪' : '管理员删除货道',
-                    TIMESTAMP);
+                    $is_fueling ? '管理员删除加注枪' : '管理员删除货道');
             }
 
             $device_type->setExtraData('cargo_lanes', $cargo_lanes);
@@ -296,7 +294,7 @@ $result = DBUtil::transactionDo(function () use ($id, &$device) {
         }
     }
 
-    $res = $device->resetPayload($cargo_lanes, '管理员编辑设备', TIMESTAMP);
+    $res = $device->resetPayload($cargo_lanes, '管理员编辑设备');
     if (is_error($res)) {
         throw new RuntimeException('保存设备库存数据失败！');
     }

@@ -185,9 +185,6 @@ class Device extends State
      * @开头表示增加指定数量，正值表示增加指定数量，负值表示减少指定数量，0值表示重置到最大数量
      * 空数组则重置所有货道商品数量到最大值
      * 返回商品改变的数量
-     * @param deviceModelObj $device
-     * @param array $data
-     * @return array
      */
     public static function resetPayload(deviceModelObj $device, array $data = []): array
     {

@@ -888,7 +888,7 @@ class deviceModelObj extends ModelObj
     {
         static $cache = [];
 
-        $now = empty($now) ? time() : $now;
+        $now = empty($now) ? TIMESTAMP : $now;
 
         if ($cache[$now]) {
             $clr = $cache[$now];

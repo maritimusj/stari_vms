@@ -445,14 +445,13 @@ class agent
 
         $extra = $device->get('extra', []);
 
-        $now = time();
         $payload = [];
 
         if (Request::isset('device_type')) {
             $type_id = Request::int('device_type');
 
             if ($type_id != $device->getDeviceType()) {
-                $payload[] = $device->resetPayload(['*' => '@0'], '代理商改变型号', $now);
+                $payload[] = $device->resetPayload(['*' => '@0'], '代理商改变型号');
                 $device->setDeviceType($type_id);
             }
 
@@ -473,16 +472,14 @@ class agent
                     ];
                     if ($old[$index] && $old[$index]['goods'] != intval($goods_id)) {
                         $payload[] = $device->resetPayload([$index => '@0'],
-                            $device->isFuelingDevice() ? '代理商更改加注枪商品' : '代理商更改货道商品',
-                            $now);
+                            $device->isFuelingDevice() ? '代理商更改加注枪商品' : '代理商更改货道商品');
                     }
                     unset($old[$index]);
                 }
 
                 foreach ($old as $index => $lane) {
                     $payload[] = $device->resetPayload([$index => '@0'],
-                        $device->isFuelingDevice() ? '代理商删除加注枪' : '代理商删除货道',
-                        $now);
+                        $device->isFuelingDevice() ? '代理商删除加注枪' : '代理商删除货道');
                 }
 
                 $device_type->setExtraData('cargo_lanes', $cargo_lanes);
@@ -509,7 +506,7 @@ class agent
                     $cargo_lanes[$index]['price'] = intval($prices[$index]);
                 }
             }
-            $res = $device->resetPayload($cargo_lanes, '代理商编辑设备', $now);
+            $res = $device->resetPayload($cargo_lanes, '代理商编辑设备');
             if (is_error($res)) {
                 return err('保存设备库存数据失败！');
             }
@@ -1785,6 +1782,7 @@ class agent
     public static function updateUserQRCode(userModelObj $user): array
     {
         $type = Request::str('type');
+
         return misc::updateUserQRCode($user, $type);
     }
 

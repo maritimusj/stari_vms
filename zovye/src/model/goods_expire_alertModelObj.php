@@ -21,6 +21,7 @@ use function zovye\tb;
  * @method getInvalidIfExpired()
  * @method getLaneId()
  * @method setLaneId($lane_id)
+ * @method setGoodsNum(mixed $num)
  */
 class goods_expire_alertModelObj extends ModelObj
 {
@@ -40,6 +41,9 @@ class goods_expire_alertModelObj extends ModelObj
 
     /** @var int */
     protected $lane_id;
+
+    /** @var int */
+    protected $goods_num;
 
     /** @var int */
     protected $expired_at;

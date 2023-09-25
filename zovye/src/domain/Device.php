@@ -244,6 +244,14 @@ class Device extends State
                     $lowest = $lanes_data[$lane_id]['num'];
                 }
 
+                if (App::isGoodsExpireAlertEnabled()) {
+                    $alert = GoodsExpireAlert::getFor($device, $index);
+                    if ($alert) {
+                        $alert->setGoodsNum($lanes_data[$lane_id]['num']);
+                        $alert->save();
+                    }
+                }
+
                 //统计商品补货数量
                 $goods = $cargo_lanes[$index]['goods'];
                 $changed = $lanes_data[$lane_id]['num'] - $old;

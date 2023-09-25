@@ -47,8 +47,15 @@ class GoodsExpireAlert extends AbstractBase
 
     public static function getAllExpiredForAgent(userModelObj $user, $fetch_total = false)
     {
-        $query = self::query(['agent_id' => $user->getId()]);
-        $query->where('expired_at>0 AND expired_at-pre_days*86400<='.time());
+        $query = self::query();
+
+        $query->where([
+            'agent_id' => $user->getId(),
+            'goods_num >' => 0,
+            'expired_at >' => 0,
+        ]);
+
+        $query->where('expired_at-pre_days*86400<='.TIMESTAMP);
 
         if ($fetch_total) {
             return $query->count();
@@ -101,7 +108,7 @@ class GoodsExpireAlert extends AbstractBase
 FROM $alert_tb a 
 INNER JOIN $keeper_tb k ON a.agent_id=k.agent_id 
 INNER JOIN $keeper_device_tb d ON k.id=d.keeper_id AND d.device_id=a.device_id 
-WHERE k.id={$keeper->getId()} AND d.kind=1 AND a.expired_at>0 AND a.expired_at-a.pre_days*86400<=$ts
+WHERE k.id={$keeper->getId()} AND d.kind=1 AND a.goods_num>0 AND a.expired_at>0 AND a.expired_at-a.pre_days*86400<=$ts
 SQL;
         if ($fetch_total) {
             $res = We7::pdo_fetch('SELECT COUNT(*) AS total '.$sql);

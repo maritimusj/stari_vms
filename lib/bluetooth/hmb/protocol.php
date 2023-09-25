@@ -24,7 +24,7 @@ class protocol implements IBlueToothProtocol
 
     function getTitle(): string
     {
-        return '蓝牙售货机协议(hmb v0.1)';
+        return '蓝牙售货机协议(hmb v1.0)';
     }
 
     function transUID($uid)

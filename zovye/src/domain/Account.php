@@ -1205,6 +1205,8 @@ class Account extends State
                         $account['media'] = './resource/images/nopic.jpg';
                     }
                 }
+
+                $account['img'] = Util::toMedia($account['img'], true);
             }
         }
 

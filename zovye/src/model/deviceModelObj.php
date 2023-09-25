@@ -317,6 +317,11 @@ class deviceModelObj extends ModelObj
         return $this->updateSettings('extra.bluetooth.motor', intval($motor));
     }
 
+    public function getBluetoothTimeout(): int
+    {
+        return $this->settings('extra.bluetooth.timeout', 0);
+    }
+
     public function setBluetoothStatus($status): bool
     {
         return $this->updateSettings('extra.bluetooth.status', $status);

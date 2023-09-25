@@ -115,6 +115,7 @@ $result = DBUtil::transactionDo(function () use ($id, &$device) {
             'uid' => Request::trim('BUID'),
             'mac' => Request::trim('MAC'),
             'motor' => Request::int('Motor'),
+            'timeout' => Request::int('timeout'),
         ];
     }
 

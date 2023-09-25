@@ -281,17 +281,15 @@
                         <div class="form-group">
                             <label for="select_protocols" class="col-md-2 control-label">蓝牙协议</label>
                             <div class="col-md-10">
-                                <select name="blueToothProtocol" id="select_protocols" style="width:100%;" data-device="{php echo $device ? $device->getId() : 0}">
-                                    {if empty($device)}
-                                    <option value="{php echo  \zovye\domain\DeviceTypes::UNKNOWN_TYPE}" selected disabled>
-                                        &lt;请选择蓝牙协议&gt;
+                                <select name="blueToothProtocol" id="select_protocols" style="width:100%;" 
+                                data-device="{php echo $device ? $device->getId() : 0}"
+                                v-model="bluetooth.current">
+                                <option value="{php echo  \zovye\domain\DeviceTypes::UNKNOWN_TYPE}" disabled>
+                                    &lt;请选择蓝牙协议&gt;
+                                </option>
+                                    <option :value="item.name" v-for="(item,index) in bluetooth.list">
+                                        {{item.title}}
                                     </option>
-                                    {/if}
-                                    {loop $bluetooth['protocols'] $index $item}
-                                    <option value="{$item['name']}" {if $item['name'] == $bluetooth['protocol'] } selected{/if}>
-                                    {$item['title']}
-                                    </option>
-                                    {/loop}
                                 </select>
                             </div>
                         </div>
@@ -299,6 +297,13 @@
                             <label for="MAC" class="col-md-2 control-label">硬件MAC地址</label>
                             <div class="col-md-10">
                                 <input type="text" class="form-control" name="MAC" id="MAC" value="{php echo $device ? $device->getMAC() : ''}">
+                            </div>
+                        </div>
+                        <div class="form-group" v-if="bluetooth.current === 'hmb'">
+                            <label for="MAC" class="col-md-2 control-label">出货时长（秒）</label>
+                            <div class="col-md-10">
+                                <input type="number" class="form-control" name="timeout" id="timeout" value="{php echo $device ? $device->getBluetoothTimeout() : 0}">
+                                <span class="help-block">* 请设置设备开启后的持续时间，0表示使用全局超时时间。</span>
                             </div>
                         </div>
                         <div class="form-group">
@@ -998,6 +1003,10 @@
                     start: { initilized: false },
                     end: { initilized: false },
                     expiration: { initilized: false },
+                },
+                bluetooth: {
+                    list: JSON.parse(`{php echo json_encode($bluetooth['protocols'])}`),
+                    current: `{$bluetooth['protocol']}`,
                 },
                 config: {
                     goods_package_enabled: `{php echo \zovye\App::isGoodsPackageEnabled()? 1 : ''}`,

@@ -70,9 +70,10 @@ class response implements IResponse
     function getMessage(): string
     {
         switch ($this->getID()) {
+            case 4: return '=> 当前电量（' . $this->getBatteryValue() . '%）' ;
+            case 6: return $this->data == 'a5a5a5' ? '=> 确认回复' : '=> 未知消息';
             case 8:
             case 12: return '=> 启动结果' . ($this->isOpenResultOk() ? '（成功）':'（失败）');
-            case 4: return '=> 当前电量（' . $this->getBatteryValue() . '%）' ;
             default: return '=> 未知消息';
         }
     }

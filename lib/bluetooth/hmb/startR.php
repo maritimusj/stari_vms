@@ -51,7 +51,7 @@ class startR implements ICmd
 
     function getMessage(): string
     {
-        return '<= 请求出货：'.$this->index." ({$this->timeout}秒)";
+        return '<= 请求出货：'.$this->index."（{$this->timeout}秒）";
     }
 
     function getEncoded($fn = null)

@@ -60,11 +60,13 @@ interface IResponse
 
     /**
      * 获取原始数据
+     * @return mixed
      */
     function getRawData();
 
     /**
      * 获取数据
+     * @return mixed
      */
     function getEncodeData();
 

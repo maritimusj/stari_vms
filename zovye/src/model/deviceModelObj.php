@@ -1979,8 +1979,12 @@ class deviceModelObj extends ModelObj
             } else {
                 $option = ['locker' => $mcb_channel];
             }
-
-            $option['timeout'] = $timeout;
+            if ($this->getBlueToothProtocolName() == 'hmb') {
+                $bluetoothTimeout = $this->getBluetoothTimeout();
+                $option['timeout'] = empty($bluetoothTimeout) ? $timeout : $bluetoothTimeout;
+            } else {
+                $option['timeout'] = $timeout;
+            }
 
             $cmd = $protocol->open($this->getBUID(), $option);
             if ($cmd) {

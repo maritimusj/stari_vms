@@ -65,6 +65,28 @@
             color: goldenrod;
             font-style: italic;
         }
+
+        @media (orientation: landscape) {
+            .wave {
+                display: none;
+            }
+            .copyrights {
+                display: none;
+            }
+            .loading,
+            .success{
+                top: -30vh;
+            }
+            body {
+                font-size: 5vh;
+            }
+            .icon img {
+                width: 20vh;
+            }
+            .loading .icon img,
+            .success .icon img {
+                margin: 6vh;
+            }
     </style>
 </head>
 <body>

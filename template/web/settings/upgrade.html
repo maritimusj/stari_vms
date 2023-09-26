@@ -13,8 +13,7 @@
             <table class="table">
                 <thead>
                     <th>#</th>
-                    <th>远程</th>
-                    <th>本地</th>
+                    <th>文件</th>
                     <th>大小</th>
                     <th>日期</th>
                     <th>操作</th>
@@ -24,17 +23,15 @@
                     <tr>
                         <td>{php echo $i + 1}</td>
                         <td>{$e['filename']}</td>
-                        <td>{$e['dest']}</td>
                         <td>{$e['size']}</td>
                         <td>{$e['createtime']}</td>
-                        <td>下载</td>
+                        <td>更新</td>
                     </tr>
                 {/loop}
                 {loop $upgrade['copy'] $j $e}
                     <tr>
                         <td>{php echo count($upgrade['download']) + $j + 1}</td>
                         <td>{$e['filename']}</td>
-                        <td>{$e['dest']}</td>
                         <td>{$e['size']}</td>
                         <td>{$e['createtime']}</td>
                         <td>复制</td>
@@ -44,7 +41,6 @@
                     <tr>
                         <td>{php echo count($upgrade['download']) +count($upgrade['copy']) + $k + 1}</td>
                         <td>{$e['filename']}</td>
-                        <td>{$e['dest']}</td>
                         <td>{$e['size']}</td>
                         <td>{$e['createtime']}</td>
                         <td>移动</td>
@@ -54,7 +50,6 @@
                 <tr>
                     <td>{php echo count($upgrade['download']) + count($upgrade['copy']) + count($upgrade['move']) + $z + 1}</td>
                     <td>{$e['filename']}</td>
-                    <td>{$e['dest']}</td>
                     <td>{$e['size']}</td>
                     <td>{$e['createtime']}</td>
                     <td>删除</td>

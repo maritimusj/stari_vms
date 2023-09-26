@@ -164,7 +164,7 @@ $result = DBUtil::transactionDo(function() use ($id, &$from) {
             $gsp_enabled = Request::bool('gsp_enabled');
             $user->updateSettings('agentData.gsp.enabled', $gsp_enabled);
             if ($gsp_enabled) {
-                $gsp_mode = in_array(Request::str('gsp_mode'), [GSP::REL, GSP::FREE, GSP::MIXED]) ?
+                $gsp_mode = in_array(Request::str('gsp_mode'), [GSP::REL, GSP::FREE, GSP::MIXED], true) ?
                     Request::str('gsp_mode') : GSP::REL;
                 $gsp_mode_type = Request::str('gsp_mode_type', GSP::PERCENT);
                 $user->updateSettings('agentData.gsp.mode', $gsp_mode);
@@ -181,7 +181,7 @@ $result = DBUtil::transactionDo(function() use ($id, &$from) {
                     $rel_2 = max(0, Request::float('rel_level2', 0, 2) * 100);
                     $rel_3 = max(0, Request::float('rel_level3', 0, 2) * 100);
 
-                    if (in_array($gsp_mode, [GSP::AMOUNT, GSP::AMOUNT_PER_GOODS])) {
+                    if (in_array($gsp_mode, [GSP::AMOUNT, GSP::AMOUNT_PER_GOODS], true)) {
                         $rel_1 = intval($rel_1);
                         $rel_2 = intval($rel_2);
                         $rel_3 = intval($rel_3);

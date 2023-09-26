@@ -18,7 +18,7 @@ if (empty($adv)) {
     JSON::fail('找不到这个广告！');
 }
 
-if (in_array($adv->getType(), [Advertising::SCREEN, Advertising::SCREEN_NAV])) {
+if (in_array($adv->getType(), [Advertising::SCREEN, Advertising::SCREEN_NAV], true)) {
 
     $assign_data = $adv->settings('assigned', []);
     if ($assign_data) {

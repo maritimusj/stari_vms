@@ -197,7 +197,7 @@ class Agent
 
         /** @var userModelObj $entry */
         foreach ($query->findAll() as $entry) {
-            if (!in_array($entry->getId(), $result)) {
+            if (!in_array($entry->getId(), $result, true)) {
                 $result[] = $fetch_obj ? $entry : $entry->getId();
                 self::getAllSubordinates($entry, $result, $fetch_obj);
             }

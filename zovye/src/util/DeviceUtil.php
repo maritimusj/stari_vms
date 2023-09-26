@@ -44,14 +44,14 @@ class DeviceUtil
 
         if ($data['agents']) {
             $agent = $device->getAgent();
-            if ($agent && in_array($agent->getId(), $data['agents'])) {
+            if ($agent && in_array($agent->getId(), $data['agents'], true)) {
                 return true;
             }
         }
 
         if ($data['groups']) {
             $group_id = $device->getGroupId();
-            if ($group_id && in_array($group_id, $data['groups'])) {
+            if ($group_id && in_array($group_id, $data['groups'], true)) {
                 return true;
             }
         }
@@ -64,7 +64,7 @@ class DeviceUtil
         }
 
         if ($data['devices']) {
-            if (in_array($device->getId(), $data['devices'])) {
+            if (in_array($device->getId(), $data['devices'], true)) {
                 return true;
             }
         }

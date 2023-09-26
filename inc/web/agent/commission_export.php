@@ -93,6 +93,12 @@ if (Request::bool('is_export')) {
     $query->where($cond);
     $query->orderBy('createtime DESC');
 
+    $arr = [
+        CommissionBalance::ORDER_FREE,
+        CommissionBalance::ORDER_BALANCE,
+        CommissionBalance::ORDER_WX_PAY,
+    ];
+
     /** @var commission_balanceModelObj $entry */
     foreach ($query->findAll() as $index => $entry) {
         $data = [
@@ -106,14 +112,7 @@ if (Request::bool('is_export')) {
             $data['xval'] = '+'.$data['xval'];
         }
 
-        if (in_array(
-            $entry->getSrc(),
-            [
-                CommissionBalance::ORDER_FREE,
-                CommissionBalance::ORDER_BALANCE,
-                CommissionBalance::ORDER_WX_PAY,
-            ]
-        )) {
+        if (in_array($entry->getSrc(), $arr, true)) {
             $order_id = $entry->getExtraData('orderid');
             $order = Order::get($order_id);
             if ($order) {

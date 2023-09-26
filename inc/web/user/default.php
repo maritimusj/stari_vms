@@ -70,7 +70,7 @@ if (Request::has('openid')) {
     //搜索用户名
     $s_keywords = urldecode(Request::trim('s_keywords'));
     if ($s_keywords) {
-        if (in_array($s_principal, ['agent', 'partner', 'keeper', 'tester', 'gspor'])) {
+        if (in_array($s_principal, ['agent', 'partner', 'keeper', 'tester', 'gspor'], true)) {
             $query->whereOr([
                 'name LIKE' => "%$s_keywords%",
                 'nickname LIKE' => "%$s_keywords%",

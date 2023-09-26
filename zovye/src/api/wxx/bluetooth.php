@@ -561,7 +561,7 @@ class bluetooth
 
         if (Request::has('deviceid')) {
             $d_id = Request::int('deviceid');
-            if (in_array($d_id, $device_keys)) {
+            if (in_array($d_id, $device_keys, true)) {
                 $condition['device_id'] = $d_id;
             } else {
                 $condition['device_id'] = -1;
@@ -845,7 +845,7 @@ class bluetooth
 
         if (Request::has('deviceid')) {
             $d_id = Request::int('deviceid');
-            if (in_array($d_id, $device_keys)) {
+            if (in_array($d_id, $device_keys, true)) {
                 $condition['device_id'] = $d_id;
             } else {
                 $condition['device_id'] = -1;

@@ -26,8 +26,12 @@ class RowLocker
 
     public function lock($tb_name, $condition, $seg, $auto_unlock = false, $lock_guid = null): bool
     {
-        if ($this->locked || empty($tb_name) || empty($condition) || empty($seg) || in_array($seg, ['id', 'uniacid']
-            ) || !isset($condition[$seg])) {
+        if ($this->locked ||
+            empty($tb_name) ||
+            empty($condition) ||
+            empty($seg) ||
+            in_array($seg, ['id', 'uniacid'], true) ||
+            !isset($condition[$seg])) {
             return false;
         }
 

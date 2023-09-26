@@ -19,7 +19,7 @@ if (empty($ad)) {
 
 $state = $ad->getState() == Advertising::NORMAL ? Advertising::BANNED : Advertising::NORMAL;
 if ($ad->setState($state) && Advertising::update($ad)) {
-    if (in_array($ad->getType(), [Advertising::SCREEN, Advertising::SCREEN_NAV])) {
+    if (in_array($ad->getType(), [Advertising::SCREEN, Advertising::SCREEN_NAV], true)) {
         //通知设备更新屏幕广告
         $assign_data = $ad->settings('assigned', []);
         Advertising::notifyAll($assign_data);

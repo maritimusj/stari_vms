@@ -165,7 +165,7 @@ if ($fn == 'adduser' || $fn == 'edituser') {
                  ] as $key => $v) {
             if (Request::has($v['type'])) {
                 $type = Request::str($v['type']);
-                if (in_array($type, [GSP::PERCENT, GSP::PERCENT_PER_GOODS])) {
+                if (in_array($type, [GSP::PERCENT, GSP::PERCENT_PER_GOODS], true)) {
                     $val = min(10000, max(0, Request::float($v['val'], 0, 2) * 100));
                 } else {
                     $val = max(0, Request::float($v['val'], 0, 2) * 100);
@@ -246,7 +246,7 @@ if ($fn == 'adduser' || $fn == 'edituser') {
 } elseif ($fn == 'get_role') {
 
     $level = Request::str('level');
-    if (!in_array($level, [GSP::LEVEL1, GSP::LEVEL2, GSP::LEVEL3])) {
+    if (!in_array($level, [GSP::LEVEL1, GSP::LEVEL2, GSP::LEVEL3], true)) {
         JSON::fail('角色不正确！');
     }
 
@@ -271,7 +271,7 @@ if ($fn == 'adduser' || $fn == 'edituser') {
 } elseif ($fn == 'save_role') {
 
     $level = Request::str('level');
-    if (!in_array($level, [GSP::LEVEL1, GSP::LEVEL2, GSP::LEVEL3])) {
+    if (!in_array($level, [GSP::LEVEL1, GSP::LEVEL2, GSP::LEVEL3], true)) {
         JSON::fail('角色不正确！');
     }
     $data = [
@@ -287,7 +287,7 @@ if ($fn == 'adduser' || $fn == 'edituser') {
 
         if (Request::has($v['type'])) {
             $type = Request::str($v['type']);
-            if (in_array($type, [GSP::PERCENT, GSP::PERCENT_PER_GOODS])) {
+            if (in_array($type, [GSP::PERCENT, GSP::PERCENT_PER_GOODS], true)) {
                 $val = min(10000, max(0, Request::float($v['val'], 0, 2) * 100));
             } else {
                 $val = max(0, Request::float($v['val'], 0, 2) * 100);

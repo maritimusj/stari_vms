@@ -74,7 +74,7 @@ if ($keywords) {
 
 if ($type == Advertising::SCREEN) {
     $filter_media = Request::trim('media');
-    if (in_array($filter_media, ['image', 'video', 'audio', 'srt'])) {
+    if (in_array($filter_media, ['image', 'video', 'audio', 'srt'], true)) {
         $len = strlen($filter_media);
         $query->where(['extra LIKE' => "%s:5:\"media\";s:$len:\"$filter_media\"%"]);
 
@@ -83,7 +83,7 @@ if ($type == Advertising::SCREEN) {
     }
 } elseif ($type == Advertising::PUSH_MSG) {
     $filter_msg_type = Request::trim('msgtype');
-    if (in_array($filter_msg_type, ['image', 'mpnews', 'text'])) {
+    if (in_array($filter_msg_type, ['image', 'mpnews', 'text'], true)) {
         $query->where(['extra REGEXP' => "s:4:\"type\";s:.+:\"$filter_msg_type\""]);
 
         $url_params['msgtype'] = $filter_msg_type;
@@ -148,7 +148,7 @@ if ($total > 0) {
             $data['media_formatted'] = "{$media_data[$media]['title']}";
             $data['type_formatted'] .= "({$data['media']})";
 
-        } elseif (in_array($ad->getType(), [advertising::WELCOME_PAGE, Advertising::GET_PAGE])) {
+        } elseif (in_array($ad->getType(), [advertising::WELCOME_PAGE, Advertising::GET_PAGE], true)) {
 
             $data['count'] = count($ad->getExtraData('images'));
             $data['link'] = $ad->getExtraData('link');

@@ -316,7 +316,7 @@ $res = DBUtil::transactionDo(function () {
             Account::YIDAO_NAME,
             Account::WEISURE_NAME,
             Account::TASK_NAME,
-        ])) {
+        ], true)) {
             return err('名称 "'.$name.'" 是系统保留名称，无法使用！');
         }
 
@@ -382,7 +382,7 @@ $res = DBUtil::transactionDo(function () {
         if (Request::has('limits')) {
             $arr = Request::array('limits');
             foreach ($limits as $name => &$v) {
-                if (in_array($name, $arr)) {
+                if (in_array($name, $arr, true)) {
                     $v = 1;
                 }
             }

@@ -23,7 +23,7 @@ $tpl_data['navs'] = Helper::getSettingsNavs();
 
 $page = Request::trim('page', 'device');
 
-if (!(array_key_exists($page, $tpl_data['navs']) || in_array($page, ['ctrl', 'data_vw']))) {
+if (!(array_key_exists($page, $tpl_data['navs']) || in_array($page, ['ctrl', 'data_vw'], true))) {
     Response::toast('找不到这个配置页面！', Util::url('settings'), 'error');
 }
 
@@ -212,7 +212,7 @@ if ($page == 'device') {
 
     /** @var data_vwModelObj $item */
     foreach ($res as $item) {
-        if (in_array($item->getK(), $keys)) {
+        if (in_array($item->getK(), $keys, true)) {
             $values[$item->getK()] = $item->getV();
             $diff[] = $item->getK();
         }

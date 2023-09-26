@@ -42,7 +42,7 @@ if ($fn == 'default') {
     extract(getParsedDate());
 
     $sort = Request::trim('sort', 'price');
-    if (!in_array($sort, ['total', 'price', 'amount'])) {
+    if (!in_array($sort, ['total', 'price', 'amount'], true)) {
         $sort = 'price';
     }
 
@@ -116,7 +116,7 @@ if ($fn == 'default') {
     }
 
     $sort = Request::trim('sort', 'price');
-    if (!in_array($sort, ['total', 'price', 'amount'])) {
+    if (!in_array($sort, ['total', 'price', 'amount'], true)) {
         $sort = 'price';
     }
 

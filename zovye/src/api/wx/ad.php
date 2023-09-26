@@ -152,7 +152,7 @@ class ad
                     $data['media_formatted'] = Advertising::desc($media);
                     $data['type_formatted'] .= "({$data['media']})";
 
-                } elseif (in_array($type, [advertising::WELCOME_PAGE, Advertising::GET_PAGE])) {
+                } elseif (in_array($type, [advertising::WELCOME_PAGE, Advertising::GET_PAGE], true)) {
 
                     $images = $ad->getExtraData('images', []);
                     $data['filename'] = $images;

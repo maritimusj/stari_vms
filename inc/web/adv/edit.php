@@ -70,7 +70,7 @@ if ($id > 0) {
 
         $tpl_data['url'] = $ad->getExtraData('url');
 
-    } elseif (in_array($type, [Advertising::WELCOME_PAGE, Advertising::GET_PAGE])) {
+    } elseif (in_array($type, [Advertising::WELCOME_PAGE, Advertising::GET_PAGE], true)) {
 
         $tpl_data['images'] = $ad->getExtraData('images');
         $tpl_data['link'] = $ad->getExtraData('link');

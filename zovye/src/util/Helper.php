@@ -78,7 +78,7 @@ class Helper
     {
         $theme = self::getTheme($device);
 
-        return !in_array($theme, ['balance', 'balance2', 'spa', 'spec', 'summer']);
+        return !in_array($theme, ['balance', 'balance2', 'spa', 'spec', 'summer'], true);
     }
 
     /**
@@ -1421,7 +1421,7 @@ include './index.php';
             return false;
         }
 
-        if (in_array($limit['scname'], [Account::DAY, Account::WEEK, Account::MONTH])) {
+        if (in_array($limit['scname'], [Account::DAY, Account::WEEK, Account::MONTH], true)) {
             if ($limit['scname'] == Account::DAY) {
                 $time = new DateTimeImmutable('00:00');
             } elseif ($limit['scname'] == Account::WEEK) {

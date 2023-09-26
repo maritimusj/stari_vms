@@ -22,7 +22,7 @@ if (empty($ad)) {
 
 $origin_data = $ad->settings('assigned', []);
 if ($ad->updateSettings('assigned', $data) && Advertising::update($ad)) {
-    if (in_array($ad->getType(), [Advertising::SCREEN, Advertising::SCREEN_NAV])) {
+    if (in_array($ad->getType(), [Advertising::SCREEN, Advertising::SCREEN_NAV], true)) {
         if (Advertising::notifyAll($origin_data, $data)) {
             JSON::success('设置已经保存成功，已通知设备更新！');
         } else {

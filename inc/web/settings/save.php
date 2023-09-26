@@ -145,12 +145,12 @@ if ($page == 'device') {
     }
 
     $protocol = Request::array('protocol');
-    foreach(BlueToothProtocol::all() as $item) {
+    foreach (BlueToothProtocol::all() as $item) {
         Config::app("bluetooth.{$item['name']}.enabled", $protocol[$item['name']] ?? 0, true);
     }
 
     $themes = Request::array('theme');
-    foreach(Theme::all() as $theme) {
+    foreach (Theme::all() as $theme) {
         Config::app("theme.{$theme['name']}.enabled", $themes[$theme['name']] ?? 0, true);
     }
 
@@ -335,10 +335,9 @@ if ($page == 'device') {
                 $rel_2 = max(0, Request::float('rel_gsp_level2', 0, 2) * 100);
                 $rel_3 = max(0, Request::float('rel_gsp_level3', 0, 2) * 100);
 
-                if (in_array(
-                    $settings['agent']['reg']['gsp_mode_type'],
-                    [GSP::AMOUNT, GSP::AMOUNT_PER_GOODS]
-                )) {
+                $gsp_mode_type = $settings['agent']['reg']['gsp_mode_type'];
+
+                if (in_array($gsp_mode_type, [GSP::AMOUNT, GSP::AMOUNT_PER_GOODS], true)) {
                     $rel_0 = intval($rel_0);
                     $rel_1 = intval($rel_1);
                     $rel_2 = intval($rel_2);
@@ -953,9 +952,9 @@ if ($page == 'device') {
         Config::balance('order.as', Request::str('balanceOrderAs'), true);
         Config::balance('order.auto_rb', Request::bool('autoRollbackOrderBalance') ? 1 : 0, true);
 
-        $promote_opts = Request::array('accountPromoteBonusOption');
+        $promote_bonus_opts = Request::array('accountPromoteBonusOption');
         foreach (['third_platform', 'account', 'video', 'wxapp', 'douyin'] as $name) {
-            Config::balance("account.promote_bonus.$name", in_array($name, $promote_opts) ? 1 : 0, true);
+            Config::balance("account.promote_bonus.$name", in_array($name, $promote_bonus_opts, true) ? 1 : 0, true);
         }
 
         Config::balance('account.promote_bonus.min', Request::int('accountPromoteBonusMin'), true);

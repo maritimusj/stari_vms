@@ -365,7 +365,8 @@ class Advertising extends State
                 return err('不正确的广告类型！');
             }
 
-            if (in_array($extra['media'], [Advertising::MEDIA_IMAGE, Advertising::MEDIA_VIDEO, Advertising::MEDIA_SRT])) {
+            $arr = [Advertising::MEDIA_IMAGE, Advertising::MEDIA_VIDEO, Advertising::MEDIA_SRT];
+            if (in_array($extra['media'], $arr, true)) {
                 $extra['area'] = intval($params['area']);
             }
 
@@ -400,7 +401,7 @@ class Advertising extends State
 
             $extra['url'] = $url;
 
-        } elseif (in_array($type, [Advertising::WELCOME_PAGE, Advertising::GET_PAGE])) {
+        } elseif (in_array($type, [Advertising::WELCOME_PAGE, Advertising::GET_PAGE], true)) {
 
             $images = (array)$params['images'];
             if (empty($images)) {
@@ -522,7 +523,7 @@ class Advertising extends State
             } else {
                 if ($ad->isReviewPassed()) {
                     //通知设备更新屏幕广告
-                    if (in_array($ad->getType(), [Advertising::SCREEN, Advertising::SCREEN_NAV])) {
+                    if (in_array($ad->getType(), [Advertising::SCREEN, Advertising::SCREEN_NAV], true)) {
                         $assign_data = $ad->settings('assigned', []);
                         Advertising::notifyAll($assign_data);
                     }
@@ -573,7 +574,7 @@ class Advertising extends State
 
                 if ($ad->updateSettings("reviewData.$current", $data) && Advertising::update($ad)) {
 
-                    if (in_array($ad->getType(), [Advertising::SCREEN, Advertising::SCREEN_NAV])) {
+                    if (in_array($ad->getType(), [Advertising::SCREEN, Advertising::SCREEN_NAV], true)) {
                         //通知设备更新屏幕广告
                         $assign_data = $ad->settings('assigned', []);
                         Advertising::notifyAll($assign_data);

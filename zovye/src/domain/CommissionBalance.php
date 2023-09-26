@@ -171,7 +171,8 @@ $admin_info
 REFUND;
         } elseif (in_array(
             $entry->getSrc(),
-            [CommissionBalance::ORDER_FREE, CommissionBalance::ORDER_BALANCE, CommissionBalance::ORDER_WX_PAY]
+            [CommissionBalance::ORDER_FREE, CommissionBalance::ORDER_BALANCE, CommissionBalance::ORDER_WX_PAY],
+            true
         )) {
 
             $order_id = $entry->getExtraData('orderid');

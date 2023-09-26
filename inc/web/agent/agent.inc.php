@@ -17,11 +17,19 @@ use zovye\util\Helper;
 use zovye\util\Util;
 
 $op = Request::op('default');
-if (in_array(
-    $op,
-    ['create', 'edit', 'agent_base', 'agent_funcs', 'agent_notice', 'agent_commission', 'agent_misc', 'agent_payment']
-)) {
 
+$valid_ops = [
+    'create',
+    'edit',
+    'agent_base',
+    'agent_funcs',
+    'agent_notice',
+    'agent_commission',
+    'agent_misc',
+    'agent_payment',
+];
+
+if (in_array($op, $valid_ops, true)) {
     $id = Request::int('id');
     $agent = null;
     if ($op == 'create') {

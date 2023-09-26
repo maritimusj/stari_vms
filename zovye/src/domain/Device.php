@@ -1196,10 +1196,8 @@ class Device extends State
 
     public static function sendEventTemplateMsg(deviceModelObj $device, string $event)
     {
-        if (!in_array(
-            $event,
-            ['online', 'offline', 'error', 'low_battery', 'low_remain']
-        )) {
+        $device_events = ['online', 'offline', 'error', 'low_battery', 'low_remain'];
+        if (!in_array($event, $device_events, true)) {
             return err('不支持的事件通知！');
         }
 

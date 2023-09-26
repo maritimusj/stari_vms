@@ -121,7 +121,7 @@ if ($qr_codes->count() > 0) {
         $entry->setExtraData('visited.total', $total + 1);
 
         $user_visited = $user->settings('qrcode.visited', []);
-        if (!in_array($user->getId(), $user_visited)) {
+        if (!in_array($user->getId(), $user_visited, true)) {
 
             $count = (int)$entry->getExtraData('visited.count');
             $entry->setExtraData('visited.count', $count + 1);

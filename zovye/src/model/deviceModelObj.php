@@ -2586,7 +2586,7 @@ class deviceModelObj extends ModelObj
                     $day_total = $user->getTodayFreeTotal($goods->getId());
                     if ($day_total >= $day_limit) {
                         self::disableFree($goodsData);
-                    } elseif (!empty($params[Goods::AllowFree]) || in_array(Goods::AllowFree, $params)) {
+                    } elseif (!empty($params[Goods::AllowFree]) || in_array(Goods::AllowFree, $params, true)) {
                         $goodsData['num'] = min($goodsData['num'], $day_limit - $day_total);
                     }
                 }
@@ -2596,7 +2596,7 @@ class deviceModelObj extends ModelObj
                     $all_total = $user->getFreeTotal($goods->getId());
                     if ($all_total >= $all_limit) {
                         self::disableFree($goodsData);
-                    } elseif (!empty($params[Goods::AllowFree]) || in_array(Goods::AllowFree, $params)) {
+                    } elseif (!empty($params[Goods::AllowFree]) || in_array(Goods::AllowFree, $params, true)) {
                         $goodsData['num'] = min($goodsData['num'], $all_limit - $all_total);
                     }
                 }
@@ -2608,7 +2608,7 @@ class deviceModelObj extends ModelObj
                     $day_total = $user->getTodayPayTotal($goods->getId());
                     if ($day_total >= $day_limit) {
                         self::disablePay($goodsData);
-                    } elseif (!empty($params[Goods::AllowPay]) || in_array(Goods::AllowPay, $params)) {
+                    } elseif (!empty($params[Goods::AllowPay]) || in_array(Goods::AllowPay, $params, true)) {
                         $goodsData['num'] = min($goodsData['num'], $day_limit - $day_total);
                     }
                 }
@@ -2618,7 +2618,7 @@ class deviceModelObj extends ModelObj
                     $all_total = $user->getPayTotal($goods->getId());
                     if ($all_total >= $all_limit) {
                         self::disablePay($goodsData);
-                    } elseif (!empty($params[Goods::AllowPay]) || in_array(Goods::AllowPay, $params)) {
+                    } elseif (!empty($params[Goods::AllowPay]) || in_array(Goods::AllowPay, $params, true)) {
                         $goodsData['num'] = min($goodsData['num'], $all_limit - $all_total);
                     }
                 }
@@ -2635,17 +2635,19 @@ class deviceModelObj extends ModelObj
             if ($params) {
                 if ((!empty($params[Goods::AllowPay]) || in_array(
                             Goods::AllowPay,
-                            $params
+                            $params,
+                            true
                         )) && empty($data[Goods::AllowPay])) {
                     return false;
                 }
                 if ((!empty($params[Goods::AllowFree]) || in_array(
                             Goods::AllowFree,
-                            $params
+                            $params,
+                            true
                         )) && empty($data[Goods::AllowFree])) {
                     return false;
                 }
-                if ((!empty($params[Goods::AllowBalance]) || in_array(Goods::AllowBalance, $params))) {
+                if ((!empty($params[Goods::AllowBalance]) || in_array(Goods::AllowBalance, $params, true))) {
                     if (empty($data[Goods::AllowBalance]) || empty($data['balance'])) {
                         return false;
                     }

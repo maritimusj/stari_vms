@@ -89,17 +89,12 @@ class Goods
         return m('goods')->create($data);
     }
 
-    /**
-     * @param $id
-     * @param array $params
-     * @return array
-     */
     public static function data($id, array $params = []): array
     {
         $goods = self::get($id);
         if ($goods) {
-            $detail = in_array('detail', $params, true) || $params['detail'];
             $use_image_proxy = in_array('useImageProxy', $params, true) || $params['useImageProxy'];
+            $detail = in_array('detail', $params, true) || $params['detail'] || $use_image_proxy;
             $fullPath = in_array('fullPath', $params, true) || $params['fullPath'];
             return self::format($goods, $detail, $use_image_proxy, $fullPath);
         }
@@ -107,11 +102,6 @@ class Goods
         return [];
     }
 
-    /**
-     * @param mixed $id
-     * @param bool $deleted
-     * @return goodsModelObj|null
-     */
     public static function get($id, bool $deleted = false): ?goodsModelObj
     {
         /** @var goodsModelObj[] $cache */
@@ -134,13 +124,6 @@ class Goods
         return null;
     }
 
-    /**
-     * @param goodsModelObj $entry
-     * @param bool $detail
-     * @param bool $use_image_proxy
-     * @param bool $full_path
-     * @return array
-     */
     public static function format(
         goodsModelObj $entry,
         bool $detail = false,
@@ -242,11 +225,7 @@ class Goods
         return $data;
     }
 
-    /**
-     * @param array $params
-     * @param callable|null $formatter
-     * @return array
-     */
+
     public static function getList(array $params = [], callable $formatter = null): array
     {
         $page = max(1, intval($params['page']));
@@ -354,10 +333,6 @@ class Goods
         return false;
     }
 
-    /**
-     * @param array $condition
-     * @return ModelObjFinder
-     */
     public static function query(array $condition = []): ModelObjFinder
     {
         if (is_array($condition) && isset($condition['id'])) {

@@ -93,9 +93,9 @@ class Goods
     {
         $goods = self::get($id);
         if ($goods) {
+            $detail =  in_array('detail', $params, true) || $params['detail'];
             $use_image_proxy = in_array('useImageProxy', $params, true) || $params['useImageProxy'];
-            $detail = in_array('detail', $params, true) || $params['detail'] || $use_image_proxy;
-            $fullPath = in_array('fullPath', $params, true) || $params['fullPath'];
+            $fullPath = $use_image_proxy || in_array('fullPath', $params, true) || $params['fullPath'];
             return self::format($goods, $detail, $use_image_proxy, $fullPath);
         }
 

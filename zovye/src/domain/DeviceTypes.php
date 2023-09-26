@@ -169,11 +169,6 @@ class DeviceTypes
         return m('device_types')->where(We7::uniacid([]))->where($condition);
     }
 
-    /**
-     * @param device_typesModelObj $entry
-     * @param bool $detail
-     * @return array
-     */
     public static function format(device_typesModelObj $entry, bool $detail = false): array
     {
         $data = [
@@ -199,11 +194,6 @@ class DeviceTypes
         return $data;
     }
 
-    /**
-     * @param device_typesModelObj $entry
-     * @param bool $detail
-     * @return array
-     */
     public static function getCargoLanes(device_typesModelObj $entry, bool $detail = false): array
     {
         $cargo_lanes = $entry->getExtraData('cargo_lanes', []);

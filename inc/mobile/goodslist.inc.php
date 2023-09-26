@@ -8,7 +8,6 @@ namespace zovye;
 
 use zovye\domain\Device;
 use zovye\domain\Goods;
-use zovye\util\Util;
 
 defined('IN_IA') or exit('Access Denied');
 
@@ -53,7 +52,7 @@ foreach ($result as $entry) {
             $goods[$key] = [
                 'id' => $entry['goods_id'],
                 'name' => $entry['goods_name'],
-                'img' => Util::toMedia($entry['goods_img'], true),
+                'img' => $entry['goods_img'],
                 'num' => intval($entry['num']),
                 'allow_free' => $entry[Goods::AllowFree],
                 'allow_pay' => $entry[Goods::AllowPay],

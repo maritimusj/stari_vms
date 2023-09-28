@@ -96,6 +96,7 @@ class agent
             if (empty($user->getMobile())) {
                 $mobile = strval($res['phoneNumber']);
                 if (empty($mobile)) {
+                    // 返回错误代码1001，小程序请求用户授权获取手机号码
                     return error(1001, '登录失败，用户没有绑定手机号码！');
                 }
                 $user->setMobile($mobile);
@@ -122,6 +123,7 @@ class agent
         /** @var userModelObj $user */
         $user = User::findOne(['mobile' => $mobile, 'app' => User::WX]);
         if (empty($user)) {
+            // 返回错误代码1001，小程序请求用户授权获取手机号码
             return error(1001, "您还不是我们的代理商，立即注册? [ $mobile ]");
         }
 

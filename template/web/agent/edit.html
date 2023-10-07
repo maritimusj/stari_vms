@@ -1285,18 +1285,6 @@
                             <span class="help-block">* 勾选后，所有运营人员佣金配置会被更改为当前配置，否则仅保存为默认配置。</span>
                         </label>
                     </div>
-                </div>             
-                <div class="seg-divider"></div>
-                <div class="form-group">
-                    <label for="reductGoodsNum" class="col-md-2 control-label">库存</label>
-                    <div class="col-md-10">
-                        <div class="checkbox">
-                            <label>
-                                <input type="checkbox" name="reductGoodsNum" id="reductGoodsNum" value="1" {if !isset($agent_data['keeper']['reductGoodsNum']) || $agent_data['keeper']['reductGoodsNum']['enabled']}checked{/if}>
-                                运营人员补货后，减少设备商品库存
-                            </label>
-                        </div>
-                    </div>
                 </div>
             </div>
             {if \zovye\App::isZeroBonusEnabled()}

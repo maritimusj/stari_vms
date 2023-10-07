@@ -301,10 +301,6 @@ $result = DBUtil::transactionDo(function() use ($id, &$from) {
                 }
             }
 
-            $user->updateSettings('agentData.keeper.reductGoodsNum', [
-                'enabled' => Request::int('reductGoodsNum'),
-            ]);
-
             if (App::isZeroBonusEnabled()) {
                 $user->updateSettings('agentData.custom.bonus.zero.v', min(100, Request::float('zeroBonus', -1, 2)));
             }

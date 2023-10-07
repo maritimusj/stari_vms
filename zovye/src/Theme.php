@@ -59,6 +59,7 @@ class Theme
     public static function valid(): array
     {
         $list = self::all();
+        
         foreach ($list as $index => $theme) {
             if (!Config::app("theme.{$theme['name']}.enabled", true)) {
                 unset($list[$index]);

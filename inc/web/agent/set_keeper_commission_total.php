@@ -20,7 +20,7 @@ if (empty($keeper)) {
 
 Response::templateJSON(
     'web/keeper/commission_total',
-    "{$keeper->getName()}的配置",
+    "{$keeper->getName()}的剩余有效补货数量",
     [
         'id' => $keeper->getId(),
         'total' => $keeper->getCommissionTotal(),

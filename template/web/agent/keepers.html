@@ -159,11 +159,12 @@
             const val = $('#editKeeperConfig input[name=commissionTotal]').val();
             next({id, val}, function(res) {
                 $('#modal-message').modal('hide');
-                if (res && res.data) {
+                if (res && res.status && res.data) {
+                    const tr = $("#keeperlist tr[data-id="+id+"]");console.log(tr);
                     if (res.data.val === -1) {
-                        e.find(`commission-total`).text(`&lt;未设置&gt;`);
+                        tr.find(".commission-total").html(`&lt;未设置&gt;`);
                     } else {
-                        e.find(`commission-total`).text(res.data.val);
+                        tr.find(".commission-total").text(res.data.val);
                     }
                 }
             });

@@ -896,7 +896,7 @@ class keeper
         list($v, $way, $is_percent) = $keeper->getCommissionValue($device);
         if ($way == \zovye\domain\Keeper::COMMISSION_RELOAD) {
             if ($is_percent) {
-                $commission_price_calc = function ($num, $goods_id) use ($v, $keeper) {
+                $commission_price_calc = function ($num, $goods_id) use ($v, $device, $keeper) {
                     if (App::isKeeperCommissionLimitEnabled()) {
                         //运营人员补货数量限制为-1表示不限制，否则必须 > 0才能获得佣金
                         $valid_commission_total = $keeper->getCommissionLimitTotal();
@@ -908,9 +908,9 @@ class keeper
                             }
                         }
                     }
-                    $goods = Goods::get($goods_id);
-                    $price = $goods ? $goods->getPrice() : 0;
-                    return intval(round($num * $price * $v / 10000));
+                    $goods = $device->getGoods($goods_id);
+                    $price = $goods ? $goods['price'] : 0;
+                    return intval(round($num * $price * $v / 100));
                 };
             } else {
                 $commission_price_calc = function ($num) use ($v, $keeper) {

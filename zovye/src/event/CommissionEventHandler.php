@@ -431,7 +431,7 @@ class CommissionEventHandler
             }
 
             if ($is_percent) {
-                $val = intval(round($commission_total * intval($v) / 10000) * ($item_num / $order->getItemNum()));
+                $val = intval(round($commission_total * intval($v) / 100) * ($item_num / $order->getItemNum()));
             } else {
                 $val = intval($v * $item_num);
             }

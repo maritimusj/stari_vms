@@ -3,7 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
- 
+
 namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
@@ -26,15 +26,18 @@ $result = [];
 /** @var keeperModelObj $keeper */
 foreach ($query->findAll() as $keeper) {
     $user = $keeper->getUser();
-    $result[] = [
+    $data = [
         'id' => $keeper->getId(),
         'user' => empty($user) ? [] : $user->profile(),
         'name' => $keeper->getName(),
         'mobile' => $keeper->getMobile(),
-        'commission_limit_total' => $keeper->getCommissionLimitTotal(),
         'devices_total' => intval($keeper->deviceQuery()->count()),
         'createtime' => date('Y-m-d H:i:s', $keeper->getCreatetime()),
     ];
+    if (App::isKeeperCommissionLimitEnabled()) {
+        $data['commission_limit_total'] = $keeper->getCommissionLimitTotal();
+    }
+    $result[] = $data;
 }
 
 Response::showTemplate(

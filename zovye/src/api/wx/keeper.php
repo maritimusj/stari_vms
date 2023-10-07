@@ -307,8 +307,10 @@ class keeper
                 'id' => $keeper->getId(),
                 'name' => $keeper->getName(),
                 'mobile' => $keeper->getMobile(),
-                'commission_limit_total' => $keeper->getCommissionLimitTotal()
             ];
+            if (App::isKeeperCommissionLimitEnabled()) {
+                $data['commission_limit_total'] = $keeper->getCommissionLimitTotal();
+            }
             $user = $keeper->getUser();
             if ($user) {
                 $data['user_id'] = $user->getId();

@@ -31,7 +31,7 @@ foreach ($query->findAll() as $keeper) {
         'user' => empty($user) ? [] : $user->profile(),
         'name' => $keeper->getName(),
         'mobile' => $keeper->getMobile(),
-        'commission_total' => $keeper->getCommissionTotal(),
+        'commission_limit_total' => $keeper->getCommissionLimitTotal(),
         'devices_total' => intval($keeper->deviceQuery()->count()),
         'createtime' => date('Y-m-d H:i:s', $keeper->getCreatetime()),
     ];

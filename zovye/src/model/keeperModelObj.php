@@ -109,7 +109,7 @@ class keeperModelObj extends ModelObj
         return $this->setExtraData('commission.limit_total', $total);
     }
 
-    public function getCommissionTotal(): int
+    public function getCommissionLimitTotal(): int
     {
         return $this->getExtraData('commission.limit_total', -1);
     }

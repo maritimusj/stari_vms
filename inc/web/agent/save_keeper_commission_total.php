@@ -25,7 +25,7 @@ if (Request::is_numeric('val')) {
 
 if ($keeper->save()) {
     JSON::success([
-        'val' => $keeper->getCommissionTotal(),
+        'val' => $keeper->getCommissionLimitTotal(),
     ]);
 }
 

@@ -306,6 +306,7 @@ class keeper
                 'id' => $keeper->getId(),
                 'name' => $keeper->getName(),
                 'mobile' => $keeper->getMobile(),
+                'commission_limit_total' => $keeper->getCommissionLimitTotal()
             ];
             $user = $keeper->getUser();
             if ($user) {
@@ -895,7 +896,7 @@ class keeper
                 $commission_price_calc = function ($num, $goods_id) use ($v, $keeper) {
                     if (App::isKeeperCommissionLimitEnabled()) {
                         //运营人员补货数量限制为-1表示不限制，否则必须 > 0才能获得佣金
-                        $valid_commission_total = $keeper->getCommissionTotal();
+                        $valid_commission_total = $keeper->getCommissionLimitTotal();
                         if ($valid_commission_total != -1) {
                             $num = min($valid_commission_total, $num);
                             $keeper->setCommissionLimitTotal(max(0, $valid_commission_total - $num));
@@ -910,7 +911,7 @@ class keeper
                 $commission_price_calc = function ($num) use ($v, $keeper) {
                     if (App::isKeeperCommissionLimitEnabled()) {
                         //运营人员补货数量限制为-1表示不限制，否则必须 > 0才能获得佣金
-                        $valid_commission_total = $keeper->getCommissionTotal();
+                        $valid_commission_total = $keeper->getCommissionLimitTotal();
                         if ($valid_commission_total != -1) {
                             $num = min($valid_commission_total, $num);
                             $keeper->setCommissionLimitTotal(max(0, $valid_commission_total - $num));

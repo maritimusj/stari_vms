@@ -23,6 +23,6 @@ Response::templateJSON(
     "{$keeper->getName()}的剩余有效补货数量",
     [
         'id' => $keeper->getId(),
-        'total' => $keeper->getCommissionTotal(),
+        'total' => $keeper->getCommissionLimitTotal(),
     ]
 );

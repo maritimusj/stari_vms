@@ -212,6 +212,14 @@ class keeper
                 $keeper_user->save();
             }
 
+            if (App::isKeeperCommissionLimitEnabled()) {
+                if (Request::is_numeric('commissionLimitTotal')) {
+                    $keeper->setCommissionLimitTotal(Request::int('commissionLimitTotal'));
+                } else {
+                    $keeper->setCommissionLimitTotal(-1);
+                }
+            }
+
             if ($keeper->save()) {
                 return ['msg' => empty($id) ? '请联系运营人员登录并绑定手机号！' : '运营人员资料保存成功！'];
             }
@@ -885,13 +893,14 @@ class keeper
         if ($way == \zovye\domain\Keeper::COMMISSION_RELOAD) {
             if ($is_percent) {
                 $commission_price_calc = function ($num, $goods_id) use ($v, $keeper) {
-                    //运营人员补货数量限制为-1表示不限制，否则必须 > 0才能获得佣金
-                    $valid_commission_total = $keeper->getCommissionTotal();
-                    if ($valid_commission_total != -1) {
-                        $num = min($valid_commission_total, $num);
-                        $keeper->setCommissionTotal(max(0, $valid_commission_total - $num));
+                    if (App::isKeeperCommissionLimitEnabled()) {
+                        //运营人员补货数量限制为-1表示不限制，否则必须 > 0才能获得佣金
+                        $valid_commission_total = $keeper->getCommissionTotal();
+                        if ($valid_commission_total != -1) {
+                            $num = min($valid_commission_total, $num);
+                            $keeper->setCommissionLimitTotal(max(0, $valid_commission_total - $num));
+                        }
                     }
-
                     $goods = Goods::get($goods_id);
                     $price = $goods ? $goods->getPrice() : 0;
 
@@ -899,11 +908,13 @@ class keeper
                 };
             } else {
                 $commission_price_calc = function ($num) use ($v, $keeper) {
-                    //运营人员补货数量限制为-1表示不限制，否则必须 > 0才能获得佣金
-                    $valid_commission_total = $keeper->getCommissionTotal();
-                    if ($valid_commission_total != -1) {
-                        $num = min($valid_commission_total, $num);
-                        $keeper->setCommissionTotal(max(0, $valid_commission_total - $num));
+                    if (App::isKeeperCommissionLimitEnabled()) {
+                        //运营人员补货数量限制为-1表示不限制，否则必须 > 0才能获得佣金
+                        $valid_commission_total = $keeper->getCommissionTotal();
+                        if ($valid_commission_total != -1) {
+                            $num = min($valid_commission_total, $num);
+                            $keeper->setCommissionLimitTotal(max(0, $valid_commission_total - $num));
+                        }
                     }
                     return intval($v * $num);
                 };

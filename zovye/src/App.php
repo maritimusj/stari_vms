@@ -507,4 +507,9 @@ class App
     {
         return settings('custom.longPressOrder.enabled', false);
     }
+
+    public static function isKeeperCommissionLimitEnabled(): bool
+    {
+        return settings('custom.keeper.commissionLimit.enabled', false);
+    }
 }

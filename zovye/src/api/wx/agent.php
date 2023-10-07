@@ -214,6 +214,7 @@ class agent
                 'flash_egg' => App::isFlashEggEnabled(),
                 'device_schedule' => App::isDeviceScheduleTaskEnabled(),
                 'goods_expire_alert' => App::isGoodsExpireAlertEnabled(),
+                'keeper_commission_limit_enabled' => App::isKeeperCommissionLimitEnabled(),
             ],
             'wxapp' => [
                 'debug' => false,

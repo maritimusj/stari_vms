@@ -104,13 +104,13 @@ class keeperModelObj extends ModelObj
         return Agent::get($this->agent_id);
     }
 
-    public function setCommissionTotal($total = null)
+    public function setCommissionLimitTotal($total = null)
     {
-        return $this->setExtraData('commission.total', $total);
+        return $this->setExtraData('commission.limit_total', $total);
     }
 
     public function getCommissionTotal(): int
     {
-        return $this->getExtraData('commission.total', -1);
+        return $this->getExtraData('commission.limit_total', -1);
     }
 }

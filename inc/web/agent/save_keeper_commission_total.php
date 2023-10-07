@@ -18,9 +18,9 @@ if (empty($keeper)) {
 }
 
 if (Request::is_numeric('val')) {
-    $keeper->setCommissionTotal(Request::int('val'));
+    $keeper->setCommissionLimitTotal(Request::int('val'));
 } else {
-    $keeper->setCommissionTotal(-1);
+    $keeper->setCommissionLimitTotal(-1);
 }
 
 if ($keeper->save()) {

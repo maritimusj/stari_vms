@@ -83,7 +83,7 @@
                     {if \zovye\App::isKeeperCommissionLimitEnabled()}
                     <td class="center">
                         <div data-op="setKeeperCommissionTotal" title="点击设置">
-                            {if $item['commission_total'] == -1}
+                            {if $item['commission_limit_total'] == -1}
                            <span class="commission-total text-muted"> &lt;未设置&gt;</span>
                             {else}
                             <span class="commission-total">

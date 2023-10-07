@@ -910,7 +910,7 @@ class keeper
                     }
                     $goods = Goods::get($goods_id);
                     $price = $goods ? $goods->getPrice() : 0;
-                    return intval(round($num * $price * $v / 100));
+                    return intval(round($num * $price * $v / 10000));
                 };
             } else {
                 $commission_price_calc = function ($num) use ($v, $keeper) {

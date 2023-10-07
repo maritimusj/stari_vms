@@ -295,11 +295,7 @@ class Device extends State
         } else {
             $match_fn = function ($lane) use ($goods_id, &$result) {
                 if ($lane['goods'] == $goods_id && $lane['num'] > 0) {
-                    if (empty($result['num'])) {
-                        return true;
-                    }
-
-                    return $lane['num'] < $result['num'];
+                    return empty($result['num']) || $lane['num'] < $result['num'];
                 }
 
                 return false;

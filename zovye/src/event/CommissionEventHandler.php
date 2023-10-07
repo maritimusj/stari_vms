@@ -157,7 +157,17 @@ class CommissionEventHandler
      */
     protected static function balance(deviceModelObj $device, orderModelObj $order): bool
     {
-        $val = intval(Config::balance('order.commission.val', 0));
+        $agent = $device->getAgent();
+        if ($agent) {
+            $data = $agent->getAgentData('commission.balance', []);
+            if ($data && isset($data['price'])) {
+                $val = intval($data['price']);
+            }
+        }
+
+        if (!isset($val)) {
+            $val = Config::balance('order.commission.val', 0);
+        }
 
         $commission_total = $val * $order->getItemNum();
 

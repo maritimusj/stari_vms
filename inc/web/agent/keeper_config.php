@@ -22,7 +22,7 @@ $config = $keeper->settings('notice', []);
 
 Response::templateJSON(
     'web/keeper/config',
-    '配置',
+    '通知配置',
     [
         'id' => $keeper->getId(),
         'config' => Helper::getWxPushMessageConfig($config),

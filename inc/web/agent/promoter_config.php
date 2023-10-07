@@ -23,7 +23,7 @@ if (empty($keeper)) {
 
 Response::templateJSON(
     'web/promoter/config',
-    '推广员佣金配置',
+    "{$keeper->getName()}的推广员佣金配置",
     [
         'id' => $keeper->getId(),
         'config' => $keeper->settings('promoter.commission', []),

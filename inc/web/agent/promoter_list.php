@@ -38,8 +38,8 @@ foreach ($query->findAll() as $promoter) {
 }
 
 Response::templateJSON(
-    'web/user/promoter_list',
-    '全部推广员',
+    'web/promoter/list',
+    "{$keeper->getName()}的推广员列表",
     [
         'id' => $keeper->getId(),
         'list' => $list,

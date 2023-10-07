@@ -157,6 +157,13 @@
             const val = $('#editKeeperConfig input[name=commissionTotal]').val();
             next({id, val}, function(res) {
                 $('#modal-message').modal('hide');
+                if (res && res.data) {
+                    if (res.data.val === -1) {
+                        e.find(`commission-total`).text(`&lt;未设置&gt;`);
+                    } else {
+                        e.find(`commission-total`).text(res.data.val);
+                    }
+                }
             });
         })
     });

@@ -24,7 +24,9 @@ if (Request::is_numeric('val')) {
 }
 
 if ($keeper->save()) {
-    JSON::success('保存成功！');
+    JSON::success([
+        'val' => $keeper->getCommissionTotal(),
+    ]);
 }
 
 JSON::success('保存失败！');

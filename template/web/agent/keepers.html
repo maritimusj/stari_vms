@@ -46,7 +46,9 @@
                     <th>姓名</th>
                     <th>手机号码</th>
                     <th class="center">设备数量</th>
+                    {if \zovye\App::isKeeperCommissionLimitEnabled()}
                     <th class="center">剩余有效补货数量</th>
+                    {/if}
                     <th style="text-align: center;width: 10em;">
                         <div>创建时间</div>
                     </th>
@@ -78,6 +80,7 @@
                             {$item['devices_total']}
                         </a>
                     </td>
+                    {if \zovye\App::isKeeperCommissionLimitEnabled()}
                     <td class="center">
                         <div data-op="setKeeperCommissionTotal">
                             {if $item['commission_total'] == -1}
@@ -89,6 +92,7 @@
                             {/if}
                         </div>
                     </td>
+                    {/if}
                     <td>
                         <div style="color:#9E9E9E;font-size:12px;">{$item['createtime']}</div>
                     </td>

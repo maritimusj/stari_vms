@@ -423,7 +423,7 @@
             <div class="seg" id="special">
                 <div class="title">支付订单</div>
                 <div class="form-group">
-                    <label for="commission_fee" class="col-md-2 control-label">手续费</label>
+                    <label for="commissionFee" class="col-md-2 control-label">手续费</label>
                     <div class="col-md-10">
                         <div class="control-label checkbox-inline">
                             <label for="feeType1" class="radio-inline">
@@ -434,13 +434,27 @@
                                 <input name="feeType" id="feeType0" type="radio" value="0"  {if $agent_data['commission']['fee_type'] == 0}checked="checked"{/if} onclick="chfeeTypeTitle('元')">
                                 固定金额 &nbsp;
                             </label>
-                            <input type="number"  class="form-control" style="display:inline-block;width:10em;" name="commission_fee" id="commission_fee" value="{php echo number_format($agent_data['commission']['fee'] /100, 2)}" min="0" step="0.01">
-                            <span id="fee_type_title">{if $agent_data['commission']['fee_type']==1}%{else}元{/if}</span>
+                            <input type="number"  class="form-control" style="display:inline-block;width:10em;" name="commissionFee" id="commissionFee" value="{php echo number_format($agent_data['commission']['fee'] /100, 2)}" min="0" step="0.01">
+                            <span id="feeTypeTitle">{if $agent_data['commission']['fee_type']==1}%{else}元{/if}</span>
                             <span class="help-block">* 扣除支付订单手续费后，剩余金额作为代理商佣金</span>
                         </div>
                     </div>
                 </div>
             </div>
+            {if \zovye\App::isBalanceEnabled()}
+            <div class="seg">
+                <div class="title">积分订单</div>
+                <div class="form-group">
+                    <label for="balanceOrderPrice" class="col-md-2 control-label">佣金（元）
+                        <img src="{MODULE_URL}static/img/yen.svg" class="yen">
+                    </label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="balanceOrderPrice" id="balanceOrderPrice" value="{php echo isset($agent_data['commission']['balance']['price']) ? number_format($agent_data['commission']['balance']['price']/100, 2) : ''}" min="0" step="0.01">
+                        <span class="help-block">* 用户使用积分每兑换一个商品后，代理商都会获得指定佣金奖励，<b>空白表示则使用系统设置</b></span>
+                    </div>
+                </div>
+            </div>
+            {/if}
             <div class="seg" id="special2">
                 <div class="title">佣金分享</div>
                 <div class="form-group">
@@ -807,7 +821,7 @@
 {template 'web/common/search_user'}
 <script>
     function chfeeTypeTitle(title) {
-        $("#fee_type_title").html(title);
+        $("#feeTypeTitle").html(title);
     }
 
     const api = {

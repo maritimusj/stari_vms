@@ -156,7 +156,12 @@ $result = DBUtil::transactionDo(function() use ($id, &$from) {
             $user->updateSettings('agentData.commission.enabled', $enabled);
             if ($enabled) {
                 $user->updateSettings('agentData.commission.fee_type', Request::bool('feeType') ? 1 : 0);
-                $user->updateSettings('agentData.commission.fee', Request::float('commission_fee', 0, 2) * 100);
+                $user->updateSettings('agentData.commission.fee', intval(Request::float('commission_fee', 0, 2) * 100));
+                if (Request::is_numeric('balanceOrderPrice')) {
+                    $user->updateSettings('agentData.commission.balance.price', intval(Request::float('balanceOrderPrice', 0, 2) * 100));
+                } else {
+                    $user->updateSettings('agentData.commission.balance', []);
+                }
                 $user->setPrincipal(Principal::Gspor);
             }
 
@@ -177,9 +182,9 @@ $result = DBUtil::transactionDo(function() use ($id, &$from) {
                         'p' => Request::bool('payOrderGSP') ? 1 : 0,
                     ]);
 
-                    $rel_1 = max(0, Request::float('rel_level1', 0, 2) * 100);
-                    $rel_2 = max(0, Request::float('rel_level2', 0, 2) * 100);
-                    $rel_3 = max(0, Request::float('rel_level3', 0, 2) * 100);
+                    $rel_1 = (int)max(0, Request::float('rel_level1', 0, 2) * 100);
+                    $rel_2 = (int)max(0, Request::float('rel_level2', 0, 2) * 100);
+                    $rel_3 = (int)max(0, Request::float('rel_level3', 0, 2) * 100);
 
                     if (in_array($gsp_mode, [GSP::AMOUNT, GSP::AMOUNT_PER_GOODS], true)) {
                         $rel_1 = intval($rel_1);
@@ -217,10 +222,10 @@ $result = DBUtil::transactionDo(function() use ($id, &$from) {
                             'b' => Request::bool('balanceOrder') ? 1 : 0,
                             'p' => Request::bool('payOrder') ? 1 : 0,
                         ],
-                        'level0' => Request::float('bonus_level0', 0, 2) * 100,
-                        'level1' => Request::float('bonus_level1', 0, 2) * 100,
-                        'level2' => Request::float('bonus_level2', 0, 2) * 100,
-                        'level3' => Request::float('bonus_level3', 0, 2) * 100,
+                        'level0' => intval(Request::float('bonus_level0', 0, 2) * 100),
+                        'level1' => intval(Request::float('bonus_level1', 0, 2) * 100),
+                        'level2' => intval(Request::float('bonus_level2', 0, 2) * 100),
+                        'level3' => intval(Request::float('bonus_level3', 0, 2) * 100),
                     ]
                 );
             }

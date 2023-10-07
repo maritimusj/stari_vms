@@ -7,7 +7,6 @@
 namespace zovye;
 
 use zovye\domain\Keeper;
-use zovye\util\Helper;
 
 defined('IN_IA') or exit('Access Denied');
 
@@ -18,8 +17,8 @@ if (empty($keeper)) {
     JSON::fail('找不到这个运营人员！');
 }
 
-if (Request::is_numeric('commissionTotal')) {
-    $keeper->setCommissionTotal(Request::int('commissionTotal'));
+if (Request::is_numeric('val')) {
+    $keeper->setCommissionTotal(Request::int('val'));
 } else {
     $keeper->setCommissionTotal(-1);
 }

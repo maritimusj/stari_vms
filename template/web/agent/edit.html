@@ -1273,7 +1273,7 @@
                     <label for="commissionVal" class="col-md-2 control-label"><span id="commissionTitle">金额</span></label>
                     <div class="col-md-10">
                         <input type="number" class="form-control" name="commissionVal" id="commissionVal" value="{$keeper_data[$keeper_data['type']]}" step="0.01">
-                        <span class="help-block">* 以上为运营人员默认设置</span>
+                        <span class="help-block">* <b>注意：以上为运营人员默认设置</b></span>
                     </div>
                 </div>
                 <div class="form-group">
@@ -1281,7 +1281,7 @@
                     <div class="col-md-10">
                         <label class="control-label">
                             <input type="checkbox" name="applyConfigToAll" id="applyConfigToAll" value="1">
-                            更新该代理商所有运营人员的当前设置
+                            更新当前设置到所有运营人员
                             <span class="help-block">* 勾选后，所有运营人员佣金配置会被更改为当前配置，否则仅保存为默认配置。</span>
                         </label>
                     </div>

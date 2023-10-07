@@ -18,13 +18,11 @@ if (empty($keeper)) {
     JSON::fail('找不到这个运营人员！');
 }
 
-$config = $keeper->settings('notice', []);
-
 Response::templateJSON(
-    'web/keeper/config',
-    "{$keeper->getName()}的通知配置",
+    'web/keeper/commission_total',
+    "{$keeper->getName()}的配置",
     [
         'id' => $keeper->getId(),
-        'config' => Helper::getWxPushMessageConfig($config),
+        'total' => $keeper->getCommissionTotal(),
     ]
 );

@@ -1,0 +1,17 @@
+<form class="form-horizontal" id="editKeeperConfig" data-id="{$id}">
+    <div class="form-group">
+        <div class="col-md-10">
+            <label for="commissionTotal" class="col-md-2 control-label"><span id="commissionTitle">可用补货次数</span></label>
+            <div class="col-md-10">
+                <input type="number" class="form-control" name="commissionTotal" id="commissionTotal" value="{php echo total == -1? '': $total}" step="1" min="0">
+                <span class="help-block">* 运营人员每次补货时会相应减少，到达0值后补货不再获得佣金，<b>空白表示不启用限制</b></span>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10" style="text-align: right;">
+            <button type="button" class="btn btn-primary" data-op="saveKeeperCommissionTotal">保存</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">退出</button>
+        </div>
+    </div>
+</form>

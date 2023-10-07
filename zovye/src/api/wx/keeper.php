@@ -884,19 +884,31 @@ class keeper
         list($v, $way, $is_percent) = $keeper->getCommissionValue($device);
         if ($way == \zovye\domain\Keeper::COMMISSION_RELOAD) {
             if ($is_percent) {
-                $commission_price_calc = function ($num, $goods_id) use ($v) {
+                $commission_price_calc = function ($num, $goods_id) use ($v, $keeper) {
+                    //运营人员补货数量限制为-1表示不限制，否则必须 > 0才能获得佣金
+                    $valid_commission_total = $keeper->getCommissionTotal();
+                    if ($valid_commission_total != -1) {
+                        $num = min($valid_commission_total, $num);
+                        $keeper->setCommissionTotal(max(0, $valid_commission_total - $num));
+                    }
+
                     $goods = Goods::get($goods_id);
                     $price = $goods ? $goods->getPrice() : 0;
 
                     return intval(round($num * $price * $v / 100));
                 };
             } else {
-                $commission_price_calc = function ($num) use ($v) {
+                $commission_price_calc = function ($num) use ($v, $keeper) {
+                    //运营人员补货数量限制为-1表示不限制，否则必须 > 0才能获得佣金
+                    $valid_commission_total = $keeper->getCommissionTotal();
+                    if ($valid_commission_total != -1) {
+                        $num = min($valid_commission_total, $num);
+                        $keeper->setCommissionTotal(max(0, $valid_commission_total - $num));
+                    }
                     return intval($v * $num);
                 };
             }
         }
-
         //创建佣金记录
         $create_commission_fn = function ($total) use ($agent, $device, $keeper) {
             if (!$agent->acquireLocker(User::COMMISSION_BALANCE_LOCKER)) {

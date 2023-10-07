@@ -18,13 +18,14 @@ if (empty($keeper)) {
     JSON::fail('找不到这个运营人员！');
 }
 
-$config = $keeper->settings('notice', []);
+if (Request::is_numeric('commissionTotal')) {
+    $keeper->setCommissionTotal(Request::int('commissionTotal'));
+} else {
+    $keeper->setCommissionTotal(-1);
+}
 
-Response::templateJSON(
-    'web/keeper/config',
-    "{$keeper->getName()}的通知配置",
-    [
-        'id' => $keeper->getId(),
-        'config' => Helper::getWxPushMessageConfig($config),
-    ]
-);
+if ($keeper->save()) {
+    JSON::success('保存成功！');
+}
+
+JSON::success('保存失败！');

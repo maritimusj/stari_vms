@@ -2256,6 +2256,9 @@ class deviceModelObj extends ModelObj
     }
 
 
+    /**
+     * @return keeperModelObj[]
+     */
     public function getKeepers(): array
     {
         $result = [];

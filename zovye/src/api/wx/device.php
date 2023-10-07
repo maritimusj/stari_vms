@@ -1058,10 +1058,8 @@ class device
         }
 
         $result = [];
-
         $keepers = $device->getKeepers();
 
-        /** @var keeperModelObj $keeper */
         foreach ($keepers as $keeper) {
             $data = [
                 'name' => $keeper->getName(),

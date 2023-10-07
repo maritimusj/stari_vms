@@ -9,6 +9,7 @@ namespace zovye;
 use zovye\domain\Device;
 use zovye\domain\Order;
 use zovye\domain\User;
+use zovye\model\keeperModelObj;
 
 defined('IN_IA') or exit('Access Denied');
 
@@ -57,8 +58,8 @@ if ($op == 'keeper') {
     }
 
     if (isset($device)) {
-        $keepers = $device->getKeepers();
         $result = [];
+        $keepers = $device->getKeepers();
         foreach($keepers as $keeper) {
             $result[] = [
                 'name' => $keeper->getName(),

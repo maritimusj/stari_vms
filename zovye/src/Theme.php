@@ -65,7 +65,7 @@ class Theme
             }
         }
 
-        return $list;
+        return array_values($list);
     }
 
     public static function getThemeFile($device, $name): string

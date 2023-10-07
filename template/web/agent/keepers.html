@@ -154,7 +154,7 @@
         zovye.op('saveKeeperCommissionTotal', function(self, next) {
             const e = self.closest('[data-id]');
             const id = e.data('id');
-            const val = $('#editPromoterConfig input[name=commissionTotal]').val();
+            const val = $('#editKeeperConfig input[name=commissionTotal]').val();
             next({id, val}, function(res) {
                 $('#modal-message').modal('hide');
             });

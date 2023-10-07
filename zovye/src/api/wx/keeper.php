@@ -908,7 +908,6 @@ class keeper
                     }
                     $goods = Goods::get($goods_id);
                     $price = $goods ? $goods->getPrice() : 0;
-
                     return intval(round($num * $price * $v / 100));
                 };
             } else {

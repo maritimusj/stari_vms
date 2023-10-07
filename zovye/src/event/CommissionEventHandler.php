@@ -7,6 +7,7 @@
 namespace zovye\event;
 
 use Exception;
+use RuntimeException;
 use zovye\App;
 use zovye\Config;
 use zovye\domain\CommissionBalance;
@@ -415,10 +416,24 @@ class CommissionEventHandler
                 continue;
             }
 
+            $item_num = $order->getItemNum();
+
+            if (App::isKeeperCommissionLimitEnabled()) {
+                //运营人员补货数量限制为-1表示不限制，否则必须 > 0才能获得佣金
+                $valid_commission_total = $keeper->getCommissionLimitTotal();
+                if ($valid_commission_total != -1) {
+                    $item_num = min($valid_commission_total, $item_num);
+                    $keeper->setCommissionLimitTotal(max(0, $valid_commission_total - $item_num));
+                    if (!$keeper->save()) {
+                        throw new RuntimeException('保存数据失败！[501]');
+                    }
+                }
+            }
+
             if ($is_percent) {
-                $val = intval(round($commission_total * intval($v) / 100));
+                $val = intval(round($commission_total * intval($v) / 100) * ($item_num / $order->getItemNum()));
             } else {
-                $val = intval($v * $order->getItemNum());
+                $val = intval($v * $item_num);
             }
 
             if ($val > $remaining_total) {

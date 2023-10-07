@@ -10,6 +10,7 @@ namespace zovye\api\wx;
 use DateTime;
 use DateTimeImmutable;
 use Exception;
+use RuntimeException;
 use zovye\api\common;
 use zovye\App;
 use zovye\business\GDCVMachine;
@@ -900,6 +901,9 @@ class keeper
                         if ($valid_commission_total != -1) {
                             $num = min($valid_commission_total, $num);
                             $keeper->setCommissionLimitTotal(max(0, $valid_commission_total - $num));
+                            if (!$keeper->save()) {
+                                throw new RuntimeException('保存数据失败！[501]');
+                            }
                         }
                     }
                     $goods = Goods::get($goods_id);
@@ -915,6 +919,9 @@ class keeper
                         if ($valid_commission_total != -1) {
                             $num = min($valid_commission_total, $num);
                             $keeper->setCommissionLimitTotal(max(0, $valid_commission_total - $num));
+                            if (!$keeper->save()) {
+                                throw new RuntimeException('保存数据失败！[501]');
+                            }
                         }
                     }
                     return intval($v * $num);

@@ -22,6 +22,7 @@ use zovye\domain\Locker;
 use zovye\domain\Order;
 use zovye\model\agentModelObj;
 use zovye\model\deviceModelObj;
+use zovye\model\keeperModelObj;
 use zovye\model\userModelObj;
 use zovye\Request;
 use zovye\Stats;
@@ -1056,9 +1057,11 @@ class device
             return $device;
         }
 
-
         $result = [];
+
         $keepers = $device->getKeepers();
+
+        /** @var keeperModelObj $keeper */
         foreach ($keepers as $keeper) {
             $data = [
                 'name' => $keeper->getName(),
@@ -1067,10 +1070,12 @@ class device
                 'commission' => $keeper->getCommissionValue($device),
 
             ];
+
             $user = $keeper->getUser();
             if ($user) {
                 $data['user'] = $user->profile();
             }
+
             $result[] = $data;
         }
 

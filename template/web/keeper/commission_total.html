@@ -3,7 +3,7 @@
         <div class="col-md-10">
             <label for="commissionTotal" class="col-md-2 control-label"><span id="commissionTitle">可用补货次数</span></label>
             <div class="col-md-10">
-                <input type="number" class="form-control" name="commissionTotal" id="commissionTotal" value="{php echo total == -1? '': $total}" step="1" min="0">
+                <input type="number" class="form-control" name="commissionTotal" id="commissionTotal" value="{php echo $total == -1? '': $total}" step="1" min="0">
                 <span class="help-block">* 运营人员每次补货时会相应减少，到达0值后补货不再获得佣金，<b>空白表示不启用限制</b></span>
             </div>
         </div>

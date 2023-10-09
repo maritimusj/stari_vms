@@ -56,7 +56,7 @@ class protocol implements IBlueToothProtocol
 
     function initialize($device_id)
     {
-        return err('无法连接设备，请联系管理员！');
+        return err('蓝牙设备无响应!');
     }
 
     /**

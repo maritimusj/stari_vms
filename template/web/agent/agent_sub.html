@@ -160,16 +160,15 @@
                                 </li>
                                 {if isset($agent['commission'])}
                                 <li role="separator" class="divider"></li>
-                                <li><a href="#" data-op="viewCommissionLog"><i class="fa fa-rmb fa-fw"></i> 收入明细</a>
+                                <li><a href="#" data-op="monthStats"><i class="fa fa-rmb fa-fw"></i> 收入明细</a>
                                 </li>
-                                <li><a
-                                        href="{php echo $this->createWebUrl('agent', array('op'=>'withdraw', 'agentId'=>$agent['id']));}"><i
-                                            class="fa fa-credit-card fa-fw"></i> 提现记录</a></li>
+                                <li><a href="{php echo $this->createWebUrl('withdraw', array('op'=>'default', 'agentId'=>$agent['id']));}">
+                                    <i class="fa fa-credit-card fa-fw"></i> 提现记录
+                                </a></li>
                                 {/if}
                                 <li role="separator" class="divider"></li>
                                 <li>
-                                    <a href="{php echo $this->createWebUrl('agent', array('op'=>'agent_remove', 'id'=>$agent['id'], 'from'=>'agent'));}"
-                                        onclick="if(!confirm('确定要取消用户的代理身份吗？')){return false;}">
+                                    <a href="{php echo $this->createWebUrl('agent', array('op'=>'agent_remove', 'id'=>$agent['id'], 'from'=>'agent'));}" onclick="if(!confirm('确定要取消用户的代理身份吗？')){return false;}">
                                         <i class="fa fa-close"></i> 取消代理身份
                                     </a>
                                 </li>
@@ -217,6 +216,7 @@
         })
         const api = {
             url: "{php echo $this->createWebUrl('agent');}",
+            user_url: "{php echo $this->createWebUrl('user');}",
         }
         api.showResult = function (params, url) {
             $.getJSON(url || api.url, params).then(function (res) {
@@ -232,7 +232,6 @@
                 }
             })
         }
-
         api.viewStatsChart = function (id) {
             api.showResult({ op: 'viewStatsChart', id: id });
         }
@@ -242,7 +241,14 @@
         api.createAgent = function () {
             api.showResult({ op: 'create' });
         }
-
+        api.monthStats = function (userid) {
+            api.showResult({op: 'month_stats', id: userid}, api.user_url);
+        }
+        api.monthStatsOfYear = function (_, _, self) {
+            const year = self.data('year');
+            const userid = self.closest('.year').data('user');
+            api.showResult({op: 'month_stats', id: userid, year}, api.user_url);
+        }
         api.showMsgDetail = function (id) {
             $.getJSON(api.url, { op: 'msglist_detail', id: id }).then(function (res) {
                 if (res) {

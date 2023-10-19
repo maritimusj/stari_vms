@@ -32,9 +32,7 @@ class alert
             if (is_error($device)) {
                 return $device;
             }
-        }
-
-        if ($user->isKeeper()) {
+        } elseif ($user->isKeeper()) {
             $keeper = $user->getKeeper();
             $device = Device::find(Request::str('id'), ['imei', 'shadow_id']);
             if (empty($device)) {
@@ -113,9 +111,7 @@ class alert
             $agent = $user->isAgent() ? $user->getAgent() : $user->getPartnerAgent();
 
             return GoodsExpireAlert::getAllExpiredForAgent($agent, true);
-        }
-
-        if ($user->isKeeper()) {
+        } elseif ($user->isKeeper()) {
             $keeper = $user->getKeeper();
 
             return GoodsExpireAlert::getAllExpiredForKeeper($keeper, true);

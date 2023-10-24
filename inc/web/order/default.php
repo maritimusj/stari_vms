@@ -295,7 +295,7 @@ if (Request::is_ajax()) {
     $data = [
         'isajax' => true,
         'orders' => $orders,
-        'user' => Request::has('user_id'),
+        'user' => isset($user),
         'accounts' => $accounts,
         'pager' => $pager,
     ];
@@ -304,7 +304,8 @@ if (Request::is_ajax()) {
         $data['device'] = $device;
     }
 
-    Response::templateJSON('web/order/list', isset($user) ? '<b>'.$user->getName().'</b>的订单列表' : '', $data);
+    $title = isset($user) ? ($user->getName() ?: '<匿名用户>').'的订单列表' : '';
+    Response::templateJSON('web/order/list', $title, $data);
 }
 
 $tpl_data['s_way'] = $way;

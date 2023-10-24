@@ -59,11 +59,7 @@ $user_id = Request::int('user_id');
 if ($user_id) {
     $user = User::get($user_id);
     if ($user) {
-        if (settings('migration.order') != '20230822') {
-            $condition['openid'] = $user->getOpenid();
-        } else {
-            $condition['user_id'] = $user->getId();
-        }
+        $condition['openid'] = $user->getOpenid();
 
         $tpl_data['s_user_id'] = $user->getId();
         $tpl_data['user_res'] = $user->profile();

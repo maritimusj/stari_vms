@@ -36,7 +36,6 @@ $result = DBUtil::transactionDo(function () use ($id, &$device) {
         'name' => Request::trim('name'),
         'imei' => Request::trim('IMEI'),
         'group_id' => Request::int('group'),
-        'capacity' => max(0, Request::int('capacity')),
         'remain' => max(0, Request::int('remain')),
         's3' => Request::bool('isDown') ? Device::STATUS_MAINTENANCE : Device::STATUS_NORMAL,
     ];

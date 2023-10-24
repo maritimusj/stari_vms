@@ -87,23 +87,17 @@ if (isset($params['goodsId'])) {
         $goods->setS1($s1);
 
         if (isset($params['goodsSize'])) {
-            if ($params['goodsSize'] != $goods->getExtraData('lottery.size')) {
-                $goods->setExtraData('lottery.size', intval($params['goodsSize']));
-            }
+            $goods->setExtraData('lottery.size', intval($params['goodsSize']));
         }
 
         if ($params['goodsMcbIndex'] != '') {
-            if ($params['goodsMcbIndex'] != $goods->getExtraData('lottery.index')) {
-                $goods->setExtraData('lottery.index', intval($params['goodsMcbIndex']));
-            }
+            $goods->setExtraData('lottery.index', intval($params['goodsMcbIndex']));
         } else {
             $goods->setExtraData('lottery');
         }
 
         if (isset($params['goodsSizeUnit'])) {
-            if ($params['goodsSizeUnit'] != $goods->getExtraData('lottery.unit')) {
-                $goods->setExtraData('lottery.unit', intval($params['goodsSizeUnit']));
-            }
+            $goods->setExtraData('lottery.unit', intval($params['goodsSizeUnit']));
         }
 
         if (App::isBalanceEnabled()) {

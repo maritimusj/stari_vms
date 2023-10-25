@@ -137,7 +137,7 @@ class common
         }
 
         if ($user->isBanned()) {
-            return err('登录失败，请稍后再试！');
+            return err('账户不可用，请稍后再试！');
         }
 
         //清除原来的登录信息
@@ -326,6 +326,8 @@ class common
         }
 
         JSON::fail('请先登录后再请求数据![204]');
+
+        return null;
     }
 
     public static function getKeeper($return_error = false): ?keeperModelObj

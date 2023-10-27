@@ -18,16 +18,16 @@ $ts = Request::int('ts');
 $sign = Request::str('sign');
 
 if (abs(time() - $ts) > 3600 || empty($sign) || empty($op)) {
-    exit('invalid request.');
+    Response::echo('invalid request.');
 }
 
 $secret = Config::api('app.secret');
 if (empty($secret)) {
-    exit('invalid app secret.');
+    Response::echo('invalid app secret.');
 }
 
 if ($sign != sha1("$op$ts$secret")) {
-    exit('invalid sign.');
+    Response::echo('invalid sign.');
 }
 
 $op = Request::str('q');

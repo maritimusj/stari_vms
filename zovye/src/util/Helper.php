@@ -1334,10 +1334,8 @@ include './index.php';
             }
         }
 
-        $is_new_user = empty(Order::getFirstOrderOfUser($user));
-
         if ($params['unfollow'] || in_array('unfollow', $params, true)) {
-            if (!$is_new_user && Helper::checkLimit($account, $user, [], 1)) {
+            if (Helper::checkLimit($account, $user, [], 1)) {
                 return err('您已经完成了该任务！');
             }
         }
@@ -1363,7 +1361,7 @@ include './index.php';
                 Account::MONTH => '这个月的免费额度已经用完啦！',
             ];
 
-            if (!$is_new_user && Helper::checkLimit(
+            if (Helper::checkLimit(
                     $account,
                     $user,
                     ['createtime >=' => $time->getTimestamp(),],
@@ -1376,7 +1374,7 @@ include './index.php';
         //scCount, 所有用户在每个周期内总数量
         $sc_count = $account->getSccount();
         if ($sc_count > 0) {
-            if (!$is_new_user && Helper::checkLimit($account, null, [
+            if (Helper::checkLimit($account, null, [
                     'createtime >=' => $time->getTimestamp(),
                 ], $sc_count)) {
                 return err('任务免费额度已用完！');
@@ -1386,7 +1384,7 @@ include './index.php';
         //total，单个用户累计可领取数量
         $total = $account->getTotal();
         if ($total > 0) {
-            if (!$is_new_user && Helper::checkLimit($account, $user, [], $total)) {
+            if (Helper::checkLimit($account, $user, [], $total)) {
                 return err('您已经完成这个任务了！');
             }
         }
@@ -1394,7 +1392,7 @@ include './index.php';
         //$orderLimits，最大订单数量
         $order_limits = $account->getOrderLimits();
         if ($order_limits > 0) {
-            if (!$is_new_user && Helper::checkLimit($account, null, [], $order_limits)) {
+            if (Helper::checkLimit($account, null, [], $order_limits)) {
                 return err('公众号免费额度已用完！！');
             }
         }

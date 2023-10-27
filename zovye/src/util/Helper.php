@@ -7,7 +7,6 @@
 
 namespace zovye\util;
 
-use DateTime;
 use DateTimeImmutable;
 use Exception;
 use RuntimeException;
@@ -17,7 +16,6 @@ use zovye\domain\Account;
 use zovye\domain\Balance;
 use zovye\domain\BalanceLog;
 use zovye\domain\CommissionBalance;
-use zovye\domain\Counter;
 use zovye\domain\Device;
 use zovye\domain\DeviceLogs;
 use zovye\domain\Goods;
@@ -1597,132 +1595,6 @@ include './index.php';
         }
 
         return $ids;
-    }
-
-    public static function updateOrderCounters(orderModelObj $order)
-    {
-        if (!Locker::try("order:counter:{$order->getId()}")) {
-            return false;
-        }
-
-        $uid = App::uid(6);
-        $counters = [
-            "$uid:order:all" => function () {
-                return Order::query()->count();
-            },
-        ];
-
-        $create_time = $order->getCreatetime();
-        $counters[$uid.':order:month:'.date('Y-m', $create_time)] = function () use ($create_time) {
-            $start = new DateTime("@$create_time");
-            $start->modify('first day of this month 00:00');
-            $end = new DateTime("@$create_time");
-            $end->modify('first day of next month 00:00');
-
-            return Order::query([
-                'createtime >=' => $start->getTimestamp(),
-                'createtime <' => $end->getTimestamp(),
-            ])->count();
-        };
-        $counters[$uid.':order:day:'.date('Y-m-d', $create_time)] = function () use ($create_time) {
-            $start = new DateTime("@$create_time");
-            $start->modify('00:00');
-            $end = new DateTime("@$create_time");
-            $end->modify('next day 00:00');
-
-            return Order::query([
-                'createtime >=' => $start->getTimestamp(),
-                'createtime <' => $end->getTimestamp(),
-            ])->count();
-        };
-
-        $device = $order->getDevice();
-        if ($device) {
-            $counters["device:{$device->getId()}:order:all"] = function () use ($device) {
-                return Order::query([
-                    'device_id' => $device->getId(),
-                ])->count();
-            };
-            $counters["device:{$device->getId()}:order:month:".date('Y-m', $create_time)] = function () use (
-                $device,
-                $create_time
-            ) {
-                $start = new DateTime("@$create_time");
-                $start->modify('first day of this month 00:00');
-                $end = new DateTime("@$create_time");
-                $end->modify('first day of next month 00:00');
-
-                return Order::query([
-                    'device_id' => $device->getId(),
-                    'createtime >=' => $start->getTimestamp(),
-                    'createtime <' => $end->getTimestamp(),
-                ])->count();
-            };
-            $counters["device:{$device->getId()}:order:day:".date('Y-m-d', $create_time)] = function () use (
-                $device,
-                $create_time
-            ) {
-                $start = new DateTime("@$create_time");
-                $start->modify('00:00');
-                $end = new DateTime("@$create_time");
-                $end->modify('next day 00:00');
-
-                return Order::query([
-                    'device_id' => $device->getId(),
-                    'createtime >=' => $start->getTimestamp(),
-                    'createtime <' => $end->getTimestamp(),
-                ])->count();
-            };
-        }
-
-        $agent = $order->getAgent();
-        if ($agent) {
-            $counters["agent:{$agent->getId()}:order:all"] = function () use ($agent) {
-                return Order::query([
-                    'agent_id' => $agent->getId(),
-                ])->count();
-            };
-            $counters["agent:{$agent->getId()}:order:month:".date('Y-m', $create_time)] = function () use (
-                $agent,
-                $create_time
-            ) {
-                $start = new DateTime("@$create_time");
-                $start->modify('first day of this month 00:00');
-                $end = new DateTime("@$create_time");
-                $end->modify('first day of next month 00:00');
-
-                return Order::query([
-                    'agent_id' => $agent->getId(),
-                    'createtime >=' => $start->getTimestamp(),
-                    'createtime <' => $end->getTimestamp(),
-                ])->count();
-            };
-            $counters["agent:{$agent->getId()}:order:day:".date('Y-m-d', $create_time)] = function () use (
-                $agent,
-                $create_time
-            ) {
-                $start = new DateTime("@$create_time");
-                $start->modify('00:00');
-                $end = new DateTime("@$create_time");
-                $end->modify('next day 00:00');
-
-                return Order::query([
-                    'agent_id' => $agent->getId(),
-                    'createtime >=' => $start->getTimestamp(),
-                    'createtime <' => $end->getTimestamp(),
-                ])->count();
-            };
-        }
-
-        return DBUtil::transactionDo(function () use ($order, $counters) {
-            foreach ($counters as $uid => $initFN) {
-                if (!Counter::increment($uid, 1, $initFN)) {
-                    return err('fail');
-                }
-            }
-
-            return true;
-        });
     }
 
     public static function parseAgentFNsFromGPC(): array

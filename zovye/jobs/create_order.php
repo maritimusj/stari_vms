@@ -179,7 +179,7 @@ function prepare(string $order_no)
         if (is_error($result)) {
             $log_data['result'] = $result;
         } else {
-            $log_data['result'] = $order->getExtraData('pull.result', []);
+            $log_data['result'] = $order->getExtraData('pull.result');
         }
 
         if ($order) {

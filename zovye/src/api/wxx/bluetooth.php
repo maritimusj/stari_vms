@@ -141,7 +141,6 @@ class bluetooth
         $cmd = $proto->onConnected($device->getBUID(), $data);
         if ($cmd) {
             Device::createBluetoothCmdLog($device, $cmd);
-
             return [
                 'data' => $cmd->getEncoded(BlueToothProtocol::BASE64),
                 'hex' => $cmd->getEncoded(BlueToothProtocol::HEX),
@@ -231,7 +230,6 @@ class bluetooth
 
         if ($response->isOpenResult()) {
             $order = Order::getLastOrderOfDevice($device);
-
             if ($order) {
                 if (empty($order->getExtraData('bluetooth.raw'))) {
                     $order->setExtraData('bluetooth.raw', $response->getEncodeData());
@@ -292,7 +290,6 @@ class bluetooth
         $cmd = $response->getAttachedCMD();
         if ($cmd) {
             Device::createBluetoothCmdLog($device, $cmd);
-
             $data['data'] = $cmd->getEncoded(BlueToothProtocol::BASE64);
             $data['hex'] = $cmd->getEncoded(BlueToothProtocol::HEX);
         }

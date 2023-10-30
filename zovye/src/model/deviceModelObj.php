@@ -1937,6 +1937,11 @@ class deviceModelObj extends ModelObj
      */
     public function pull(array $options = [])
     {
+        //充电和加注设备不支持
+        if ($this->isChargingDevice() || $this->isFuelingDevice()) {
+            return err('设备不支持这个操作！');
+        }
+
         //虚拟设备直接返回成功
         if ($this->isVDevice()) {
             return [
@@ -1946,14 +1951,10 @@ class deviceModelObj extends ModelObj
             ];
         }
 
-        if ($this->isChargingDevice() || $this->isFuelingDevice()) {
-            return err('设备不支持这个操作！');
-        }
-
-        $result = null;
-
+        //数量
         $num = max(1, $options['num']);
 
+        //货道
         $mcb_channel = isset($options['channel']) ? intval($options['channel']) : Device::CHANNEL_DEFAULT;
 
         //zovye接口出货
@@ -1962,7 +1963,7 @@ class deviceModelObj extends ModelObj
             $timeout = DEFAULT_DEVICE_WAIT_TIMEOUT;
         }
 
-        //蓝牙设备
+        //蓝牙设备出货处理
         if ($this->isBlueToothDevice()) {
             $protocol = $this->getBlueToothProtocol();
             if (empty($protocol)) {
@@ -2005,42 +2006,44 @@ class deviceModelObj extends ModelObj
                         );
                     }
                 }
-            }
-        } else {
-            if ($options['online'] && !$this->isMcbOnline()) {
-                return err('设备已关机！');
+
+                return $result;
             }
 
-            $extra = $options;
-
-            //附加参数
-            if (empty($extra['ip'])) {
-                $extra['ip'] = CLIENT_IP;
-            }
-
-            if (empty($extra['user-agent'])) {
-                $extra['user-agent'] = $_SERVER['HTTP_USER_AGENT'];
-            }
-
-            //打开设备，出货
-            /** @var string|array $result */
-            $result = $this->open($mcb_channel, $num, $timeout, $extra);
-
-            if (is_error($result)) {
-                $this->setLastError($result['errno'], $result['message']);
-                if (empty($options['test'])) {
-                    $this->scheduleErrorNotifyJob();
-                }
-            } elseif (is_error($result['data'])) {
-                $this->setLastError($result['data']['errno'], $result['data']['message']);
-                if (empty($options['test'])) {
-                    $this->scheduleErrorNotifyJob();
-                }
-                $result = $result['data'];
-            }
+            return null;
         }
 
-        $this->save();
+        //普通设备出货请求处理
+
+        if ($options['online'] && !$this->isMcbOnline()) {
+            return err('设备已关机！');
+        }
+
+        //附加参数
+        if (empty($options['ip'])) {
+            $options['ip'] = CLIENT_IP;
+        }
+
+        if (empty($options['user-agent'])) {
+            $options['user-agent'] = $_SERVER['HTTP_USER_AGENT'];
+        }
+
+        //打开设备，出货
+        /** @var string|array $result */
+        $result = $this->open($mcb_channel, $num, $timeout, $options);
+
+        if (is_error($result)) {
+            $this->setLastError($result['errno'], $result['message']);
+            if (empty($options['test'])) {
+                $this->scheduleErrorNotifyJob();
+            }
+        } elseif (is_error($result['data'])) {
+            $this->setLastError($result['data']['errno'], $result['data']['message']);
+            if (empty($options['test'])) {
+                $this->scheduleErrorNotifyJob();
+            }
+            $result = $result['data'];
+        }
 
         return $result;
     }

@@ -83,7 +83,7 @@ foreach ($query->findAll() as $entry) {
         $data['result']['timeUsed'] = intval($result_data['timeUsed']);
     } else {
         $data['result'] = [
-            'errno' => empty($result),
+            'errno' => empty($result) ? -1 : 0,
             'message' => empty($result) ? '失败' : '成功',
         ];
     }

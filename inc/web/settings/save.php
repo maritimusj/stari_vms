@@ -275,7 +275,7 @@ if ($page == 'device') {
         $files = [
             [
                 'filename' => IA_ROOT.'/index.php',
-                'content' => "<?php\r\nrequire './framework/bootstrap.inc.php';\r\nheader('Location: ' . '{$module_url}');\r\nexit();",
+                'content' => "<?php\r\nrequire './framework/bootstrap.inc.php';\r\nheader('Location: ' . '$module_url');\r\nexit();",
             ],
             [
                 'filename' => IA_ROOT.'/framework/bootstrap.inc.php',

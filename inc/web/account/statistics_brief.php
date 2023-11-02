@@ -29,6 +29,7 @@ try {
     $begin = new DateTime(date('Y-m-d 00:00:00', $first_order['createtime']));
 } catch (Exception $e) {
     JSON::fail('订单数据不正确！');
+    exit();
 }
 
 $nextYear = new DateTime('first day of Jan next year 00:00');

@@ -8,6 +8,7 @@ namespace zovye\domain;
 
 use DateTime;
 use zovye\base;
+use zovye\base\ModelObjFinder;
 use zovye\model\device_groupsModelObj;
 use zovye\We7;
 use function zovye\isEmptyArray;
@@ -38,9 +39,9 @@ class Group
 
     /**
      * @param mixed $condition
-     * @return \zovye\base\ModelObjFinder
+     * @return ModelObjFinder
      */
-    public static function query($condition = []): base\ModelObjFinder
+    public static function query($condition = []): ModelObjFinder
     {
         if (is_numeric($condition)) {
             $condition = ['type_id' => $condition];

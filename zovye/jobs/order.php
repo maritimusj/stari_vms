@@ -19,7 +19,6 @@ use zovye\Log;
 use zovye\Request;
 use zovye\util\Helper;
 use zovye\util\Util;
-use zovye\We7;
 use function zovye\isEmptyArray;
 use function zovye\settings;
 

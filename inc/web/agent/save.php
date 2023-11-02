@@ -186,11 +186,7 @@ $result = DBUtil::transactionDo(function() use ($id, &$from) {
                     $rel_2 = (int)max(0, Request::float('rel_level2', 0, 2) * 100);
                     $rel_3 = (int)max(0, Request::float('rel_level3', 0, 2) * 100);
 
-                    if (in_array($gsp_mode, [GSP::AMOUNT, GSP::AMOUNT_PER_GOODS], true)) {
-                        $rel_1 = intval($rel_1);
-                        $rel_2 = intval($rel_2);
-                        $rel_3 = intval($rel_3);
-                    } else {
+                    if (in_array($gsp_mode, [GSP::PERCENT, GSP::PERCENT_PER_GOODS], true)) {
                         $rel_1 = min(10000, $rel_1);
                         $rel_2 = min(10000, $rel_2);
                         $rel_3 = min(10000, $rel_3);

@@ -14,6 +14,7 @@ use function zovye\tb;
  * @method getOrg()
  * @method getNum()
  * @method getGoodsId()
+ * @method getLaneId()
  */
 class payload_logsModelObj extends ModelObj
 {

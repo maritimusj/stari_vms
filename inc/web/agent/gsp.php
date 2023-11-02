@@ -81,6 +81,8 @@ if ($fn == 'adduser' || $fn == 'edituser') {
                 $mode_type = GSP::AMOUNT;
             } elseif ($data[GSP::AMOUNT_PER_GOODS]) {
                 $mode_type = GSP::AMOUNT_PER_GOODS;
+            } else {
+                $mode_type = GSP::PERCENT;
             }
 
             $tpl_data['mode_type'] = $mode_type;

@@ -9,7 +9,6 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 use RuntimeException;
-use zovye\api\common;
 use zovye\api\wx\balance;
 use zovye\domain\Principal;
 use zovye\domain\Referral;

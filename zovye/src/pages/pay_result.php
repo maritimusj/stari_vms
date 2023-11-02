@@ -38,7 +38,7 @@ if ($device) {
                     $tpl_data['slides'][] = [
                         'id' => intval($adv['id']),
                         'name' => strval($adv['name']),
-                        'image' => strval(Util::toMedia($image)),
+                        'image' => Util::toMedia($image),
                         'url' => strval($adv['extra']['link']),
                     ];
                 }

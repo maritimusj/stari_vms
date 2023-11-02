@@ -72,7 +72,7 @@ class JfbAccount implements IAccountProvider
             }
         }
 
-        $fans = empty($user) ? Session::fansInfo() : $user->profile();
+        $fans = $user->profile();
         $area = $device->getArea();
 
         $data = [

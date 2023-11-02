@@ -38,7 +38,7 @@ if (empty($id) || empty($serial) || empty($secret) || hash_hmac('sha256', "$id.$
 
 $lucky = FlashEgg::getLucky($id);
 if (empty($lucky)) {
-    Response::data(err('对不起，找不到这个抽奖活动！'));;
+    Response::data(err('对不起，找不到这个抽奖活动！'));
 }
 
 if (!$lucky->isEnabled()) {

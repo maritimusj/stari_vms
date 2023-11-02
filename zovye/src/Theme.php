@@ -6,7 +6,6 @@
 
 namespace zovye;
 
-use zovye\api\wx\fb;
 use zovye\util\Helper;
 
 class Theme

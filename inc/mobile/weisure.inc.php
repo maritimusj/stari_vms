@@ -9,6 +9,7 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+use Exception;
 use zovye\account\WeiSureAccount;
 use zovye\domain\Account;
 use zovye\util\Helper;
@@ -24,7 +25,11 @@ if (Request::is_post()) {
     ]);
 
     if (App::isWeiSureEnabled()) {
-        WeiSureAccount::cb(Request::json());
+        try {
+            WeiSureAccount::cb(Request::json());
+        } catch (Exception $e) {
+            Response::echo($e->getMessage());
+        }
     } else {
         Log::debug('weisure', [
             'error' => '微保没有启用！',

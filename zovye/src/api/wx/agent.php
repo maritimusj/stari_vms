@@ -26,6 +26,7 @@ use zovye\domain\DeviceTypes;
 use zovye\domain\Inventory;
 use zovye\domain\Keeper;
 use zovye\domain\LoginData;
+use zovye\domain\Maintenance;
 use zovye\domain\Order;
 use zovye\domain\Principal;
 use zovye\domain\User;
@@ -1195,7 +1196,7 @@ class agent
             'name' => $agent->getName(),
         ];
 
-        if (\zovye\domain\Maintenance::create($data) && $device->save()) {
+        if (Maintenance::create($data) && $device->save()) {
             $device->remove('lastErrorData');
 
             return [

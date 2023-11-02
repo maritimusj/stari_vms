@@ -155,7 +155,7 @@ class Util
             $res = str_replace($str, $replacements, $res);
         }
 
-        return $use_image_proxy ? Util::getImageProxyURL($res) : $res;
+        return $use_image_proxy ? Util::getImageProxyURL($res) : strval($res);
     }
 
     public static function generateUID(): string

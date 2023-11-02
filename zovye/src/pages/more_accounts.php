@@ -33,7 +33,7 @@ if ($tpl['device']['id']) {
                         $tpl['slides'][] = [
                             'id' => intval($adv['id']),
                             'name' => strval($adv['name']),
-                            'image' => strval(Util::toMedia($image)),
+                            'image' => Util::toMedia($image),
                             'link' => strval($adv['extra']['link']),
                         ];
                     }

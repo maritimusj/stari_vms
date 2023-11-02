@@ -1319,7 +1319,7 @@ class deviceModelObj extends ModelObj
                     'id' => intval($adv['id']),
                     'type' => strval($adv['extra']['media']),
                 ];
-                $data['url'] = strval(Util::toMedia($adv['extra']['url']));
+                $data['url'] = Util::toMedia($adv['extra']['url']);
                 if ($data['type'] == 'image') {
                     $data['duration'] = intval($adv['extra']['duration'] ?: settings('advs.image.duration', 10)) * 1000;
                 }
@@ -1332,7 +1332,7 @@ class deviceModelObj extends ModelObj
 
         //其它配置
         $cfg = [
-            'banner' => strval(Util::toMedia($banner)),
+            'banner' => Util::toMedia($banner),
             'volume' => intval($vol),
             'advs' => $ads,
         ];

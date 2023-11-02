@@ -29,6 +29,7 @@ if (Request::has('num')) {
     ]);
 } else {
     JSON::fail('参数不正确！');
+    exit();
 }
 
 if (is_error($res)) {

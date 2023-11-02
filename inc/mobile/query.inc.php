@@ -9,7 +9,6 @@ namespace zovye;
 use zovye\domain\Device;
 use zovye\domain\Order;
 use zovye\domain\User;
-use zovye\model\keeperModelObj;
 
 defined('IN_IA') or exit('Access Denied');
 

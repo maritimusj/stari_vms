@@ -32,6 +32,7 @@ try {
     }
 } catch (Exception $e) {
     JSON::fail('时间格式不正确！');
+    exit();
 }
 
 $result = [

@@ -547,7 +547,7 @@ class Advertising extends State
                         $slides[] = [
                             'id' => intval($ad['id']),
                             'name' => strval($ad['name']),
-                            'image' => strval(Util::toMedia($image)),
+                            'image' => Util::toMedia($image),
                             'link' => strval($ad['extra']['link']),
                         ];
                     }

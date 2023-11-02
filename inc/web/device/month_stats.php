@@ -24,6 +24,7 @@ try {
     $month = new DateTime($month_str);
 } catch (Exception $e) {
     JSON::fail('时间不正确！');
+    exit();
 }
 
 $title = $month->format('Y年n月');

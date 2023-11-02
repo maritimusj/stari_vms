@@ -73,6 +73,7 @@ $cond = [
 if (Request::bool('is_export')) {
     if (empty($user)) {
         Response::toast('请指定用户！', '', 'error');
+        exit();
     }
 
     set_time_limit(60);
@@ -225,7 +226,7 @@ if (Request::bool('is_export')) {
         } elseif ($entry->getSrc() == CommissionBalance::ADJUST) {
             $data['event'] = '管理员调整';
         } else {
-            $data['event'] = CommissionBalance::desc($entry->getSrc());;
+            $data['event'] = CommissionBalance::desc($entry->getSrc());
         }
         $logs[] = $data;
     }

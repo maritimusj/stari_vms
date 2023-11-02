@@ -27,6 +27,7 @@ try {
     $year = new DateTime(sprintf("%d-%02d-01", $year_str, $month_str));
 } catch (Exception $e) {
     JSON::fail('时间格式不正确！');
+    exit();
 }
 
 if ($year->getTimestamp() > time()) {

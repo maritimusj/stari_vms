@@ -46,7 +46,7 @@ if ($device) {
                         $tpl['slides'][] = [
                             'id' => intval($adv['id']),
                             'name' => strval($adv['name']),
-                            'image' => strval(Util::toMedia($image)),
+                            'image' => Util::toMedia($image),
                             'url' => Util::murl('adsstats', $url_params),
                         ];
                     }

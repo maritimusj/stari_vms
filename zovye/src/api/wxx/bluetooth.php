@@ -97,7 +97,7 @@ class bluetooth
                         $result[] = [
                             'id' => intval($adv['id']),
                             'name' => strval($adv['name']),
-                            'image' => strval(Util::toMedia($image)),
+                            'image' => Util::toMedia($image),
                             'link' => strval($adv['extra']['link']),
                             'app_id' => $adv['extra']['app_id'],
                             'app_path' => $adv['extra']['app_path'],

@@ -754,7 +754,8 @@ class accountModelObj extends ModelObj
         ]);
     }
 
-    public function setLongPressSeconds($seconds) {
+    public function setLongPressSeconds($seconds): bool
+    {
         return $this->updateSettings('custom.longPressOrder.seconds', intval($seconds));
     }
 

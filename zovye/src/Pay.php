@@ -255,7 +255,15 @@ class Pay
             }
 
             //获取一个配置完整的pay对象
-            $pay = self::getActivePayObj($data['deviceUID'], $name);
+            $device = null;
+            if ($data['deviceUID']) {
+                $device = Device::get($data['deviceUID'], true);
+                if (empty($device)) {
+                    throw new Exception('找不到这个设备！');
+                }
+            }
+
+            $pay = self::getActivePayObj($device, $name);
             if (is_error($pay)) {
                 throw new Exception($pay['message']);
             }
@@ -556,19 +564,12 @@ class Pay
 
     /**
      * 获取设备关联的支付配置
-     * @param mixed $device
+     * @param deviceModelObj|null $device
      */
-    public static function getPayParams($device = null, string $name = ''): array
+    public static function getPayParams(deviceModelObj $device = null, string $name = ''): array
     {
-        if (!empty($device) && is_string($device)) {
-            $device = Device::get($device, true);
-            if (empty($device)) {
-                return err('找不到这个设备！');
-            }
-        }
-
         $res = [];
-        if ($device instanceof deviceModelObj) {
+        if ($device) {
             $agent = $device->getAgent();
             if ($agent) {
                 $res = Agent::getPayParams($agent, $name);
@@ -660,9 +661,11 @@ class Pay
 
     /**
      * 根据设备和名称获取已配置好的支付对象
-     * @param string|deviceModelObj $device
+     * @param deviceModelObj $device
+     * @param string $name
+     * @return array|LCSWPay|SQBPay|WXPay
      */
-    public static function getActivePayObj($device, string $name = '')
+    public static function getActivePayObj(deviceModelObj $device, string $name = '')
     {
         $res = self::getPayParams($device, $name);
         if (is_error($res)) {

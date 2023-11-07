@@ -514,6 +514,7 @@ class Pay
                 if ((Session::isWxAppUser() && (!isset($data['wxapp']) || $data['wxapp'])) ||
                     (Session::isWxUser() && !Session::isWxAppUser() && (!isset($data['wx']) || $data['wx'])) ||
                     (Session::isAliUser() && (!isset($data['ali']) || $data['ali']))) {
+
                     $data['name'] = $name;
                     unset($data['wx'], $data['ali'], $data['wxapp']);
 

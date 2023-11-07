@@ -150,7 +150,7 @@ class pay
         }
 
         if ($res['result_code'] !== '01') {
-            return err('支付失败！');
+            return err($res['return_msg'] ?? '支付失败！');
         }
 
         return $res;
@@ -189,7 +189,7 @@ class pay
         }
 
         if ($res['result_code'] !== '01') {
-            return err('创建支付失败！');
+            return err($res['return_msg'] ?? '创建支付失败！');
         }
 
         return $res;
@@ -252,7 +252,7 @@ class pay
         }
 
         if ($res['result_code'] !== '01') {
-            return err('关闭订单失败！');
+            return err($res['return_msg'] ?? '关闭订单失败！');
         }
 
         return $res;
@@ -283,7 +283,7 @@ class pay
         }
 
         if ($res['result_code'] !== '01') {
-            return err('退款失败！');
+            return err($res['return_msg'] ?? '退款失败！');
         }
 
         return $res;

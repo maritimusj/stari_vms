@@ -319,7 +319,7 @@ class Job
                 'user' => $user_id,
                 'order' => $order_id,
                 'time' => time(),
-            ], 70) !== false) {
+            ], 180) !== false) {
             return true;
         }
 

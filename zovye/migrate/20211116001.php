@@ -5,14 +5,15 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 $tb_name = APP_NAME;
-
-$sql = <<<SQL
+if (We7::pdo_table_exists($tb_name . '_prize')) {
+    $sql = <<<SQL
 DROP TABLE `ims_zovye_vms_aaf_balance`;
 DROP TABLE `ims_zovye_vms_prize`;
 DROP TABLE `ims_zovye_vms_prizelist`;
 DROP TABLE `ims_zovye_vms_referal`;
 SQL;
-Migrate::execSQL($sql);
+    Migrate::execSQL($sql);
+}
 
 if (We7::pdo_field_exists($tb_name . '_account', 'balance_deduct_num')) {
     $sql = <<<SQL

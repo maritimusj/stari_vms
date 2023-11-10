@@ -104,7 +104,7 @@ define('MAX_ORDER_NO_LEN', 32);
 define('DEVICE_FORWARDER_URL', 'https://z.ph6618.cn/?id={imei}');
 define('FLUSH_DEVICE_FORWARDER_URL', 'https://z.ph6618.cn/cache/flush?id={imei}');
 
-define('DEFAULT_LBS_KEY', 'FNBBZ-DK2C4-3LCUM-DXXIO-GVYQ7-OTBEA');
+define('DEFAULT_LBS_KEY', '');
 
 define('JS_WE7UTIL_URL', $GLOBALS['_W']['siteroot']."app/resource/js/app/util.js");
 define('JS_JQUERY_URL', 'https://cdn.staticfile.org/jquery/1.11.1/jquery.min.js');

@@ -7,13 +7,19 @@ defined('IN_IA') or exit('Access Denied');
 $tb_name = APP_NAME;
 
 $sql = <<<SQL
-ALTER TABLE `ims_zovye_vms_account` DROP `balance_deduct_num`;
 DROP TABLE `ims_zovye_vms_aaf_balance`;
 DROP TABLE `ims_zovye_vms_prize`;
 DROP TABLE `ims_zovye_vms_prizelist`;
 DROP TABLE `ims_zovye_vms_referal`;
 SQL;
 Migrate::execSQL($sql);
+
+if (We7::pdo_field_exists($tb_name . '_account', 'balance_deduct_num')) {
+    $sql = <<<SQL
+ALTER TABLE `ims_zovye_vms_account` DROP `balance_deduct_num`;
+SQL;
+    Migrate::execSQL($sql);
+}
 
 if (!We7::pdo_field_exists($tb_name.'_balance', 'extra')) {
     $sql = <<<SQL

@@ -223,6 +223,9 @@ class Util
         return "$scheme$user$pass$host$port$path$query$fragment";
     }
 
+    /**
+     * 生成指定路由的后台网址
+     */
     public static function url(string $do = '', array $params = [], bool $eid = true): string
     {
         $params['m'] = APP_NAME;
@@ -234,6 +237,9 @@ class Util
         return We7::url("site/entry/$do", $params);
     }
 
+    /**
+     * 生成指定路由的移动端网址
+     */
     public static function murl(string $do = '', array $params = [], bool $full_url = true): string
     {
         $params['do'] = $do;
@@ -259,6 +265,10 @@ class Util
         return str_replace($str, $replacements, $url);
     }
 
+    /**
+     * 生成一个指定路由的短网址
+     * 注：由于原腾讯短网址服务下线，暂时不做处理
+     */
     public static function shortMobileUrl(string $do, array $params = []): string
     {
         return Util::murl($do, $params);
@@ -327,6 +337,9 @@ class Util
         return "$url$signStr/$image_url";
     }
 
+    /**
+     * 获取当前系统负载情况
+     */
     public static function isSysLoadAverageOk(): bool
     {
         $load = sys_getloadavg();

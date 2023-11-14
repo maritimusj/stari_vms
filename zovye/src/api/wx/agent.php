@@ -23,6 +23,7 @@ use zovye\domain\CommissionBalance;
 use zovye\domain\Cron;
 use zovye\domain\Device;
 use zovye\domain\DeviceTypes;
+use zovye\domain\GSP;
 use zovye\domain\Inventory;
 use zovye\domain\Keeper;
 use zovye\domain\LoginData;
@@ -1289,7 +1290,7 @@ class agent
                         $gsp['rel'][$level] = number_format($val / 100, 2);
                     }
                     $data['gsp_rel'] = $gsp['rel'];
-                    $data['gsp_rel_mode_type'] = $gsp['mode_type'] ?? 'percent';
+                    $data['gsp_rel_mode_type'] = $gsp['mode_type'] ?? GSP::PERCENT;
                 }
 
                 $result['list'][] = $data;
@@ -1486,7 +1487,7 @@ class agent
                             foreach ((array)$gsp['rel'] as $level => $val) {
                                 $gsp['rel'][$level] = number_format($val / 100, 2);
                             }
-                            $data['gsp_rel_mode_type'] = $gsp['mode_type'] ?? 'percent';
+                            $data['gsp_rel_mode_type'] = $gsp['mode_type'] ?? GSP::PERCENT;
                         }
 
                         $result['list'][] = $data;

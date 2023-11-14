@@ -33,7 +33,7 @@
     <div class="heading">
         <span class="operate">
             <span id="qrcode">
-                <i class="fa fa-fw fa-qrcode"></i>
+                <i class="fa fa-fw fa-qrcode" data-op="refresh" title="点击重新生成二维码"></i>
                 <img src="{php echo tomedia(isset($config['qrcode'])? $config['qrcode']:'')}" data-url="{php echo $config['url']?:''}" title="点击复制网址"/>
             </span>
             <a href="{php echo $this->createWebUrl('qrcode', array('op'=>'edit'));}"  title="添加活码转跳">
@@ -87,10 +87,11 @@
     </div>
 </div>
 <script>
-    $(function(){
-        $('[data-url]').each(function(){
-            util.clip(this, $(this).data('url'));
-        });
+    require(["{php \zovye\url(false, 'static/js/zovye.min.js?v=20210716')}"], function (zovye) {
+        zovye.enableOp();
+        zovye.enableCopy();
+        zovye.setApiUrl("{php echo $this->createWebUrl('qrcode');}");
     });
+
 </script>
 {template 'common/footer'}

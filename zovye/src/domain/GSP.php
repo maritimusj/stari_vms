@@ -19,7 +19,6 @@ class GSP
     const AMOUNT = 'amount'; // 固定金额
 
     const PERCENT_PER_GOODS = 'percent/goods'; // 百分比 x 商品数量
-
     const AMOUNT_PER_GOODS = 'amount/goods'; // 固定金额 x 商品数量
 
     const REL = 'rel'; // 三级分佣

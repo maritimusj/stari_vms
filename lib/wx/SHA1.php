@@ -22,7 +22,7 @@ class SHA1
      * @param string $encrypt_msg
      * @return array
      */
-    public function getSHA1(string $token, string $timestamp, string $nonce, string $encrypt_msg): array
+    public function calc(string $token, string $timestamp, string $nonce, string $encrypt_msg): array
     {
         $array = array($encrypt_msg, $token, $timestamp, $nonce);
 

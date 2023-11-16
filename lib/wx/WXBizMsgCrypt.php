@@ -56,7 +56,7 @@ class WXBizMsgCrypt
         }
 
         //生成安全签名
-        list($ret, $signature) = (new SHA1())->getSHA1($this->token, $timestamp, $nonce, $encrypt);
+        list($ret, $signature) = (new SHA1())->calc($this->token, $timestamp, $nonce, $encrypt);
         if ($ret != ErrorCode::OK) {
             return [$ret, ''];
         }
@@ -100,7 +100,7 @@ class WXBizMsgCrypt
         }
 
         //验证安全签名
-        list($ret, $signature) = (new SHA1())->getSHA1($this->token, $timestamp, $nonce, $encrypt);
+        list($ret, $signature) = (new SHA1())->calc($this->token, $timestamp, $nonce, $encrypt);
 
         if ($ret != ErrorCode::OK) {
             return [$ret, ''];

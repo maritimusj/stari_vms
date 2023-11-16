@@ -685,11 +685,6 @@ class userModelObj extends ModelObj
         return Locker::try("user:{$this->getId()}:$name");
     }
 
-    public function recharge(pay_logsModelObj $pay_log)
-    {
-        return CommissionBalance::recharge($this, $pay_log);
-    }
-
     public function cleanLastActiveData($key = ''): bool
     {
         if (empty($key)) {

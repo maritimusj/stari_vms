@@ -12,6 +12,7 @@ defined('IN_IA') or exit('Access Denied');
 //充值支付结果检查
 
 use zovye\CtrlServ;
+use zovye\domain\CommissionBalance;
 use zovye\domain\Locker;
 use zovye\Job;
 use zovye\JobException;
@@ -71,7 +72,7 @@ if (empty($user)) {
     throw new JobException('找不到指定的用户!', $log);
 }
 
-$res = $user->recharge($pay_log);
+$res = CommissionBalance::recharge($user, $pay_log);
 if (is_error($res) && $res['errno'] < 0) {
     throw new JobException($res['message'], $log);
 }

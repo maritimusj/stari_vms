@@ -12,6 +12,7 @@ use zovye\business\Charging;
 use zovye\business\Fueling;
 use zovye\contract\IPay;
 use zovye\domain\Agent;
+use zovye\domain\CommissionBalance;
 use zovye\domain\Device;
 use zovye\domain\Locker;
 use zovye\domain\Order;
@@ -292,7 +293,7 @@ class Pay
             if ($pay_log->getLevel() == LOG_RECHARGE) {
                 $user = $pay_log->getOwner();
                 if ($user) {
-                    $res = $user->recharge($pay_log);
+                    $res = CommissionBalance::recharge($user, $pay_log);
                     if (is_error($res) && $res['errno'] < 0) {
                         throw new Exception($res['message']);
                     }

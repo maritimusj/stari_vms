@@ -30,17 +30,12 @@ use zovye\domain\PayLogs;
 use zovye\domain\Principal;
 use zovye\domain\Referral;
 use zovye\domain\User;
-use zovye\Pay;
 use zovye\util\CacheUtil;
 use zovye\util\DBUtil;
 use zovye\util\Util;
 use zovye\We7;
 use zovye\We7credit;
-use zovye\WxMCHPay;
-use zovye\WxMCHPayV3;
 use function zovye\err;
-use function zovye\is_error;
-use function zovye\isEmptyArray;
 use function zovye\m;
 use function zovye\settings;
 use function zovye\tb;
@@ -742,101 +737,6 @@ class userModelObj extends ModelObj
 
             return true;
         });
-    }
-
-    public function getMCHPayResult($transaction, $trade_no): array
-    {
-        $params = Pay::getDefaultPayParams(Pay::WX);
-        if (empty($params)) {
-            return err('没有配置微信打款信息！');
-        }
-
-        if (!isEmptyArray($params['v3'])) {
-            $config = $params['v3'];
-
-            $config['appid'] = $params['appid'];
-            $config['mch_id'] = $params['mch_id'];
-
-            return (new WxMCHPayV3($config))->transferInfo($transaction, $trade_no);
-        }
-
-        $file = Pay::getPEMFile($params['pem']);
-        if (is_error($file)) {
-            return $file;
-        }
-
-        $params['pem']['cert'] = $file['cert_filename'];
-        $params['pem']['key'] = $file['key_filename'];
-
-        return (new WxMCHPay($params))->transferInfo($transaction, $trade_no);
-    }
-
-    /**
-     * 给用户打款.
-     *
-     * @param $n
-     * @param $trade_no
-     * @param string $desc
-     *
-     * @return array
-     */
-    public function MCHPay($n, $trade_no, string $desc = ''): array
-    {
-        if ($trade_no && $n > 0) {
-            $params = Pay::getDefaultPayParams(Pay::WX);
-            if (empty($params)) {
-                return err('没有配置微信打款信息！');
-            }
-
-            if (!isEmptyArray($params['v3'])) {
-                $config = $params['v3'];
-
-                if ($this->isWxUser()) {
-                    $config['appid'] = $params['appid'];
-                } elseif ($this->isWXAppUser()) {
-                    $config['appid'] = $params['wxappid'];
-                } else {
-                    return err('只能给微信或微信小程序用户转账！');
-                }
-
-                $config['mch_id'] = $params['mch_id'];
-
-                $mch_pay = new WxMCHPayV3($config);
-            } else {
-                $file = Pay::getPEMFile($params['pem']);
-                if (is_error($file)) {
-                    return $file;
-                }
-
-                $params['pem']['cert'] = $file['cert_filename'];
-                $params['pem']['key'] = $file['key_filename'];
-
-                $mch_pay = new WxMCHPay($params);
-            }
-
-            $res = $mch_pay->transferTo($this->openid, $trade_no, $n, $desc);
-            if (is_error($res)) {
-                return $res;
-            }
-
-            if ($res) {
-                if ($res['batch_id']) {
-                    $info = $mch_pay->transferInfo($res['batch_id'], $trade_no);
-                    if ($info && $info['detail_status'] == 'SUCCESS') {
-                        return $info;
-                    }
-
-                    return $res;
-                }
-                if ($res['partner_trade_no'] == $trade_no && isset($res['payment_no'])) {
-                    return $res;
-                }
-            }
-
-            return err('打款失败！');
-        }
-
-        return err('参数不正确！');
     }
 
     public function cleanLastActiveData($key = ''): bool

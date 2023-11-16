@@ -7,6 +7,7 @@
 namespace zovye;
 
 use Exception;
+use RuntimeException;
 use zovye\business\Charging;
 use zovye\business\Fueling;
 use zovye\contract\IPay;
@@ -688,5 +689,83 @@ class Pay
         $str = substr($code, 0, 2);
 
         return in_array($str, ['10', '11', '12', '13', '14', '15']);
+    }
+
+    public static function getWxPayClientFor(userModelObj $user)
+    {
+        $params = Pay::getDefaultPayParams(Pay::WX);
+        if (empty($params)) {
+            throw new RuntimeException('没有配置微信打款信息！');
+        }
+
+        if (!isEmptyArray($params['v3'])) {
+            $config = $params['v3'];
+            $config['mch_id'] = $params['mch_id'];
+
+            if ($user->isWxUser()) {
+                $config['appid'] = $params['appid'];
+            } elseif ($user->isWXAppUser()) {
+                $config['appid'] = $params['wxappid'];
+            } else {
+                throw new RuntimeException('只能给微信或微信小程序用户转账！');
+            }
+
+            return new WxMCHPayV3($config);
+        }
+
+        $file = Pay::getPEMFile($params['pem']);
+        if (is_error($file)) {
+            throw new RuntimeException($file['message']);
+        }
+
+        $params['pem']['cert'] = $file['cert_filename'];
+        $params['pem']['key'] = $file['key_filename'];
+
+        return new WxMCHPay($params);
+    }
+
+    public static function getMCHPayResult(userModelObj $user, $transaction, $trade_no): array
+    {
+        return (self::getWxPayClientFor($user))->transferInfo($transaction, $trade_no);
+    }
+
+    /**
+     * 给用户打款.
+     *
+     * @param userModelObj $user
+     * @param $num
+     * @param $trade_no
+     * @param string $desc
+     *
+     * @return array
+     */
+    public static function MCHPay(userModelObj $user, $num, $trade_no, string $desc = ''): array
+    {
+        if ($trade_no && $num > 0) {
+            $client = Pay::getWxPayClientFor($user);
+
+            $res = $client->transferTo($user->getOpenid(), $trade_no, $num, $desc);
+            if (is_error($res)) {
+                return $res;
+            }
+
+            if ($res) {
+                if ($res['batch_id']) {
+                    $info = $client->transferInfo($res['batch_id'], $trade_no);
+                    if ($info && $info['detail_status'] == 'SUCCESS') {
+                        return $info;
+                    }
+
+                    return $res;
+                }
+                if ($res['partner_trade_no'] == $trade_no && isset($res['payment_no'])) {
+                    return $res;
+                }
+            }
+
+            return err('打款失败！');
+        }
+
+        return err('参数不正确！');
     }
 }

@@ -3,7 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
- 
+
 namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
@@ -101,9 +101,13 @@ if ($total > 0) {
                     $state = 'mchpay committed';
                     $user = User::get($entry->getOpenid(), true);
                     if ($user) {
-                        $MCHPayResult = $user->getMCHPayResult($MCHPayResult['batch_id'], $MCHPayResult['out_batch_no']);
+                        $MCHPayResult = Pay::getMCHPayResult(
+                            $user,
+                            $MCHPayResult['batch_id'],
+                            $MCHPayResult['out_batch_no']
+                        );
                         if ($MCHPayResult['detail_status'] == 'SUCCESS' || $MCHPayResult['detail_status'] == 'FAIL') {
-                            $entry->update(['mchpayResult' =>  $MCHPayResult]);
+                            $entry->update(['mchpayResult' => $MCHPayResult]);
                             $entry->save();
                         }
                     }

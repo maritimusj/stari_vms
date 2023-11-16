@@ -9,7 +9,7 @@ use WeChatPay\Util\PemUtil;
 
 class WxPayV3
 {
-    public static function getClient(array $config): ?BuilderChainable
+    public static function getClient(array $config): BuilderChainable
     {
         // 设置参数
         // 从本地文件中加载「商户API私钥」，「商户API私钥」会用来生成请求的签名

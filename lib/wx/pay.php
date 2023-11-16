@@ -34,6 +34,7 @@ class pay
             'refund_fee' => $refund_val,
             'out_refund_no' => $out_refund_no,
         ];
+
         if ($is_transaction_id) {
             $data['transaction_id'] = $no;
         } else {
@@ -49,6 +50,7 @@ class pay
     public function requestApi($url, $params, $extra = array())
     {
         $xml = We7::array2xml($params);
+
         $response = ihttp::request($url, $xml, $extra);
         if (is_error($response)) {
             return $response;
@@ -105,17 +107,18 @@ class pay
         unset($params['sign']);
         ksort($params);
 
-        $string = $this->array2url($params);
-        $string = $string."&key={$this->config['key']}";
-        $string = md5($string);
+        $str = $this->array2url($params);
+        $str = $str."&key={$this->config['key']}";
+        $str = md5($str);
 
-        return strtoupper($string);
+        return strtoupper($str);
     }
 
     public function array2url($params): string
     {
         $str = '';
         $ignore = array('coupon_refund_fee', 'coupon_refund_count');
+
         foreach ($params as $key => $val) {
             if ((empty($val) || is_array($val)) && !in_array($key, $ignore)) {
                 continue;
@@ -128,7 +131,7 @@ class pay
 
     /*
      * 转换短网址
-     * */
+     */
     public function shortUrl($url)
     {
         $params = array(
@@ -137,7 +140,9 @@ class pay
             'long_url' => $url,
             'nonce_str' => Util::random(32),
         );
+
         $params['sign'] = $this->buildSign($params);
+
         $result = $this->requestApi('https://api.mch.weixin.qq.com/tools/shorturl', $params);
         if (is_error($result)) {
             return $result;
@@ -152,12 +157,15 @@ class pay
         if (empty($params['out_trade_no'])) {
             return err('缺少必填参数out_trade_no:商户订单号');
         }
+
         if (empty($params['body'])) {
             return err('缺少必填参数body:商品描述');
         }
+
         if (empty($params['total_fee'])) {
             return err('缺少必填参数total_fee:总金额');
         }
+
         if (empty($params['auth_code'])) {
             return err('缺少必填参数auth_code:付款码');
         }
@@ -173,8 +181,8 @@ class pay
 
     /*
      * 扫码模式一生成支付url
-     * */
-    public function buildNativePayurl($product_id, $short_url = true)
+     */
+    public function buildNativePayUrl($product_id, $short_url = true)
     {
         $params = array(
             'appid' => $this->config['appid'],
@@ -183,7 +191,9 @@ class pay
             'nonce_str' => Util::random(32),
             'product_id' => $product_id,
         );
+
         $params['sign'] = $this->buildSign($params);
+
         $url = 'weixin://wxpay/bizpayurl?'.$this->array2url($params);
         if ($short_url) {
             $url = $this->shortUrl($url);
@@ -194,19 +204,22 @@ class pay
 
     /*
      * 接口
-     * */
+     */
     public function buildUnifiedOrder($params)
     {
         //检测必填参数
         if (empty($params['out_trade_no'])) {
             return err('缺少统一支付接口必填参数out_trade_no:商户订单号');
         }
+
         if (empty($params['body'])) {
             return err('缺少统一支付接口必填参数body:商品描述');
         }
+
         if (empty($params['total_fee'])) {
             return err('缺少统一支付接口必填参数total_fee:总金额');
         }
+
         if (empty($params['trade_type'])) {
             return err('缺少统一支付接口必填参数trade_type:交易类型');
         }
@@ -234,7 +247,7 @@ class pay
 
     /*
      * 查询订单
-     * */
+     */
     public function queryOrder($no, $is_transaction_id = false)
     {
         $params = array(
@@ -242,6 +255,7 @@ class pay
             'mch_id' => $this->config['mch_id'],
             'nonce_str' => Util::random(32),
         );
+
         if ($is_transaction_id) {
             $params['transaction_id'] = $no;
         } else {
@@ -270,7 +284,7 @@ class pay
     /*
      * 申请退款
      * $params 退款参数
-     * */
+     */
     public function doRefund($params)
     {
         $params['appid'] = $this->config['appid'];

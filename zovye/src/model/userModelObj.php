@@ -753,15 +753,13 @@ class userModelObj extends ModelObj
 
         if (!isEmptyArray($params['v3'])) {
             $config = $params['v3'];
+
             $config['appid'] = $params['appid'];
             $config['mch_id'] = $params['mch_id'];
 
-            $mch_pay = new WxMCHPayV3($config);
-
-            return $mch_pay->transferInfo($transaction, $trade_no);
+            return (new WxMCHPayV3($config))->transferInfo($transaction, $trade_no);
         }
 
-        $mch_pay = new WxMCHPay($params);
         $file = Pay::getPEMFile($params['pem']);
         if (is_error($file)) {
             return $file;
@@ -770,7 +768,7 @@ class userModelObj extends ModelObj
         $params['pem']['cert'] = $file['cert_filename'];
         $params['pem']['key'] = $file['key_filename'];
 
-        return $mch_pay->transferInfo($transaction, $trade_no);
+        return (new WxMCHPay($params))->transferInfo($transaction, $trade_no);
     }
 
     /**

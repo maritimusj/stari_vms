@@ -2,33 +2,81 @@
 
 namespace zovye;
 
+use Exception;
+use GuzzleHttp\Exception\RequestException;
 use WeChatPay\Builder;
 use WeChatPay\BuilderChainable;
 use WeChatPay\Crypto\Rsa;
 use WeChatPay\Util\PemUtil;
 
+require_once MODULE_ROOT.'vendor/autoload.php';
+
 class WxPayV3
 {
-    public static function getClient(array $config): BuilderChainable
+    /** @var BuilderChainable */
+    private $instance;
+
+    private function __construct(BuilderChainable $instance)
     {
-        // 设置参数
-        // 从本地文件中加载「商户API私钥」，「商户API私钥」会用来生成请求的签名
-        $merchantPrivateKeyInstance = Rsa::from($config['pem']['key']);
+        $this->instance = $instance;
+    }
 
-        // 从本地文件中加载「微信支付平台证书」，用来验证微信支付应答的签名
-        $platformPublicKeyInstance = Rsa::from($config['pem']['cert'], Rsa::KEY_TYPE_PUBLIC);
-
+    public static function getClient(array $config): self
+    {
         // 从「微信支付平台证书」中获取「证书序列号」
-        $platformCertificateSerial = PemUtil::parseCertificateSerialNo($config['pem']['cert']);
+        $serial = PemUtil::parseCertificateSerialNo($config['pem']['cert']);
 
         // 构造一个 APIv3 客户端实例
-        return Builder::factory([
+        $instance = Builder::factory([
             'mchid' => $config['mch_id'],         // 商户号
             'serial' => $config['serial'],        // 「商户API证书」的「证书序列号」
-            'privateKey' => $merchantPrivateKeyInstance,
+            'privateKey' => Rsa::from($config['pem']['key']),
             'certs' => [
-                $platformCertificateSerial => $platformPublicKeyInstance,
+                $serial => Rsa::from($config['pem']['cert'], Rsa::KEY_TYPE_PUBLIC),
             ],
         ]);
+
+        return new WxPayV3($instance);
+    }
+
+    public function get($path, $data = [])
+    {
+        return $this->query('get', $path, $data);
+    }
+
+    public function post($path, $data = [])
+    {
+        return $this->query('post', $path, $data);
+    }
+
+    public function query($method, $path, $data = [])
+    {
+        try {
+            if ($method == 'post') {
+                $response = $this->instance->chain($path)->post(['json' => $data]);
+            } elseif ($method == 'get') {
+                $response = $this->instance->chain($path)->get(['query' => $data]);
+            } else {
+                return err('暂不支持的http方法:'.$method);
+            }
+
+            $contents = $response->getBody()->getContents();
+            if ($contents) {
+                return json_decode($contents, true);
+            }
+        } catch (Exception $e) {
+            Log::error('wx_pay_v3', [
+                'error' => $e->getMessage(),
+            ]);
+
+            if ($e instanceof RequestException && $e->hasResponse()) {
+                $r = $e->getResponse();
+                $contents = $r->getBody()->getContents();
+
+                return json_decode($contents, true);
+            }
+        }
+
+        return err('请求失败，请稍后再试！');
     }
 }

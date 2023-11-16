@@ -6,12 +6,6 @@
 
 namespace zovye;
 
-require MODULE_ROOT.'vendor/autoload.php';
-
-use Exception;
-
-use GuzzleHttp\Exception\RequestException;
-
 class WxMCHPayV3
 {
     private $config;
@@ -31,37 +25,6 @@ class WxMCHPayV3
     public function __construct(array $config)
     {
         $this->config = $config;
-    }
-
-    protected function getResponse($method, $path, $data = [])
-    {
-        try {
-            $client = WxPayV3::getClient($this->config);
-            if ($method == 'post') {
-                $response = $client->chain($path)->post(['json' => $data]);
-            } elseif ($method == 'get') {
-                $response = $client->chain($path)->get([
-                    'query' => $data,
-                ]);
-            } else {
-                return err('暂不支持的http方法:'.$method);
-            }
-
-            $contents = $response->getBody()->getContents();
-            return json_decode($contents, true);
-
-        } catch (Exception $e) {
-            Log::error('v3_transfer', [
-                'error' => $e->getMessage(),
-            ]);
-            if ($e instanceof RequestException && $e->hasResponse()) {
-                $r = $e->getResponse();
-                $contents = $r->getBody()->getContents();
-                return json_decode($contents, true);
-            }
-        }
-
-        return err('请求失败，请稍后再试！');
     }
 
     public function transferTo($openid, $trade_no, $money, string $desc = ''): array
@@ -87,7 +50,7 @@ class WxMCHPayV3
             ],
         ];
 
-        $response = $this->getResponse('post', 'v3/transfer/batches', $data);
+        $response = WxPayV3::getClient($this->config)->post('v3/transfer/batches', $data);
         if (is_error($response)) {
             return $response;
         }
@@ -96,7 +59,9 @@ class WxMCHPayV3
             if ($response['message']) {
                 return err($response['message']);
             }
+
             $code = $response['code'];
+
             return err(self::$errMsg[$code] ?? self::$errMsg['UNKNOWN']);
         }
 
@@ -112,15 +77,12 @@ class WxMCHPayV3
      */
     public function transferInfo(string $batch_id, string $trade_no = ''): array
     {
-        $response = $this->getResponse(
-            'get',
-            "v3/transfer/batches/batch-id/$batch_id",
-            [
-                'need_query_detail' => 'true',
-                'detail_status' => 'ALL',
-            ]
-        );
+        $data = [
+            'need_query_detail' => 'true',
+            'detail_status' => 'ALL',
+        ];
 
+        $response = WxPayV3::getClient($this->config)->get("v3/transfer/batches/batch-id/$batch_id", $data);
         if (is_error($response)) {
             return $response;
         }
@@ -130,6 +92,7 @@ class WxMCHPayV3
                 return err($response['message']);
             }
             $code = $response['code'];
+
             return err(self::$errMsg[$code] ?? self::$errMsg['UNKNOWN']);
         }
 
@@ -141,6 +104,7 @@ class WxMCHPayV3
                         return $i;
                     }
                 }
+
                 return [];
             }
 

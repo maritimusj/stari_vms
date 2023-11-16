@@ -14,7 +14,6 @@ use zovye\base\ModelObj;
 use zovye\business\ChargingNowData;
 use zovye\business\Fueling;
 use zovye\business\UserCommissionBalanceCard;
-use zovye\business\VIP;
 use zovye\business\VIPCard;
 use zovye\contract\ICard;
 use zovye\domain\Account;
@@ -31,11 +30,9 @@ use zovye\domain\Principal;
 use zovye\domain\Referral;
 use zovye\domain\User;
 use zovye\util\CacheUtil;
-use zovye\util\DBUtil;
 use zovye\util\Util;
 use zovye\We7;
 use zovye\We7credit;
-use function zovye\err;
 use function zovye\m;
 use function zovye\settings;
 use function zovye\tb;
@@ -690,53 +687,7 @@ class userModelObj extends ModelObj
 
     public function recharge(pay_logsModelObj $pay_log)
     {
-        if (!$pay_log->isPaid()) {
-            return err('未支付完成！');
-        }
-
-        if ($pay_log->isRecharged()) {
-            return err('支付记录已使用！');
-        }
-
-        if ($pay_log->isCancelled() || $pay_log->isTimeout() || $pay_log->isRefund()) {
-            return err('支付已无效!');
-        }
-
-        return DBUtil::transactionDo(function () use ($pay_log) {
-
-            $price = $pay_log->getPrice();
-            if ($price < 1) {
-                return err('支付金额小于1!');
-            }
-
-            if (App::isFuelingDeviceEnabled()) {
-                $promotion_price = VIP::getRechargePromotionVal($price);
-            }
-
-            $extra = [
-                'pay_log' => $pay_log->getId(),
-            ];
-
-            if (isset($promotion_price) && $promotion_price != 0) {
-                $extra['promotion_price'] = $promotion_price;
-                $price += $promotion_price;
-            }
-
-            $balance = $this->getCommissionBalance();
-            if (!$balance->change($price, CommissionBalance::RECHARGE, $extra)) {
-                return err('创建用户账户记录失败!');
-            }
-
-            $pay_log->setData('recharged', [
-                'time' => time(),
-            ]);
-
-            if (!$pay_log->save()) {
-                return err('保存用户数据失败!');
-            }
-
-            return true;
-        });
+        return CommissionBalance::recharge($this, $pay_log);
     }
 
     public function cleanLastActiveData($key = ''): bool

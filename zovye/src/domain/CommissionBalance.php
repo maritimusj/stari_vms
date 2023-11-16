@@ -6,11 +6,15 @@
 
 namespace zovye\domain;
 
+use zovye\App;
 use zovye\base;
+use zovye\business\VIP;
 use zovye\model\commission_balanceModelObj;
+use zovye\model\pay_logsModelObj;
 use zovye\model\userModelObj;
 use zovye\Pay;
 use zovye\State;
+use zovye\util\DBUtil;
 use zovye\We7;
 use function zovye\_W;
 use function zovye\err;
@@ -125,6 +129,57 @@ class CommissionBalance extends State
         }
 
         return err('提现申请数据有误，请联系管理员核实！');
+    }
+
+    public static function recharge(userModelObj $user, pay_logsModelObj $pay_log)
+    {
+        if (!$pay_log->isPaid()) {
+            return err('未支付完成！');
+        }
+
+        if ($pay_log->isRecharged()) {
+            return err('支付记录已使用！');
+        }
+
+        if ($pay_log->isCancelled() || $pay_log->isTimeout() || $pay_log->isRefund()) {
+            return err('支付已无效!');
+        }
+
+        return DBUtil::transactionDo(function () use ($user, $pay_log) {
+
+            $price = $pay_log->getPrice();
+            if ($price < 1) {
+                return err('支付金额小于1!');
+            }
+
+            if (App::isFuelingDeviceEnabled()) {
+                $promotion_price = VIP::getRechargePromotionVal($price);
+            }
+
+            $extra = [
+                'pay_log' => $pay_log->getId(),
+            ];
+
+            if (isset($promotion_price) && $promotion_price != 0) {
+                $extra['promotion_price'] = $promotion_price;
+                $price += $promotion_price;
+            }
+
+            $balance = $user->getCommissionBalance();
+            if (!$balance->change($price, CommissionBalance::RECHARGE, $extra)) {
+                return err('创建用户账户记录失败!');
+            }
+
+            $pay_log->setData('recharged', [
+                'time' => time(),
+            ]);
+
+            if (!$pay_log->save()) {
+                return err('保存用户数据失败!');
+            }
+
+            return true;
+        });
     }
 
     /**

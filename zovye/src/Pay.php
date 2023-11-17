@@ -584,6 +584,10 @@ class Pay
                 if ($res && $res['name'] == Pay::WX) {
                     $sub_mch_id = $res['mch_id'];
                     $res =  self::getDefaultPayParams(self::WX);
+                    if (empty($res['v3'])) {
+                        return err('需要配置微信v3支付参数！');
+                    }
+                    $res = $res['v3'];
                     $res['sub_mch_id'] = $sub_mch_id;
                     return $res;
                 }

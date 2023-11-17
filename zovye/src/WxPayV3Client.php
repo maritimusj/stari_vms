@@ -4,39 +4,16 @@ namespace zovye;
 
 use Exception;
 use GuzzleHttp\Exception\RequestException;
-use WeChatPay\Builder;
 use WeChatPay\BuilderChainable;
-use WeChatPay\Crypto\Rsa;
-use WeChatPay\Util\PemUtil;
 
-require_once MODULE_ROOT.'vendor/autoload.php';
-
-class WxPayV3
+class WxPayV3Client
 {
     /** @var BuilderChainable */
     private $instance;
 
-    private function __construct(BuilderChainable $instance)
+    public function __construct(BuilderChainable $instance)
     {
         $this->instance = $instance;
-    }
-
-    public static function getClient(array $config): self
-    {
-        // 从「微信支付平台证书」中获取「证书序列号」
-        $serial = PemUtil::parseCertificateSerialNo($config['pem']['cert']);
-
-        // 构造一个 APIv3 客户端实例
-        $instance = Builder::factory([
-            'mchid' => $config['mch_id'],         // 商户号
-            'serial' => $config['serial'],        // 「商户API证书」的「证书序列号」
-            'privateKey' => Rsa::from($config['pem']['key']),
-            'certs' => [
-                $serial => Rsa::from($config['pem']['cert'], Rsa::KEY_TYPE_PUBLIC),
-            ],
-        ]);
-
-        return new WxPayV3($instance);
     }
 
     public function get($path, $data = [])

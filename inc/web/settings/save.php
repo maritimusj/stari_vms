@@ -771,13 +771,15 @@ if ($page == 'device') {
     if ($wx_enabled) {
         $settings['pay']['wx']['appid'] = Request::trim('wxAppID');
         $settings['pay']['wx']['wxappid'] = Request::trim('wxxAppID');
-        $settings['pay']['wx']['key'] = Request::trim('wxAppKey');
+        $settings['pay']['wx']['key'] = Request::trim('wxApiV3Key');
         $settings['pay']['wx']['mch_id'] = Request::trim('wxMCHID');
+        $settings['pay']['wx']['sub_mch_id'] = Request::trim('wxSubMCHID');
         $settings['pay']['wx']['pem'] = [
             'cert' => Request::trim('certPEM'),
             'key' => Request::trim('keyPEM'),
         ];
 
+        $settings['pay']['wx']['v3']['key'] = Request::trim('wxApiV3Key');
         $settings['pay']['wx']['v3']['serial'] = Request::trim('v3Serial');
         $settings['pay']['wx']['v3']['pem'] = [
             'cert' => Request::trim('V3cert'),

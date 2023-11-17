@@ -200,11 +200,18 @@
                         <input type="text" class="form-control" name="wxMCHID" id="wxMCHID" value="{$settings['pay']['wx']['mch_id']}">
                     </div>
                 </div>
+                <div class="form-group">
+                    <label for="wxSubMCHID" class="col-md-2 control-label">子商户号（可选）</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="wxSubMCHID" id="wxSubMCHID" value="{$settings['pay']['wx']['sub_mch_id']}">
+                        <span class="help-block">* 需要微信支付v3版本的相关参数</span>
+                    </div>
+                </div>
                 <div class="seg-divider"></div>
                 <div class="form-group">
-                    <label for="wxAppKey" class="col-md-2 control-label">API密钥(v2)</label>
+                    <label for="wxApiKey" class="col-md-2 control-label">API密钥(v2)</label>
                     <div class="col-md-10">
-                        <input type="text" class="form-control inputMask" name="wxAppKey" id="wxAppKey" value="{$settings['pay']['wx']['key']}">
+                        <input type="text" class="form-control inputMask" name="wxApiKey" id="wxApiKey" value="{$settings['pay']['wx']['key']}">
                     </div>
                 </div>
                 <div class="form-group">
@@ -215,7 +222,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="certPEM" class="col-md-2 control-label">平台证书(v2)</label>
+                    <label for="certPEM" class="col-md-2 control-label">微信平台证书(v2)</label>
                     <div class="col-md-10">
                         <textarea type="text" class="form-control inputMask" name="certPEM" id="certPEM">{$settings['pay']['wx']['pem']['cert']}</textarea>
                         <span class="help-block">*用于微信退款及打款操作，PEM格式</span>
@@ -226,7 +233,7 @@
                     <label for="v3Serial" class="col-md-2 control-label">证书序列号(v3)</label>
                     <div class="col-md-10">
                         <input type="text" class="form-control" name="v3Serial" id="v3Serial" value="{$settings['pay']['wx']['v3']['serial']}">
-                        <span class="help-block">* 如果配置了v3支付，则会优先使用v3 API</span>
+                        <span class="help-block">* 商户API证书的序列号</span>
                     </div>
                 </div>
                 <div class="form-group">
@@ -237,7 +244,13 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="V3cert" class="col-md-2 control-label">平台证书(v3)</label>
+                    <label for="wxApiV3Key" class="col-md-2 control-label">API密钥(v3)</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control inputMask" name="wxApiV3Key" id="wxApiV3Key" value="{$settings['pay']['wx'][v3]['key']}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="V3cert" class="col-md-2 control-label">微信平台证书(v3)</label>
                     <div class="col-md-10">
                         <textarea type="text" class="form-control inputMask" name="V3cert" id="V3cert">{$settings['pay']['wx']['v3']['pem']['cert']}</textarea>
                         <span class="help-block">* 微信支付平台证书，要求pem格式</span>

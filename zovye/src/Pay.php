@@ -24,11 +24,15 @@ use zovye\model\userModelObj;
 use zovye\payment\LCSWPay;
 use zovye\payment\SQBPay;
 use zovye\payment\WXPay;
+use zovye\payment\WxPayV3;
 
 class Pay
 {
     //微信公众号
     const WX = 'wx';
+
+    //微信支付v3
+    const WX_V3 = 'wx_v3';
 
     //微信小程序
     const WxAPP = 'wxapp';
@@ -44,6 +48,7 @@ class Pay
 
     static $names = [
         self::WX => '微信支付',
+        self::WX_V3 => '微信支付v3',
         self::WxAPP => '微信小程序支付',
         self::ALI => '支付宝',
         self::LCSW => '扫呗',
@@ -649,6 +654,10 @@ class Pay
         }
 
         //微信公众号支付或小程序支付
+        if ($name == self::WX_V3) {
+            return new WxPayV3();
+        }
+
         if ($name == self::WX || $name == self::WxAPP) {
             return new WXPay();
         }
@@ -675,7 +684,7 @@ class Pay
             return $res;
         }
 
-        $pay = self::makePayObj(strval($res['name']));
+        $pay = $res['sub_mch_id'] ? self::makePayObj(self::WX_V3) : self::makePayObj(strval($res['name']));
         if (is_error($pay)) {
             return $pay;
         }

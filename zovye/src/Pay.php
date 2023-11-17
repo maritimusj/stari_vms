@@ -581,6 +581,12 @@ class Pay
             $agent = $device->getAgent();
             if ($agent) {
                 $res = Agent::getPayParams($agent, $name);
+                if ($res && $res['name'] == Pay::WX) {
+                    $sub_mch_id = $res['mch_id'];
+                    $res =  self::getDefaultPayParams(self::WX);
+                    $res['sub_mch_id'] = $sub_mch_id;
+                    return $res;
+                }
             }
         }
 

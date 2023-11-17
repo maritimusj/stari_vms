@@ -667,7 +667,10 @@ class Pay
 
         //微信公众号支付或小程序支付
         if ($name == self::WX_V3) {
-            return new WxPayV3();
+            $pay = new WxPayV3();
+            $config = self::getDefaultPayParams(self::WX);
+            $pay->setConfig($config['v3']);
+            return $pay;
         }
 
         if ($name == self::WX || $name == self::WxAPP) {

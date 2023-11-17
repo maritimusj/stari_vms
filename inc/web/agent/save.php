@@ -309,6 +309,14 @@ $result = DBUtil::transactionDo(function() use ($id, &$from) {
             $data['wx']['enable'] = $wx_enabled;
             if ($wx_enabled) {
                 $data['wx']['mch_id'] = Request::trim('wxMCHID');
+                //创建接口文件
+                Helper::createApiRedirectFile('payment/wx_v3.php', 'payresult', [
+                    'headers' => [
+                        'HTTP_USER_AGENT' => 'wx_v3_notify',
+                    ],
+                    'op' => 'notify',
+                    'from' => 'wx_v3',
+                ]);
             }
 
             $lcsw_enabled = Request::bool('lcsw');

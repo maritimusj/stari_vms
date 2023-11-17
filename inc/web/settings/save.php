@@ -788,15 +788,22 @@ if ($page == 'device') {
             ],
         ];
 
-        if (false === Helper::createApiRedirectFile('payment/wx.php', 'payresult', [
-                'headers' => [
-                    'HTTP_USER_AGENT' => 'wx_notify',
-                ],
-                'op' => 'notify',
-                'from' => 'wx',
-            ])) {
-            Response::toast('创建微信支付入口文件失败！');
-        }
+        //创建接口文件
+        Helper::createApiRedirectFile('payment/wx_v3.php', 'payresult', [
+            'headers' => [
+                'HTTP_USER_AGENT' => 'wx_v3_notify',
+            ],
+            'op' => 'notify',
+            'from' => 'wx_v3',
+        ]);
+
+        Helper::createApiRedirectFile('payment/wx.php', 'payresult', [
+            'headers' => [
+                'HTTP_USER_AGENT' => 'wx_notify',
+            ],
+            'op' => 'notify',
+            'from' => 'wx',
+        ]);
     }
 
     $lcsw_enabled = Request::bool('lcsw') ? 1 : 0;

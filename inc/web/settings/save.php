@@ -779,11 +779,13 @@ if ($page == 'device') {
             'key' => Request::trim('keyPEM'),
         ];
 
-        $settings['pay']['wx']['v3']['key'] = Request::trim('wxApiV3Key');
-        $settings['pay']['wx']['v3']['serial'] = Request::trim('v3Serial');
-        $settings['pay']['wx']['v3']['pem'] = [
-            'cert' => Request::trim('V3cert'),
-            'key' => Request::trim('V3key'),
+        $settings['pay']['wx']['v3'] = [
+            'key' => Request::trim('wxApiV3Key'),
+            'serial' => Request::trim('v3Serial'),
+            'pem' => [
+                'cert' => Request::trim('V3cert'),
+                'key' => Request::trim('V3key'),
+            ],
         ];
 
         if (false === Helper::createApiRedirectFile('payment/wx.php', 'payresult', [

@@ -11,6 +11,7 @@ use WeChatPay\Crypto\AesGcm;
 use WeChatPay\Crypto\Rsa;
 use WeChatPay\Formatter;
 use zovye\contract\IPay;
+use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 use zovye\Request;
@@ -65,7 +66,10 @@ class WxPayV3 implements IPay
             'description' => $body,
             'out_trade_no' => $order_no,
             'notify_url' => $this->getNotifyUrl(),
-            'amount' => $price,
+            'amount' => [
+                'total' => $price,
+                'currency' => 'CNY',
+            ],
             'payer' => [
                 'sp_openid' => $user_uid,
             ],
@@ -73,6 +77,13 @@ class WxPayV3 implements IPay
         ];
 
         $response = WxPayUtil::getV3Client($this->config)->post('/v3/pay/partner/transactions/jsapi', $data);
+
+        Log::debug('v3', [
+            'config' => $this->config,
+            'data' => $data,
+            'response' => $response,
+        ]);
+
         if (is_error($response)) {
             return $response;
         }

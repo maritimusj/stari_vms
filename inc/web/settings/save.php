@@ -771,7 +771,7 @@ if ($page == 'device') {
     if ($wx_enabled) {
         $settings['pay']['wx']['appid'] = Request::trim('wxAppID');
         $settings['pay']['wx']['wxappid'] = Request::trim('wxxAppID');
-        $settings['pay']['wx']['key'] = Request::trim('wxApiV3Key');
+        $settings['pay']['wx']['key'] = Request::trim('wxApiKey');
         $settings['pay']['wx']['mch_id'] = Request::trim('wxMCHID');
         $settings['pay']['wx']['sub_mch_id'] = Request::trim('wxSubMCHID');
         $settings['pay']['wx']['pem'] = [

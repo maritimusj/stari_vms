@@ -171,7 +171,7 @@
             <div class="seg">
                 <div class="title">微信支付</div>
                 <div class="form-group">
-                    <label for="wx" class="col-md-2 control-label">微信支付</label>
+                    <label for="wx" class="col-md-2 control-label"></label>
                     <div class="col-md-10">
                         <div class="checkbox">
                             <label>
@@ -204,7 +204,7 @@
                     <label for="wxSubMCHID" class="col-md-2 control-label">子商户号（可选）</label>
                     <div class="col-md-10">
                         <input type="text" class="form-control" name="wxSubMCHID" id="wxSubMCHID" value="{$settings['pay']['wx']['sub_mch_id']}">
-                        <span class="help-block">* 需要微信支付v3版本的相关参数</span>
+                        <span class="help-block">* 如果使用商户模式，请填写子商户号。注意：商户模式支付v3版</span>
                     </div>
                 </div>
                 <div class="seg-divider"></div>
@@ -246,7 +246,7 @@
                 <div class="form-group">
                     <label for="wxApiV3Key" class="col-md-2 control-label">API密钥(v3)</label>
                     <div class="col-md-10">
-                        <input type="text" class="form-control inputMask" name="wxApiV3Key" id="wxApiV3Key" value="{$settings['pay']['wx'][v3]['key']}">
+                        <input type="text" class="form-control inputMask" name="wxApiV3Key" id="wxApiV3Key" value="{$settings['pay']['wx']['v3']['key']}">
                     </div>
                 </div>
                 <div class="form-group">

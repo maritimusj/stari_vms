@@ -5,11 +5,11 @@
  */
 namespace zovye\model;
 
-use zovye\base\modelObj;
+use zovye\base\ModelObj;
 use zovye\traits\ExtraDataGettersAndSetters;
 use function zovye\tb;
 
-class payment_configModelObj extends modelObj
+class payment_configModelObj extends ModelObj
 {
     public static function getTableName($read_or_write): string
     {

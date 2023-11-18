@@ -9,6 +9,7 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 use DateTime;
+use Exception;
 use zovye\business\ChargingServ;
 use zovye\domain\WxApp;
 use zovye\model\data_vwModelObj;
@@ -40,6 +41,18 @@ if ($page == 'device') {
 
     $tpl_data['mobile_url'] = Util::murl('mobile');
     $tpl_data['agreement'] = Config::agent('agreement', []);
+
+} elseif ($page == 'payment') {
+
+    if (is_array($settings['pay']['wx']['v3']['pem']['cert'])) {
+        if ($settings['pay']['wx']['v3']['pem']['cert']['expire_time']) {
+            try {
+                $expire_at = new DateTime($settings['pay']['wx']['v3']['pem']['cert']['expire_time']);
+                $settings['pay']['wx']['v3']['pem']['cert']['expire_time'] = $expire_at->format('Y-m-d H:i:s');
+            } catch (Exception $e) {
+            }
+        }
+    }
 
 } elseif ($page == 'account') {
 

@@ -10,7 +10,7 @@ CREATE TABLE `ims_zovye_vms_payment_config` (
     `id` INT NOT NULL AUTO_INCREMENT , 
     `uniacid` INT NOT NULL , 
     `agent_id` INT NOT NULL DEFAULT '0', 
-    `name` INT NOT NULL , 
+    `name` VARCHAR(62) NOT NULL DEFAULT '', 
     `extra` TEXT NULL , 
     `createtime` INT NOT NULL , 
     PRIMARY KEY (`id`),

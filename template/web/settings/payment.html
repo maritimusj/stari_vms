@@ -263,7 +263,7 @@
                             $settings['pay']['wx']['v3']['pem']['cert']
                             {/if}
                         </textarea>
-                        <span class="help-block">* 微信支付平台证书，要求pem格式</span>
+                        <span class="help-block">* 微信支付平台证书{if is_array($settings['pay']['wx']['v3']['pem']['cert'])}，序列号：{$settings['pay']['wx']['v3']['pem']['cert']['serial_no']}，过期时间：{$settings['pay']['wx']['v3']['pem']['cert']['expire_time']}}{/if}</span>
                     </div>
                 </div>
                 </fieldset>

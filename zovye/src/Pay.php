@@ -682,7 +682,7 @@ class Pay
             return err('支付宝原生支付暂不可用！');
         }
 
-        return err('不支持的支付类型！');
+        return err('不支持的支付类型：');
     }
 
 

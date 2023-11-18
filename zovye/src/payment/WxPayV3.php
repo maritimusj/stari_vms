@@ -14,7 +14,6 @@ use zovye\contract\IPay;
 use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
-use zovye\Pay;
 use zovye\Request;
 use zovye\util\Util;
 use zovye\util\WxPayUtil;

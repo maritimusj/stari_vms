@@ -9,6 +9,9 @@ use zovye\base\ModelObj;
 use zovye\traits\ExtraDataGettersAndSetters;
 use function zovye\tb;
 
+/**
+ * @method getName()
+ */
 class payment_configModelObj extends ModelObj
 {
     public static function getTableName($read_or_write): string

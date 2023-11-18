@@ -10,6 +10,7 @@ namespace zovye\domain;
 use zovye\base\ModelFactory;
 use zovye\model\agentModelObj;
 use zovye\model\deviceModelObj;
+use zovye\model\payment_configModelObj;
 use zovye\util\Helper;
 use function zovye\err;
 use function zovye\m;
@@ -36,6 +37,7 @@ class PaymentConfig extends AbstractBase
 
     public static function createOrUpdate($agent_id, $name, $extra = [])
     {
+        /** @var payment_configModelObj $config */
         $config = PaymentConfig::findOne([
             'agent_id' => $agent_id,
             'name' => $name,
@@ -59,7 +61,7 @@ class PaymentConfig extends AbstractBase
         //创建接口文件
         $res = Helper::createApiRedirectFile("payment/{$config->getId()}.php", 'payresult', [
             'headers' => [
-                'HTTP_USER_AGENT' => 'wx_notify',
+                'HTTP_USER_AGENT' => 'payment_notify',
             ],
             'op' => 'notify',
             'from' => $config->getName(),

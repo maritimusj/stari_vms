@@ -13,6 +13,7 @@ use zovye\domain\Account;
 use zovye\domain\Agent;
 use zovye\domain\CommissionBalance;
 use zovye\domain\GSP;
+use zovye\domain\PaymentConfig;
 use zovye\domain\User;
 use zovye\model\accountModelObj;
 use zovye\model\data_vwModelObj;
@@ -766,12 +767,97 @@ if ($page == 'device') {
     }
 
 } elseif ($page == 'payment') {
+    if (Request::bool('wx')) {
+        $data = [
+            'appid' => Request::trim('wxAppID'),
+            'wxapp_id' => Request::trim('wxxAppID'),
+            'key' => Request::trim('wxApiKey'),
+            'mch_id' => Request::trim('wxMCHID'),
+            'sub_mch_id' => Request::trim('wxSubMCHID'),
+            'pem' => [
+                'cert' => Request::trim('certPEM'),
+                'key' => Request::trim('keyPEM'),
+            ],
+        ];
+
+        $res = PaymentConfig::createOrUpdate(0, Pay::WX, $data);
+        if (is_error($res)) {
+            Log::error('settings', [
+                'error' => $res,
+                'data' => $data,
+            ]);
+        }
+
+        if (Request::bool('wxApiV3Key') && Request::bool('v3Serial')) {
+            $data = [
+                'appid' => Request::trim('wxAppID'),
+                'wxapp_id' => Request::trim('wxxAppID'),
+                'key' => Request::trim('wxApiV3Key'),
+                'serial' => Request::trim('v3Serial'),
+                'mch_id' => Request::trim('wxMCHID'),
+                'sub_mch_id' => Request::trim('wxSubMCHID'),
+                'pem' => [
+                    'key' => Request::trim('V3key'),
+                ],
+            ];
+
+            $res = WxPayUtil::getWxPlatformCertification($data);
+            if (is_error($res)) {
+                Log::error('settings', [
+                    'error' => $res,
+                    'data' => $data,
+                ]);
+            } else {
+                $data['pem']['cert'] = $res;
+                $res = PaymentConfig::createOrUpdate(0, Pay::WX_V3, $data);
+                if (is_error($res)) {
+                    Log::error('settings', [
+                        'error' => $res,
+                        'data' => $data,
+                    ]);
+                }
+            }
+        }
+    } else {
+        PaymentConfig::remove([
+            'agent_id' => 0,
+            'name' => Pay::WX,
+        ]);
+        PaymentConfig::remove([
+            'agent_id' => 0,
+            'name' => Pay::WX_V3,
+        ]);
+    }
+
+    if (Request::bool('lcsw')) {
+        $data = [
+            'wx' => Request::bool('lcsw_weixin'),
+            'ali' => Request::bool('lcsw_ali'),
+            'wxapp' => Request::bool('lcsw_wxapp'),
+            'merchant_no' => Request::trim('merchant_no'),
+            'terminal_id' => Request::trim('terminal_id'),
+            'access_token' => Request::trim('access_token'),
+        ];
+        $res = PaymentConfig::createOrUpdate(0, Pay::LCSW, $data);
+        if (is_error($res)) {
+            Log::error('settings', [
+                'error' => $res,
+                'data' => $data,
+            ]);
+        }
+    } else {
+        PaymentConfig::remove([
+            'agent_id' => 0,
+            'name' => Pay::LCSW,
+        ]);
+    }
+
     $wx_enabled = Request::bool('wx') ? 1 : 0;
     $settings['pay']['wx']['enable'] = $wx_enabled;
 
     if ($wx_enabled) {
         $settings['pay']['wx']['appid'] = Request::trim('wxAppID');
-        $settings['pay']['wx']['wxappid'] = Request::trim('wxxAppID');
+        $settings['pay']['wx'][''] = Request::trim('wxxAppID');
         $settings['pay']['wx']['key'] = Request::trim('wxApiKey');
         $settings['pay']['wx']['mch_id'] = Request::trim('wxMCHID');
         $settings['pay']['wx']['sub_mch_id'] = Request::trim('wxSubMCHID');

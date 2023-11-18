@@ -34,6 +34,5 @@ class payment_configModelObj extends ModelObj
 	/** @var int */
 	protected $createtime;
 
-
 	use ExtraDataGettersAndSetters;
 }

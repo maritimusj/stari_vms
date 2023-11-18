@@ -18,6 +18,7 @@ use zovye\model\accountModelObj;
 use zovye\model\data_vwModelObj;
 use zovye\util\Helper;
 use zovye\util\Util;
+use zovye\util\WxPayUtil;
 
 $url = _W('siteroot');
 
@@ -783,10 +784,20 @@ if ($page == 'device') {
             'key' => Request::trim('wxApiV3Key'),
             'serial' => Request::trim('v3Serial'),
             'pem' => [
-                'cert' => Request::trim('V3cert'),
+                'cert' => settings('pay.wx.v3.pem.cert'),
                 'key' => Request::trim('V3key'),
             ],
         ];
+
+        if ($settings['pay']['wx']['v3']['key']
+            && $settings['pay']['wx']['v3']['serial']
+            && $settings['pay']['wx']['v3']['pem']['key']) {
+
+            $res = WxPayUtil::getWxPlatformCertification($settings['pay']['wx']);
+            if (!is_error($res)) {
+                $settings['pay']['wx']['v3']['pem']['cert'] = $res;
+            }
+        }
 
         //创建接口文件
         Helper::createApiRedirectFile('payment/wx_v3.php', 'payresult', [

@@ -8,11 +8,16 @@
 namespace zovye\util;
 
 use WeChatPay\Builder;
+use WeChatPay\Crypto\AesGcm;
 use WeChatPay\Crypto\Rsa;
 use WeChatPay\Util\PemUtil;
+use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 use zovye\WxPayV3Client;
+use function zovye\err;
+use function zovye\is_error;
+use function zovye\isEmptyArray;
 
 require_once MODULE_ROOT.'vendor/autoload.php';
 
@@ -20,20 +25,73 @@ class WxPayUtil
 {
     public static function getV3Client(array $config): WxPayV3Client
     {
-        // 从「微信支付平台证书」中获取「证书序列号」
-        $serial = PemUtil::parseCertificateSerialNo($config['pem']['cert']);
-
-        // 构造一个 APIv3 客户端实例
-        $instance = Builder::factory([
+        $params = [
             'mchid' => $config['mch_id'],         // 商户号
             'serial' => $config['serial'],        // 「商户API证书」的「证书序列号」
             'privateKey' => Rsa::from($config['pem']['key']),
             'certs' => [
-                $serial => Rsa::from($config['pem']['cert'], Rsa::KEY_TYPE_PUBLIC),
+                '' => '', //首次下载时，无法提供平台证书
             ],
+        ];
+
+        if ($config['pem']['cert']) {
+            $cert_data = is_array($config['pem']['cert']) ? $config['pem']['cert']['data'] : $config['pem']['cert'];
+            // 从「微信支付平台证书」中获取「证书序列号」
+            $serial = PemUtil::parseCertificateSerialNo($cert_data);
+            $params['certs'] = [
+                $serial => Rsa::from($cert_data, Rsa::KEY_TYPE_PUBLIC),
+            ];
+        }
+
+        // 构造一个 APIv3 客户端实例
+        return new WxPayV3Client(Builder::factory($params));
+    }
+
+    public static function getWxPlatformCertification($config)
+    {
+        if (isEmptyArray($config['v3'])) {
+            return err('微信支付v3配置为空！');
+        }
+
+        // 设置参数
+        $v3config = $config['v3'];
+        $v3config['mch_id'] = $config['mch_id'];
+
+        // 发送请求
+        $resp = (self::getV3Client($v3config))->get('v3/certificates');
+
+        Log::debug('WxPayUtil', [
+            'v3config' => $v3config,
+            'resp' => $resp,
         ]);
 
-        return new WxPayV3Client($instance);
+        if (is_error($resp)) {
+            return $resp;
+        }
+
+        [
+            'data' => [
+                0 => [
+                    'encrypt_certificate' => [
+                        'associated_data' => $associated_data,
+                        'ciphertext' => $ciphertext,
+                        'nonce' => $nonce,
+                    ],
+                    'expire_time' => $expire_time,
+                    'serial_no' => $serial_no,
+                ],
+            ],
+        ] = $resp;
+
+        // 加密文本消息解密
+        $data = AesGcm::decrypt($ciphertext, $v3config['key'], $nonce, $associated_data);
+
+        // 保存
+        return [
+            'serial_no' => $serial_no,
+            'data' => $data,
+            'expire_time' => $expire_time,
+        ];
     }
 
     /**

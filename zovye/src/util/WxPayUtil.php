@@ -30,7 +30,7 @@ class WxPayUtil
             'serial' => $config['serial'],        // 「商户API证书」的「证书序列号」
             'privateKey' => Rsa::from($config['pem']['key']),
             'certs' => [
-                '' => '', //首次下载时，无法提供平台证书
+                'any' => null,
             ],
         ];
 

@@ -256,7 +256,7 @@
                 <div class="form-group">
                     <label for="V3cert" class="col-md-2 control-label">微信平台证书(v3)</label>
                     <div class="col-md-10">
-                        <textarea type="text" class="form-control inputMask" name="V3cert" id="V3cert" readonly>{php echo $settings['pay']['wx']['v3']['pem']['cert']['data'] ?? $settings['pay']['wx']['v3']['pem']['cert']}</textarea>
+                        <textarea type="text" class="form-control inputMask" name="V3cert" id="V3cert" readonly>{php echo $settings['pay']['wx']['v3']['pem']['cert']['data'] ?? strval($settings['pay']['wx']['v3']['pem']['cert'])}</textarea>
                         <span class="help-block">* 微信支付平台证书，要求pem格式</span>
                     </div>
                 </div>

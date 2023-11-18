@@ -86,7 +86,7 @@ DEBUG_MODE;
  */
 namespace zovye\model;
 
-use zovye\\model\\modelObj;
+use zovye\\base\\modelObj;
 use function zovye\\tb;
 
 class $classname extends modelObj

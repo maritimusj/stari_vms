@@ -72,6 +72,6 @@ class PaymentConfig extends AbstractBase
             return err('无法创建支付回调文件！');
         }
 
-        return true;
+        return $config;
     }
 }

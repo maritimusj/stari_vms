@@ -787,7 +787,7 @@ if ($page == 'device') {
                 'data' => $data,
             ]);
         }
-
+  
         if (Request::bool('wxApiV3Key') && Request::bool('v3Serial')) {
             $data = [
                 'appid' => Request::trim('wxAppID'),

@@ -7,6 +7,7 @@
 
 namespace zovye\util;
 
+use Exception;
 use WeChatPay\Builder;
 use WeChatPay\Crypto\AesGcm;
 use WeChatPay\Crypto\Rsa;
@@ -49,49 +50,45 @@ class WxPayUtil
 
     public static function getWxPlatformCertification($config)
     {
-        if (isEmptyArray($config['v3'])) {
-            return err('微信支付v3配置为空！');
-        }
+        try {
+            // 发送请求
+            $resp = (self::getV3Client($config))->get('v3/certificates');
 
-        // 设置参数
-        $v3config = $config['v3'];
-        $v3config['mch_id'] = $config['mch_id'];
+            Log::debug('WxPayUtil', [
+                'v3config' => $config,
+                'resp' => $resp,
+            ]);
 
-        // 发送请求
-        $resp = (self::getV3Client($v3config))->get('v3/certificates');
+            if (is_error($resp)) {
+                return $resp;
+            }
 
-        Log::debug('WxPayUtil', [
-            'v3config' => $v3config,
-            'resp' => $resp,
-        ]);
-
-        if (is_error($resp)) {
-            return $resp;
-        }
-
-        [
-            'data' => [
-                0 => [
-                    'encrypt_certificate' => [
-                        'associated_data' => $associated_data,
-                        'ciphertext' => $ciphertext,
-                        'nonce' => $nonce,
+            [
+                'data' => [
+                    0 => [
+                        'encrypt_certificate' => [
+                            'associated_data' => $associated_data,
+                            'ciphertext' => $ciphertext,
+                            'nonce' => $nonce,
+                        ],
+                        'expire_time' => $expire_time,
+                        'serial_no' => $serial_no,
                     ],
-                    'expire_time' => $expire_time,
-                    'serial_no' => $serial_no,
                 ],
-            ],
-        ] = $resp;
+            ] = $resp;
 
-        // 加密文本消息解密
-        $data = AesGcm::decrypt($ciphertext, $v3config['key'], $nonce, $associated_data);
+            // 加密文本消息解密
+            $data = AesGcm::decrypt($ciphertext, $config['key'], $nonce, $associated_data);
 
-        // 保存
-        return [
-            'serial_no' => $serial_no,
-            'data' => $data,
-            'expire_time' => $expire_time,
-        ];
+            // 保存
+            return [
+                'serial_no' => $serial_no,
+                'data' => $data,
+                'expire_time' => $expire_time,
+            ];
+        } catch(Exception $e) {
+            return err($e->getMessage());
+        }
     }
 
     /**

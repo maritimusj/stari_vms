@@ -139,7 +139,14 @@
                         <input type="number" class="form-control" name="maxFree" id="maxFree" value="{php echo intval($settings['user']['maxFree'])}">
                         <span class="help-block">* 用户每天可免费领取的最大次数, 0表示不限制</span>
                     </div>
-                </div>              
+                </div>
+                <div class="form-group">
+                    <label for="freeCD" class="col-md-2 control-label">用户免费领取时间间隔（单位：小时）</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="freeCD" id="freeCD" value="{php echo intval($settings['user']['freeCD'])}">
+                        <span class="help-block">* 用户免费领取成功后指定时间内无法再领取, 0表示不限制</span>
+                    </div>
+                </div>
                 <div class="form-group">
                     <label for="orderRetryLastTime" class="col-md-2 control-label">领取失败后重试</label>
                     <div class="col-md-10">

@@ -504,6 +504,7 @@ if ($page == 'device') {
     $settings['misc']['maxAccounts'] = Request::int('maxAccounts');
     $settings['user']['maxTotalFree'] = Request::int('maxTotalFree');
     $settings['user']['maxFree'] = Request::int('maxFree');
+    $settings['user']['freeCD'] = Request::int('freeCD');
     $settings['misc']['accountsPromote'] = Request::bool('accountsPromote') ? 1 : 0;
 
     $settings['order']['retry']['last'] = Request::int('orderRetryLastTime');

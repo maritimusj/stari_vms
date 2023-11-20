@@ -102,11 +102,11 @@ class Agent
      * @param string $name
      * @return array
      */
-    public static function getPayParams(agentModelObj $agent, string $name = ''): array
+    public static function getPayConfiguration(agentModelObj $agent, string $name = ''): array
     {
         $params = $agent->settings('agentData.pay', []);
 
-        return Pay::selectPayParams($params, $name);
+        return Pay::selectPayConfiguration($params, $name);
     }
 
     public static function remove(agentModelObj $agent): array

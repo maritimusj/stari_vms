@@ -501,10 +501,10 @@ class Pay
         return PayLogs::findOne(['level' => $level, 'title' => $order_no]);
     }
 
-    public static function selectPayParams(array $params, string $name): array
+    public static function selectPayConfiguration(array $config, string $name = ''): array
     {
         if ($name) {
-            $data = $params[$name];
+            $data = $config[$name];
             if ($data) {
                 $data['name'] = $name;
                 unset($data['wx'], $data['ali'], $data['wxapp']);
@@ -515,8 +515,8 @@ class Pay
             return [];
         }
 
-        $fn = function ($name) use ($params) {
-            $data = $params[$name] ?? [];
+        $fn = function ($name) use ($config) {
+            $data = $config[$name] ?? [];
             if ($data['enable']) {
                 if ((Session::isWxAppUser() && (!isset($data['wxapp']) || $data['wxapp'])) ||
                     (Session::isWxUser() && !Session::isWxAppUser() && (!isset($data['wx']) || $data['wx'])) ||
@@ -542,14 +542,14 @@ class Pay
             return $SQB;
         }
 
-        $wx = $params[Pay::WX] ?? [];
+        $wx = $config[Pay::WX] ?? [];
         if ($wx['enable']) {
             $wx['name'] = Pay::WX;
 
             return $wx;
         }
 
-        $ali = $params[Pay::ALI] ?? [];
+        $ali = $config[Pay::ALI] ?? [];
         if ($ali['enable']) {
             $ali['name'] = Pay::ALI;
 
@@ -563,26 +563,26 @@ class Pay
     /*  以下为内部函数
      * ****************************************************************************************************************/
 
-    public static function getDefaultPayParams(string $name = ''): array
+    public static function getDefaultConfiguration(string $name = ''): array
     {
         $params = settings('pay', []);
 
-        return self::selectPayParams($params, $name);
+        return self::selectPayConfiguration($params, $name);
     }
 
     /**
      * 获取设备关联的支付配置
      * @param deviceModelObj|null $device
      */
-    public static function getPayParams(deviceModelObj $device = null, string $name = ''): array
+    public static function getPayConfiguration(deviceModelObj $device = null, string $name = ''): array
     {
         $res = [];
         if ($device) {
             $agent = $device->getAgent();
             if ($agent) {
-                $res = Agent::getPayParams($agent, $name);
+                $res = Agent::getPayConfiguration($agent, $name);
                 if ($res && $res['name'] == Pay::WX) {
-                    $default =  self::getDefaultPayParams(self::WX);
+                    $default = self::getDefaultConfiguration(self::WX);
                     if (empty($default['v3'])) {
                         return err('需要配置微信v3支付参数！');
                     }
@@ -591,13 +591,14 @@ class Pay
                     $config['wxappid'] = $default['wxappid'];
                     $config['mch_id'] = $default['mch_id'];
                     $config['sub_mch_id'] = $res['mch_id'];
+
                     return $config;
                 }
             }
         }
 
         if (empty($res) || empty($res['enable']) || empty(array_diff_key($res, ['enable' => 1, 'name' => 1]))) {
-            $res = self::getDefaultPayParams($name);
+            $res = self::getDefaultConfiguration($name);
         }
 
         if ($res['pem'] && !empty($res['pem']['cert']) && !empty($res['pem']['key'])) {
@@ -668,8 +669,9 @@ class Pay
         //微信公众号支付或小程序支付
         if ($name == self::WX_V3) {
             $pay = new WxPayV3();
-            $config = self::getDefaultPayParams(self::WX);
+            $config = self::getDefaultConfiguration(self::WX);
             $pay->setConfig($config['v3']);
+
             return $pay;
         }
 
@@ -685,6 +687,53 @@ class Pay
         return err('不支持的支付类型：');
     }
 
+    public static function loadConfig($name)
+    {
+
+    }
+
+    public static function make($config)
+    {
+        $name = $config['name'];
+        if ($name == self::LCSW) {
+            $lcsw = new LCSWPay();
+            $lcsw->setConfig($config);
+
+            return $lcsw;
+        }
+
+        if ($name == self::SQB) {
+            $sqb = new SQBPay();
+            $sqb->setConfig($config);
+
+            return $sqb;
+        }
+
+        if ($name == self::WX || $name == self::WxAPP) {
+            if ($config['v3']) {
+                $v3config = $config['v3'];
+                $v3config['appid'] = $config['appid'];
+                $v3config['wxappid'] = $config['wxappid'];
+
+                $v3 = new WxPayV3();
+                $v3->setConfig($v3config);
+
+                return $v3;
+            }
+
+            $wx = new WXPay();
+            $wx->setConfig($config);
+
+            return $wx;
+        }
+
+        //支付宝支付
+        if ($name == self::ALI) {
+            return err('暂不支付支付宝原生支付！');
+        }
+
+        return err('不支持的支付类型！');
+    }
 
     /**
      * 根据设备和名称获取已配置好的支付对象
@@ -694,19 +743,12 @@ class Pay
      */
     public static function getActivePayObj(deviceModelObj $device, string $name = '')
     {
-        $res = self::getPayParams($device, $name);
-        if (is_error($res)) {
-            return $res;
+        $config = self::getPayConfiguration($device, $name);
+        if (is_error($config)) {
+            return $config;
         }
 
-        $pay = $res['sub_mch_id'] ? self::makePayObj(self::WX_V3) : self::makePayObj(strval($res['name']));
-        if (is_error($pay)) {
-            return $pay;
-        }
-
-        $pay->setConfig($res);
-
-        return $pay;
+        return self::make($config);
     }
 
     public static function isWxPayQrcode($code): bool
@@ -718,7 +760,7 @@ class Pay
 
     public static function getWxPayClientFor(userModelObj $user)
     {
-        $params = Pay::getDefaultPayParams(Pay::WX);
+        $params = Pay::getDefaultConfiguration(Pay::WX);
         if (empty($params)) {
             throw new RuntimeException('没有配置微信打款信息！');
         }

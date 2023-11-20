@@ -9,10 +9,11 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 use DateTime;
-use Exception;
 use zovye\business\ChargingServ;
+use zovye\domain\PaymentConfig;
 use zovye\domain\WxApp;
 use zovye\model\data_vwModelObj;
+use zovye\model\payment_configModelObj;
 use zovye\model\wx_appModelObj;
 use zovye\util\Helper;
 use zovye\util\HttpUtil;
@@ -44,14 +45,26 @@ if ($page == 'device') {
 
 } elseif ($page == 'payment') {
 
-    if (is_array($settings['pay']['wx']['v3']['pem']['cert'])) {
-        if ($settings['pay']['wx']['v3']['pem']['cert']['expire_time']) {
-            try {
-                $expire_at = new DateTime($settings['pay']['wx']['v3']['pem']['cert']['expire_time']);
-                $settings['pay']['wx']['v3']['pem']['cert']['expire_time'] = $expire_at->format('Y-m-d H:i:s');
-            } catch (Exception $e) {
-            }
-        }
+    $tpl_data['payment'] = [];
+
+    /** @var payment_configModelObj $wx_payment_config */
+    $wx_payment_config = PaymentConfig::findOne([
+        'agent_id' => 0,
+        'name' => Pay::WX,
+    ]);
+
+    if ($wx_payment_config) {
+        $tpl_data['payment']['wx'] = $wx_payment_config->getExtraData();
+    }
+
+    /** @var payment_configModelObj $wx_v3_payment_config */
+    $wx_v3_payment_config = PaymentConfig::findOne([
+        'agent_id' => 0,
+        'name' => Pay::WX_V3,
+    ]);
+
+    if ($wx_v3_payment_config) {
+        $tpl_data['payment']['wx_v3'] = $wx_v3_payment_config->getExtraData();
     }
 
 } elseif ($page == 'account') {

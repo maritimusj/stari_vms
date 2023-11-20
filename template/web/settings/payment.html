@@ -175,35 +175,35 @@
                     <div class="col-md-10">
                         <div class="checkbox">
                             <label>
-                                <input type="checkbox" name="wx" id="wx" value="1" {if $settings['pay']['wx']['enable']}checked{/if}>
+                                <input type="checkbox" name="wx" id="wx" value="1" {if $payment['wx']}checked{/if}>
                                 是否启用
                             </label>
                         </div>
                     </div>
                 </div>
-                <fieldset {if empty($settings['pay']['wx']['enable'])}disabled{/if} name="wx">
+                <fieldset {if empty($payment['wx'])}disabled{/if} name="wx">
                 <div class="form-group">
                     <label for="wxAppID" class="col-md-2 control-label">公众号 appID</label>
                     <div class="col-md-10">
-                        <input type="text" class="form-control" name="wxAppID" id="wxAppID" value="{$settings['pay']['wx']['appid']}">
+                        <input type="text" class="form-control" name="wxAppID" id="wxAppID" value="{$payment['wx']['appid']}">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="wxxAppID" class="col-md-2 control-label">小程序 appID</label>
                     <div class="col-md-10">
-                        <input type="text" class="form-control" name="wxxAppID" id="wxxAppID" value="{$settings['pay']['wx']['wxappid']}">
+                        <input type="text" class="form-control" name="wxxAppID" id="wxxAppID" value="{$payment['wx']['wxappid']}">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="wxMCHID" class="col-md-2 control-label">商户号</label>
                     <div class="col-md-10">
-                        <input type="text" class="form-control" name="wxMCHID" id="wxMCHID" value="{$settings['pay']['wx']['mch_id']}">
+                        <input type="text" class="form-control" name="wxMCHID" id="wxMCHID" value="{$payment['wx']['mch_id']}">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="wxSubMCHID" class="col-md-2 control-label">子商户号（可选）</label>
                     <div class="col-md-10">
-                        <input type="text" class="form-control" name="wxSubMCHID" id="wxSubMCHID" value="{$settings['pay']['wx']['sub_mch_id']}">
+                        <input type="text" class="form-control" name="wxSubMCHID" id="wxSubMCHID" value="{$payment['wx']['sub_mch_id']}">
                         <span class="help-block">* 如果使用商户模式，请填写子商户号。注意：商户模式支付v3版</span>
                     </div>
                 </div>
@@ -213,20 +213,20 @@
                 <div class="form-group">
                     <label for="wxApiKey" class="col-md-2 control-label">API密钥(v2)</label>
                     <div class="col-md-10">
-                        <input type="text" class="form-control inputMask" name="wxApiKey" id="wxApiKey" value="{$settings['pay']['wx']['key']}">
+                        <input type="text" class="form-control inputMask" name="wxApiKey" id="wxApiKey" value="{$payment['wx']['key']}">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="keyPEM" class="col-md-2 control-label">商户API私钥(v2)</label>
                     <div class="col-md-10">
-                        <textarea type="text" class="form-control inputMask" name="keyPEM" id="keyPEM">{$settings['pay']['wx']['pem']['key']}</textarea>
+                        <textarea type="text" class="form-control inputMask" name="keyPEM" id="keyPEM">{$payment['wx']['pem']['key']}</textarea>
                         <span class="help-block">* 用于微信退款及打款操作，PEM格式</span>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="certPEM" class="col-md-2 control-label">微信平台证书(v2)</label>
                     <div class="col-md-10">
-                        <textarea type="text" class="form-control inputMask" name="certPEM" id="certPEM">{$settings['pay']['wx']['pem']['cert']}</textarea>
+                        <textarea type="text" class="form-control inputMask" name="certPEM" id="certPEM">{$payment['wx']['pem']['cert']}</textarea>
                         <span class="help-block">*用于微信退款及打款操作，PEM格式</span>
                     </div>
                 </div>
@@ -236,35 +236,31 @@
                 <div class="form-group">
                     <label for="v3Serial" class="col-md-2 control-label">证书序列号(v3)</label>
                     <div class="col-md-10">
-                        <input type="text" class="form-control" name="v3Serial" id="v3Serial" value="{$settings['pay']['wx']['v3']['serial']}">
+                        <input type="text" class="form-control" name="v3Serial" id="v3Serial" value="{$payment['wx_v3']['serial']}">
                         <span class="help-block">* 商户API证书的序列号</span>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="V3key" class="col-md-2 control-label">商户API私钥(v3)</label>
                     <div class="col-md-10">
-                        <textarea type="text" class="form-control inputMask" name="V3key" id="V3key">{$settings['pay']['wx']['v3']['pem']['key']}</textarea>
+                        <textarea type="text" class="form-control inputMask" name="V3key" id="V3key">{$payment['wx_v3']]['pem']['key']}</textarea>
                         <span class="help-block">*  商户API私钥，要求pem格式</span>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="wxApiV3Key" class="col-md-2 control-label">API密钥(v3)</label>
                     <div class="col-md-10">
-                        <input type="text" class="form-control inputMask" name="wxApiV3Key" id="wxApiV3Key" value="{$settings['pay']['wx']['v3']['key']}">
+                        <input type="text" class="form-control inputMask" name="wxApiV3Key" id="wxApiV3Key" value="{$payment['wx_v3']['key']}">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="V3cert" class="col-md-2 control-label">微信平台证书(v3)</label>
                     <div class="col-md-10">
                         <textarea type="text" class="form-control inputMask" name="V3cert" id="V3cert" readonly>
-                            {if is_array($settings['pay']['wx']['v3']['pem']['cert'])}
-                            {$settings['pay']['wx']['v3']['pem']['cert']['data']}
-                            {else}
-                            $settings['pay']['wx']['v3']['pem']['cert']
-                            {/if}
+                            {$payment['wx_v3']['pem']['cert']['data']}
                         </textarea>
-                        <span class="help-block">* {if is_array($settings['pay']['wx']['v3']['pem']['cert'])}
-                            序列号：{$settings['pay']['wx']['v3']['pem']['cert']['serial_no']}，过期时间：{$settings['pay']['wx']['v3']['pem']['cert']['expire_time']}
+                        <span class="help-block">* {if is_array($payment['wx_v3']['pem']['cert'])}
+                            序列号：{$payment['wx_v3']['pem']['cert']['serial_no']}，过期时间：{$payment['wx_v3']['pem']['cert']['expire_time']}
                             {else}
                             正确设置其它必要参数后，保存时会自动下载微信平台证书
                             {/if}</span>

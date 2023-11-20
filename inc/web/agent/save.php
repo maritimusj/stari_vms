@@ -339,7 +339,10 @@ $result = DBUtil::transactionDo(function () use ($id, &$from) {
         if ($is_edit) {
             return ['message' => '保存成功！'];
         }
+
         $from = 'edit';
+
+        //启动通知任务
         Job::newAgent($user);
 
         return ['message' => '代理商设置成功！'];

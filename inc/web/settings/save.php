@@ -788,7 +788,7 @@ if ($page == 'device') {
                 'data' => $data,
             ]);
         }
-  
+
         if (Request::bool('wxApiV3Key') && Request::bool('v3Serial')) {
             $data = [
                 'appid' => Request::trim('wxAppID'),
@@ -853,77 +853,24 @@ if ($page == 'device') {
         ]);
     }
 
-    $wx_enabled = Request::bool('wx') ? 1 : 0;
-    $settings['pay']['wx']['enable'] = $wx_enabled;
-
-    if ($wx_enabled) {
-        $settings['pay']['wx']['appid'] = Request::trim('wxAppID');
-        $settings['pay']['wx'][''] = Request::trim('wxxAppID');
-        $settings['pay']['wx']['key'] = Request::trim('wxApiKey');
-        $settings['pay']['wx']['mch_id'] = Request::trim('wxMCHID');
-        $settings['pay']['wx']['sub_mch_id'] = Request::trim('wxSubMCHID');
-        $settings['pay']['wx']['pem'] = [
-            'cert' => Request::trim('certPEM'),
-            'key' => Request::trim('keyPEM'),
+    if ($settings['pay']['SQB']['enable']) {
+        $data = [
+            'wx' => Request::bool('SQB_weixin'),
+            'ali' => Request::bool('SQB_ali'),
+            'wxapp' => Request::bool('SQB_wxapp'),
         ];
-
-        $settings['pay']['wx']['v3'] = [
-            'key' => Request::trim('wxApiV3Key'),
-            'serial' => Request::trim('v3Serial'),
-            'pem' => [
-                'cert' => settings('pay.wx.v3.pem.cert'),
-                'key' => Request::trim('V3key'),
-            ],
-        ];
-
-        if ($settings['pay']['wx']['v3']['key']
-            && $settings['pay']['wx']['v3']['serial']
-            && $settings['pay']['wx']['v3']['pem']['key']) {
-
-            $res = WxPayUtil::getWxPlatformCertification($settings['pay']['wx']);
-            if (!is_error($res)) {
-                $settings['pay']['wx']['v3']['pem']['cert'] = $res;
-            }
+        $res = PaymentConfig::createOrUpdate(0, Pay::SQB, $data);
+        if (is_error($res)) {
+            Log::error('settings', [
+                'error' => $res,
+                'data' => $data,
+            ]);
         }
-
-        //创建接口文件
-        Helper::createApiRedirectFile('payment/wx_v3.php', 'payresult', [
-            'headers' => [
-                'HTTP_USER_AGENT' => 'wx_v3_notify',
-            ],
-            'op' => 'notify',
-            'from' => 'wx_v3',
+    } else {
+        PaymentConfig::remove([
+            'agent_id' => 0,
+            'name' => Pay::SQB,
         ]);
-
-        Helper::createApiRedirectFile('payment/wx.php', 'payresult', [
-            'headers' => [
-                'HTTP_USER_AGENT' => 'wx_notify',
-            ],
-            'op' => 'notify',
-            'from' => 'wx',
-        ]);
-    }
-
-    $lcsw_enabled = Request::bool('lcsw') ? 1 : 0;
-    $settings['pay']['lcsw']['enable'] = $lcsw_enabled;
-
-    if ($lcsw_enabled) {
-        $settings['pay']['lcsw']['wx'] = Request::bool('lcsw_weixin');
-        $settings['pay']['lcsw']['ali'] = Request::bool('lcsw_ali');
-        $settings['pay']['lcsw']['wxapp'] = Request::bool('lcsw_wxapp');
-        $settings['pay']['lcsw']['merchant_no'] = Request::trim('merchant_no');
-        $settings['pay']['lcsw']['terminal_id'] = Request::trim('terminal_id');
-        $settings['pay']['lcsw']['access_token'] = Request::trim('access_token');
-
-        if (false === Helper::createApiRedirectFile('payment/lcsw.php', 'payresult', [
-                'headers' => [
-                    'HTTP_USER_AGENT' => 'lcsw_notify',
-                ],
-                'op' => 'notify',
-                'from' => 'lcsw',
-            ])) {
-            Response::toast('创建扫呗支付入口文件失败！');
-        }
     }
 
     $settings['ali']['appid'] = Request::trim('ali_appid');
@@ -933,19 +880,6 @@ if ($page == 'device') {
     $settings['alixapp']['id'] = Request::trim('alixapp_id');
     $settings['alixapp']['pubkey'] = Request::trim('alixapp_pubkey');
     $settings['alixapp']['prikey'] = Request::trim('alixapp_prikey');
-
-    if ($settings['pay']['SQB']['enable']) {
-        $settings['pay']['SQB']['wx'] = Request::bool('SQB_weixin');
-        $settings['pay']['SQB']['ali'] = Request::bool('SQB_ali');
-        $settings['pay']['SQB']['wxapp'] = Request::bool('SQB_wxapp');
-        Helper::createApiRedirectFile('/payment/SQB.php', 'payresult', [
-            'headers' => [
-                'HTTP_USER_AGENT' => 'SQB_notify',
-            ],
-            'op' => 'notify',
-            'from' => 'SQB',
-        ]);
-    }
 
 } elseif ($page == 'data_vw') {
     $db_arr = [];

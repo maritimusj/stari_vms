@@ -47,24 +47,16 @@ if ($page == 'device') {
 
     $tpl_data['payment'] = [];
 
-    /** @var payment_configModelObj $wx_payment_config */
-    $wx_payment_config = PaymentConfig::findOne([
-        'agent_id' => 0,
-        'name' => Pay::WX,
-    ]);
+    foreach ([Pay::WX, Pay::WX_V3, Pay::LCSW, Pay::SQB] as $name) {
+        /** @var payment_configModelObj $config */
+        $config = PaymentConfig::findOne([
+            'agent_id' => 0,
+            'name' => $name,
+        ]);
 
-    if ($wx_payment_config) {
-        $tpl_data['payment']['wx'] = $wx_payment_config->getExtraData();
-    }
-
-    /** @var payment_configModelObj $wx_v3_payment_config */
-    $wx_v3_payment_config = PaymentConfig::findOne([
-        'agent_id' => 0,
-        'name' => Pay::WX_V3,
-    ]);
-
-    if ($wx_v3_payment_config) {
-        $tpl_data['payment']['wx_v3'] = $wx_v3_payment_config->getExtraData();
+        if ($config) {
+            $tpl_data['payment'][$name] = $config->getExtraData();
+        }
     }
 
 } elseif ($page == 'account') {

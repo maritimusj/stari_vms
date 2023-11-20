@@ -770,7 +770,7 @@ if ($page == 'device') {
     if (Request::bool('wx')) {
         $data = [
             'appid' => Request::trim('wxAppID'),
-            'wxapp_id' => Request::trim('wxxAppID'),
+            'wxappid' => Request::trim('wxxAppID'),
             'key' => Request::trim('wxApiKey'),
             'mch_id' => Request::trim('wxMCHID'),
             'sub_mch_id' => Request::trim('wxSubMCHID'),
@@ -791,7 +791,7 @@ if ($page == 'device') {
         if (Request::bool('wxApiV3Key') && Request::bool('v3Serial')) {
             $data = [
                 'appid' => Request::trim('wxAppID'),
-                'wxapp_id' => Request::trim('wxxAppID'),
+                'wxappid' => Request::trim('wxxAppID'),
                 'key' => Request::trim('wxApiV3Key'),
                 'serial' => Request::trim('v3Serial'),
                 'mch_id' => Request::trim('wxMCHID'),

@@ -44,7 +44,7 @@ class PaymentConfig extends AbstractBase
         ]);
 
         if ($config) {
-            $config->setExtra($extra);
+            $config->setExtraData($extra);
             if (!$config->save()) {
                 return err('保存失败！');
             }

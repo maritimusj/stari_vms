@@ -1532,6 +1532,10 @@ include './index.php';
 
     public static function checkFreeOrderLimits(userModelObj $user, deviceModelObj $device)
     {
+        if ($user->isFreeCD()) {
+            return err('暂时不能免费领取，请稍后再试！');
+        }
+
         //每日免费额度限制
         if (Helper::getUserTodayFreeNum($user, $device) < 1) {
             return err('今天已经不能再领了，明天再来吧！');

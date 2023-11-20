@@ -1180,12 +1180,8 @@ class Account extends State
         }
 
         // 免费领取冷却时间
-        $free_cd = settings('user.freeCD', 0);
-        if ($free_cd > 0) {
-            $last_order = Order::getLastOrderOfUser($user);
-            if ($last_order && time() - $last_order->getCreatetime() < $free_cd * 60 * 60) {
-                return [];
-            }
+        if ($user->isFreeCD()) {
+            return [];
         }
 
         //获取本地可用公众号列表

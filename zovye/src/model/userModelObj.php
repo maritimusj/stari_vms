@@ -945,4 +945,18 @@ class userModelObj extends ModelObj
     {
         return Principal::is($this, Principal::Promoter);
     }
+
+    /**
+     * 检查用户是否处理免费领取冷却中
+     * @return bool
+     */
+    public function isFreeCD(): bool
+    {
+        $free_cd = settings('user.freeCD', 0);
+        if ($free_cd > 0) {
+            $last_order = Order::getLastOrderOfUser($this);
+            return $last_order && time() - $last_order->getCreatetime() < $free_cd * 60 * 60;
+        }
+        return false;
+    }
 }

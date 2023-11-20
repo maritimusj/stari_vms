@@ -388,7 +388,7 @@
     api.monthStats = function (userid) {
         api.showResult({op: 'month_stats', id: userid}, api.user_url);
     }
-    api.monthStatsOfYear = function (_, _, self) {
+    api.monthStatsOfYear = function (_1, _2, self) {
         const year = self.data('year');
         const userid = self.closest('.year').data('user');
         api.showResult({op: 'month_stats', id: userid, year}, api.user_url);
@@ -415,7 +415,7 @@
     $('#search-form').submit(function(e){
         e.preventDefault();
         const url = $(this).attr('action');
-        const keywords = $('input[name=keywords').val();
+        const keywords = $('input[name=keywords]').val();
         window.location.replace(url + '&keywords=' + keywords);
     });
 </script>

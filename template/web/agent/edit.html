@@ -1340,7 +1340,7 @@
 <form action="{php echo $this->createWebUrl('agent');}" method="post">
     <div class="panel panel-default nav-tab-item" id="special">
         <div class="heading">
-            {if  $agent_data['pay']['wx']['enable'] || $agent_data['pay']['lcsw']['enable']}
+            {if !empty($payment)}
             <div class="alert alert-warning alert-dismissible" role="alert" style="width: 35em;margin-bottom:0;">
             <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             <strong>注意：</strong> 代理商已开启自定义支付，提现申请会被拒绝！！
@@ -1355,52 +1355,52 @@
                     <div class="col-md-10">
                         <div class="checkbox">
                             <label>
-                                <input type="checkbox" name="lcsw" id="lcsw" value="1" {if $agent_data['pay']['lcsw']['enable']}checked{/if}>
+                                <input type="checkbox" name="lcsw" id="lcsw" value="1" {if $payment['lcsw']}checked{/if}>
                                 是否启用（请联系客服开通）
                             </label>
                         </div>
                     </div>
                 </div>
-                <fieldset {if empty($agent_data['pay']['lcsw']['enable'])}disabled{/if} name="lcsw">
+                <fieldset {if empty($payment['lcsw'])}disabled{/if} name="lcsw">
                 <div class="form-group">
                     <label for="merchant_no" class="col-md-2 control-label">商户号</label>
                     <div class="col-md-10">
-                        <input type="text" class="form-control" name="merchant_no" id="merchant_no" value="{$agent_data['pay']['lcsw']['merchant_no']}">
+                        <input type="text" class="form-control" name="merchant_no" id="merchant_no" value="{$payment['lcsw']['merchant_no']}">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="terminal_id" class="col-md-2 control-label">终端号</label>
                     <div class="col-md-10">
-                        <input type="text" class="form-control" name="terminal_id" id="terminal_id" value="{$agent_data['pay']['lcsw']['terminal_id']}">
+                        <input type="text" class="form-control" name="terminal_id" id="terminal_id" value="{$payment['lcsw']['terminal_id']}">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="access_token" class="col-md-2 control-label">密钥</label>
                     <div class="col-md-10">
-                        <input type="text" class="form-control inputMask" name="access_token" id="access_token" value="{$agent_data['pay']['lcsw']['access_token']}">
+                        <input type="text" class="form-control inputMask" name="access_token" id="access_token" value="{$payment['lcsw']['access_token']}">
                     </div>
                 </div>
                 </fieldset>
             </div>
             <div class="seg">                
-                {if $agent_data['pay']['SQB']}
+                {if $payment['SQB']}
                 <div class="title">收钱吧</div>
                 <div class="form-group">
                     <label for="vendor_key" class="col-md-2 control-label">终端名称</label>
                     <div class="col-md-10">
-                        <span class="form-control">{$agent_data['pay']['SQB']['title']}</span>
+                        <span class="form-control">{$payment['SQB']['title']}</span>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="vendor_key" class="col-md-2 control-label">终端号</label>
                     <div class="col-md-10">
-                        <span class="form-control">{$agent_data['pay']['SQB']['sn']}</span>
+                        <span class="form-control">{$payment['SQB']['sn']}</span>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="code" class="col-md-2 control-label">终端密钥</label>
                     <div class="col-md-10">
-                        <span class="form-control inputMask">{$agent_data['pay']['SQB']['key']}</span>
+                        <span class="form-control inputMask">{$payment['SQB']['key']}</span>
                     </div>
                 </div>
                 <div class="form-group">
@@ -1458,17 +1458,17 @@
                     <div class="col-md-10">
                         <div class="checkbox">
                             <label>
-                                <input type="checkbox" name="wx" id="wx" value="1" {if $agent_data['pay']['wx']['enable']}checked{/if}>
+                                <input type="checkbox" name="wx" id="wx" value="1" {if $payment['wx']}checked{/if}>
                                 是否启用
                             </label>
                         </div>
                     </div>
                 </div>
-                <fieldset {if empty($agent_data['pay']['wx']['enable'])}disabled{/if} name="wx">
+                <fieldset {if empty($payment['wx'])}disabled{/if} name="wx">
                 <div class="form-group">
                     <label for="wxMCHID" class="col-md-2 control-label">子商户号</label>
                     <div class="col-md-10">
-                        <input type="text" class="form-control" name="wxMCHID" id="wxMCHID" value="{$agent_data['pay']['wx']['mch_id']}">
+                        <input type="text" class="form-control" name="wxMCHID" id="wxMCHID" value="{$payment['wx']['sub_mch_id']}">
                     </div>
                 </div>
                 </fieldset>

@@ -3,7 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
- 
+
 namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
@@ -13,6 +13,7 @@ use zovye\domain\CommissionBalance;
 use zovye\domain\Device;
 use zovye\domain\GSP;
 use zovye\domain\Keeper;
+use zovye\domain\PaymentConfig;
 use zovye\domain\Principal;
 use zovye\domain\User;
 use zovye\model\deviceModelObj;
@@ -24,7 +25,7 @@ use zovye\util\Util;
 $id = Request::int('id');
 $from = Request::str('from');
 
-$result = DBUtil::transactionDo(function() use ($id, &$from) {
+$result = DBUtil::transactionDo(function () use ($id, &$from) {
 
     $user = User::get($id);
     if (empty($user)) {
@@ -129,10 +130,10 @@ $result = DBUtil::transactionDo(function() use ($id, &$from) {
                         'low_battery' => Request::bool('deviceLowBattery') ? 1 : 0,
                         'low_remain' => Request::bool('deviceLowRemain') ? 1 : 0,
                     ],
-                    'order' =>  [
+                    'order' => [
                         'succeed' => Request::bool('orderSucceed') ? 1 : 0,
                         'failed' => Request::bool('orderFailed') ? 1 : 0,
-                    ]
+                    ],
                 ]
             );
         }
@@ -158,7 +159,10 @@ $result = DBUtil::transactionDo(function() use ($id, &$from) {
                 $user->updateSettings('agentData.commission.fee_type', Request::bool('feeType') ? 1 : 0);
                 $user->updateSettings('agentData.commission.fee', intval(Request::float('commission_fee', 0, 2) * 100));
                 if (Request::is_numeric('balanceOrderPrice')) {
-                    $user->updateSettings('agentData.commission.balance.price', intval(Request::float('balanceOrderPrice', 0, 2) * 100));
+                    $user->updateSettings(
+                        'agentData.commission.balance.price',
+                        intval(Request::float('balanceOrderPrice', 0, 2) * 100)
+                    );
                 } else {
                     $user->updateSettings('agentData.commission.balance', []);
                 }
@@ -302,41 +306,32 @@ $result = DBUtil::transactionDo(function() use ($id, &$from) {
             }
         }
     } elseif (Request::bool('agent_payment')) {
-        if ($user->isAgent()) {
-            $data = $user->settings('agentData.pay', []);
-
-            $wx_enabled = request('wx') ? 1 : 0;
-            $data['wx']['enable'] = $wx_enabled;
-            if ($wx_enabled) {
-                $data['wx']['mch_id'] = Request::trim('wxMCHID');
-                //创建接口文件
-                Helper::createApiRedirectFile('payment/wx_v3.php', 'payresult', [
-                    'headers' => [
-                        'HTTP_USER_AGENT' => 'wx_v3_notify',
-                    ],
-                    'op' => 'notify',
-                    'from' => 'wx_v3',
-                ]);
+        if (Request::bool('wx')) {
+            if (!PaymentConfig::createOrUpdate($user->getId(), Pay::WX_V3, [
+                'sub_mch_id' => Request::trim('wxMCHID'),
+            ])) {
+                return err('保存微信支付配置失败！');
             }
+        } else {
+            PaymentConfig::remove([
+                'agent_id' => $user->getId(),
+                'name' => Pay::WX_V3,
+            ]);
+        }
 
-            $lcsw_enabled = Request::bool('lcsw');
-            $data['lcsw']['enable'] = $lcsw_enabled;
-            if ($lcsw_enabled) {
-                $data['lcsw']['merchant_no'] = Request::trim('merchant_no');
-                $data['lcsw']['terminal_id'] = Request::trim('terminal_id');
-                $data['lcsw']['access_token'] = Request::trim('access_token');
-
-                //创建扫呗接口文件
-                Helper::createApiRedirectFile('payment/lcsw.php', 'payresult', [
-                    'headers' => [
-                        'HTTP_USER_AGENT' => 'lcsw_notify',
-                    ],
-                    'op' => 'notify',
-                    'from' => 'lcsw',
-                ]);
+        if (Request::bool('lcsw')) {
+            if (!PaymentConfig::createOrUpdate($user->getId(), Pay::LCSW, [
+                'merchant_no' => Request::trim('merchant_no'),
+                'terminal_id' => Request::trim('terminal_id'),
+                'access_token' => Request::trim('access_token'),
+            ])) {
+                return err('保存扫呗配置失败！');
             }
-
-            $user->updateSettings('agentData.pay', $data);
+        } else {
+            PaymentConfig::remove([
+                'agent_id' => $user->getId(),
+                'name' => Pay::WX_V3,
+            ]);
         }
     }
 
@@ -346,9 +341,15 @@ $result = DBUtil::transactionDo(function() use ($id, &$from) {
         }
         $from = 'edit';
         Job::newAgent($user);
+
         return ['message' => '代理商设置成功！'];
     }
+
     return err('保存失败！');
 });
 
-Response::toast($result['message'], Util::url('agent', ['op' => $from, 'id' => $id]), is_error($result) ? 'error' : 'success');
+Response::toast(
+    $result['message'],
+    Util::url('agent', ['op' => $from, 'id' => $id]),
+    is_error($result) ? 'error' : 'success'
+);

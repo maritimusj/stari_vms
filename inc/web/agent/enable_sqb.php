@@ -7,6 +7,7 @@
 namespace zovye;
 
 use zovye\domain\Agent;
+use zovye\domain\PaymentConfig;
 use zovye\util\SQBUtil;
 
 defined('IN_IA') or exit('Access Denied');
@@ -28,12 +29,13 @@ if (is_error($result)) {
     JSON::fail($result);
 }
 
-if ($agent->updateSettings('agentData.pay.SQB', [
-    'enable' => 1,
+$config = PaymentConfig::createOrUpdate($agent->getId(), Pay::SQB, [
     'sn' => $result['terminal_sn'],
     'key' => $result['terminal_key'],
     'title' => $result['store_name'],
-])) {
+]);
+
+if ($config) {
     JSON::success('成功！');
 }
 

@@ -66,6 +66,7 @@ class PaymentConfig extends AbstractBase
             'op' => 'notify',
             'from' => $config->getName(),
             'id' => $config->getId(),
+            'agentId' => $config->getAgentId(),
         ]);
 
         if (empty($res)) {

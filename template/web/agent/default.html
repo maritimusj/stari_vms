@@ -62,8 +62,10 @@
         <form class="form-inline" action="{php echo $this->createWebUrl('agent')}" method="post" id="search-form">
             <div id="search-bar">
                 <div class="text-input">
-                    <input type="text" class="form-control" name="keywords" placeholder="请输入代理商呢称/手机号码搜索..." value="{$keywords}">
-                    <button type="submit" class="button" role="button"><i class="fa fa-search"></i>&nbsp;搜索</span>
+                    <label>
+                        <input type="text" class="form-control" name="keywords" placeholder="请输入代理商呢称/手机号码搜索..." value="{$keywords}">
+                    </label>
+                    <button type="submit" class="button" role="button"><i class="fa fa-search"></i>&nbsp;搜索</button>
                 </div>
             </div>            
         </form>

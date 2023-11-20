@@ -853,26 +853,6 @@ if ($page == 'device') {
         ]);
     }
 
-    if ($settings['pay']['SQB']['enable']) {
-        $data = [
-            'wx' => Request::bool('SQB_weixin'),
-            'ali' => Request::bool('SQB_ali'),
-            'wxapp' => Request::bool('SQB_wxapp'),
-        ];
-        $res = PaymentConfig::createOrUpdate(0, Pay::SQB, $data);
-        if (is_error($res)) {
-            Log::error('settings', [
-                'error' => $res,
-                'data' => $data,
-            ]);
-        }
-    } else {
-        PaymentConfig::remove([
-            'agent_id' => 0,
-            'name' => Pay::SQB,
-        ]);
-    }
-
     $settings['ali']['appid'] = Request::trim('ali_appid');
     $settings['ali']['pubkey'] = Request::trim('ali_pubkey');
     $settings['ali']['prikey'] = Request::trim('ali_prikey');

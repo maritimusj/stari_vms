@@ -6,6 +6,7 @@
 
 namespace zovye;
 
+use zovye\domain\PaymentConfig;
 use zovye\util\Helper;
 use zovye\util\SQBUtil;
 
@@ -22,25 +23,13 @@ if (is_error($result)) {
     JSON::fail($result);
 }
 
-if (false === Helper::createApiRedirectFile('/payment/SQB.php', 'payresult', [
-        'headers' => [
-            'HTTP_USER_AGENT' => 'SQB_notify',
-        ],
-        'op' => 'notify',
-        'from' => 'SQB',
-    ])) {
-    Response::toast('创建收钱吧支付入口文件失败！');
-}
-
-if (updateSettings('pay.SQB', [
-    'enable' => 1,
-    'wx' => Request::bool('wx'),
-    'wxapp' => Request::bool('wxapp'),    
-    'ali' => Request::bool('ali'),
+$config = PaymentConfig::createOrUpdate(0, Pay::SQB, [
     'sn' => $result['terminal_sn'],
     'key' => $result['terminal_key'],
     'title' => $result['store_name'],
-])) {
+]);
+
+if ($config) {
     JSON::success('成功！');
 }
 

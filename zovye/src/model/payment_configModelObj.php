@@ -11,6 +11,7 @@ use function zovye\tb;
 
 /**
  * @method getName()
+ * @method getAgentId()
  */
 class payment_configModelObj extends ModelObj
 {

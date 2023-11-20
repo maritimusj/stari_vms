@@ -2,6 +2,7 @@
 
 namespace zovye;
 
+use zovye\domain\Agent;
 use zovye\domain\PaymentConfig;
 
 defined('IN_IA') or exit('Access Denied');
@@ -73,6 +74,37 @@ SQL;
                     'pem' => $config['v3']['pem'],
                 ],
             ]);
+        }
+    }
+
+    $query = Agent::query();
+    foreach ($query->findAll() as $agent) {
+        $data = $agent->settings('agentData.pay', []);
+        if ($data) {
+            if ($data['wx'] && $data['wx']['enable']) {
+                unset($data['wx']['enable']);
+                PaymentConfig::create([
+                    'agent_id' => $agent->getId(),
+                    'name' => Pay::WX_V3,
+                    'extra' => $data['wx'],
+                ]);
+            }
+            if ($data['lcsw'] && $data['lcsw']['enable']) {
+                unset($data['lcsw']['enable']);
+                PaymentConfig::create([
+                    'agent_id' => $agent->getId(),
+                    'name' => Pay::LCSW,
+                    'extra' => $data['lcsw'],
+                ]);
+            }
+            if ($data['SQB'] && $data['SQB']['enable']) {
+                unset($data['SQB']['enable']);
+                PaymentConfig::create([
+                    'agent_id' => $agent->getId(),
+                    'name' => Pay::SQB,
+                    'extra' => $data['SQB'],
+                ]);
+            }
         }
     }
 }

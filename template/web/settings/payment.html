@@ -22,7 +22,7 @@
                         <div class="checkbox">
                             <label>
                                 <input type="checkbox" name="lcsw" id="lcsw" value="1" {if $payment['lcsw']}checked{/if}>
-                                是否启用（请联系客服开通）
+                                是否启用
                             </label>
                         </div>
                     </div>
@@ -80,41 +80,54 @@
                 {else}
                 <div class="title">收钱吧</div>
                 <div class="form-group">
-                    <label for="vendor_sn" class="col-md-2 control-label">AppID</label>
+                    <label for="SQB" class="col-md-2 control-label"></label>
                     <div class="col-md-10">
-                        <input type="text" class="form-control" name="app_id" value="">
-                        <span class="help-block">* 服务商AppID，仅用于激活，*** 不会保存到当前系统中 ***</span>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="SQB" id="SQB" value="1" {if $payment['SQB']}checked{/if}>
+                                是否启用
+                            </label>
+                        </div>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="vendor_sn" class="col-md-2 control-label">序列号</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" name="vendor_sn" id="vendor_sn" value="">
-                        <span class="help-block">* 服务商序列号，仅用于激活，*** 不会保存到当前系统中 ***</span>
+                <fieldset {if empty($payment['SQB'])}disabled{/if} name="SQB">
+                    <div class="form-group">
+                        <label for="vendor_sn" class="col-md-2 control-label">AppID</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="app_id" value="">
+                            <span class="help-block">* 服务商AppID，仅用于激活，*** 不会保存到当前系统中 ***</span>
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label for="vendor_key" class="col-md-2 control-label">密钥</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" name="vendor_key" id="vendor_key">
-                        <span class="help-block">* 服务商密钥，仅用于激活，*** 不会保存到当前系统中 ***</span>
+                    <div class="form-group">
+                        <label for="vendor_sn" class="col-md-2 control-label">序列号</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="vendor_sn" id="vendor_sn" value="">
+                            <span class="help-block">* 服务商序列号，仅用于激活，*** 不会保存到当前系统中 ***</span>
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label for="code" class="col-md-2 control-label">激活码</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" name="code" id="code">
-                        <span class="help-block">* 终端激活码，服务商后台生成</span>
+                    <div class="form-group">
+                        <label for="vendor_key" class="col-md-2 control-label">密钥</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="vendor_key" id="vendor_key">
+                            <span class="help-block">* 服务商密钥，仅用于激活，*** 不会保存到当前系统中 ***</span>
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label for="code" class="col-md-2 control-label"></label>
-                    <div class="col-md-10">
-                        <button class="btn btn-success" data-op="enableSQB">
-                            <i class="fa fa-check"></i> 激活
-                        </button>
+                    <div class="form-group">
+                        <label for="code" class="col-md-2 control-label">激活码</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="code" id="code">
+                            <span class="help-block">* 终端激活码，服务商后台生成</span>
+                        </div>
                     </div>
-                </div>
+                    <div class="form-group">
+                        <label for="code" class="col-md-2 control-label"></label>
+                        <div class="col-md-10">
+                            <button class="btn btn-success" data-op="enableSQB">
+                                <i class="fa fa-check"></i> 激活
+                            </button>
+                        </div>
+                    </div>
+                </fieldset>
                 {/if}
             </div>
             <div class="seg">
@@ -287,6 +300,10 @@
 
         $('#special input[name=lcsw]').click(function(){
             $('#special fieldset[name=lcsw]').attr('disabled', !$(this).is(':checked'));
+        })
+
+        $('#special input[name=SQB]').click(function(){
+            $('#special fieldset[name=SQB]').attr('disabled', !$(this).is(':checked'));
         })
 
         const apiUrl = "{php echo $this->createWebUrl('settings')}";

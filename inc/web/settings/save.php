@@ -810,7 +810,13 @@ if ($page == 'device') {
             $result = SQBUtil::activate($app_id, $vendor_sn, $vendor_key, $code);
 
             if (is_error($result)) {
-                Log::error('SQB', $result);
+                Log::error('SQB', [
+                    'app_id' => $app_id,
+                    'vendor_sn' => $vendor_sn,
+                    'vendor_key' => $vendor_key,
+                    'code' => $code,
+                    'error' => $result,
+                ]);
             } else {
                 $config = PaymentConfig::createOrUpdate(0, Pay::SQB, [
                     'sn' => $result['terminal_sn'],
@@ -864,6 +870,12 @@ if ($page == 'device') {
             'pem' => [
                 'cert' => Request::trim('certPEM'),
                 'key' => Request::trim('keyPEM'),
+            ],
+            'app' => [
+                'wx' => [
+                    'h5' => true,
+                    'miniapp' => true,
+                ],
             ],
         ];
 

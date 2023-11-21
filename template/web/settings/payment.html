@@ -50,19 +50,19 @@
                         <label class="col-md-2 control-label">客户端</label>
                         <div class="col-md-10">
                             <label class="checkbox-inline" title="用户使用微信扫一扫支付时，是否使用扫呗收款">
-                                <input type="checkbox" name="lcswWxH5" value="1" {if $payment['lcsw']['app']['wx']['h5']}checked{/if}>
+                                <input type="checkbox" name="lcswWxH5" value="1" {if empty($payment['lcsw']) || $payment['lcsw']['app']['wx']['h5']}checked{/if}>
                                 微信H5
                             </label>
                             <label class="checkbox-inline" title="用户使用微信小程序支付时，是否使用扫呗收款">
-                                <input type="checkbox" name="lcswWxMiniApp" value="1" {if $payment['lcsw']['app']['wx']['miniapp']}checked{/if}>
+                                <input type="checkbox" name="lcswWxMiniApp" value="1" {if empty($payment['lcsw']) || $payment['lcsw']['app']['wx']['miniapp']}checked{/if}>
                                 微信小程序
                             </label>
                             <label class="checkbox-inline" title="用户使用支付宝扫一扫支付时，是否使用扫呗收款">
-                                <input type="checkbox" name="lcswAliH5" value="1" {if $payment['lcsw']['app']['ali']['h5']}checked{/if}>
+                                <input type="checkbox" name="lcswAliH5" value="1" {if empty($payment['lcsw']) || $payment['lcsw']['app']['ali']['h5']}checked{/if}>
                                 支付宝H5
                             </label>
                             <label class="checkbox-inline" title="用户使用支付宝小程序时，是否使用扫呗收款">
-                                <input type="checkbox" name="lcswAliMiniApp" value="1" {if $payment['lcsw']['app']['ali']['miniapp']}checked{/if}>
+                                <input type="checkbox" name="lcswAliMiniApp" value="1" {if empty($payment['lcsw']) || $payment['lcsw']['app']['ali']['miniapp']}checked{/if}>
                                 支付宝小程序
                             </label>
                         </div>
@@ -83,45 +83,47 @@
                         </div>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="vendor_key" class="col-md-2 control-label">终端名称</label>
-                    <div class="col-md-10">
-                        <span class="form-control">{$payment['SQB']['title']}</span>
+                <fieldset name="SQB">
+                    <div class="form-group">
+                        <label for="vendor_key" class="col-md-2 control-label">终端名称</label>
+                        <div class="col-md-10">
+                            <span class="form-control">{$payment['SQB']['title']}</span>
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label for="vendor_key" class="col-md-2 control-label">终端号</label>
-                    <div class="col-md-10">
-                        <span class="form-control">{$payment['SQB']['sn']}</span>
+                    <div class="form-group">
+                        <label for="vendor_key" class="col-md-2 control-label">终端号</label>
+                        <div class="col-md-10">
+                            <span class="form-control">{$payment['SQB']['sn']}</span>
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label for="code" class="col-md-2 control-label">终端密钥</label>
-                    <div class="col-md-10">
-                        <span class="form-control inputMask">{$payment['SQB']['key']}</span>
+                    <div class="form-group">
+                        <label for="code" class="col-md-2 control-label">终端密钥</label>
+                        <div class="col-md-10">
+                            <span class="form-control inputMask">{$payment['SQB']['key']}</span>
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">客户端</label>
-                    <div class="col-md-10">
-                        <label class="checkbox-inline" title="用户使用微信扫一扫支付时，是否使用收钱吧收款">
-                            <input type="checkbox" name="SQBWxH5" value="1" {if $payment['SQB']['app']['wx']['h5']}checked{/if}>
-                            微信H5
-                        </label>
-                        <label class="checkbox-inline" title="用户使用微信小程序支付时，是否使用收钱吧收款">
-                            <input type="checkbox" name="SQBWxApp" value="1" {if $payment['SQB']['app']['wx']['miniapp']}checked{/if}>
-                            微信小程序
-                        </label>
-                        <label class="checkbox-inline" title="用户使用支付宝扫一扫支付时，是否使用收钱吧收款">
-                            <input type="checkbox" name="SQBAliH5" value="1" {if $payment['SQB']['app']['ali']['h5']}checked{/if}>
-                            支付宝H5
-                        </label>
-                        <label class="checkbox-inline" title="用户使用支付宝小程序时，是否使用收钱吧收款">
-                            <input type="checkbox" name="SQBAliMiniApp" value="1" {if $payment['SQB']['app']['ali']['miniapp']}checked{/if}>
-                            支付宝小程序
-                        </label>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">客户端</label>
+                        <div class="col-md-10">
+                            <label class="checkbox-inline" title="用户使用微信扫一扫支付时，是否使用收钱吧收款">
+                                <input type="checkbox" name="SQBWxH5" value="1" {if $payment['SQB']['app']['wx']['h5']}checked{/if}>
+                                微信H5
+                            </label>
+                            <label class="checkbox-inline" title="用户使用微信小程序支付时，是否使用收钱吧收款">
+                                <input type="checkbox" name="SQBWxApp" value="1" {if $payment['SQB']['app']['wx']['miniapp']}checked{/if}>
+                                微信小程序
+                            </label>
+                            <label class="checkbox-inline" title="用户使用支付宝扫一扫支付时，是否使用收钱吧收款">
+                                <input type="checkbox" name="SQBAliH5" value="1" {if $payment['SQB']['app']['ali']['h5']}checked{/if}>
+                                支付宝H5
+                            </label>
+                            <label class="checkbox-inline" title="用户使用支付宝小程序时，是否使用收钱吧收款">
+                                <input type="checkbox" name="SQBAliMiniApp" value="1" {if $payment['SQB']['app']['ali']['miniapp']}checked{/if}>
+                                支付宝小程序
+                            </label>
+                        </div>
                     </div>
-                </div>
+                </fieldset>
                 {else}
                 <div class="title">收钱吧</div>
                 <div class="form-group">
@@ -135,7 +137,7 @@
                         </div>
                     </div>
                 </div>
-                <fieldset {if empty($payment['SQB'])}disabled{/if} name="SQB">
+                <fieldset name="SQB" disabled>
                     <div class="form-group">
                         <label for="vendor_sn" class="col-md-2 control-label">AppID</label>
                         <div class="col-md-10">
@@ -382,66 +384,6 @@
 
         $('#special input[name=SQB]').click(function(){
             $('#special fieldset[name=SQB]').attr('disabled', !$(this).is(':checked'));
-        })
-
-        const apiUrl = "{php echo $this->createWebUrl('settings')}";
-
-        $('button[data-op]').click(function(event) {
-            event.preventDefault();
-
-            const op = $(this).data('op');
-            if (op === 'enableSQB') {
-                const params =  {
-                    'op': 'enableSQB',
-                    'app_id': $('input[name=app_id]').val(),
-                    'vendor_sn': $.trim($('input[name=vendor_sn]').val()),
-                    'vendor_key': $.trim($('input[name=vendor_key').val()),
-                    'code': $.trim($('input[name=code]').val()),
-                    'wx': $('input[name=SQB_weixin]').is(':checked') ? 1 : 0,
-                    'ali': $('input[name=SQB_ali]').is(':checked') ? 1 : 0,
-                    'wxapp': $('input[name=SQB_wxapp]').is(':checked') ? 1 : 0,
-                }
-                if (params['vendor_key'] === '') {
-                    $('input[name=vendor_key').siblings('.inputMask').click();
-                    util.message('请输入服务商密钥！', '', 'error');
-                    return;
-                }
-                if (params['code'] === '') {
-                    $('input[name=code').focus();
-                    util.message('请输入终端激活码！', '', 'error');
-                    return;
-                }                
-                $.getJSON(apiUrl, params).then(function(res) {
-                    if (res) {
-                        if (res.status) {
-                            util.message(res.data && res.data.msg || '激活成功！', '', 'success');
-                            setTimeout(() => {
-                                window.location.reload();
-                            }, 3000);             
-                        } else {
-                            const msg = res.data.msg || '失败！';
-                            util.message(msg, '', 'error');
-                        }
-                    }
-                })
-            } else if (op == 'disableSQB') {
-                if (!confirm('确定要取消收钱吧的激活状态吗？')) {
-                    return;
-                }
-                $.getJSON(apiUrl, {op: 'disableSQB'}).then(function(res) {
-                    if (res) {
-                        if (res.status) {
-                            util.message(res.data && res.data.msg || '已取消！', '', 'success');
-                            setTimeout(() => {
-                                window.location.reload();
-                            }, 3000);
-                        } else {
-                            const msg = res.data.msg || '失败！';
-                            util.message(msg, '', 'error');
-                        }
-                    }
-                })
-            }
         })
     })
 </script>

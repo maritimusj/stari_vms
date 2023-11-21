@@ -20,6 +20,7 @@ use zovye\model\deviceModelObj;
 use zovye\model\keeperModelObj;
 use zovye\util\DBUtil;
 use zovye\util\Helper;
+use zovye\util\SQBUtil;
 use zovye\util\Util;
 
 $id = Request::int('id');
@@ -306,26 +307,103 @@ $result = DBUtil::transactionDo(function () use ($id, &$from) {
             }
         }
     } elseif (Request::bool('agent_payment')) {
-        if (Request::bool('wx')) {
-            if (!PaymentConfig::createOrUpdate($user->getId(), Pay::WX_V3, [
-                'sub_mch_id' => Request::trim('wxMCHID'),
-            ])) {
-                return err('保存微信支付配置失败！');
-            }
-        } else {
-            PaymentConfig::remove([
-                'agent_id' => $user->getId(),
-                'name' => Pay::WX_V3,
-            ]);
-        }
 
         if (Request::bool('lcsw')) {
             if (!PaymentConfig::createOrUpdate($user->getId(), Pay::LCSW, [
                 'merchant_no' => Request::trim('merchant_no'),
                 'terminal_id' => Request::trim('terminal_id'),
                 'access_token' => Request::trim('access_token'),
+                'app' => [
+                    'wx' => [
+                        'h5' => Request::bool('lcswWxH5'),
+                        'miniapp' => Request::bool('lcswWxMiniApp'),
+                    ],
+                    'ali' => [
+                        'h5' => Request::bool('lcswAliH5'),
+                        'miniapp' => Request::bool('lcswAliMiniApp'),
+                    ],
+                ]
             ])) {
                 return err('保存扫呗配置失败！');
+            }
+        } else {
+            PaymentConfig::remove([
+                'agent_id' => $user->getId(),
+                'name' => Pay::LCSW,
+            ]);
+        }
+
+        if (Request::bool('SQB')) {
+            if (Request::has('app_id')) {
+                $app_id = Request::trim('app_id');
+                $vendor_sn = Request::trim('vendor_sn');
+                $vendor_key = Request::trim('vendor_key');
+                $code = Request::trim('code');
+        
+                $result = SQBUtil::activate($app_id, $vendor_sn, $vendor_key, $code);
+    
+                if (is_error($result)) {
+                    Log::error('SQB', [
+                        'app_id' => $app_id,
+                        'vendor_sn' => $vendor_sn,
+                        'vendor_key' => $vendor_key,
+                        'code' => $code,
+                        'error' => $result,
+                    ]);
+                } else {
+                    $config = PaymentConfig::createOrUpdate($user->getId(), Pay::SQB, [
+                        'sn' => $result['terminal_sn'],
+                        'key' => $result['terminal_key'],
+                        'title' => $result['store_name'],
+                        'app' => [
+                            'wx' => [
+                                'h5' => Request::bool('SQBWxH5'),
+                                'miniapp' => Request::bool('SQBWxMiniApp'),
+                            ],
+                            'ali' => [
+                                'h5' => Request::bool('SQBAliH5'),
+                                'miniapp' => Request::bool('SQBAliMiniApp'),
+                            ],
+                        ]
+                    ]);            
+                }
+            } else {
+                $config = PaymentConfig::findOne([
+                    'agent_id' => $user->getId(),
+                    'name' => Pay::SQB,
+                ]);
+                if ($config) {
+                    $config->setExtraData('app', [
+                        'wx' => [
+                            'h5' => Request::bool('SQBWxH5'),
+                            'miniapp' => Request::bool('SQBWxMiniApp'),
+                        ],
+                        'ali' => [
+                            'h5' => Request::bool('SQBAliH5'),
+                            'miniapp' => Request::bool('SQBAliMiniApp'),
+                        ],
+                    ]);
+                    $config->save();
+                }
+            }
+        } else {
+            PaymentConfig::remove([
+                'agent_id' => 0,
+                'name' => Pay::SQB,
+            ]);
+        }
+
+        if (Request::bool('wx')) {
+            if (!PaymentConfig::createOrUpdate($user->getId(), Pay::WX_V3, [
+                'sub_mch_id' => Request::trim('wxMCHID'),
+                'app' => [
+                    'wx' => [
+                        'h5' => true,
+                        'miniapp' => true,
+                    ],
+                ],
+            ])) {
+                return err('保存微信支付配置失败！');
             }
         } else {
             PaymentConfig::remove([

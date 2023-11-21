@@ -26,6 +26,7 @@ use zovye\model\userModelObj;
 use zovye\payment\LCSWPay;
 use zovye\payment\SQBPay;
 use zovye\payment\WXPay;
+use zovye\payment\WxPayV3;
 
 class Pay
 {
@@ -694,7 +695,7 @@ class Pay
         }
 
         if ($config->getName() == self::WX_V3) {
-            return new WXPay($config->toArray());
+            return new WxPayV3($config->toArray());
         }
 
         return null;

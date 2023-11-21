@@ -13,7 +13,6 @@ use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 use zovye\util\PayUtil;
 use zovye\We7;
-use function zovye\_W;
 use function zovye\is_error;
 
 class WXPay implements IPay
@@ -46,20 +45,6 @@ class WXPay implements IPay
             'key' => $this->config['key'],
             'pem' => $this->config['pem'],
         ]);
-    }
-
-    protected function getNotifyUrl(): string
-    {
-        $notify_url = _W('siteroot');
-        $path = 'addons/'.APP_NAME.'/';
-
-        if (mb_strpos($notify_url, $path) === false) {
-            $notify_url .= $path;
-        }
-
-        $notify_url .= 'payment/wx.php';
-
-        return $notify_url;
     }
 
     public function createQrcodePay(
@@ -121,7 +106,7 @@ class WXPay implements IPay
             'openid' => $user_uid,
             'body' => $body,
             'total_fee' => $price,
-            'notify_url' => $this->getNotifyUrl(),
+            'notify_url' => PayUtil::getPaymentCallbackUrl($this->config['config_id']),
         ];
 
         $res = $wx->buildUnifiedOrder($params);

@@ -14,8 +14,10 @@ use WeChatPay\Crypto\Rsa;
 use WeChatPay\Util\PemUtil;
 use zovye\Log;
 use zovye\model\deviceModelObj;
+use zovye\model\payment_configModelObj;
 use zovye\model\userModelObj;
 use zovye\WxPayV3Client;
+use function zovye\_W;
 use function zovye\err;
 use function zovye\is_error;
 
@@ -85,9 +87,21 @@ class PayUtil
                 'data' => $data,
                 'expire_time' => $expire_time,
             ];
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             return err($e->getMessage());
         }
+    }
+
+    public static function getPaymentCallbackUrl($config_id): string
+    {
+        $notify_url = _W('siteroot');
+        $path = 'addons/'.APP_NAME.'/';
+
+        if (mb_strpos($notify_url, $path) === false) {
+            $notify_url .= $path;
+        }
+
+        return $notify_url."payment/$config_id";
     }
 
     public static function getAliPayJs(array $params = []): string

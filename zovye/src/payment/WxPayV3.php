@@ -18,13 +18,12 @@ use zovye\Pay;
 use zovye\Request;
 use zovye\util\Util;
 use zovye\util\PayUtil;
-use function zovye\_W;
 use function zovye\err;
 use function zovye\is_error;
 
 class WxPayV3 implements IPay
 {
-    private $config = [];
+    private $config;
 
     /**
      * @param array $config
@@ -44,20 +43,6 @@ class WxPayV3 implements IPay
         return $this->config;
     }
 
-    protected function getNotifyUrl(): string
-    {
-        $notify_url = _W('siteroot');
-        $path = 'addons/'.APP_NAME.'/';
-
-        if (mb_strpos($notify_url, $path) === false) {
-            $notify_url .= $path;
-        }
-
-        $notify_url .= 'payment/wx_v3.php';
-
-        return $notify_url;
-    }
-
     public function createXAppPay(string $user_uid, string $device_uid, string $order_no, int $price, string $body = '')
     {
         //小程序支付，使用小程序appid
@@ -74,7 +59,7 @@ class WxPayV3 implements IPay
             'sub_mchid' => $this->config['sub_mch_id'],
             'description' => $body,
             'out_trade_no' => $order_no,
-            'notify_url' => $this->getNotifyUrl(),
+            'notify_url' => PayUtil::getPaymentCallbackUrl($this->config['config_id']),
             'amount' => [
                 'total' => $price,
                 'currency' => 'CNY',

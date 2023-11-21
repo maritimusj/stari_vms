@@ -12,10 +12,8 @@ use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 use zovye\Request;
-use zovye\Session;
 use zovye\util\Util;
 use zovye\util\PayUtil;
-use function zovye\_W;
 use function zovye\err;
 use function zovye\error;
 use function zovye\is_error;
@@ -47,24 +45,6 @@ class SQBPay implements IPay
         return new pay($this->config);
     }
 
-    protected function getNotifyUrl(): string
-    {
-        $notify_url = _W('siteroot');
-        $path = 'addons/'.APP_NAME.'/';
-
-        if (mb_strpos($notify_url, $path) === false) {
-            $notify_url .= $path;
-        }
-
-        if (Session::isAliUser()) {
-            $notify_url .= 'payment/SQBAlipay.php';
-        } else {
-            $notify_url .= 'payment/SQB.php';
-        }
-
-        return $notify_url;
-    }
-
     public function createQrcodePay(
         string $code,
         string $device_uid,
@@ -74,7 +54,7 @@ class SQBPay implements IPay
     ) {
         $SQB = $this->getSQB();
 
-        $notify_url = $this->getNotifyUrl();
+        $notify_url = PayUtil::getPaymentCallbackUrl($this->config['config_id']);
         $res = $SQB->qrPay($code, $order_no, $price, $device_uid, $body, $notify_url);
 
         Log::debug('sqb_qrpay', [
@@ -113,7 +93,7 @@ class SQBPay implements IPay
     ): array {
         $SQB = $this->getSQB();
 
-        $notify_url = $this->getNotifyUrl();
+        $notify_url = PayUtil::getPaymentCallbackUrl($this->config['config_id']);
         $res = $SQB->xAppPay($user_uid, $order_no, $price, $device_uid, $body, $notify_url);
 
         Log::debug('sqb_xapppay', [
@@ -148,7 +128,7 @@ class SQBPay implements IPay
     ): array {
         $SQB = $this->getSQB();
 
-        $notify_url = $this->getNotifyUrl();
+        $notify_url = PayUtil::getPaymentCallbackUrl($this->config['config_id']);
         $pay_result_url = Util::murl('payresult', ['op' => 'SQB']);
 
         return [

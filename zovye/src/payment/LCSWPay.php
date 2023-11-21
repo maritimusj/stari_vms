@@ -13,7 +13,6 @@ use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 use zovye\Session;
 use zovye\util\PayUtil;
-use function zovye\_W;
 use function zovye\err;
 use function zovye\is_error;
 
@@ -50,20 +49,6 @@ class LCSWPay implements IPay
         ]);
     }
 
-    protected function getNotifyUrl(): string
-    {
-        $url = _W('siteroot');
-        $path = 'addons/'.APP_NAME.'/';
-
-        if (mb_strpos($url, $path) === false) {
-            $url .= $path;
-        }
-
-        $url .= "payment/{$this->config['config_id']}.php";
-
-        return $url;
-    }
-
     protected function createPay(
         callable $fn,
         string $user_uid,
@@ -80,7 +65,7 @@ class LCSWPay implements IPay
             'orderNO' => $order_no,
             'price' => $price,
             'body' => $body,
-            'notify_url' => $this->getNotifyUrl(),
+            'notify_url' => PayUtil::getPaymentCallbackUrl($this->config['config_id']),
         ];
 
         $res = $fn($lcsw, $params);
@@ -127,7 +112,7 @@ class LCSWPay implements IPay
             'orderNO' => $order_no,
             'price' => $price,
             'body' => $body,
-            'notify_url' => $this->getNotifyUrl(),
+            'notify_url' => PayUtil::getPaymentCallbackUrl($this->config['config_id']),
         ];
 
         return $lcsw->qrpay($params);

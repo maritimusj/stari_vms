@@ -101,7 +101,7 @@ class PayUtil
             $notify_url .= $path;
         }
 
-        return $notify_url."payment/$config_id";
+        return $notify_url."payment/$config_id.php";
     }
 
     public static function getAliPayJs(array $params = []): string

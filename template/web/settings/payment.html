@@ -28,29 +28,61 @@
                     </div>
                 </div>
                 <fieldset {if empty($payment['lcsw'])}disabled{/if} name="lcsw">
-                <div class="form-group">
-                    <label for="merchant_no" class="col-md-2 control-label">商户号</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" name="merchant_no" id="merchant_no" value="{$payment['lcsw']['merchant_no']}">
+                    <div class="form-group">
+                        <label for="merchant_no" class="col-md-2 control-label">商户号</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="merchant_no" id="merchant_no" value="{$payment['lcsw']['merchant_no']}">
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label for="terminal_id" class="col-md-2 control-label">终端号</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" name="terminal_id" id="terminal_id" value="{$payment['lcsw']['terminal_id']}">
+                    <div class="form-group">
+                        <label for="terminal_id" class="col-md-2 control-label">终端号</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="terminal_id" id="terminal_id" value="{$payment['lcsw']['terminal_id']}">
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label for="access_token" class="col-md-2 control-label">密钥</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control inputMask" name="access_token" id="access_token" value="{$payment['lcsw']['access_token']}">
+                    <div class="form-group">
+                        <label for="access_token" class="col-md-2 control-label">密钥</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control inputMask" name="access_token" id="access_token" value="{$payment['lcsw']['access_token']}">
+                        </div>
                     </div>
-                </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">客户端</label>
+                        <div class="col-md-10">
+                            <label class="checkbox-inline" title="用户使用微信扫一扫支付时，是否使用扫呗收款">
+                                <input type="checkbox" name="lcswWxH5" value="1" {if $payment['lcsw']['app']['wx']['h5']}checked{/if}>
+                                微信H5
+                            </label>
+                            <label class="checkbox-inline" title="用户使用微信小程序支付时，是否使用扫呗收款">
+                                <input type="checkbox" name="lcswWxMiniApp" value="1" {if $payment['lcsw']['app']['wx']['miniapp']}checked{/if}>
+                                微信小程序
+                            </label>
+                            <label class="checkbox-inline" title="用户使用支付宝扫一扫支付时，是否使用扫呗收款">
+                                <input type="checkbox" name="lcswAliH5" value="1" {if $payment['lcsw']['app']['ali']['h5']}checked{/if}>
+                                支付宝H5
+                            </label>
+                            <label class="checkbox-inline" title="用户使用支付宝小程序时，是否使用扫呗收款">
+                                <input type="checkbox" name="lcswAliMiniApp" value="1" {if $payment['lcsw']['app']['ali']['miniapp']}checked{/if}>
+                                支付宝小程序
+                            </label>
+                        </div>
+                    </div>
                 </fieldset>
             </div>
             <div class="seg">       
                 {if $payment['SQB']}
                 <div class="title">收钱吧</div>
+                <div class="form-group">
+                    <label for="SQB" class="col-md-2 control-label"></label>
+                    <div class="col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="SQB" id="SQB" value="1" checked>
+                                是否启用
+                            </label>
+                        </div>
+                    </div>
+                </div>
                 <div class="form-group">
                     <label for="vendor_key" class="col-md-2 control-label">终端名称</label>
                     <div class="col-md-10">
@@ -70,11 +102,24 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="code" class="col-md-2 control-label"></label>
+                    <label class="col-md-2 control-label">客户端</label>
                     <div class="col-md-10">
-                        <button class="btn btn-danger" data-op="disableSQB">
-                            <i class="fa fa-ban"></i> 取消
-                        </button>
+                        <label class="checkbox-inline" title="用户使用微信扫一扫支付时，是否使用收钱吧收款">
+                            <input type="checkbox" name="SQBWxH5" value="1" {if $payment['SQB']['app']['wx']['h5']}checked{/if}>
+                            微信H5
+                        </label>
+                        <label class="checkbox-inline" title="用户使用微信小程序支付时，是否使用收钱吧收款">
+                            <input type="checkbox" name="SQBWxApp" value="1" {if $payment['SQB']['app']['wx']['miniapp']}checked{/if}>
+                            微信小程序
+                        </label>
+                        <label class="checkbox-inline" title="用户使用支付宝扫一扫支付时，是否使用收钱吧收款">
+                            <input type="checkbox" name="SQBAliH5" value="1" {if $payment['SQB']['app']['ali']['h5']}checked{/if}>
+                            支付宝H5
+                        </label>
+                        <label class="checkbox-inline" title="用户使用支付宝小程序时，是否使用收钱吧收款">
+                            <input type="checkbox" name="SQBAliMiniApp" value="1" {if $payment['SQB']['app']['ali']['miniapp']}checked{/if}>
+                            支付宝小程序
+                        </label>
                     </div>
                 </div>
                 {else}
@@ -84,7 +129,7 @@
                     <div class="col-md-10">
                         <div class="checkbox">
                             <label>
-                                <input type="checkbox" name="SQB" id="SQB" value="1" {if $payment['SQB']}checked{/if}>
+                                <input type="checkbox" name="SQB" id="SQB" value="1">
                                 是否启用
                             </label>
                         </div>
@@ -120,11 +165,24 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="code" class="col-md-2 control-label"></label>
+                        <label class="col-md-2 control-label">客户端</label>
                         <div class="col-md-10">
-                            <button class="btn btn-success" data-op="enableSQB">
-                                <i class="fa fa-check"></i> 激活
-                            </button>
+                            <label class="checkbox-inline" title="用户使用微信扫一扫支付时，是否使用收钱吧收款">
+                                <input type="checkbox" name="SQBWxH5" value="1" checked>
+                                微信H5
+                            </label>
+                            <label class="checkbox-inline" title="用户使用微信小程序支付时，是否使用收钱吧收款">
+                                <input type="checkbox" name="SQBWxApp" value="1" checked>
+                                微信小程序
+                            </label>
+                            <label class="checkbox-inline" title="用户使用支付宝扫一扫支付时，是否使用收钱吧收款">
+                                <input type="checkbox" name="SQBAliH5" value="1" checked>
+                                支付宝H5
+                            </label>
+                            <label class="checkbox-inline" title="用户使用支付宝小程序时，是否使用收钱吧收款">
+                                <input type="checkbox" name="SQBAliMiniApp" value="1" checked>
+                                支付宝小程序
+                            </label>
                         </div>
                     </div>
                 </fieldset>
@@ -157,7 +215,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="wxMCHID" class="col-md-2 control-label">商户号</label>
+                    <label for="wxMCHID" class="col-md-2 control-label">主商户号</label>
                     <div class="col-md-10">
                         <input type="text" class="form-control" name="wxMCHID" id="wxMCHID" value="{$payment['wx']['mch_id']}">
                     </div>
@@ -167,6 +225,27 @@
                     <div class="col-md-10">
                         <input type="text" class="form-control" name="wxSubMCHID" id="wxSubMCHID" value="{$payment['wx']['sub_mch_id']}">
                         <span class="help-block">* 如果使用商户模式，请填写子商户号。注意：商户模式支付v3版</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">客户端</label>
+                    <div class="col-md-10">
+                        <label class="checkbox-inline" title="用户使用微信扫一扫支付时">
+                            <input type="checkbox" name="lcswWxH5" value="1" checked disabled>
+                            微信H5
+                        </label>
+                        <label class="checkbox-inline" title="用户使用微信小程序支付时">
+                            <input type="checkbox" name="lcswWxMiniApp" value="1" checked disabled>
+                            微信小程序
+                        </label>
+                        <label class="checkbox-inline" title="用户使用支付宝扫一扫支付时">
+                            <input type="checkbox" name="lcswAliH5" value="1" disabled>
+                            支付宝H5
+                        </label>
+                        <label class="checkbox-inline" title="用户使用支付宝小程序时">
+                            <input type="checkbox" name="lcswAliMiniApp" value="1" disabled>
+                            支付宝小程序
+                        </label>
                     </div>
                 </div>
                 <div class="seg-divider">
@@ -250,7 +329,6 @@
                         <textarea type="text" class="form-control inputMask" name="ali_prikey" id="ali_prikey">{$settings['ali']['prikey']}</textarea>
                     </div>
                 </div>
-
             </div>
 
             <div class="seg">

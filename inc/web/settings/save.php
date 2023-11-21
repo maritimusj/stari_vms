@@ -18,6 +18,7 @@ use zovye\domain\User;
 use zovye\model\accountModelObj;
 use zovye\model\data_vwModelObj;
 use zovye\util\Helper;
+use zovye\util\SQBUtil;
 use zovye\util\Util;
 use zovye\util\WxPayUtil;
 
@@ -768,6 +769,91 @@ if ($page == 'device') {
     }
 
 } elseif ($page == 'payment') {
+
+    if (Request::bool('lcsw')) {
+        $data = [
+            'merchant_no' => Request::trim('merchant_no'),
+            'terminal_id' => Request::trim('terminal_id'),
+            'access_token' => Request::trim('access_token'),
+            'app' => [
+                'wx' => [
+                    'h5' => Request::bool('lcswWxH5'),
+                    'miniapp' => Request::bool('lcswWxMiniApp'),
+                ],
+                'ali' => [
+                    'h5' => Request::bool('lcswAliH5'),
+                    'miniapp' => Request::bool('lcswAliMiniApp'),
+                ],
+            ]
+        ];
+        $res = PaymentConfig::createOrUpdate(0, Pay::LCSW, $data);
+        if (is_error($res)) {
+            Log::error('settings', [
+                'error' => $res,
+                'data' => $data,
+            ]);
+        }
+    } else {
+        PaymentConfig::remove([
+            'agent_id' => 0,
+            'name' => Pay::LCSW,
+        ]);
+    }
+
+    if (Request::bool('SQB')) {
+        if (Request::has('app_id')) {
+            $app_id = Request::trim('app_id');
+            $vendor_sn = Request::trim('vendor_sn');
+            $vendor_key = Request::trim('vendor_key');
+            $code = Request::trim('code');
+    
+            $result = SQBUtil::activate($app_id, $vendor_sn, $vendor_key, $code);
+
+            if (is_error($result)) {
+                Log::error('SQB', $result);
+            } else {
+                $config = PaymentConfig::createOrUpdate(0, Pay::SQB, [
+                    'sn' => $result['terminal_sn'],
+                    'key' => $result['terminal_key'],
+                    'title' => $result['store_name'],
+                    'app' => [
+                        'wx' => [
+                            'h5' => Request::bool('SQBWxH5'),
+                            'miniapp' => Request::bool('SQBWxMiniApp'),
+                        ],
+                        'ali' => [
+                            'h5' => Request::bool('SQBAliH5'),
+                            'miniapp' => Request::bool('SQBAliMiniApp'),
+                        ],
+                    ]
+                ]);            
+            }
+        } else {
+            $config = PaymentConfig::findOne([
+                'agent_id' => 0,
+                'name' => Pay::SQB,
+            ]);
+            if ($config) {
+                $config->setExtraData('app', [
+                    'wx' => [
+                        'h5' => Request::bool('SQBWxH5'),
+                        'miniapp' => Request::bool('SQBWxMiniApp'),
+                    ],
+                    'ali' => [
+                        'h5' => Request::bool('SQBAliH5'),
+                        'miniapp' => Request::bool('SQBAliMiniApp'),
+                    ],
+                ]);
+                $config->save();
+            }
+        }
+    } else {
+        PaymentConfig::remove([
+            'agent_id' => 0,
+            'name' => Pay::SQB,
+        ]);
+    }
+
     if (Request::bool('wx')) {
         $data = [
             'appid' => Request::trim('wxAppID'),
@@ -827,29 +913,6 @@ if ($page == 'device') {
         PaymentConfig::remove([
             'agent_id' => 0,
             'name' => Pay::WX_V3,
-        ]);
-    }
-
-    if (Request::bool('lcsw')) {
-        $data = [
-            'wx' => Request::bool('lcsw_weixin'),
-            'ali' => Request::bool('lcsw_ali'),
-            'wxapp' => Request::bool('lcsw_wxapp'),
-            'merchant_no' => Request::trim('merchant_no'),
-            'terminal_id' => Request::trim('terminal_id'),
-            'access_token' => Request::trim('access_token'),
-        ];
-        $res = PaymentConfig::createOrUpdate(0, Pay::LCSW, $data);
-        if (is_error($res)) {
-            Log::error('settings', [
-                'error' => $res,
-                'data' => $data,
-            ]);
-        }
-    } else {
-        PaymentConfig::remove([
-            'agent_id' => 0,
-            'name' => Pay::LCSW,
         ]);
     }
 

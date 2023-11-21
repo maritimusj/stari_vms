@@ -16,6 +16,11 @@ class WxPayV3Client
         $this->instance = $instance;
     }
 
+    public function instance(): BuilderChainable
+    {
+        return $this->instance;
+    }
+
     public function get($path, $data = [])
     {
         return $this->query('get', $path, $data);

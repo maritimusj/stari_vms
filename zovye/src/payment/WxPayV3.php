@@ -114,12 +114,13 @@ class WxPayV3 implements IPay
         $data = [
             'sp_mchid' => $this->config['mch_id'],
             'sub_mchid' => $this->config['sub_mch_id'],
+            'order_no' => $order_no,
         ];
 
-        $response = PayUtil::getWxPayV3Client($this->config)->post(
-            "/v3/pay/partner/transactions/out-trade-no/$order_no/close",
-            $data
-        );
+        $response = PayUtil::getWxPayV3Client($this->config)
+            ->instance()
+            ->v3->pay->partner->transactions->outTradeNo->_order_no_->close
+            ->post($data);
 
         if (is_error($response)) {
             return $response;
@@ -155,10 +156,10 @@ class WxPayV3 implements IPay
             $data['out_trade_no'] = $order_no;
         }
 
-        $response = PayUtil::getWxPayV3Client($this->config)->post(
-            '/v3/refund/domestic/refunds',
-            $data
-        );
+        $response = PayUtil::getWxPayV3Client($this->config)
+            ->instance()
+            ->v3->refund->domestic->refunds
+            ->post($data);
 
         if (is_error($response)) {
             return $response;
@@ -176,12 +177,13 @@ class WxPayV3 implements IPay
         $data = [
             'sp_mchid' => $this->config['mch_id'],
             'sub_mchid' => $this->config['sub_mch_id'],
+            'order_no' => $order_no,
         ];
 
-        $response = PayUtil::getWxPayV3Client($this->config)->post(
-            "/v3/pay/partner/transactions/out-trade-no/$order_no",
-            $data
-        );
+        $response = PayUtil::getWxPayV3Client($this->config)
+            ->instance()
+            ->v3->pay->partner->transactions->outTradeNo->_order_no_
+            ->post($data);
 
         if (is_error($response)) {
             return $response;

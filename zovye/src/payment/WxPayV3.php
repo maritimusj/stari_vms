@@ -183,7 +183,7 @@ class WxPayV3 implements IPay
         $response = PayUtil::getWxPayV3Client($this->config)
             ->instance()
             ->v3->pay->partner->transactions->outTradeNo->_order_no_
-            ->post($data);
+            ->get($data);
 
         if (is_error($response)) {
             return $response;

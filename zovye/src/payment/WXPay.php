@@ -11,24 +11,31 @@ use zovye\contract\IPay;
 use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
-use zovye\util\Util;
-use zovye\util\WxPayUtil;
+use zovye\util\PayUtil;
 use zovye\We7;
 use function zovye\_W;
 use function zovye\is_error;
 
 class WXPay implements IPay
 {
-    private $config = [];
+    private $config;
+
+    /**
+     * @param array $config
+     */
+    public function __construct(array $config = [])
+    {
+        $this->config = $config;
+    }
 
     public function getName(): string
     {
-        return empty($this->config['name']) ? \zovye\Pay::WX : $this->config['name'];
+        return \zovye\Pay::WX;
     }
 
-    public function setConfig(array $config = [])
+    public function getConfig(): array
     {
-        $this->config = $config;
+        return $this->config;
     }
 
     private function getWx(): pay
@@ -146,7 +153,7 @@ class WXPay implements IPay
      */
     public function getPayJs(deviceModelObj $device, userModelObj $user): string
     {
-        return WxPayUtil::getPayJs($device, $user);
+        return PayUtil::getPayJs($device, $user);
     }
 
     public function query(string $order_no)

@@ -17,9 +17,9 @@ interface IPay
     public function getName(): string;
 
     /**
-     * 设置支付参数
+     * 获取支付参数
      */
-    public function setConfig(array $config = []);
+    public function getConfig(): array;
 
     /**
      * 创建支付订单
@@ -38,6 +38,7 @@ interface IPay
 
     /**
      * 获取支付Js
+     * @return mixed
      */
     public function getPayJs(deviceModelObj $device, userModelObj $user);
 
@@ -70,5 +71,9 @@ interface IPay
      */
     public function checkResult(array $data = []);
 
+    /**
+     * @param bool $ok
+     * @return mixed
+     */
     public function getResponse(bool $ok = true);
 }

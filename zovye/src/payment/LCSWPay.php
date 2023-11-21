@@ -12,25 +12,33 @@ use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 use zovye\Session;
-use zovye\util\Util;
+use zovye\util\PayUtil;
 use function zovye\_W;
 use function zovye\err;
 use function zovye\is_error;
 
 class LCSWPay implements IPay
 {
-    private $config = [];
+    private $config;
 
     const RESPONSE_OK = '{"return_code":"01","return_msg":"SUCCESS"}';
+
+    /**
+     * @param array $config
+     */
+    public function __construct(array $config = [])
+    {
+        $this->config = $config;
+    }
 
     public function getName(): string
     {
         return \zovye\Pay::LCSW;
     }
 
-    public function setConfig(array $config = [])
+    public function getConfig(): array
     {
-        $this->config = $config;
+        return $this->config;
     }
 
     private function getLCSW(): pay
@@ -51,7 +59,7 @@ class LCSWPay implements IPay
             $url .= $path;
         }
 
-        $url .= 'payment/lcsw.php';
+        $url .= "payment/{$this->config['config_id']}.php";
 
         return $url;
     }
@@ -156,193 +164,7 @@ class LCSWPay implements IPay
 
     public function getPayJs(deviceModelObj $device, userModelObj $user): string
     {
-        $params = [
-            'JQueryURL' => JS_JQUERY_URL,
-            'orderAPIURL' => Util::murl('order', ['deviceUID' => $device->getImei()]),
-            'payResultURL' => Util::murl('payresult', ['orderNO' => '__orderNO__', 'deviceid' => $device->getId()]),
-            'payFailed' => Util::murl('payfailed', ['msg' => '__msg__']),
-        ];
-
-        if (Session::isAliUser()) {
-            return $this->getAliPayJs($params);
-        } else {
-            return $this->getWxPayJs($params);
-        }
-    }
-
-    protected function getAliPayJs(array $params = []): string
-    {
-        return <<<ALI_JSCODE
-<script src="{$params['JQueryURL']}"></script>
-<script src="https://gw.alipayobjects.com/as/g/h5-lib/alipayjsapi/3.1.1/alipayjsapi.inc.min.js"></script>
-<script>
-    const zovye_fn = {};
-    zovye_fn.redirectToGetPayResultPage = function(orderNO, msg) {
-        let api_url = "{$params['payResultURL']}".replace("__orderNO__", orderNO);
-        api_url = api_url.replace("__msg__", encodeURIComponent(msg));
-        window.location.replace(api_url);
-    }
-    
-    zovye_fn.redirectToPayFailedPage = function(msg) {
-        //window.location.replace("{$params['payFailed']}".replace('__msg__', encodeURIComponent(msg)));
-        alert(msg);
-    }
-
-    zovye_fn.pay = function (res) {
-        return new Promise(function(resolve, reject) {
-           if (!res) {
-                return reject("请求失败！");
-            }       
-            if (!res.status) {
-                if (res.message) {
-                    return reject(res.message);
-                }
-                if(res.data && res.data.msg) {                   
-                    return reject(res.data.msg);
-                }        
-                return reject("请求失败！");
-            } 
-            
-            const data = res.data;    
-            ap.tradePay({tradeNO: data.tradeNo}, function (res) {
-                if (parseInt(res.resultCode) === 9000) {
-                    $.get("{$params['orderAPIURL']}", { op: "finished", orderNO: data.orderNO });
-                    resolve(data.orderNO, data.msg || "");
-                } else if (parseInt(res.resultCode) === 6001) {
-                    $.get("{$params['orderAPIURL']}", { op: "cancel", orderNO: data.orderNO });
-                    reject("支付取消!");
-                } else {
-                    $.get("{$params['orderAPIURL']}", { op: "cancel", orderNO: data.orderNO });
-                    reject("支付失败!");
-                }
-            });
-        });
-    }
-    zovye_fn.goods_wxpay = function(params, successFN, failFN) {
-      return new Promise(function(resolve, reject) {
-        const goodsID = typeof params === 'object' && params.goodsID !== undefined ? params.goodsID : params;
-        const total = typeof params === 'object' && params.total !== undefined ? params.total : 1;
-          $.get("{$params['orderAPIURL']}", {op: "create", goodsID: goodsID, total: total}).then(function(res) {
-              zovye_fn.pay(res).then(function(orderNO, msg) {
-                  if (typeof successFN !== 'function' || !successFN(orderNO)) {
-                    zovye_fn.redirectToGetPayResultPage(orderNO, msg);
-                  }
-                  resolve(orderNO, msg);
-              }).catch(function(msg) {
-                  if (typeof failFN !== 'function' || !failFN(msg)) {
-                    zovye_fn.redirectToPayFailedPage(msg);
-                  }
-                  reject(msg);
-              });
-          });  
-      });
-    }
-    zovye_fn.package_pay = function(packageID, successFN, failFN) {
-      return new Promise(function(resolve, reject) {
-          $.get("{$params['orderAPIURL']}", {op: "create", packageID: packageID}).then(function(res) {
-              zovye_fn.pay(res).then(function(orderNO, msg) {
-                  if (typeof successFN !== 'function' || !successFN(orderNO)) {
-                    zovye_fn.redirectToGetPayResultPage(orderNO, msg);
-                  }
-                  resolve(orderNO, msg);
-              }).catch(function(msg) {
-                  if (typeof failFN !== 'function' || !failFN(msg)) {
-                    zovye_fn.redirectToPayFailedPage(msg);
-                  }
-                  reject(msg);
-              });
-          });  
-      });
-    }
-</script>
-ALI_JSCODE;
-    }
-
-    protected function getWxPayJs(array $params = []): string
-    {
-        $js_sdk = Util::jssdk();
-
-        return <<<JSCODE
-<script src="{$params['JQueryURL']}"></script>
-{$js_sdk}
-<script>
-    wx.ready(function() {
-        wx.hideAllNonBaseMenuItem();
-    });
-    
-    const zovye_fn = {};
-    zovye_fn.redirectToGetPayResultPage = function(orderNO, msg) {
-        let api_url = "{$params['payResultURL']}".replace("__orderNO__", orderNO);
-        api_url = api_url.replace("__msg__", encodeURIComponent(msg))
-        window.location.replace(api_url);
-    }
-    
-    zovye_fn.redirectToPayFailedPage = function(msg) {
-        //window.location.replace("{$params['payFailed']}".replace('__msg__', encodeURIComponent(msg)));
-        alert(msg);
-    }
-        
-    zovye_fn.pay = function(res) {
-        return new Promise(function(resolve, reject) {
-            if (!res) {
-                return reject('请求失败！');
-            }
-            if (!res.status) {
-                if (res.message) {
-                    return reject(res.message);
-                }
-                if(res.data && res.data.msg) {                   
-                    return reject(res.data.msg);
-                }        
-                return reject("请求失败！");
-            } 
-            
-            const data = res.data;
-            WeixinJSBridge.invoke('getBrandWCPayRequest', {
-                "appId": data.appId,
-                "timeStamp": data.timeStamp,
-                "nonceStr": data.nonceStr,
-                "package": data.package,
-                "signType": data.signType,
-                "paySign": data.paySign,
-            }, function (res) {
-                if (res.err_msg === "get_brand_wcpay_request:ok") {
-                    $.get("{$params['orderAPIURL']}", { op: "finished", orderNO: data.orderNO });
-                    resolve(data.orderNO, data.msg || "");
-                } else if (res.err_msg === 'get_brand_wcpay_request:cancel') {
-                    $.get("{$params['orderAPIURL']}", { op: "cancel", orderNO: data.orderNO });
-                    reject("支付取消!");
-                } else {
-                    $.get("{$params['orderAPIURL']}", { op: "cancel", orderNO: data.orderNO });
-                    reject("支付失败!");
-                }
-            });
-        });
-    }
-    
-    zovye_fn.goods_wxpay = function(params, successFN, failFN) {
-      return new Promise(function(resolve, reject) {
-          const goodsID = typeof params === 'object' && params.goodsID !== undefined ? params.goodsID : params;
-          const total = typeof params === 'object' && params.total !== undefined ? params.total : 1;
-          $.get("{$params['orderAPIURL']}", {op: "create", goodsID: goodsID, total: total}).then(function(res) {
-              zovye_fn.pay(res).then(function(orderNO, msg) {
-                  if (typeof successFN !== 'function' || !successFN(orderNO)) {
-                      zovye_fn.redirectToGetPayResultPage(orderNO, msg);
-                  }
-                  resolve(orderNO, msg);
-              }).catch(function(msg) {
-                  if (typeof failFN !== 'function' || !failFN(msg)) {
-                      zovye_fn.redirectToPayFailedPage(msg);
-                  }
-                  reject(msg);
-              });
-          });      
-      }).catch((e)=>{
-            alert(e);
-        });
-    }
-</script>
-JSCODE;
+        return PayUtil::getPayJs($device, $user);
     }
 
     public function close(string $order_no)

@@ -20,7 +20,7 @@ use zovye\model\data_vwModelObj;
 use zovye\util\Helper;
 use zovye\util\SQBUtil;
 use zovye\util\Util;
-use zovye\util\WxPayUtil;
+use zovye\util\PayUtil;
 
 $url = _W('siteroot');
 
@@ -778,15 +778,17 @@ if ($page == 'device') {
             'app' => [
                 'wx' => [
                     'h5' => Request::bool('lcswWxH5'),
+                    'qrcode' => Request::bool('lcswQRCode'),
                     'miniapp' => Request::bool('lcswWxMiniApp'),
                 ],
                 'ali' => [
                     'h5' => Request::bool('lcswAliH5'),
+                    'qrcode' => Request::bool('lcswQRCode'),
                     'miniapp' => Request::bool('lcswAliMiniApp'),
                 ],
             ]
         ];
-        $res = PaymentConfig::createOrUpdate(0, Pay::LCSW, $data);
+        $res = PaymentConfig::createOrUpdateByName(Pay::LCSW, $data);
         if (is_error($res)) {
             Log::error('settings', [
                 'error' => $res,
@@ -794,10 +796,7 @@ if ($page == 'device') {
             ]);
         }
     } else {
-        PaymentConfig::remove([
-            'agent_id' => 0,
-            'name' => Pay::LCSW,
-        ]);
+        PaymentConfig::removeByName(Pay::LCSW);
     }
 
     if (Request::bool('SQB')) {
@@ -818,35 +817,36 @@ if ($page == 'device') {
                     'error' => $result,
                 ]);
             } else {
-                $config = PaymentConfig::createOrUpdate(0, Pay::SQB, [
+                PaymentConfig::createOrUpdateByName(Pay::SQB, [
                     'sn' => $result['terminal_sn'],
                     'key' => $result['terminal_key'],
                     'title' => $result['store_name'],
                     'app' => [
                         'wx' => [
                             'h5' => Request::bool('SQBWxH5'),
+                            'qrcode' => Request::bool('SQBQRCode'),
                             'miniapp' => Request::bool('SQBWxMiniApp'),
                         ],
                         'ali' => [
                             'h5' => Request::bool('SQBAliH5'),
+                            'qrcode' => Request::bool('SQBQRCode'),
                             'miniapp' => Request::bool('SQBAliMiniApp'),
                         ],
                     ]
                 ]);            
             }
         } else {
-            $config = PaymentConfig::findOne([
-                'agent_id' => 0,
-                'name' => Pay::SQB,
-            ]);
+            $config = PaymentConfig::getByName(Pay::SQB);
             if ($config) {
                 $config->setExtraData('app', [
                     'wx' => [
                         'h5' => Request::bool('SQBWxH5'),
+                        'qrcode' => Request::bool('SQBQRCode'),
                         'miniapp' => Request::bool('SQBWxMiniApp'),
                     ],
                     'ali' => [
                         'h5' => Request::bool('SQBAliH5'),
+                        'qrcode' => Request::bool('SQBQRCode'),
                         'miniapp' => Request::bool('SQBAliMiniApp'),
                     ],
                 ]);
@@ -854,10 +854,7 @@ if ($page == 'device') {
             }
         }
     } else {
-        PaymentConfig::remove([
-            'agent_id' => 0,
-            'name' => Pay::SQB,
-        ]);
+        PaymentConfig::removeByName(Pay::SQB);
     }
 
     if (Request::bool('wx')) {
@@ -874,12 +871,13 @@ if ($page == 'device') {
             'app' => [
                 'wx' => [
                     'h5' => true,
+                    'qrcode' => true,
                     'miniapp' => true,
                 ],
             ],
         ];
 
-        $res = PaymentConfig::createOrUpdate(0, Pay::WX, $data);
+        $res = PaymentConfig::createOrUpdateByName(Pay::WX, $data);
         if (is_error($res)) {
             Log::error('settings', [
                 'error' => $res,
@@ -898,9 +896,16 @@ if ($page == 'device') {
                 'pem' => [
                     'key' => Request::trim('V3key'),
                 ],
+                'app' => [
+                    'wx' => [
+                        'h5' => true,
+                        'qrcode' => true,
+                        'miniapp' => true,
+                    ],
+                ],
             ];
 
-            $res = WxPayUtil::getWxPlatformCertification($data);
+            $res = PayUtil::getWxPlatformCertification($data);
             if (is_error($res)) {
                 Log::error('settings', [
                     'error' => $res,
@@ -908,7 +913,7 @@ if ($page == 'device') {
                 ]);
             } else {
                 $data['pem']['cert'] = $res;
-                $res = PaymentConfig::createOrUpdate(0, Pay::WX_V3, $data);
+                $res = PaymentConfig::createOrUpdateByName(Pay::WX_V3, $data);
                 if (is_error($res)) {
                     Log::error('settings', [
                         'error' => $res,
@@ -918,14 +923,8 @@ if ($page == 'device') {
             }
         }
     } else {
-        PaymentConfig::remove([
-            'agent_id' => 0,
-            'name' => Pay::WX,
-        ]);
-        PaymentConfig::remove([
-            'agent_id' => 0,
-            'name' => Pay::WX_V3,
-        ]);
+        PaymentConfig::removeByName(Pay::WX);
+        PaymentConfig::removeByName(Pay::WX_V3);
     }
 
     $settings['ali']['appid'] = Request::trim('ali_appid');

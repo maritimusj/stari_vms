@@ -39,4 +39,16 @@ class payment_configModelObj extends ModelObj
 	protected $createtime;
 
 	use ExtraDataGettersAndSetters;
+
+    public function isEnabled($app)
+    {
+        return $this->getExtraData("app.$app", false);
+    }
+
+    public function toArray(): array
+    {
+        $data = (array)$this->getExtraData();
+        $data['config_id'] = $this->getId();
+        return $data;
+    }
 }

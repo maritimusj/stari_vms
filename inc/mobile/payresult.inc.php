@@ -33,10 +33,12 @@ if ($op == 'default') {
 
     Log::debug('payresult', [
         'from' => $_GET['from'],
+        'agent_id' => $_GET['config_id'],
+        'config_id' => $_GET['config_id'],
         'raw' => Request::raw(),
     ]);
 
-    $res = Pay::notify($_GET['from'], Request::raw());
+    $res = Pay::notify($_GET['config_id'], Request::raw());
 
     exit($res);
 }

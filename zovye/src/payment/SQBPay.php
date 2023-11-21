@@ -14,6 +14,7 @@ use zovye\model\userModelObj;
 use zovye\Request;
 use zovye\Session;
 use zovye\util\Util;
+use zovye\util\PayUtil;
 use function zovye\_W;
 use function zovye\err;
 use function zovye\error;
@@ -21,16 +22,24 @@ use function zovye\is_error;
 
 class SQBPay implements IPay
 {
-    private $config = [];
+    private $config;
+
+    /**
+     * @param array $config
+     */
+    public function __construct(array $config = [])
+    {
+        $this->config = $config;
+    }
 
     public function getName(): string
     {
         return \zovye\Pay::SQB;
     }
 
-    public function setConfig(array $config = [])
+    public function getConfig(): array
     {
-        $this->config = $config;
+        return $this->config;
     }
 
     private function getSQB(): pay
@@ -149,68 +158,7 @@ class SQBPay implements IPay
 
     public function getPayJs(deviceModelObj $device, userModelObj $user): string
     {
-        $device_uid = $device->getImei();
-
-        $js_sdk = Util::jssdk();
-        $jquery_url = JS_JQUERY_URL;
-        $order_api_url = Util::murl('order', ['deviceUID' => $device_uid]);
-
-        return <<<JS_CODE
-<script src="$jquery_url"></script>
-$js_sdk
-<script>
-    wx.ready(function(){
-        wx.hideAllNonBaseMenuItem();
-    });
-    const zovye_fn = {};
-    zovye_fn.pay = function(res) {
-        return new Promise(function(resolve, reject) {
-           if (!res) {
-                return reject("请求失败！");
-            }       
-           if (!res.status) {
-                if (res.message) {
-                    return reject(res.message);
-                }
-                if(res.data && res.data.msg) {                   
-                    return reject(res.data.msg);
-                }        
-                return reject("请求失败！");
-           } 
-           const data = res.data;
-           if (data && data.redirect) {
-               window.location.replace(data.redirect);
-               return resolve('正在转跳...');
-           }
-           return reject('支付转跳网址为空！');
-        })
-    }
-    zovye_fn.goods_wxpay = function(params) {
-        return new Promise(function(resolve, reject) {
-            const goodsID = typeof params === 'object' && params.goodsID !== undefined ? params.goodsID : params;
-            const total = typeof params === 'object' && params.total !== undefined ? params.total : 1;
-            $.get("$order_api_url", {op: "create", goodsID: goodsID, total: total}).then(function(res) {
-              zovye_fn.pay(res).catch(function(msg) {
-                  reject(msg);
-              });
-          });
-        }).catch((e)=>{
-            console.log(e);
-        });
-    }
-    zovye_fn.package_pay = function(packageID) {
-        return new Promise(function(resolve, reject) {
-            $.get("$order_api_url", {op: "create", packageID: packageID}).then(function(res) {
-              zovye_fn.pay(res).catch(function(msg) {
-                  reject(msg);
-              });
-          });
-        }).catch((e)=>{
-            console.log(e);
-        });
-    }
-    </script>
-JS_CODE;
+        return PayUtil::getPayJs($device, $user);
     }
 
     public function close(string $order_no)

@@ -17,14 +17,15 @@ use zovye\domain\Device;
 use zovye\domain\Locker;
 use zovye\domain\Order;
 use zovye\domain\PayLogs;
+use zovye\domain\PaymentConfig;
 use zovye\domain\User;
 use zovye\model\deviceModelObj;
 use zovye\model\pay_logsModelObj;
+use zovye\model\payment_configModelObj;
 use zovye\model\userModelObj;
 use zovye\payment\LCSWPay;
 use zovye\payment\SQBPay;
 use zovye\payment\WXPay;
-use zovye\payment\WxPayV3;
 
 class Pay
 {
@@ -33,9 +34,6 @@ class Pay
 
     //微信支付v3
     const WX_V3 = 'wx_v3';
-
-    //微信小程序
-    const WxAPP = 'wxapp';
 
     //支付宝
     const ALI = 'ali';
@@ -49,7 +47,6 @@ class Pay
     static $names = [
         self::WX => '微信支付',
         self::WX_V3 => '微信支付v3',
-        self::WxAPP => '微信小程序支付',
         self::ALI => '支付宝',
         self::LCSW => '扫呗',
         self::SQB => '收钱吧',
@@ -60,17 +57,77 @@ class Pay
         return self::$names[$name] ?? '未知';
     }
 
+    public static function rebuildPay(pay_logsModelObj $log): ?IPay
+    {
+        $config_id = $log->getPayConfigId();
+        if (empty($config_id)) {
+            return null;
+        }
+
+        $config = PaymentConfig::get($config_id);
+        if (!$config) {
+            return null;
+        }
+
+        return self::from($config);
+    }
+
+    public static function selectPay(deviceModelObj $device, userModelObj $user, string $scene): ?IPay
+    {
+        if ($user->isWxUser() || $user->isWXAppUser()) {
+            $names = [self::LCSW, self::SQB, self::WX_V3, self::WX];
+        } elseif ($user->isAliUser()) {
+            $names = [self::LCSW, self::SQB];
+        } else {
+            return null;
+        }
+
+        $agent = $device->getAgent();
+        if ($agent) {
+            foreach ($names as $name) {
+                /** @var payment_configModelObj $config */
+                $config = PaymentConfig::getFor($agent, $name);
+                if (!$config) {
+                    continue;
+                }
+                if ($user->isWxUser() && $config->isEnabled("wx.$scene")) {
+                    return self::from($config);
+                }
+                if ($user->isAliUser() && $config->isEnabled("ali.$scene")) {
+                    return self::from($config);
+                }
+            }
+        }
+
+        foreach ($names as $name) {
+            /** @var payment_configModelObj $config */
+            $config = PaymentConfig::getByName($name);
+            if (!$config) {
+                continue;
+            }
+            if ($user->isWxUser() && $config->isEnabled("wx.$scene")) {
+                return self::from($config);
+            }
+            if ($user->isAliUser() && $config->isEnabled("ali.$scene")) {
+                return self::from($config);
+            }
+        }
+
+        return null;
+    }
+
     /**
      * 获取支付需要的Js，函数会根据指定的设备和用户，获取特定的支付配置
+     * @return mixed
      */
     public static function getPayJs(deviceModelObj $device, userModelObj $user)
     {
-        $res = self::getActivePayObj($device);
-        if (is_error($res)) {
-            return $res;
+        $pay = self::selectPay($device, $user, 'h5');
+        if (!$pay) {
+            return err('暂时无法支付！');
         }
 
-        return $res->getPayJs($device, $user);
+        return $pay->getPayJs($device, $user);
     }
 
     /**
@@ -81,15 +138,16 @@ class Pay
     private static function prepareData(
         deviceModelObj $device,
         userModelObj $user,
+        string $scene,
         array $goods,
         array $pay_data = []
     ): array {
-        $pay = self::getActivePayObj($device);
-        if (is_error($pay)) {
-            return $pay;
+        $pay = self::selectPay($device, $user, $scene);
+        if (!$pay) {
+            return err('暂时无法支付！');
         }
 
-        list($order_no,) = self::prepareDataWithPay($pay->getName(), $device, $user, $goods, $pay_data);
+        list($order_no,) = self::prepareDataWithPay($pay, $device, $user, $goods, $pay_data);
         if (is_error($order_no)) {
             return $order_no;
         }
@@ -98,7 +156,7 @@ class Pay
     }
 
     public static function prepareDataWithPay(
-        string $pay_name,
+        IPay $pay,
         deviceModelObj $device,
         userModelObj $user,
         array $goods,
@@ -114,7 +172,8 @@ class Pay
             'device' => $device->getId(),
             'user' => $user->getOpenid(),
             'pay' => [
-                'name' => $pay_name,
+                'config_id' => $pay->getConfig()['config_id'],
+                'name' => $pay->getName(),
             ],
             'orderData' => [
                 'orderNO' => $order_no,
@@ -146,12 +205,13 @@ class Pay
 
     private static function createPay(
         $fn,
+        $scene,
         deviceModelObj $device,
         userModelObj $user,
         array $goods,
         array $pay_data = []
     ): array {
-        $result = self::prepareData($device, $user, $goods, $pay_data);
+        $result = self::prepareData($device, $user, $scene, $goods, $pay_data);
         if (is_error($result)) {
             return ['', $result];
         }
@@ -196,7 +256,6 @@ class Pay
         return [$order_no, $res];
     }
 
-
     /**
      * 创建支付订单
      * @param deviceModelObj $device 设备
@@ -210,7 +269,7 @@ class Pay
         array $goods,
         array $pay_data = []
     ): array {
-        return self::createPay('createXAppPay', $device, $user, $goods, $pay_data);
+        return self::createPay('createXAppPay', 'miniapp', $device, $user, $goods, $pay_data);
     }
 
     /**
@@ -226,7 +285,7 @@ class Pay
         array $goods,
         array $pay_data = []
     ): array {
-        return self::createPay('createJsPay', $device, $user, $goods, $pay_data);
+        return self::createPay('createJsPay', 'h5', $device, $user, $goods, $pay_data);
     }
 
     public static function createQrcodePay(
@@ -235,21 +294,27 @@ class Pay
         array $goods,
         array $pay_data = []
     ): array {
-        return self::createPay('createQrcodePay', $device, User::getPseudoUser($code, '<匿名用户>'), $goods, $pay_data);
+        return self::createPay('createQrcodePay', 'qrcode',  $device, User::getPseudoUser($code, '<匿名用户>'), $goods, $pay_data);
     }
 
     /**
      * 处理支付的通知数据
-     * @param string $name 支付类型名称
+     * @param int $config_id
+     * @param string $input
+     * @return mixed
      */
-    public static function notify(string $name, string $input)
+    public static function notify(int $config_id, string $input)
     {
         $pay = null;
         try {
-            //获取一个临时的pay对象
-            $pay = self::makePayObj($name);
-            if (is_error($pay)) {
-                throw new Exception($pay['message']);
+            $config = PaymentConfig::get($config_id);
+            if (!$config) {
+                throw new Exception('不正确的支付配置id！');
+            }
+
+            $pay = self::from($config);
+            if (!$pay) {
+                throw new Exception('支付配置出错！');
             }
 
             $data = $pay->decodeData($input);
@@ -259,20 +324,6 @@ class Pay
 
             if (is_error($data)) {
                 throw new Exception($data['message']);
-            }
-
-            //获取一个配置完整的pay对象
-            $device = null;
-            if ($data['deviceUID']) {
-                $device = Device::get($data['deviceUID'], true);
-                if (empty($device)) {
-                    throw new Exception('找不到这个设备！');
-                }
-            }
-
-            $pay = self::getActivePayObj($device, $name);
-            if (is_error($pay)) {
-                throw new Exception($pay['message']);
             }
 
             if (!$pay->checkResult($data['raw'])) {
@@ -342,7 +393,7 @@ class Pay
         } catch (Exception $e) {
             Log::error('pay', [
                 'error' => $e->getMessage(),
-                'name' => $name,
+                'config_id' => $config_id,
                 'input' => $input,
             ]);
 
@@ -353,16 +404,16 @@ class Pay
     /**
      * 关闭订单
      */
-    public static function close(string $order_no)
+    public static function close(string $order_no): array
     {
         $pay_log = self::getPayLog($order_no);
         if (empty($pay_log)) {
             return err('找不到支付记录！');
         }
 
-        $pay = self::getPayObj($pay_log);
-        if (is_error($pay)) {
-            return $pay;
+        $pay = self::rebuildPay($pay_log);
+        if (!$pay) {
+            return err('支付配置不正确！');
         }
 
         return $pay->close($order_no);
@@ -381,24 +432,9 @@ class Pay
         return self::refundByLog($pay_log, $total, $data);
     }
 
-    public static function getPayObj(pay_logsModelObj $pay_log)
-    {
-        $device_id = $pay_log->getDeviceId();
-
-        if ($device_id != 0) {
-            $device = Device::get($device_id);
-        }
-
-        if (!isset($device)) {
-            $device = Device::getDummyDevice();
-        }
-
-        return self::getActivePayObj($device, $pay_log->getPayName());
-    }
-
     public static function refundByLog(pay_logsModelObj $pay_log, int &$total = 0, array $data = [])
     {
-        $pay = self::getPayObj($pay_log);
+        $pay = self::rebuildPay($pay_log);
         if (is_error($pay)) {
             return $pay;
         }
@@ -427,25 +463,18 @@ class Pay
         return $res;
     }
 
-    public static function queryFor(pay_logsModelObj $pay_log)
+    public static function queryFor(pay_logsModelObj $pay_log): array
     {
-        $device_id = $pay_log->getDeviceId();
-
-        if ($device_id == 0) {
-            $device = Device::getDummyDevice();
-        } else {
-            $device = Device::get($device_id);
-            if (empty($device)) {
-                return err('找不到这个设备！');
-            }
-        }
-
-        $pay = self::getActivePayObj($device, $pay_log->getPayName());
-        if (is_error($pay)) {
-            return $pay;
+        $pay = self::rebuildPay($pay_log);
+        if (!$pay) {
+            return err('支付配置不正确！');
         }
 
         $order_no = $pay_log->getOrderNO();
+
+        if (empty($order_no)) {
+            return err('订单号不正确！');
+        }
 
         return $pay->query($order_no);
     }
@@ -453,7 +482,7 @@ class Pay
     /**
      * 查询指定支付信息
      */
-    public static function query(string $order_no)
+    public static function query(string $order_no): array
     {
         $pay_log = self::getPayLog($order_no);
         if (empty($pay_log)) {
@@ -650,105 +679,25 @@ class Pay
         return [];
     }
 
-
-    /**
-     * 获取一个临时的支付对象
-     */
-    private static function makePayObj(string $name)
+    public static function from(payment_configModelObj $config): ?IPay
     {
-        //lcsw(扫呗）第三方支付
-        if ($name == self::LCSW) {
-            return new LCSWPay();
+        if ($config->getName() == self::LCSW) {
+            return new LCSWPay($config->toArray());
         }
 
-        //收钱吧
-        if ($name == self::SQB) {
-            return new SQBPay();
+        if ($config->getName() == self::SQB) {
+            return new SQBPay($config->toArray());
         }
 
-        //微信公众号支付或小程序支付
-        if ($name == self::WX_V3) {
-            $pay = new WxPayV3();
-            $config = self::getDefaultConfiguration(self::WX);
-            $pay->setConfig($config['v3']);
-
-            return $pay;
+        if ($config->getName() == self::WX) {
+            return new WXPay($config->toArray());
         }
 
-        if ($name == self::WX || $name == self::WxAPP) {
-            return new WXPay();
+        if ($config->getName() == self::WX_V3) {
+            return new WXPay($config->toArray());
         }
 
-        //支付宝支付
-        if ($name == self::ALI) {
-            return err('支付宝原生支付暂不可用！');
-        }
-
-        return err('不支持的支付类型：');
-    }
-
-    public static function loadConfig($name)
-    {
-
-    }
-
-    public static function make($config)
-    {
-        $name = $config['name'];
-        if ($name == self::LCSW) {
-            $lcsw = new LCSWPay();
-            $lcsw->setConfig($config);
-
-            return $lcsw;
-        }
-
-        if ($name == self::SQB) {
-            $sqb = new SQBPay();
-            $sqb->setConfig($config);
-
-            return $sqb;
-        }
-
-        if ($name == self::WX || $name == self::WxAPP) {
-            if ($config['v3']) {
-                $v3config = $config['v3'];
-                $v3config['appid'] = $config['appid'];
-                $v3config['wxappid'] = $config['wxappid'];
-
-                $v3 = new WxPayV3();
-                $v3->setConfig($v3config);
-
-                return $v3;
-            }
-
-            $wx = new WXPay();
-            $wx->setConfig($config);
-
-            return $wx;
-        }
-
-        //支付宝支付
-        if ($name == self::ALI) {
-            return err('暂不支付支付宝原生支付！');
-        }
-
-        return err('不支持的支付类型！');
-    }
-
-    /**
-     * 根据设备和名称获取已配置好的支付对象
-     * @param deviceModelObj $device
-     * @param string $name
-     * @return array|LCSWPay|SQBPay|WXPay
-     */
-    public static function getActivePayObj(deviceModelObj $device, string $name = '')
-    {
-        $config = self::getPayConfiguration($device, $name);
-        if (is_error($config)) {
-            return $config;
-        }
-
-        return self::make($config);
+        return null;
     }
 
     public static function isWxPayQrcode($code): bool

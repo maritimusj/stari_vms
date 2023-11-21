@@ -47,7 +47,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-md-2 control-label">客户端</label>
+                        <label class="col-md-2 control-label">场景</label>
                         <div class="col-md-10">
                             <label class="checkbox-inline" title="用户使用微信扫一扫支付时，是否使用扫呗收款">
                                 <input type="checkbox" name="lcswWxH5" value="1" {if empty($payment['lcsw']) || $payment['lcsw']['app']['wx']['h5']}checked{/if}>
@@ -64,6 +64,10 @@
                             <label class="checkbox-inline" title="用户使用支付宝小程序时，是否使用扫呗收款">
                                 <input type="checkbox" name="lcswAliMiniApp" value="1" {if empty($payment['lcsw']) || $payment['lcsw']['app']['ali']['miniapp']}checked{/if}>
                                 支付宝小程序
+                            </label>
+                            <label class="checkbox-inline" title="用户使用付款二维码时，是否使用扫呗收款">
+                                <input type="checkbox" name="lcswQRCode" value="1" {if empty($payment['lcsw']) || $payment['lcsw']['app']['wx']['qrcode']}checked{/if}>
+                                付款二维码
                             </label>
                         </div>
                     </div>
@@ -103,7 +107,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-md-2 control-label">客户端</label>
+                        <label class="col-md-2 control-label">场景</label>
                         <div class="col-md-10">
                             <label class="checkbox-inline" title="用户使用微信扫一扫支付时，是否使用收钱吧收款">
                                 <input type="checkbox" name="SQBWxH5" value="1" {if $payment['SQB']['app']['wx']['h5']}checked{/if}>
@@ -120,6 +124,10 @@
                             <label class="checkbox-inline" title="用户使用支付宝小程序时，是否使用收钱吧收款">
                                 <input type="checkbox" name="SQBAliMiniApp" value="1" {if $payment['SQB']['app']['ali']['miniapp']}checked{/if}>
                                 支付宝小程序
+                            </label>
+                            <label class="checkbox-inline" title="用户使用付款二维码时，是否使用收钱吧收款">
+                                <input type="checkbox" name="SQBQRCode" value="1" {if $payment['SQB']['app']['wx']['qrcode']}checked{/if}>
+                                付款二维码
                             </label>
                         </div>
                     </div>
@@ -167,7 +175,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-md-2 control-label">客户端</label>
+                        <label class="col-md-2 control-label">场景</label>
                         <div class="col-md-10">
                             <label class="checkbox-inline" title="用户使用微信扫一扫支付时，是否使用收钱吧收款">
                                 <input type="checkbox" name="SQBWxH5" value="1" checked>
@@ -184,6 +192,10 @@
                             <label class="checkbox-inline" title="用户使用支付宝小程序时，是否使用收钱吧收款">
                                 <input type="checkbox" name="SQBAliMiniApp" value="1" checked>
                                 支付宝小程序
+                            </label>
+                            <label class="checkbox-inline" title="用户使用付款二维码时，是否使用收钱吧收款">
+                                <input type="checkbox" name="SQBQRCode" value="1" checked>
+                                付款二维码
                             </label>
                         </div>
                     </div>
@@ -230,23 +242,27 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-md-2 control-label">客户端</label>
+                    <label class="col-md-2 control-label">场景</label>
                     <div class="col-md-10">
                         <label class="checkbox-inline" title="用户使用微信扫一扫支付时">
-                            <input type="checkbox" name="lcswWxH5" value="1" checked disabled>
+                            <input type="checkbox" value="1" checked disabled>
                             微信H5
                         </label>
                         <label class="checkbox-inline" title="用户使用微信小程序支付时">
-                            <input type="checkbox" name="lcswWxMiniApp" value="1" checked disabled>
+                            <input type="checkbox" value="1" checked disabled>
                             微信小程序
                         </label>
                         <label class="checkbox-inline" title="用户使用支付宝扫一扫支付时">
-                            <input type="checkbox" name="lcswAliH5" value="1" disabled>
+                            <input type="checkbox" value="1" disabled>
                             支付宝H5
                         </label>
                         <label class="checkbox-inline" title="用户使用支付宝小程序时">
-                            <input type="checkbox" name="lcswAliMiniApp" value="1" disabled>
+                            <input type="checkbox" value="1" disabled>
                             支付宝小程序
+                        </label>
+                        <label class="checkbox-inline" title="用户使用支付宝小程序时">
+                            <input type="checkbox" value="1" disabled>
+                            付款二维码
                         </label>
                     </div>
                 </div>

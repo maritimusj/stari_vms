@@ -316,10 +316,12 @@ $result = DBUtil::transactionDo(function () use ($id, &$from) {
                 'app' => [
                     'wx' => [
                         'h5' => Request::bool('lcswWxH5'),
+                        'qrcode' => Request::bool('lcswQRCode'),
                         'miniapp' => Request::bool('lcswWxMiniApp'),
                     ],
                     'ali' => [
                         'h5' => Request::bool('lcswAliH5'),
+                        'qrcode' => Request::bool('lcswQRCode'),
                         'miniapp' => Request::bool('lcswAliMiniApp'),
                     ],
                 ]
@@ -351,17 +353,19 @@ $result = DBUtil::transactionDo(function () use ($id, &$from) {
                         'error' => $result,
                     ]);
                 } else {
-                    $config = PaymentConfig::createOrUpdate($user->getId(), Pay::SQB, [
+                    PaymentConfig::createOrUpdate($user->getId(), Pay::SQB, [
                         'sn' => $result['terminal_sn'],
                         'key' => $result['terminal_key'],
                         'title' => $result['store_name'],
                         'app' => [
                             'wx' => [
                                 'h5' => Request::bool('SQBWxH5'),
+                                'qrcode' => Request::bool('SQBQRCode'),
                                 'miniapp' => Request::bool('SQBWxMiniApp'),
                             ],
                             'ali' => [
                                 'h5' => Request::bool('SQBAliH5'),
+                                'qrcode' => Request::bool('SQBQRCode'),
                                 'miniapp' => Request::bool('SQBAliMiniApp'),
                             ],
                         ]
@@ -376,10 +380,12 @@ $result = DBUtil::transactionDo(function () use ($id, &$from) {
                     $config->setExtraData('app', [
                         'wx' => [
                             'h5' => Request::bool('SQBWxH5'),
+                            'qrcode' => Request::bool('SQBQRCode'),
                             'miniapp' => Request::bool('SQBWxMiniApp'),
                         ],
                         'ali' => [
                             'h5' => Request::bool('SQBAliH5'),
+                            'qrcode' => Request::bool('SQBQRCode'),
                             'miniapp' => Request::bool('SQBAliMiniApp'),
                         ],
                     ]);
@@ -388,7 +394,7 @@ $result = DBUtil::transactionDo(function () use ($id, &$from) {
             }
         } else {
             PaymentConfig::remove([
-                'agent_id' => 0,
+                'agent_id' => $user->getId(),
                 'name' => Pay::SQB,
             ]);
         }
@@ -399,6 +405,7 @@ $result = DBUtil::transactionDo(function () use ($id, &$from) {
                 'app' => [
                     'wx' => [
                         'h5' => true,
+                        'qrcode' => true,
                         'miniapp' => true,
                     ],
                 ],

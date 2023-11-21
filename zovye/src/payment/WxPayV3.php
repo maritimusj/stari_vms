@@ -14,9 +14,10 @@ use zovye\contract\IPay;
 use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
+use zovye\Pay;
 use zovye\Request;
 use zovye\util\Util;
-use zovye\util\WxPayUtil;
+use zovye\util\PayUtil;
 use function zovye\_W;
 use function zovye\err;
 use function zovye\is_error;
@@ -25,14 +26,22 @@ class WxPayV3 implements IPay
 {
     private $config = [];
 
-    public function getName(): string
-    {
-        return 'wx_v3';
-    }
-
-    public function setConfig(array $config = [])
+    /**
+     * @param array $config
+     */
+    public function __construct(array $config = [])
     {
         $this->config = $config;
+    }
+
+    public function getName(): string
+    {
+        return Pay::WX_V3;
+    }
+
+    public function getConfig(): array
+    {
+        return $this->config;
     }
 
     protected function getNotifyUrl(): string
@@ -76,7 +85,7 @@ class WxPayV3 implements IPay
             'attach' => $device_uid,
         ];
 
-        $response = WxPayUtil::getV3Client($this->config)->post('/v3/pay/partner/transactions/jsapi', $data);
+        $response = PayUtil::getWxPayV3Client($this->config)->post('/v3/pay/partner/transactions/jsapi', $data);
 
         Log::debug('v3', [
             'config' => $this->config,
@@ -112,7 +121,7 @@ class WxPayV3 implements IPay
 
     public function getPayJs(deviceModelObj $device, userModelObj $user): string
     {
-        return WxPayUtil::getPayJs($device, $user);
+        return PayUtil::getPayJs($device, $user);
     }
 
     public function close(string $order_no)
@@ -122,7 +131,7 @@ class WxPayV3 implements IPay
             'sub_mchid' => $this->config['sub_mch_id'],
         ];
 
-        $response = WxPayUtil::getV3Client($this->config)->post(
+        $response = PayUtil::getWxPayV3Client($this->config)->post(
             "/v3/pay/partner/transactions/out-trade-no/$order_no/close",
             $data
         );
@@ -152,7 +161,7 @@ class WxPayV3 implements IPay
             $data['out_trade_no'] = $order_no;
         }
 
-        $response = WxPayUtil::getV3Client($this->config)->post(
+        $response = PayUtil::getWxPayV3Client($this->config)->post(
             '/v3/refund/domestic/refunds',
             $data
         );
@@ -175,7 +184,7 @@ class WxPayV3 implements IPay
             'sub_mchid' => $this->config['sub_mch_id'],
         ];
 
-        $response = WxPayUtil::getV3Client($this->config)->post(
+        $response = PayUtil::getWxPayV3Client($this->config)->post(
             "/v3/pay/partner/transactions/out-trade-no/$order_no",
             $data
         );

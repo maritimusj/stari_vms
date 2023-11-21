@@ -92,6 +92,11 @@ class pay_logsModelObj extends BaseLogsModelObj implements ICard
         return strval($this->getData('pay.name'));
     }
 
+    public function getPayConfigId()
+    {
+        return $this->getData('pay.config_id', 0);
+    }
+
     public function getTotal(): int
     {
         $total = intval($this->getData('total'));
@@ -193,5 +198,4 @@ class pay_logsModelObj extends BaseLogsModelObj implements ICard
 
         return strval($this->getData('queryResult.transaction_id'));
     }
-
 }

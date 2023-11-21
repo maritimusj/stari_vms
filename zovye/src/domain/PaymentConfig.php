@@ -9,7 +9,6 @@ namespace zovye\domain;
 
 use zovye\base\ModelFactory;
 use zovye\model\agentModelObj;
-use zovye\model\deviceModelObj;
 use zovye\model\payment_configModelObj;
 use zovye\util\Helper;
 use function zovye\err;
@@ -22,17 +21,33 @@ class PaymentConfig extends AbstractBase
         return m('payment_config');
     }
 
-    public static function getFor(agentModelObj $agent = null, $name = '')
+    public static function getByName($name)
     {
         return parent::findOne([
-            'agent_id' => $agent ? $agent->getId() : 0,
+            'agent_id' => 0,
             'name' => $name,
         ]);
     }
 
-    public static function getForDevice(deviceModelObj $device, $name)
+    public static function removeByName($name): bool
     {
-        return self::getFor($device->getAgent(), $name);
+        return parent::remove([
+            'agent_id' => 0,
+            'name' => $name,
+        ]);
+    }
+
+    public static function getFor(agentModelObj $agent, $name)
+    {
+        return parent::findOne([
+            'agent_id' => $agent->getId(),
+            'name' => $name,
+        ]);
+    }
+
+    public static function createOrUpdateByName($name, $extra = [])
+    {
+        return self::createOrUpdate(0, $name, $extra);
     }
 
     public static function createOrUpdate($agent_id, $name, $extra = [])
@@ -65,8 +80,8 @@ class PaymentConfig extends AbstractBase
             ],
             'op' => 'notify',
             'from' => $config->getName(),
-            'id' => $config->getId(),
-            'agentId' => $config->getAgentId(),
+            'config_id' => $config->getId(),
+            'agent_id' => $config->getAgentId(),
         ]);
 
         if (empty($res)) {

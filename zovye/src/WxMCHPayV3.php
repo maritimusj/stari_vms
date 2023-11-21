@@ -6,7 +6,7 @@
 
 namespace zovye;
 
-use zovye\util\WxPayUtil;
+use zovye\util\PayUtil;
 
 class WxMCHPayV3
 {
@@ -52,7 +52,7 @@ class WxMCHPayV3
             ],
         ];
 
-        $response = WxPayUtil::getV3Client($this->config)->post('v3/transfer/batches', $data);
+        $response = PayUtil::getWxPayV3Client($this->config)->post('v3/transfer/batches', $data);
         if (is_error($response)) {
             return $response;
         }
@@ -84,7 +84,7 @@ class WxMCHPayV3
             'detail_status' => 'ALL',
         ];
 
-        $response = WxPayUtil::getV3Client($this->config)->get("v3/transfer/batches/batch-id/$batch_id", $data);
+        $response = PayUtil::getWxPayV3Client($this->config)->get("v3/transfer/batches/batch-id/$batch_id", $data);
         if (is_error($response)) {
             return $response;
         }

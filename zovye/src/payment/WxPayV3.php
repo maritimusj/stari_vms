@@ -112,8 +112,10 @@ class WxPayV3 implements IPay
     public function close(string $order_no)
     {
         $data = [
-            'sp_mchid' => $this->config['mch_id'],
-            'sub_mchid' => $this->config['sub_mch_id'],
+            'json' => [
+                'sp_mchid' => $this->config['mch_id'],
+                'sub_mchid' => $this->config['sub_mch_id'],
+            ],
             'order_no' => $order_no,
         ];
 
@@ -141,19 +143,21 @@ class WxPayV3 implements IPay
         }
 
         $data = [
-            'sub_mchid' => $this->config['sub_mch_id'],
-            'out_refund_no' => Util::random(32),
-            'amount' => [
-                'refund' => $amount,
-                'total' => intval($res['total']),
-                'currency' => 'CNY',
+            'json' => [
+                'sub_mchid' => $this->config['sub_mch_id'],
+                'out_refund_no' => Util::random(32),
+                'amount' => [
+                    'refund' => $amount,
+                    'total' => intval($res['total']),
+                    'currency' => 'CNY',
+                ],
             ],
         ];
 
         if ($is_transaction_id) {
-            $data['transaction_id'] = $order_no;
+            $data['json']['transaction_id'] = $order_no;
         } else {
-            $data['out_trade_no'] = $order_no;
+            $data['json']['out_trade_no'] = $order_no;
         }
 
         $response = PayUtil::getWxPayV3Client($this->config)
@@ -175,8 +179,10 @@ class WxPayV3 implements IPay
     public function query(string $order_no)
     {
         $data = [
-            'sp_mchid' => $this->config['mch_id'],
-            'sub_mchid' => $this->config['sub_mch_id'],
+            'query' => [
+                'sp_mchid' => $this->config['mch_id'],
+                'sub_mchid' => $this->config['sub_mch_id'],
+            ],
             'order_no' => $order_no,
         ];
 
@@ -196,7 +202,7 @@ class WxPayV3 implements IPay
         return [
             'result' => 'success',
             'type' => $this->getName(),
-            'merchant_no' => $this->config['mch_id'],
+            'merchant_no' => $response['sp_mchid'] ?? $response['mchid'],
             'orderNO' => $response['out_trade_no'],
             'transaction_id' => $response['transaction_id'],
             'total' => $response['amount'],

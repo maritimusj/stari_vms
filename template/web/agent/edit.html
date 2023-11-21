@@ -1541,17 +1541,17 @@
                     <div class="col-md-10">
                         <div class="checkbox">
                             <label>
-                                <input type="checkbox" name="wx" id="wx" value="1" {if $payment['wx']}checked{/if}>
+                                <input type="checkbox" name="wx" id="wx" value="1" {if $payment['wx_v3']}checked{/if}>
                                 是否启用
                             </label>
                         </div>
                     </div>
                 </div>
-                <fieldset {if empty($payment['wx'])}disabled{/if} name="wx">
+                <fieldset {if empty($payment['wx_v3'])}disabled{/if} name="wx">
                 <div class="form-group">
                     <label for="wxMCHID" class="col-md-2 control-label">子商户号</label>
                     <div class="col-md-10">
-                        <input type="text" class="form-control" name="wxMCHID" id="wxMCHID" value="{$payment['wx']['sub_mch_id']}">
+                        <input type="text" class="form-control" name="wxMCHID" id="wxMCHID" value="{$payment['wx_v3']['sub_mch_id']}">
                     </div>
                 </div>
                 <div class="form-group">

@@ -178,6 +178,9 @@ if ($op == 'agent_commission') {
             $tpl_data['payment'][$name] = $config->getExtraData();
         }
     }
+
+} elseif ($op == 'agent_misc') {
+    $tpl_data['themes'] = Theme::valid();
 }
 
 $keeper_data = $agent->settings('agentData.keeper.data', []);
@@ -189,10 +192,6 @@ if ($keeper_data) {
     }
 
     $tpl_data['keeper_data'] = $keeper_data;
-}
-
-if ($op == 'agent_misc') {
-    $tpl_data['themes'] = Theme::valid();
 }
 
 Response::showTemplate('web/agent/edit', $tpl_data);

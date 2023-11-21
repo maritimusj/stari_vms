@@ -132,12 +132,21 @@ class WxPayV3 implements IPay
         return $response;
     }
 
-    public function refund(string $order_no, int $total, bool $is_transaction_id = false)
+    public function refund(string $order_no, int $amount, bool $is_transaction_id = false)
     {
+        $res = $this->query($order_no);
+        if (is_error($res)) {
+            return $res;
+        }
+
         $data = [
             'sub_mchid' => $this->config['sub_mch_id'],
             'out_refund_no' => Util::random(32),
-            'amount' => $total,
+            'amount' => [
+                'refund' => $amount,
+                'total' => intval($res['total']),
+                'currency' => 'CNY',
+            ],
         ];
 
         if ($is_transaction_id) {

@@ -170,7 +170,7 @@ class WXPay implements IPay
         return $wx->close($order_no);
     }
 
-    public function refund(string $order_no, int $total, bool $is_transaction_id = false)
+    public function refund(string $order_no, int $amount, bool $is_transaction_id = false)
     {
         $wx = $this->getWx();
 
@@ -179,7 +179,7 @@ class WXPay implements IPay
             return $res;
         }
 
-        return $wx->refund($order_no, intval($res['total']), $total, $is_transaction_id);
+        return $wx->refund($order_no, intval($res['total']), $amount, $is_transaction_id);
     }
 
     public function decodeData(string $input): array

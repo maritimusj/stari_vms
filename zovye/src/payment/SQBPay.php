@@ -157,11 +157,11 @@ class SQBPay implements IPay
         return err($res['error_message'] ?? '关闭订单失败');
     }
 
-    public function refund(string $order_no, int $total, bool $is_transaction_id = false)
+    public function refund(string $order_no, int $amount, bool $is_transaction_id = false)
     {
         $SQB = $this->getSQB();
 
-        $res = $SQB->refund($order_no, $total, $is_transaction_id);
+        $res = $SQB->refund($order_no, $amount, $is_transaction_id);
         if (is_error($res)) {
             return $res;
         }

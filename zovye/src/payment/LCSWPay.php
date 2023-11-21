@@ -169,20 +169,20 @@ class LCSWPay implements IPay
         return $res;
     }
 
-    public function refund(string $order_no, int $total, bool $is_transaction_id = false)
+    public function refund(string $order_no, int $amount, bool $is_transaction_id = false)
     {
         $res = $this->query($order_no);
         if (is_error($res)) {
             return $res;
         }
 
-        if ($total < 1 || $total > $res['total']) {
+        if ($amount < 1 || $amount > $res['total']) {
             return err('退款金额不正确！');
         }
 
         $lcsw = $this->getLCSW();
 
-        $res = $lcsw->doRefund($res['transaction_id'], $total, $res['pay_type']);
+        $res = $lcsw->doRefund($res['transaction_id'], $amount, $res['pay_type']);
 
         if (is_error($res)) {
             return $res;

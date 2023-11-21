@@ -50,11 +50,11 @@ interface IPay
     /**
      * 请求退款
      * @param string $order_no
-     * @param int $total
+     * @param int $amount 退款金额
      * @param bool $is_transaction_id
      * @return mixed
      */
-    public function refund(string $order_no, int $total, bool $is_transaction_id = false);
+    public function refund(string $order_no, int $amount,  bool $is_transaction_id = false);
 
     /**
      * 查询订单

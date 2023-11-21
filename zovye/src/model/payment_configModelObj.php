@@ -29,7 +29,7 @@ class payment_configModelObj extends ModelObj
 	/** @var int */
 	protected $agent_id;
 
-	/** @var int */
+	/** @var string */
 	protected $name;
 
 	/** @var string */

@@ -800,7 +800,7 @@ if ($page == 'device') {
     }
 
     if (Request::bool('SQB')) {
-        if (Request::has('app_id')) {
+        if (Request::isset('app_id')) {
             $app_id = Request::trim('app_id');
             $vendor_sn = Request::trim('vendor_sn');
             $vendor_key = Request::trim('vendor_key');

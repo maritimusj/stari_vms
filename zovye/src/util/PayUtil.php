@@ -4,7 +4,6 @@
  * @url www.stariture.com
  */
 
-
 namespace zovye\util;
 
 use Exception;
@@ -14,14 +13,11 @@ use WeChatPay\Crypto\Rsa;
 use WeChatPay\Util\PemUtil;
 use zovye\Log;
 use zovye\model\deviceModelObj;
-use zovye\model\payment_configModelObj;
 use zovye\model\userModelObj;
 use zovye\WxPayV3Client;
 use function zovye\_W;
 use function zovye\err;
 use function zovye\is_error;
-
-require_once MODULE_ROOT.'vendor/autoload.php';
 
 class PayUtil
 {

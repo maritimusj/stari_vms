@@ -12,6 +12,11 @@ use zovye\util\Util;
 //定义常量REQUEST_ID
 define('REQUEST_ID', Util::generateUID());
 
+$vendor_autoload_filename = require_once MODULE_ROOT.'vendor/autoload.php';
+if (file_exists($vendor_autoload_filename)) {
+    require_once $vendor_autoload_filename;
+}
+
 try {
     //启动应用
     app()->run();

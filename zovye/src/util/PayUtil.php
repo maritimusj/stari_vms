@@ -7,6 +7,7 @@
 namespace zovye\util;
 
 use Exception;
+use Psr\Http\Message\ResponseInterface;
 use WeChatPay\Builder;
 use WeChatPay\Crypto\AesGcm;
 use WeChatPay\Crypto\Rsa;
@@ -43,6 +44,15 @@ class PayUtil
 
         // 构造一个 APIv3 客户端实例
         return new WxPayV3Client(Builder::factory($params));
+    }
+
+    public static function parseWxPayV3Response(ResponseInterface $response)
+    {
+        $contents = $response->getBody()->getContents();
+        if ($contents) {
+            return json_decode($contents, true);
+        }
+        return err('请求失败！');
     }
 
     public static function getWxPlatformCertification($config)

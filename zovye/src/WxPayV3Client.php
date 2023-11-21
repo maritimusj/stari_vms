@@ -5,6 +5,7 @@ namespace zovye;
 use Exception;
 use GuzzleHttp\Exception\RequestException;
 use WeChatPay\BuilderChainable;
+use zovye\util\PayUtil;
 
 class WxPayV3Client
 {
@@ -42,20 +43,15 @@ class WxPayV3Client
                 return err('暂不支持的http方法:'.$method);
             }
 
-            $contents = $response->getBody()->getContents();
-            if ($contents) {
-                return json_decode($contents, true);
-            }
+            return PayUtil::parseWxPayV3Response($response);
+
         } catch (Exception $e) {
             Log::error('wx_pay_v3', [
                 'error' => $e->getMessage(),
             ]);
 
             if ($e instanceof RequestException && $e->hasResponse()) {
-                $r = $e->getResponse();
-                $contents = $r->getBody()->getContents();
-
-                return json_decode($contents, true);
+                return PayUtil::parseWxPayV3Response($e->getResponse());
             }
         }
 

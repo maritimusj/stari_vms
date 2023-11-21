@@ -124,15 +124,13 @@ class WxPayV3 implements IPay
             ->v3->pay->partner->transactions->outTradeNo->_order_no_->close
             ->post($data);
 
-        if (is_error($response)) {
-            return $response;
+        $result = PayUtil::parseWxPayV3Response($response);
+
+        if (!empty($result['code'])) {
+            return err($result['message'] ?? '请求失败！');
         }
 
-        if (!empty($response['code'])) {
-            return err($response['message'] ?? '请求失败！');
-        }
-
-        return $response;
+        return $result;
     }
 
     public function refund(string $order_no, int $amount, bool $is_transaction_id = false)
@@ -165,18 +163,16 @@ class WxPayV3 implements IPay
             ->v3->refund->domestic->refunds
             ->post($data);
 
-        if (is_error($response)) {
-            return $response;
+        $result = PayUtil::parseWxPayV3Response($response);
+
+        if (!empty($result['code'])) {
+            return err($result['message'] ?? '请求失败！');
         }
 
-        if (!empty($response['code'])) {
-            return err($response['message'] ?? '请求失败！');
-        }
-
-        return $response;
+        return $result;
     }
 
-    public function query(string $order_no)
+    public function query(string $order_no): array
     {
         $data = [
             'query' => [
@@ -191,24 +187,22 @@ class WxPayV3 implements IPay
             ->v3->pay->partner->transactions->outTradeNo->_order_no_
             ->get($data);
 
-        if (is_error($response)) {
-            return $response;
-        }
+        $result = PayUtil::parseWxPayV3Response($response);
 
-        if (!empty($response['code'])) {
-            return err($response['message'] ?? '请求失败！');
+        if (!empty($result['code'])) {
+            return err($result['message'] ?? '请求失败！');
         }
 
         return [
             'result' => 'success',
             'type' => $this->getName(),
-            'merchant_no' => $response['sp_mchid'] ?? $response['mchid'],
-            'orderNO' => $response['out_trade_no'],
-            'transaction_id' => $response['transaction_id'],
-            'total' => $response['amount'],
-            'paytime' => $response['success_time'],
-            'openid' => $response['payer']['sp_openid'] ?? $response['payer']['sub_openid'],
-            'deviceUID' => $response['attach'],
+            'merchant_no' => $result['sp_mchid'] ?? $result['mchid'],
+            'orderNO' => $result['out_trade_no'],
+            'transaction_id' => $result['transaction_id'],
+            'total' => $result['amount'],
+            'paytime' => $result['success_time'],
+            'openid' => $result['payer']['sp_openid'] ?? $result['payer']['sub_openid'],
+            'deviceUID' => $result['attach'],
         ];
     }
 

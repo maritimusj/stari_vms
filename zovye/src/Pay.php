@@ -605,8 +605,10 @@ class Pay
                 if (!$default) {
                     throw new RuntimeException('不正确的支付配置！');
                 }
+
                 $data = $default->getExtraData();
                 $data['sub_mch_id'] = $sub_mch_id;
+
                 $config->setExtraData($data);
             }
 

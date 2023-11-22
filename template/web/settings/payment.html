@@ -6,6 +6,11 @@
 <!--</div>-->
 {/if}
 {php \zovye\url(true, 'static/css/common.css?v=20230710');}
+<style>
+    [data-op] {
+        cursor: pointer;
+    }
+</style>
 {template "web/settings/nav"}
 <form action="{php echo $this->createWebUrl('settings');}" method="post">
     <div class="panel panel-default nav-tab-item" id="special">
@@ -312,16 +317,18 @@
                         <input type="text" class="form-control inputMask" name="wxApiV3Key" id="wxApiV3Key" value="{$payment['wx_v3']['key']}">
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="V3cert" class="col-md-2 control-label">微信平台证书(v3)</label>
+                <div class="form-group operate">
+                    <label for="V3cert" class="col-md-2 control-label">
+                        微信平台证书(v3)
+                    </label>
                     <div class="col-md-10">
                         <textarea type="text" class="form-control inputMask" name="V3cert" id="V3cert" readonly>
                             {$payment['wx_v3']['pem']['cert']['data']}
                         </textarea>
-                        <span class="help-block">* {if is_array($payment['wx_v3']['pem']['cert'])}
-                            序列号：{$payment['wx_v3']['pem']['cert']['serial_no']}，过期时间：{$payment['wx_v3']['pem']['cert']['expire_time']}
+                        <span class="help-block">* {if $payment['wx_v3']['pem']['cert']}
+                            序列号：{$payment['wx_v3']['pem']['cert']['serial_no']}，过期时间：{$payment['wx_v3']['pem']['cert']['expire_time']} <span data-op="refresh_wx_platform_cert" title="重新加载微信平台证书">.</span>
                             {else}
-                            正确设置其它必要参数后，保存时会自动下载微信平台证书
+                            请先设置其它必要参数，然后再点击<b data-op="refresh_wx_platform_cert">更新证书</b>
                             {/if}</span>
                     </div>
                 </div>
@@ -383,6 +390,7 @@
     require(["{php \zovye\url(false, 'static/js/zovye.min.js')}"], function (zovye) {
         zovye.enableInputMask();
         zovye.enableCopy();
+        zovye.enableOp();
     })
 
     $(function(){

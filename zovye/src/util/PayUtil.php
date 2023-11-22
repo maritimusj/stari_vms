@@ -7,7 +7,9 @@
 namespace zovye\util;
 
 use Exception;
+use GuzzleHttp\Exception\RequestException;
 use Psr\Http\Message\ResponseInterface;
+use RuntimeException;
 use WeChatPay\Builder;
 use WeChatPay\BuilderChainable;
 use WeChatPay\Crypto\AesGcm;
@@ -33,13 +35,13 @@ class PayUtil
             ],
         ];
 
-        if ($config['pem']['cert']) {
+        if ($config['pem']['cert']['data']) {
             $cert_data = $config['pem']['cert']['data'];
-            // 从「微信支付平台证书」中获取「证书序列号」
-            $serial = PemUtil::parseCertificateSerialNo($cert_data);
-            $params['certs'] = [
-                $serial => Rsa::from($cert_data, Rsa::KEY_TYPE_PUBLIC),
-            ];
+              // 从「微信支付平台证书」中获取「证书序列号」
+              $serial = PemUtil::parseCertificateSerialNo($cert_data);
+              $params['certs'] = [
+                  $serial => Rsa::from($cert_data, Rsa::KEY_TYPE_PUBLIC),
+              ];
         }
 
         // 构造一个 APIv3 客户端实例
@@ -61,14 +63,19 @@ class PayUtil
     {
         try {
             // 发送请求
-            $response = (self::getWxPayV3Builder($config))->v3->certificates->get();
+            try {
+                $response = (self::getWxPayV3Builder($config))->chain('v3/certificates')->get();
+            } catch (RequestException $e) {
+                if ($e->hasResponse()) {
+                    $response = $e->getResponse();
+                }
+            }
+
+            if (!isset($response)) {
+                throw new RuntimeException('请求失败！');
+            }
 
             $result = self::parseWxPayV3Response($response);
-
-            Log::debug('WxPayUtil', [
-                'v3config' => $config,
-                'result' => $result,
-            ]);
 
             if (is_error($result)) {
                 return $result;
@@ -90,13 +97,14 @@ class PayUtil
 
             // 加密文本消息解密
             $data = AesGcm::decrypt($ciphertext, $config['key'], $nonce, $associated_data);
-
+  
             // 保存
             return [
                 'serial_no' => $serial_no,
                 'data' => $data,
                 'expire_time' => $expire_time,
             ];
+
         } catch (Exception $e) {
             return err($e->getMessage());
         }

@@ -905,21 +905,17 @@ if ($page == 'device') {
                 ],
             ];
 
-            $res = PayUtil::getWxPlatformCertificate($data);
-            if (is_error($res)) {
-                Log::error('settings', [
-                    'error' => $res,
-                    'data' => $data,
-                ]);
+            $config = PaymentConfig::getByName(Pay::WX_V3);
+            if ($config) {
+                $data['pem']['cert'] = $config->getExtraData('pem.cert', []);
+                $config->setExtraData($data);
+                $config->save();
             } else {
-                $data['pem']['cert'] = $res;
-                $res = PaymentConfig::createOrUpdateByName(Pay::WX_V3, $data);
-                if (is_error($res)) {
-                    Log::error('settings', [
-                        'error' => $res,
-                        'data' => $data,
-                    ]);
-                }
+                PaymentConfig::create([
+                    'agent_id' => 0,
+                    'name' => Pay::WX_V3,
+                    'extra' => $data,
+                ]);
             }
         }
     } else {

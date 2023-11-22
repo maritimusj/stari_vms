@@ -119,6 +119,19 @@ class Pay
                     continue;
                 }
                 if ($matchFN($user, $config)) {
+                    //如果代理商配置的是微信支付，获得子商户号后合并到系统全局配置中
+                    if ($config->getName() == Pay::WX_V3) {
+                        $sub_mch_id = $config->getExtraData('sub_mch_id', '');
+                        if (empty($sub_mch_id)) {
+                            return null;
+                        }
+                        /** @var payment_configModelObj $default */
+                        $default = PaymentConfig::getByName(Pay::WX_V3);
+                        if ($default) {
+                            $default->setExtraData('sub_mch_id', $sub_mch_id);
+                        }
+                        return self::make($default);
+                    }
                     return self::make($config);
                 }
             }

@@ -30,6 +30,7 @@ $data['merchant_no'] = $data['payResult']['raw']['merchant_no'] ??
     $data['payResult']['merchant_no'] ??
     $data['queryResult']['merchant_no'] ??
     $data['payResult']['raw']['mch_id'] ??
+    $data['payResult']['raw']['sub_mchid'] ??
     $data['payResult']['raw']['sn'] ??
     $data['queryResult']['sn'];
 

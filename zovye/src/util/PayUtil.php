@@ -9,6 +9,7 @@ namespace zovye\util;
 use Exception;
 use Psr\Http\Message\ResponseInterface;
 use WeChatPay\Builder;
+use WeChatPay\BuilderChainable;
 use WeChatPay\Crypto\AesGcm;
 use WeChatPay\Crypto\Rsa;
 use WeChatPay\Util\PemUtil;
@@ -22,7 +23,7 @@ use function zovye\is_error;
 
 class PayUtil
 {
-    public static function getWxPayV3Client(array $config): WxPayV3Client
+    public static function WxPayV3Builder(array $config): BuilderChainable
     {
         $params = [
             'mchid' => $config['mch_id'],         // 商户号
@@ -43,7 +44,13 @@ class PayUtil
         }
 
         // 构造一个 APIv3 客户端实例
-        return new WxPayV3Client(Builder::factory($params));
+        return Builder::factory($params);
+    }
+
+    public static function getWxPayV3Client(array $config): WxPayV3Client
+    {
+        // 构造一个 APIv3 客户端实例
+        return new WxPayV3Client(self::WxPayV3Builder($config));
     }
 
     public static function parseWxPayV3Response(ResponseInterface $response)

@@ -54,43 +54,49 @@ class WxPayV3 implements IPay
     public function createJsPay(string $user_uid, string $device_uid, string $order_no, int $price, string $body = '')
     {
         $data = [
-            'sp_appid' => $this->config['appid'],
-            'sp_mchid' => $this->config['mch_id'],
-            'sub_mchid' => $this->config['sub_mch_id'],
-            'description' => $body,
-            'out_trade_no' => $order_no,
-            'notify_url' => PayUtil::getPaymentCallbackUrl($this->config['config_id']),
-            'amount' => [
-                'total' => $price,
-                'currency' => 'CNY',
+            'json' => [
+                'sp_appid' => $this->config['appid'],
+                'sp_mchid' => $this->config['mch_id'],
+                'sub_mchid' => $this->config['sub_mch_id'],
+                'description' => $body,
+                'out_trade_no' => $order_no,
+                'notify_url' => PayUtil::getPaymentCallbackUrl($this->config['config_id']),
+                'amount' => [
+                    'total' => $price,
+                    'currency' => 'CNY',
+                ],
+                'payer' => [
+                    'sp_openid' => $user_uid,
+                ],
+                'attach' => $device_uid,
             ],
-            'payer' => [
-                'sp_openid' => $user_uid,
-            ],
-            'attach' => $device_uid,
         ];
 
-        $response = PayUtil::getWxPayV3Client($this->config)->post('/v3/pay/partner/transactions/jsapi', $data);
+        $response = PayUtil::WxPayV3Builder($this->config)
+            ->v3->pay->partner->transactions->jsapi
+            ->post($data);
+
+        $result = PayUtil::parseWxPayV3Response($response);
 
         Log::debug('v3', [
             'config' => $this->config,
             'data' => $data,
-            'response' => $response,
+            'result' => $result,
         ]);
 
-        if (is_error($response)) {
-            return $response;
+        if (is_error($result)) {
+            return $result;
         }
 
-        if (!empty($response['code'])) {
-            return err($response['message'] ?? '请求失败！');
+        if (!empty($result['code'])) {
+            return err($result['message'] ?? '请求失败！');
         }
 
         $params = [
             'appId' => $this->config['appid'],
             'timeStamp' => (string)Formatter::timestamp(),
             'nonceStr' => Formatter::nonce(),
-            'package' => "prepay_id={$response['prepay_id']}",
+            'package' => "prepay_id={$result['prepay_id']}",
         ];
 
         $params += [
@@ -119,8 +125,7 @@ class WxPayV3 implements IPay
             'order_no' => $order_no,
         ];
 
-        $response = PayUtil::getWxPayV3Client($this->config)
-            ->instance()
+        $response = PayUtil::WxPayV3Builder($this->config)
             ->v3->pay->partner->transactions->outTradeNo->_order_no_->close
             ->post($data);
 
@@ -158,8 +163,7 @@ class WxPayV3 implements IPay
             $data['json']['out_trade_no'] = $order_no;
         }
 
-        $response = PayUtil::getWxPayV3Client($this->config)
-            ->instance()
+        $response = PayUtil::WxPayV3Builder($this->config)
             ->v3->refund->domestic->refunds
             ->post($data);
 
@@ -182,8 +186,7 @@ class WxPayV3 implements IPay
             'order_no' => $order_no,
         ];
 
-        $response = PayUtil::getWxPayV3Client($this->config)
-            ->instance()
+        $response = PayUtil::WxPayV3Builder($this->config)
             ->v3->pay->partner->transactions->outTradeNo->_order_no_
             ->get($data);
 

@@ -102,7 +102,6 @@ if ($total > 0) {
                     $user = User::get($entry->getOpenid(), true);
                     if ($user) {
                         $MCHPayResult = Pay::getMCHPayResult(
-                            $user,
                             $MCHPayResult['batch_id'],
                             $MCHPayResult['out_batch_no']
                         );

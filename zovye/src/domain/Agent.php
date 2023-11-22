@@ -14,7 +14,6 @@ use zovye\model\deviceModelObj;
 use zovye\model\goodsModelObj;
 use zovye\model\keeperModelObj;
 use zovye\model\userModelObj;
-use zovye\Pay;
 use zovye\We7;
 use function zovye\err;
 use function zovye\m;
@@ -94,19 +93,6 @@ class Agent
     public static function isLocationValidateEnabled(agentModelObj $agent): bool
     {
         return !empty($agent->settings('agentData.location.validate.enabled'));
-    }
-
-    /**
-     * 获取指定代理商，指定设备的支付信息
-     * @param $agent agentModelObj
-     * @param string $name
-     * @return array
-     */
-    public static function getPayConfiguration(agentModelObj $agent, string $name = ''): array
-    {
-        $params = $agent->settings('agentData.pay', []);
-
-        return Pay::selectPayConfiguration($params, $name);
     }
 
     public static function remove(agentModelObj $agent): array

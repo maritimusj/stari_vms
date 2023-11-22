@@ -11,7 +11,6 @@ use RuntimeException;
 use zovye\business\Charging;
 use zovye\business\Fueling;
 use zovye\contract\IPay;
-use zovye\domain\Agent;
 use zovye\domain\CommissionBalance;
 use zovye\domain\Device;
 use zovye\domain\Locker;
@@ -59,19 +58,19 @@ class Pay
         return self::$names[$name] ?? '未知';
     }
 
-    public static function rebuildPay(pay_logsModelObj $log): ?IPay
+    public static function rebuildPay(pay_logsModelObj $log): IPay
     {
         $config_id = $log->getPayConfigId();
         if (empty($config_id)) {
-            return null;
+            throw new RuntimeException('config_id 为空！');
         }
 
         $config = PaymentConfig::get($config_id);
         if (!$config) {
-            return null;
+            throw new RuntimeException('找不到这个支付配置！');
         }
 
-        return self::from($config);
+        return self::make($config);
     }
 
     public static function selectPay(deviceModelObj $device, userModelObj $user, string $scene): ?IPay
@@ -93,10 +92,10 @@ class Pay
                     continue;
                 }
                 if ($user->isWxUser() && $config->isEnabled("wx.$scene")) {
-                    return self::from($config);
+                    return self::make($config);
                 }
                 if ($user->isAliUser() && $config->isEnabled("ali.$scene")) {
-                    return self::from($config);
+                    return self::make($config);
                 }
             }
         }
@@ -108,10 +107,10 @@ class Pay
                 continue;
             }
             if ($user->isWxUser() && $config->isEnabled("wx.$scene")) {
-                return self::from($config);
+                return self::make($config);
             }
             if ($user->isAliUser() && $config->isEnabled("ali.$scene")) {
-                return self::from($config);
+                return self::make($config);
             }
         }
 
@@ -170,11 +169,13 @@ class Pay
             $order_no = Order::makeUID($user, $device, $pay_data['serial'] ?? time());
         }
 
+        $config = $pay->getConfig();
+
         $more = [
             'device' => $device->getId(),
             'user' => $user->getOpenid(),
             'pay' => [
-                'config_id' => $pay->getConfig()['config_id'],
+                'config_id' => $config['config_id'],
                 'name' => $pay->getName(),
             ],
             'orderData' => [
@@ -321,10 +322,7 @@ class Pay
                 throw new Exception('不正确的支付配置id！');
             }
 
-            $pay = self::from($config);
-            if (!$pay) {
-                throw new Exception('支付配置出错！');
-            }
+            $pay = self::make($config);
 
             $data = $pay->decodeData($input);
             if (empty($data)) {
@@ -420,12 +418,7 @@ class Pay
             return err('找不到支付记录！');
         }
 
-        $pay = self::rebuildPay($pay_log);
-        if (!$pay) {
-            return err('支付配置不正确！');
-        }
-
-        return $pay->close($order_no);
+        return (self::rebuildPay($pay_log))->close($order_no);
     }
 
     /**
@@ -443,17 +436,12 @@ class Pay
 
     public static function refundByLog(pay_logsModelObj $pay_log, int &$total = 0, array $data = [])
     {
-        $pay = self::rebuildPay($pay_log);
-        if (is_error($pay)) {
-            return $pay;
-        }
-
         $price_total = $pay_log->getPrice();
         if ($total < 1 || $total > $price_total) {
             $total = $price_total;
         }
 
-        $res = $pay->refund($pay_log->getOrderNO(), $total);
+        $res = (self::rebuildPay($pay_log))->refund($pay_log->getOrderNO(), $total);
         if (is_error($res)) {
             $pay_log->setData('refund_fail', ['result' => $res]);
             $pay_log->save();
@@ -474,18 +462,13 @@ class Pay
 
     public static function queryFor(pay_logsModelObj $pay_log): array
     {
-        $pay = self::rebuildPay($pay_log);
-        if (!$pay) {
-            return err('支付配置不正确！');
-        }
-
         $order_no = $pay_log->getOrderNO();
 
         if (empty($order_no)) {
             return err('订单号不正确！');
         }
 
-        return $pay->query($order_no);
+        return (self::rebuildPay($pay_log))->query($order_no);
     }
 
     /**
@@ -539,118 +522,6 @@ class Pay
         return PayLogs::findOne(['level' => $level, 'title' => $order_no]);
     }
 
-    public static function selectPayConfiguration(array $config, string $name = ''): array
-    {
-        if ($name) {
-            $data = $config[$name];
-            if ($data) {
-                $data['name'] = $name;
-                unset($data['wx'], $data['ali'], $data['wxapp']);
-
-                return $data;
-            }
-
-            return [];
-        }
-
-        $fn = function ($name) use ($config) {
-            $data = $config[$name] ?? [];
-            if ($data['enable']) {
-                if ((Session::isWxAppUser() && (!isset($data['wxapp']) || $data['wxapp'])) ||
-                    (Session::isWxUser() && !Session::isWxAppUser() && (!isset($data['wx']) || $data['wx'])) ||
-                    (Session::isAliUser() && (!isset($data['ali']) || $data['ali']))) {
-
-                    $data['name'] = $name;
-                    unset($data['wx'], $data['ali'], $data['wxapp']);
-
-                    return $data;
-                }
-            }
-
-            return [];
-        };
-
-        $lcsw = $fn(Pay::LCSW);
-        if ($lcsw) {
-            return $lcsw;
-        }
-
-        $SQB = $fn(Pay::SQB);
-        if ($SQB) {
-            return $SQB;
-        }
-
-        $wx = $config[Pay::WX] ?? [];
-        if ($wx['enable']) {
-            $wx['name'] = Pay::WX;
-
-            return $wx;
-        }
-
-        $ali = $config[Pay::ALI] ?? [];
-        if ($ali['enable']) {
-            $ali['name'] = Pay::ALI;
-
-            return $ali;
-        }
-
-        return [];
-    }
-
-    /******************************************************************************************************************/
-    /*  以下为内部函数
-     * ****************************************************************************************************************/
-
-    public static function getDefaultConfiguration(string $name = ''): array
-    {
-        $params = settings('pay', []);
-
-        return self::selectPayConfiguration($params, $name);
-    }
-
-    /**
-     * 获取设备关联的支付配置
-     * @param deviceModelObj|null $device
-     */
-    public static function getPayConfiguration(deviceModelObj $device = null, string $name = ''): array
-    {
-        $res = [];
-        if ($device) {
-            $agent = $device->getAgent();
-            if ($agent) {
-                $res = Agent::getPayConfiguration($agent, $name);
-                if ($res && $res['name'] == Pay::WX) {
-                    $default = self::getDefaultConfiguration(self::WX);
-                    if (empty($default['v3'])) {
-                        return err('需要配置微信v3支付参数！');
-                    }
-                    $config = $default['v3'];
-                    $config['appid'] = $default['appid'];
-                    $config['wxappid'] = $default['wxappid'];
-                    $config['mch_id'] = $default['mch_id'];
-                    $config['sub_mch_id'] = $res['mch_id'];
-
-                    return $config;
-                }
-            }
-        }
-
-        if (empty($res) || empty($res['enable']) || empty(array_diff_key($res, ['enable' => 1, 'name' => 1]))) {
-            $res = self::getDefaultConfiguration($name);
-        }
-
-        if ($res['pem'] && !empty($res['pem']['cert']) && !empty($res['pem']['key'])) {
-            $file = self::getPEMFile($res['pem']);
-            if (!is_error($file)) {
-                $res['pem']['cert'] = $file['cert_filename'];
-                $res['pem']['key'] = $file['key_filename'];
-            }
-        }
-
-        return $res;
-    }
-
-
     /**
      * 保存证书到文件并返回路径
      */
@@ -688,7 +559,7 @@ class Pay
         return [];
     }
 
-    public static function from(payment_configModelObj $config): ?IPay
+    public static function make(payment_configModelObj $config): IPay
     {
         if ($config->getName() == self::LCSW) {
             return new LCSWPay($config->toArray());
@@ -702,7 +573,7 @@ class Pay
             return new WXPay($config->toArray());
         }
 
-        if ($config->getName() == self::WX_V3) {
+        if ($config->getName() == self::WX_V3 && class_exists(' \WeChatPay\Builder', false)) {
             $data = $config->toArray();
 
             if ($data['sub_mch_id']) {
@@ -712,7 +583,7 @@ class Pay
             return new WxPayV3Merchant($data);
         }
 
-        return null;
+        throw new RuntimeException('不正确的支付配置！');
     }
 
     public static function isWxPayQrcode($code): bool
@@ -722,42 +593,36 @@ class Pay
         return in_array($str, ['10', '11', '12', '13', '14', '15']);
     }
 
-    public static function getWxPayClientFor(userModelObj $user)
+    public static function getWxMCHPayClient()
     {
-        $params = Pay::getDefaultConfiguration(Pay::WX);
-        if (empty($params)) {
-            throw new RuntimeException('没有配置微信打款信息！');
+        /** @var payment_configModelObj $config */
+        $config = PaymentConfig::getByName(Pay::WX_V3);
+        if ($config) {
+            return new WxMCHPayV3($config->toArray());
         }
 
-        if (!isEmptyArray($params['v3'])) {
-            $config = $params['v3'];
-            $config['mch_id'] = $params['mch_id'];
+        /** @var payment_configModelObj $config */
+        $config = PaymentConfig::getByName(Pay::WX);
+        if ($config) {
+            $config = $config->toArray();
 
-            if ($user->isWxUser()) {
-                $config['appid'] = $params['appid'];
-            } elseif ($user->isWXAppUser()) {
-                $config['appid'] = $params['wxappid'];
-            } else {
-                throw new RuntimeException('只能给微信或微信小程序用户转账！');
+            $res = Pay::getPEMFile($config['pem']);
+            if (is_error($res)) {
+                throw new RuntimeException($res['message']);
             }
 
-            return new WxMCHPayV3($config);
+            $config['pem']['cert'] = $res['cert_filename'];
+            $config['pem']['key'] = $res['key_filename'];
+
+            return new WxMCHPay($config);
         }
 
-        $file = Pay::getPEMFile($params['pem']);
-        if (is_error($file)) {
-            throw new RuntimeException($file['message']);
-        }
-
-        $params['pem']['cert'] = $file['cert_filename'];
-        $params['pem']['key'] = $file['key_filename'];
-
-        return new WxMCHPay($params);
+        throw new RuntimeException('没有支付配置！');
     }
 
-    public static function getMCHPayResult(userModelObj $user, $transaction, $trade_no): array
+    public static function getMCHPayResult($transaction, $trade_no): array
     {
-        return (self::getWxPayClientFor($user))->transferInfo($transaction, $trade_no);
+        return (self::getWxMCHPayClient())->transferInfo($transaction, $trade_no);
     }
 
     /**
@@ -773,7 +638,7 @@ class Pay
     public static function MCHPay(userModelObj $user, $num, $trade_no, string $desc = ''): array
     {
         if ($trade_no && $num > 0) {
-            $client = Pay::getWxPayClientFor($user);
+            $client = Pay::getWxMCHPayClient();
 
             $res = $client->transferTo($user->getOpenid(), $trade_no, $num, $desc);
             if (is_error($res)) {

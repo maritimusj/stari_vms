@@ -9,13 +9,11 @@ namespace zovye\util;
 use Exception;
 use GuzzleHttp\Exception\RequestException;
 use Psr\Http\Message\ResponseInterface;
-use RuntimeException;
 use WeChatPay\Builder;
 use WeChatPay\BuilderChainable;
 use WeChatPay\Crypto\AesGcm;
 use WeChatPay\Crypto\Rsa;
 use WeChatPay\Util\PemUtil;
-use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 use function zovye\_W;
@@ -68,11 +66,9 @@ class PayUtil
             } catch (RequestException $e) {
                 if ($e->hasResponse()) {
                     $response = $e->getResponse();
+                } else {
+                    throw new $e;
                 }
-            }
-
-            if (!isset($response)) {
-                throw new RuntimeException('请求失败！');
             }
 
             $result = self::parseWxPayV3Response($response);

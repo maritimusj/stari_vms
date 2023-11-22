@@ -34,7 +34,7 @@ class PayUtil
         ];
 
         if ($config['pem']['cert']) {
-            $cert_data = is_array($config['pem']['cert']) ? $config['pem']['cert']['data'] : $config['pem']['cert'];
+            $cert_data = $config['pem']['cert']['data'];
             // 从「微信支付平台证书」中获取「证书序列号」
             $serial = PemUtil::parseCertificateSerialNo($cert_data);
             $params['certs'] = [

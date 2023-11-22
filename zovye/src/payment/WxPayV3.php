@@ -96,6 +96,12 @@ abstract class WxPayV3 implements IPay
             $data['json']['out_trade_no'] = $order_no;
         }
 
+        $config = $this->getConfig();
+
+        if ($config['sub_mch_id']) {
+            $data['json']['sub_mchid'] = $config['sub_mch_id'];
+        }
+
         $response = PayUtil::getWxPayV3Builder($this->getConfig())
             ->v3->refund->domestic->refunds
             ->post($data);
@@ -117,27 +123,31 @@ abstract class WxPayV3 implements IPay
             return err($result['message'] ?? '请求失败！');
         }
 
+        if ($result['trade_state'] != 'SUCCESS') {
+            return err($result['trade_state_desc'] ?? '订单状态异常！');
+        }
+
         return [
             'result' => 'success',
             'type' => $this->getName(),
-            'merchant_no' => $result['sp_mchid'] ?? $result['mchid'],
+            'merchant_no' => $result['sub_mchid'] ?? $result['mchid'],
             'orderNO' => $result['out_trade_no'],
             'transaction_id' => $result['transaction_id'],
-            'total' => $result['amount'],
+            'total' => $result['amount']['total'],
             'paytime' => $result['success_time'],
-            'openid' => $result['payer']['sp_openid'] ?? $result['payer']['sub_openid'],
+            'openid' => $result['payer']['sp_openid'] ?? $result['payer']['openid'],
             'deviceUID' => $result['attach'],
         ];
     }
 
     public function decodeData(string $input): array
     {
-        $signature = Request::header('WECHATPAY_SIGNATURE');
-        $timestamp = Request::header('WECHATPAY_TIMESTAMP');
-        $nonce = Request::header('WECHATPAY_NONCE');
+        $signature = Request::header('HTTP_WECHATPAY_SIGNATURE');
+        $timestamp = Request::header('HTTP_WECHATPAY_TIMESTAMP');
+        $nonce = Request::header('HTTP_WECHATPAY_NONCE');
 
-        // 检查通知时间偏移量，允许5分钟之内的偏移
-        if (abs(Formatter::timestamp() - (int)$timestamp) > 300) {
+        // // 检查通知时间偏移量，允许5分钟之内的偏移
+        if (abs(time() - (int)$timestamp) > 300) {
             return err('数据已超时！');
         }
 
@@ -147,7 +157,7 @@ abstract class WxPayV3 implements IPay
         // 构造验签名串
             Formatter::joinedByLineFeed($timestamp, $nonce, $input),
             $signature,
-            Rsa::from($config['pem']['cert'], Rsa::KEY_TYPE_PUBLIC)
+            Rsa::from($config['pem']['cert']['data'], Rsa::KEY_TYPE_PUBLIC)
         );
 
         if (!$verified) {
@@ -170,13 +180,13 @@ abstract class WxPayV3 implements IPay
             ],
         ] = $inBodyArray;
 
-        // 加密文本消息解密, $this->config['key'] APIv3密钥
+        // 加密文本消息解密, $config['key'] APIv3密钥
         $inBodyResource = AesGcm::decrypt($ciphertext, $config['key'], $nonce, $aad);
 
         // 把解密后的文本转换为PHP Array数组
         $data = (array)json_decode($inBodyResource, true);
         if ($data['trade_state'] != 'SUCCESS') {
-            return err('支付失败！');
+            return err($data['trade_state_desc'] ?? '订单状态异常！');
         }
 
         return [

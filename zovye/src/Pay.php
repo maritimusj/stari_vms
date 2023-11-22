@@ -573,7 +573,7 @@ class Pay
             return new WXPay($config->toArray());
         }
 
-        if ($config->getName() == self::WX_V3 && class_exists(' \WeChatPay\Builder', false)) {
+        if ($config->getName() == self::WX_V3 && class_exists('\WeChatPay\Builder', true)) {
             $data = $config->toArray();
 
             if ($data['sub_mch_id']) {

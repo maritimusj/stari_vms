@@ -776,16 +776,8 @@ if ($page == 'device') {
             'terminal_id' => Request::trim('terminal_id'),
             'access_token' => Request::trim('access_token'),
             'app' => [
-                'wx' => [
-                    'h5' => Request::bool('lcswWxH5'),
-                    'qrcode' => Request::bool('lcswQRCode'),
-                    'miniapp' => Request::bool('lcswWxMiniApp'),
-                ],
-                'ali' => [
-                    'h5' => Request::bool('lcswAliH5'),
-                    'qrcode' => Request::bool('lcswQRCode'),
-                    'miniapp' => Request::bool('lcswAliMiniApp'),
-                ],
+                'wx' => Request::bool('lcswWx'),
+                'ali' => Request::bool('lcswAli'),
             ]
         ];
         $res = PaymentConfig::createOrUpdateByName(Pay::LCSW, $data);
@@ -822,16 +814,8 @@ if ($page == 'device') {
                     'key' => $result['terminal_key'],
                     'title' => $result['store_name'],
                     'app' => [
-                        'wx' => [
-                            'h5' => Request::bool('SQBWxH5'),
-                            'qrcode' => Request::bool('SQBQRCode'),
-                            'miniapp' => Request::bool('SQBWxMiniApp'),
-                        ],
-                        'ali' => [
-                            'h5' => Request::bool('SQBAliH5'),
-                            'qrcode' => Request::bool('SQBQRCode'),
-                            'miniapp' => Request::bool('SQBAliMiniApp'),
-                        ],
+                        'wx' => Request::bool('SQBWx'),
+                        'ali' => Request::bool('SQBAli'),
                     ]
                 ]);            
             }
@@ -839,16 +823,8 @@ if ($page == 'device') {
             $config = PaymentConfig::getByName(Pay::SQB);
             if ($config) {
                 $config->setExtraData('app', [
-                    'wx' => [
-                        'h5' => Request::bool('SQBWxH5'),
-                        'qrcode' => Request::bool('SQBQRCode'),
-                        'miniapp' => Request::bool('SQBWxMiniApp'),
-                    ],
-                    'ali' => [
-                        'h5' => Request::bool('SQBAliH5'),
-                        'qrcode' => Request::bool('SQBQRCode'),
-                        'miniapp' => Request::bool('SQBAliMiniApp'),
-                    ],
+                    'wx' => Request::bool('SQBWx'),
+                    'ali' => Request::bool('SQBAli'),
                 ]);
                 $config->save();
             }
@@ -869,11 +845,7 @@ if ($page == 'device') {
                 'key' => Request::trim('keyPEM'),
             ],
             'app' => [
-                'wx' => [
-                    'h5' => true,
-                    'qrcode' => true,
-                    'miniapp' => true,
-                ],
+                'wx' => true,
             ],
         ];
 
@@ -897,11 +869,7 @@ if ($page == 'device') {
                     'key' => Request::trim('V3key'),
                 ],
                 'app' => [
-                    'wx' => [
-                        'h5' => true,
-                        'qrcode' => true,
-                        'miniapp' => true,
-                    ],
+                    'wx' => true,
                 ],
             ];
 

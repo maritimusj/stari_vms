@@ -314,16 +314,8 @@ $result = DBUtil::transactionDo(function () use ($id, &$from) {
                 'terminal_id' => Request::trim('terminal_id'),
                 'access_token' => Request::trim('access_token'),
                 'app' => [
-                    'wx' => [
-                        'h5' => Request::bool('lcswWxH5'),
-                        'qrcode' => Request::bool('lcswQRCode'),
-                        'miniapp' => Request::bool('lcswWxMiniApp'),
-                    ],
-                    'ali' => [
-                        'h5' => Request::bool('lcswAliH5'),
-                        'qrcode' => Request::bool('lcswQRCode'),
-                        'miniapp' => Request::bool('lcswAliMiniApp'),
-                    ],
+                    'wx' => Request::bool('lcswWx'),
+                    'ali' => Request::bool('lcswAli'),
                 ]
             ])) {
                 return err('保存扫呗配置失败！');
@@ -358,16 +350,8 @@ $result = DBUtil::transactionDo(function () use ($id, &$from) {
                         'key' => $result['terminal_key'],
                         'title' => $result['store_name'],
                         'app' => [
-                            'wx' => [
-                                'h5' => Request::bool('SQBWxH5'),
-                                'qrcode' => Request::bool('SQBQRCode'),
-                                'miniapp' => Request::bool('SQBWxMiniApp'),
-                            ],
-                            'ali' => [
-                                'h5' => Request::bool('SQBAliH5'),
-                                'qrcode' => Request::bool('SQBQRCode'),
-                                'miniapp' => Request::bool('SQBAliMiniApp'),
-                            ],
+                            'wx' => Request::bool('SQBWx'),
+                            'ali' => Request::bool('SQBAli'),
                         ]
                     ]);            
                 }
@@ -378,16 +362,8 @@ $result = DBUtil::transactionDo(function () use ($id, &$from) {
                 ]);
                 if ($config) {
                     $config->setExtraData('app', [
-                        'wx' => [
-                            'h5' => Request::bool('SQBWxH5'),
-                            'qrcode' => Request::bool('SQBQRCode'),
-                            'miniapp' => Request::bool('SQBWxMiniApp'),
-                        ],
-                        'ali' => [
-                            'h5' => Request::bool('SQBAliH5'),
-                            'qrcode' => Request::bool('SQBQRCode'),
-                            'miniapp' => Request::bool('SQBAliMiniApp'),
-                        ],
+                        'wx' => Request::bool('SQBWx'),
+                        'ali' => Request::bool('SQBAli'),
                     ]);
                     $config->save();
                 }
@@ -403,11 +379,7 @@ $result = DBUtil::transactionDo(function () use ($id, &$from) {
             if (!PaymentConfig::createOrUpdate($user->getId(), Pay::WX_V3, [
                 'sub_mch_id' => Request::trim('wxMCHID'),
                 'app' => [
-                    'wx' => [
-                        'h5' => true,
-                        'qrcode' => true,
-                        'miniapp' => true,
-                    ],
+                    'wx' => true,
                 ],
             ])) {
                 return err('保存微信支付配置失败！');

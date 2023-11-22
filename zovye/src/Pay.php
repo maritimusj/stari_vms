@@ -62,6 +62,17 @@ class Pay
     {
         $config_id = $log->getPayConfigId();
         if (empty($config_id)) {
+            //尝试兼容原系统的支付配置
+            $device_id = $log->getDeviceId();
+            if ($device_id) {
+                $device = Device::get($device_id);
+                if ($device) {
+                    $user = User::get($log->getUserOpenid(), true);
+                    if ($user) {
+                        return self::selectPay($device, $user);
+                    }
+                }
+            }
             throw new RuntimeException('config_id 为空！');
         }
 
@@ -73,7 +84,7 @@ class Pay
         return self::make($config);
     }
 
-    public static function selectPay(deviceModelObj $device, userModelObj $user, string $scene): ?IPay
+    public static function selectPay(deviceModelObj $device, userModelObj $user): ?IPay
     {
         if ($user->isWxUser() || $user->isWXAppUser()) {
             $names = [self::LCSW, self::SQB, self::WX_V3, self::WX];
@@ -83,6 +94,19 @@ class Pay
             return null;
         }
 
+        $matchFN = function(userModelObj $user,payment_configModelObj $config) {
+            if ($user->isWxUser() && $config->isEnabled('wx.h5')) {
+                return true;
+            }
+            if ($user->isWXAppUser() && $config->isEnabled('wx.miniapp')) {
+                return true;
+            }
+            if ($user->isAliUser() && $config->isEnabled('ali')) {
+                return true;
+            }
+            return false;
+        };
+
         $agent = $device->getAgent();
         if ($agent) {
             foreach ($names as $name) {
@@ -91,10 +115,7 @@ class Pay
                 if (!$config) {
                     continue;
                 }
-                if ($user->isWxUser() && $config->isEnabled("wx.$scene")) {
-                    return self::make($config);
-                }
-                if ($user->isAliUser() && $config->isEnabled("ali.$scene")) {
+                if ($matchFN($user, $config)) {
                     return self::make($config);
                 }
             }
@@ -106,10 +127,7 @@ class Pay
             if (!$config) {
                 continue;
             }
-            if ($user->isWxUser() && $config->isEnabled("wx.$scene")) {
-                return self::make($config);
-            }
-            if ($user->isAliUser() && $config->isEnabled("ali.$scene")) {
+            if ($matchFN($user, $config)) {
                 return self::make($config);
             }
         }
@@ -123,7 +141,7 @@ class Pay
      */
     public static function getPayJs(deviceModelObj $device, userModelObj $user)
     {
-        $pay = self::selectPay($device, $user, 'h5');
+        $pay = self::selectPay($device, $user);
         if (!$pay) {
             return err('暂时无法支付！');
         }
@@ -139,11 +157,10 @@ class Pay
     private static function prepareData(
         deviceModelObj $device,
         userModelObj $user,
-        string $scene,
         array $goods,
         array $pay_data = []
     ): array {
-        $pay = self::selectPay($device, $user, $scene);
+        $pay = self::selectPay($device, $user);
         if (!$pay) {
             return err('暂时无法支付！');
         }
@@ -208,13 +225,12 @@ class Pay
 
     private static function createPay(
         $fn,
-        $scene,
         deviceModelObj $device,
         userModelObj $user,
         array $goods,
         array $pay_data = []
     ): array {
-        $result = self::prepareData($device, $user, $scene, $goods, $pay_data);
+        $result = self::prepareData($device, $user, $goods, $pay_data);
         if (is_error($result)) {
             return ['', $result];
         }
@@ -272,7 +288,7 @@ class Pay
         array $goods,
         array $pay_data = []
     ): array {
-        return self::createPay('createXAppPay', 'miniapp', $device, $user, $goods, $pay_data);
+        return self::createPay('createXAppPay', $device, $user, $goods, $pay_data);
     }
 
     /**
@@ -288,7 +304,7 @@ class Pay
         array $goods,
         array $pay_data = []
     ): array {
-        return self::createPay('createJsPay', 'h5', $device, $user, $goods, $pay_data);
+        return self::createPay('createJsPay', $device, $user, $goods, $pay_data);
     }
 
     public static function createQRCodePay(
@@ -299,7 +315,6 @@ class Pay
     ): array {
         return self::createPay(
             'createQRCodePay',
-            'qrcode',
             $device,
             User::getPseudoUser($code, '<匿名用户>'),
             $goods,

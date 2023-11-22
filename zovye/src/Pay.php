@@ -119,19 +119,6 @@ class Pay
                     continue;
                 }
                 if ($matchFN($user, $config)) {
-                    //如果代理商配置的是微信支付，获得子商户号后合并到系统全局配置中
-                    if ($config->getName() == Pay::WX_V3) {
-                        $sub_mch_id = $config->getExtraData('sub_mch_id', '');
-                        if (empty($sub_mch_id)) {
-                            return null;
-                        }
-                        /** @var payment_configModelObj $default */
-                        $default = PaymentConfig::getByName(Pay::WX_V3);
-                        if ($default) {
-                            $default->setExtraData('sub_mch_id', $sub_mch_id);
-                        }
-                        return self::make($default);
-                    }
                     return self::make($config);
                 }
             }
@@ -605,6 +592,23 @@ class Pay
         }
 
         if ($config->getName() == self::WX_V3 && class_exists('\WeChatPay\Builder')) {
+
+            //如果代理商配置的是微信支付，获得子商户号后合并到系统全局配置中
+            if ($config->getAgentId() != 0 && $config->getName() == Pay::WX_V3) {
+                $sub_mch_id = $config->getExtraData('sub_mch_id', '');
+                if (empty($sub_mch_id)) {
+                    throw new RuntimeException('不正确的支付配置！');
+                }
+
+                /** @var payment_configModelObj $config */
+                $config = PaymentConfig::getByName(Pay::WX_V3);
+                if (!$config) {
+                    throw new RuntimeException('不正确的支付配置！');
+                }
+
+                $config->setExtraData('sub_mch_id', $sub_mch_id);
+            }
+
             $data = $config->toArray();
 
             if ($data['sub_mch_id']) {

@@ -97,7 +97,10 @@ class LCSWPay implements IPay
         ];
     }
 
-    public function createQrcodePay(
+    /**
+     * 付款码支付
+     */
+    public function createQRCodePay(
         string $code,
         string $device_uid,
         string $order_no,

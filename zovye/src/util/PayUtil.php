@@ -16,14 +16,13 @@ use WeChatPay\Util\PemUtil;
 use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
-use zovye\WxPayV3Client;
 use function zovye\_W;
 use function zovye\err;
 use function zovye\is_error;
 
 class PayUtil
 {
-    public static function WxPayV3Builder(array $config): BuilderChainable
+    public static function getWxPayV3Builder(array $config): BuilderChainable
     {
         $params = [
             'mchid' => $config['mch_id'],         // 商户号
@@ -47,34 +46,32 @@ class PayUtil
         return Builder::factory($params);
     }
 
-    public static function getWxPayV3Client(array $config): WxPayV3Client
-    {
-        // 构造一个 APIv3 客户端实例
-        return new WxPayV3Client(self::WxPayV3Builder($config));
-    }
-
     public static function parseWxPayV3Response(ResponseInterface $response)
     {
         $contents = $response->getBody()->getContents();
+
         if ($contents) {
             return json_decode($contents, true);
         }
+
         return err('请求失败！');
     }
 
-    public static function getWxPlatformCertification($config)
+    public static function getWxPlatformCertificate($config)
     {
         try {
             // 发送请求
-            $resp = (self::getWxPayV3Client($config))->get('v3/certificates');
+            $response = (self::getWxPayV3Builder($config))->v3->certificates->get();
+
+            $result = self::parseWxPayV3Response($response);
 
             Log::debug('WxPayUtil', [
                 'v3config' => $config,
-                'resp' => $resp,
+                'result' => $result,
             ]);
 
-            if (is_error($resp)) {
-                return $resp;
+            if (is_error($result)) {
+                return $result;
             }
 
             [
@@ -89,7 +86,7 @@ class PayUtil
                         'serial_no' => $serial_no,
                     ],
                 ],
-            ] = $resp;
+            ] = $result;
 
             // 加密文本消息解密
             $data = AesGcm::decrypt($ciphertext, $config['key'], $nonce, $associated_data);
@@ -315,7 +312,7 @@ JSCODE;
         return <<<JS
 <script src="{$params['JQueryURL']}"></script>
 <script>
-$(function(){
+$(function() {
     alert("当前环境不支持！");
 })
 </script>

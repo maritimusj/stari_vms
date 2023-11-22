@@ -11,18 +11,6 @@ use zovye\util\PayUtil;
 class WxMCHPayV3
 {
     private $config;
-    private static $errMsg = [
-        'SYSTEM_ERROR' => '微信系统错误，请稍后重试！',
-        'APPID_MCHID_NOT_MATCH' => '商户号和appid没有绑定关系',
-        'PARAM_ERROR' => '参数错误',
-        'INVALID_REQUEST' => '参数错误',
-        'NO_AUTH' => '商户信息不合法',
-        'NOT_ENOUGH' => '资金不足',
-        'ACCOUNTERROR' => '商户账户付款受限',
-        'QUOTA_EXCEED' => '超出商户单日转账额度',
-        'FREQUENCY_LIMITED' => '频率超限',
-        'UNKNOWN' => '其它未知错误！',
-    ];
 
     public function __construct(array $config)
     {
@@ -36,39 +24,40 @@ class WxMCHPayV3
         }
 
         $data = [
-            'appid' => $this->config['appid'],
-            'out_batch_no' => $trade_no,
-            'batch_name' => $desc,
-            'batch_remark' => $desc,
-            'total_amount' => $money,
-            'total_num' => 1,
-            'transfer_detail_list' => [
-                [
-                    'out_detail_no' => $trade_no,
-                    'transfer_amount' => $money,
-                    'transfer_remark' => $desc,
-                    'openid' => $openid,
+            'json' => [
+                'appid' => $this->config['appid'],
+                'out_batch_no' => $trade_no,
+                'batch_name' => $desc,
+                'batch_remark' => $desc,
+                'total_amount' => $money,
+                'total_num' => 1,
+                'transfer_detail_list' => [
+                    [
+                        'out_detail_no' => $trade_no,
+                        'transfer_amount' => $money,
+                        'transfer_remark' => $desc,
+                        'openid' => $openid,
+                    ],
                 ],
             ],
         ];
 
-        $response = PayUtil::getWxPayV3Client($this->config)->post('v3/transfer/batches', $data);
-        if (is_error($response)) {
-            return $response;
+        $response = PayUtil::getWxPayV3Builder($this->config)
+            ->v3->transfer->batches
+            ->post($data);
+
+        $result = PayUtil::parseWxPayV3Response($response);
+
+        if (is_error($result)) {
+            return $result;
         }
 
-        if (!empty($response['code'])) {
-            if ($response['message']) {
-                return err($response['message']);
-            }
-
-            $code = $response['code'];
-
-            return err(self::$errMsg[$code] ?? self::$errMsg['UNKNOWN']);
+        if (!empty($result['code'])) {
+            return err($result['message'] ?? '请求失败！');
         }
 
-        if ($response['batch_id']) {
-            return $response;
+        if ($result['batch_id']) {
+            return $result;
         }
 
         return err('接口返回数据错误！');
@@ -80,25 +69,28 @@ class WxMCHPayV3
     public function transferInfo(string $batch_id, string $trade_no = ''): array
     {
         $data = [
-            'need_query_detail' => 'true',
-            'detail_status' => 'ALL',
+            'query' => [
+                'need_query_detail' => 'true',
+                'detail_status' => 'ALL',
+            ],
+            'batch_id' => $batch_id,
         ];
 
-        $response = PayUtil::getWxPayV3Client($this->config)->get("v3/transfer/batches/batch-id/$batch_id", $data);
-        if (is_error($response)) {
-            return $response;
+        $response = PayUtil::getWxPayV3Builder($this->config)
+            ->v3->transfer->batches->batch_id->_batch_id_
+            ->get($data);
+
+        $result = PayUtil::parseWxPayV3Response($response);
+
+        if (is_error($result)) {
+            return $result;
         }
 
-        if (!empty($response['code'])) {
-            if ($response['message']) {
-                return err($response['message']);
-            }
-            $code = $response['code'];
-
-            return err(self::$errMsg[$code] ?? self::$errMsg['UNKNOWN']);
+        if (!empty($result['code'])) {
+            return err($result['message'] ?? '请求失败！');
         }
 
-        $list = (array)$response['transfer_detail_list'];
+        $list = (array)$result['transfer_detail_list'];
         if ($list) {
             if ($trade_no) {
                 foreach ($list as $i) {
@@ -113,8 +105,8 @@ class WxMCHPayV3
             return $list;
         }
 
-        if ($response['transfer_batch']) {
-            $batch = $response['transfer_batch'];
+        if ($result['transfer_batch']) {
+            $batch = $result['transfer_batch'];
             if ($batch['batch_status'] == 'CLOSED') {
                 return [
                     'detail_status' => 'FAIL',

@@ -905,7 +905,7 @@ if ($page == 'device') {
                 ],
             ];
 
-            $res = PayUtil::getWxPlatformCertification($data);
+            $res = PayUtil::getWxPlatformCertificate($data);
             if (is_error($res)) {
                 Log::error('settings', [
                     'error' => $res,

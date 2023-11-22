@@ -7,82 +7,37 @@
 
 namespace zovye\payment;
 
+use Psr\Http\Message\ResponseInterface;
+use WeChatPay\BuilderChainable;
 use WeChatPay\Crypto\AesGcm;
 use WeChatPay\Crypto\Rsa;
 use WeChatPay\Formatter;
 use zovye\contract\IPay;
-use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
-use zovye\Pay;
 use zovye\Request;
-use zovye\util\Util;
 use zovye\util\PayUtil;
+use zovye\util\Util;
 use function zovye\err;
 use function zovye\is_error;
 
-class WxPayV3 implements IPay
+abstract class WxPayV3 implements IPay
 {
-    private $config;
+    abstract function getConfig():array;
 
-    /**
-     * @param array $config
-     */
-    public function __construct(array $config = [])
+    public function builder(): BuilderChainable
     {
-        $this->config = $config;
+        return PayUtil::getWxPayV3Builder($this->getConfig());
     }
 
-    public function getName(): string
+    public function getCallbackUrl(): string
     {
-        return Pay::WX_V3;
+        return PayUtil::getPaymentCallbackUrl($this->getConfig()['config_id']);
     }
 
-    public function getConfig(): array
+    public function parseJSPayResponse(ResponseInterface $response)
     {
-        return $this->config;
-    }
-
-    public function createXAppPay(string $user_uid, string $device_uid, string $order_no, int $price, string $body = '')
-    {
-        //小程序支付，使用小程序appid
-        $this->config['appid'] = $this->config['wxappid'];
-
-        return $this->createJsPay($user_uid, $device_uid, $order_no, $price, $body);
-    }
-
-    public function createJsPay(string $user_uid, string $device_uid, string $order_no, int $price, string $body = '')
-    {
-        $data = [
-            'json' => [
-                'sp_appid' => $this->config['appid'],
-                'sp_mchid' => $this->config['mch_id'],
-                'sub_mchid' => $this->config['sub_mch_id'],
-                'description' => $body,
-                'out_trade_no' => $order_no,
-                'notify_url' => PayUtil::getPaymentCallbackUrl($this->config['config_id']),
-                'amount' => [
-                    'total' => $price,
-                    'currency' => 'CNY',
-                ],
-                'payer' => [
-                    'sp_openid' => $user_uid,
-                ],
-                'attach' => $device_uid,
-            ],
-        ];
-
-        $response = PayUtil::WxPayV3Builder($this->config)
-            ->v3->pay->partner->transactions->jsapi
-            ->post($data);
-
         $result = PayUtil::parseWxPayV3Response($response);
-
-        Log::debug('v3', [
-            'config' => $this->config,
-            'data' => $data,
-            'result' => $result,
-        ]);
 
         if (is_error($result)) {
             return $result;
@@ -92,8 +47,10 @@ class WxPayV3 implements IPay
             return err($result['message'] ?? '请求失败！');
         }
 
+        $config = $this->getConfig();
+
         $params = [
-            'appId' => $this->config['appid'],
+            'appId' => $config['appid'],
             'timeStamp' => (string)Formatter::timestamp(),
             'nonceStr' => Formatter::nonce(),
             'package' => "prepay_id={$result['prepay_id']}",
@@ -102,7 +59,7 @@ class WxPayV3 implements IPay
         $params += [
             'paySign' => Rsa::sign(
                 Formatter::joinedByLineFeed(...array_values($params)),
-                Rsa::from($this->config['pem']['key'])
+                Rsa::from($config['pem']['key'])
             ),
             'signType' => 'RSA',
         ];
@@ -115,29 +72,6 @@ class WxPayV3 implements IPay
         return PayUtil::getPayJs($device, $user);
     }
 
-    public function close(string $order_no)
-    {
-        $data = [
-            'json' => [
-                'sp_mchid' => $this->config['mch_id'],
-                'sub_mchid' => $this->config['sub_mch_id'],
-            ],
-            'order_no' => $order_no,
-        ];
-
-        $response = PayUtil::WxPayV3Builder($this->config)
-            ->v3->pay->partner->transactions->outTradeNo->_order_no_->close
-            ->post($data);
-
-        $result = PayUtil::parseWxPayV3Response($response);
-
-        if (!empty($result['code'])) {
-            return err($result['message'] ?? '请求失败！');
-        }
-
-        return $result;
-    }
-
     public function refund(string $order_no, int $amount, bool $is_transaction_id = false)
     {
         $res = $this->query($order_no);
@@ -147,7 +81,6 @@ class WxPayV3 implements IPay
 
         $data = [
             'json' => [
-                'sub_mchid' => $this->config['sub_mch_id'],
                 'out_refund_no' => Util::random(32),
                 'amount' => [
                     'refund' => $amount,
@@ -163,7 +96,7 @@ class WxPayV3 implements IPay
             $data['json']['out_trade_no'] = $order_no;
         }
 
-        $response = PayUtil::WxPayV3Builder($this->config)
+        $response = PayUtil::getWxPayV3Builder($this->getConfig())
             ->v3->refund->domestic->refunds
             ->post($data);
 
@@ -176,20 +109,8 @@ class WxPayV3 implements IPay
         return $result;
     }
 
-    public function query(string $order_no): array
+    public function parseQueryResponse(ResponseInterface $response): array
     {
-        $data = [
-            'query' => [
-                'sp_mchid' => $this->config['mch_id'],
-                'sub_mchid' => $this->config['sub_mch_id'],
-            ],
-            'order_no' => $order_no,
-        ];
-
-        $response = PayUtil::WxPayV3Builder($this->config)
-            ->v3->pay->partner->transactions->outTradeNo->_order_no_
-            ->get($data);
-
         $result = PayUtil::parseWxPayV3Response($response);
 
         if (!empty($result['code'])) {
@@ -211,20 +132,22 @@ class WxPayV3 implements IPay
 
     public function decodeData(string $input): array
     {
-        $signature = Request::header('WECHATPAY_SIGNATURE');// 请根据实际情况获取
-        $timestamp = Request::header('WECHATPAY_TIMESTAMP');// 请根据实际情况获取
-        $nonce = Request::header('WECHATPAY_NONCE');// 请根据实际情况获取
+        $signature = Request::header('WECHATPAY_SIGNATURE');
+        $timestamp = Request::header('WECHATPAY_TIMESTAMP');
+        $nonce = Request::header('WECHATPAY_NONCE');
 
         // 检查通知时间偏移量，允许5分钟之内的偏移
-        if (300 < abs(Formatter::timestamp() - (int)$timestamp)) {
+        if (abs(Formatter::timestamp() - (int)$timestamp) > 300) {
             return err('数据已超时！');
         }
+
+        $config = $this->getConfig();
 
         $verified = Rsa::verify(
         // 构造验签名串
             Formatter::joinedByLineFeed($timestamp, $nonce, $input),
             $signature,
-            Rsa::from($this->config['pem']['cert'], Rsa::KEY_TYPE_PUBLIC)
+            Rsa::from($config['pem']['cert'], Rsa::KEY_TYPE_PUBLIC)
         );
 
         if (!$verified) {
@@ -248,7 +171,7 @@ class WxPayV3 implements IPay
         ] = $inBodyArray;
 
         // 加密文本消息解密, $this->config['key'] APIv3密钥
-        $inBodyResource = AesGcm::decrypt($ciphertext, $this->config['key'], $nonce, $aad);
+        $inBodyResource = AesGcm::decrypt($ciphertext, $config['key'], $nonce, $aad);
 
         // 把解密后的文本转换为PHP Array数组
         $data = (array)json_decode($inBodyResource, true);

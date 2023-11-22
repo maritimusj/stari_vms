@@ -26,7 +26,8 @@ use zovye\model\userModelObj;
 use zovye\payment\LCSWPay;
 use zovye\payment\SQBPay;
 use zovye\payment\WXPay;
-use zovye\payment\WxPayV3;
+use zovye\payment\WxPayV3Merchant;
+use zovye\payment\WxPayV3Partner;
 
 class Pay
 {
@@ -289,13 +290,20 @@ class Pay
         return self::createPay('createJsPay', 'h5', $device, $user, $goods, $pay_data);
     }
 
-    public static function createQrcodePay(
+    public static function createQRCodePay(
         deviceModelObj $device,
         string $code,
         array $goods,
         array $pay_data = []
     ): array {
-        return self::createPay('createQrcodePay', 'qrcode',  $device, User::getPseudoUser($code, '<匿名用户>'), $goods, $pay_data);
+        return self::createPay(
+            'createQRCodePay',
+            'qrcode',
+            $device,
+            User::getPseudoUser($code, '<匿名用户>'),
+            $goods,
+            $pay_data
+        );
     }
 
     /**
@@ -695,7 +703,13 @@ class Pay
         }
 
         if ($config->getName() == self::WX_V3) {
-            return new WxPayV3($config->toArray());
+            $data = $config->toArray();
+
+            if ($data['sub_mch_id']) {
+                return new WxPayV3Partner($data);
+            }
+
+            return new WxPayV3Merchant($data);
         }
 
         return null;

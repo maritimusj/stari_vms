@@ -749,7 +749,7 @@ class Helper
                 throw new RuntimeException('对不起，商品库存不足！');
             }
 
-            list($order_no, $data) = Pay::createQrcodePay($device, $code, $goods, [
+            list($order_no, $data) = Pay::createQRCodePay($device, $code, $goods, [
                 'order_no' => $order_no,
                 'level' => LOG_GOODS_PAY,
                 'total' => 1,

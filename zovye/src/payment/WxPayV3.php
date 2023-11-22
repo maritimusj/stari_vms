@@ -7,6 +7,7 @@
 
 namespace zovye\payment;
 
+use Exception;
 use Psr\Http\Message\ResponseInterface;
 use WeChatPay\BuilderChainable;
 use WeChatPay\Crypto\AesGcm;
@@ -23,7 +24,7 @@ use function zovye\is_error;
 
 abstract class WxPayV3 implements IPay
 {
-    abstract function getConfig():array;
+    abstract function getConfig(): array;
 
     public function builder(): BuilderChainable
     {
@@ -102,17 +103,22 @@ abstract class WxPayV3 implements IPay
             $data['json']['sub_mchid'] = $config['sub_mch_id'];
         }
 
-        $response = PayUtil::getWxPayV3Builder($this->getConfig())
-            ->v3->refund->domestic->refunds
-            ->post($data);
+        try {
+            $response = PayUtil::getWxPayV3Builder($this->getConfig())
+                ->v3->refund->domestic->refunds
+                ->post($data);
 
-        $result = PayUtil::parseWxPayV3Response($response);
+            $result = PayUtil::parseWxPayV3Response($response);
 
-        if (!empty($result['code'])) {
-            return err($result['message'] ?? '请求失败！');
+            if (!empty($result['code'])) {
+                return err($result['message'] ?? '请求失败！');
+            }
+
+            return $result;
+
+        } catch (Exception $e) {
+            return err($e->getMessage());
         }
-
-        return $result;
     }
 
     public function parseQueryResponse(ResponseInterface $response): array
@@ -142,61 +148,66 @@ abstract class WxPayV3 implements IPay
 
     public function decodeData(string $input): array
     {
-        $signature = Request::header('HTTP_WECHATPAY_SIGNATURE');
-        $timestamp = Request::header('HTTP_WECHATPAY_TIMESTAMP');
-        $nonce = Request::header('HTTP_WECHATPAY_NONCE');
+        try {
+            $signature = Request::header('HTTP_WECHATPAY_SIGNATURE');
+            $timestamp = Request::header('HTTP_WECHATPAY_TIMESTAMP');
+            $nonce = Request::header('HTTP_WECHATPAY_NONCE');
 
-        // // 检查通知时间偏移量，允许5分钟之内的偏移
-        if (abs(time() - (int)$timestamp) > 300) {
-            return err('数据已超时！');
+            // // 检查通知时间偏移量，允许5分钟之内的偏移
+            if (abs(time() - (int)$timestamp) > 300) {
+                throw new Exception('数据已超时！');
+            }
+
+            $config = $this->getConfig();
+
+            $verified = Rsa::verify(
+            // 构造验签名串
+                Formatter::joinedByLineFeed($timestamp, $nonce, $input),
+                $signature,
+                Rsa::from($config['pem']['cert']['data'], Rsa::KEY_TYPE_PUBLIC)
+            );
+
+            if (!$verified) {
+                throw new Exception('数据检验失败！');
+            }
+
+            // 转换通知的JSON文本消息为PHP Array数组
+            $inBodyArray = (array)json_decode($input, true);
+
+            if (!empty($inBodyArray['code'])) {
+                throw new Exception($inBodyArray['message'] ?? '支付失败！');
+            }
+
+            // 使用PHP7的数据解构语法，从Array中解构并赋值变量
+            [
+                'resource' => [
+                    'ciphertext' => $ciphertext,
+                    'nonce' => $nonce,
+                    'associated_data' => $aad,
+                ],
+            ] = $inBodyArray;
+
+            // 加密文本消息解密, $config['key'] APIv3密钥
+            $inBodyResource = AesGcm::decrypt($ciphertext, $config['key'], $nonce, $aad);
+
+            // 把解密后的文本转换为PHP Array数组
+            $data = (array)json_decode($inBodyResource, true);
+            if ($data['trade_state'] != 'SUCCESS') {
+                throw new  Exception($data['trade_state_desc'] ?? '订单状态异常！');
+            }
+
+            return [
+                'type' => $this->getName(),
+                'deviceUID' => $data['attach'],
+                'orderNO' => $data['out_trade_no'],
+                'total' => $data['amount'],
+                'transaction_id' => $data['transaction_id'],
+                'raw' => $data,
+            ];
+
+        } catch (Exception $e) {
+            return err($e->getMessage());
         }
-
-        $config = $this->getConfig();
-
-        $verified = Rsa::verify(
-        // 构造验签名串
-            Formatter::joinedByLineFeed($timestamp, $nonce, $input),
-            $signature,
-            Rsa::from($config['pem']['cert']['data'], Rsa::KEY_TYPE_PUBLIC)
-        );
-
-        if (!$verified) {
-            return err('数据检验失败！');
-        }
-
-        // 转换通知的JSON文本消息为PHP Array数组
-        $inBodyArray = (array)json_decode($input, true);
-
-        if (!empty($inBodyArray['code'])) {
-            return err($inBodyArray['message'] ?? '支付失败！');
-        }
-
-        // 使用PHP7的数据解构语法，从Array中解构并赋值变量
-        [
-            'resource' => [
-                'ciphertext' => $ciphertext,
-                'nonce' => $nonce,
-                'associated_data' => $aad,
-            ],
-        ] = $inBodyArray;
-
-        // 加密文本消息解密, $config['key'] APIv3密钥
-        $inBodyResource = AesGcm::decrypt($ciphertext, $config['key'], $nonce, $aad);
-
-        // 把解密后的文本转换为PHP Array数组
-        $data = (array)json_decode($inBodyResource, true);
-        if ($data['trade_state'] != 'SUCCESS') {
-            return err($data['trade_state_desc'] ?? '订单状态异常！');
-        }
-
-        return [
-            'type' => $this->getName(),
-            'deviceUID' => $data['attach'],
-            'orderNO' => $data['out_trade_no'],
-            'total' => $data['amount'],
-            'transaction_id' => $data['transaction_id'],
-            'raw' => $data,
-        ];
     }
 
     public function checkResult(array $data = [])

@@ -7,6 +7,7 @@
 
 namespace zovye\payment;
 
+use Exception;
 use zovye\Pay;
 use zovye\util\PayUtil;
 use function zovye\err;
@@ -62,11 +63,16 @@ class WxPayV3Partner extends WxPayV3
             ],
         ];
 
-        $response = parent::builder()
-            ->v3->pay->partner->transactions->jsapi
-            ->post($data);
+        try {
+            $response = parent::builder()
+                ->v3->pay->partner->transactions->jsapi
+                ->post($data);
 
-        return parent::parseJSPayResponse($response);
+            return parent::parseJSPayResponse($response);
+
+        } catch (Exception $e) {
+            return err($e->getMessage());
+        }
     }
 
     public function close(string $order_no)
@@ -79,17 +85,22 @@ class WxPayV3Partner extends WxPayV3
             'order_no' => $order_no,
         ];
 
-        $response = parent::builder()
-            ->v3->pay->partner->transactions->outTradeNo->_order_no_->close
-            ->post($data);
+        try {
+            $response = parent::builder()
+                ->v3->pay->partner->transactions->outTradeNo->_order_no_->close
+                ->post($data);
 
-        $result = PayUtil::parseWxPayV3Response($response);
+            $result = PayUtil::parseWxPayV3Response($response);
 
-        if (!empty($result['code'])) {
-            return err($result['message'] ?? '请求失败！');
+            if (!empty($result['code'])) {
+                return err($result['message'] ?? '请求失败！');
+            }
+
+            return $result;
+
+        } catch (Exception $e) {
+            return err($e->getMessage());
         }
-
-        return $result;
     }
 
     public function query(string $order_no): array
@@ -102,10 +113,15 @@ class WxPayV3Partner extends WxPayV3
             'order_no' => $order_no,
         ];
 
-        $response = parent::builder()
-            ->v3->pay->partner->transactions->outTradeNo->_order_no_
-            ->get($data);
+        try {
+            $response = parent::builder()
+                ->v3->pay->partner->transactions->outTradeNo->_order_no_
+                ->get($data);
 
-        return parent::parseQueryResponse($response);
+            return parent::parseQueryResponse($response);
+
+        } catch (Exception $e) {
+            return err($e->getMessage());
+        }
     }
 }

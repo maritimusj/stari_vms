@@ -63,10 +63,8 @@
             <tr>
                 <td>退款金额</td>
                 <td class="refund">
-                    {if $data['refund']['result']['data']['total_amount']}
-                    {php echo number_format($data['refund']['result']['data']['total_amount'] / 100, 2, '.', '')} 元
-                    {elseif $data['refund']['result']['refund_fee']}
-                    {php echo number_format($data['refund']['result']['refund_fee'] / 100, 2, '.', '')} 元
+                    {if $data['refund']['result']['total']}
+                    {php echo number_format($data['refund']['result']['total'] / 100, 2, '.', '')} 元
                     {/if}
                 </td>
             </tr>

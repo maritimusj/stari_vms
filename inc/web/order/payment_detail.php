@@ -34,6 +34,12 @@ $data['merchant_no'] = $data['payResult']['raw']['merchant_no'] ??
     $data['payResult']['raw']['sn'] ??
     $data['queryResult']['sn'];
 
+if ($data['refund']['result']) {
+    $data['refund']['result']['total'] = $data['refund']['result']['data']['total_amount'] ??
+        $data['refund']['result']['refund_fee'] ??
+        $data['refund']['result']['amount']['refund'];
+}
+
 Response::templateJSON(
     'web/order/payment',
     '支付详情',

@@ -600,13 +600,14 @@ class Pay
                     throw new RuntimeException('不正确的支付配置！');
                 }
 
-                /** @var payment_configModelObj $config */
-                $config = PaymentConfig::getByName(Pay::WX_V3);
-                if (!$config) {
+                /** @var payment_configModelObj $default */
+                $default = PaymentConfig::getByName(Pay::WX_V3);
+                if (!$default) {
                     throw new RuntimeException('不正确的支付配置！');
                 }
-
-                $config->setExtraData('sub_mch_id', $sub_mch_id);
+                $data = $default->getExtraData();
+                $data['sub_mch_id'] = $sub_mch_id;
+                $config->setExtraData($data);
             }
 
             $data = $config->toArray();

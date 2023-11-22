@@ -69,7 +69,10 @@ class Pay
                 if ($device) {
                     $user = User::get($log->getUserOpenid(), true);
                     if ($user) {
-                        return self::selectPay($device, $user);
+                        $pay = self::selectPay($device, $user);
+                        if ($pay) {
+                            return $pay;
+                        }
                     }
                 }
             }
@@ -86,24 +89,24 @@ class Pay
 
     public static function selectPay(deviceModelObj $device, userModelObj $user): ?IPay
     {
-        if ($user->isWxUser() || $user->isWXAppUser()) {
+        if ($user->isWxUser() || $user->isWXAppUser() || Session::isWxUser() || Session::isWxAppUser()) {
             $names = [self::LCSW, self::SQB, self::WX_V3, self::WX];
-        } elseif ($user->isAliUser()) {
+        } elseif ($user->isAliUser() || Session::isAliUser()) {
             $names = [self::LCSW, self::SQB];
         } else {
             return null;
         }
 
-        $matchFN = function(userModelObj $user,payment_configModelObj $config) {
-            if ($user->isWxUser() && $config->isEnabled('wx.h5')) {
+        $matchFN = function (userModelObj $user, payment_configModelObj $config) {
+            if (($user->isWxUser() || $user->isWXAppUser() || Session::isWxUser() || Session::isWxAppUser())
+                && $config->isEnabled('wx')) {
                 return true;
             }
-            if ($user->isWXAppUser() && $config->isEnabled('wx.miniapp')) {
+
+            if (($user->isAliUser() || Session::isAliUser()) && $config->isEnabled('ali')) {
                 return true;
             }
-            if ($user->isAliUser() && $config->isEnabled('ali')) {
-                return true;
-            }
+
             return false;
         };
 
@@ -143,7 +146,7 @@ class Pay
     {
         $pay = self::selectPay($device, $user);
         if (!$pay) {
-            return err('暂时无法支付！');
+            return err('支付暂时不可用！');
         }
 
         return $pay->getPayJs($device, $user);
@@ -162,7 +165,7 @@ class Pay
     ): array {
         $pay = self::selectPay($device, $user);
         if (!$pay) {
-            return err('暂时无法支付！');
+            return err('支付暂时不可用！');
         }
 
         list($order_no,) = self::prepareDataWithPay($pay, $device, $user, $goods, $pay_data);

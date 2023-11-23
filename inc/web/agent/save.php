@@ -314,7 +314,10 @@ $result = DBUtil::transactionDo(function () use ($id, &$from) {
                 'terminal_id' => Request::trim('terminal_id'),
                 'access_token' => Request::trim('access_token'),
                 'app' => [
-                    'wx' => Request::bool('lcswWx'),
+                    'wx' => [
+                        'h5' => Request::bool('lcswWxH5'),
+                        'mini_app' => Request::bool('lcswWxMiniApp'),
+                    ],
                     'ali' => Request::bool('lcswAli'),
                 ]
             ])) {
@@ -350,7 +353,10 @@ $result = DBUtil::transactionDo(function () use ($id, &$from) {
                         'key' => $result['terminal_key'],
                         'title' => $result['store_name'],
                         'app' => [
-                            'wx' => Request::bool('SQBWx'),
+                            'wx' => [
+                                'h5' => Request::bool('SQBWxH5'),
+                                'mini_app' => Request::bool('SQBWxMiniApp'),
+                            ],
                             'ali' => Request::bool('SQBAli'),
                         ]
                     ]);            
@@ -362,7 +368,10 @@ $result = DBUtil::transactionDo(function () use ($id, &$from) {
                 ]);
                 if ($config) {
                     $config->setExtraData('app', [
-                        'wx' => Request::bool('SQBWx'),
+                        'wx' => [
+                            'h5' => Request::bool('SQBWxH5'),
+                            'mini_app' => Request::bool('SQBWxMiniApp'),
+                        ],
                         'ali' => Request::bool('SQBAli'),
                     ]);
                     $config->save();
@@ -379,7 +388,10 @@ $result = DBUtil::transactionDo(function () use ($id, &$from) {
             if (!PaymentConfig::createOrUpdate($user->getId(), Pay::WX_V3, [
                 'sub_mch_id' => Request::trim('wxMCHID'),
                 'app' => [
-                    'wx' => true,
+                    'wx' => [
+                        'h5' => true,
+                        'mini_app' => true,
+                    ],
                 ],
             ])) {
                 return err('保存微信支付配置失败！');

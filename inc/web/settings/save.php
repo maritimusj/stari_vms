@@ -776,9 +776,12 @@ if ($page == 'device') {
             'terminal_id' => Request::trim('terminal_id'),
             'access_token' => Request::trim('access_token'),
             'app' => [
-                'wx' => Request::bool('lcswWx'),
+                'wx' => [
+                    'h5' => Request::bool('lcswWxH5'),
+                    'mini_app' => Request::bool('lcswWxMiniApp'),
+                ],
                 'ali' => Request::bool('lcswAli'),
-            ]
+            ],
         ];
         $res = PaymentConfig::createOrUpdateByName(Pay::LCSW, $data);
         if (is_error($res)) {
@@ -797,7 +800,7 @@ if ($page == 'device') {
             $vendor_sn = Request::trim('vendor_sn');
             $vendor_key = Request::trim('vendor_key');
             $code = Request::trim('code');
-    
+
             $result = SQBUtil::activate($app_id, $vendor_sn, $vendor_key, $code);
 
             if (is_error($result)) {
@@ -814,16 +817,22 @@ if ($page == 'device') {
                     'key' => $result['terminal_key'],
                     'title' => $result['store_name'],
                     'app' => [
-                        'wx' => Request::bool('SQBWx'),
+                        'wx' => [
+                            'h5' => Request::bool('SQBWxH5'),
+                            'mini_app' => Request::bool('SQBWxMiniApp'),
+                        ],
                         'ali' => Request::bool('SQBAli'),
-                    ]
-                ]);            
+                    ],
+                ]);
             }
         } else {
             $config = PaymentConfig::getByName(Pay::SQB);
             if ($config) {
                 $config->setExtraData('app', [
-                    'wx' => Request::bool('SQBWx'),
+                    'wx' => [
+                        'h5' => Request::bool('SQBWxH5'),
+                        'mini_app' => Request::bool('SQBWxMiniApp'),
+                    ],
                     'ali' => Request::bool('SQBAli'),
                 ]);
                 $config->save();
@@ -845,7 +854,10 @@ if ($page == 'device') {
                 'key' => Request::trim('keyPEM'),
             ],
             'app' => [
-                'wx' => true,
+                'wx' => [
+                    'h5' => true,
+                    'mini_app' => true,
+                ],
             ],
         ];
 
@@ -869,7 +881,8 @@ if ($page == 'device') {
                     'key' => Request::trim('V3key'),
                 ],
                 'app' => [
-                    'wx' => true,
+                    'h5' => true,
+                    'mini_app' => true,
                 ],
             ];
 

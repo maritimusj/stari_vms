@@ -320,6 +320,45 @@ ALI_JSCODE;
             alert(e);
         });
     }
+    
+    zovye_fn.package_pay = function(packageID, successFN, failFN) {
+      return new Promise(function(resolve, reject) {
+          $.get("{$params['orderAPIURL']}", {op: "create", packageID: packageID}).then(function(res) {
+              zovye_fn.pay(res).then(function(orderNO, msg) {
+                  if (typeof successFN !== 'function' || !successFN(orderNO)) {
+                    zovye_fn.redirectToGetPayResultPage(orderNO, msg);
+                  }
+                  resolve(orderNO, msg);
+              }).catch(function(msg) {
+                  if (typeof failFN !== 'function' || !failFN(msg)) {
+                    zovye_fn.redirectToPayFailedPage(msg);
+                  }
+                  reject(msg);
+              });
+          });  
+      });
+    }
+</script>
+JSCODE;
+    }
+
+    public static function getDummyPayJs(): string
+    {
+        $jquery_url = JS_JQUERY_URL;
+
+        return <<<JSCODE
+<script src="$jquery_url"></script>
+<script>
+    const zovye_fn = {};
+    zovye_fn.pay = function() {
+        alert('暂时无法完成支付！');
+    }
+    zovye_fn.goods_wxpay = function() {
+        alert('暂时无法完成支付！');
+    }
+    zovye_fn.package_pay = function() {
+        alert('暂时无法完成支付！');
+    }
 </script>
 JSCODE;
     }
@@ -344,13 +383,6 @@ JSCODE;
             return self::getAliPayJs($params);
         }
 
-        return <<<JS
-<script src="{$params['JQueryURL']}"></script>
-<script>
-$(function() {
-    alert("当前环境不支持！");
-})
-</script>
-JS;
+        return self::getDummyPayJs();
     }
 }

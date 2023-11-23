@@ -16,6 +16,7 @@ use zovye\domain\Order;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 use zovye\util\Helper;
+use zovye\util\PayUtil;
 use zovye\util\TemplateUtil;
 use zovye\util\Util;
 
@@ -122,7 +123,7 @@ $device_imei = $device->getImei();
 
 $pay_js = Pay::getPayJs($device, $user);
 if (is_error($pay_js)) {
-    Response::alert($pay_js['message'], 'error');
+    $pay_js = PayUtil::getDummyPayJs();
 }
 
 $requestID = REQUEST_ID;
@@ -227,7 +228,6 @@ zovye_fn.chooseGoods = function(goods, num, cb) {
         }
     });
 }
-
 JSCODE;
 }
 if (App::isGDCVMachineEnabled()) {

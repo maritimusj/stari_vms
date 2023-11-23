@@ -46,6 +46,6 @@ if ($op == 'default') {
 
     $res = Pay::notify($_GET['config_id'], Request::raw());
 
-    exit($res);
+    Response::echo($res);
 }
 

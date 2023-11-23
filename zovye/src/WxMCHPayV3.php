@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+use Exception;
+use GuzzleHttp\Exception\RequestException;
 use zovye\util\PayUtil;
 
 class WxMCHPayV3
@@ -42,25 +44,30 @@ class WxMCHPayV3
             ],
         ];
 
-        $response = PayUtil::getWxPayV3Builder($this->config)
-            ->v3->transfer->batches
-            ->post($data);
+        try {
+            $response = PayUtil::getWxPayV3Builder($this->config)
+                ->v3->transfer->batches
+                ->post($data);
 
-        $result = PayUtil::parseWxPayV3Response($response);
+            $result = PayUtil::parseWxPayV3Response($response);
 
-        if (is_error($result)) {
-            return $result;
+            if (is_error($result)) {
+                return $result;
+            }
+
+            if (!empty($result['code'])) {
+                return err($result['message'] ?? '请求失败！');
+            }
+
+            if ($result['batch_id']) {
+                return $result;
+            }
+
+            return err('接口返回数据错误！');
+
+        } catch (Exception $e) {
+            return err($e->getMessage());
         }
-
-        if (!empty($result['code'])) {
-            return err($result['message'] ?? '请求失败！');
-        }
-
-        if ($result['batch_id']) {
-            return $result;
-        }
-
-        return err('接口返回数据错误！');
     }
 
     /**
@@ -76,47 +83,52 @@ class WxMCHPayV3
             'batch_id' => $batch_id,
         ];
 
-        $response = PayUtil::getWxPayV3Builder($this->config)
-            ->v3->transfer->batches->batch_id->_batch_id_
-            ->get($data);
+        try {
+            $response = PayUtil::getWxPayV3Builder($this->config)
+                ->v3->transfer->batches->batch_id->_batch_id_
+                ->get($data);
 
-        $result = PayUtil::parseWxPayV3Response($response);
+            $result = PayUtil::parseWxPayV3Response($response);
 
-        if (is_error($result)) {
-            return $result;
-        }
+            if (is_error($result)) {
+                return $result;
+            }
 
-        if (!empty($result['code'])) {
-            return err($result['message'] ?? '请求失败！');
-        }
+            if (!empty($result['code'])) {
+                return err($result['message'] ?? '请求失败！');
+            }
 
-        $list = (array)$result['transfer_detail_list'];
-        if ($list) {
-            if ($trade_no) {
-                foreach ($list as $i) {
-                    if ($i && $i['out_detail_no'] == $trade_no) {
-                        return $i;
+            $list = (array)$result['transfer_detail_list'];
+            if ($list) {
+                if ($trade_no) {
+                    foreach ($list as $i) {
+                        if ($i && $i['out_detail_no'] == $trade_no) {
+                            return $i;
+                        }
                     }
+
+                    return [];
                 }
 
-                return [];
+                return $list;
             }
 
-            return $list;
-        }
-
-        if ($result['transfer_batch']) {
-            $batch = $result['transfer_batch'];
-            if ($batch['batch_status'] == 'CLOSED') {
-                return [
-                    'detail_status' => 'FAIL',
-                    'batch_id' => $batch['batch_id'],
-                    'out_batch_no' => $batch['out_batch_no'],
-                    'close_reason' => $batch['close_reason'],
-                ];
+            if ($result['transfer_batch']) {
+                $batch = $result['transfer_batch'];
+                if ($batch['batch_status'] == 'CLOSED') {
+                    return [
+                        'detail_status' => 'FAIL',
+                        'batch_id' => $batch['batch_id'],
+                        'out_batch_no' => $batch['out_batch_no'],
+                        'close_reason' => $batch['close_reason'],
+                    ];
+                }
             }
-        }
 
-        return err('接口返回数据错误！');
+            return err('接口返回数据错误！');
+
+        } catch (Exception $e) {
+            return err($e->getMessage());
+        }
     }
 }

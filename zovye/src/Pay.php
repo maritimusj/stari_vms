@@ -255,17 +255,6 @@ class Pay
 
         if (is_callable([$pay, $fn])) {
             $res = $pay->$fn($user->getOpenid(), $device->getImei(), $order_no, $price, $title);
-
-            Log::debug('pay', [
-                'prepareData' => $result,
-                'pay' => $pay,
-                'fn' => $fn,
-                'goods' => $goods,
-                'data' => $pay_data,
-                'user' => $user->profile(),
-                'res' => $res,
-            ]);
-
         } else {
             Log::debug('pay', [
                 'result' => $result,
@@ -275,7 +264,7 @@ class Pay
                 'data' => $pay_data,
                 'user' => $user->profile(),
             ]);
-            $res = err('unknown pay function:'.$fn);
+            trigger_error('无效的支付函数！', E_USER_ERROR);
         }
 
         return [$order_no, $res];

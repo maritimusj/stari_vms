@@ -26,7 +26,7 @@ if ($op == 'default') {
     if (Request::trim('is_success') == 'T' && Request::str('status') == 'SUCCESS') {
         $order_no = Request::str('orderNO');
         $device = Device::get(Request::int('deviceid'));
-    
+
         Response::payResultPage([
             'order_no' => $order_no,
             'device' => $device,
@@ -44,8 +44,8 @@ if ($op == 'default') {
         'raw' => Request::raw(),
     ]);
 
-    $res = Pay::notify($_GET['config_id'], Request::raw());
+    $response = Pay::notify($_GET['config_id'], Request::raw());
 
-    Response::echo($res);
+    Response::echo($response);
 }
 

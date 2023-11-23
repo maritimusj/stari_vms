@@ -219,18 +219,11 @@ abstract class WxPayV3 implements IPay
         return $data['trade_state'] == 'SUCCESS';
     }
 
-    public function getResponse(bool $ok = true): array
+    public function getResponse(bool $ok = true): string
     {
-        if ($ok) {
-            return [
-                'code' => 'SUCCESS',
-                'message' => '成功',
-            ];
-        }
-
-        return [
-            'code' => 'FAIL',
-            'message' => '失败',
-        ];
+        return json_encode([
+            'code' => $ok ? 'SUCCESS' : 'FAIL',
+            'message' => $ok ? '成功' : '失败',
+        ]);
     }
 }

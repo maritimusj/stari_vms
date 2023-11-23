@@ -585,11 +585,11 @@ class Pay
 
         /** @var payment_configModelObj $config */
         $config = PaymentConfig::getByName(Pay::WX);
-        if (!$config) {
-            throw new RuntimeException('没有支付配置！');
+        if ($config) {
+            return new WxMCHPay($config->toArray());
         }
 
-        return new WxMCHPay($config->toArray());
+        throw new RuntimeException('没有支付配置！');
     }
 
     public static function getMCHPayResult($transaction, $trade_no): array

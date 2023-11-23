@@ -194,7 +194,7 @@ class Helper
         return $list;
     }
 
-    public static function isZeroBonus(deviceModelObj $device, $w): bool
+    public static function isZeroBonusEnabled(deviceModelObj $device, $w): bool
     {
         if (App::isZeroBonusEnabled()) {
             $zero = settings('custom.bonus.zero', []);

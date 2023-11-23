@@ -264,7 +264,7 @@ function createOrder(
     }
 
     //定制功能：零佣金
-    if (Helper::isZeroBonus($device, Order::FREE_STR)) {
+    if (Helper::isZeroBonusEnabled($device, Order::FREE_STR)) {
         $order_data['agent_id'] = 0;
         $order_data['device_id'] = 0;
         $order_data['extra']['custom'] = [

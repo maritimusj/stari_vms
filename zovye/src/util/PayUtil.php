@@ -350,14 +350,32 @@ JSCODE;
 <script src="$jquery_url"></script>
 <script>
     const zovye_fn = {};
-    zovye_fn.pay = function() {
-        alert('暂时无法完成支付！');
+    zovye_fn.pay = function(res) {
+        return new Promise(function(resolve, reject) {
+            alert('暂时无法支付购买！');
+            reject();
+        });
     }
-    zovye_fn.goods_wxpay = function() {
-        alert('暂时无法完成支付！');
+    zovye_fn.goods_wxpay = function(params, successFN, failFN) {
+        if (typeof failFN === 'function') {
+            failFN('暂时无法支付购买！');
+            return;
+        }
+        
+        return new Promise(function(resolve, reject) {
+            alert('暂时无法支付购买！');
+            reject();
+        });
     }
-    zovye_fn.package_pay = function() {
-        alert('暂时无法完成支付！');
+    zovye_fn.package_pay = function(packageID, successFN, failFN) {
+        if (typeof failFN === 'function') {
+            failFN('暂时无法支付购买！');
+            return;
+        }
+        return new Promise(function(resolve, reject) {
+            alert('暂时无法支付购买！');
+            reject();
+        });
     }
 </script>
 JSCODE;

@@ -8,7 +8,6 @@ namespace zovye\payment;
 
 use wx\pay;
 use zovye\contract\IPay;
-use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 use zovye\util\PayUtil;
@@ -65,14 +64,7 @@ class WXPay implements IPay
             'total_fee' => $price,
         ];
 
-        $res = $this->getWx()->buildQrcodePay($params);
-
-        Log::debug('qr_pay', [
-            'params' => $params,
-            'res' => $res,
-        ]);
-
-        return $res;
+        return $this->getWx()->buildQrcodePay($params);
     }
 
     public function createXAppPay(
@@ -111,11 +103,6 @@ class WXPay implements IPay
         ];
 
         $res = $wx->buildUnifiedOrder($params);
-
-        Log::debug('js_pay', [
-            'params' => $params,
-            'res' => $res,
-        ]);
 
         if (is_error($res)) {
             return $res;

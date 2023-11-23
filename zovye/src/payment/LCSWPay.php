@@ -8,7 +8,6 @@ namespace zovye\payment;
 
 use lcsw\pay;
 use zovye\contract\IPay;
-use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 use zovye\Session;
@@ -57,8 +56,6 @@ class LCSWPay implements IPay
         int $price,
         string $body = ''
     ): array {
-        $lcsw = $this->getLCSW();
-
         $params = [
             'userUID' => $user_uid,
             'deviceUID' => $device_uid,
@@ -68,12 +65,7 @@ class LCSWPay implements IPay
             'notify_url' => PayUtil::getPaymentCallbackUrl($this->config['config_id']),
         ];
 
-        $res = $fn($lcsw, $params);
-
-        Log::debug('lcsw_xapppay', [
-            'params' => $params,
-            'res' => $res,
-        ]);
+        $res = $fn($this->getLCSW(), $params);
 
         if (is_error($res)) {
             return $res;
@@ -107,8 +99,6 @@ class LCSWPay implements IPay
         int $price,
         string $body = ''
     ) {
-        $lcsw = $this->getLCSW();
-
         $params = [
             'code' => $code,
             'deviceUID' => $device_uid,
@@ -118,7 +108,7 @@ class LCSWPay implements IPay
             'notify_url' => PayUtil::getPaymentCallbackUrl($this->config['config_id']),
         ];
 
-        return $lcsw->qrpay($params);
+        return $this->getLCSW()->qrpay($params);
     }
 
     public function createXAppPay(
@@ -157,9 +147,7 @@ class LCSWPay implements IPay
 
     public function close(string $order_no)
     {
-        $lcsw = $this->getLCSW();
-
-        $res = $lcsw->close($order_no);
+        $res = $this->getLCSW()->close($order_no);
 
         if (is_error($res)) {
             return $res;
@@ -183,9 +171,7 @@ class LCSWPay implements IPay
             return err('退款金额不正确！');
         }
 
-        $lcsw = $this->getLCSW();
-
-        $res = $lcsw->doRefund($res['transaction_id'], $amount, $res['pay_type']);
+        $res = $this->getLCSW()->doRefund($res['transaction_id'], $amount, $res['pay_type']);
 
         if (is_error($res)) {
             return $res;
@@ -200,8 +186,8 @@ class LCSWPay implements IPay
 
     public function query(string $order_no)
     {
-        $lcsw = $this->getLCSW();
-        $res = $lcsw->queryOrder($order_no);
+        $res = $this->getLCSW()->queryOrder($order_no);
+
         if (is_error($res)) {
             return $res;
         }
@@ -223,6 +209,7 @@ class LCSWPay implements IPay
     public function decodeData(string $input): array
     {
         $data = json_decode($input, true);
+
         if (empty($data)) {
             return err('数据为空！');
         }
@@ -243,9 +230,7 @@ class LCSWPay implements IPay
 
     public function checkResult(array $data = []): bool
     {
-        $lcsw = $this->getLCSW();
-
-        $sign = $lcsw->sign([
+        $sign = $this->getLCSW()->sign([
             'return_code' => $data['return_code'],
             'return_msg' => $data['return_msg'],
             'result_code' => $data['result_code'],

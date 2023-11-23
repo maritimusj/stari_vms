@@ -8,7 +8,6 @@ namespace zovye\payment;
 
 use SQB\pay;
 use zovye\contract\IPay;
-use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 use zovye\Request;
@@ -55,22 +54,9 @@ class SQBPay implements IPay
         int $price,
         string $body = ''
     ) {
-        $SQB = $this->getSQB();
-
         $notify_url = PayUtil::getPaymentCallbackUrl($this->config['config_id']);
-        $res = $SQB->qrPay($code, $order_no, $price, $device_uid, $body, $notify_url);
 
-        Log::debug('sqb_qrpay', [
-            'params' => [
-                'code' => $code,
-                'order_no' => $order_no,
-                'price' => $price,
-                'device_uid' => $device_uid,
-                'body' => $body,
-                'notify_url' => $notify_url,
-            ],
-            'res' => $res,
-        ]);
+        $res = $this->getSQB()->qrPay($code, $order_no, $price, $device_uid, $body, $notify_url);
 
         if (is_error($res)) {
             return $res;
@@ -94,22 +80,9 @@ class SQBPay implements IPay
         int $price,
         string $body = ''
     ): array {
-        $SQB = $this->getSQB();
-
         $notify_url = PayUtil::getPaymentCallbackUrl($this->config['config_id']);
-        $res = $SQB->xAppPay($user_uid, $order_no, $price, $device_uid, $body, $notify_url);
 
-        Log::debug('sqb_xapppay', [
-            'params' => [
-                'user_uid' => $user_uid,
-                'order_no' => $order_no,
-                'price' => $price,
-                'device_uid' => $device_uid,
-                'body' => $body,
-                'notify_url' => $notify_url,
-            ],
-            'res' => $res,
-        ]);
+        $res = $this->getSQB()->xAppPay($user_uid, $order_no, $price, $device_uid, $body, $notify_url);
 
         if (is_error($res)) {
             return $res;
@@ -129,13 +102,11 @@ class SQBPay implements IPay
         int $price,
         string $body = ''
     ): array {
-        $SQB = $this->getSQB();
-
         $notify_url = PayUtil::getPaymentCallbackUrl($this->config['config_id']);
         $pay_result_url = Util::murl('payresult', ['op' => 'SQB']);
 
         return [
-            'redirect' => $SQB->wapApiPro($order_no, $price, $device_uid, $body, $notify_url, $pay_result_url),
+            'redirect' => $this->getSQB()->wapApiPro($order_no, $price, $device_uid, $body, $notify_url, $pay_result_url),
         ];
     }
 
@@ -146,9 +117,8 @@ class SQBPay implements IPay
 
     public function close(string $order_no)
     {
-        $SQB = $this->getSQB();
+        $res = $this->getSQB()->close($order_no);
 
-        $res = $SQB->close($order_no);
         if (is_error($res)) {
             return $res;
         }
@@ -162,9 +132,8 @@ class SQBPay implements IPay
 
     public function refund(string $order_no, int $amount, bool $is_transaction_id = false)
     {
-        $SQB = $this->getSQB();
+        $res = $this->getSQB()->refund($order_no, $amount, $is_transaction_id);
 
-        $res = $SQB->refund($order_no, $amount, $is_transaction_id);
         if (is_error($res)) {
             return $res;
         }
@@ -186,9 +155,8 @@ class SQBPay implements IPay
 
     public function query(string $order_no)
     {
-        $SQB = $this->getSQB();
+        $res = $this->getSQB()->query($order_no);
 
-        $res = $SQB->query($order_no);
         if (is_error($res)) {
             return $res;
         }
@@ -239,9 +207,7 @@ class SQBPay implements IPay
 
     public function checkResult(array $data = []): bool
     {
-        $SQB = $this->getSQB();
-
-        return $SQB->checkSign(Request::raw(), Request::header('HTTP_AUTHORIZATION'));
+        return $this->getSQB()->checkSign(Request::raw(), Request::header('HTTP_AUTHORIZATION'));
     }
 
     public function getResponse(bool $ok = true): string

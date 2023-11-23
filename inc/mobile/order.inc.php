@@ -199,7 +199,7 @@ if ($op === 'create') {
             ];
         } else {
             $response = ['code' => 502];
-            if (Helper::NeedAutoRefund($order)) {
+            if (Helper::isAutoRefundEnabled($order)) {
                 $response['msg'] = '出货失败，已提交退款申请！';
             } else {
                 $response['msg'] = '出货失败，请联系管理员！';

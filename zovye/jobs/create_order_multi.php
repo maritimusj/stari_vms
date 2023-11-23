@@ -361,7 +361,7 @@ function createOrder(
 
 function refund(string $order_no, deviceModelObj $device, string $reason)
 {
-    $need = Helper::NeedAutoRefund($device);
+    $need = Helper::isAutoRefundEnabled($device);
     if ($need) {
         $result = Job::refund($order_no, $reason, -1, false, intval(settings('order.rollback.delay', 0)));
         if (empty($result)) {

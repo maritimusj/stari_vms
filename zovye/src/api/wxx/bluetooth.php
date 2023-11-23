@@ -239,7 +239,7 @@ class bluetooth
                     } elseif ($response->isOpenResultFail()) {
                         $order->setResultCode($response->getErrorCode());
                         $order->setBluetoothResultFail($response->getMessage());
-                        if (Helper::NeedAutoRefund($device)) {
+                        if (Helper::isAutoRefundEnabled($device)) {
                             //启动退款
                             Job::refund($order->getOrderNO(), $response->getMessage());
                         }

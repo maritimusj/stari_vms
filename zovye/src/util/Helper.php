@@ -83,7 +83,7 @@ class Helper
      * 设备故障时，订单是否需要自动退款
      * @param null $obj
      */
-    public static function NeedAutoRefund($obj = null): bool
+    public static function isAutoRefundEnabled($obj = null): bool
     {
         if ($obj instanceof deviceModelObj) {
             $device = $obj;

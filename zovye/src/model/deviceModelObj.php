@@ -2002,7 +2002,7 @@ class deviceModelObj extends ModelObj
                 Device::createBluetoothCmdLog($this, $cmd);
                 $result = $cmd->getEncoded(BlueToothProtocol::BASE64);
 
-                if (Helper::NeedAutoRefund($this)) {
+                if (Helper::isAutoRefundEnabled($this)) {
                     $order = Order::getLastOrderOfDevice($this);
                     if ($order) {
                         $delay = max(15, max(settings('order.rollback.delay', 0), $timeout));

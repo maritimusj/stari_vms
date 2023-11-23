@@ -48,7 +48,7 @@ try {
     prepare($order_no);
 } catch (ExceptionNeedsRefund $e) {
     $device = $e->getDevice();
-    $refund = Helper::NeedAutoRefund($device);
+    $refund = Helper::isAutoRefundEnabled($device);
     if ($refund) {
         $res = Job::refund($order_no, $e->getMessage(), 0, false, intval(settings('order.rollback.delay', 0)));
         if (!$res) {

@@ -444,7 +444,7 @@ class DeviceUtil
                     } catch (Exception $e) {
                         //return error($e->getCode(), $e->getMessage());
                     }
-                    if (Helper::NeedAutoRefund($device)) {
+                    if (Helper::isAutoRefundEnabled($device)) {
                         //退款任务
                         Job::refund($order->getOrderNO(), $result['message']);
                     }

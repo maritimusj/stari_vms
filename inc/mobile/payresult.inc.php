@@ -24,7 +24,13 @@ if ($op == 'default') {
 } elseif ($op == 'SQB') {
 
     if (Request::trim('is_success') == 'T' && Request::str('status') == 'SUCCESS') {
-        Response::alert('支付成功！');
+        $order_no = Request::str('orderNO');
+        $device = Device::get(Request::int('deviceid'));
+    
+        Response::payResultPage([
+            'order_no' => $order_no,
+            'device' => $device,
+        ]);
     }
 
     Response::alert(Request::trim('error_message', '支付失败！'), 'error');

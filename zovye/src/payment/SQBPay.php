@@ -103,7 +103,7 @@ class SQBPay implements IPay
         string $body = ''
     ): array {
         $notify_url = PayUtil::getPaymentCallbackUrl($this);
-        $pay_result_url = Util::murl('payresult', ['op' => 'SQB']);
+        $pay_result_url = Util::murl('payresult', ['op' => 'SQB', 'orderNO' => $order_no, 'deviceid' => $device_uid]);
         $redirect_url = $this->getSQB()->wapApiPro($order_no, $price, $device_uid, $body, $notify_url, $pay_result_url);
 
         return [

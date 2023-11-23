@@ -291,7 +291,7 @@ ALI_JSCODE;
             
             if (data && data.redirect) {
                window.location.replace(data.redirect);
-               return resolve('正在转跳...');
+               return resolve(null, '正在转跳...');
             }
             
             WeixinJSBridge.invoke('getBrandWCPayRequest', {
@@ -322,10 +322,12 @@ ALI_JSCODE;
           const total = typeof params === 'object' && params.total !== undefined ? params.total : 1;
           $.get("{$params['orderAPIURL']}", {op: "create", goodsID: goodsID, total: total}).then(function(res) {
               zovye_fn.pay(res).then(function(orderNO, msg) {
-                  if (typeof successFN !== 'function' || !successFN(orderNO)) {
-                      zovye_fn.redirectToGetPayResultPage(orderNO, msg);
+                  if (orderNO) {
+                      if (typeof successFN !== 'function' || !successFN(orderNO)) {
+                          zovye_fn.redirectToGetPayResultPage(orderNO, msg);
+                      }
+                      resolve(orderNO, msg);
                   }
-                  resolve(orderNO, msg);
               }).catch(function(msg) {
                   if (typeof failFN !== 'function' || !failFN(msg)) {
                       zovye_fn.redirectToPayFailedPage(msg);
@@ -367,7 +369,7 @@ JSCODE;
 <script src="$jquery_url"></script>
 <script>
     const zovye_fn = {};
-    zovye_fn.pay = function(res) {
+    zovye_fn.pay = function() {
         return new Promise(function(resolve, reject) {
             alert('暂时无法支付购买！');
             reject();

@@ -7,7 +7,6 @@
 namespace zovye;
 
 use Exception;
-use GuzzleHttp\Exception\RequestException;
 use zovye\util\PayUtil;
 
 class WxMCHPayV3

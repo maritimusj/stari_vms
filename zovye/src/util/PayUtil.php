@@ -189,7 +189,7 @@ class PayUtil
             
             if (data && data.redirect) {
                window.location.replace(data.redirect);
-               return resolve('正在转跳...');
+               return resolve(null, '正在转跳...');
             }
             
             ap.tradePay({tradeNO: data.tradeNo}, function (res) {
@@ -213,10 +213,12 @@ class PayUtil
         const total = typeof params === 'object' && params.total !== undefined ? params.total : 1;
           $.get("{$params['orderAPIURL']}", {op: "create", goodsID: goodsID, total: total}).then(function(res) {
               zovye_fn.pay(res).then(function(orderNO, msg) {
-                  if (typeof successFN !== 'function' || !successFN(orderNO)) {
-                    zovye_fn.redirectToGetPayResultPage(orderNO, msg);
+                  if (orderNO) {
+                      if (typeof successFN !== 'function' || !successFN(orderNO)) {
+                        zovye_fn.redirectToGetPayResultPage(orderNO, msg);
+                      }
+                      resolve(orderNO, msg);
                   }
-                  resolve(orderNO, msg);
               }).catch(function(msg) {
                   if (typeof failFN !== 'function' || !failFN(msg)) {
                     zovye_fn.redirectToPayFailedPage(msg);

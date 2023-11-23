@@ -98,8 +98,11 @@ class Pay
         }
 
         $matchFN = function (userModelObj $user, payment_configModelObj $config) {
-            if (($user->isWxUser() || $user->isWXAppUser() || Session::isWxUser() || Session::isWxAppUser())
-                && $config->isEnabled('wx')) {
+            if (($user->isWxUser() || Session::isWxUser()) && $config->isEnabled('wx.h5')) {
+                return true;
+            }
+
+            if (($user->isWXAppUser() || Session::isWxAppUser()) && $config->isEnabled('wx.mini_app')) {
                 return true;
             }
 

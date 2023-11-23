@@ -34,7 +34,7 @@ abstract class WxPayV3 implements IPay
 
     public function getCallbackUrl(): string
     {
-        return PayUtil::getPaymentCallbackUrl($this->getConfig()['config_id']);
+        return PayUtil::getPaymentCallbackUrl($this);
     }
 
     public function parseJSPayResponse(ResponseInterface $response)
@@ -121,6 +121,7 @@ abstract class WxPayV3 implements IPay
             if ($e instanceof RequestException) {
                 return self::parseQueryResponse($e->getResponse());
             }
+
             return err($e->getMessage());
         }
     }

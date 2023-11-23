@@ -54,7 +54,7 @@ class SQBPay implements IPay
         int $price,
         string $body = ''
     ) {
-        $notify_url = PayUtil::getPaymentCallbackUrl($this->config['config_id']);
+        $notify_url = PayUtil::getPaymentCallbackUrl($this);
 
         $res = $this->getSQB()->qrPay($code, $order_no, $price, $device_uid, $body, $notify_url);
 
@@ -80,7 +80,7 @@ class SQBPay implements IPay
         int $price,
         string $body = ''
     ): array {
-        $notify_url = PayUtil::getPaymentCallbackUrl($this->config['config_id']);
+        $notify_url = PayUtil::getPaymentCallbackUrl($this);
 
         $res = $this->getSQB()->xAppPay($user_uid, $order_no, $price, $device_uid, $body, $notify_url);
 
@@ -102,7 +102,7 @@ class SQBPay implements IPay
         int $price,
         string $body = ''
     ): array {
-        $notify_url = PayUtil::getPaymentCallbackUrl($this->config['config_id']);
+        $notify_url = PayUtil::getPaymentCallbackUrl($this);
         $pay_result_url = Util::murl('payresult', ['op' => 'SQB']);
 
         return [

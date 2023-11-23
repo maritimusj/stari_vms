@@ -62,7 +62,7 @@ class LCSWPay implements IPay
             'orderNO' => $order_no,
             'price' => $price,
             'body' => $body,
-            'notify_url' => PayUtil::getPaymentCallbackUrl($this->config['config_id']),
+            'notify_url' => PayUtil::getPaymentCallbackUrl($this),
         ];
 
         $res = $fn($this->getLCSW(), $params);
@@ -105,7 +105,7 @@ class LCSWPay implements IPay
             'orderNO' => $order_no,
             'price' => $price,
             'body' => $body,
-            'notify_url' => PayUtil::getPaymentCallbackUrl($this->config['config_id']),
+            'notify_url' => PayUtil::getPaymentCallbackUrl($this),
         ];
 
         return $this->getLCSW()->qrpay($params);

@@ -15,6 +15,7 @@ use WeChatPay\Crypto\AesGcm;
 use WeChatPay\Crypto\Rsa;
 use WeChatPay\Util\PemUtil;
 use zovye\App;
+use zovye\contract\IPay;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 use zovye\We7;
@@ -108,7 +109,7 @@ class PayUtil
         }
     }
 
-    public static function getPaymentCallbackUrl($config_id): string
+    public static function getPaymentCallbackUrl(IPay $pay): string
     {
         $notify_url = _W('siteroot');
         $path = 'addons/'.APP_NAME.'/';
@@ -117,7 +118,9 @@ class PayUtil
             $notify_url .= $path;
         }
 
-        return $notify_url."payment/$config_id.php";
+        $config = $pay->getConfig();
+
+        return $notify_url."payment/{$config['config_id']}.php";
     }
 
     /**

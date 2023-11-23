@@ -90,8 +90,6 @@ class WXPay implements IPay
         int $price,
         string $body = ''
     ): array {
-        $wx = $this->getWx();
-
         $params = [
             'device_info' => $device_uid,
             'out_trade_no' => $order_no,
@@ -99,8 +97,10 @@ class WXPay implements IPay
             'openid' => $user_uid,
             'body' => $body,
             'total_fee' => $price,
-            'notify_url' => PayUtil::getPaymentCallbackUrl($this->config['config_id']),
+            'notify_url' => PayUtil::getPaymentCallbackUrl($this),
         ];
+
+        $wx = $this->getWx();
 
         $res = $wx->buildUnifiedOrder($params);
 

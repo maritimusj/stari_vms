@@ -539,34 +539,26 @@ class Pay
     {
         if ($pem['cert'] && $pem['key']) {
 
-            $str = App::uid(8);
-            $dir = PEM_DIR.$str.DIRECTORY_SEPARATOR;
-
-            $pem_file = [
-                'cert_filename' => $dir.sha1($pem['cert']).'.pem',
-                'key_filename' => $dir.sha1($pem['key']).'.pem',
-            ];
-
-            if (!$force && file_exists($pem_file['cert_filename']) && file_exists($pem_file['key_filename'])) {
-                return $pem_file;
-            }
+            $dir = PEM_DIR.App::uid(8).DIRECTORY_SEPARATOR;
 
             We7::make_dirs($dir);
 
+            $cert_filename = $dir.sha1($pem['cert']).'.pem';
+            $key_filename = $dir.sha1($pem['key']).'.pem';
+
+            if (!$force && file_exists($cert_filename) && file_exists($key_filename)) {
+                return [$cert_filename, $key_filename];
+            }
+
             if (
-                file_put_contents($pem_file['cert_filename'], $pem['cert']) !== false &&
-                file_put_contents($pem_file['key_filename'], $pem['key']) !== false
+                file_put_contents($cert_filename, $pem['cert']) !== false &&
+                file_put_contents($key_filename, $pem['key']) !== false
             ) {
-                return $pem_file;
-            } else {
-                Log::error("getPEMFile", [
-                    'pem' => $pem_file,
-                    'error' => '写入PEM文件出错！',
-                ]);
+                return [$cert_filename, $key_filename];
             }
         }
 
-        return [];
+        return err('写入证书文件失败！');
     }
 
     public static function make(payment_configModelObj $config): IPay

@@ -57,8 +57,8 @@ class payment_configModelObj extends ModelObj
             // v2版本使用curl请求api接口，php7版本只支持文件名指定证书
             $res = Pay::getPEMFile($data['pem']);
             if (!is_error($res)) {
-                $data['pem']['cert'] = $res['cert_filename'];
-                $data['pem']['key'] = $res['key_filename'];
+                $data['pem']['cert'] = $res[0];
+                $data['pem']['key'] = $res[1];
             }
         }
 

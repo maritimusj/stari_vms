@@ -9,6 +9,7 @@ namespace zovye\model;
 use zovye\base\ModelObj;
 use zovye\Pay;
 use zovye\traits\ExtraDataGettersAndSetters;
+use zovye\util\PayUtil;
 use function zovye\is_error;
 use function zovye\tb;
 
@@ -55,7 +56,7 @@ class payment_configModelObj extends ModelObj
 
         if ($this->getName() == Pay::WX) {
             // v2版本使用curl请求api接口，php7版本只支持文件名指定证书
-            $res = Pay::getPEMFile($data['pem']);
+            $res = PayUtil::writePEMToFile($data['pem']);
             if (!is_error($res)) {
                 $data['pem']['cert'] = $res[0];
                 $data['pem']['key'] = $res[1];

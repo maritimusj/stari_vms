@@ -532,35 +532,6 @@ class Pay
         return PayLogs::findOne(['level' => $level, 'title' => $order_no]);
     }
 
-    /**
-     * 保存证书到文件并返回路径
-     */
-    public static function getPEMFile(array $pem, bool $force = false): array
-    {
-        if ($pem['cert'] && $pem['key']) {
-
-            $dir = PEM_DIR.App::uid(8).DIRECTORY_SEPARATOR;
-
-            We7::make_dirs($dir);
-
-            $cert_filename = $dir.sha1($pem['cert']).'.pem';
-            $key_filename = $dir.sha1($pem['key']).'.pem';
-
-            if (!$force && file_exists($cert_filename) && file_exists($key_filename)) {
-                return [$cert_filename, $key_filename];
-            }
-
-            if (
-                file_put_contents($cert_filename, $pem['cert']) !== false &&
-                file_put_contents($key_filename, $pem['key']) !== false
-            ) {
-                return [$cert_filename, $key_filename];
-            }
-        }
-
-        return err('写入证书文件失败！');
-    }
-
     public static function make(payment_configModelObj $config): IPay
     {
         switch ($config->getName()) {

@@ -14,8 +14,10 @@ use WeChatPay\BuilderChainable;
 use WeChatPay\Crypto\AesGcm;
 use WeChatPay\Crypto\Rsa;
 use WeChatPay\Util\PemUtil;
+use zovye\App;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
+use zovye\We7;
 use function zovye\_W;
 use function zovye\err;
 use function zovye\is_error;
@@ -116,6 +118,35 @@ class PayUtil
         }
 
         return $notify_url."payment/$config_id.php";
+    }
+
+    /**
+     * 保存证书到文件并返回路径
+     */
+    public static function writePEMToFile(array $pem, bool $force = false): array
+    {
+        if ($pem['cert'] && $pem['key']) {
+
+            $dir = PEM_DIR.App::uid(8).DIRECTORY_SEPARATOR;
+
+            We7::make_dirs($dir);
+
+            $cert_filename = $dir.sha1($pem['cert']).'.pem';
+            $key_filename = $dir.sha1($pem['key']).'.pem';
+
+            if (!$force && file_exists($cert_filename) && file_exists($key_filename)) {
+                return [$cert_filename, $key_filename];
+            }
+
+            if (
+                file_put_contents($cert_filename, $pem['cert']) !== false &&
+                file_put_contents($key_filename, $pem['key']) !== false
+            ) {
+                return [$cert_filename, $key_filename];
+            }
+        }
+
+        return err('写入证书文件失败！');
     }
 
     public static function getAliPayJs(array $params = []): string

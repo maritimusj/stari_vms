@@ -579,56 +579,45 @@ class Pay
 
     public static function make(payment_configModelObj $config): IPay
     {
-        if ($config->getName() == self::LCSW) {
-            return new LCSWPay($config->toArray());
-        }
-
-        if ($config->getName() == self::SQB) {
-            return new SQBPay($config->toArray());
-        }
-
-        if ($config->getName() == self::WX) {
-            return new WXPay($config->toArray());
-        }
-
-        if ($config->getName() == self::WX_V3 && class_exists('\WeChatPay\Builder')) {
-
-            //如果代理商配置的是微信支付，获得子商户号后合并到系统全局配置中
-            if ($config->getAgentId() != 0 && $config->getName() == Pay::WX_V3) {
-                $sub_mch_id = $config->getExtraData('sub_mch_id', '');
-                if (empty($sub_mch_id)) {
-                    throw new RuntimeException('不正确的支付配置！');
+        switch ($config->getName()) {
+            case self::LCSW:
+                return new LCSWPay($config->toArray());
+            case self::SQB:
+                return new SQBPay($config->toArray());
+            case self::WX:
+                return new WXPay($config->toArray());
+            case self::WX_V3:
+                if (!class_exists('\WeChatPay\Builder')) {
+                    throw new RuntimeException('缺少微信支付sdk！');
                 }
 
-                /** @var payment_configModelObj $default */
-                $default = PaymentConfig::getByName(Pay::WX_V3);
-                if (!$default) {
-                    throw new RuntimeException('不正确的支付配置！');
+                if ($config->getAgentId() == 0) {
+                    $data = $config->toArray();
+                } else {
+                    $sub_mch_id = $config->getExtraData('sub_mch_id', '');
+                    if (empty($sub_mch_id)) {
+                        throw new RuntimeException('不正确的支付配置！');
+                    }
+
+                    /** @var payment_configModelObj $default */
+                    $default = PaymentConfig::getByName(Pay::WX_V3);
+                    if (!$default) {
+                        throw new RuntimeException('不正确的支付配置！');
+                    }
+
+                    $data = $default->getExtraData();
+                    $data['sub_mch_id'] = $sub_mch_id;
                 }
 
-                $data = $default->getExtraData();
-                $data['sub_mch_id'] = $sub_mch_id;
-
-                $config->setExtraData($data);
-            }
-
-            $data = $config->toArray();
-
-            if ($data['sub_mch_id']) {
-                return new WxPayV3Partner($data);
-            }
-
-            return new WxPayV3Merchant($data);
+                return empty($data['sub_mch_id']) ? new WxPayV3Merchant($data) : new WxPayV3Partner($data);
+            default:
+                throw new RuntimeException('不正确的支付配置！');
         }
-
-        throw new RuntimeException('不正确的支付配置！');
     }
 
-    public static function isWxPayQrcode($code): bool
+    public static function isWxPayQRCode($code): bool
     {
-        $str = substr($code, 0, 2);
-
-        return in_array($str, ['10', '11', '12', '13', '14', '15']);
+        return in_array(substr($code, 0, 2), ['10', '11', '12', '13', '14', '15']);
     }
 
     public static function getWxMCHPayClient()

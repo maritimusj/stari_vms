@@ -101,7 +101,7 @@ fwIDAQAB
         $params['client_sn'] = $order_no;                   //商户系统订单号,必须在商户系统内唯一；且长度不超过64字节
         $params['total_amount'] = "$amount";              //以分为单位,不超过10位纯数字字符串,超过1亿元的收款请使用银行转账
 
-        if (\zovye\Pay::isWxPayQrcode($code)) {
+        if (\zovye\Pay::isWxPayQRCode($code)) {
             $params['payway'] = '3';
         } else {
             $params['payway'] = '1';

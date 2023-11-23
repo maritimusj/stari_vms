@@ -37,11 +37,11 @@ class PayUtil
 
         if ($config['pem']['cert']['data']) {
             $cert_data = $config['pem']['cert']['data'];
-              // 从「微信支付平台证书」中获取「证书序列号」
-              $serial = PemUtil::parseCertificateSerialNo($cert_data);
-              $params['certs'] = [
-                  $serial => Rsa::from($cert_data, Rsa::KEY_TYPE_PUBLIC),
-              ];
+            // 从「微信支付平台证书」中获取「证书序列号」
+            $serial = PemUtil::parseCertificateSerialNo($cert_data);
+            $params['certs'] = [
+                $serial => Rsa::from($cert_data, Rsa::KEY_TYPE_PUBLIC),
+            ];
         }
 
         // 构造一个 APIv3 客户端实例
@@ -61,41 +61,41 @@ class PayUtil
 
     public static function getWxPlatformCertificate($config)
     {
+        // 发送请求
         try {
-            // 发送请求
-            try {
-                $response = (self::getWxPayV3Builder($config))->chain('v3/certificates')->get();
-            } catch (RequestException $e) {
-                if ($e->hasResponse()) {
-                    $response = $e->getResponse();
-                } else {
-                    throw new $e;
-                }
+            $response = (self::getWxPayV3Builder($config))->chain('v3/certificates')->get();
+        } catch (RequestException $e) {
+            if ($e->hasResponse()) {
+                $response = $e->getResponse();
+            } else {
+                throw new $e;
             }
+        }
 
-            $result = self::parseWxPayV3Response($response);
+        $result = self::parseWxPayV3Response($response);
 
-            if (is_error($result)) {
-                return $result;
-            }
+        if (is_error($result)) {
+            return $result;
+        }
 
-            [
-                'data' => [
-                    0 => [
-                        'encrypt_certificate' => [
-                            'associated_data' => $associated_data,
-                            'ciphertext' => $ciphertext,
-                            'nonce' => $nonce,
-                        ],
-                        'expire_time' => $expire_time,
-                        'serial_no' => $serial_no,
+        [
+            'data' => [
+                0 => [
+                    'encrypt_certificate' => [
+                        'associated_data' => $associated_data,
+                        'ciphertext' => $ciphertext,
+                        'nonce' => $nonce,
                     ],
+                    'expire_time' => $expire_time,
+                    'serial_no' => $serial_no,
                 ],
-            ] = $result;
+            ],
+        ] = $result;
 
+        try {
             // 加密文本消息解密
             $data = AesGcm::decrypt($ciphertext, $config['key'], $nonce, $associated_data);
-  
+
             // 保存
             return [
                 'serial_no' => $serial_no,

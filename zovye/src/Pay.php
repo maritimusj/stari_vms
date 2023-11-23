@@ -428,7 +428,11 @@ class Pay
             return err('找不到支付记录！');
         }
 
-        return (self::rebuildPay($pay_log))->close($order_no);
+        try {
+            return (self::rebuildPay($pay_log))->close($order_no);
+        } catch (Exception $e) {
+            return err($e->getMessage());
+        }
     }
 
     /**
@@ -451,23 +455,28 @@ class Pay
             $total = $price_total;
         }
 
-        $res = (self::rebuildPay($pay_log))->refund($pay_log->getOrderNO(), $total);
-        if (is_error($res)) {
-            $pay_log->setData('refund_fail', ['result' => $res]);
+        try {
+            $result = (self::rebuildPay($pay_log))->refund($pay_log->getOrderNO(), $total);
+            if (is_error($result)) {
+                $pay_log->setData('refund_fail', ['result' => $result]);
+                $pay_log->save();
+
+                return $result;
+            }
+
+            $data['result'] = $result;
+            if (empty($data['createtime'])) {
+                $data['createtime'] = time();
+            }
+
+            $pay_log->setData('refund', $data);
             $pay_log->save();
 
-            return $res;
+            return $result;
+
+        } catch (Exception $e) {
+            return err($e->getMessage());
         }
-
-        $data['result'] = $res;
-        if (empty($data['createtime'])) {
-            $data['createtime'] = time();
-        }
-
-        $pay_log->setData('refund', $data);
-        $pay_log->save();
-
-        return $res;
     }
 
     public static function queryFor(pay_logsModelObj $pay_log): array
@@ -478,7 +487,11 @@ class Pay
             return err('订单号不正确！');
         }
 
-        return (self::rebuildPay($pay_log))->query($order_no);
+        try {
+            return (self::rebuildPay($pay_log))->query($order_no);
+        } catch (Exception $e) {
+            return err($e->getMessage());
+        }
     }
 
     /**

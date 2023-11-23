@@ -71,7 +71,7 @@ foreach ($query->page($page, $page_size)->findAll() as $entry) {
         ];
     }
 
-    if (empty($log['data']['payResult'])) {
+    if (empty($log['data']['payResult']) && empty($log['data']['queryResult'])) {
         $log['data']['queryResult'] = Pay::query($log['orderNO']);
     }
 

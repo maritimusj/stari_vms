@@ -154,13 +154,12 @@ class Session
 
     public static function setContainer(userModelObj $user)
     {
-        if ($user->isAliUser()) {
-            $_SESSION['ali_user_id'] = $user->getOpenid();
-        } elseif ($user->isWxUser()) {
+        if ($user->isWxUser()) {
             $_SESSION['wx_user_id'] = $user->getOpenid();
         } elseif ($user->isWXAppUser()) {
-            $_SESSION['wx_user_id'] = $user->getOpenid();
             $_SESSION['wxapp_user_id'] = $user->getOpenid();
+        } elseif ($user->isAliUser()) {
+            $_SESSION['ali_user_id'] = $user->getOpenid();
         } elseif ($user->isDouYinUser()) {
             $_SESSION['douyin_user_id'] = $user->getOpenid();
         }
@@ -168,16 +167,18 @@ class Session
 
     public static function getUserUID(): string
     {
-        if (self::isAliUser()) {
-            return strval($_SESSION['ali_user_id']);
-        }
         if (self::isWxUser()) {
             return strval($_SESSION['wx_user_id']);
+        }
+        if (self::isWxAppUser()) {
+            return strval($_SESSION['wxapp_user_id']);
+        }
+        if (self::isAliUser()) {
+            return strval($_SESSION['ali_user_id']);
         }
         if (self::isDouYinUser()) {
             return strval($_SESSION['douyin_user_id']);
         }
-
         return '';
     }
 

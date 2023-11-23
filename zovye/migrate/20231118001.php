@@ -67,7 +67,7 @@ SQL;
             'agent_id' => 0,
             'name' => Pay::WX,
             'extra' => [
-                'appid' => $config['wx']['wxapp'],
+                'appid' => $config['wx']['appid'],
                 'wxappid' => $config['wx']['wxappid'],
                 'mch_id' => $config['wx']['mch_id'],
                 'sub_mch_id' => $config['wx']['sub_mch_id'],
@@ -87,7 +87,7 @@ SQL;
                 'agent_id' => 0,
                 'name' => Pay::WX_V3,
                 'extra' => [
-                    'appid' => $config['wx']['wxapp'],
+                    'appid' => $config['wx']['appid'],
                     'wxappid' => $config['wx']['wxappid'],
                     'mch_id' => $config['wx']['mch_id'],
                     'sub_mch_id' => '',

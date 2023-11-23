@@ -622,21 +622,11 @@ class Pay
 
         /** @var payment_configModelObj $config */
         $config = PaymentConfig::getByName(Pay::WX);
-        if ($config) {
-            $config = $config->toArray();
-
-            $res = Pay::getPEMFile($config['pem']);
-            if (is_error($res)) {
-                throw new RuntimeException($res['message']);
-            }
-
-            $config['pem']['cert'] = $res['cert_filename'];
-            $config['pem']['key'] = $res['key_filename'];
-
-            return new WxMCHPay($config);
+        if (!$config) {
+            throw new RuntimeException('没有支付配置！');
         }
 
-        throw new RuntimeException('没有支付配置！');
+        return new WxMCHPay($config->toArray());
     }
 
     public static function getMCHPayResult($transaction, $trade_no): array

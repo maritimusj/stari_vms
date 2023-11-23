@@ -3,10 +3,13 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
+
 namespace zovye\model;
 
 use zovye\base\ModelObj;
+use zovye\Pay;
 use zovye\traits\ExtraDataGettersAndSetters;
+use function zovye\is_error;
 use function zovye\tb;
 
 /**
@@ -20,25 +23,25 @@ class payment_configModelObj extends ModelObj
         return tb('payment_config');
     }
 
-	/** @var int */
-	protected $id;
+    /** @var int */
+    protected $id;
 
-	/** @var int */
-	protected $uniacid;
+    /** @var int */
+    protected $uniacid;
 
-	/** @var int */
-	protected $agent_id;
+    /** @var int */
+    protected $agent_id;
 
-	/** @var string */
-	protected $name;
+    /** @var string */
+    protected $name;
 
-	/** @var string */
-	protected $extra;
+    /** @var string */
+    protected $extra;
 
-	/** @var int */
-	protected $createtime;
+    /** @var int */
+    protected $createtime;
 
-	use ExtraDataGettersAndSetters;
+    use ExtraDataGettersAndSetters;
 
     public function isEnabled($app)
     {
@@ -49,6 +52,16 @@ class payment_configModelObj extends ModelObj
     {
         $data = (array)$this->getExtraData();
         $data['config_id'] = $this->getId();
+
+        if ($this->getName() == Pay::WX) {
+            // v2版本使用curl请求api接口，php7版本只支持文件名指定证书
+            $res = Pay::getPEMFile($data['pem']);
+            if (!is_error($res)) {
+                $data['pem']['cert'] = $res['cert_filename'];
+                $data['pem']['key'] = $res['key_filename'];
+            }
+        }
+
         return $data;
     }
 }

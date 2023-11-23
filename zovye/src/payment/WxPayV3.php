@@ -153,7 +153,7 @@ abstract class WxPayV3 implements IPay
             $timestamp = Request::header('HTTP_WECHATPAY_TIMESTAMP');
             $nonce = Request::header('HTTP_WECHATPAY_NONCE');
 
-            // // 检查通知时间偏移量，允许5分钟之内的偏移
+            // 检查通知时间偏移量，允许5分钟之内的偏移
             if (abs(time() - (int)$timestamp) > 300) {
                 throw new Exception('数据已超时！');
             }
@@ -178,7 +178,6 @@ abstract class WxPayV3 implements IPay
                 throw new Exception($inBodyArray['message'] ?? '支付失败！');
             }
 
-            // 使用PHP7的数据解构语法，从Array中解构并赋值变量
             [
                 'resource' => [
                     'ciphertext' => $ciphertext,
@@ -193,7 +192,7 @@ abstract class WxPayV3 implements IPay
             // 把解密后的文本转换为PHP Array数组
             $data = (array)json_decode($inBodyResource, true);
             if ($data['trade_state'] != 'SUCCESS') {
-                throw new  Exception($data['trade_state_desc'] ?? '订单状态异常！');
+                throw new Exception($data['trade_state_desc'] ?? '订单状态异常！');
             }
 
             return [

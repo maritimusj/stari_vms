@@ -72,7 +72,7 @@ class Helper
      * 如果当前皮肤需要tpl_data中获取任务列表，否返回true
      * @param deviceModelObj|null $device
      */
-    public static function needsTplAccountsData(deviceModelObj $device = null): bool
+    public static function isNeedsTplAccountsData(deviceModelObj $device = null): bool
     {
         $theme = self::getTheme($device);
 

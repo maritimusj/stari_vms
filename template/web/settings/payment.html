@@ -273,14 +273,16 @@
                         微信平台证书(v3)
                     </label>
                     <div class="col-md-10">
+                        {if $payment['wx_v3']['pem']['cert']}
                         <textarea type="text" class="form-control inputMask" name="V3cert" id="V3cert" readonly>
                             {$payment['wx_v3']['pem']['cert']['data']}
                         </textarea>
-                        <span class="help-block">* {if $payment['wx_v3']['pem']['cert']}
-                            序列号：{$payment['wx_v3']['pem']['cert']['serial_no']}，过期时间：{$payment['wx_v3']['pem']['cert']['expire_time']} <span data-op="refresh_wx_platform_cert" title="重新加载微信平台证书">.</span>
-                            {else}
-                            请先设置其它必要参数，然后再点击<b data-op="refresh_wx_platform_cert">更新证书</b>
-                            {/if}</span>
+                        <span class="help-block">
+                            * 序列号：{$payment['wx_v3']['pem']['cert']['serial_no']}，过期时间：{$payment['wx_v3']['pem']['cert']['expire_time']} <span data-op="refresh_wx_platform_cert" title="重新加载微信平台证书">.</span>
+                        </span>
+                        {else}
+                        <span class="help-block">请先设置其它必要参数，然后再点击<b data-op="refresh_wx_platform_cert">更新证书</b></span>
+                        {/if}
                     </div>
                 </div>
                 </fieldset>

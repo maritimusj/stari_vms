@@ -13,7 +13,7 @@ defined('IN_IA') or exit('Access Denied');
 
 $config = PaymentConfig::getByName(Pay::WX_V3);
 if (!$config) {
-    JSON::fail('请先配置其它微信支付v3参数！');
+    JSON::fail('请先设置其它必要参数，再请求更新微信平台证书！');
 }
 
 $res = PayUtil::getWxPlatformCertificate($config->toArray());

@@ -55,7 +55,7 @@
                         <label class="col-md-2 control-label">场景</label>
                         <div class="col-md-10">
                             <label class="checkbox-inline" title="用户使用微信公众号支付时，是否使用扫呗收款">
-                                <input type="checkbox" name="lcswWxH5" value="1" {if empty($payment['lcsw']) || $payment['lcsw']['app']['wx']['h5'}checked{/if}>
+                                <input type="checkbox" name="lcswWxH5" value="1" {if empty($payment['lcsw']) || $payment['lcsw']['app']['wx']['h5']}checked{/if}>
                                 微信h5
                             </label>
                             <label class="checkbox-inline" title="用户使用微信小程序支付时，是否使用扫呗收款">

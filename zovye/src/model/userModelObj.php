@@ -208,7 +208,15 @@ class userModelObj extends ModelObj
             $name = $this->settings('partnerData.name', '');
         }
 
-        return strval(empty($name) ? $this->nickname : $name);
+        if (empty($name)) {
+            $name = $this->nickname;
+        }
+
+        if (empty($name)) {
+            $name = '<匿名用户>';
+        }
+
+        return $name;
     }
 
     /**
@@ -961,8 +969,10 @@ class userModelObj extends ModelObj
                 $cond['src'] = [Order::ACCOUNT, Order::FREE];
             }
             $last_order = Order::getLastOrderOfUser($this, $cond);
+
             return $last_order && time() - $last_order->getCreatetime() < $free_cd * 60 * 60;
         }
+
         return false;
     }
 }

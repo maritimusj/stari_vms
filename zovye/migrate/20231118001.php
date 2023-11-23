@@ -29,10 +29,16 @@ SQL;
             'agent_id' => 0,
             'name' => Pay::LCSW,
             'extra' => [
-                'wxapp' => $config['lcsw']['wxapp'],
                 'merchant_no' => $config['lcsw']['merchant_no'],
                 'terminal_id' => $config['lcsw']['terminal_id'],
                 'access_token' => $config['lcsw']['access_token'],
+                'app' => [
+                    'wx' => [
+                        'h5' => boolval($config['lcsw']['wx']),
+                        'mini_app' => boolval($config['lcsw']['wxapp']),
+                    ],
+                    'ali' => boolval($config['lcsw']['ali']),
+                ],
             ],
         ]);
     }
@@ -42,7 +48,16 @@ SQL;
             'agent_id' => 0,
             'name' => Pay::SQB,
             'extra' => [
-
+                'sn' => $config['SQB']['terminal_sn'],
+                'key' => $config['SQB']['terminal_key'],
+                'title' => $config['SQB']['store_name'],
+                'app' => [
+                    'wx' => [
+                        'h5' => boolval($config['SQB']['wx']),
+                        'mini_app' => boolval($config['SQB']['wxapp']),
+                    ],
+                    'ali' => boolval($config['SQB']['ali']),
+                ],
             ],
         ]);
     }
@@ -57,7 +72,13 @@ SQL;
                 'mch_id' => $config['wx']['mch_id'],
                 'sub_mch_id' => $config['wx']['sub_mch_id'],
                 'key' => $config['wx']['key'],
-                'pem' => $config['pem'],
+                'pem' => $config['wx']['pem'],
+                'app' => [
+                    'wx' => [
+                        'h5' => true,
+                        'mini_app' => true,
+                    ],
+                ],
             ],
         ]);
 
@@ -69,9 +90,16 @@ SQL;
                     'appid' => $config['wx']['wxapp'],
                     'wxappid' => $config['wx']['wxappid'],
                     'mch_id' => $config['wx']['mch_id'],
-                    'sub_mch_id' => $config['wx']['sub_mch_id'],
+                    'sub_mch_id' => '',
                     'key' => $config['wx']['v3']['key'],
-                    'pem' => $config['v3']['pem'],
+                    'serial' => $config['wx']['v3']['serial'],
+                    'pem' => $config['wx']['v3']['pem'],
+                    'app' => [
+                        'wx' => [
+                            'h5' => true,
+                            'mini_app' => true,
+                        ],
+                    ],
                 ],
             ]);
         }
@@ -81,28 +109,55 @@ SQL;
     foreach ($query->findAll() as $agent) {
         $data = $agent->settings('agentData.pay', []);
         if ($data) {
-            if ($data['wx'] && $data['wx']['enable']) {
-                unset($data['wx']['enable']);
-                PaymentConfig::create([
-                    'agent_id' => $agent->getId(),
-                    'name' => Pay::WX_V3,
-                    'extra' => $data['wx'],
-                ]);
-            }
             if ($data['lcsw'] && $data['lcsw']['enable']) {
-                unset($data['lcsw']['enable']);
                 PaymentConfig::create([
                     'agent_id' => $agent->getId(),
                     'name' => Pay::LCSW,
-                    'extra' => $data['lcsw'],
+                    'extra' => [
+                        'merchant_no' => $data['lcsw']['merchant_no'],
+                        'terminal_id' => $data['lcsw']['terminal_id'],
+                        'access_token' => $data['lcsw']['access_token'],
+                        'app' => [
+                            'wx' => [
+                                'h5' => boolval($data['lcsw']['wx']),
+                                'mini_app' => boolval($data['lcsw']['wxapp']),
+                            ],
+                            'ali' => boolval($data['lcsw']['ali']),
+                        ],
+                    ],
                 ]);
             }
             if ($data['SQB'] && $data['SQB']['enable']) {
-                unset($data['SQB']['enable']);
                 PaymentConfig::create([
                     'agent_id' => $agent->getId(),
                     'name' => Pay::SQB,
-                    'extra' => $data['SQB'],
+                    'extra' => [
+                        'sn' => $data['SQB']['terminal_sn'],
+                        'key' => $data['SQB']['terminal_key'],
+                        'title' => $data['SQB']['store_name'],
+                        'app' => [
+                            'wx' => [
+                                'h5' => boolval($data['SQB']['wx']),
+                                'mini_app' => boolval($data['SQB']['wxapp']),
+                            ],
+                            'ali' => boolval($data['SQB']['ali']),
+                        ],
+                    ],
+                ]);
+            }
+            if ($data['wx'] && $data['wx']['enable']) {
+                PaymentConfig::create([
+                    'agent_id' => $agent->getId(),
+                    'name' => Pay::WX_V3,
+                    'extra' => [
+                        'sub_mch_id' => $data['wx']['mch_id'],
+                        'app' => [
+                            'wx' => [
+                                'h5' => true,
+                                'mini_app' => true,
+                            ],
+                        ],
+                    ],
                 ]);
             }
         }

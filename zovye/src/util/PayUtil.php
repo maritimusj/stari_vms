@@ -185,7 +185,13 @@ class PayUtil
                 return reject("请求失败！");
             } 
             
-            const data = res.data;    
+            const data = res.data;
+            
+            if (data && data.redirect) {
+               window.location.replace(data.redirect);
+               return resolve('正在转跳...');
+            }
+            
             ap.tradePay({tradeNO: data.tradeNo}, function (res) {
                 if (parseInt(res.resultCode) === 9000) {
                     $.get("{$params['orderAPIURL']}", { op: "finished", orderNO: data.orderNO });
@@ -200,6 +206,7 @@ class PayUtil
             });
         });
     }
+    
     zovye_fn.goods_wxpay = function(params, successFN, failFN) {
       return new Promise(function(resolve, reject) {
         const goodsID = typeof params === 'object' && params.goodsID !== undefined ? params.goodsID : params;
@@ -219,6 +226,7 @@ class PayUtil
           });  
       });
     }
+    
     zovye_fn.package_pay = function(packageID, successFN, failFN) {
       return new Promise(function(resolve, reject) {
           $.get("{$params['orderAPIURL']}", {op: "create", packageID: packageID}).then(function(res) {
@@ -280,6 +288,12 @@ ALI_JSCODE;
             } 
             
             const data = res.data;
+            
+            if (data && data.redirect) {
+               window.location.replace(data.redirect);
+               return resolve('正在转跳...');
+            }
+            
             WeixinJSBridge.invoke('getBrandWCPayRequest', {
                 "appId": data.appId,
                 "timeStamp": data.timeStamp,

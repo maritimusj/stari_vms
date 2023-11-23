@@ -869,7 +869,7 @@ if ($page == 'device') {
             ]);
         }
 
-        if (Request::bool('wxApiV3Key') && Request::bool('v3Serial')) {
+        if (Request::bool('v3Serial')) {
             $data = [
                 'appid' => Request::trim('wxAppID'),
                 'wxappid' => Request::trim('wxxAppID'),
@@ -898,6 +898,8 @@ if ($page == 'device') {
                     'extra' => $data,
                 ]);
             }
+        } else {
+            PaymentConfig::removeByName(Pay::WX_V3);
         }
     } else {
         PaymentConfig::removeByName(Pay::WX);

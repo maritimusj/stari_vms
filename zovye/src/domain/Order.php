@@ -396,11 +396,12 @@ class Order extends State
 
     /**
      * @param userModelObj $user
+     * @param array $cond
      * @return orderModelObj
      */
-    public static function getLastOrderOfUser(userModelObj $user): ?orderModelObj
+    public static function getLastOrderOfUser(userModelObj $user, array $cond = []): ?orderModelObj
     {
-        $query = self::query(['openid' => $user->getOpenid()]);
+        $query = self::query(array_merge(['openid' => $user->getOpenid()], $cond));
 
         return $query->orderBy('id DESC')->findOne();
     }
@@ -1354,7 +1355,7 @@ class Order extends State
                     case 'device_address':
                         $location = $device ? $device->getLocation() : [];
                         $data[$header] = strval($location['address']);
-                        break;                                           
+                        break;
                     case 'createtime':
                         $data[$header] = date('Y-m-d H:i:s', $entry->getCreatetime());
                         break;
@@ -1423,7 +1424,7 @@ class Order extends State
                     'value' => Wx::trim_character($device->getImei()),
                 ];
                 $data['thing3'] = ['value' => Wx::trim_thing($goods_name)];
-                $data['amount4'] = ['value' => number_format($order->getPrice() / 100, 2, '.', '') . '元'];
+                $data['amount4'] = ['value' => number_format($order->getPrice() / 100, 2, '.', '').'元'];
                 $data['time5'] = ['value' => date('Y-m-d H:i:s', $order->getCreatetime())];
                 break;
             case self::EVENT_FAILED:

@@ -954,7 +954,13 @@ class userModelObj extends ModelObj
     {
         $free_cd = settings('user.freeCD', 0);
         if ($free_cd > 0) {
-            $last_order = Order::getLastOrderOfUser($this);
+            $cond = [];
+            if (App::isBalanceEnabled() && Balance::isFreeOrder()) {
+                $cond['src'] = [Order::ACCOUNT, Order::FREE, Order::BALANCE];
+            } else {
+                $cond['src'] = [Order::ACCOUNT, Order::FREE];
+            }
+            $last_order = Order::getLastOrderOfUser($this, $cond);
             return $last_order && time() - $last_order->getCreatetime() < $free_cd * 60 * 60;
         }
         return false;

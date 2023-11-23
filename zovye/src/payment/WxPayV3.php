@@ -8,6 +8,7 @@
 namespace zovye\payment;
 
 use Exception;
+use GuzzleHttp\Exception\RequestException;
 use Psr\Http\Message\ResponseInterface;
 use WeChatPay\BuilderChainable;
 use WeChatPay\Crypto\AesGcm;
@@ -117,6 +118,9 @@ abstract class WxPayV3 implements IPay
             return $result;
 
         } catch (Exception $e) {
+            if ($e instanceof RequestException) {
+                return self::parseQueryResponse($e->getResponse());
+            }
             return err($e->getMessage());
         }
     }

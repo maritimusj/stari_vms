@@ -8,6 +8,7 @@
 namespace zovye\payment;
 
 use Exception;
+use GuzzleHttp\Exception\RequestException;
 use zovye\Pay;
 use zovye\util\PayUtil;
 use function zovye\err;
@@ -71,6 +72,12 @@ class WxPayV3Partner extends WxPayV3
             return parent::parseJSPayResponse($response);
 
         } catch (Exception $e) {
+            if ($e instanceof RequestException) {
+                $res = PayUtil::parseWxPayV3Response($e->getResponse());
+
+                return err($res['message'] ?? '请求失败！');
+            }
+
             return err($e->getMessage());
         }
     }
@@ -99,6 +106,12 @@ class WxPayV3Partner extends WxPayV3
             return $result;
 
         } catch (Exception $e) {
+            if ($e instanceof RequestException) {
+                $res = PayUtil::parseWxPayV3Response($e->getResponse());
+
+                return err($res['message'] ?? '请求失败！');
+            }
+
             return err($e->getMessage());
         }
     }
@@ -121,6 +134,12 @@ class WxPayV3Partner extends WxPayV3
             return parent::parseQueryResponse($response);
 
         } catch (Exception $e) {
+            if ($e instanceof RequestException) {
+                $res = PayUtil::parseWxPayV3Response($e->getResponse());
+
+                return err($res['message'] ?? '请求失败！');
+            }
+
             return err($e->getMessage());
         }
     }

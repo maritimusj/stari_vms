@@ -7,6 +7,8 @@
 
 namespace zovye\payment;
 
+use Exception;
+use GuzzleHttp\Exception\RequestException;
 use zovye\Pay;
 use zovye\util\PayUtil;
 use function zovye\err;
@@ -61,9 +63,20 @@ class WxPayV3Merchant extends WxPayV3
             ],
         ];
 
-        $response = parent::builder()->v3->pay->transactions->jsapi->post($data);
+        try {
+            $response = parent::builder()->v3->pay->transactions->jsapi->post($data);
 
-        return parent::parseJSPayResponse($response);
+            return parent::parseJSPayResponse($response);
+
+        } catch (Exception $e) {
+            if ($e instanceof RequestException) {
+                $res = PayUtil::parseWxPayV3Response($e->getResponse());
+
+                return err($res['message'] ?? '请求失败！');
+            }
+
+            return err($e->getMessage());
+        }
     }
 
     public function close(string $order_no)
@@ -75,17 +88,28 @@ class WxPayV3Merchant extends WxPayV3
             'order_no' => $order_no,
         ];
 
-        $response = parent::builder()
-            ->v3->pay->transactions->outTradeNo->_order_no_->close
-            ->post($data);
+        try {
+            $response = parent::builder()
+                ->v3->pay->transactions->outTradeNo->_order_no_->close
+                ->post($data);
 
-        $result = PayUtil::parseWxPayV3Response($response);
+            $result = PayUtil::parseWxPayV3Response($response);
 
-        if (!empty($result['code'])) {
-            return err($result['message'] ?? '请求失败！');
+            if (!empty($result['code'])) {
+                return err($result['message'] ?? '请求失败！');
+            }
+
+            return $result;
+
+        } catch (Exception $e) {
+            if ($e instanceof RequestException) {
+                $res = PayUtil::parseWxPayV3Response($e->getResponse());
+
+                return err($res['message'] ?? '请求失败！');
+            }
+
+            return err($e->getMessage());
         }
-
-        return $result;
     }
 
     public function query(string $order_no): array
@@ -97,10 +121,21 @@ class WxPayV3Merchant extends WxPayV3
             'order_no' => $order_no,
         ];
 
-        $response = parent::builder()
-            ->v3->pay->transactions->outTradeNo->_order_no_
-            ->get($data);
+        try {
+            $response = parent::builder()
+                ->v3->pay->transactions->outTradeNo->_order_no_
+                ->get($data);
 
-        return parent::parseQueryResponse($response);
+            return parent::parseQueryResponse($response);
+
+        } catch (Exception $e) {
+            if ($e instanceof RequestException) {
+                $res = PayUtil::parseWxPayV3Response($e->getResponse());
+
+                return err($res['message'] ?? '请求失败！');
+            }
+
+            return err($e->getMessage());
+        }
     }
 }

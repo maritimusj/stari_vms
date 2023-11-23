@@ -7,6 +7,7 @@
 namespace zovye;
 
 use Exception;
+use GuzzleHttp\Exception\RequestException;
 use zovye\util\PayUtil;
 
 class WxMCHPayV3
@@ -65,6 +66,12 @@ class WxMCHPayV3
             return err('接口返回数据错误！');
 
         } catch (Exception $e) {
+            if ($e instanceof RequestException) {
+                $res = PayUtil::parseWxPayV3Response($e->getResponse());
+
+                return err($res['message'] ?? '请求失败！');
+            }
+
             return err($e->getMessage());
         }
     }
@@ -127,6 +134,12 @@ class WxMCHPayV3
             return err('接口返回数据错误！');
 
         } catch (Exception $e) {
+            if ($e instanceof RequestException) {
+                $res = PayUtil::parseWxPayV3Response($e->getResponse());
+
+                return err($res['message'] ?? '请求失败！');
+            }
+
             return err($e->getMessage());
         }
     }

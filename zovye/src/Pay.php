@@ -118,10 +118,8 @@ class Pay
             foreach ($names as $name) {
                 /** @var payment_configModelObj $config */
                 $config = PaymentConfig::getFor($agent, $name);
-                if (!$config) {
-                    continue;
-                }
-                if ($matchFN($user, $config)) {
+
+                if ($config && $matchFN($user, $config)) {
                     return self::make($config);
                 }
             }
@@ -130,10 +128,8 @@ class Pay
         foreach ($names as $name) {
             /** @var payment_configModelObj $config */
             $config = PaymentConfig::getByName($name);
-            if (!$config) {
-                continue;
-            }
-            if ($matchFN($user, $config)) {
+
+            if ($config && $matchFN($user, $config)) {
                 return self::make($config);
             }
         }

@@ -57,8 +57,6 @@ class WXPay implements IPay
         int $price,
         string $body = ''
     ) {
-        $wx = $this->getWx();
-
         $params = [
             'device_info' => $device_uid,
             'out_trade_no' => $order_no,
@@ -67,7 +65,7 @@ class WXPay implements IPay
             'total_fee' => $price,
         ];
 
-        $res = $wx->buildQrcodePay($params);
+        $res = $this->getWx()->buildQrcodePay($params);
 
         Log::debug('qr_pay', [
             'params' => $params,
@@ -146,9 +144,8 @@ class WXPay implements IPay
 
     public function query(string $order_no)
     {
-        $wx = $this->getWx();
+        $res = $this->getWx()->queryOrder($order_no);
 
-        $res = $wx->queryOrder($order_no);
         if (is_error($res)) {
             return $res;
         }
@@ -168,21 +165,18 @@ class WXPay implements IPay
 
     public function close(string $order_no)
     {
-        $wx = $this->getWx();
-
-        return $wx->close($order_no);
+        return $this->getWx()->close($order_no);
     }
 
     public function refund(string $order_no, int $amount, bool $is_transaction_id = false)
     {
-        $wx = $this->getWx();
-
         $res = $this->query($order_no);
+
         if (is_error($res)) {
             return $res;
         }
 
-        return $wx->refund($order_no, intval($res['total']), $amount, $is_transaction_id);
+        return $this->getWx()->refund($order_no, intval($res['total']), $amount, $is_transaction_id);
     }
 
     public function decodeData(string $input): array
@@ -208,9 +202,7 @@ class WXPay implements IPay
             return false;
         }
 
-        $wx = $this->getWx();
-
-        return $wx->buildSign($data) === $data['sign'];
+        return $this->getWx()->buildSign($data) === $data['sign'];
     }
 
     public function getResponse(bool $ok = true): string

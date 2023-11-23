@@ -210,13 +210,9 @@ abstract class WxPayV3 implements IPay
         }
     }
 
-    public function checkResult(array $data = [])
+    public function checkResult(array $data = []): bool
     {
-        if ($data['trade_state'] != 'SUCCESS') {
-            return err('支付失败！');
-        }
-
-        return true;
+        return $data['trade_state'] == 'SUCCESS';
     }
 
     public function getResponse(bool $ok = true): array

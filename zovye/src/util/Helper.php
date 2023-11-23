@@ -109,7 +109,7 @@ class Helper
     /**
      * 是否设置必须关注公众号以后才能购买商品
      */
-    public static function MustFollowAccount(deviceModelObj $device): bool
+    public static function isMustFollowAccountEnabled(deviceModelObj $device): bool
     {
         if (!App::isMustFollowAccountEnabled()) {
             return false;

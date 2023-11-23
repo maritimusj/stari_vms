@@ -56,7 +56,7 @@ if (Session::isAliUser()) {
 
 //如果设置必须关注公众号以后才能购买商品
 $goods_list_FN = false;
-if (Helper::MustFollowAccount($device)) {
+if (Helper::isMustFollowAccountEnabled($device)) {
     if ($tpl['from'] != 'account') {
         if (empty($tpl['accounts'])) {
             $account = Account::getUserNext($device, $user);

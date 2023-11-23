@@ -16,7 +16,7 @@ $user = User::get(Request::int('id'));
 if (empty($user)) {
     JSON::fail('找不到这个用户！');
 }
-$name = $user->getName() ?: '<匿名用户>';
+$name = $user->getName();
 $title = "<b>$name</b>的余额变动记录";
 $page = max(1, Request::int('page'));
 $page_size = Request::int('pagesize', 5);

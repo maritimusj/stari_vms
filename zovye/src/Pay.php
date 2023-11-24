@@ -58,6 +58,11 @@ class Pay
         return self::$names[$name] ?? '未知';
     }
 
+    /**
+     * 从支付记录创建支付对象
+     * @param pay_logsModelObj $log
+     * @return IPay
+     */
     public static function rebuildPay(pay_logsModelObj $log): IPay
     {
         $config_id = $log->getPayConfigId();
@@ -87,6 +92,12 @@ class Pay
         return self::make($config);
     }
 
+    /**
+     * 根据设备和用户，选择对应的支付对象
+     * @param deviceModelObj $device
+     * @param userModelObj $user
+     * @return IPay|null
+     */
     public static function selectPay(deviceModelObj $device, userModelObj $user): ?IPay
     {
         if ($user->isWxUser() || $user->isWXAppUser() || Session::isWxUser() || Session::isWxAppUser()) {
@@ -432,7 +443,7 @@ class Pay
     }
 
     /**
-     * 请求退款
+     * 根据订单号请求退款
      */
     public static function refund(string $order_no, int &$total = 0, array $data = [])
     {
@@ -444,6 +455,9 @@ class Pay
         return self::refundByLog($pay_log, $total, $data);
     }
 
+    /**
+     * 根据支付记录请求退款
+     */
     public static function refundByLog(pay_logsModelObj $pay_log, int &$total = 0, array $data = [])
     {
         $price_total = $pay_log->getPrice();
@@ -475,6 +489,9 @@ class Pay
         }
     }
 
+    /**
+     * 根据支付记录请求支付结果
+     */
     public static function queryFor(pay_logsModelObj $pay_log): array
     {
         $order_no = $pay_log->getOrderNO();
@@ -491,7 +508,7 @@ class Pay
     }
 
     /**
-     * 查询指定支付信息
+     * 根据订单号查询支付结果
      */
     public static function query(string $order_no): array
     {
@@ -541,6 +558,11 @@ class Pay
         return PayLogs::findOne(['level' => $level, 'title' => $order_no]);
     }
 
+    /**
+     * 根据支付配置创建支付对象
+     * @param payment_configModelObj $config
+     * @return IPay
+     */
     public static function make(payment_configModelObj $config): IPay
     {
         switch ($config->getName()) {
@@ -579,11 +601,20 @@ class Pay
         }
     }
 
+    /**
+     * 判断付款码是否为微信付款码
+     * @param $code
+     * @return bool
+     */
     public static function isWxPayQRCode($code): bool
     {
         return in_array(substr($code, 0, 2), ['10', '11', '12', '13', '14', '15']);
     }
 
+    /**
+     * 获取一个微信转账对象
+     * @return WxMCHPay|WxMCHPayV3
+     */
     public static function getWxMCHPayClient()
     {
         /** @var payment_configModelObj $config */
@@ -601,13 +632,19 @@ class Pay
         throw new RuntimeException('没有支付配置！');
     }
 
+    /**
+     * 查询微信转账结果
+     * @param $transaction
+     * @param $trade_no
+     * @return array
+     */
     public static function getMCHPayResult($transaction, $trade_no): array
     {
         return (self::getWxMCHPayClient())->transferInfo($transaction, $trade_no);
     }
 
     /**
-     * 给用户打款.
+     * 给用户转账
      *
      * @param userModelObj $user
      * @param $num

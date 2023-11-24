@@ -437,7 +437,7 @@
                                     </tr>
                                     </tbody>
                                 </table>
-                                <div v-if="config.goods_package_enabled && !config.is_bluetooth_device && !config.is_fueling_device">
+                                <div v-if="isPackageGoodsEnabled">
                                     <button class="btn btn-success"
                                             @click.prevent="newPackage"
                                             :disabled="loading"
@@ -690,7 +690,7 @@
                             <span class="help-block" v-html="theme.helper"></span>
                         </div>
                     </div>
-                    <div class="form-group" v-if="config.is_normal_device || config.is_vdevice">
+                    <div class="form-group"  v-if="isPackageGoodsEnabled">
                         <label for="group" class="col-md-2 control-label">商品列表</label>
                         <div class="col-md-10">
                             <select name="goodsList" id="group" style="width:100%;">
@@ -1089,6 +1089,9 @@
                     return (this.currentType.cargo_lanes || []).filter(lane => {
                         return !!lane.packing;
                     })
+                },
+                isPackageGoodsEnabled() {
+                    return this.config.goods_package_enabled && !this.config.is_bluetooth_device && !this.config.is_fueling_device;
                 },
                 loading() {
                     return this.changing || this.searching || this.creating;

@@ -323,7 +323,7 @@ $result = DBUtil::transactionDo(function () use ($id, &$device) {
     }
 
     $extra['location']['tencent'] = $device->settings('extra.location.tencent', []);
-    $extra['goodsList'] = Request::trim('goodsList');
+    $extra['goodsList'] = App::isGoodsPackageEnabled() ? Request::trim('goodsList') : 'goods';
 
     $extra['schedule'] = [
         'screen' => [

@@ -2552,13 +2552,27 @@ class deviceModelObj extends ModelObj
         return $total;
     }
 
+    public function goodsListViewStyle()
+    {
+        if (App::isGoodsPackageEnabled()) {
+            $w = $this->settings('extra.goodsList', '');
+            if (in_array($w, ['all', 'goods', 'packages'])) {
+                return $w;
+            }
+        }
+        return 'goods';
+    }
+
     public function getGoodsAndPackages($user, $params = [], $available_restrict = true): array
     {
         $result = [];
-        $w = $this->settings('extra.goodsList');
-        if (empty($w) || $w == 'all' || $w == 'goods') {
+
+        $w = $this->goodsListViewStyle();
+
+        if ($w == 'all' || $w == 'goods') {
             $result['goods'] = $this->getGoodsList($user, $params, $available_restrict);
         }
+
         if ($w == 'all' || $w == 'packages') {
             $result['packages'] = $this->getPackages();
         }

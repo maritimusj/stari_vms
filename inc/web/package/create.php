@@ -15,6 +15,10 @@ use zovye\domain\Package;
 use zovye\domain\PackageGoods;
 use zovye\util\DBUtil;
 
+if (!App::isGoodsPackageEnabled()) {
+    JSON::fail('这个功能没有启用！');
+}
+
 $device_id = Request::int('deviceId');
 if ($device_id) {
     $device = Device::get($device_id);

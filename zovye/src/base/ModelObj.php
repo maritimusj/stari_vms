@@ -361,7 +361,7 @@ abstract class ModelObj implements ISettings
                         $props[$prop->getName()] = self::parseType($prop->getDocComment());
                     }
                     return $props;
-                }, $classname);
+                }, $classname, $doc);
 
                 $props_cache[$classname] = $props;
 

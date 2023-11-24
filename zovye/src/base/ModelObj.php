@@ -12,9 +12,11 @@ use ReflectionProperty;
 use RuntimeException;
 use zovye\contract\ISettings;
 use zovye\domain\LogObj;
+use zovye\Log;
 use zovye\Settings;
 use zovye\traits\DirtyChecker;
 use zovye\traits\GettersAndSetters;
+use zovye\util\CacheUtil;
 use zovye\util\Util;
 use function zovye\convert;
 use function zovye\getArray;
@@ -123,6 +125,7 @@ abstract class ModelObj implements ISettings
         if ($key && isset($sub)) {
             $data = $this->settings($key, []);
             unset($data[$sub]);
+
             return $this->updateSettings($key, $data);
         }
 
@@ -347,18 +350,23 @@ abstract class ModelObj implements ISettings
         static $props_cache = [];
 
         $classname = get_called_class();
-        if (!isset($props_cache[$classname])) {
 
+        if (!isset($props_cache[$classname])) {
             try {
-                $ref = new ReflectionClass($classname);
-                foreach ($ref->getProperties(
-                    ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED
-                ) as $prop) {
-                    $props_cache[$classname][$prop->getName()] = self::parseType($prop->getDocComment());
-                }
+                $props = CacheUtil::cachedCall(0, function() use($classname) {
+                    $ref = new ReflectionClass($classname);
+                    $props = [];
+                    $filter = ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED;
+                    foreach ($ref->getProperties($filter) as $prop) {
+                        $props[$prop->getName()] = self::parseType($prop->getDocComment());
+                    }
+                    return $props;
+                }, $classname);
+
+                $props_cache[$classname] = $props;
+
             } catch (Exception $e) {
             }
-
         }
 
         return $doc ? $props_cache[$classname] : array_keys($props_cache[$classname]);

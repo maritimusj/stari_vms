@@ -6,7 +6,6 @@
 
 namespace zovye;
 
-use Exception;
 use RuntimeException;
 use zovye\business\Charging;
 use zovye\business\Fueling;
@@ -344,41 +343,41 @@ class Pay
         try {
             $config = PaymentConfig::get($config_id);
             if (!$config) {
-                throw new Exception('不正确的支付配置id！');
+                throw new RuntimeException('不正确的支付配置id！');
             }
 
             $pay = self::make($config);
             if (!$pay) {
-                throw new Exception('支付不可用！');
+                throw new RuntimeException('支付不可用！');
             }
 
             $data = $pay->decodeData($input);
             if (empty($data)) {
-                throw new Exception('回调数据为空！');
+                throw new RuntimeException('回调数据为空！');
             }
 
             if (is_error($data)) {
-                throw new Exception($data['message']);
+                throw new RuntimeException($data['message']);
             }
 
             if (!$pay->checkResult($data['raw'])) {
-                throw new Exception('回调数据异常！');
+                throw new RuntimeException('回调数据异常！');
             }
 
             if (!Locker::try("pay:{$data['orderNO']}", REQUEST_ID, 3)) {
-                throw new Exception('无法锁定支付记录！');
+                throw new RuntimeException('无法锁定支付记录！');
             }
 
             $pay_log = self::getPayLog($data['orderNO']);
             if (empty($pay_log)) {
-                throw new Exception('找不到支付记录！');
+                throw new RuntimeException('找不到支付记录！');
             }
 
             $pay_log->setData('payResult', $data);
             $pay_log->setData('create_order.createtime', time());
 
             if (!$pay_log->save()) {
-                throw new Exception('保存支付记录失败！');
+                throw new RuntimeException('保存支付记录失败！');
             }
 
             if ($pay_log->getLevel() == LOG_RECHARGE) {
@@ -386,18 +385,18 @@ class Pay
                 if ($user) {
                     $res = CommissionBalance::recharge($user, $pay_log);
                     if (is_error($res) && $res['errno'] < 0) {
-                        throw new Exception($res['message']);
+                        throw new RuntimeException($res['message']);
                     }
 
                     return $pay->getResponse();
                 }
-                throw new Exception('处理充值失败！');
+                throw new RuntimeException('处理充值失败！');
 
             } elseif ($pay_log->getLevel() == LOG_CHARGING_PAY) {
 
                 $res = Charging::startFromPayLog($pay_log);
                 if (is_error($res)) {
-                    throw new Exception($res['message']);
+                    throw new RuntimeException($res['message']);
                 }
 
                 return $pay->getResponse(false);
@@ -406,7 +405,7 @@ class Pay
 
                 $res = Fueling::startFromPayLog($pay_log);
                 if (is_error($res)) {
-                    throw new Exception($res['message']);
+                    throw new RuntimeException($res['message']);
                 }
 
                 return $pay->getResponse(false);
@@ -414,18 +413,18 @@ class Pay
 
             $device = Device::get($data['deviceUID'], true);
             if (empty($device)) {
-                throw new Exception('找不到这个设备:'.$data['deviceUID']);
+                throw new RuntimeException('找不到这个设备:'.$data['deviceUID']);
             }
 
             //创建一个回调执行创建订单，出货任务
             $res = Job::createOrder($data['orderNO'], $device);
             if (empty($res) || is_error($res)) {
-                throw new Exception('创建订单任务失败！');
+                throw new RuntimeException('创建订单任务失败！');
             }
 
             return $pay->getResponse();
 
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             Log::error('pay', [
                 'error' => $e->getMessage(),
                 'config_id' => $config_id,
@@ -448,7 +447,7 @@ class Pay
 
         try {
             return (self::rebuildPay($pay_log))->close($order_no);
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             return err($e->getMessage());
         }
     }
@@ -495,7 +494,7 @@ class Pay
 
             return $result;
 
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             return err($e->getMessage());
         }
     }
@@ -513,7 +512,7 @@ class Pay
 
         try {
             return (self::rebuildPay($pay_log))->query($order_no);
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             return err($e->getMessage());
         }
     }
@@ -607,7 +606,7 @@ class Pay
                 default:
                     throw new RuntimeException('不正确的支付配置！');
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             Log::error('pay', [
                 'config' => $config->toArray(),
                 'error' => $e->getMessage(),

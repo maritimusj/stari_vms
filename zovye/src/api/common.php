@@ -111,7 +111,6 @@ class common
             $device = Device::get($device_uid, true);
             if ($device) {
                 $user->setLastActiveDevice($device);
-                $user->setLastActiveData('from', 'wxapp');
             }
         }
 
@@ -128,7 +127,6 @@ class common
             }
             if (isset($device)) {
                 $user->setLastActiveDevice($device);
-                $user->setLastActiveData('from', 'wxapp');
             }
             if ($res['phoneNumber']) {
                 $user->setMobile($res['phoneNumber']);

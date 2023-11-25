@@ -43,6 +43,22 @@ class api
         return DeviceUtil::getNearBy();
     }
 
+    public static function deviceData(userModelObj $user): array
+    {
+        $device = Device::get(Request::str('deviceId'), true);
+        if (empty($device)) {
+            return err('找不到这个设备！');
+        }
+
+        if($device->isMaintenance()) {
+            return err('设备正在维护中！');
+        }
+
+        $user->setLastActiveDevice($device);
+
+        return $device->profile();
+    }
+
     /**
      * 获取设备相关的广告
      */

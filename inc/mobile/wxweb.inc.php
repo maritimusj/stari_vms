@@ -26,6 +26,7 @@ router::exec($op, [
     'upload' => [common::class, 'upload'],
     'pageInfo' => [common::class, 'pageInfo'],
     'nearBy' => [api::class, 'nearBy'],
+    'deviceData' => [api::class, 'deviceData'],
     'advs' => [api::class, 'ads'],
     'accounts' => [api::class, 'accounts'],
     'goods' => [api::class, 'goods'],

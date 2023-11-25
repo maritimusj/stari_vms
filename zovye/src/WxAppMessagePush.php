@@ -69,11 +69,6 @@ class WxAppMessagePush
 
         if ($msg['MsgType'] == 'text') {
             try {
-
-                if ($user->getLastActiveData('from') != 'wxapp') {
-                    throw new RuntimeException('请从小程序进入服务，谢谢！');
-                }
-
                 $device = $user->getLastActiveDevice();
 
                 if (empty($device)) {

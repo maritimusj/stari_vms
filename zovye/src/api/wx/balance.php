@@ -14,6 +14,7 @@ use zovye\domain\CommissionBalance;
 use zovye\domain\Device;
 use zovye\domain\Goods;
 use zovye\domain\Order;
+use zovye\domain\PaymentConfig;
 use zovye\domain\User;
 use zovye\Job;
 use zovye\model\agentModelObj;
@@ -111,7 +112,10 @@ class balance
 
         $withdraw = settings('commission.withdraw', []);
 
-        if (!empty($withdraw['count']['month'])) {
+        //每月提现次数限制
+        $month_total = intval($withdraw['count']['month']);
+
+        if ($month_total != 0) {
             $count = CommissionBalance::query(
                 [
                     'src' => CommissionBalance::WITHDRAW,
@@ -120,17 +124,19 @@ class balance
                 ]
             )->count();
 
-            if ($count >= $withdraw['count']['month']) {
+            if ($count >= $month_total) {
                 return err('本月可用提现次数已用完！');
             }
         }
 
+        //最低提现金额
         if (!empty($withdraw['min']) && $amount < $withdraw['min']) {
             $min = number_format($withdraw['min'] / 100, 2);
 
             return err("提现金额不能少于{$min}元");
         }
 
+        //最高提现金额
         if (!empty($withdraw['max']) && $amount > $withdraw['max']) {
             $max = number_format($withdraw['max'] / 100, 2);
 
@@ -264,7 +270,7 @@ class balance
             }
         }
 
-        if ($agent->isPaymentConfigEnabled()) {
+        if (PaymentConfig::hasAny($agent)) {
             return err('提现申请被拒绝，请联系管理员！');
         }
 

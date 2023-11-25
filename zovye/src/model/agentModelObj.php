@@ -8,6 +8,7 @@ namespace zovye\model;
 
 use zovye\domain\Device;
 use zovye\domain\GSP;
+use zovye\domain\PaymentConfig;
 use zovye\domain\Principal;
 use zovye\domain\User;
 use zovye\util\DBUtil;
@@ -122,18 +123,6 @@ class agentModelObj extends userModelObj
     public function allowReduceGoodsNum(): bool
     {
         return (bool)$this->getAgentData('keeper.reduceGoodsNum.enabled', true);
-    }
-
-    public function isPaymentConfigEnabled(): bool
-    {
-        $pay = $this->getAgentData('pay', []);
-        foreach ((array)$pay as $config) {
-            if (is_array($config) && $config['enable']) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**

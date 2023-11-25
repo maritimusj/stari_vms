@@ -125,7 +125,7 @@ class Pay
         };
 
         $agent = $device->getAgent();
-        if ($agent) {
+        if ($agent && PaymentConfig::hasAny($agent)) {
             foreach ($names as $name) {
                 /** @var payment_configModelObj $config */
                 $config = PaymentConfig::getFor($agent, $name);
@@ -134,6 +134,8 @@ class Pay
                     return self::make($config);
                 }
             }
+            //如果代理商开启了独立支付，在没有匹配到支付配置的情况下，直接返回null
+            return null;
         }
 
         foreach ($names as $name) {

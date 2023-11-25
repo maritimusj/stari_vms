@@ -23,6 +23,7 @@ use zovye\domain\Inventory;
 use zovye\domain\Locker;
 use zovye\domain\LoginData;
 use zovye\domain\Order;
+use zovye\domain\PaymentConfig;
 use zovye\domain\Replenish;
 use zovye\domain\User;
 use zovye\JSON;
@@ -471,7 +472,7 @@ class keeper
             return err('代理商账户异常，请联系代理商！');
         }
 
-        if ($agent->isPaymentConfigEnabled()) {
+        if (PaymentConfig::hasAny($agent)) {
             return err('提现申请被拒绝，请联系代理商！');
         }
 

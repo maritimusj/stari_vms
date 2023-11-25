@@ -37,6 +37,11 @@ class PaymentConfig extends AbstractBase
         ]);
     }
 
+    public static function hasAny(agentModelObj $agent): bool
+    {
+        return parent::exists(['agent_id' => $agent->getId()]);
+    }
+
     public static function getFor(agentModelObj $agent, $name)
     {
         return parent::findOne([

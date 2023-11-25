@@ -881,8 +881,10 @@ if ($page == 'device') {
                     'key' => Request::trim('V3key'),
                 ],
                 'app' => [
-                    'h5' => true,
-                    'mini_app' => true,
+                    'wx' => [
+                        'h5' => true,
+                        'mini_app' => true,
+                    ],
                 ],
             ];
 

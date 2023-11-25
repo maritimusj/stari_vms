@@ -81,7 +81,7 @@ class Pay
                     }
                 }
             }
-            throw new RuntimeException('config_id 为空！');
+            throw new RuntimeException('支付不可用！[01]');
         }
 
         $config = PaymentConfig::get($config_id);
@@ -89,7 +89,12 @@ class Pay
             throw new RuntimeException('找不到这个支付配置！');
         }
 
-        return self::make($config);
+        $pay = self::make($config);
+        if (!$pay) {
+            throw new RuntimeException('支付不可用！[02]');
+        }
+
+        return $pay;
     }
 
     /**
@@ -134,6 +139,7 @@ class Pay
                     return self::make($config);
                 }
             }
+
             //如果代理商开启了独立支付，在没有匹配到支付配置的情况下，直接返回null
             return null;
         }
@@ -342,6 +348,9 @@ class Pay
             }
 
             $pay = self::make($config);
+            if (!$pay) {
+                throw new Exception('支付不可用！');
+            }
 
             $data = $pay->decodeData($input);
             if (empty($data)) {
@@ -563,44 +572,49 @@ class Pay
     /**
      * 根据支付配置创建支付对象
      * @param payment_configModelObj $config
-     * @return IPay
+     * @return null|IPay
      */
-    public static function make(payment_configModelObj $config): IPay
+    public static function make(payment_configModelObj $config): ?IPay
     {
-        switch ($config->getName()) {
-            case self::LCSW:
-                return new LCSWPay($config->toArray());
-            case self::SQB:
-                return new SQBPay($config->toArray());
-            case self::WX:
-                return new WXPay($config->toArray());
-            case self::WX_V3:
-                if (!class_exists('\WeChatPay\Builder')) {
-                    throw new RuntimeException('缺少微信支付sdk！');
-                }
+        try {
+            switch ($config->getName()) {
+                case self::LCSW:
+                    return new LCSWPay($config->toArray());
+                case self::SQB:
+                    return new SQBPay($config->toArray());
+                case self::WX:
+                    return new WXPay($config->toArray());
+                case self::WX_V3:
+                    if ($config->getAgentId() == 0) {
+                        $data = $config->toArray();
+                    } else {
+                        $sub_mch_id = $config->getExtraData('sub_mch_id', '');
+                        if (empty($sub_mch_id)) {
+                            throw new RuntimeException('不正确的支付配置！');
+                        }
 
-                if ($config->getAgentId() == 0) {
-                    $data = $config->toArray();
-                } else {
-                    $sub_mch_id = $config->getExtraData('sub_mch_id', '');
-                    if (empty($sub_mch_id)) {
-                        throw new RuntimeException('不正确的支付配置！');
+                        /** @var payment_configModelObj $default */
+                        $default = PaymentConfig::getByName(Pay::WX_V3);
+                        if (!$default) {
+                            throw new RuntimeException('不正确的支付配置！');
+                        }
+
+                        $data = $default->getExtraData();
+                        $data['sub_mch_id'] = $sub_mch_id;
                     }
 
-                    /** @var payment_configModelObj $default */
-                    $default = PaymentConfig::getByName(Pay::WX_V3);
-                    if (!$default) {
-                        throw new RuntimeException('不正确的支付配置！');
-                    }
-
-                    $data = $default->getExtraData();
-                    $data['sub_mch_id'] = $sub_mch_id;
-                }
-
-                return empty($data['sub_mch_id']) ? new WxPayV3Merchant($data) : new WxPayV3Partner($data);
-            default:
-                throw new RuntimeException('不正确的支付配置！');
+                    return empty($data['sub_mch_id']) ? new WxPayV3Merchant($data) : new WxPayV3Partner($data);
+                default:
+                    throw new RuntimeException('不正确的支付配置！');
+            }
+        } catch (Exception $e) {
+            Log::error('pay', [
+                'config' => $config->toArray(),
+                'error' => $e->getMessage(),
+            ]);
         }
+
+        return null;
     }
 
     /**

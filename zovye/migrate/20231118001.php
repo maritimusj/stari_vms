@@ -119,10 +119,10 @@ SQL;
                         'access_token' => $data['lcsw']['access_token'],
                         'app' => [
                             'wx' => [
-                                'h5' => boolval($data['lcsw']['wx']),
-                                'mini_app' => boolval($data['lcsw']['wxapp']),
+                                'h5' => true,
+                                'mini_app' => true,
                             ],
-                            'ali' => boolval($data['lcsw']['ali']),
+                            'ali' => true,
                         ],
                     ],
                 ]);
@@ -137,10 +137,10 @@ SQL;
                         'title' => $data['SQB']['store_name'],
                         'app' => [
                             'wx' => [
-                                'h5' => boolval($data['SQB']['wx']),
-                                'mini_app' => boolval($data['SQB']['wxapp']),
+                                'h5' => true,
+                                'mini_app' => true,
                             ],
-                            'ali' => boolval($data['SQB']['ali']),
+                            'ali' => true,
                         ],
                     ],
                 ]);

@@ -9,6 +9,7 @@ namespace zovye\payment;
 
 use Exception;
 use GuzzleHttp\Exception\RequestException;
+use zovye\Log;
 use zovye\Pay;
 use zovye\util\PayUtil;
 use function zovye\err;
@@ -75,7 +76,19 @@ class WxPayV3Partner extends WxPayV3
             if ($e instanceof RequestException) {
                 $res = PayUtil::parseWxPayV3Response($e->getResponse());
 
+                Log::error('wxPayV3Partner', [
+                    'm' => 'createJsPay',
+                    'data' => $data,
+                    'result' => $res,
+                ]);
+
                 return err($res['message'] ?? '请求失败！');
+            } else {
+                Log::error('wxPayV3Partner', [
+                    'm' => 'createJsPay',
+                    'data' => $data,
+                    'result' => $e->getMessage(),
+                ]);
             }
 
             return err($e->getMessage());
@@ -100,6 +113,13 @@ class WxPayV3Partner extends WxPayV3
             $result = PayUtil::parseWxPayV3Response($response);
 
             if (!empty($result['code'])) {
+
+                Log::error('wxPayV3Partner', [
+                    'm' => 'close',
+                    'data' => $data,
+                    'result' => $result,
+                ]);
+                
                 return err($result['message'] ?? '请求失败！');
             }
 
@@ -109,7 +129,19 @@ class WxPayV3Partner extends WxPayV3
             if ($e instanceof RequestException) {
                 $res = PayUtil::parseWxPayV3Response($e->getResponse());
 
+                Log::error('wxPayV3Partner', [
+                    'm' => 'close',
+                    'data' => $data,
+                    'result' => $res,
+                ]);
+
                 return err($res['message'] ?? '请求失败！');
+            } else {
+                Log::error('wxPayV3Partner', [
+                    'm' => 'close',
+                    'data' => $data,
+                    'result' => $e->getMessage(),
+                ]);
             }
 
             return err($e->getMessage());
@@ -137,7 +169,20 @@ class WxPayV3Partner extends WxPayV3
             if ($e instanceof RequestException) {
                 $res = PayUtil::parseWxPayV3Response($e->getResponse());
 
+                Log::error('wxPayV3Partner', [
+                    'm' => 'query',
+                    'data' => $data,
+                    'result' => $res,
+                ]);
+
                 return err($res['message'] ?? '请求失败！');
+            } else {
+                Log::error('wxPayV3Partner', [
+                    'm' => 'query',
+                    'data' => $data,
+                    'result' => $e->getMessage(),
+                ]);
+
             }
 
             return err($e->getMessage());

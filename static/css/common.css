@@ -1336,7 +1336,6 @@ table tr td .log .price.zero{
 form .inputMask {
     color: #ccc;
     cursor: pointer;
-    visibility: hidden;
 }
 
 .form-control.text-url {

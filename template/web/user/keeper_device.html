@@ -1,5 +1,5 @@
 {template 'common/header'}
-{php \zovye\url(true, 'static/css/common.css?v=20230710');}
+{php \zovye\url(true, 'static/css/common.css?v=20231125');}
 <style>
     .we7-modal-dialog .modal-body{
         max-height: unset;
@@ -100,7 +100,7 @@
     </div>
 </div>
 <script>
-    require(["{php \zovye\url(false, 'static/js/zovye.min.js?v=20210717')}"], function (zovye) {
+    require(["{php \zovye\url(false, 'static/js/zovye.min.js?v=20231125')}"], function (zovye) {
         zovye.enableOp();
         zovye.setApiUrl("{php echo $this->createWebUrl('user', ['user' => $user?$user->getId() : 0]);}");
         zovye.op('keeper_device_remove', function(self, next) {

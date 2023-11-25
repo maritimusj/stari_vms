@@ -1,5 +1,5 @@
 {template 'common/header'}
-{php \zovye\url(true, 'static/css/common.css?v=20230710');}
+{php \zovye\url(true, 'static/css/common.css?v=20231125');}
 <style>
     .level-title {
         font-size: 16px;
@@ -234,7 +234,7 @@
             }
         });
     }
-    require(["{php \zovye\url(false, 'static/js/zovye.min.js')}"], function (zovye) {
+    require(["{php \zovye\url(false, 'static/js/zovye.min.js?v=20231125')}"], function (zovye) {
         zovye.enableOp();
         zovye.enableInputMask();
         zovye.enableCopy('text');

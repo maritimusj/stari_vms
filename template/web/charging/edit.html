@@ -47,7 +47,7 @@
     background-color: #ff5722;
 }
 </style>
-{php \zovye\url(true, 'static/css/common.css?v=20230710');}<ul class="nav nav-tabs" id="navbar">
+{php \zovye\url(true, 'static/css/common.css?v=20231125');}<ul class="nav nav-tabs" id="navbar">
     <li role="presentation" class="active"><a href="#">
         <i class="fa fa-pencil"></i> 
         {if $id > 0}编辑{else}添加{/if}分组
@@ -228,7 +228,7 @@
         $("input[name=lng]").val(data.latlng.lng);
         $("input[name=address]").val(data.poiaddress);
     }
-    require(["{php \zovye\url(false, 'static/js/zovye.min.js?v=20210717')}"], function (zovye) {
+    require(["{php \zovye\url(false, 'static/js/zovye.min.js?v=20231125')}"], function (zovye) {
         zovye.enableOp();
         zovye.setApiUrl("{php echo $this->createWebUrl('util');}");
     });

@@ -1,5 +1,5 @@
 {template 'common/header'}
-{php \zovye\url(true, 'static/css/common.css?v=20230710');}
+{php \zovye\url(true, 'static/css/common.css?v=20231125');}
 <style>
     .radio-inline+.radio-inline, .checkbox-inline+.checkbox-inline {
         margin-top: 0;
@@ -204,7 +204,7 @@
     </div>
 </form>
 <script>
-    require(["{php \zovye\url(false, 'static/js/zovye.min.js')}"], function (zovye) {
+    require(["{php \zovye\url(false, 'static/js/zovye.min.js?v=20231125')}"], function (zovye) {
         zovye.enableOp();
         zovye.setApiUrl("{php echo $this->createWebUrl('settings');}");
         zovye.result('refreshWxPlatformToken', function(res){

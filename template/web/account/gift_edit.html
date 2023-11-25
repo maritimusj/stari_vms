@@ -1,5 +1,5 @@
 {template 'common/header'}
-{php \zovye\url(true, 'static/css/common.css?v=20230710');}
+{php \zovye\url(true, 'static/css/common.css?v=20231125');}
 <style>
     th.fixed {
         min-width: 200px;
@@ -215,7 +215,7 @@
     }
 
     const vuejsUrl = "{php \zovye\url(false, JS_VUE_URL);}";
-    const zovyeJsUrl = "{php \zovye\url(false, 'static/js/zovye.min.js')}";
+    const zovyeJsUrl = "{php \zovye\url(false, 'static/js/zovye.min.js?v=20231125')}";
     const apiUrl = "{php echo $this->createWebUrl('account');}";
     const goodsApiUrl = "{php echo $this->createWebUrl('goods');}";
 

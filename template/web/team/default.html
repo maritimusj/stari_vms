@@ -1,5 +1,5 @@
 {template 'common/header'}
-{php \zovye\url(true, 'static/css/common.css?v=20231125');}
+{php \zovye\url(true, 'static/css/common.css?v=20231125001');}
 <style>
     [data-op] {
         cursor: pointer;
@@ -91,7 +91,7 @@
 
 <script>
     const api_url = "{php echo $this->createWebUrl('team');}";
-    require(["{php \zovye\url(false, 'static/js/zovye.min.js?v=20231125')}"], function (zovye) {
+    require(["{php \zovye\url(false, 'static/js/zovye.min.js?v=20231125001')}"], function (zovye) {
         zovye.enableOp();
         zovye.enableCopy('mobile');
         zovye.setApiUrl(api_url);

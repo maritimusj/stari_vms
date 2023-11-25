@@ -1,5 +1,5 @@
 {template 'common/header'}
-{php \zovye\url(true, 'static/css/common.css?v=20231125');}
+{php \zovye\url(true, 'static/css/common.css?v=20231125001');}
 
 <ul class="nav nav-tabs" id="navbar">
     <li role="presentation"><a href="{php echo $this->createWebUrl('device', ['op' => 'new_group']);}">普通分组</a></li>
@@ -87,7 +87,7 @@
     </div>
 </div>
 <script>
-    require(["{php \zovye\url(false, 'static/js/zovye.min.js?v=20231125')}"], function (zovye) {
+    require(["{php \zovye\url(false, 'static/js/zovye.min.js?v=20231125001')}"], function (zovye) {
         zovye.enableOp();
         zovye.setApiUrl("{php echo $this->createWebUrl('charging');}");
         zovye.op('dayStatsData', function(self, next) {

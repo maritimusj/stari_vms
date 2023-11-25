@@ -5,7 +5,7 @@
 <!--  <strong>警告，</strong> 模块当前处于调试模式！请修改模块目录下，zovye/include/constants.php中的DEBUG常量值！-->
 <!--</div>-->
 {/if}
-{php \zovye\url(true, 'static/css/common.css?v=20231125');}
+{php \zovye\url(true, 'static/css/common.css?v=20231125001');}
 <style>
     .fa-info-circle {
         position: relative;
@@ -382,7 +382,7 @@
     </div>
 </form>
 <script>
-    require(["{php \zovye\url(false, 'static/js/zovye.min.js?v=20231125')}"], function (zovye) {
+    require(["{php \zovye\url(false, 'static/js/zovye.min.js?v=20231125001')}"], function (zovye) {
         zovye.enableInputMask();
         zovye.enableCopy();
         zovye.setApiUrl("{php echo $this->createWebUrl('settings');}")

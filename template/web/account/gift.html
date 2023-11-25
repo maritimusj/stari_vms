@@ -1,5 +1,5 @@
 {template 'common/header'}
-{php \zovye\url(true, 'static/css/common.css?v=20231125');}
+{php \zovye\url(true, 'static/css/common.css?v=20231125001');}
 <style>
     .operate .state.auth {
         margin-left: 0;
@@ -145,7 +145,7 @@
     </div>
 </div>
 <script>
-    require(["{php \zovye\url(false, 'static/js/zovye.min.js?v=20231125')}"], function (zovye) {
+    require(["{php \zovye\url(false, 'static/js/zovye.min.js?v=20231125001')}"], function (zovye) {
         zovye.enableOp();
         zovye.enableCopy();
         zovye.setApiUrl("{php echo $this->createWebUrl('account');}");

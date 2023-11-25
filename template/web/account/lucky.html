@@ -1,5 +1,5 @@
 {template 'common/header'}
-{php \zovye\url(true, 'static/css/common.css?v=20231125');}
+{php \zovye\url(true, 'static/css/common.css?v=20231125001');}
 <style>
     #flashLuckyList .image img {
         width: 64px;
@@ -136,7 +136,7 @@
     </div>
 </div>
 <script>
-    require(["{php \zovye\url(false, 'static/js/zovye.min.js?v=20231125')}", "util"], function (zovye, util) {
+    require(["{php \zovye\url(false, 'static/js/zovye.min.js?v=20231125001')}", "util"], function (zovye, util) {
         zovye.enableOp();
         zovye.setApiUrl("{php echo $this->createWebUrl('account');}");
         zovye.op('lucky_remove', function(self, next) {

@@ -6,9 +6,9 @@
 
 namespace zovye;
 
-use Exception;
 use ReflectionClass;
 use ReflectionMethod;
+use RuntimeException;
 
 class EventBus
 {
@@ -39,7 +39,7 @@ class EventBus
 
     /**
      * 通知处理程序进行事件处理
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function on($name, array $params = [])
     {
@@ -73,7 +73,7 @@ class EventBus
         $res = $reflection->invokeArgs(null, $args);
 
         if (is_error($res)) {
-            throw new Exception($res['message'], $res['errno']);
+            throw new RuntimeException($res['message'], $res['errno']);
         }
     }
 

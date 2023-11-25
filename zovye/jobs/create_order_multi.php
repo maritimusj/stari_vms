@@ -8,7 +8,7 @@ namespace zovye\job\createOrderMulti;
 
 defined('IN_IA') or exit('Access Denied');
 
-use Exception;
+use RuntimeException;
 use zovye\App;
 use zovye\CtrlServ;
 use zovye\domain\Device;
@@ -57,7 +57,7 @@ try {
         'orderNO' => $order_no,
         'error' => $e->getMessage(),
     ]);
-} catch (Exception $e) {
+} catch (RuntimeException $e) {
     Log::error('order_create_multi', [
         'orderNO' => $order_no,
         'error' => $e->getMessage(),
@@ -65,7 +65,7 @@ try {
 }
 
 /**
- * @throws Exception
+ * @throws RuntimeException
  */
 function throwException(pay_logsModelObj $pay_log, $message, $refund = false, $device = null)
 {
@@ -80,29 +80,29 @@ function throwException(pay_logsModelObj $pay_log, $message, $refund = false, $d
         }
     }
 
-    throw new Exception($message);
+    throw new RuntimeException($message);
 }
 
 /**
  * @param $order_no
  * @return bool
- * @throws Exception
+ * @throws RuntimeException
  */
 function process($order_no): bool
 {
     $locker = Locker::try("pay:$order_no", REQUEST_ID, 6);
     if (!$locker) {
-        throw new Exception('无法锁定支付信息！');
+        throw new RuntimeException('无法锁定支付信息！');
     }
 
     /** @var pay_logsModelObj $pay_log */
     $pay_log = Pay::getPayLog($order_no);
     if (empty($pay_log)) {
-        throw new Exception('找不到支付信息！');
+        throw new RuntimeException('找不到支付信息！');
     }
 
     if ($pay_log->isRefund()) {
-        throw new Exception('支付已退款！');
+        throw new RuntimeException('支付已退款！');
     }
 
     $device = Device::get($pay_log->getDeviceId());
@@ -235,7 +235,7 @@ function process($order_no): bool
  * @param userModelObj $user
  * @param pay_logsModelObj $pay_log
  * @return orderModelObj
- * @throws Exception
+ * @throws RuntimeException
  */
 function createOrder(
     string $order_no,
@@ -304,7 +304,7 @@ function createOrder(
         $order_data['extra']['package'] = $package_data;
 
     } else {
-        throw new Exception('找不到商品或者套餐信息！');
+        throw new RuntimeException('找不到商品或者套餐信息！');
     }
 
     $query_result = $pay_log->getQueryResult();
@@ -315,7 +315,7 @@ function createOrder(
     } else {
         $pay_result = $pay_log->getPayResult();
         if (empty($pay_result)) {
-            throw new Exception('订单未支付！');
+            throw new RuntimeException('订单未支付！');
         }
         $pay_result['from'] = 'cb';
         $order_data['extra']['payResult'] = $pay_result;
@@ -337,7 +337,7 @@ function createOrder(
     $order = Order::create($order_data);
 
     if (empty($order)) {
-        throw new Exception('领取失败，创建订单失败！');
+        throw new RuntimeException('领取失败，创建订单失败！');
     }
 
     //事件：订单已经创建
@@ -349,7 +349,7 @@ function createOrder(
 
     //保存在事件处理中存入订单的数据
     if (!$order->save()) {
-        throw new Exception('领取失败，保存订单失败！');
+        throw new RuntimeException('领取失败，保存订单失败！');
     }
 
     $user->remove('last');

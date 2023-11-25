@@ -8,7 +8,6 @@ namespace zovye\model;
 
 use zovye\domain\Device;
 use zovye\domain\GSP;
-use zovye\domain\PaymentConfig;
 use zovye\domain\Principal;
 use zovye\domain\User;
 use zovye\util\DBUtil;

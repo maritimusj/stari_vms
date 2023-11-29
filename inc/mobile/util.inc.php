@@ -105,7 +105,7 @@ if ($op == 'default') {
 
     $fn = Request::str('fn');
     if ($fn == 'pass') {
-        if (Advertising::pass($id, _W('username'))) {
+        if (Advertising::pass($id, $user->getName())) {
             Request::is_ajax() ? JSON::success('广告已经通过审核！') : Response::alert('广告已经通过审核！');
         }
         Request::is_ajax() ? JSON::fail('审核操作失败！') : Response::alert('审核操作失败！', 'error');

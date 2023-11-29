@@ -138,13 +138,13 @@ if ($op == 'default') {
     switch ($ad->getType()) {
         case Advertising::SCREEN:
             $media = $ad->getExtraData('media');
-            if ($media == 'srt') {
+            if ($media == Advertising::MEDIA_SRT) {
                 $tpl_data['content'] = $ad->getExtraData('text');
-            } elseif ($media == 'image') {
+            } elseif ($media == Advertising::MEDIA_IMAGE) {
                 $tpl_data['images'] = [$ad->getExtraData('url')];
-            } elseif ($media == 'video') {
+            } elseif ($media == Advertising::MEDIA_VIDEO) {
                 $tpl_data['videos'] = [$ad->getExtraData('url')];
-            } elseif ($media == 'audio') {
+            } elseif ($media == Advertising::MEDIA_AUDIO) {
                 $tpl_data['audios'] = [$ad->getExtraData('url')];
             }
             break;

@@ -27,16 +27,16 @@ if ($op == 'sms') {
         $mobile = Request::trim('mobile');
 
         if (empty($mobile)) {
-            throw new RuntimeException('Invalid mobile phone number.');
+            throw new RuntimeException('invalid mobile phone number.');
         }
     
         $device = Device::get(Request::str('device'), true);
         if (empty($device)) {
-            throw new RuntimeException('Fail to get device info.');
+            throw new RuntimeException('fail to get device info.');
         }
     
         if (!$device->lockAcquire()) {
-            throw new RuntimeException('An error occurred, please try again later.');
+            throw new RuntimeException('an error occurred, please try again later.');
         }
 
         /** @var userModelObj $user */
@@ -50,11 +50,11 @@ if ($op == 'sms') {
         }
 
         if (empty($user)) {
-            throw new RuntimeException('Fail to get user info!');
+            throw new RuntimeException('fail to get user info!');
         }
     
         if (!$user->acquireLocker(User::ORDER_LOCKER)) {
-            throw new RuntimeException('An error occurred, please try again later.');
+            throw new RuntimeException('an error occurred, please try again later.');
         }
     
         $res = Promo::verifySMS($user);
@@ -70,7 +70,7 @@ if ($op == 'sms') {
         }
 
         if (!empty($res['code'])) {
-            throw new RuntimeException("Fail to send sms: {$res['error']}");
+            throw new RuntimeException("fail to send sms: {$res['error']}");
         }
 
         if (!Promo::createSMSLog($user, [
@@ -79,7 +79,7 @@ if ($op == 'sms') {
             'device' => $device->getImei(),
             'createtime' => time(),
         ])) {
-            throw new RuntimeException('An error occurred, please try again later.');
+            throw new RuntimeException('an error occurred, please try again later.');
         }
         
         $config = Promo::getConfig();
@@ -98,7 +98,7 @@ if ($op == 'sms') {
     $config = Promo::getConfig();
 
     if (empty($mobile) || empty($code)) {
-        JSON::fail('Invalid request params.');
+        JSON::fail('invalid request params.');
     }
 
     $user = User::findOne(['mobile' => $mobile]);
@@ -107,31 +107,31 @@ if ($op == 'sms') {
     }
 
     if (empty($user)) {
-        JSON::fail('Incorrect mobile number.');
+        JSON::fail('incorrect mobile number.');
     }
 
     if (!$user->acquireLocker(User::ORDER_LOCKER)) {
-        throw new RuntimeException('An error occurred, please try again later.');
+        throw new RuntimeException('an error occurred, please try again later.');
     }
 
     $log = Promo::getLastSMSLog($user);
     if (empty($log)) {
-        JSON::fail('Incorrect sms code.');
+        JSON::fail('incorrect sms code.');
     }
 
     $data = $log->getData();
 
     if ($data['code'] !== $code || time() - $data['createtime'] > $config['sms']['expired']) {
-        JSON::fail('Invalid verification code or expired.');
+        JSON::fail('invalid verification code or expired.');
     }
 
     if ($data['orderNO']) {
-        JSON::fail('Invalid verification code or expired.');
+        JSON::fail('invalid verification code or expired.');
     }
 
     $device = Device::get($data['device'], true);
     if (empty($device)) {
-        JSON::fail('Device not exists.');
+        JSON::fail('device not exists.');
     }
 
     if ($num > $config['goods']['max']) {
@@ -145,7 +145,7 @@ if ($op == 'sms') {
     }
 
     if (empty($goods) || $goods['num'] < 1) {
-        JSON::fail('Insufficient quantity of goods.');
+        JSON::fail('insufficient quantity of goods.');
     }
 
     $nonce_str = sha1("{$log->getId()}");
@@ -180,11 +180,11 @@ if ($op == 'sms') {
     $order = Order::create($order_data);
 
     if (empty($order)) {
-        JSON::fail('An error occurred, please try again later.');
+        JSON::fail('an error occurred, please try again later.');
     }
 
     if (!Job::createOrderFor($order)) {
-        JSON::fail('An error occurred, please try again later.');
+        JSON::fail('an error occurred, please try again later.');
     }
 
     $log->setData('orderNO', $order_no);

@@ -1308,7 +1308,7 @@ class deviceModelObj extends ModelObj
 
         foreach ($this->getAds(Advertising::SCREEN) as $adv) {
 
-            if ($adv['extra']['media'] == 'srt') {
+            if ($adv['extra']['media'] == Advertising::MEDIA_SRT) {
                 if (!empty($adv['extra']['text'])) {
                     $srt['subs'][] = strval($adv['extra']['text']);
                     if (!empty($adv['extra']['speed']) && $srt['speed'] != $adv['extra']['speed']) {
@@ -1330,7 +1330,7 @@ class deviceModelObj extends ModelObj
                     'type' => strval($adv['extra']['media']),
                 ];
                 $data['url'] = Util::toMedia($adv['extra']['url']);
-                if ($data['type'] == 'image') {
+                if ($data['type'] == Advertising::MEDIA_IMAGE) {
                     $data['duration'] = intval($adv['extra']['duration'] ?: settings('advs.image.duration', 10)) * 1000;
                 }
                 if ($adv['extra']['area']) {
@@ -1795,7 +1795,7 @@ class deviceModelObj extends ModelObj
     {
         $subs = [];
         foreach ($this->getAds(Advertising::SCREEN) as $adv) {
-            if ($adv['extra']['media'] == 'srt') {
+            if ($adv['extra']['media'] == Advertising::MEDIA_SRT) {
                 if (!empty($adv['extra']['text'])) {
                     $subs[] = strval($adv['extra']['text']);
                 }
@@ -2560,6 +2560,7 @@ class deviceModelObj extends ModelObj
                 return $w;
             }
         }
+
         return 'goods';
     }
 

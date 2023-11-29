@@ -218,19 +218,19 @@ class Advertising extends State
     public static function getMediaData(): array
     {
         return [
-            'image' => [
+            self::MEDIA_IMAGE => [
                 'icon' => 'fa-image',
                 'title' => '图片',
             ],
-            'video' => [
+            self::MEDIA_VIDEO => [
                 'icon' => 'fa-youtube-play',
                 'title' => '视频',
             ],
-            'audio' => [
+            self::MEDIA_AUDIO => [
                 'icon' => 'fa-music',
                 'title' => '音频',
             ],
-            'srt' => [
+            self::MEDIA_SRT => [
                 'icon' => 'fa-text-width',
                 'title' => '字幕',
             ],
@@ -310,6 +310,7 @@ class Advertising extends State
     public static function verify($signature_url): bool
     {
         list($sha1val, $url) = explode('@', $signature_url, 2);
+
         return !empty($sha1val) && !empty($url) && sha1(App::uid().CLIENT_IP.$url) == $sha1val;
     }
 
@@ -319,6 +320,7 @@ class Advertising extends State
         if (!empty($sha1val) && !empty($url) && sha1(App::uid().CLIENT_IP.$url) == $sha1val) {
             return $url;
         }
+
         return false;
     }
 

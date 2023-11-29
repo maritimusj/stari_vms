@@ -48,7 +48,7 @@ if ($id > 0) {
 
     if ($type == Advertising::SCREEN) {
         $media = $ad->getExtraData('media');
-        if ($media == 'srt') {
+        if ($media == Advertising::MEDIA_SRT) {
 
             $tpl_data['text'] = $ad->getExtraData('text');
             $tpl_data['size'] = $ad->getExtraData('size');
@@ -58,7 +58,7 @@ if ($id > 0) {
 
         } else {
             $tpl_data['url'] = $ad->getExtraData('url');
-            if ($media == 'image') {
+            if ($media == Advertising::MEDIA_IMAGE) {
                 $tpl_data['duration'] = $ad->getExtraData('duration', 10);
             }
         }

@@ -3,7 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
- 
+
 namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
@@ -77,7 +77,7 @@ if (is_error($res)) {
         $srt = [];
         $ads = $device->getAds(Advertising::SCREEN);
         foreach ($ads as $ad) {
-            if ($ad['extra']['media'] == 'srt') {
+            if ($ad['extra']['media'] == Advertising::MEDIA_SRT) {
                 $srt[] = [
                     'id' => $ad['id'],
                     'text' => strval($ad['extra']['text']),

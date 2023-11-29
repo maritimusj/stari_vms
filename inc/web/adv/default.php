@@ -74,7 +74,12 @@ if ($keywords) {
 
 if ($type == Advertising::SCREEN) {
     $filter_media = Request::trim('media');
-    if (in_array($filter_media, ['image', 'video', 'audio', 'srt'], true)) {
+    if (in_array($filter_media, [
+        Advertising::MEDIA_IMAGE,
+        Advertising::MEDIA_VIDEO,
+        Advertising::MEDIA_AUDIO,
+        Advertising::MEDIA_SRT,
+    ], true)) {
         $len = strlen($filter_media);
         $query->where(['extra LIKE' => "%s:5:\"media\";s:$len:\"$filter_media\"%"]);
 
@@ -138,7 +143,7 @@ if ($total > 0) {
         if ($ad->getType() == Advertising::SCREEN) {
 
             $media = $ad->getExtraData('media');
-            if ($media == 'srt') {
+            if ($media == Advertising::MEDIA_SRT) {
                 $data['text'] = urlencode($ad->getExtraData('text'));
             } else {
                 $data['url'] = Util::toMedia($ad->getExtraData('url'));

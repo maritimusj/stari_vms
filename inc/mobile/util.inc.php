@@ -76,21 +76,20 @@ if ($op == 'default') {
 
     JSON::success("成功！");
 
-} elseif ($op == 'adv_review') {
+} elseif ($op == 'ad_review') {
 
     $user = Session::getCurrentUser();
     if (empty($user) || $user->isBanned()) {
         Response::alert('找不到这个用户或者用户已被禁用！', 'error');
     }
 
-    $ad_id = Request::int('id');
-    if ($user->getId() != settings('notice.reviewAdminUserId') || Request::str('sign') !== sha1(
-            App::uid()."{$user->getId()}:$ad_id"
-        )) {
+    $id = Request::int('id');
+    $sign = sha1(App::uid().":{$user->getId()}:$id");
+    if ($user->getId() != Config::WxPushMessage('config.sys.review.user.id') || Request::str('sign') !== $sign) {
         Response::alert('无效的请求！', 'error');
     }
 
-    $ad = Advertising::get($ad_id);
+    $ad = Advertising::get($id);
     if (empty($ad) || $ad->getState() == Advertising::DELETED) {
         Response::alert('找不到这个广告！', 'error');
     }
@@ -105,12 +104,12 @@ if ($op == 'default') {
 
     $fn = Request::str('fn');
     if ($fn == 'pass') {
-        if (Advertising::pass($ad_id, _W('username'))) {
+        if (Advertising::pass($id, _W('username'))) {
             Request::is_ajax() ? JSON::success('广告已经通过审核！') : Response::alert('广告已经通过审核！');
         }
         Request::is_ajax() ? JSON::fail('审核操作失败！') : Response::alert('审核操作失败！', 'error');
     } elseif ($fn == 'reject') {
-        if (Advertising::reject($ad_id)) {
+        if (Advertising::reject($id)) {
             Request::is_ajax() ? JSON::success('已拒绝广告通过审核！') : Response::alert('已拒绝广告通过审核！');
         }
         Request::is_ajax() ? JSON::fail('审核操作失败！') : Response::alert('审核操作失败！', 'error');

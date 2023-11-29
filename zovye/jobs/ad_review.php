@@ -61,9 +61,9 @@ if (empty($agent)) {
 $url = Util::murl(
     'util',
     [
-        'op' => 'adv_review',
+        'op' => 'ad_review',
         'id' => $ad->getId(),
-        'sign' => sha1(App::uid()."{$user->getId()}:{$ad->getId()}"),
+        'sign' => sha1(App::uid().":{$user->getId()}:{$ad->getId()}"),
     ]
 );
 

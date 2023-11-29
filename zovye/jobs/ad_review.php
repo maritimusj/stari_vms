@@ -82,4 +82,4 @@ $log['result'] = Wx::sendTemplateMsg([
     'data' => $log['data'],
 ]);
 
-Log::debug('adv_review', $log);
+Log::debug('ad_review', $log);

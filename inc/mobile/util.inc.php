@@ -84,6 +84,7 @@ if ($op == 'default') {
     }
 
     $id = Request::int('id');
+
     $sign = sha1(App::uid().":{$user->getId()}:$id");
     if ($user->getId() != Config::WxPushMessage('config.sys.review.user.id') || Request::str('sign') !== $sign) {
         Response::alert('无效的请求！', 'error');

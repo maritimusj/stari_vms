@@ -21,8 +21,8 @@ class WxMCHPayV3
 
     public function transferTo($openid, $trade_no, $money, string $desc = ''): array
     {
-        if ($money < MCH_PAY_MIN_MONEY) {
-            return err('提现金额不能小于'.number_format(MCH_PAY_MIN_MONEY / 100, 2).'元');
+        if ($money < 100) {
+            return err('提现金额不能小于1.00元！');
         }
 
         $data = [

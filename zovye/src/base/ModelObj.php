@@ -45,7 +45,7 @@ abstract class ModelObj implements ISettings
     use DirtyChecker;
     use GettersAndSetters;
 
-    public function __construct($id, ModelFactory $factory, $settingsUseCache = SETTINGS_USE_CACHE)
+    public function __construct($id, ModelFactory $factory, $settingsUseCache = true)
     {
         $this->configFilter('set', ['id', 'factory']);
 

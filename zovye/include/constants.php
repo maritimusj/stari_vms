@@ -25,9 +25,6 @@ define('SYS_MAX_LOAD_AVERAGE_VALUE', 10);
 
 define('DEBUG', true);
 
-//默认settings数据是否使用cache，建议开启redis缓存后设置为true
-define('SETTINGS_USE_CACHE', true);
-
 define('L_DEBUG', 1);
 define('L_INFO', 2);
 define('L_WARN', 3);
@@ -49,7 +46,7 @@ define('JOB_LEVEL_HIGH', 'order');
 define('JOB_LEVEL_NORMAL', 'normal');
 define('JOB_LEVEL_LOW', 'lower');
 
-define('LOG_PAY_RESULT', 60);
+define('LOG_SMS', 30);
 
 define('LOG_PAY', 101);
 define('LOG_GOODS_TEST', 110);
@@ -65,8 +62,6 @@ define('LOG_RECHARGE', 121);
 define('LOG_FUELING_PAY', 122);
 define('LOG_DEVICE_RENEWAL_PAY', 123);
 
-define('LOG_SMS', 30);
-
 define('EVENT_BEFORE_LOCK', 'device.beforeLock');
 define('EVENT_LOCKED', 'device.locked');
 define('EVENT_OPEN_SUCCESS', 'device.openSuccess');
@@ -76,7 +71,6 @@ define('EVENT_ORDER_CREATED', 'device.orderCreated');
 define('DEFAULT_PAGE_SIZE', 20);
 define('DEFAULT_DEVICE_CAPACITY', 10);
 define('DEFAULT_DEVICE_WAIT_TIMEOUT', 15);
-define('DEFAULT_LOCK_TIMEOUT', 15);
 
 define('VISIT_DATA_TIMEOUT', 300);
 define('PAY_TIMEOUT', 180); //支付超时，秒
@@ -90,7 +84,6 @@ define('DEFAULT_COPYRIGHTS', '© 版权所有，侵权必究');
 
 define('WITHDRAW_ADMIN', 0); //手动打款
 define('WITHDRAW_AUTO', 1); //自动打款
-define('MCH_PAY_MIN_MONEY', 100); //微信提现最低金额（分）
 
 define('DEFAULT_IMAGE_DURATION', 10); //图片广告默认停留时间（秒）
 
@@ -99,8 +92,9 @@ define('UNLOCKED', 'n/a');
 
 define('MAX_ORDER_NO_LEN', 32);
 
-define('DEVICE_FORWARDER_URL', 'https://z.ph6618.cn/?id={imei}');
 define('FLUSH_DEVICE_FORWARDER_URL', 'https://z.ph6618.cn/cache/flush?id={imei}');
+
+define('UPGRADE_URL', 'http://127.0.0.1:9012');
 
 define('DEFAULT_LBS_KEY', '');
 
@@ -120,19 +114,14 @@ define('JS_SWIPER_URL', 'https://cdn.staticfile.org/Swiper/4.5.1/js/swiper.min.j
 define('CSS_SWIPER_URL', 'https://cdn.staticfile.org/Swiper/4.5.1/css/swiper.min.css');
 define('CSS_ANIMATE_URL', 'https://cdn.staticfile.org/animate.css/4.1.1/animate.min.css');
 
-define('UPGRADE_URL', 'http://127.0.0.1:9012');
-
-define(
-    'HTTP_USER_AGENT',
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36'
-);
-
 defined('DEVELOPMENT') or define('DEVELOPMENT', DEBUG);
 defined('TIMESTAMP') or define('TIMESTAMP', time());
 defined('CLIENT_IP') or define('CLIENT_IP', Session::getClientIp());
 defined('MATERIAL_WEXIN') or define('MATERIAL_WEXIN', 'perm'); //微信素材类型
+
 define('REGULAR_EMAIL', '/\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/i');
 define('REGULAR_TEL', '/^(?:\+|\d)[\d-]{6,14}\d$/');
+
 defined('MODULE_URL') or define('MODULE_URL', ZOVYE_STATIC_URL);
 defined('ATTACHMENT_ROOT') or define('ATTACHMENT_ROOT', ZOVYE_ROOT.'/attachment/');
 defined('MODULE_ROOT') or define('MODULE_ROOT', ZOVYE_ROOT);

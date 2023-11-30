@@ -35,7 +35,7 @@ class FileLogWriter implements ILogWriter
                 self::$log_cache = [];
 
                 if (rand(0, 10) == 10) {
-                    self::deleteExpiredLogFiles($topic, LOG_MAX_DAY);
+                    self::deleteExpiredLogFiles($topic, LOG_MAX_RETAIN_DAYS);
                 }
             });
         }
@@ -89,7 +89,7 @@ class FileLogWriter implements ILogWriter
         return $filename;
     }
 
-    public static function deleteExpiredLogFiles(string $name, int $keep_days): void
+    public static function deleteExpiredLogFiles(string $name, int $retain_days): void
     {
         $files = [];
         $patten = self::logDir($name).'/*.log';
@@ -106,7 +106,7 @@ class FileLogWriter implements ILogWriter
                 unset($files["$time.$suffix"]);
             }
             $date->modify('-1 day');
-        } while (--$keep_days > 0);
+        } while (--$retain_days > 0);
 
         foreach ($files as $filename) {
             unlink($filename);

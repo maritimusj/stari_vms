@@ -126,7 +126,7 @@ class Balance
                 'data' => $data,
             ]);
 
-            $result = CtrlServ::httpQueuedCallback(LEVEL_NORMAL, $notify_url, $json_str);
+            $result = CtrlServ::httpQueuedCallback(JOB_LEVEL_NORMAL, $notify_url, $json_str);
             if (is_error($result)) {
                 Log::error('balance_notify', [
                     'notify_url' => $notify_url,

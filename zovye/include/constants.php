@@ -38,16 +38,16 @@ define('L_FATAL', 5);
 define('LOG_LEVEL', L_DEBUG);
 
 //日志最多保留天数
-define('LOG_MAX_DAY', 7);
+define('LOG_MAX_RETAIN_DAYS', 7);
 
 //按主题过滤日志
 define('LOG_TOPIC_INCLUDES', []);
 
 define('ZOVYE_STATIC_URL', $GLOBALS['_W']['sitescheme'].$_SERVER['HTTP_HOST'].'/addons/'.APP_NAME.'/');
 
-define('LEVEL_HIGH', 'order');
-define('LEVEL_NORMAL', 'normal');
-define('LEVEL_LOW', 'lower');
+define('JOB_LEVEL_HIGH', 'order');
+define('JOB_LEVEL_NORMAL', 'normal');
+define('JOB_LEVEL_LOW', 'lower');
 
 define('LOG_PAY_RESULT', 60);
 

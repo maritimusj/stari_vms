@@ -72,16 +72,16 @@ class Job
                 'goods' => $goods_id,
                 'num' => $num,
                 'ip' => $ip,
-            ], LEVEL_HIGH) !== false;
+            ], JOB_LEVEL_HIGH) !== false;
     }
 
     public static function createOrder($order_no, deviceModelObj $device = null)
     {
         if ($device && $device->isBlueToothDevice()) {
-            return CtrlServ::scheduleJob('create_order', ['orderNO' => $order_no], LEVEL_HIGH);
+            return CtrlServ::scheduleJob('create_order', ['orderNO' => $order_no], JOB_LEVEL_HIGH);
         }
 
-        return CtrlServ::scheduleJob('create_order_multi', ['orderNO' => $order_no], LEVEL_HIGH);
+        return CtrlServ::scheduleJob('create_order_multi', ['orderNO' => $order_no], JOB_LEVEL_HIGH);
     }
 
     public static function orderPayResult($order_no, $start = 0, $timeout = 3)

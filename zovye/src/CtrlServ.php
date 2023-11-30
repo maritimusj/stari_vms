@@ -322,7 +322,7 @@ class CtrlServ
     /**
      * 创建一个优先级回调任务
      */
-    public static function scheduleJob($op, array $params = [], string $level = LEVEL_NORMAL)
+    public static function scheduleJob($op, array $params = [], string $level = JOB_LEVEL_NORMAL)
     {
         $result = self::httpQueuedCallback($level, self::makeJobUrl($op, $params));
 

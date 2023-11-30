@@ -77,7 +77,7 @@ class JobEventHandler
                         $data['agent'] = $agent->profile();
                     }
 
-                    CtrlServ::httpQueuedCallback(LEVEL_NORMAL, $notify['url'], json_encode($data));
+                    CtrlServ::httpQueuedCallback(JOB_LEVEL_NORMAL, $notify['url'], json_encode($data));
                 }
             }
         }

@@ -6,8 +6,6 @@
 
 namespace zovye;
 
-define('ZOVYE', 'v2');
-
 define(
     'ZOVYE_ROOT',
     str_replace(DIRECTORY_SEPARATOR.'zovye'.DIRECTORY_SEPARATOR.'include', '', __DIR__).DIRECTORY_SEPARATOR
@@ -21,13 +19,6 @@ define('MOD_CACHE_DIR', DATA_DIR.'mod_cache'.DIRECTORY_SEPARATOR);
 define('PEM_DIR', DATA_DIR.'pem'.DIRECTORY_SEPARATOR); //微信支付企业密钥文件生成目录，最好设置到web目录以外的目录，需要可写权限
 define('LIB_DIR', ZOVYE_ROOT.'lib'.DIRECTORY_SEPARATOR);
 
-define('L_ALL', 0);
-define('L_DEBUG', 1);
-define('L_INFO', 2);
-define('L_WARN', 3);
-define('L_ERROR', 4);
-define('L_FATAL', 5);
-
 define('APP_NAME', basename(ZOVYE_ROOT));
 
 define('SYS_MAX_LOAD_AVERAGE_VALUE', 10);
@@ -36,6 +27,12 @@ define('DEBUG', true);
 
 //默认settings数据是否使用cache，建议开启redis缓存后设置为true
 define('SETTINGS_USE_CACHE', true);
+
+define('L_DEBUG', 1);
+define('L_INFO', 2);
+define('L_WARN', 3);
+define('L_ERROR', 4);
+define('L_FATAL', 5);
 
 //日志等级
 define('LOG_LEVEL', L_DEBUG);
@@ -53,8 +50,8 @@ define('LEVEL_NORMAL', 'normal');
 define('LEVEL_LOW', 'lower');
 
 define('LOG_PAY_RESULT', 60);
-define('LOG_PAY', 101);
 
+define('LOG_PAY', 101);
 define('LOG_GOODS_TEST', 110);
 define('LOG_GOODS_PAY', 111);
 define('LOG_GOODS_CB', 112);

@@ -15,7 +15,6 @@ class FileLogWriter implements ILogWriter
     static $log_cache = [];
 
     static $suffix = [
-        L_ALL => '',
         L_DEBUG => 'debug',
         L_INFO => 'info',
         L_WARN => 'warn',

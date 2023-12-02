@@ -41,6 +41,7 @@ class advertisingModelObj extends ModelObj
     /** @var int */
     protected $agent_id;
 
+    /** @var int */
     protected $type;
 
     /** @var string */

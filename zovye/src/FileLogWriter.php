@@ -64,8 +64,10 @@ class FileLogWriter implements ILogWriter
     {
         $log_dir = LOG_DIR.App::uid(8).DIRECTORY_SEPARATOR.$name;
 
-        We7::make_dirs($log_dir);
-
+        if (!file_exists($log_dir)) {
+            We7::make_dirs($log_dir);
+        }
+        
         return $log_dir;
     }
 

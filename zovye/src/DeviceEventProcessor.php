@@ -303,35 +303,26 @@ class DeviceEventProcessor
 
     /**
      * 处理实体硬件的事件
+     * return mixed
      */
     public static function handle(string $event, array $data)
     {
-        try {
-            $e = self::$events[$event];
-            if (!isset($e)) {
-                throw new RuntimeException('找不到这个消息处理程序！');
-            }
-
-            // 消息日志
-            self::log($e, $data);
-
-            $fn = $e['handler'];
-
-            if (!empty($fn)) {
-                if (!is_callable($fn)) {
-                    throw new RuntimeException('指定的处理程序不正确！');
-                }
-                call_user_func($fn, $data);
-            }
-        } catch (Exception $e) {
-            Log::error('events', [
-                'event' => $event,
-                'data' => $data,
-                'error' => $e->getMessage(),
-            ]);
+        $e = self::$events[$event];
+        if (!isset($e)) {
+            throw new RuntimeException('找不到这个消息处理程序！');
         }
 
-        exit(CtrlServ::OK);
+        // 消息日志
+        self::log($e, $data);
+
+        $fn = $e['handler'];
+
+        if (!empty($fn)) {
+            if (!is_callable($fn)) {
+                throw new RuntimeException('指定的处理程序不正确！');
+            }
+            call_user_func($fn, $data);
+        }
     }
 
     /**

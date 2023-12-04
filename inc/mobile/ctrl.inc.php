@@ -6,6 +6,9 @@
 
 namespace zovye;
 
+use Exception;
+use RuntimeException;
+
 defined('IN_IA') or exit('Access Denied');
 
 Request::extraAjaxJsonData();
@@ -17,7 +20,7 @@ if (Request::has('op')) {
     $op = Request::op();
     $data = Request::array('data');
     // 兼容原始设备消息模式
-    if(empty($data['id'])) {
+    if (empty($data['id'])) {
         $data['id'] = Request::str('id');
         if (Request::has('version')) {
             $data['version'] = Request::str('version');
@@ -39,10 +42,7 @@ if (Request::has('op')) {
     }
 }
 
-$sign = Request::header('HTTP_ZOVYE_SIGN');
-$no_str = Request::header('HTTP_ZOVYE_NOSTR');
-
-Log::debug('ctrl', function() use ($op, $data) {
+Log::debug('ctrl', function () use ($op, $data) {
     return [
         'op' => $op,
         'data' => $data,
@@ -52,17 +52,25 @@ Log::debug('ctrl', function() use ($op, $data) {
 
 $config = settings('ctrl', []);
 
-//检查回调签名
-if ($config['checkSign']) {
-    $x = CtrlServ::makeNotifierSign($config['appKey'], $config['appSecret'],$no_str,Request::raw());
-    if ($x !== $sign) {
-        Log::fatal('ctrl', [
-            'error' => '签名检验失败！',
-            'op' => $op,
-            'sign' => $sign,
-            'raw' => Request::raw(),
-        ]);
+try {
+    if ($config['checkSign'] && Request::header('HTTP_ZOVYE_SIGN') !== CtrlServ::makeNotifierSign(
+            $config['appKey'],
+            $config['appSecret'],
+            Request::header('HTTP_ZOVYE_NOSTR'),
+            Request::raw()
+        )) {
+        throw new RuntimeException('签名不正确！');
     }
+
+    //消息处理
+    DeviceEventProcessor::handle($op, $data);
+
+} catch (Exception $e) {
+    Log::error('events', [
+        'event' => $op,
+        'data' => $data,
+        'error' => $e->getMessage(),
+    ]);
 }
 
-DeviceEventProcessor::handle($op, $data);
+Response::echo(CtrlServ::OK);

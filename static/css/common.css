@@ -1347,12 +1347,9 @@ form .inputMask {
     max-height: unset;
 }
 
-.pull-right {
-    font-size: 0.5em;
-}
-
 .pull-right .pagination>li>a, .pagination>li>span {
     padding: 6px 10px;
+    font-size: 12px;
 }
 
 #search-bar .text-input {

@@ -141,6 +141,7 @@ class bluetooth
         $cmd = $proto->onConnected($device->getBUID(), $data);
         if ($cmd) {
             Device::createBluetoothCmdLog($device, $cmd);
+
             return [
                 'data' => $cmd->getEncoded(BlueToothProtocol::BASE64),
                 'hex' => $cmd->getEncoded(BlueToothProtocol::HEX),
@@ -278,7 +279,7 @@ class bluetooth
                 $device->setQoe($battery);
                 if ($device->isLowBattery()) {
                     $device->setLastError(Device::ERROR_LOW_BATTERY, Device::desc(Device::ERROR_LOW_BATTERY));
-                    Job::deviceEventNotify($device, 'low_battery');
+                    Job::deviceEventNotify($device, Device::EVENT_LOW_BATTERY);
                 }
 
                 $data['battery'] = $battery;

@@ -1230,7 +1230,7 @@ class deviceModelObj extends ModelObj
 
         if ($remainWarning > 0 && $this->remain < $remainWarning) {
             $set_s2_flag = true;
-            Job::deviceEventNotify($this, 'low_remain');
+            Job::deviceEventNotify($this, Device::EVENT_LOW_REMAIN);
         }
 
         $this->setS2($this->remain < 1 || $set_s2_flag ? 1 : 0);
@@ -2061,7 +2061,7 @@ class deviceModelObj extends ModelObj
     public function scheduleErrorNotifyJob(): bool
     {
         //使用控制中心推送通知
-        return Job::deviceEventNotify($this, 'error');
+        return Job::deviceEventNotify($this, Device::EVENT_ERROR);
     }
 
     /**

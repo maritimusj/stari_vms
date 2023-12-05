@@ -72,6 +72,12 @@ class Device extends State
 
     const DUMMY_DEVICE_PREFIX = 'B#';
 
+    const EVENT_ONLINE = 'online';
+    const EVENT_OFFLINE = 'offline';
+    const EVENT_ERROR = 'error';
+    const EVENT_LOW_BATTERY = 'low_battery';
+    const EVENT_LOW_REMAIN = 'low_remain';
+
     private static $cache = [];
 
     public static function objClassname(): string
@@ -922,6 +928,7 @@ class Device extends State
             LOG_GOODS_RETRY => '重试',
             LOG_GOODS_BALANCE => '积分',
         ];
+
         if (isset($titles[$type])) {
             return $titles[$type];
         }
@@ -1192,7 +1199,14 @@ class Device extends State
 
     public static function sendEventTemplateMsg(deviceModelObj $device, string $event)
     {
-        $device_events = ['online', 'offline', 'error', 'low_battery', 'low_remain'];
+        $device_events = [
+            self::EVENT_ONLINE,
+            self::EVENT_OFFLINE,
+            self::EVENT_ERROR,
+            self::EVENT_LOW_BATTERY,
+            self::EVENT_LOW_REMAIN,
+        ];
+
         if (!in_array($event, $device_events, true)) {
             return err('不支持的事件通知！');
         }
@@ -1215,21 +1229,21 @@ class Device extends State
         $url = '';
 
         switch ($event) {
-            case 'online':
+            case self::EVENT_ONLINE:
                 $data['thing2'] = ['value' => Wx::trim_thing($device->getName())];
                 $data['character_string9'] = ['value' => Wx::trim_character($device->getImei())];
                 $location = $device->getLocation();
                 $data['thing11'] = ['value' => Wx::trim_thing($location['address']) ?: '<没有位置信息>'];
                 $data['time4'] = ['value' => date('Y-m-d H:i:s')];
                 break;
-            case 'offline':
+            case self::EVENT_OFFLINE:
                 $data['thing2'] = ['value' => Wx::trim_thing($device->getName())];
                 $data['thing6'] = ['value' => Wx::trim_thing($device->getImei())];
                 $location = $device->getLocation();
                 $data['thing17'] = ['value' => Wx::trim_thing($location['address'] ?: '<没有位置信息>')];
                 $data['time4'] = ['value' => date('Y-m-d H:i:s')];
                 break;
-            case 'error':
+            case self::EVENT_ERROR:
                 $data['thing9'] = ['value' => Wx::trim_thing($device->getName())];
                 $data['character_string17'] = ['value' => Wx::trim_character($device->getImei())];
                 $location = $device->getLocation();
@@ -1238,7 +1252,7 @@ class Device extends State
                 $data['thing5'] = ['value' => Wx::trim_thing($err['message'] ?? '<未知故障>')];
                 $data['time2'] = ['value' => date('Y-m-d H:i:s')];
                 break;
-            case 'low_battery':
+            case self::EVENT_LOW_BATTERY:
                 $data['thing1'] = ['value' => Wx::trim_thing($device->getName())];
                 $data['character_string4'] = ['value' => Wx::trim_character($device->getImei())];
                 $location = $device->getLocation();
@@ -1246,7 +1260,7 @@ class Device extends State
                 $qoe = $device->getQoe();
                 $data['thing2'] = ['value' => $qoe == -1 ? '剩余电量：<未知>' : "剩余电量：$qoe%"];
                 break;
-            case 'low_remain':
+            case self::EVENT_LOW_REMAIN:
                 $warningRemain = App::getRemainWarningNum($device->getAgent());
 
                 $payload = $device->getPayload();

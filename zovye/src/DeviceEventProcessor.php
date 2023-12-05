@@ -404,7 +404,7 @@ class DeviceEventProcessor
                 $device->setLastOnline(TIMESTAMP);
                 $device->updateFirstMsgStats();
 
-                Job::deviceEventNotify($device, 'online');
+                Job::deviceEventNotify($device, Device::EVENT_ONLINE);
             }
         }
     }
@@ -593,7 +593,7 @@ class DeviceEventProcessor
                 Fueling::onEventOnline($device);
             }
 
-            Job::deviceEventNotify($device, 'online');
+            Job::deviceEventNotify($device, Device::EVENT_ONLINE);
         }
     }
 
@@ -616,7 +616,7 @@ class DeviceEventProcessor
 
             $device->save();
 
-            Job::deviceEventNotify($device, 'offline');
+            Job::deviceEventNotify($device, Device::EVENT_OFFLINE);
         }
     }
 
@@ -817,7 +817,7 @@ class DeviceEventProcessor
             $device->setLastPing(TIMESTAMP);
             $device->save();
 
-            Job::deviceEventNotify($device, 'online');
+            Job::deviceEventNotify($device, Device::EVENT_ONLINE);
         }
     }
 

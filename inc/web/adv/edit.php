@@ -65,6 +65,7 @@ if ($id > 0) {
 
         $tpl_data['media'] = $media;
         $tpl_data['area'] = $ad->getExtraData('area', 0);
+        $tpl_data['scene'] = $ad->getExtraData('scene', '');
 
     } elseif ($type == Advertising::SCREEN_NAV) {
 

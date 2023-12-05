@@ -370,6 +370,8 @@ class Advertising extends State
             $arr = [Advertising::MEDIA_IMAGE, Advertising::MEDIA_VIDEO, Advertising::MEDIA_SRT];
             if (in_array($extra['media'], $arr, true)) {
                 $extra['area'] = intval($params['area']);
+            } else {
+                $extra['scene'] = intval($params['scene']);
             }
 
             if ($extra['media'] == Advertising::MEDIA_SRT) {

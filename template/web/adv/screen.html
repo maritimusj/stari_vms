@@ -270,7 +270,15 @@
                 <label for="duration" class="col-md-2 control-label">屏幕区域代码</label>
                 <div class="col-md-10">
                     <input type="number" class="form-control" name="area" id="area" value="{php echo $area ?: 0}" min="0">
-                    <span class="help-block">* 如果APP版本不支持区域划分，可忽略</span>
+                    <span class="help-block">* 需要APP支持，可忽略</span>
+                </div>
+            </div>
+            {else}
+            <div class="form-group">
+                <label for="duration" class="col-md-2 control-label">场景值</label>
+                <div class="col-md-10">
+                    <input type="text" class="form-control" name="scene" id="scene" value="{$scene}">
+                    <span class="help-block">* 需要APP支持，可忽略</span>
                 </div>
             </div>
             {/if}

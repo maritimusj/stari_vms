@@ -520,14 +520,14 @@ class DeviceEventProcessor
         $app_id = $data['id'];
         $device = Device::getFromAppId($app_id);
         if ($device) {
-            $result = $device->getAppConfig();
-            $result['tags'] = $device->getTopics(); //要订阅的topics
+            $config = $device->getAppConfig();
+            $config['tags'] = $device->getTopics(); //要订阅的topics
 
             //是不是刷新操作？
             if ($device->has('refresh')) {
                 $device->remove('refresh');
             } else {
-                $device->setAppLastOnline(time());
+                $device->setAppLastOnline(TIMESTAMP);
             }
 
             $device->setAppVersion($data['version']);
@@ -538,11 +538,11 @@ class DeviceEventProcessor
 
             //发送设备注册的MCB的IMEI
             //APP要根据这个判断是否创建虚拟ＭＣＢ
-            $result['mcbUID'] = strval($device->getImei());
+            $config['mcbUID'] = strval($device->getImei());
 
-            $device->appPublish('config', $result);
+            $device->appPublish('config', $config);
         } else {
-            $result = [
+            $config = [
                 'volume' => 10, //音量百分比 0 - 100
                 'banner' => Util::toMedia(settings('misc.banner')), //固定引导图
                 'advs' => [],
@@ -551,14 +551,14 @@ class DeviceEventProcessor
             //发送设备注册二维码
             $url = Util::murl('app', ['id' => $app_id]);
             $qrcode = QRCodeUtil::createFile("app.$app_id", $url);
-            $result['qrcode'] = Util::toMedia($qrcode);
-            $result['qrcode_url'] = $url;
-            $result['reginfo'] = [
+            $config['qrcode'] = Util::toMedia($qrcode);
+            $config['qrcode_url'] = $url;
+            $config['reginfo'] = [
                 'appId' => strval($app_id),
                 'title' => strval(settings('misc.siteTitle')),
             ];
 
-            CtrlServ::appPublish($app_id, 'config', $result);
+            CtrlServ::appPublish($app_id, 'config', $config);
         }
     }
 

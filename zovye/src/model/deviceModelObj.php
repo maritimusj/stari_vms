@@ -1336,6 +1336,9 @@ class deviceModelObj extends ModelObj
                 if ($adv['extra']['area']) {
                     $data['area'] = intval($adv['extra']['area']);
                 }
+                if ($adv['extra']['scene']) {
+                    $data['scene'] = strval($adv['extra']['scene']);
+                }
                 $ads[] = $data;
             }
         }

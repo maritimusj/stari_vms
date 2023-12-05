@@ -24,7 +24,7 @@ $op = Request::op('default');
 
 if ($op == 'default') {
     if (Request::bool('charging')) {
-        Response::alert('请关联充电桩小程序');
+        Response::alert('请关联充电桩小程序！');
     }
     //检查设备
     $device_id = request('id'); //设备ＩＤ

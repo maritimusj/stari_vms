@@ -626,29 +626,35 @@ class DeviceEventProcessor
      */
     public static function onMcbResult(array $data = [])
     {
-        $device = Device::get($data['uid'], true);
-        if ($device) {
-            if ($device->isNormalDevice()) {
-                if ($data['code']) {
-                    $device->setProtocolV1Code($data['code']);
-                }
-            } else {
-                $extra = (array)$data['extra'];
-                if ($device->isChargingDevice()) {
-                    Charging::onEventResult($device, $extra);
-                } elseif ($device->isFuelingDevice()) {
-                    Fueling::onEventResult($device, $extra);
-                } else {
-                    if ($extra && $extra['ser'] && $extra['re'] === 3) {
-                        $order = Order::get($extra['ser'], true);
-                        if ($order) {
-                            $order->setResultCode(0);
-                            $order->setExtraData('pull.callback', $data);
-                            $order->save();
-                        }
+        ['uid' => $uid, 'code' => $code, 'extra' => $extra] = $data;
+
+        if (!empty($uid) && is_array($extra)) {
+
+            $device = Device::get($uid, true);
+            if (empty($device)) {
+                throw new RuntimeException('找不到这个设备！');
+            }
+
+            if ($device->isChargingDevice()) {
+                Charging::onEventResult($device, $extra);
+            } elseif ($device->isFuelingDevice()) {
+                Fueling::onEventResult($device, $extra);
+            } elseif ($device->isBlueToothDevice()) {
+                ['ser' => $serial, 're' => $re] = $extra;
+                if ($serial && $re === 3) {
+                    $order = Order::get($serial, true);
+                    if ($order) {
+                        $order->setResultCode(0);
+                        $order->setExtraData('pull.callback', $data);
+                        $order->save();
                     }
                 }
+            } elseif ($device->isNormalDevice()) {
+                if ($code) {
+                    $device->setProtocolV1Code($code);
+                }
             }
+
             $device->save();
         }
     }

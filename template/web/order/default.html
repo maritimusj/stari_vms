@@ -13,8 +13,19 @@
         height: 16px;
         margin-right: 3px;
     }
-    #orderlist .transactionId.query img {
-        filter: grayscale(1);
+    #orderlist .transactionId .image-container {
+        position: relative;
+        display: inline-block; 
+    }
+    #orderlist .transactionId.query .image-container:after {
+        content: ''; 
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 3px;
+        height: 3px;
+        background-color: red;
+        border-radius: 50%;
     }
     #orderlist .goods {
         max-height: 100px;
@@ -305,9 +316,13 @@
                         </div>
                         {else}
                         {if $order['price']>0}
-                        <div class="transactionId {$order['src']}" data-op="paymentDetail">
-                            <img src="{MODULE_URL}static/img/{$order['pay_name']}.svg" title="{php echo \zovye\Pay::getTitle($order['pay_name'])}">
-                            {$order['transaction_id']}
+                        <div class="transactionId {$order['src']}">
+                            <div class="image-container">
+                                <img src="{MODULE_URL}static/img/{$order['pay_name']}.svg" title="{php echo \zovye\Pay::getTitle($order['pay_name'])}">
+                            </div>
+                            <span data-op="paymentDetail" title="支付详情">
+                                {$order['transaction_id']}
+                            </span>
                         </div>
                         {elseif $order['balance'] > 0}
                         <div class="orderSrc">

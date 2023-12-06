@@ -269,6 +269,8 @@ if ($page == 'device') {
             $tpl_data['formatted_now'] = (new DateTime())->setTimestamp($data['now'])->format("Y-m-d H:i:s");
         }
         $tpl_data['queue'] = Config::app('queue', []);
+    } else {
+        $tpl_data['version'] = 'n/a';
     }
 
     if (App::isChargingDeviceEnabled()) {

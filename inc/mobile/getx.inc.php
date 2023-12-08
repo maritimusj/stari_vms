@@ -79,94 +79,82 @@ try {
         throw new RuntimeException('无法领取这个商品，请联系管理员！');
     }
 
-    $result = DBUtil::transactionDo(function () use ($device, $user, $account, $goods_id, $ticket_data_saved) {
-        //出货流程，EventBus会抛出异常
-        $result = DeviceUtil::open([
-            $device,
-            $user,
-            $account,
-            'level' => LOG_GOODS_FREE,
-            'goodsId' => $goods_id,
-            'online' => false,
-        ]);
-
-        if (is_error($result)) {
-            if ($result['errno'] === State::ERROR_LOCK_FAILED && settings('order.waitQueue.enabled', false)) {
-                $params = [
-                    'account' => $account->getId(),
-                    'device' => $device->getId(),
-                    'user' => $user->getId(),
-                    'goods' => $goods_id,
-                    'ip' => $user->getLastActiveIp(),
-                ];
-                if (!Job::createAccountOrder($params)) {
-                    throw new RuntimeException('启动排队任务失败！');
-                }
-
-                return ['message' => '正在排队出货，请稍等！'];
-            }
-
-            return $result;
-        }
-
-        $order = Order::get($result['orderId']);
-        if ($order) {
-            if ($ticket_data_saved['questionnaireAccountId']) {
-                $questionnaire = Account::get($ticket_data_saved['questionnaireAccountId']);
-            } elseif ($account->isQuestionnaire()) {
-                $questionnaire = $account;
-            } else {
-                $questionnaire = null;
-            }
-
-            if ($questionnaire) {
-                $result = Questionnaire::submitAnswer(
-                    $questionnaire,
-                    $ticket_data_saved['answer'] ?? [],
-                    $user,
-                    $device
-                );
-                if (is_error($result)) {
-                    throw new RuntimeException('问卷答案没通过审核！');
-                }
-
-                $result->setData('order', $order->profile());
-                if (!$result->save()) {
-                    throw new RuntimeException('保存订单数据失败！');
-                }
-
-                unset($ticket_data_saved['answer']);
-                $ticket_data_saved['logId'] = $result->getId();
-            }
-
-            $order->setExtraData('ticket', $ticket_data_saved);
-            if (!$order->save()) {
-                throw new RuntimeException('保存订单数据失败！');
-            }
-
-            return [
-                'message' => '谢谢，欢迎下次使用！',
-                'orderId' => $order->getId(),
-            ];
-        }
-
-        return err('创建订单失败！');
-    });
+    //出货流程，EventBus会抛出异常
+    $result = DeviceUtil::open([
+        $device,
+        $user,
+        $account,
+        'level' => LOG_GOODS_FREE,
+        'goodsId' => $goods_id,
+        'online' => false,
+    ]);
 
     if (is_error($result)) {
-        $device->appShowMessage('出货失败，请稍后再试！', 'error');
+        if ($result['errno'] === State::ERROR_LOCK_FAILED && settings('order.waitQueue.enabled', false)) {
+            $params = [
+                'account' => $account->getId(),
+                'device' => $device->getId(),
+                'user' => $user->getId(),
+                'goods' => $goods_id,
+                'ip' => $user->getLastActiveIp(),
+            ];
+
+            if (!Job::createAccountOrder($params)) {
+                throw new RuntimeException('启动排队任务失败！');
+            }
+
+            JSON::success(['message' => '正在排队出货，请稍等！']);
+        }
+
         throw new RuntimeException($result['message']);
     }
 
-    if ($result['message']) {
-        $device->appShowMessage($result['message']);
+    $order = Order::get($result['orderId']);
+    if (empty($order)) {
+        throw new RuntimeException('出货失败，找不到这个订单！');
+    }
+
+    if ($ticket_data_saved['questionnaireAccountId']) {
+        $questionnaire = Account::get($ticket_data_saved['questionnaireAccountId']);
+    } elseif ($account->isQuestionnaire()) {
+        $questionnaire = $account;
+    } else {
+        $questionnaire = null;
+    }
+
+    if ($questionnaire) {
+        $result = Questionnaire::submitAnswer(
+            $questionnaire,
+            $ticket_data_saved['answer'] ?? [],
+            $user,
+            $device
+        );
+
+        if (is_error($result)) {
+            throw new RuntimeException('问卷答案没通过审核！');
+        }
+
+        $result->setData('order', $order->profile());
+        if (!$result->save()) {
+            throw new RuntimeException('保存订单数据失败！');
+        }
+
+        unset($ticket_data_saved['answer']);
+        $ticket_data_saved['logId'] = $result->getId();
+    }
+
+    $order->setExtraData('ticket', $ticket_data_saved);
+    if (!$order->save()) {
+        throw new RuntimeException('保存订单数据失败！');
     }
 
     $response = [
-        'ok' => !empty($result['orderId']),
-        'text' => empty($result['orderId']) ? '领取失败' : '领取成功',
-        'msg' => $result['message'],
+        'ok' => true,
+        'text' => '领取成功',
+        'msg' => '谢谢，欢迎下次使用！',
     ];
+
+    $device->appShowMessage($response['msg']);
 
     if (App::isFlashEggEnabled()) {
         $goods = Goods::get($goods_id);

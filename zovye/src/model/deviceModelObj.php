@@ -1934,7 +1934,7 @@ class deviceModelObj extends ModelObj
     }
 
     /**
-     * 尝试锁定设备，超过系统设置的超时时长后，自动解锁
+     * 尝试锁定设备
      */
     public function lockAcquire(int $retries = 0, int $delay_seconds = 1): ?lockerModelObj
     {

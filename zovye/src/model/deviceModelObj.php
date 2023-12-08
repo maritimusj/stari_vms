@@ -34,6 +34,7 @@ use zovye\domain\Tags;
 use zovye\domain\User;
 use zovye\domain\DeviceTypes;
 use zovye\Job;
+use zovye\Log;
 use zovye\Pay;
 use zovye\Stats;
 use zovye\util\DeviceUtil;
@@ -1275,6 +1276,7 @@ class deviceModelObj extends ModelObj
                 if (!is_error($res)) {
                     return $account['qrcode'];
                 }
+                Log::error('device', $res);
             }
         }
 

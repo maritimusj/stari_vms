@@ -1261,7 +1261,7 @@ class deviceModelObj extends ModelObj
         return $str ? implode(',', $titles) : $titles;
     }
 
-    public function getAccountQRCode($local = true): string
+    public function getAccountQRCode($download_to_local = true): string
     {
         //是否设置了屏幕二维码的公众号
         if (App::isUseAccountQRCode()) {
@@ -1274,11 +1274,13 @@ class deviceModelObj extends ModelObj
 
                 $res = Account::updateAuthAccountQRCode($account, [App::uid(6), 'device', $this->getId()], false);
                 if (!is_error($res)) {
-                    if ($local) {
-                        $filename = QRCodeUtil::downloadQRCode($account['qrcode']);
-                        return Util::toMedia($filename);
+                    $url = $account['qrcode'];
+
+                    if ($download_to_local) {
+                        return Util::toMedia(QRCodeUtil::downloadQRCode($url));
                     }
-                    return $account['qrcode'];
+
+                    return $url;
                 }
                 Log::error('device', $res);
             }

@@ -15,7 +15,6 @@ use zovye\domain\Device;
 use zovye\domain\Goods;
 use zovye\domain\Order;
 use zovye\domain\Questionnaire;
-use zovye\util\DBUtil;
 use zovye\util\DeviceUtil;
 use zovye\util\LocationUtil;
 

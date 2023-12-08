@@ -32,7 +32,7 @@ $device = $tpl['device']['_obj'];
 if ($device) {
     //格式化广告
     $tpl['slides'] = [];
-    $ads = $device->getAds(Advertising::GET_PAGE);
+    $ads = $device->getAllAds(Advertising::GET_PAGE);
     if ($ads) {
         $url_params = [
             'deviceid' => $tpl['device']['id'],

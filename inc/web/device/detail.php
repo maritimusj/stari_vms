@@ -75,7 +75,7 @@ if (is_error($res)) {
 } else {
     if ($res['data']['srt']['subs']) {
         $srt = [];
-        $ads = $device->getAds(Advertising::SCREEN);
+        $ads = $device->getAllAds(Advertising::SCREEN);
         foreach ($ads as $ad) {
             if ($ad['extra']['media'] == Advertising::MEDIA_SRT) {
                 $srt[] = [

@@ -88,7 +88,7 @@ class bluetooth
         }
 
         //广告列表
-        $ads = $device->getAds(Advertising::WELCOME_PAGE);
+        $ads = $device->getAllAds(Advertising::WELCOME_PAGE);
         $result = [];
         foreach ($ads as $adv) {
             if ($adv['extra']['images']) {

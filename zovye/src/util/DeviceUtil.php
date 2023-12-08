@@ -557,7 +557,7 @@ class DeviceUtil
     public static function getAds(deviceModelObj $device, $type, $max_total): array
     {
         $result = [];
-        foreach ($device->getAds($type) as $item) {
+        foreach ($device->getAllAds($type) as $item) {
             $data = [
                 'id' => $item['id'],
                 'title' => $item['title'],

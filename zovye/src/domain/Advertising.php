@@ -543,7 +543,7 @@ class Advertising extends State
     public static function getDeviceSliders(deviceModelObj $device): array
     {
         $slides = [];
-        $ads = $device->getAds(Advertising::WELCOME_PAGE);
+        $ads = $device->getAllAds(Advertising::WELCOME_PAGE);
         foreach ($ads as $ad) {
             if ($ad['extra']['images']) {
                 foreach ($ad['extra']['images'] as $image) {

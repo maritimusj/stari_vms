@@ -58,7 +58,7 @@ $device->checkRemain();
 
 //检查公众号消息推送设置
 $media = null;
-$adv = $device->getOneAdv(Advertising::PUSH_MSG, true);
+$adv = $device->getOneAd(Advertising::PUSH_MSG, true);
 if ($adv) {
     $media = [
         'type' => $adv['extra']['msg']['type'],
@@ -82,7 +82,7 @@ if ($media && $media['type'] != 'settings' && $media['type'] != 'none' && $media
 }
 
 if ($order->isFree() && App::isSponsorAdEnabled()) {
-    $data = $device->getOneAdv(Advertising::SPONSOR, true, function ($ad) {
+    $data = $device->getOneAd(Advertising::SPONSOR, true, function ($ad) {
         return $ad && $ad->getExtraData('num', 0) > 0;
     });
     if ($data) {

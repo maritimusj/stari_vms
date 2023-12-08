@@ -25,7 +25,7 @@ if ($tpl['device']['id']) {
     $device = Device::get($tpl['device']['id']);
     if ($device) {
         $tpl['slides'] = [];
-        $ads = $device->getAds(Advertising::WELCOME_PAGE);
+        $ads = $device->getAllAds(Advertising::WELCOME_PAGE);
         foreach ($ads as $adv) {
             if ($adv['extra']['images']) {
                 foreach ($adv['extra']['images'] as $image) {

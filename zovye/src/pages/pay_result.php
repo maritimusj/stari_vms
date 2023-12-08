@@ -30,7 +30,7 @@ $tpl_data = TemplateUtil::getTplData(
 
 if ($device) {
     //广告列表
-    $ads = $device->getAds(Advertising::GET_PAGE);
+    $ads = $device->getAllAds(Advertising::GET_PAGE);
     foreach ($ads as $adv) {
         if ($adv['extra']['images']) {
             foreach ($adv['extra']['images'] as $image) {

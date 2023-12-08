@@ -1113,7 +1113,7 @@ class deviceModelObj extends ModelObj
         $params = [];
 
         //小程序识别码
-        $adv = $this->getOneAdv(Advertising::WX_APP_URL_CODE);
+        $adv = $this->getOneAd(Advertising::WX_APP_URL_CODE);
         if ($adv && $adv['extra']['code']) {
             $params['app'] = strval($adv['extra']['code']);
         } else {
@@ -1290,7 +1290,7 @@ class deviceModelObj extends ModelObj
         $vol = $this->settings('extra.volume', 0);
 
         //引导图
-        $res = $this->getOneAdv(Advertising::SCREEN_NAV);
+        $res = $this->getOneAd(Advertising::SCREEN_NAV);
         if ($res) {
             $banner = $res['extra']['url'];
         }
@@ -1306,7 +1306,7 @@ class deviceModelObj extends ModelObj
             'subs' => [],
         ];
 
-        foreach ($this->getAds(Advertising::SCREEN) as $adv) {
+        foreach ($this->getAllAds(Advertising::SCREEN) as $adv) {
 
             if ($adv['extra']['media'] == Advertising::MEDIA_SRT) {
                 if (!empty($adv['extra']['text'])) {
@@ -1389,9 +1389,9 @@ class deviceModelObj extends ModelObj
     /**
      * 获取一个指定类型的广告
      */
-    public function getOneAdv($type, bool $random = false, callable $filterFN = null): ?array
+    public function getOneAd($type, bool $random = false, callable $filterFN = null): ?array
     {
-        $ads = $this->getAds($type);
+        $ads = $this->getAllAds($type);
         if (!isEmptyArray($ads)) {
             if ($random) {
                 shuffle($ads);
@@ -1415,7 +1415,7 @@ class deviceModelObj extends ModelObj
     /**
      * 获取相关广告
      */
-    public function getAds($type, bool $ignore_cache = false): array
+    public function getAllAds($type, bool $ignore_cache = false): array
     {
         $ads = null;
 
@@ -1591,7 +1591,7 @@ class deviceModelObj extends ModelObj
         }
 
         $cachedData = $this->settings("adsData.type$type.data", []);
-        $ads = $this->getAds($type, true);
+        $ads = $this->getAllAds($type, true);
 
         if (empty($cachedData) && empty($ads)) {
             return false;
@@ -1797,7 +1797,7 @@ class deviceModelObj extends ModelObj
     public function getSrcConfig(): array
     {
         $subs = [];
-        foreach ($this->getAds(Advertising::SCREEN) as $adv) {
+        foreach ($this->getAllAds(Advertising::SCREEN) as $adv) {
             if ($adv['extra']['media'] == Advertising::MEDIA_SRT) {
                 if (!empty($adv['extra']['text'])) {
                     $subs[] = strval($adv['extra']['text']);
@@ -2201,7 +2201,7 @@ class deviceModelObj extends ModelObj
     {
         $delay = 0;
 
-        $ads = $this->getAds(Advertising::REDIRECT_URL);
+        $ads = $this->getAllAds(Advertising::REDIRECT_URL);
         if ($ads) {
             foreach ($ads as $ad) {
                 if ($ad['extra']['when'][$when]) {

@@ -45,6 +45,7 @@ if ($page == 'device') {
 
 } elseif ($page == 'payment') {
 
+    $tpl_data['wx_v3_sdk_installed'] = class_exists('\\WeChatPay\\Builder');
     $tpl_data['payment'] = [];
 
     foreach ([Pay::WX, Pay::WX_V3, Pay::LCSW, Pay::SQB] as $name) {

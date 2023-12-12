@@ -44,26 +44,31 @@ if (!CtrlServ::checkJobSign($log)) {
 $order = Order::get($uid, true);
 if ($order) {
     $result = $order->getChargingResult();
-    if (empty($result)) {
-        Charging::end($uid, $charger_id, function ($order) {
-            $order->setExtraData('timeout', [
-                'at' => time(),
-                'reason' => '充电桩无响应，请稍后再试！',
-            ]);
-            //如果即时支付，尝试退款
-            $pay_log = Pay::getPayLog($order->getOrderNO());
-            if ($pay_log) {
-                Job::refund($order->getOrderNO(), '充电订单超时退款');
-            }
-        });
-
-        $log['error'] = [
+    if ($result) {
+        $log['result'] = $result;
+        Job::exit($log);
+    }
+    $status = $order->getChargingStatus();
+    if($status) {
+        $log['status'] = $status;
+        Job::exit($log);
+    }
+    Charging::end($uid, $charger_id, function ($order) {
+        $order->setExtraData('timeout', [
             'at' => time(),
             'reason' => '充电桩无响应，请稍后再试！',
-        ];
-    } else {
-        $log['result'] = $result;
-    }
+        ]);
+        //如果即时支付，尝试退款
+        $pay_log = Pay::getPayLog($order->getOrderNO());
+        if ($pay_log) {
+            Job::refund($order->getOrderNO(), '充电订单超时退款');
+        }
+    });
+
+    $log['error'] = [
+        'at' => time(),
+        'reason' => '充电桩无响应，请稍后再试！',
+    ];
 }
 
 $device = Device::get($device_id);

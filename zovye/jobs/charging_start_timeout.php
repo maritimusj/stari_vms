@@ -46,12 +46,16 @@ if ($order) {
     $result = $order->getChargingResult();
     if ($result) {
         $log['result'] = $result;
-        Job::exit($log);
+        Job::exit(function () use ($log) {
+            Log::debug('charging_start_timeout', $log);
+        });
     }
     $status = $order->getChargingStatus();
-    if($status) {
+    if ($status) {
         $log['status'] = $status;
-        Job::exit($log);
+        Job::exit(function () use ($log) {
+            Log::debug('charging_start_timeout', $log);
+        });
     }
     Charging::end($uid, $charger_id, function ($order) {
         $order->setExtraData('timeout', [

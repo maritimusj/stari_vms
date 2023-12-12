@@ -417,10 +417,9 @@
                                     </div>
                                     {/if}
                                 {else}
-                                    {if $order['charging']['result']['re'] == 3}
                                     {if $order['charging']['status']}
                                         <div class="charging">
-                                            <i class="fa fa-share-alt fa-fw"></i> 充电枪号：{php echo $order['charging']['result']['ch'] ?? '?'}
+                                            <i class="fa fa-share-alt fa-fw"></i> 充电枪号：{php echo $order['charging']['result']['ch'] ?? $order['charging']['chargerID']}
                                         </div>
                                         <div class="charging">
                                             <i class="fa fa-bolt fa-fw"></i> 总耗电量：<strong>{php echo $order['charging']['status']['chargedKWH']}</strong> 度
@@ -439,7 +438,6 @@
                                             <i class="fa fa-info-circle fa-fw"></i> 充电数据上报已超时，<span data-op="endOrder">立即结算?</span>
                                         </div>
                                         {/if}
-                                    {/if}
                                     {elseif $order['charging']['result']}
                                     <div>
                                         <i class="fa fa-share-alt fa-fw"></i> 充电枪号：{php echo $order['charging']['result']['ch'] ?? '?'}

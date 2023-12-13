@@ -13,6 +13,7 @@ use zovye\business\Fueling;
 use zovye\domain\Device;
 use zovye\domain\DeviceEvents;
 use zovye\domain\Order;
+use zovye\domain\User;
 use zovye\util\Helper;
 use zovye\util\QRCodeUtil;
 use zovye\util\Util;
@@ -635,12 +636,13 @@ class DeviceEventProcessor
                 throw new RuntimeException('找不到这个设备！');
             }
 
+            ['ser' => $serial, 're' => $re] = $extra;
+
             if ($device->isChargingDevice()) {
                 Charging::onEventResult($device, $extra);
             } elseif ($device->isFuelingDevice()) {
                 Fueling::onEventResult($device, $extra);
             } elseif ($device->isBlueToothDevice()) {
-                ['ser' => $serial, 're' => $re] = $extra;
                 if ($serial && $re === 3) {
                     $order = Order::get($serial, true);
                     if ($order) {
@@ -652,6 +654,34 @@ class DeviceEventProcessor
             } elseif ($device->isNormalDevice()) {
                 if ($code) {
                     $device->setProtocolV1Code($code);
+                }
+                if (empty($serial)) {
+                    //创建匿名订单
+                    $user = User::getPseudoUser();
+                    $goods = $device->getGoodsByLane(0);
+                    $order_data = [
+                        'src' => Order::FREE,
+                        'order_id' => Order::makeUID($user, $device, TIMESTAMP),
+                        'openid' => $user->getOpenid(),
+                        'user_id' => $user->getId(),
+                        'agent_id' => $device->getAgentId(),
+                        'device_id' => $device->getId(),
+                        'name' => $goods['name'],
+                        'goods_id' => $goods['id'],
+                        'num' => 1,
+                        'price' => 0,
+                        'ip' => CLIENT_IP,
+                        'extra' => [
+                            'level' => LOG_GOODS_FREE,
+                            'goods' => $goods,
+                            'device' => [
+                                'imei' => $device->getImei(),
+                                'name' => $device->getName(),
+                            ],
+                            'user' => $user->profile(),
+                        ],
+                    ];
+                    Order::create($order_data);
                 }
             }
 

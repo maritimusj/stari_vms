@@ -264,7 +264,7 @@ class agent
         if (is_error($res)) {
             Log::error('wxapi', $res);
 
-            return $res;
+            return err('解析微信消息错误，请重试！');
         }
 
         $result = agent::doUserLogin($res);

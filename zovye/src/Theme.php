@@ -99,12 +99,6 @@ class Theme
             return $name;
         }
 
-        Log::error('theme', [
-            'theme' => $name,
-            'file' => $filename,
-            'error' => 'theme file not found!',
-        ]);
-
-        return 'file_not_found';
+        trigger_error("theme file not found, theme: $theme, name: $name", E_USER_ERROR);
     }
 }

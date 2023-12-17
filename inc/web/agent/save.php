@@ -158,7 +158,7 @@ $result = DBUtil::transactionDo(function () use ($id, &$from) {
             $user->updateSettings('agentData.commission.enabled', $enabled);
             if ($enabled) {
                 $user->updateSettings('agentData.commission.fee_type', Request::bool('feeType') ? 1 : 0);
-                $user->updateSettings('agentData.commission.fee', intval(Request::float('commission_fee', 0, 2) * 100));
+                $user->updateSettings('agentData.commission.fee', intval(Request::float('commissionFee', 0, 2) * 100));
                 if (Request::is_numeric('balanceOrderPrice')) {
                     $user->updateSettings(
                         'agentData.commission.balance.price',

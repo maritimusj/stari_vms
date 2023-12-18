@@ -150,10 +150,10 @@ class Balance
             if (!empty($mobile)) {
 
                 $total = 0;
-                $allUser = User::getAllUserByMobile($mobile);
+                $all_user = User::getAllUserByMobile($mobile, $this->user->getApp());
 
-                if (!empty($allUser)) {
-                    foreach ($allUser as $user) {
+                if (!empty($all_user)) {
+                    foreach ($all_user as $user) {
                         $total += self::getTotal($user);
                     }
 

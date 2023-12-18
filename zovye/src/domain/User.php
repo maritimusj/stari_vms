@@ -346,12 +346,18 @@ class User
         return $discount;
     }
 
-    public static function getAllUserByMobile($mobile): array
+    public static function getAllUserByMobile($mobile, $app = null): array
     {
         $result = [];
 
+        $cond = ['mobile' => $mobile];
+
+        if ($app) {
+            $cond['app'] = $app;
+        }
+
         /** @var userModelObj $user */
-        foreach (User::query(['mobile' => $mobile])->findAll() as $user) {
+        foreach (User::query($cond)->findAll() as $user) {
             if (!$user->isBanned()) {
                 $result[] = $user;
             }

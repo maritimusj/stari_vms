@@ -352,7 +352,7 @@ class User
 
         $cond = ['mobile' => $mobile];
 
-        if ($app) {
+        if (isset($app)) {
             $cond['app'] = $app;
         }
 

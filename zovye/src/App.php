@@ -336,6 +336,7 @@ class App
         return true;
     }
 
+    /** 用户单次最多购买的商品数量（0表示不限制） */
     public static function getOrderMaxGoodsNum(): int
     {
         return settings('order.goods.maxNum', 10);

@@ -1360,11 +1360,11 @@ include './index.php';
             ];
 
             if (Helper::checkLimit(
-                    $account,
-                    $user,
-                    ['createtime >=' => $time->getTimestamp(),],
-                    $count
-                )) {
+                $account,
+                $user,
+                ['createtime >=' => $time->getTimestamp(),],
+                $count
+            )) {
                 return err($desc[$sc_name]);
             }
         }
@@ -1373,8 +1373,8 @@ include './index.php';
         $sc_count = $account->getSccount();
         if ($sc_count > 0) {
             if (Helper::checkLimit($account, null, [
-                    'createtime >=' => $time->getTimestamp(),
-                ], $sc_count)) {
+                'createtime >=' => $time->getTimestamp(),
+            ], $sc_count)) {
                 return err('任务免费额度已用完！');
             }
         }
@@ -1611,30 +1611,6 @@ include './index.php';
         return $FNs;
     }
 
-    public static function getUserFreeNum(userModelObj $user, deviceModelObj $device): int
-    {
-        $remain = null;
-
-        if (is_null($remain)) {
-            $max_free = 0;
-
-            $agent = $device->getAgent();
-            if ($agent) {
-                $max_free = $agent->getAgentData('misc.maxTotalFree', 0);
-            }
-
-            $max_free = $max_free > 0 ? $max_free : (int)settings('user.maxTotalFree', 0);
-
-            if ($max_free > 0) {
-                $remain = max(0, $max_free - $user->getFreeTotal());
-            } else {
-                $remain = App::getOrderMaxGoodsNum();
-            }
-        }
-
-        return $remain;
-    }
-
     /**
      * 返回用户还需要关注的公众号列表
      */
@@ -1696,26 +1672,30 @@ include './index.php';
      */
     public static function getUserTodayFreeNum(userModelObj $user, deviceModelObj $device): int
     {
-        $remain = null;
+        $limits = 0;
 
-        if (is_null($remain)) {
-            $max_free = 0;
-
-            $agent = $device->getAgent();
-            if ($agent) {
-                $max_free = $agent->getAgentData('misc.maxFree', 0);
-            }
-
-            $max_free = $max_free > 0 ? $max_free : (int)settings('user.maxFree', 0);
-
-            if ($max_free > 0) {
-                $remain = max(0, $max_free - $user->getTodayFreeTotal());
-            } else {
-                $remain = App::getOrderMaxGoodsNum();
-            }
+        $agent = $device->getAgent();
+        if ($agent) {
+            $limits = $agent->getAgentData('misc.maxFree', 0);
         }
 
-        return $remain;
+        $limits = !empty($limits) ? $limits : settings('user.maxFree', 0);
+
+        return !empty($limits) ? max(0, $limits - $user->getTodayFreeTotal()) : 1;
+    }
+
+    public static function getUserFreeNum(userModelObj $user, deviceModelObj $device): int
+    {
+        $limits = 0;
+
+        $agent = $device->getAgent();
+        if ($agent) {
+            $limits = $agent->getAgentData('misc.maxTotalFree', 0);
+        }
+
+        $limits = !empty($limits) ? $limits : settings('user.maxTotalFree', 0);
+
+        return !empty($limits) ? max(0, $limits - $user->getFreeTotal()) : 1;
     }
 
     public static function getPayloadWithAlertData(deviceModelObj $device, bool $detail = true): array
@@ -1734,8 +1714,9 @@ include './index.php';
                         'invalid_if_expired' => $alert->getInvalidIfExpired(),
                     ];
                 }
-            }            
+            }
         }
+
         return $payload;
     }
 
@@ -1778,6 +1759,7 @@ include './index.php';
                 ]);
             }
         }
+
         return $res['path'];
     }
 }

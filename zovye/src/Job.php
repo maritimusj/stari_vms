@@ -164,17 +164,9 @@ class Job
         return CtrlServ::scheduleJob('account_msg', $msg);
     }
 
-    public static function order($order_id): bool
+    public static function order(orderModelObj $order): bool
     {
-        if (empty($queue['max_size']) || $queue['size'] < $queue['max_size']) {
-
-            $queue['size'] = CtrlServ::scheduleJob('order', ['id' => $order_id]);
-            $queue['updatetime'] = time();
-            Config::app('queue', $queue, true);
-            return $queue['size'] !== false;
-        }
-
-        return false;
+        return CtrlServ::scheduleJob('order', ['id' => $order->getId()]) !== false;
     }
 
     public static function getResult($order_no, $openid): bool

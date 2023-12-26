@@ -21,7 +21,7 @@ class JobEventHandler
     public static function onDeviceOpenSuccess(orderModelObj $order = null)
     {
         if ($order) {
-            Job::order($order->getId());
+            Job::order($order);
             Job::orderNotify($order);
 
             if (App::isGDCVMachineEnabled() && $order->isFree()) {

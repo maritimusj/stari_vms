@@ -19,13 +19,13 @@ $group = Group::get($id);
 if ($group && $group->destroy()) {
     $result = Device::query(['group_id' => $id])->findAll();
 
-    /** @var deviceModelObj $entry */
-    foreach ($result as $entry) {
-        $entry->setGroupId(0);
+    /** @var deviceModelObj $device */
+    foreach ($result as $device) {
+        $device->setGroupId(0);
         //更新广告
-        $entry->updateScreenAdsData();
+        $device->updateScreenAdsData();
         //更新公众号
-        $entry->updateAccountData();
+        $device->updateAccountData();
     }
 
     Response::toast('删除成功！', Util::url('device', ['op' => 'new_group']), 'success');

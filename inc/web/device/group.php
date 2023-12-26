@@ -41,13 +41,13 @@ $result = [
     'list' => [],
 ];
 
-/** @var device_groupsModelObj $entry */
-foreach ($query->findAll() as $entry) {
+/** @var device_groupsModelObj $group */
+foreach ($query->findAll() as $group) {
     $result['list'][] = [
-        'id' => $entry->getId(),
-        'title' => $entry->getTitle(),
-        'clr' => $entry->getClr(),
-        'total' => Device::query(['group_id' => $entry->getId()])->count(),
+        'id' => $group->getId(),
+        'title' => $group->getTitle(),
+        'clr' => $group->getClr(),
+        'total' => Device::query(['group_id' => $group->getId()])->count(),
     ];
 }
 

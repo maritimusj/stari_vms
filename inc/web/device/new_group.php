@@ -43,16 +43,16 @@ $query->page($page, $page_size);
 $query->orderBy('id DESC');
 
 $list = [];
-/** @var device_groupsModelObj $entry */
-foreach ($query->findAll() as $entry) {
+/** @var device_groupsModelObj $group */
+foreach ($query->findAll() as $group) {
     $data = [
-        'id' => $entry->getId(),
-        'title' => $entry->getTitle(),
-        'clr' => $entry->getClr(),
-        'total' => Device::query(['group_id' => $entry->getId()])->count(),
-        'createtime_formatted' => date('Y-m-d H:i', $entry->getCreatetime()),
+        'id' => $group->getId(),
+        'title' => $group->getTitle(),
+        'clr' => $group->getClr(),
+        'total' => Device::query(['group_id' => $group->getId()])->count(),
+        'createtime_formatted' => date('Y-m-d H:i', $group->getCreatetime()),
     ];
-    $agent = $entry->getAgent();
+    $agent = $group->getAgent();
     if ($agent) {
         $data['agent'] = $agent->profile();
     }

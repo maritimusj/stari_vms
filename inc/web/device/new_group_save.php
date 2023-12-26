@@ -22,14 +22,14 @@ $agent_id = Request::int('agentId');
 
 $id = Request::int('id');
 
-/** @var device_groupsModelObj $one */
-$one = Group::get($id);
-if ($one) {
-    $one->setTitle($title);
-    $one->setClr($clr);
-    $one->setAgentId($agent_id);
+/** @var device_groupsModelObj $group */
+$group = Group::get($id);
+if ($group) {
+    $group->setTitle($title);
+    $group->setClr($clr);
+    $group->setAgentId($agent_id);
 } else {
-    $one = Group::create([
+    $group = Group::create([
         'type_id' => Group::NORMAL,
         'agent_id' => $agent_id,
         'title' => $title,
@@ -38,7 +38,7 @@ if ($one) {
     ]);
 }
 
-if ($one->save()) {
+if ($group->save()) {
     Response::toast('保存成功！', Util::url('device', ['op' => 'new_group']), 'success');
 }
 

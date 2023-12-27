@@ -61,7 +61,11 @@
                     {if $e['limit'] > 0 && $e['val'] > 0}
                     <div class="bonus">
                         <i class="fa fa-tag"></i>
+                        {if $e['limit'] > 0}
                         <span class="limit">{php echo number_format($e['limit']/100, 2, '.', '')}元</span>，赠送<span class="val">{php echo number_format($e['val']/100, 2, '.', '')}元</span>
+                        {else}
+                        充电奖励<span class="val">{php echo number_format($e['val']/100, 2, '.', '')}元</span>
+                        {/if}
                     </div>
                     {/if}
                     {/loop}

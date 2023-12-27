@@ -39,15 +39,15 @@ $total = $query->count();
 $query->page($page, $page_size);
 
 $list = [];
-/** @var device_groupsModelObj $entry */
-foreach ($query->findAll() as $entry) {
-    $data = $entry->format();
-    $agent = $entry->getAgent();
+/** @var device_groupsModelObj $group */
+foreach ($query->findAll() as $group) {
+    $data = $group->format();
+    $agent = $group->getAgent();
     if ($agent) {
         $data['agent'] = $agent->profile();
     }
 
-    $data['total'] = Device::query(['group_id' => $entry->getId()])->count();
+    $data['total'] = Device::query(['group_id' => $group->getId()])->count();
     $data['remote_version'] = ChargingServ::getGroupVersion($data['name']);
 
     $list[] = $data;

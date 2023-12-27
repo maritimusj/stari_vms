@@ -592,10 +592,17 @@ class Charging
                             $extra
                         );
                         if ($log) {
+                            $val = number_format($bonus['val'] / 100, 2, '.', '');
+                            if ($bonus['limit'] > 0) {
+                                $limit = number_format($bonus['limit'] / 100, 2, '.', '');
+                                $desc = "满{$limit}元送{$val}元";
+                            } else {
+                                $desc = "充电奖励{$val}元";
+                            }
                             $order->setExtraData('bonus', [
                                 'log' => $log->getId(),
                                 'val' => $log->getXVal(),
-                                'desc' => '奖励奖励',
+                                'desc' => $desc,
                             ]);
                             $order->save();
                             break;

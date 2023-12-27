@@ -68,6 +68,12 @@ if ($id > 0) {
         'lat' => $lat,
     ]);
     $group->setFee($fee);
+    $group->setExtraData('bonus', [
+        [
+            'limit' => intval(Request::float('BonusLimit0') * 100),
+            'val' => intval(Request::float('BonusVal0') * 100),
+        ]
+    ]);
 } else {
     $data = [
         'agent_id' => isset($agent) ? $agent->getId() : 0,
@@ -81,6 +87,12 @@ if ($id > 0) {
             'lng' => $lng,
             'lat' => $lat,
             'fee' => $fee,
+            'bonus' => [
+                [
+                    'limit' => intval(Request::float('BonusLimit0') * 100),
+                    'val' => intval(Request::float('BonusVal0') * 100), 
+                ],
+            ],
         ],
     ];
 

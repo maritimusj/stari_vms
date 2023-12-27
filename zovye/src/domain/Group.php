@@ -127,6 +127,8 @@ class Group
                 $data['current_ef'] = sprintf("¥ %.04f /度", $fee['ef']);
                 $data['current_sf'] .= sprintf("¥ %.04f /度", $fee['sf']);
             }
+
+            $data['bonus'] = $entry->getExtraData('bonus', []);
         }
 
         return $data;

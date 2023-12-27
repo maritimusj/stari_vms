@@ -148,6 +148,21 @@
                     </div>    
                 </div>
                 <div class="form-group">
+                    <label for="accountPromoteBonus" class="col-md-2 control-label">
+                        消费奖励
+                    </label>
+                    <div class="col-md-10">
+                        <div class="col-md-5" style="padding-left:0;">
+                            <input type="number" class="form-control" name="BonusLimit0" id="BonusLimit0" value="{php echo is_array($group['bonus']) ? number_format($group['bonus'][0]['limit']/100, 2, '.', '') : 0.00}" min="0" step="0.01" title="最低消费金额">
+                            <span class="help-block">* 最低消费金额</span>
+                        </div>
+                        <div class="col-md-5" style="padding-left:0;">
+                            <input type="number" class="form-control" name="BonusVal0" id="BonusVal0" value="{php echo is_array($group['bonus']) ? number_format($group['bonus'][0]['val']/100, 2, '.', '') : 0.00}" min="0" step="0.01" title="赠送金额">
+                            <span class="help-block">* 赠送金额（充值到用户账户）</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
                     <label for="title" class="col-md-2 control-label">计费时段</label>
                     <div class="col-md-10">
                         <div class="ts-arr">

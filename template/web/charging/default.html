@@ -1,6 +1,12 @@
 {template 'common/header'}
 {php \zovye\url(true, 'static/css/common.css?v=20231125001');}
-
+<style>
+    #grouplist .bonus {
+        color: #8BC34A;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+</style>
 <ul class="nav nav-tabs" id="navbar">
     <li role="presentation"><a href="{php echo $this->createWebUrl('device', ['op' => 'new_group']);}">普通分组</a></li>
     <li role="presentation" class="active"><a href="#">充电桩分组</a></li>
@@ -50,6 +56,16 @@
                 </td>
                 <td>
                     {$item['tips']}
+                    {if is_array($item['bonus'])}
+                    {loop $item['bonus'] $e}
+                    {if $e['limit'] > 0 && $e['val'] > 0}
+                    <div class="bonus">
+                        <i class="fa fa-tag"></i>
+                        <span class="limit">{php echo number_format($e['limit']/100, 2, '.', '')}元</span>，赠送<span class="val">{php echo number_format($e['val']/100, 2, '.', '')}元</span>
+                    </div>
+                    {/if}
+                    {/loop}
+                    {/if}
                 </td>
                 <td>
                     {$item['description']}

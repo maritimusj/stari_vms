@@ -73,7 +73,7 @@ class CommissionBalance extends State
         self::CHARGING_FEE => '充电桩订单结算',
         self::CHARGING_SERVICE_FEE => '充电桩订单(服务费)',
         self::CHARGING_ELECTRIC_FEE => '充电桩订单(电费)',
-        self::CHARGING_BONUS => '充电奖励',
+        self::CHARGING_BONUS => '停车补贴',
         self::FUELING_FEE => '尿素加注订单结算',
         self::TRANSFER_OUT => '转账给用户',
         self::TRANSFER_RECEIVED => '收到转账',
@@ -428,7 +428,7 @@ CHARGING;
             $data['memo'] = <<<CHARGING
 <dl class="log dl-horizontal">
 <dt>事件</dt>
-<dd class="event">充电奖励</dd>
+<dd class="event">停车补贴</dd>
 <dt>订单</dt>
 <dd class="event">$order_info</dd>
 $group_info

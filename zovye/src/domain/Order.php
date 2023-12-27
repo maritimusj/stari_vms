@@ -950,6 +950,11 @@ class Order extends State
                 $data['reward'] = $reward;
             }
 
+            $bonus = $order->getExtraData('bonus', []);
+            if ($bonus) {
+                $data['bonus'] = $bonus;
+            }
+
             if (App::isSmsPromoEnabled()) {
                 $promo = $order->getExtraData('promo');
                 if ($promo) {

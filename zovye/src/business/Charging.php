@@ -586,7 +586,18 @@ class Charging
                             'serial' => $serial,
                         ];
 
-                        if ($balance->change($bonus['val'], CommissionBalance::CHARGING_BONUS, $extra)) {
+                        $log = $balance->change(
+                            $bonus['val'],
+                            CommissionBalance::CHARGING_BONUS,
+                            $extra
+                        );
+                        if ($log) {
+                            $order->setExtraData('bonus', [
+                                'log' => $log->getId(),
+                                'val' => $log->getXVal(),
+                                'desc' => '奖励奖励',
+                            ]);
+                            $order->save();
                             break;
                         } else {
                             Log::error('charging', [

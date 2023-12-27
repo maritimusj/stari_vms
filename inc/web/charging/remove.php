@@ -28,9 +28,9 @@ $result = DBUtil::transactionDo(function () use ($id) {
     if ($group->destroy()) {
         $result = Device::query(['group_id' => $id])->findAll();
 
-        /** @var deviceModelObj $entry */
-        foreach ($result as $entry) {
-            $entry->setGroupId(0);
+        /** @var deviceModelObj $device */
+        foreach ($result as $device) {
+            $device->setGroupId(0);
         }
     }
 

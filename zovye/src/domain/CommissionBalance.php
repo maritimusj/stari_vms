@@ -47,6 +47,7 @@ class CommissionBalance extends State
     const CHARGING_FEE = 20;
     const CHARGING_SERVICE_FEE = 21;
     const CHARGING_ELECTRIC_FEE = 22;
+    const CHARGING_BONUS = 23;
 
     const FUELING_FEE = 30;
 
@@ -72,6 +73,7 @@ class CommissionBalance extends State
         self::CHARGING_FEE => '充电桩订单结算',
         self::CHARGING_SERVICE_FEE => '充电桩订单(服务费)',
         self::CHARGING_ELECTRIC_FEE => '充电桩订单(电费)',
+        self::CHARGING_BONUS => '充电奖励',
         self::FUELING_FEE => '尿素加注订单结算',
         self::TRANSFER_OUT => '转账给用户',
         self::TRANSFER_RECEIVED => '收到转账',
@@ -401,6 +403,32 @@ CHARGING;
 <dl class="log dl-horizontal">
 <dt>事件</dt>
 <dd class="event">充电订单结算</dd>
+<dt>订单</dt>
+<dd class="event">$order_info</dd>
+$group_info
+$device_info
+</dl>
+CHARGING;
+        } elseif ($entry->getSrc() == CommissionBalance::CHARGING_BONUS) {
+            $order_id = $entry->getExtraData('orderid');
+            $order = Order::get($order_id);
+            $order_info = '';
+            $device_info = '';
+            $group_info = '';
+            if ($order) {
+                $order_info = $order->getOrderNO();
+                $device = $order->getDevice();
+                if ($device) {
+                    $device_info = "<dt>充电桩</dt><dd class=\"admin\">{$device->getName()}</dd>";
+                }
+                $title = $order->getExtraData('group.title', '');
+                $address = $order->getExtraData('group.address', '');
+                $group_info = "<dt>站点</dt><dd class=\"admin\">$title</dd><dt>地址</dt><dd class=\"admin\">$address</dd>";
+            }
+            $data['memo'] = <<<CHARGING
+<dl class="log dl-horizontal">
+<dt>事件</dt>
+<dd class="event">充电奖励</dd>
 <dt>订单</dt>
 <dd class="event">$order_info</dd>
 $group_info

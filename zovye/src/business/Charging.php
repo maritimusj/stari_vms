@@ -566,6 +566,38 @@ class Charging
                 }
             }
 
+            // 满多少赠送多少设置
+            $group = $device->getGroup();
+            if ($group) {
+                $bonus_data = $group->getExtraData('bonus', []);
+                if ($bonus_data) {
+                    foreach ($bonus_data as $bonus) {
+                        if ($bonus['val'] < 1) {
+                            continue;
+                        }
+
+                        if (!empty($bonus['limit']) && $totalPrice < $bonus['limit']) {
+                            continue;
+                        }
+
+                        $balance = $user->getCommissionBalance();
+                        $extra = [
+                            'orderid' => $order->getId(),
+                            'serial' => $serial,
+                        ];
+
+                        if ($balance->change($bonus['val'], CommissionBalance::CHARGING_BONUS, $extra)) {
+                            break;
+                        } else {
+                            Log::error('charging', [
+                                'error' => '用户赠送金额失败！',
+                                'data' => $extra,
+                            ]);
+                        }
+                    }
+                }
+            }
+
             return true;
         });
     }

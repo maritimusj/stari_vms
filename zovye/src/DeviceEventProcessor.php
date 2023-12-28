@@ -592,6 +592,11 @@ class DeviceEventProcessor
 
             if ($device->isFuelingDevice()) {
                 Fueling::onEventOnline($device);
+            } else {
+                $config = $device->settings('extra.mcb_config', []);
+                if ($config) {
+                    $device->mcbPublish('config', '', $config);
+                }
             }
 
             Job::deviceEventNotify($device, Device::EVENT_ONLINE);

@@ -215,6 +215,7 @@
         <div class="panel panel-default panel-first">
             <div class="heading">
                 <span class="operate">
+                    <i class="fa fa-gear" title="主板配置"  @click="mcbConfig" v-show="active === 'extra'"></i>
                     <i class="fa fa-reply" title="返回"  onclick="backToList();"></i>
                 </span>
             </div>
@@ -937,6 +938,7 @@
 <script>
     const api = {
         url: "{php echo $this->createWebUrl('goods');}",
+        device_url: "{php echo $this->createWebUrl('device');}",
         dlg: null,
     }
 
@@ -977,6 +979,24 @@
     api.chooseGoods = function (params) {
         api.showResult({ pagesize: 10, ...params });
     }
+
+    api.mcbConfig = function(deviceId) {
+        api.showResult({
+            op: 'mcbConfig',
+            id: deviceId,
+        }, api.device_url);
+    }
+
+    api.saveMcbConfig = function(deviceId) {
+        api.showResult({
+            op: 'saveMcbConfig',
+            id: deviceId,
+            data: window.btoa(encodeURIComponent($('#json_text').val())),
+        }, api.device_url, false, function(res) {
+            api.hide();
+        });
+    }
+    
 
     require(['jquery', '{php \zovye\url(false, JS_VUE_URL);}', 'datetimepicker'], function ($, Vue, datetimepicker) {
         const api_url = "{php echo $this->createWebUrl('devicetypes');}";
@@ -1337,6 +1357,9 @@
                 },
                 editPackageGoodsNumDone(goods, index) {
                     this.calcPackageGoodsTotal(this.currentPackage);
+                },
+                mcbConfig() {
+                    api.mcbConfig(this.deviceId);
                 },
                 showDatetimePicker(o, e, datepicker = true, timepicker = false) {
                     if (o && !o.initilized) {

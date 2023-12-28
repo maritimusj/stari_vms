@@ -346,9 +346,9 @@ class keeper
                     'imei' => $device_ids,
                 ]);
 
-                /** @var deviceModelObj $entry */
-                foreach ($query->findAll() as $entry) {
-                    $entry->removeKeeper($keeper);
+                /** @var deviceModelObj $device */
+                foreach ($query->findAll() as $device) {
+                    $device->removeKeeper($keeper);
                 }
             }
 
@@ -375,9 +375,9 @@ class keeper
                 if ($group_ids) {
                     $query = Device::query(['group_id' => $group_ids, 'agent_id' => $agent->getId()]);
 
-                    /** @var deviceModelObj $entry */
-                    foreach ($query->findAll() as $entry) {
-                        $device_ids[] = $entry->getImei();
+                    /** @var deviceModelObj $device */
+                    foreach ($query->findAll() as $device) {
+                        $device_ids[] = $device->getImei();
                     }
 
                     $device_ids = array_unique($device_ids);
@@ -428,16 +428,16 @@ class keeper
                 'imei' => $device_ids,
             ]);
 
-            /** @var deviceModelObj $entry */
-            foreach ($query->findAll() as $entry) {
-                $keeper_data = $entry->getKeeperData($keeper);
+            /** @var deviceModelObj $device */
+            foreach ($query->findAll() as $device) {
+                $keeper_data = $device->getKeeperData($keeper);
                 if ($way != -1) {
                     $keeper_data['way'] = $way;
                 }
                 if ($kind != -1) {
                     $keeper_data['kind'] = $kind;
                 }
-                $entry->setKeeper($keeper, $set_commission($keeper_data));
+                $device->setKeeper($keeper, $set_commission($keeper_data));
             }
 
             return ['msg' => '分配成功！'];

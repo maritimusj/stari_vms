@@ -22,6 +22,6 @@ Response::templateJSON(
     '主板配置',
     [
         'device' => $device->profile(),
-        'data' => $data ? json_encode($data) : '',
+        'data' => $data ? json_encode($data, JSON_PRETTY_PRINT) : '',
     ]
 );

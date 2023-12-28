@@ -812,11 +812,15 @@ class agent
             return err('用户不存在！');
         }
 
-        $device_ids = [];
+        $devices = [];
 
         $device_id = Request::trim('deviceid');
         if (!empty($device_id)) {
-            $device_ids[] = $device_id;
+            $device = \zovye\api\wx\device::getDevice($device_id, $agent);
+            if (is_error($device)) {
+                return $device;
+            }
+            $devices[] = $device;
         }
 
         $group_id = Request::int('group');
@@ -825,21 +829,17 @@ class agent
                 'agent_id' => $agent->getId(),
                 'group_id' => $group_id,
             ]);
-            /** @var deviceModelObj $entry */
-            foreach ($query->findAll() as $entry) {
-                $device_ids[] = $entry->getImei();
+            /** @var deviceModelObj $device */
+            foreach ($query->findAll() as $device) {
+                if (!$device->isOwnerOrSuperior($agent)) {
+                    return err('没有权限管理这个设备！');
+                }
+                $devices[] = $device;
             }
         }
 
-        foreach ($device_ids as $device_id) {
-            $device = \zovye\api\wx\device::getDevice($device_id, $agent);
-            if (is_error($device)) {
-                return $device;
-            }
-
-            if (Device::bind($device, $target) && $device->save()) {
-                continue;
-            } else {
+        foreach ($devices as $device) {
+            if (!Device::bind($device, $target) && $device->save()) {
                 return err('转移设备失败！');
             }
         }
@@ -878,17 +878,17 @@ class agent
         ];
 
         if ($total > 0) {
-            /** @var deviceModelObj $entry */
-            foreach ($query->page($page, $page_size)->findAll() as $entry) {
-                $address = $entry->settings(
+            /** @var deviceModelObj $device */
+            foreach ($query->page($page, $page_size)->findAll() as $device) {
+                $address = $device->settings(
                     'extra.location.tencent.address',
-                    $entry->settings('extra.location.address')
+                    $device->settings('extra.location.address')
                 ) ?: '<地址未登记>';
                 $result['list'][] = [
-                    'id' => $entry->getImei(),
-                    'name' => $entry->getName(),
+                    'id' => $device->getImei(),
+                    'name' => $device->getName(),
                     'address' => $address,
-                    'remain' => intval($entry->getRemainNum()),
+                    'remain' => intval($device->getRemainNum()),
                 ];
             }
         }
@@ -925,16 +925,17 @@ class agent
         ];
 
         if ($total > 0) {
-            /** @var deviceModelObj $entry */
-            foreach ($query->page($page, $page_size)->findAll() as $entry) {
-                $address = $entry->settings(
+            /** @var deviceModelObj $device */
+            $list = $query->page($page, $page_size)->findAll();
+            foreach ($list as $device) {
+                $address = $device->settings(
                     'extra.location.tencent.address',
-                    $entry->settings('extra.location.address')
+                    $device->settings('extra.location.address')
                 ) ?: '<地址未登记>';
-                $last_error = $entry->getLastError();
+                $last_error = $device->getLastError();
                 $result['list'][] = [
-                    'id' => $entry->getImei(),
-                    'name' => $entry->getName(),
+                    'id' => $device->getImei(),
+                    'name' => $device->getName(),
                     'address' => $address,
                     'errorCode' => intval($last_error['errno']),
                     'errorDesc' => strval($last_error['message']),
@@ -957,18 +958,18 @@ class agent
 
         $list = [];
 
-        /** @var cronModelObj $entry */
-        foreach (Device::getAllScheduleTask($device) as $entry) {
-            $spec = $entry->getSpec();
+        /** @var cronModelObj $cron */
+        foreach (Device::getAllScheduleTask($device) as $cron) {
+            $spec = $cron->getSpec();
 
             $data = [
-                'id' => $entry->getId(),
+                'id' => $cron->getId(),
                 'spec' => $spec,
                 'desc' => Cron::describe($spec),
-                'total' => $entry->getTotal(),
-                'job_uid' => $entry->getJobUid(),
-                'next' => Device::getScheduleTaskNext($entry->getJobUid()),
-                'formatted_createtime' => date('Y-m-d H:i:s', $entry->getCreatetime()),
+                'total' => $cron->getTotal(),
+                'job_uid' => $cron->getJobUid(),
+                'next' => Device::getScheduleTaskNext($cron->getJobUid()),
+                'formatted_createtime' => date('Y-m-d H:i:s', $cron->getCreatetime()),
             ];
 
             $list[] = $data;

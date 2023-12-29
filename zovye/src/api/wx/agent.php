@@ -125,8 +125,11 @@ class agent
         /** @var userModelObj $user */
         $user = User::findOne(['mobile' => $mobile, 'app' => User::WX]);
         if (empty($user)) {
-            // 如果不是授权获取的手机号码，则返回错误代码1001，小程序请求用户授权获取手机号码
-            return error(isset($res['phoneNumber']) ? -1 : 1001, "您还不是我们的代理商，立即注册? [ $mobile ]");
+            $user = User::findOne(['mobile' => $mobile, 'app' => User::THIRD_ACCOUNT]);
+            if (empty($user)) {
+                // 如果不是授权获取的手机号码，则返回错误代码1001，小程序请求用户授权获取手机号码
+                return error(isset($res['phoneNumber']) ? -1 : 1001, "您还不是我们的代理商，立即注册? [ $mobile ]");
+            }
         }
 
         if ($res['config'] && !$user->isWxAppAllowed($res['config']['key'])) {

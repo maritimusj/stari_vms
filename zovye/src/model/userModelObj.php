@@ -56,6 +56,7 @@ use function zovye\tb;
  * @method setLockedUid(string $UNLOCKED)
  * @method setOpenid($getOpenid)
  * @method getApp()
+ * @method setApp($app)
  * @method setS1(string $s1)
  *
  * @property login_dataModelObj $loginData

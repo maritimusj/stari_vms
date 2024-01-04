@@ -40,6 +40,12 @@ class keeper_devicesModelObj extends ModelObj
     /** @var int */
     protected $commission_fixed;
 
+    /** @var int */
+    protected $commission_free_percent;
+
+    /** @var int */
+    protected $commission_free_fixed;
+
     protected $way; //佣金类型 0 销售分成 1 补货分成
 
     protected $kind; //补货权限 0 没有 1 有
@@ -68,6 +74,22 @@ class keeper_devicesModelObj extends ModelObj
         $this->setDirty(['commission_percent', 'way', 'commission_fixed']);
     }
 
+    public function setCommissionFreePercent($percent, $way = Keeper::COMMISSION_ORDER)
+    {
+        $this->commission_free_percent = $percent;
+        $this->commission_free_fixed = -1;
+        $this->way = $way;
+        $this->setDirty(['commission_free_percent', 'way', 'commission_free_fixed']);
+    }
+
+    public function setCommissionFreeFixed($fixed, $way = Keeper::COMMISSION_ORDER)
+    {
+        $this->commission_free_fixed = $fixed;
+        $this->commission_free_percent = -1;
+        $this->way = $way;
+        $this->setDirty(['commission_free_percent', 'way', 'commission_free_fixed']);
+    }
+
     /**
      *
      * @return array
@@ -80,6 +102,23 @@ class keeper_devicesModelObj extends ModelObj
 
         if ($this->commission_fixed != -1) {
             return [$this->commission_fixed, intval($this->way), false];
+        }
+
+        return Keeper::DEFAULT_COMMISSION_VAL;
+    }
+
+        /**
+     *
+     * @return array
+     */
+    public function getFreeCommissionValue(): array
+    {
+        if ($this->commission_free_percent != -1) {
+            return [$this->commission_free_percent / 100, intval($this->way), true];
+        }
+
+        if ($this->commission_free_fixed != -1) {
+            return [$this->commission_free_fixed, intval($this->way), false];
         }
 
         return Keeper::DEFAULT_COMMISSION_VAL;

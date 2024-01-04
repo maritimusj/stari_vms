@@ -32,22 +32,34 @@ if (empty($device)) {
     JSON::fail('找不到这个设备！');
 }
 
-if ($device->getCommissionFixed() != -1) {
-    $commission_val = number_format(abs($device->getCommissionFixed()) / 100, 2);
-    $commission_type = 'fixed';
+$data = [
+    'device' => $device->profile(),
+    'kind' => $device->getKind(),
+    'way' => $device->getWay(),
+];
+
+if (App::isKeeperCommissionOrderDistinguishEnabled()) {
+    if ($device->getCommissionFixed() != -1) {
+        $data['pay_val'] = number_format(abs($device->getCommissionFixed()) / 100, 2, '.', '');
+        $data['free_val'] = number_format(abs($device->getCommissionFreeFixed()) / 100, 2, '.', '');
+        $data['type'] = 'fixed';
+    } else {
+        $data['pay_val'] = number_format($device->getCommissionPercent() / 100, 2, '.', '');
+        $data['free_val'] = number_format($device->getCommissionFreePercent() / 100, 2, '.', '');
+        $data['type'] = 'percent';
+    }
 } else {
-    $commission_val = number_format($device->getCommissionPercent() / 100, 2);
-    $commission_type = 'percent';
+    if ($device->getCommissionFixed() != -1) {
+        $data['val'] = number_format(abs($device->getCommissionFixed()) / 100, 2, '.', '');
+        $data['type'] = 'fixed';
+    } else {
+        $data['val'] = number_format($device->getCommissionPercent() / 100, 2, '.', '');
+        $data['type'] = 'percent';
+    }
 }
 
 Response::templateJSON(
     'web/user/keeper_device_edit',
     "设备佣金[ {$device->getName()} ]",
-    [
-        'device' => $device->profile(),
-        'val' => $commission_val,
-        'type' => $commission_type,
-        'kind' => $device->getKind(),
-        'way' => $device->getWay(),
-    ]
+    $data
 );

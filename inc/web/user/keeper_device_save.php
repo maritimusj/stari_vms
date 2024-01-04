@@ -37,21 +37,44 @@ $data = [
     'way' => Request::int('way'),
 ];
 
-$commission_val = Request::float('val', 0, 2);
-$commission_type = Request::str('type', 'fixed');
-
-if ($commission_type == 'fixed') {
-    $data['fixed'] = max(0, intval($commission_val * 100));
+if (App::isKeeperCommissionOrderDistinguishEnabled()) {
+    $pay_commission_val = Request::float('pay_val', 0, 2);
+    $free_commission_val = Request::float('free_val', 0, 2);
+    $commission_type = Request::str('type', 'fixed');
+    
+    if ($commission_type == 'fixed') {
+        $data['fixed'] = max(0, intval($pay_commission_val * 100));
+        $data['free_fixed'] = max(0, intval($free_commission_val * 100));
+    } else {
+        $data['percent'] = max(0, min(10000, intval($pay_commission_val * 100)));
+        $data['free_percent'] = max(0, min(10000, intval($free_commission_val * 100)));
+    }
 } else {
-    $data['percent'] = max(0, min(10000, intval($commission_val * 100)));
+    $commission_val = Request::float('val', 0, 2);
+    $commission_type = Request::str('type', 'fixed');
+    
+    if ($commission_type == 'fixed') {
+        $data['fixed'] = max(0, intval($commission_val * 100));
+    } else {
+        $data['percent'] = max(0, min(10000, intval($commission_val * 100)));
+    }
 }
 
 $device->setKeeper($keeper, $data);
 
-JSON::success([
+$result = [
     'msg' => '保存成功！',
     'way' => empty($data['way']) ? '销售分成' : '补货分成',
     'kind' => $data['kind'],
     'type' => $commission_type,
-    'val' => $commission_type == 'fixed' ? number_format($data['fixed'] / 100, 2, '.', '') . '元' : number_format($data['percent'] / 100, 2, '.', '') . '%',
-]);
+    'data' => $data,
+];
+
+if (App::isKeeperCommissionOrderDistinguishEnabled()) {
+    $result['pay_val'] = $commission_type == 'fixed' ? number_format($data['fixed'] / 100, 2, '.', '') . '元' : number_format($data['percent'] / 100, 2, '.', '') . '%';
+    $result['free_val'] = $commission_type == 'fixed' ? number_format($data['free_fixed'] / 100, 2, '.', '') . '元' : number_format($data['free_percent'] / 100, 2, '.', '') . '%';
+} else {
+    $result['val'] = $commission_type == 'fixed' ? number_format($data['fixed'] / 100, 2, '.', '') . '元' : number_format($data['percent'] / 100, 2, '.', '') . '%';
+}
+
+JSON::success($result);

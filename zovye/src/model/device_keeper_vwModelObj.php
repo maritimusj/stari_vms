@@ -29,6 +29,12 @@ class device_keeper_vwModelObj extends deviceModelObj
     /** @var int */
     protected $commission_fixed;
 
+    /** @var int */
+    protected $commission_free_percent;
+
+    /** @var int */
+    protected $commission_free_fixed;
+
     public static function getTableName($read_or_write): string
     {
         if ($read_or_write == self::OP_WRITE) {

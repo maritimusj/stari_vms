@@ -9,7 +9,7 @@
         </div>
     </div>
     <div class="form-group">
-        <label class="col-xs-12 col-md-2 col-md-2 control-label">方式</label>
+        <label class="col-xs-12 col-md-2 col-md-2 control-label">分佣时机</label>
         <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
             <label for="way0" class="radio-inline">
                 <input name="way" id="way0" type="radio" value="0" {if empty($way)}checked="checked"{/if}>
@@ -19,11 +19,11 @@
                 <input name="way" id="way1" type="radio" value="1"  {if !empty($way)}checked="checked"{/if}>
                 补货分成
             </label>
-            <span class="help-block">* 销售分成：设备售出商品获得分成；补货分成：完成补货即可获得分成。</span>
+            <span class="help-block">* 销售分成：设备售出商品获得分成；补货分成：完成补货即可获得分成</span>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-xs-12 col-md-2 col-md-2 control-label">类型</label>
+        <label class="col-xs-12 col-md-2 col-md-2 control-label">计算方式</label>
         <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
             <label for="type0" class="radio-inline">
                 <input name="type" id="type0" type="radio" value="fixed" {if $type == 'fixed'}checked="checked"{/if}>
@@ -35,12 +35,39 @@
             </label>
         </div>
     </div>
+    {if \zovye\App::isKeeperCommissionOrderDistinguishEnabled()}
+    <div class="way0">
+        <div class="form-group">
+            <label for="payCommissionVal" class="col-md-2 control-label"><span id="payCommissionTitle">金额(元)</span></label>
+            <div class="col-md-10">
+                <input type="number" class="form-control" name="payCommissionVal" id="payCommissionVal" value="{$pay_val}"  min="0.01" step="0.01">
+                <span class="help-block">* <b>支付订单</b>的佣金</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="freeCommissionVal" class="col-md-2 control-label"><span id="freeCommissionTitle">金额(元)</span></label>
+            <div class="col-md-10">
+                <input type="number" class="form-control" name="freeCommissionVal" id="freeCommissionVal" value="{$free_val}"  min="0.01" step="0.01">
+                <span class="help-block">* <b>免费订单</b>的佣金</span>
+            </div>
+        </div>
+    </div>
+    <div class="way1">
+        <div class="form-group">
+            <label for="commissionVal" class="col-md-2 control-label"><span id="commissionTitle">金额(元)</span></label>
+            <div class="col-md-10">
+                <input type="number" class="form-control" name="commissionVal" id="commissionVal" value="{$val}"  min="0.01" step="0.01">
+            </div>
+        </div>
+    </div>
+    {else}
     <div class="form-group">
-        <label for="commissionVal" class="col-md-2 control-label"><span id="commissionTitle">金额</span></label>
+        <label for="commissionVal" class="col-md-2 control-label"><span id="commissionTitle">金额(元)</span></label>
         <div class="col-md-10">
             <input type="number" class="form-control" name="commissionVal" id="commissionVal" value="{$val}"  min="0.01" step="0.01">
         </div>
     </div>
+    {/if}
     <div class="form-group">
         <div class="col-md-offset-2 col-md-10" style="text-align: right;">
             <button type="button" class="btn btn-primary" data-op="keeper_device_save">保存</button>
@@ -48,6 +75,36 @@
         </div>
     </div>
 </form>
+{if \zovye\App::isKeeperCommissionOrderDistinguishEnabled()}
+<script>
+    $(function() {
+        changeTitle("{$type}");
+        changeWay("{$way}");
+
+        $('input[name=type]').change(function() {
+            changeTitle($(this).val());
+        });
+
+        $('input[name=way]').change(function() {
+            changeWay($(this).val());
+        });
+    })
+    function changeTitle(type) {
+        $('#payCommissionTitle').text(type === 'percent' ? '比例(%)' : '金额(元)');
+        $('#freeCommissionTitle').text(type === 'percent' ? '比例(%)' : '金额(元)');
+        $('#commissionTitle').text(type === 'percent' ? '比例(%)' : '金额(元)');
+    }
+    function changeWay(way) {
+        if (way === '1') {
+            $('.way0').hide();
+            $('.way1').show();
+        } else {
+            $('.way0').show();
+            $('.way1').hide();
+        }
+    }
+</script>
+{else}
 <script>
     $(function() {
         changeTitle("{$type}")
@@ -59,3 +116,4 @@
         $('#commissionTitle').text(type === 'percent' ? '比例(%)' : '金额(元)');
     }
 </script>
+{/if}

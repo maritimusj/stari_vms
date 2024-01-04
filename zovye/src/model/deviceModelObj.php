@@ -2434,21 +2434,40 @@ class deviceModelObj extends ModelObj
             /** @var keeper_devicesModelObj $res */
             $res = m('keeper_devices')->findOne($cond);
             if (!empty($res)) {
-                if ($data['fixed']) {
-                    $res->setCommissionFixed(intval($data['fixed']));
+                if (App::isKeeperCommissionOrderDistinguishEnabled()) {
+                    if ($data['fixed']) {
+                        $res->setCommissionFixed(intval($data['fixed']));
+                        $res->setCommissionFreeFixed(intval($data['free_fixed']));
+                    } else {
+                        $res->setCommissionPercent(intval($data['percent']));
+                        $res->setCommissionFreePercent(intval($data['free_percent']));
+                    }
                 } else {
-                    $res->setCommissionPercent(intval($data['percent']));
+                    if ($data['fixed']) {
+                        $res->setCommissionFixed(intval($data['fixed']));
+                    } else {
+                        $res->setCommissionPercent(intval($data['percent']));
+                    }
                 }
-
                 $res->setKind(intval($data['kind']));
                 $res->setWay(intval($data['way']));
 
                 return $res->save();
             } else {
-                if (isset($data['percent'])) {
-                    $cond['commission_percent'] = intval($data['percent']);
+                if (App::isKeeperCommissionOrderDistinguishEnabled()) {
+                    if (isset($data['percent'])) {
+                        $cond['commission_percent'] = intval($data['percent']);
+                        $cond['commission_free_percent'] = intval($data['free_percent']);
+                    } else {
+                        $cond['commission_fixed'] = intval($data['fixed']);
+                        $cond['commission_free_fixed'] = intval($data['free_fixed']);
+                    }
                 } else {
-                    $cond['commission_fixed'] = intval($data['fixed']);
+                    if (isset($data['percent'])) {
+                        $cond['commission_percent'] = intval($data['percent']);
+                    } else {
+                        $cond['commission_fixed'] = intval($data['fixed']);
+                    }
                 }
 
                 $cond['kind'] = intval($data['kind']);

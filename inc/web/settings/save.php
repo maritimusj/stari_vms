@@ -185,6 +185,7 @@ if ($page == 'device') {
     $settings['custom']['TKPromoting']['enabled'] = Request::bool('TKPromotingEnabled') ? 1 : 0;
     $settings['custom']['longPressOrder']['enabled'] = Request::bool('longPressOrderEnabled') ? 1 : 0;
     $settings['custom']['keeper']['commissionLimit']['enabled'] = Request::bool('KeeperCommissionLimitEnabled') ? 1 : 0;
+    $settings['custom']['keeper']['commissionOrderDistinguish']['enabled'] = Request::bool('KeeperCommissionOrderDistinguishEnabled') ? 1 : 0;
 
     Config::app('ad.sponsor.enabled', Request::bool('sponsorAd'), true);
     Config::app('misc.GoodsExpireAlert.enabled', Request::bool('GoodsExpireAlert') ? 1 : 0, true);

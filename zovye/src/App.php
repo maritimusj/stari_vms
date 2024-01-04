@@ -513,4 +513,9 @@ class App
     {
         return settings('custom.keeper.commissionLimit.enabled', false);
     }
+
+    public static function isKeeperCommissionOrderDistinguishEnabled(): bool
+    {
+        return settings('custom.keeper.commissionOrderDistinguish.enabled', false);
+    }
 }

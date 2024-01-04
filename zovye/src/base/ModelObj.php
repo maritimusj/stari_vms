@@ -333,7 +333,9 @@ abstract class ModelObj implements ISettings
     public function __setData(array $data): ModelObj
     {
         foreach (self::getProps(true) as $prop => $type_hints) {
-            $this->$prop = convert($data[$prop], $type_hints);
+            if (isset($data[$prop])) {
+                $this->$prop = convert($data[$prop], $type_hints);
+            }
         }
 
         return $this;

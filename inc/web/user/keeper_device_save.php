@@ -3,7 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
- 
+
 namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
@@ -36,13 +36,13 @@ if (empty($device)) {
 $data = [
     'kind' => Request::int('kind'),
     'way' => Request::int('way'),
-    'type' =>  Request::str('type', 'fixed'),
+    'type' => Request::str('type', 'fixed'),
 ];
 
 if (App::isKeeperCommissionOrderDistinguishEnabled() && $data['way'] == Keeper::COMMISSION_ORDER) {
     $pay_commission_val = Request::float('pay_val', 0, 2);
     $free_commission_val = Request::float('free_val', 0, 2);
-    
+
     if ($data['type'] == 'fixed') {
         $data['fixed'] = max(0, intval($pay_commission_val * 100));
         $data['free_fixed'] = max(0, intval($free_commission_val * 100));
@@ -70,10 +70,25 @@ $result = [
 ];
 
 if (App::isKeeperCommissionOrderDistinguishEnabled() && $data['way'] == Keeper::COMMISSION_ORDER) {
-    $result['pay_val'] = $data['type'] == 'fixed' ? number_format($data['fixed'] / 100, 2, '.', '') . '元' : number_format($data['percent'] / 100, 2, '.', '') . '%';
-    $result['free_val'] = $data['type'] == 'fixed' ? number_format($data['free_fixed'] / 100, 2, '.', '') . '元' : number_format($data['free_percent'] / 100, 2, '.', '') . '%';
+    $result['pay_val'] = $data['type'] == 'fixed' ? number_format(
+            $data['fixed'] / 100,
+            2,
+            '.',
+            ''
+        ).'元' : number_format($data['percent'] / 100, 2, '.', '').'%';
+    $result['free_val'] = $data['type'] == 'fixed' ? number_format(
+            $data['free_fixed'] / 100,
+            2,
+            '.',
+            ''
+        ).'元' : number_format($data['free_percent'] / 100, 2, '.', '').'%';
 } else {
-    $result['val'] = $data['type'] == 'fixed' ? number_format($data['fixed'] / 100, 2, '.', '') . '元' : number_format($data['percent'] / 100, 2, '.', '') . '%';
+    $result['val'] = $data['type'] == 'fixed' ? number_format($data['fixed'] / 100, 2, '.', '').'元' : number_format(
+            $data['percent'] / 100,
+            2,
+            '.',
+            ''
+        ).'%';
 }
 
 JSON::success($result);

@@ -3,7 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
- 
+
 namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
@@ -11,7 +11,9 @@ defined('IN_IA') or exit('Access Denied');
 use zovye\domain\Device;
 use zovye\domain\Keeper;
 use zovye\domain\User;
+use zovye\model\device_keeper_vwModelObj;
 use zovye\model\deviceModelObj;
+use zovye\model\keeper_devicesModelObj;
 
 $user = User::get(Request::int('user'));
 if (empty($user)) {
@@ -23,7 +25,7 @@ if (empty($keeper)) {
     JSON::fail('这个用户不是运营人员！');
 }
 
-/** @var deviceModelObj $entry */
+/** @var device_keeper_vwModelObj $device */
 $device = Device::query([
     'keeper_id' => $keeper->getId(),
     'id' => Request::int('id'),
@@ -40,7 +42,7 @@ $data = [
 ];
 
 if (App::isKeeperCommissionOrderDistinguishEnabled() && $device->getWay() == Keeper::COMMISSION_ORDER) {
-    if ($device->getCommissionFixed() != -1) {
+    if ($device->isFixedValue()) {
         $data['pay_val'] = number_format(abs($device->getCommissionFixed()) / 100, 2, '.', '');
         $data['free_val'] = number_format(abs($device->getCommissionFreeFixed()) / 100, 2, '.', '');
         $data['type'] = 'fixed';
@@ -50,7 +52,7 @@ if (App::isKeeperCommissionOrderDistinguishEnabled() && $device->getWay() == Kee
         $data['type'] = 'percent';
     }
 } else {
-    if ($device->getCommissionFixed() != -1) {
+    if ($device->isFixedValue()) {
         $data['val'] = number_format(abs($device->getCommissionFixed()) / 100, 2, '.', '');
         $data['type'] = 'fixed';
     } else {

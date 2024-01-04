@@ -3,7 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
- 
+
 namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
@@ -43,7 +43,7 @@ foreach ($query->findAll() as $item) {
         'imei' => $item->getImei(),
     ];
     if (App::isKeeperCommissionOrderDistinguishEnabled() && $item->getWay() == Keeper::COMMISSION_ORDER) {
-        if ($item->getCommissionFreeFixed() != -1) {
+        if ($item->isFixedValue()) {
             $data['pay_val'] = number_format(abs($item->getCommissionFixed()) / 100, 2).'元';
             $data['free_val'] = number_format(abs($item->getCommissionFreeFixed()) / 100, 2).'元';
         } else {
@@ -51,7 +51,7 @@ foreach ($query->findAll() as $item) {
             $data['free_val'] = number_format($item->getCommissionFreePercent() / 100, 2).'%';
         }
     } else {
-        if ($item->getCommissionFixed() != -1) {
+        if ($item->isFixedValue()) {
             $data['val'] = number_format(abs($item->getCommissionFixed()) / 100, 2).'元';
         } else {
             $data['val'] = number_format($item->getCommissionPercent() / 100, 2).'%';

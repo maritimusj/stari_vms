@@ -22,6 +22,8 @@ use function zovye\tb;
  * @method getCreatetime()
  * @method getName()
  * @method getImei()
+ * @method getCommissionFreeFixed()
+ * @method getCommissionFreePercent()
  */
 class keeper_devicesModelObj extends ModelObj
 {
@@ -56,6 +58,11 @@ class keeper_devicesModelObj extends ModelObj
     public static function getTableName($read_or_write): string
     {
         return tb('keeper_devices');
+    }
+
+    public function isFixedValue(): bool
+    {
+        return $this->commission_fixed != -1;
     }
 
     public function setCommissionPercent($percent, $way = Keeper::COMMISSION_ORDER)
@@ -96,15 +103,11 @@ class keeper_devicesModelObj extends ModelObj
      */
     public function getCommissionValue(): array
     {
-        if ($this->commission_percent != -1) {
-            return [$this->commission_percent / 100, intval($this->way), true];
-        }
-
-        if ($this->commission_fixed != -1) {
+        if ($this->isFixedValue()) {
             return [$this->commission_fixed, intval($this->way), false];
         }
 
-        return Keeper::DEFAULT_COMMISSION_VAL;
+        return [$this->commission_percent / 100, intval($this->way), true];
     }
 
         /**

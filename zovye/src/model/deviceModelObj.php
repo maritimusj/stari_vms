@@ -2344,7 +2344,7 @@ class deviceModelObj extends ModelObj
                 'way' => $res->getWay(),
             ];
 
-            if ($res->getCommissionFixed() != -1) {
+            if ($res->isFixedValue()) {
                 $data['fixed'] = $res->getCommissionFixed();
             } else {
                 $data['percent'] = $res->getCommissionPercent();

@@ -12,8 +12,13 @@ use function zovye\tb;
 /**
  * Class device_keeper_vwModelObj
  * @package zovye
- * @method getKeeper_id()
+ * @method getKeeperId()
  * @method getKind()
+ * @method getWay()
+ * @method getCommissionFixed()
+ * @method getCommissionFreeFixed()
+ * @method getCommissionPercent()
+ * @method getCommissionFreePercent()
  */
 class device_keeper_vwModelObj extends deviceModelObj
 {
@@ -46,6 +51,11 @@ class device_keeper_vwModelObj extends deviceModelObj
         trigger_error('user getTableName(...) miss op!');
 
         return '';
+    }
+
+    public function isFixedValue(): bool
+    {
+        return $this->commission_fixed != -1;
     }
 
     function getKeeper(): ?keeperModelObj

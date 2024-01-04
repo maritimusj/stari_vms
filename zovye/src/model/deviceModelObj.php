@@ -2421,66 +2421,68 @@ class deviceModelObj extends ModelObj
 
     public function setKeeper($keeper, $data = []): bool
     {
-        if (!empty($keeper)) {
-            if ($keeper instanceof keeperModelObj) {
-                $keeper_id = $keeper->getId();
+        if (empty($keeper)) {
+            return false;
+        }
+
+        if ($keeper instanceof keeperModelObj) {
+            $keeper_id = $keeper->getId();
+        } else {
+            $keeper_id = intval($keeper);
+        }
+
+        $cond = [
+            'keeper_id' => $keeper_id,
+            'device_id' => $this->getId(),
+        ];
+
+        /** @var keeper_devicesModelObj $res */
+        $res = m('keeper_devices')->findOne($cond);
+        if (!empty($res)) {
+            if (App::isKeeperCommissionOrderDistinguishEnabled()) {
+                if ($data['fixed']) {
+                    $res->setCommissionFixed(intval($data['fixed']));
+                    $res->setCommissionFreeFixed(intval($data['free_fixed']));
+                } else {
+                    $res->setCommissionPercent(intval($data['percent']));
+                    $res->setCommissionFreePercent(intval($data['free_percent']));
+                }
             } else {
-                $keeper_id = intval($keeper);
+                if ($data['fixed']) {
+                    $res->setCommissionFixed(intval($data['fixed']));
+                } else {
+                    $res->setCommissionPercent(intval($data['percent']));
+                }
             }
-            $cond = [
-                'keeper_id' => $keeper_id,
-                'device_id' => $this->getId(),
-            ];
 
-            /** @var keeper_devicesModelObj $res */
-            $res = m('keeper_devices')->findOne($cond);
-            if (!empty($res)) {
-                if (App::isKeeperCommissionOrderDistinguishEnabled()) {
-                    if ($data['fixed']) {
-                        $res->setCommissionFixed(intval($data['fixed']));
-                        $res->setCommissionFreeFixed(intval($data['free_fixed']));
-                    } else {
-                        $res->setCommissionPercent(intval($data['percent']));
-                        $res->setCommissionFreePercent(intval($data['free_percent']));
-                    }
-                } else {
-                    if ($data['fixed']) {
-                        $res->setCommissionFixed(intval($data['fixed']));
-                    } else {
-                        $res->setCommissionPercent(intval($data['percent']));
-                    }
-                }
-                $res->setKind(intval($data['kind']));
-                $res->setWay(intval($data['way']));
+            $res->setKind(intval($data['kind']));
+            $res->setWay(intval($data['way']));
 
-                return $res->save();
+            return $res->save();
+        }
+
+        if (App::isKeeperCommissionOrderDistinguishEnabled()) {
+            if (isset($data['percent'])) {
+                $cond['commission_percent'] = intval($data['percent']);
+                $cond['commission_free_percent'] = intval($data['free_percent']);
             } else {
-                if (App::isKeeperCommissionOrderDistinguishEnabled()) {
-                    if (isset($data['percent'])) {
-                        $cond['commission_percent'] = intval($data['percent']);
-                        $cond['commission_free_percent'] = intval($data['free_percent']);
-                    } else {
-                        $cond['commission_fixed'] = intval($data['fixed']);
-                        $cond['commission_free_fixed'] = intval($data['free_fixed']);
-                    }
-                } else {
-                    if (isset($data['percent'])) {
-                        $cond['commission_percent'] = intval($data['percent']);
-                    } else {
-                        $cond['commission_fixed'] = intval($data['fixed']);
-                    }
-                }
-
-                $cond['kind'] = intval($data['kind']);
-                $cond['way'] = intval($data['way']);
-
-                $res = m('keeper_devices')->create($cond);
-
-                return !empty($res);
+                $cond['commission_fixed'] = intval($data['fixed']);
+                $cond['commission_free_fixed'] = intval($data['free_fixed']);
+            }
+        } else {
+            if (isset($data['percent'])) {
+                $cond['commission_percent'] = intval($data['percent']);
+            } else {
+                $cond['commission_fixed'] = intval($data['fixed']);
             }
         }
 
-        return false;
+        $cond['kind'] = intval($data['kind']);
+        $cond['way'] = intval($data['way']);
+
+        $res = m('keeper_devices')->create($cond);
+
+        return !empty($res);
     }
 
     public function hasKeeper($keeper, $op = null): bool

@@ -7,6 +7,7 @@
 namespace zovye\model;
 
 use zovye\base\ModelObj;
+use zovye\domain\CommissionValue;
 use zovye\domain\Keeper;
 use function zovye\tb;
 
@@ -99,31 +100,10 @@ class keeper_devicesModelObj extends ModelObj
 
     /**
      *
-     * @return array
+     * @return CommissionValue
      */
-    public function getCommissionValue(): array
+    public function getCommissionValue(): CommissionValue
     {
-        if ($this->isFixedValue()) {
-            return [$this->commission_fixed, intval($this->way), false];
-        }
-
-        return [$this->commission_percent / 100, intval($this->way), true];
-    }
-
-        /**
-     *
-     * @return array
-     */
-    public function getFreeCommissionValue(): array
-    {
-        if ($this->commission_free_percent != -1) {
-            return [$this->commission_free_percent / 100, intval($this->way), true];
-        }
-
-        if ($this->commission_free_fixed != -1) {
-            return [$this->commission_free_fixed, intval($this->way), false];
-        }
-
-        return Keeper::DEFAULT_COMMISSION_VAL;
+        return CommissionValue::from($this);
     }
 }

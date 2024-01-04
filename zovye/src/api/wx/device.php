@@ -50,7 +50,7 @@ class device
 
         $extra = $device->get('extra', []);
 
-        list($v, $way, $is_percent) = $device->getCommissionValue($keeper_id);
+        $commission_val = $device->getCommissionValue($keeper_id);
 
         $location = isEmptyArray($extra['location']['tencent']) ? $extra['location'] : $extra['location']['tencent'];
 
@@ -65,7 +65,7 @@ class device
                     'keeper_id' => $keeper_id,
                     'id' => $device->hasKeeper($keeper_id) ? $keeper_id : 0,
                     'kind' => $device->getKeeperKind($keeper_id),
-                    'way' => $way,
+                    'commission' => $commission_val ? $commission_val->format() : null,
                 ],
                 'extra' => [
                     'is_down' => $device->isMaintenance() ? 1 : 0,
@@ -73,11 +73,6 @@ class device
             ];
             if (!isEmptyArray($location)) {
                 $result['extra']['location'] = $location;
-            }
-            if ($is_percent) {
-                $result['keeper']['percent'] = $v;
-            } else {
-                $result['keeper']['fixed'] = $v;
             }
 
             return $result;
@@ -108,15 +103,12 @@ class device
                 //暂未实现
             ],
             'keeper' => [
+                'keeper_id' => $keeper_id,
+                'id' => $device->hasKeeper($keeper_id) ? $keeper_id : 0,
                 'kind' => $device->getKeeperKind($keeper_id),
+                'commission' => $commission_val ? $commission_val->format() : null,
             ],
         ];
-
-        if ($is_percent) {
-            $result['keeper']['percent'] = $v;
-        } else {
-            $result['keeper']['fixed'] = $v;
-        }
 
         $device_type = DeviceTypes::from($device);
         if ($device_type) {
@@ -1060,12 +1052,12 @@ class device
         $keepers = $device->getKeepers();
 
         foreach ($keepers as $keeper) {
+            $commission_val = $keeper->getCommissionValue($device);
             $data = [
                 'name' => $keeper->getName(),
                 'mobile' => $keeper->getMobile(),
                 'kind' => $keeper->getKind($device),
-                'commission' => $keeper->getCommissionValue($device),
-
+                'commission' => $commission_val ? $commission_val->format() : null,
             ];
 
             $user = $keeper->getUser();

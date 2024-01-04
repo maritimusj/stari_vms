@@ -894,9 +894,26 @@ class keeper
             return 0;
         };
 
-        list($v, $way, $is_percent) = $keeper->getCommissionValue($device);
-        if ($way == \zovye\domain\Keeper::COMMISSION_RELOAD) {
-            if ($is_percent) {
+        $commission_val = $keeper->getCommissionValue($device);
+        if ($commission_val != null && $commission_val->getWay() == \zovye\domain\Keeper::COMMISSION_RELOAD) {
+            if ($commission_val->isFixed()) {
+                $v = $commission_val->getValue();
+                $commission_price_calc = function ($num) use ($v, $keeper) {
+                    if (App::isKeeperCommissionLimitEnabled()) {
+                        //运营人员补货数量限制为-1表示不限制，否则必须 > 0才能获得佣金
+                        $valid_commission_total = $keeper->getCommissionLimitTotal();
+                        if ($valid_commission_total != -1) {
+                            $num = min($valid_commission_total, $num);
+                            $keeper->setCommissionLimitTotal(max(0, $valid_commission_total - $num));
+                            if (!$keeper->save()) {
+                                throw new RuntimeException('保存数据失败！[501]');
+                            }
+                        }
+                    }
+                    return intval($v * $num);
+                };
+            } else {
+                $v = $commission_val->getValue();
                 $commission_price_calc = function ($num, $goods_id) use ($v, $device, $keeper) {
                     if (App::isKeeperCommissionLimitEnabled()) {
                         //运营人员补货数量限制为-1表示不限制，否则必须 > 0才能获得佣金
@@ -912,21 +929,6 @@ class keeper
                     $goods = $device->getGoods($goods_id, false);
                     $price = $goods ? intval($goods['price']) : 0;
                     return intval(round($num * $price * $v / 100));
-                };
-            } else {
-                $commission_price_calc = function ($num) use ($v, $keeper) {
-                    if (App::isKeeperCommissionLimitEnabled()) {
-                        //运营人员补货数量限制为-1表示不限制，否则必须 > 0才能获得佣金
-                        $valid_commission_total = $keeper->getCommissionLimitTotal();
-                        if ($valid_commission_total != -1) {
-                            $num = min($valid_commission_total, $num);
-                            $keeper->setCommissionLimitTotal(max(0, $valid_commission_total - $num));
-                            if (!$keeper->save()) {
-                                throw new RuntimeException('保存数据失败！[501]');
-                            }
-                        }
-                    }
-                    return intval($v * $num);
                 };
             }
         }

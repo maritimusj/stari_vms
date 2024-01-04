@@ -9,6 +9,7 @@ namespace zovye\model;
 use zovye\base\ModelObj;
 use zovye\base\ModelObjFinder;
 use zovye\domain\Agent;
+use zovye\domain\CommissionValue;
 use zovye\domain\Keeper;
 use zovye\domain\User;
 use zovye\traits\ExtraDataGettersAndSetters;
@@ -52,9 +53,9 @@ class keeperModelObj extends ModelObj
 
     /**
      * @param deviceModelObj $device
-     * @return array
+     * @return CommissionValue|null
      */
-    public function getCommissionValue(deviceModelObj $device): array
+    public function getCommissionValue(deviceModelObj $device): ?CommissionValue
     {
         $device_id = $device->getId();
         /** @var keeper_devicesModelObj $res */
@@ -69,7 +70,7 @@ class keeperModelObj extends ModelObj
             return $res->getCommissionValue();
         }
 
-        return Keeper::DEFAULT_COMMISSION_VAL;
+        return null;
     }
 
     public function deviceQuery(): ModelObjFinder

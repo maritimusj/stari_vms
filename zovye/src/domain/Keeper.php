@@ -25,8 +25,6 @@ class Keeper
     //补货时分佣
     const COMMISSION_RELOAD = 1;
 
-    const DEFAULT_COMMISSION_VAL = [0, Keeper::COMMISSION_ORDER, true];
-
     private static $cache = [];
 
     public static function model(): base\ModelFactory

@@ -19,6 +19,7 @@ use zovye\domain\AdStats;
 use zovye\domain\Advertising;
 use zovye\domain\Agent;
 use zovye\domain\Balance;
+use zovye\domain\CommissionValue;
 use zovye\domain\Device;
 use zovye\domain\DeviceEvents;
 use zovye\domain\DeviceLogs;
@@ -2390,7 +2391,7 @@ class deviceModelObj extends ModelObj
         return 0;
     }
 
-    public function getCommissionValue($keeper): array
+    public function getCommissionValue($keeper): ?CommissionValue
     {
         if ($keeper instanceof keeperModelObj) {
             $keeper_id = $keeper->getId();
@@ -2399,7 +2400,7 @@ class deviceModelObj extends ModelObj
         }
 
         if (empty($keeper_id)) {
-            return Keeper::DEFAULT_COMMISSION_VAL;
+            return null;
         }
 
         $device_id = $this->getId();
@@ -2415,7 +2416,7 @@ class deviceModelObj extends ModelObj
             return $res->getCommissionValue();
         }
 
-        return Keeper::DEFAULT_COMMISSION_VAL;
+        return null;
     }
 
     public function setKeeper($keeper, $data = []): bool

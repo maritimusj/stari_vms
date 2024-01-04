@@ -411,8 +411,8 @@ class CommissionEventHandler
             }
 
             //开始处理运营人员佣金
-            list($v, $way, $is_percent) = $keeper->getCommissionValue($device);
-            if ($way != Keeper::COMMISSION_ORDER) {
+            $commission_val = $keeper->getCommissionValue($device);
+            if ($commission_val != null && $commission_val->getWay() != Keeper::COMMISSION_ORDER) {
                 continue;
             }
 
@@ -430,10 +430,11 @@ class CommissionEventHandler
                 }
             }
 
-            if ($is_percent) {
-                $val = intval(round($commission_total * intval($v) / 100) * ($item_num / $order->getItemNum()));
-            } else {
+            $v = $order->isPay() ? $commission_val->getPayValue() : $commission_val->getFreeValue();
+            if ($commission_val->isFixed()) {
                 $val = intval($v * $item_num);
+            } else {
+                $val = intval(round($commission_total * intval($v) / 100) * ($item_num / $order->getItemNum()));
             }
 
             if ($val > $remaining_total) {

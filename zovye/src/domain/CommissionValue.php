@@ -80,12 +80,14 @@ class CommissionValue
     {
         if (App::isKeeperCommissionOrderDistinguishEnabled() && $this->way == Keeper::COMMISSION_ORDER) {
             return [
+                'way' => $this->way,
                 'pay_val' => $this->getPayValue(),
                 'free_val' => $this->getFreeValue(),
                 'type' => $this->isFixed() ? 'fixed' : 'percent',
             ];
         } else {
             return [
+                'way' => $this->way,
                 'val' => $this->getPayValue(),
                 'type' => $this->isFixed() ? 'fixed' : 'percent',
             ];

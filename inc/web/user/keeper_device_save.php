@@ -9,6 +9,7 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 use zovye\domain\Device;
+use zovye\domain\Keeper;
 use zovye\domain\User;
 use zovye\model\deviceModelObj;
 
@@ -35,14 +36,14 @@ if (empty($device)) {
 $data = [
     'kind' => Request::int('kind'),
     'way' => Request::int('way'),
+    'type' =>  Request::str('type', 'fixed'),
 ];
 
-if (App::isKeeperCommissionOrderDistinguishEnabled()) {
+if (App::isKeeperCommissionOrderDistinguishEnabled() && $data['way'] == Keeper::COMMISSION_ORDER) {
     $pay_commission_val = Request::float('pay_val', 0, 2);
     $free_commission_val = Request::float('free_val', 0, 2);
-    $commission_type = Request::str('type', 'fixed');
     
-    if ($commission_type == 'fixed') {
+    if ($data['type'] == 'fixed') {
         $data['fixed'] = max(0, intval($pay_commission_val * 100));
         $data['free_fixed'] = max(0, intval($free_commission_val * 100));
     } else {
@@ -51,9 +52,8 @@ if (App::isKeeperCommissionOrderDistinguishEnabled()) {
     }
 } else {
     $commission_val = Request::float('val', 0, 2);
-    $commission_type = Request::str('type', 'fixed');
-    
-    if ($commission_type == 'fixed') {
+
+    if ($data['type'] == 'fixed') {
         $data['fixed'] = max(0, intval($commission_val * 100));
     } else {
         $data['percent'] = max(0, min(10000, intval($commission_val * 100)));
@@ -64,17 +64,16 @@ $device->setKeeper($keeper, $data);
 
 $result = [
     'msg' => '保存成功！',
-    'way' => empty($data['way']) ? '销售分成' : '补货分成',
+    'way' => $data['way'],
     'kind' => $data['kind'],
-    'type' => $commission_type,
-    'data' => $data,
+    'type' => $data['type'],
 ];
 
-if (App::isKeeperCommissionOrderDistinguishEnabled()) {
-    $result['pay_val'] = $commission_type == 'fixed' ? number_format($data['fixed'] / 100, 2, '.', '') . '元' : number_format($data['percent'] / 100, 2, '.', '') . '%';
-    $result['free_val'] = $commission_type == 'fixed' ? number_format($data['free_fixed'] / 100, 2, '.', '') . '元' : number_format($data['free_percent'] / 100, 2, '.', '') . '%';
+if (App::isKeeperCommissionOrderDistinguishEnabled() && $data['way'] == Keeper::COMMISSION_ORDER) {
+    $result['pay_val'] = $data['type'] == 'fixed' ? number_format($data['fixed'] / 100, 2, '.', '') . '元' : number_format($data['percent'] / 100, 2, '.', '') . '%';
+    $result['free_val'] = $data['type'] == 'fixed' ? number_format($data['free_fixed'] / 100, 2, '.', '') . '元' : number_format($data['free_percent'] / 100, 2, '.', '') . '%';
 } else {
-    $result['val'] = $commission_type == 'fixed' ? number_format($data['fixed'] / 100, 2, '.', '') . '元' : number_format($data['percent'] / 100, 2, '.', '') . '%';
+    $result['val'] = $data['type'] == 'fixed' ? number_format($data['fixed'] / 100, 2, '.', '') . '元' : number_format($data['percent'] / 100, 2, '.', '') . '%';
 }
 
 JSON::success($result);

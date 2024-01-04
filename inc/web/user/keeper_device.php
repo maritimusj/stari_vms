@@ -9,6 +9,7 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 use zovye\domain\Device;
+use zovye\domain\Keeper;
 use zovye\domain\User;
 use zovye\model\keeper_devicesModelObj;
 
@@ -41,15 +42,23 @@ foreach ($query->findAll() as $item) {
         'name' => $item->getName(),
         'imei' => $item->getImei(),
     ];
-
-    if ($item->getCommissionFixed() != -1) {
-        $commission_val = number_format(abs($item->getCommissionFixed()) / 100, 2).'元';
+    if (App::isKeeperCommissionOrderDistinguishEnabled() && $item->getWay() == Keeper::COMMISSION_ORDER) {
+        if ($item->getCommissionFreeFixed() != -1) {
+            $data['pay_val'] = number_format(abs($item->getCommissionFixed()) / 100, 2).'元';
+            $data['free_val'] = number_format(abs($item->getCommissionFreeFixed()) / 100, 2).'元';
+        } else {
+            $data['pay_val'] = number_format($item->getCommissionPercent() / 100, 2).'%';
+            $data['free_val'] = number_format($item->getCommissionFreePercent() / 100, 2).'%';
+        }
     } else {
-        $commission_val = number_format($item->getCommissionPercent() / 100, 2).'%';
+        if ($item->getCommissionFixed() != -1) {
+            $data['val'] = number_format(abs($item->getCommissionFixed()) / 100, 2).'元';
+        } else {
+            $data['val'] = number_format($item->getCommissionPercent() / 100, 2).'%';
+        }
     }
 
-    $data['val'] = $commission_val;
-    $data['way'] = empty($item->getWay()) ? '销售分成' : '补货分成';
+    $data['way'] = $item->getWay();
     $data['kind'] = $item->getKind();
 
     $list[] = $data;

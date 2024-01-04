@@ -73,10 +73,20 @@
                         </div>
                     </td>
                     <td>
-                        <span class="way">{$device['way']}</span>
+                        <span class="way">
+                            {php echo $device['way'] == 0 ? '销售分成' : '补货分成'}
+                        </span>
                     </td>
                     <td>
-                        <div class="val">
+                        <div class="box" {if !\zovye\App::isKeeperCommissionOrderDistinguishEnabled() || $device['way'] != 0} style="display:none"{/if}>
+                            <div>
+                                支付订单：<span class="pay_val">{$device['pay_val']}</span>
+                            </div>
+                            <div>
+                                免费订单：<span class="free_val">{$device['free_val']}</span>
+                            </div>                            
+                        </div>
+                        <div class="val"{if \zovye\App::isKeeperCommissionOrderDistinguishEnabled() && $device['way'] == 0} style="display:none"{/if}>
                             {$device['val']}
                         </div>
                     </td>
@@ -99,6 +109,58 @@
         {/if}
     </div>
 </div>
+{if \zovye\App::isKeeperCommissionOrderDistinguishEnabled()}
+<script>
+    require(["{php \zovye\url(false, 'static/js/zovye.min.js?v=20231125001')}"], function (zovye) {
+        zovye.enableOp();
+        zovye.setApiUrl("{php echo $this->createWebUrl('user', ['user' => $user?$user->getId() : 0]);}");
+        zovye.op('keeper_device_remove', function(self, next) {
+            if (!confirm('确定移除这个设备吗？')) {
+                return;
+            }
+            const tr = self.closest('tr');
+            const id = tr.data('id');
+            next({id}, function(res) {
+                if (res && res.status) {
+                    tr.remove();
+               }
+            });
+        })
+        zovye.op('keeper_device_save', function(self, next) {
+            const e = self.closest('[data-id]');
+            const id = e.data('id');
+            const kind = e.find('input[name=kind]:checked').val();
+            const way = e.find('input[name=way]:checked').val();
+            const type = e.find('input[name=type]:checked').val();
+            const val = e.find('input[name=commissionVal]').val();
+            const pay_val = e.find('input[name=payCommissionVal]').val();
+            const free_val = e.find('input[name=freeCommissionVal]').val();
+            const tr = $('#keeperDevice tr[data-id="'+id+'"]');
+            next({id, kind, way, type, val, pay_val, free_val}, function(res) {
+                if (res && res.status) {
+                    tr.find('.kind').html(res.data.kind ? '<i class="fa fa-check-square-o"></i>' : '<i class="fa fa-square-o"></i>');
+                    tr.find('.way').html(res.data.way === 0 ? '销售分成' : '补货分成');
+                    if (res.data.val !== undefined) {
+                        tr.find('.pay_val').closest('div.box').hide();
+                        tr.find('.val').html(res.data.val).show();
+                    }
+                    if (res.data.pay_val !== undefined) {
+                        tr.find('.pay_val').closest('div.box').show();
+                        tr.find('.val').hide();
+                        tr.find('.pay_val').html(res.data.pay_val);
+                    }
+                    if (res.data.free_val !== undefined) {
+                        tr.find('.free_val').closest('div.box').show();
+                        tr.find('.val').hide();
+                        tr.find('.free_val').html(res.data.free_val);
+                    }
+               }
+               $('#modal-message').modal('hide');
+            });
+        })
+    });
+</script>
+{else}
 <script>
     require(["{php \zovye\url(false, 'static/js/zovye.min.js?v=20231125001')}"], function (zovye) {
         zovye.enableOp();
@@ -126,7 +188,7 @@
             next({id, kind, way, type, val}, function(res) {
                 if (res && res.status) {
                     tr.find('.kind').html(res.data.kind ? '<i class="fa fa-check-square-o"></i>' : '<i class="fa fa-square-o"></i>');
-                    tr.find('.way').html(res.data.way);
+                    tr.find('.way').html(res.data.way === 0 ? '销售分成' : '补货分成');
                     tr.find('.val').html(res.data.val);
                }
                $('#modal-message').modal('hide');
@@ -134,4 +196,6 @@
         })
     });
 </script>
+{/if}
+
 {template 'common/footer'}

@@ -611,9 +611,11 @@
     api.stopFueling = function (userid) {
         api.showResult({op: 'stop_fueling', id: userid});
     }
+
     api.viewFlashEggGifts = function (userid) {
         api.showResult({op: 'flash_gifts', id: userid});
     }
+
     $(function(){
         $('[data-url]').each(function(){
             util.clip(this, $(this).data('url'));
@@ -688,12 +690,15 @@
         })
 
         const ids = [];
+
         $('#userlist [data-id]').each(function(){
             ids.push($(this).data('id'));
         })
+
         if(ids) {
             api.getUserStats(ids);
         }
+        
         $("body").on('click', '#log-pager .pagination li:not(.active) a', function(e){
             const url = $(this).attr("href");
             $.getJSON(url).then(function(res){

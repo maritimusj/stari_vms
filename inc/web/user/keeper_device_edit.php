@@ -9,6 +9,7 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 use zovye\domain\Device;
+use zovye\domain\Keeper;
 use zovye\domain\User;
 use zovye\model\deviceModelObj;
 
@@ -38,7 +39,7 @@ $data = [
     'way' => $device->getWay(),
 ];
 
-if (App::isKeeperCommissionOrderDistinguishEnabled()) {
+if (App::isKeeperCommissionOrderDistinguishEnabled() && $device->getWay() == Keeper::COMMISSION_ORDER) {
     if ($device->getCommissionFixed() != -1) {
         $data['pay_val'] = number_format(abs($device->getCommissionFixed()) / 100, 2, '.', '');
         $data['free_val'] = number_format(abs($device->getCommissionFreeFixed()) / 100, 2, '.', '');

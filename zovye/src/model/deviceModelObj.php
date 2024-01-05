@@ -2465,15 +2465,21 @@ class deviceModelObj extends ModelObj
             if ($data['type'] == 'fixed') {
                 $cond['commission_fixed'] = intval($data['pay_val']);
                 $cond['commission_free_fixed'] = intval($data['free_val']);
+                $cond['commission_percent'] = -1;
+                $cond['commission_free_percent'] = -1;
             } else {
                 $cond['commission_percent'] = intval($data['pay_val']);
                 $cond['commission_free_percent'] = intval($data['free_val']);
+                $cond['commission_fixed'] = -1;
             }
         } else {
             if ($data['type'] == 'fixed') {
                 $cond['commission_fixed'] = intval($data['val']);
+                $cond['commission_percent'] = -1;
             } else {
                 $cond['commission_percent'] = intval($data['val']);
+                $cond['commission_fixed'] = -1;
+                $cond['commission_free_fixed'] = -1;
             }
         }
 

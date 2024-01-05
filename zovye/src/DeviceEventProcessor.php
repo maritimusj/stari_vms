@@ -66,7 +66,7 @@ class DeviceEventProcessor
             ],
         ],
         self::EVENT_V0_RESET => [
-            'title' => '[v0]补货信号',
+            'title' => '[v0]已完成补货',
             'handler' => [self::class, 'onResetMsg'],
             'params' => [
                 'log' => [
@@ -76,7 +76,7 @@ class DeviceEventProcessor
             ],
         ],
         self::EVENT_V0_RESULT => [
-            'title' => '出货结果v0',
+            'title' => '[v0]出货结果',
             'handler' => [self::class, 'onResultMsg'],
             'params' => [
                 'log' => [
@@ -186,7 +186,7 @@ class DeviceEventProcessor
             ],
         ],
         self::EVENT_V1_RELOAD => [
-            'title' => '[v1]主板补货信号',
+            'title' => '[v1]已完成补货',
             'handler' => [self::class, 'onMcbReload'],
             'params' => [
                 'log' => [

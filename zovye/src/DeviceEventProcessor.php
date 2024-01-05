@@ -6,7 +6,6 @@
 
 namespace zovye;
 
-use Exception;
 use RuntimeException;
 use zovye\business\Charging;
 use zovye\business\Fueling;

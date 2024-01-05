@@ -220,6 +220,7 @@ class agent
                 'device_schedule' => App::isDeviceScheduleTaskEnabled(),
                 'goods_expire_alert' => App::isGoodsExpireAlertEnabled(),
                 'keeper_commission_limit_enabled' => App::isKeeperCommissionLimitEnabled(),
+                'keeper_commission_order_distinguish_enabled' => App::isKeeperCommissionOrderDistinguishEnabled(),
             ],
             'wxapp' => [
                 'debug' => false,

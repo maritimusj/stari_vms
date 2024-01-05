@@ -384,33 +384,67 @@ class keeper
                 }
             }
 
-            if (Request::has('commission')) {
-                $commission = Request::str('commission', '', true);
+            $set_commission = function ($data) {
+                return $data;
+            };
 
+            if (App::isKeeperCommissionOrderDistinguishEnabled() && Request::has('pay_val')) {
+                $pay_val = Request::str('pay_val', '', true);
+                $free_val = Request::str('free_val', '', true);
                 //%结尾表示百分比，*表示固定金额
-                if (substr($commission, -1) == '%') {
-                    $commission = rtrim($commission, '%');
-                    $percent = max(0, min(10000, intval($commission * 100)));
-                    $set_commission = function (&$data) use ($percent) {
-                        $data['percent'] = $percent;
-                        unset($data['fixed']);
+                if (substr($pay_val, -1) == '%') {
+                    $pay_val = rtrim($pay_val, '%');
+                    $free_val = rtrim($free_val, '%');
+
+                    $pay_val = max(0, min(10000, intval($pay_val * 100)));
+                    $free_val = max(0, min(10000, intval($free_val * 100)));
+
+                    $set_commission = function (&$data) use ($pay_val, $free_val) {
+                        $data['pay_val'] = $pay_val;
+                        $data['free_val'] = $free_val;
+                        $data['type'] = 'percent';
 
                         return $data;
                     };
                 } else {
-                    $commission = rtrim($commission, '*');
-                    $fixed = max(0, intval($commission));
-                    $set_commission = function (&$data) use ($fixed) {
-                        $data['fixed'] = $fixed;
-                        unset($data['percent']);
+                    $pay_val = rtrim($pay_val, '*');
+                    $free_val = rtrim($free_val, '*');
+
+                    $pay_val = max(0, intval($pay_val));
+                    $free_val = max(0, intval($free_val));
+
+                    $set_commission = function (&$data) use ($pay_val, $free_val) {
+                        $data['pay_val'] = $pay_val;
+                        $data['free_val'] = $free_val;
+                        $data['type'] = 'fixed';
 
                         return $data;
                     };
                 }
             } else {
-                $set_commission = function ($data) {
-                    return $data;
-                };
+                if (Request::has('val')) {
+                    $val = Request::str('val', '', true);
+                    //%结尾表示百分比，*表示固定金额
+                    if (substr($val, -1) == '%') {
+                        $val = rtrim($val, '%');
+                        $val = max(0, min(10000, intval($val * 100)));
+                        $set_commission = function (&$data) use ($val) {
+                            $data['val'] = $val;
+                            $data['type'] = 'percent';
+
+                            return $data;
+                        };
+                    } else {
+                        $val = rtrim($val, '*');
+                        $val = max(0, intval($val));
+                        $set_commission = function (&$data) use ($val) {
+                            $data['val'] = $val;
+                            $data['type'] = 'fixed';
+
+                            return $data;
+                        };
+                    }
+                }
             }
 
             //way 分佣时机：Keeper::COMMISSION_RELOAD，补货时 Keeper::COMMISSION_ORDER，订单生成时
@@ -910,6 +944,7 @@ class keeper
                             }
                         }
                     }
+
                     return intval($v * $num);
                 };
             } else {
@@ -928,6 +963,7 @@ class keeper
                     }
                     $goods = $device->getGoods($goods_id, false);
                     $price = $goods ? intval($goods['price']) : 0;
+
                     return intval(round($num * $price * $v / 100));
                 };
             }

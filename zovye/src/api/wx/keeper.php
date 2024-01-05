@@ -964,7 +964,7 @@ class keeper
                     $goods = $device->getGoods($goods_id, false);
                     $price = $goods ? intval($goods['price']) : 0;
 
-                    return intval(round($num * $price * $v / 100));
+                    return intval(round($num * $price * $v / 10000));
                 };
             }
         }

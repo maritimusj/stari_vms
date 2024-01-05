@@ -410,8 +410,8 @@ class keeper
                     $pay_val = rtrim($pay_val, '*');
                     $free_val = rtrim($free_val, '*');
 
-                    $pay_val = max(0, intval($pay_val));
-                    $free_val = max(0, intval($free_val));
+                    $pay_val = max(0, intval($pay_val * 100));
+                    $free_val = max(0, intval($free_val * 100));
 
                     $set_commission = function (&$data) use ($pay_val, $free_val) {
                         $data['pay_val'] = $pay_val;
@@ -436,7 +436,7 @@ class keeper
                         };
                     } else {
                         $val = rtrim($val, '*');
-                        $val = max(0, intval($val));
+                        $val = max(0, intval($val * 100));
                         $set_commission = function (&$data) use ($val) {
                             $data['val'] = $val;
                             $data['type'] = 'fixed';

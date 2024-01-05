@@ -18,6 +18,7 @@ use zovye\App;
 use zovye\contract\IPay;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
+use zovye\Session;
 use zovye\We7;
 use function zovye\_W;
 use function zovye\err;
@@ -365,10 +366,20 @@ JSCODE;
 
     public static function getDummyPayJs(): string
     {
+        $js_sdk = '';
+        if (Session::isWxUser()) {
+            $js_sdk = Util::jssdk();
+        } elseif (Session::isAliUser()) {
+            $js_sdk =  <<<JS
+<script src="https://gw.alipayobjects.com/as/g/h5-lib/alipayjsapi/3.1.1/alipayjsapi.inc.min.js"></script>
+JS;
+        }
+
         $jquery_url = JS_JQUERY_URL;
 
         return <<<JSCODE
 <script src="$jquery_url"></script>
+{$js_sdk}
 <script>
     const zovye_fn = {};
     zovye_fn.pay = function() {

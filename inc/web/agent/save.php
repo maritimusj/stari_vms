@@ -274,17 +274,28 @@ $result = DBUtil::transactionDo(function () use ($id, &$from) {
             $data = [
                 'kind' => Request::int('kind'),
                 'way' => Request::int('way'),
+                'type' => Request::str('type', 'fixed'),
             ];
-
-            $commission_val = Request::float('commissionVal', 0, 2);
-            $commission_type = Request::str('type', 'fixed');
-
-            if ($commission_type == 'fixed') {
-                $data['fixed'] = max(0, intval($commission_val * 100));
-                $data['type'] = 'fixed';
+            
+            if (App::isKeeperCommissionOrderDistinguishEnabled() && $data['way'] == Keeper::COMMISSION_ORDER) {
+                $pay_commission_val = Request::float('payCommissionVal', 0, 2);
+                $free_commission_val = Request::float('freeCommissionVal', 0, 2);
+            
+                if ($data['type'] == 'fixed') {
+                    $data['pay_val'] = max(0, intval($pay_commission_val * 100));
+                    $data['free_val'] = max(0, intval($free_commission_val * 100));
+                } else {
+                    $data['pay_val'] = max(0, min(10000, intval($pay_commission_val * 100)));
+                    $data['free_val'] = max(0, min(10000, intval($free_commission_val * 100)));
+                }
             } else {
-                $data['percent'] = max(0, min(100, intval($commission_val)));
-                $data['type'] = 'percent';
+                $commission_val = Request::float('commissionVal', 0, 2);
+            
+                if ($data['type'] == 'fixed') {
+                    $data['val'] = max(0, intval($commission_val * 100));
+                } else {
+                    $data['val'] = max(0, min(10000, intval($commission_val * 100)));
+                }
             }
 
             $user->updateSettings('agentData.keeper.data', $data);

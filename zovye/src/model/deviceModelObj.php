@@ -2439,19 +2439,19 @@ class deviceModelObj extends ModelObj
         /** @var keeper_devicesModelObj $res */
         $res = m('keeper_devices')->findOne($cond);
         if (!empty($res)) {
-            if (App::isKeeperCommissionOrderDistinguishEnabled()) {
-                if ($data['fixed']) {
-                    $res->setCommissionFixed(intval($data['fixed']));
-                    $res->setCommissionFreeFixed(intval($data['free_fixed']));
+            if (App::isKeeperCommissionOrderDistinguishEnabled() && $data['way'] == Keeper::COMMISSION_ORDER) {
+                if ($data['type'] == 'fixed') {
+                    $res->setCommissionFixed(intval($data['pay_val']));
+                    $res->setCommissionFreeFixed(intval($data['free_val']));
                 } else {
-                    $res->setCommissionPercent(intval($data['percent']));
-                    $res->setCommissionFreePercent(intval($data['free_percent']));
+                    $res->setCommissionPercent(intval($data['pay_val']));
+                    $res->setCommissionFreePercent(intval($data['free_val']));
                 }
             } else {
-                if ($data['fixed']) {
-                    $res->setCommissionFixed(intval($data['fixed']));
+                if ($data['type'] == 'fixed') {
+                    $res->setCommissionFixed(intval($data['val']));
                 } else {
-                    $res->setCommissionPercent(intval($data['percent']));
+                    $res->setCommissionPercent(intval($data['val']));
                 }
             }
 
@@ -2462,18 +2462,18 @@ class deviceModelObj extends ModelObj
         }
 
         if (App::isKeeperCommissionOrderDistinguishEnabled()) {
-            if (isset($data['percent'])) {
-                $cond['commission_percent'] = intval($data['percent']);
-                $cond['commission_free_percent'] = intval($data['free_percent']);
+            if ($data['type'] == 'fixed') {
+                $cond['commission_fixed'] = intval($data['pay_val']);
+                $cond['commission_free_fixed'] = intval($data['free_val']);
             } else {
-                $cond['commission_fixed'] = intval($data['fixed']);
-                $cond['commission_free_fixed'] = intval($data['free_fixed']);
+                $cond['commission_percent'] = intval($data['pay_val']);
+                $cond['commission_free_percent'] = intval($data['free_val']);
             }
         } else {
-            if (isset($data['percent'])) {
-                $cond['commission_percent'] = intval($data['percent']);
+            if ($data['type'] == 'fixed') {
+                $cond['commission_fixed'] = intval($data['val']);
             } else {
-                $cond['commission_fixed'] = intval($data['fixed']);
+                $cond['commission_percent'] = intval($data['val']);
             }
         }
 

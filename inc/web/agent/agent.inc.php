@@ -11,6 +11,7 @@ defined('IN_IA') or exit('Access Denied');
 
 use zovye\domain\Agent;
 use zovye\domain\GSP;
+use zovye\domain\Keeper;
 use zovye\domain\PaymentConfig;
 use zovye\domain\User;
 use zovye\model\gsp_userModelObj;
@@ -185,10 +186,11 @@ if ($op == 'agent_commission') {
 
 $keeper_data = $agent->settings('agentData.keeper.data', []);
 if ($keeper_data) {
-    if ($keeper_data['type'] == 'fixed') {
-        $keeper_data['fixed'] = number_format($keeper_data['fixed'] / 100, 2, '.', '');
+    if (App::isKeeperCommissionOrderDistinguishEnabled() && $keeper_data['way'] == Keeper::COMMISSION_ORDER) {
+        $keeper_data['pay_val'] = number_format(abs($keeper_data['pay_val']) / 100, 2, '.', '');
+        $keeper_data['free_val'] = number_format(abs($keeper_data['free_val']) / 100, 2, '.', '');
     } else {
-        $keeper_data['percent'] = intval($keeper_data['percent']);
+        $keeper_data['val'] = number_format($keeper_data['val'] / 100, 2, '.', '');
     }
 
     $tpl_data['keeper_data'] = $keeper_data;

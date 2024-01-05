@@ -1243,7 +1243,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-xs-12 col-md-2 col-md-2 control-label">方式</label>
+                    <label class="col-xs-12 col-md-2 col-md-2 control-label">分佣时机</label>
                     <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
                         <label for="way0" class="radio-inline">
                             <input name="way" id="way0" type="radio" value="0" {if empty($keeper_data['way'])}checked="checked"{/if}>
@@ -1253,11 +1253,11 @@
                             <input name="way" id="way1" type="radio" value="1"  {if !empty($keeper_data['way'])}checked="checked"{/if}>
                             补货分成
                         </label>
-                        <span class="help-block">* 销售分成：设备售出商品获得分成；补货分成：完成补货即可获得分成。</span>
+                        <span class="help-block">* 销售分成：设备售出商品获得分成；补货分成：完成补货即可获得分成</span>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-xs-12 col-md-2 col-md-2 control-label">类型</label>
+                    <label class="col-xs-12 col-md-2 col-md-2 control-label">计算方式</label>
                     <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
                         <label for="type0" class="radio-inline">
                             <input name="type" id="type0" type="radio" value="fixed" {if $keeper_data['type'] == 'fixed'}checked="checked"{/if}>
@@ -1269,13 +1269,39 @@
                         </label>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="commissionVal" class="col-md-2 control-label"><span id="commissionTitle">金额</span></label>
-                    <div class="col-md-10">
-                        <input type="number" class="form-control" name="commissionVal" id="commissionVal" value="{$keeper_data[$keeper_data['type']]}" step="0.01">
-                        <span class="help-block">* <b>注意：以上为运营人员默认设置</b></span>
+                {if \zovye\App::isKeeperCommissionOrderDistinguishEnabled()}
+                <div class="way0">
+                    <div class="form-group">
+                        <label for="payCommissionVal" class="col-md-2 control-label"><span id="payCommissionTitle">金额(元)</span></label>
+                        <div class="col-md-10">
+                            <input type="number" class="form-control" name="payCommissionVal" id="payCommissionVal" value="{$keeper_data['pay_val']}"  min="0.00" step="0.01">
+                            <span class="help-block">* <b>支付订单</b>的佣金</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="freeCommissionVal" class="col-md-2 control-label"><span id="freeCommissionTitle">金额(元)</span></label>
+                        <div class="col-md-10">
+                            <input type="number" class="form-control" name="freeCommissionVal" id="freeCommissionVal" value="{$keeper_data['free_val']}"  min="0.00" step="0.01">
+                            <span class="help-block">* <b>免费订单</b>的佣金</span>
+                        </div>
                     </div>
                 </div>
+                <div class="way1">
+                    <div class="form-group">
+                        <label for="commissionVal" class="col-md-2 control-label"><span id="commissionTitle">金额(元)</span></label>
+                        <div class="col-md-10">
+                            <input type="number" class="form-control" name="commissionVal" id="commissionVal" value="{$keeper_data['val']}"  min="0.00" step="0.01">
+                        </div>
+                    </div>
+                </div>
+                {else}
+                <div class="form-group">
+                    <label for="commissionVal" class="col-md-2 control-label"><span id="commissionTitle">金额(元)</span></label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="commissionVal" id="commissionVal" value="{$keeper_data['val']}"  min="0.00" step="0.01">
+                    </div>
+                </div>
+                {/if}
                 <div class="form-group">
                     <label for="applyConfigToAll" class="col-md-2 control-label"></label>
                     <div class="col-md-10">
@@ -1317,15 +1343,50 @@
         $('#special2 input[name=locationEnabled]').click(function(){
             $('#special2 fieldset').attr('disabled', !$(this).is(':checked'));
         })
-        changeTitle("{$keeper_data['type']}")
+    })
+</script>
+{if \zovye\App::isKeeperCommissionOrderDistinguishEnabled()}
+<script>
+    $(function() {
+        changeTitle("{$keeper_data['type']}");
+        changeWay("{$keeper_data['way']}");
+
+        $('input[name=type]').change(function() {
+            changeTitle($(this).val());
+        });
+
+        $('input[name=way]').change(function() {
+            changeWay($(this).val());
+        });
+    })
+    function changeTitle(type) {
+        $('#payCommissionTitle').text(type === 'percent' ? '百分比(%)' : '金额(元)');
+        $('#freeCommissionTitle').text(type === 'percent' ? '百分比(%)' : '金额(元)');
+        $('#commissionTitle').text(type === 'percent' ? '百分比(%)' : '金额(元)');
+    }
+    function changeWay(way) {
+        if (way === '1') {
+            $('.way0').hide();
+            $('.way1').show();
+        } else {
+            $('.way0').show();
+            $('.way1').hide();
+        }
+    }
+</script>
+{else}
+<script>
+    $(function() {
+        changeTitle("{$keeper_data['type']}");
         $('input[name=type]').change(function() {
             changeTitle($(this).val());
         });
     })
     function changeTitle(type) {
-        $('#commissionTitle').text(type === 'percent' ? '比例(%)' : '金额(元)');
+        $('#commissionTitle').text(type === 'percent' ? '百分比(%)' : '金额(元)');
     }
 </script>
+{/if}
 {elseif $op == 'agent_payment'}
 <ul class="nav nav-tabs" id="navbar">
     <li role="presentation"><a href="{php echo $this->createWebUrl('agent', array('op' => 'agent_base', 'id'=>$id));}">基本信息</a></li>

@@ -44,19 +44,19 @@ if (App::isKeeperCommissionOrderDistinguishEnabled() && $data['way'] == Keeper::
     $free_commission_val = Request::float('free_val', 0, 2);
 
     if ($data['type'] == 'fixed') {
-        $data['fixed'] = max(0, intval($pay_commission_val * 100));
-        $data['free_fixed'] = max(0, intval($free_commission_val * 100));
+        $data['pay_val'] = max(0, intval($pay_commission_val * 100));
+        $data['free_val'] = max(0, intval($free_commission_val * 100));
     } else {
-        $data['percent'] = max(0, min(10000, intval($pay_commission_val * 100)));
-        $data['free_percent'] = max(0, min(10000, intval($free_commission_val * 100)));
+        $data['pay_val'] = max(0, min(10000, intval($pay_commission_val * 100)));
+        $data['free_val'] = max(0, min(10000, intval($free_commission_val * 100)));
     }
 } else {
     $commission_val = Request::float('val', 0, 2);
 
     if ($data['type'] == 'fixed') {
-        $data['fixed'] = max(0, intval($commission_val * 100));
+        $data['val'] = max(0, intval($commission_val * 100));
     } else {
-        $data['percent'] = max(0, min(10000, intval($commission_val * 100)));
+        $data['val'] = max(0, min(10000, intval($commission_val * 100)));
     }
 }
 
@@ -71,20 +71,20 @@ $result = [
 
 if (App::isKeeperCommissionOrderDistinguishEnabled() && $data['way'] == Keeper::COMMISSION_ORDER) {
     $result['pay_val'] = $data['type'] == 'fixed' ? number_format(
-            $data['fixed'] / 100,
+            $data['pay_val'] / 100,
             2,
             '.',
             ''
-        ).'元' : number_format($data['percent'] / 100, 2, '.', '').'%';
+        ).'元' : number_format($data['pay_val'] / 100, 2, '.', '').'%';
     $result['free_val'] = $data['type'] == 'fixed' ? number_format(
-            $data['free_fixed'] / 100,
+            $data['free_val'] / 100,
             2,
             '.',
             ''
-        ).'元' : number_format($data['free_percent'] / 100, 2, '.', '').'%';
+        ).'元' : number_format($data['free_val'] / 100, 2, '.', '').'%';
 } else {
-    $result['val'] = $data['type'] == 'fixed' ? number_format($data['fixed'] / 100, 2, '.', '').'元' : number_format(
-            $data['percent'] / 100,
+    $result['val'] = $data['type'] == 'fixed' ? number_format($data['val'] / 100, 2, '.', '').'元' : number_format(
+            $data['val'] / 100,
             2,
             '.',
             ''

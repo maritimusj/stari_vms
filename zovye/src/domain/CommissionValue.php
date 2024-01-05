@@ -59,18 +59,18 @@ class CommissionValue
 
     public function getValue()
     {
-        return $this->isFixed() ? $this->fixed : $this->percent;
+        return $this->getPayValue();
     }
 
     public function getPayValue()
     {
-        return $this->isFixed() ? $this->fixed : $this->percent;
+        return $this->isFixed() ? max(0, $this->fixed) : min(10000, max(0, $this->percent));
     }
 
     public function getFreeValue()
     {
         if (App::isKeeperCommissionOrderDistinguishEnabled()) {
-            return $this->isFixed() ? $this->free_fixed : $this->free_percent;
+            return $this->isFixed() ? max(0, $this->free_fixed) : min(10000, max(0, $this->free_percent));
         }
 
         return $this->getPayValue();

@@ -37,11 +37,9 @@ class DeviceEventProcessor
     const EVENT_V1_RESULT = 'mcb.result';
     const EVENT_V1_RECORD = 'mcb.record';
     const EVENT_V1_REPORT = 'mcb.report';
-    const EVENT_V1_M_REPORT = 'mcb.m-report';
     const EVENT_V1_RELOAD = 'mcb.reload';
     const EVENT_V1_RESET = 'mcb.reset';
     const EVENT_V1_PING = 'mcb.ping';
-    const EVENT_V1_NEW_CARD = 'mcb.m-newcard';
     const EVENT_V1_FEE = 'mcb.fee';
     const EVENT_V1_CONFIG = 'mcb.config';
 
@@ -235,26 +233,6 @@ class DeviceEventProcessor
                 'log' => [
                     'enable' => true,
                     'id' => 19,
-                ],
-            ],
-        ],
-        self::EVENT_V1_M_REPORT => [
-            'title' => '[v1]主板上报设备状态(m-report)',
-            'handler' => [self::class, 'onMcbMReport'],
-            'params' => [
-                'log' => [
-                    'enable' => true,
-                    'id' => 20,
-                ],
-            ],
-        ],
-        self::EVENT_V1_NEW_CARD => [
-            'title' => '[v1]客户刷卡',
-            'handler' => [self::class, 'onMcbNewCard'],
-            'params' => [
-                'log' => [
-                    'enable' => true,
-                    'id' => 21,
                 ],
             ],
         ],
@@ -692,20 +670,6 @@ class DeviceEventProcessor
 
             $device->save();
         }
-    }
-
-    /**
-     * v1版本 m-report上报
-     */
-    public static function onMcbMReport(array $data = [])
-    {
-    }
-
-    /**
-     * v1版本  客户机刷卡事件
-     */
-    public static function onMcbNewCard(array $data = [])
-    {
     }
 
     /**

@@ -13,14 +13,19 @@
         white-space: nowrap;
     }
     .referral {
-        border: 1px solid #4CAF50;
-        border-radius: 6px;
-        padding: 1px 10px;
         color: #4CAF50;
         width: 10em;
-        text-align: center;
+        text-align: left;
         font-size: 12px;
         white-space: nowrap;
+        position: relative;
+    }
+    .referral .operate {
+        position: relative;
+        display: none;
+    }
+    .referral:hover .operate {
+        display: inline-block;
     }
     .log i.fa-list, .log i.balance-edit {
         display: none;
@@ -119,7 +124,13 @@
                     <td>
                         <div>{$agent['mobile']}</div>
                         {if $agent['referral']}
-                        <div class="referral">推荐码: {$agent['referral']}</div>
+                        <div class="referral" >
+                            推荐码: <span class="code">{$agent['referral']}</span>
+                            <div class="operate">
+                                <i class="fa fa-paste" title="复制" data-url="{$agent['referral']}"></i>
+                                <i class="fa fa-refresh" data-op="refreshReferral"></i>
+                            </div>
+                        </div>
                         {/if}
                     </td>
                     <td>
@@ -394,6 +405,22 @@
         const year = self.data('year');
         const userid = self.closest('.year').data('user');
         api.showResult({op: 'month_stats', id: userid, year}, api.user_url);
+    }
+    api.refreshReferral = function(id) {
+        if (confirm("确定要重置这个代理商的推荐吗？")) {
+            api.showResult({op: 'refresh_referral', id}, api.url, false, (res) => {
+                if (res) {
+                    if (res.status) {
+                        const tr = $('tr[data-id=' + id + ']');
+                        tr.find("span.code").html(res.data.referral);
+                    } else {
+                        if (res.data && res.data.msg) {
+                            util.message(res.data.msg, '', 'error');
+                        }
+                    }
+                }
+            });
+        }
     }
     $("#userslist").on("click", "[data-stats]", function (e) {
         const agent_id = $(this).closest('tr').data('id');

@@ -37,5 +37,4 @@ $result = DBUtil::transactionDo(function () {
     ];
 });
 
-
 JSON::result($result);

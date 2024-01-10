@@ -277,8 +277,8 @@ if (stripos($pager, '&filter=1') === false) {
         'user_id' => $user_id,
         'device_id' => $device_id,
         'order' => $order_no,
-        'datelimit[start]' => isset($start) ? $start->format('Y-m-d') : '',
-        'datelimit[end]' => isset($end) ? $end->format('Y-m-d') : '',
+        'datelimit[start]' => isset($start) && $start ? $start->format('Y-m-d') : '',
+        'datelimit[end]' => isset($end) && $end ? $end->format('Y-m-d') : '',
         'filter' => 1,
     ];
 

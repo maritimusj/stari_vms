@@ -173,7 +173,7 @@ if ($page == 'device') {
     $settings['custom']['mustFollow']['enabled'] = Request::bool('mustFollow') ? 1 : 0;
     $settings['custom']['useAccountQRCode']['enabled'] = Request::bool('useAccountQRCode') ? 1 : 0;
     $settings['custom']['bonus']['zero']['enabled'] = Request::bool('zeroBonus') ? 1 : 0;
-    $settings['custom']['device']['brief-page']['enabled'] = Request::bool('deviceBriefPage') ? 1 : 0;
+    $settings['custom']['device']['briefPage']['enabled'] = Request::bool('deviceBriefPage') ? 1 : 0;
     $settings['custom']['smsPromo']['enabled'] = Request::bool('smsPromoEnabled') ? 1 : 0;
     $settings['custom']['team']['enabled'] = Request::bool('teamEnabled') ? 1 : 0;
     $settings['custom']['cztv']['enabled'] = Request::bool('cztvEnabled') ? 1 : 0;
@@ -186,6 +186,7 @@ if ($page == 'device') {
     $settings['custom']['longPressOrder']['enabled'] = Request::bool('longPressOrderEnabled') ? 1 : 0;
     $settings['custom']['keeper']['commissionLimit']['enabled'] = Request::bool('KeeperCommissionLimitEnabled') ? 1 : 0;
     $settings['custom']['keeper']['commissionOrderDistinguish']['enabled'] = Request::bool('KeeperCommissionOrderDistinguishEnabled') ? 1 : 0;
+    $settings['custom']['device']['payConfig']['enabled'] = Request::bool('DevicePayConfigEnabled') ? 1 : 0;
 
     Config::app('ad.sponsor.enabled', Request::bool('sponsorAd'), true);
     Config::app('misc.GoodsExpireAlert.enabled', Request::bool('GoodsExpireAlert') ? 1 : 0, true);

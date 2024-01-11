@@ -518,4 +518,9 @@ class App
     {
         return settings('custom.keeper.commissionOrderDistinguish.enabled', false);
     }
+
+    public static function isDevicePayConfigEnabled(): bool
+    {
+        return settings('custom.device.payConfig.enabled', false);
+    }    
 }

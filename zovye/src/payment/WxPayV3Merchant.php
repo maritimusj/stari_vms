@@ -65,7 +65,9 @@ class WxPayV3Merchant extends WxPayV3
         ];
 
         try {
-            $response = parent::builder()->v3->pay->transactions->jsapi->post($data);
+            $response = parent::builder()
+                ->v3->pay->transactions->jsapi
+                ->post($data);
 
             return parent::parseJSPayResponse($response);
 
@@ -103,7 +105,9 @@ class WxPayV3Merchant extends WxPayV3
 
         try {
             $response = parent::builder()
-                ->v3->pay->transactions->outTradeNo->_order_no_->close
+                ->v3->pay->transactions->outTradeNo
+                ->_order_no_
+                ->close
                 ->post($data);
 
             $result = PayUtil::parseWxPayV3Response($response);
@@ -115,7 +119,7 @@ class WxPayV3Merchant extends WxPayV3
                     'data' => $data,
                     'result' => $result,
                 ]);
-                
+
                 return err($result['message'] ?? '请求失败！');
             }
 
@@ -155,7 +159,8 @@ class WxPayV3Merchant extends WxPayV3
 
         try {
             $response = parent::builder()
-                ->v3->pay->transactions->outTradeNo->_order_no_
+                ->v3->pay->transactions->outTradeNo
+                ->_order_no_
                 ->get($data);
 
             return parent::parseQueryResponse($response);

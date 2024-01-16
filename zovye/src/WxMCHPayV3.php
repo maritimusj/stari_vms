@@ -91,7 +91,8 @@ class WxMCHPayV3
 
         try {
             $response = PayUtil::getWxPayV3Builder($this->config)
-                ->v3->transfer->batches->batch_id->_batch_id_
+                ->v3->transfer->batches->batch_id
+                ->_batch_id_
                 ->get($data);
 
             $result = PayUtil::parseWxPayV3Response($response);

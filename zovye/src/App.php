@@ -339,7 +339,8 @@ class App
     /** 用户单次最多购买的商品数量（0表示不限制） */
     public static function getOrderMaxGoodsNum(): int
     {
-        return settings('order.goods.maxNum', 10);
+        $max = settings('order.goods.maxNum', 10);
+        return $max < 1 ? 10000 : $max;
     }
 
     public static function getImageProxyURL(): string

@@ -340,7 +340,7 @@ class App
     public static function getOrderMaxGoodsNum(): int
     {
         $max = settings('order.goods.maxNum', 10);
-        return $max < 1 ? 10000 : $max;
+        return $max > 0 ? $max : 10000;
     }
 
     public static function getImageProxyURL(): string

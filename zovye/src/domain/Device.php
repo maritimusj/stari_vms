@@ -280,6 +280,53 @@ class Device extends State
     }
 
     /**
+     * 获取设备的当前商品的库存信息
+     * @param deviceModelObj $device
+     * @param bool $detail
+     * @param bool $available_restrict
+     * @return array
+     */
+    public static function getPayload(
+        deviceModelObj $device,
+        bool $detail = false,
+        bool $available_restrict = false
+    ): array {
+        $data = [];
+
+        $device_type = DeviceTypes::from($device);
+        if (empty($device_type)) {
+            return $data;
+        }
+
+        $res = DeviceTypes::format($device_type, $detail);
+        if ($res && is_array($res['cargo_lanes'])) {
+            $lanes_data = $device->getCargoLanes();
+
+            $data['cargo_lanes'] = [];
+            foreach ($res['cargo_lanes'] as $index => $lane) {
+                if ($available_restrict && !GoodsExpireAlert::isAvailable($device, $index)) {
+                    continue;
+                }
+                $laneId = "l$index";
+                if (!empty($lanes_data[$laneId])) {
+                    $lane['num'] = intval($lanes_data[$laneId]['num']);
+                    if ($device->isCustomizedType() && isset($lanes_data[$laneId]['price'])) {
+                        $lane['goods_price'] = intval(round($lanes_data[$laneId]['price']));
+                        $lane['goods_price_formatted'] = number_format($lane['goods_price'] / 100, 2).'元';
+                    }
+                }
+                if ($device->isBlueToothDevice()) {
+                    $lane['is_motor'] = $device->getMotor() > $index;
+                }
+
+                $data['cargo_lanes'][$index] = $lane;
+            }
+        }
+
+        return $data;
+    }
+
+    /**
      * 获取指定货道上的商品数据，同时包括商品所在货道
      * @param deviceModelObj $device
      * @param int $goods_id
@@ -288,6 +335,8 @@ class Device extends State
      */
     public static function getGoods(deviceModelObj $device, int $goods_id, bool $available_restrict = true): array
     {
+        $device->autoResetPayload();
+
         $result = Goods::data($goods_id);
         if (empty($result)) {
             return [];
@@ -336,59 +385,14 @@ class Device extends State
         return $result;
     }
 
-    /**
-     * 获取设备的当前商品的库存信息
-     * @param deviceModelObj $device
-     * @param bool $detail
-     * @param bool $available_restrict
-     * @return array
-     */
-    public static function getPayload(
-        deviceModelObj $device,
-        bool $detail = false,
-        bool $available_restrict = false
-    ): array {
-        $data = [];
-
-        $device_type = DeviceTypes::from($device);
-        if (empty($device_type)) {
-            return $data;
-        }
-
-        $res = DeviceTypes::format($device_type, $detail);
-        if ($res && is_array($res['cargo_lanes'])) {
-            $lanes_data = $device->getCargoLanes();
-
-            $data['cargo_lanes'] = [];
-            foreach ($res['cargo_lanes'] as $index => $lane) {
-                if ($available_restrict && !GoodsExpireAlert::isAvailable($device, $index)) {
-                    continue;
-                }
-                $laneId = "l$index";
-                if (!empty($lanes_data[$laneId])) {
-                    $lane['num'] = intval($lanes_data[$laneId]['num']);
-                    if ($device->isCustomizedType() && isset($lanes_data[$laneId]['price'])) {
-                        $lane['goods_price'] = intval(round($lanes_data[$laneId]['price']));
-                        $lane['goods_price_formatted'] = number_format($lane['goods_price'] / 100, 2).'元';
-                    }
-                }
-                if ($device->isBlueToothDevice()) {
-                    $lane['is_motor'] = $device->getMotor() > $index;
-                }
-
-                $data['cargo_lanes'][$index] = $lane;
-            }
-        }
-
-        return $data;
-    }
-
     public static function getGoodsByLane(
         deviceModelObj $device,
         $lane_id,
         $params = [],
         $available_restrict = true
     ): array {
+        $device->autoResetPayload();
+
         $payload = self::getPayload($device, false, $available_restrict);
         $lane = $payload['cargo_lanes'][$lane_id];
 

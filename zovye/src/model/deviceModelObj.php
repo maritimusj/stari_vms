@@ -1236,6 +1236,30 @@ class deviceModelObj extends ModelObj
         ]);
     }
 
+    public function autoResetPayload()
+    {
+        $remainWarning = App::getRemainWarningNum($this->getAgent());
+
+        // 处理自动补货
+        $data = [];
+
+        $payload = $this->getPayload();
+
+        foreach ((array)$payload['cargo_lanes'] as $index => $lane) {
+            if (empty($lane['auto'])) {
+                continue;
+            }
+            if ($lane['num'] < $remainWarning) {
+                $data[$index] = '@0';
+            }
+        }
+
+        if ($data) {
+            $this->resetPayload($data);
+            $this->save();
+        }
+    }
+
     /**
      *  检查设备剩余，如果设置允许，会推送通知
      */
@@ -1243,11 +1267,14 @@ class deviceModelObj extends ModelObj
     {
         $remainWarning = App::getRemainWarningNum($this->getAgent());
 
+        // 缺货标志位
         $set_s2_flag = false;
 
-        if ($remainWarning > 0 && $this->remain < $remainWarning) {
-            $set_s2_flag = true;
-            Job::deviceEventNotify($this, Device::EVENT_LOW_REMAIN);
+        if ($remainWarning > 0) {
+            if ($this->remain < $remainWarning) {
+                $set_s2_flag = true;
+                Job::deviceEventNotify($this, Device::EVENT_LOW_REMAIN);
+            }
         }
 
         $this->setS2($this->remain < 1 || $set_s2_flag ? 1 : 0);
@@ -2295,6 +2322,42 @@ class deviceModelObj extends ModelObj
         return Device::getGoods($this, $goods_id, $available_restrict);
     }
 
+    public function getGoodsByLane($lane, $params = [], $available_restrict = true): array
+    {
+        return Device::getGoodsByLane($this, $lane, $params, $available_restrict);
+    }
+
+    public function getGoodsTotal($goods_id): int
+    {
+        $total = 0;
+        $payload = $this->getPayload();
+        if ($payload && $payload['cargo_lanes']) {
+            foreach ($payload['cargo_lanes'] as $entry) {
+                if ($entry['goods'] == $goods_id) {
+                    $total += intval($entry['num']);
+                }
+            }
+        }
+
+        return $total;
+    }
+
+    public function getGoodsAndPackages($user, $params = [], $available_restrict = true): array
+    {
+        $result = [];
+
+        $w = $this->goodsListViewStyle();
+
+        if ($w == 'all' || $w == 'goods') {
+            $result['goods'] = $this->getGoodsList($user, $params, $available_restrict);
+        }
+
+        if ($w == 'all' || $w == 'packages') {
+            $result['packages'] = $this->getPackages();
+        }
+
+        return $result;
+    }
 
     /**
      * @return keeperModelObj[]
@@ -2588,26 +2651,6 @@ class deviceModelObj extends ModelObj
         return Device::isOwner($this, $agent);
     }
 
-    public function getGoodsByLane($lane, $params = [], $available_restrict = true): array
-    {
-        return Device::getGoodsByLane($this, $lane, $params, $available_restrict);
-    }
-
-    public function getGoodsTotal($goods_id): int
-    {
-        $total = 0;
-        $payload = $this->getPayload();
-        if ($payload && $payload['cargo_lanes']) {
-            foreach ($payload['cargo_lanes'] as $entry) {
-                if ($entry['goods'] == $goods_id) {
-                    $total += intval($entry['num']);
-                }
-            }
-        }
-
-        return $total;
-    }
-
     public function goodsListViewStyle()
     {
         if (App::isGoodsPackageEnabled()) {
@@ -2618,23 +2661,6 @@ class deviceModelObj extends ModelObj
         }
 
         return 'goods';
-    }
-
-    public function getGoodsAndPackages($user, $params = [], $available_restrict = true): array
-    {
-        $result = [];
-
-        $w = $this->goodsListViewStyle();
-
-        if ($w == 'all' || $w == 'goods') {
-            $result['goods'] = $this->getGoodsList($user, $params, $available_restrict);
-        }
-
-        if ($w == 'all' || $w == 'packages') {
-            $result['packages'] = $this->getPackages();
-        }
-
-        return $result;
     }
 
     public static function disableFree(array &$goodsData)

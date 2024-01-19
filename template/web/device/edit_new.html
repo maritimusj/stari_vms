@@ -154,9 +154,9 @@
         align-items: stretch;
         align-content: stretch;
     }
-    .divider {
+    .seg-divider {
         width: calc(100% + 20px);
-        border-top: 1px solid #CCC;
+        border-top: 1px solid #eee;
         margin: 2em 0;
         position: relative;
         left: -10px;
@@ -793,7 +793,7 @@
                     -->
                     <!--尿素加注机-->
                     <template v-if="config.is_fueling_device">
-                        <div class="divider"></div>
+                        <div class="seg-divider"></div>
                         <div class="form-group">
                             <label class="col-xs-12 col-md-2 col-md-2 control-label">运行模式</label>
                             <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
@@ -839,7 +839,7 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="divider"></div>
+                        <div class="seg-divider"></div>
                     </template>
                     <div class="form-group">
                         <label class="col-xs-12 col-md-2 col-md-2 control-label">设备状态</label>
@@ -860,7 +860,7 @@
                         <label for="sub_mch_id" class="col-md-2 control-label">微信v3支付（子商户号）</label>
                         <div class="col-md-10">
                             <input type="text" class="form-control" name="sub_mch_id" id="sub_mch_id" value="{$extra['wx_v3']['sub_mch_id']}">
-                            <span class="help-block">* 流量计无流量超时时间，默认120秒</span>
+                            <span class="help-block">* 代理商开启单独支付并配置微信v3版本支付后，可开启设备单独支付</span>
                         </div>
                     </div>
                 </div>

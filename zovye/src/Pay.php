@@ -567,7 +567,7 @@ class Pay
 
     public static function makeWithDevice(payment_configModelObj $config, deviceModelObj $device = null): ?IPay
     {
-        if ($config->getname() == self::WX_V3 && $device) {
+        if (App::isDevicePayConfigEnabled() && $config->getname() == self::WX_V3 && $device) {
             $sub_mch_id = $device->settings('extra.wx_v3.sub_mch_id', '');
             if ($sub_mch_id) {
                 $config->setExtraData('sub_mcb_id', $sub_mch_id);

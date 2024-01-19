@@ -855,6 +855,7 @@
                             <span class="help-block">* 选择停用的设备，用户扫码后无法使用相关功能</span>
                         </div>
                     </div>
+                    {if \zovye\App::isDevicePayConfigEnabled()}
                     <div class="seg-divider"></div>
                     <div class="form-group">
                         <label for="sub_mch_id" class="col-md-2 control-label">微信v3支付（子商户号）</label>
@@ -863,6 +864,7 @@
                             <span class="help-block">* 代理商开启单独支付并配置微信v3版本支付后，可开启设备单独支付</span>
                         </div>
                     </div>
+                    {/if}
                 </div>
                 <div v-show="active === 'app'" v-if="deviceId > 0&& config.app">
                     <div class="form-group">

@@ -247,23 +247,24 @@ $result = DBUtil::transactionDo(function () use ($id, &$device) {
 
             $cargo_lanes = [];
             $capacities = Request::array('capacities');
-            $is_fueling = $device->isFuelingDevice();
 
             foreach (Request::array('goods') as $index => $goods_id) {
                 $cargo_lanes[] = [
                     'goods' => intval($goods_id),
-                    'capacity' => $is_fueling ? intval(round($capacities[$index] * 100)) : intval($capacities[$index]),
+                    'capacity' => $device->isFuelingDevice() ? intval(round($capacities[$index] * 100)) : intval(
+                        $capacities[$index]
+                    ),
                 ];
                 if ($old[$index] && $old[$index]['goods'] != intval($goods_id)) {
                     $device->resetPayload([$index => '@0'],
-                        $is_fueling ? '管理员更改加注枪商品' : '管理员更改货道商品');
+                        $device->isFuelingDevice() ? '管理员更改加注枪商品' : '管理员更改货道商品');
                 }
                 unset($old[$index]);
             }
 
             foreach ($old as $index => $lane) {
                 $device->resetPayload([$index => '@0'],
-                    $is_fueling ? '管理员删除加注枪' : '管理员删除货道');
+                    $device->isFuelingDevice() ? '管理员删除加注枪' : '管理员删除货道');
             }
 
             $device_type->setExtraData('cargo_lanes', $cargo_lanes);
@@ -275,13 +276,11 @@ $result = DBUtil::transactionDo(function () use ($id, &$device) {
         throw new RuntimeException('获取型号失败！');
     }
 
-    $is_fueling = $device->isFuelingDevice();
-
     //货道商品数量和价格
     $type_data = DeviceTypes::format($device_type);
     $cargo_lanes = [];
     foreach ($type_data['cargo_lanes'] as $index => $lane) {
-        if ($is_fueling) {
+        if ($device->isFuelingDevice()) {
             $num = intval(Request::float("lane{$index}_num", 0, 2) * 100);
         } else {
             $num = Request::int("lane{$index}_num");

@@ -1255,7 +1255,7 @@ class deviceModelObj extends ModelObj
         }
 
         if ($data) {
-            $this->resetPayload($data);
+            $this->resetPayload($data, '自动补货');
             $this->save();
         }
     }

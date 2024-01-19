@@ -200,6 +200,12 @@
     .expire-info .item.normal>.value{
         color:#4CAF50;
     }
+    .lane-num .auto-reset {
+        visibility: hidden;
+    }
+    .lane-num:hover .auto-reset {
+        visibility: inherit;
+    }
     [v-cloak] {
         display: none;
     }
@@ -412,12 +418,16 @@
                                             <template v-else>
                                                 {{lane.capacity}}
                                             </template>
-                                        <td>
+                                        <td class="lane-num">
                                             <input type="number" class="form-control goods"
                                                    :name="'lane' + i + '_num'" v-model="lane.num"
                                                    min="0"
                                                    :step="config.is_fueling_device ? '0.01':'1'"
                                                    :max="lane.capacity ? lane.capacity : ''">
+                                            <span :class="{'auto-reset': !lane.auto, 'operate': true}">
+                                                <i class="fa fa-refresh" :title="lane.auto ? '自动补货，点击取消':'点击设置为自动补货'" @click="setAutoReset(lane)"></i>
+                                                <input type="hidden" :name="'lane' + i + '_auto'" v-model="lane.auto">
+                                            </span>
                                         </td>
                                         <td class="operate">
                                             <i class="fa fa-gift"
@@ -1343,6 +1353,9 @@
                 editPriceDone(lane) {
                     this.currentLane = null;
                     lane.goods_price = parseFloat(lane.goods_price).toFixed(2);
+                },
+                setAutoReset(lane) {
+                    Vue.set(lane, "auto", !lane.auto);
                 },
                 editPackageGoodsPrice(goods, index) {
                     Vue.set(goods, 'edit', true);

@@ -254,6 +254,7 @@ $result = DBUtil::transactionDo(function () use ($id, &$device) {
                     'capacity' => $device->isFuelingDevice() ? intval(round($capacities[$index] * 100)) : intval(
                         $capacities[$index]
                     ),
+                    'auto' => Request::bool("lane{$index}_auto"),
                 ];
                 if ($old[$index] && $old[$index]['goods'] != intval($goods_id)) {
                     $device->resetPayload([$index => '@0'],

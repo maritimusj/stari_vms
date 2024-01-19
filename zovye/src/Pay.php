@@ -67,16 +67,13 @@ class Pay
         $config_id = $log->getPayConfigId();
         if (empty($config_id)) {
             //尝试兼容原系统的支付配置
-            $device_id = $log->getDeviceId();
-            if ($device_id) {
-                $device = Device::get($device_id);
-                if ($device) {
-                    $user = User::get($log->getUserOpenid(), true);
-                    if ($user) {
-                        $pay = self::selectPay($device, $user);
-                        if ($pay) {
-                            return $pay;
-                        }
+            $device = $log->getDevice();
+            if ($device) {
+                $user = User::get($log->getUserOpenid(), true);
+                if ($user) {
+                    $pay = self::selectPay($device, $user);
+                    if ($pay) {
+                        return $pay;
                     }
                 }
             }
@@ -88,7 +85,7 @@ class Pay
             throw new RuntimeException('找不到这个支付配置！');
         }
 
-        $pay = self::make($config);
+        $pay = self::makeWithDevice($config, $log->getDevice());
         if (!$pay) {
             throw new RuntimeException('支付不可用！[02]');
         }
@@ -135,7 +132,7 @@ class Pay
                 $config = PaymentConfig::getFor($agent, $name);
 
                 if ($config && $matchFN($user, $config)) {
-                    return self::make($config);
+                    return self::makeWithDevice($config, $device);
                 }
             }
 
@@ -568,6 +565,18 @@ class Pay
         return PayLogs::findOne(['level' => $level, 'title' => $order_no]);
     }
 
+    public static function makeWithDevice(payment_configModelObj $config, deviceModelObj $device = null): ?IPay
+    {
+        if ($config->getname() == self::WX_V3 && $device) {
+            $sub_mch_id = $device->settings('extra.wx_v3.sub_mch_id', '');
+            if ($sub_mch_id) {
+                $config->setExtraData('sub_mcb_id', $sub_mch_id);
+            }
+        }
+
+        return self::make($config);
+    }
+
     /**
      * 根据支付配置创建支付对象
      * @param payment_configModelObj $config
@@ -587,11 +596,6 @@ class Pay
                     if ($config->getAgentId() == 0) {
                         $data = $config->toArray();
                     } else {
-                        $sub_mch_id = $config->getExtraData('sub_mch_id', '');
-                        if (empty($sub_mch_id)) {
-                            throw new RuntimeException('不正确的支付配置！');
-                        }
-
                         /** @var payment_configModelObj $default */
                         $default = PaymentConfig::getByName(Pay::WX_V3);
                         if (!$default) {
@@ -599,7 +603,7 @@ class Pay
                         }
 
                         $data = $default->getExtraData();
-                        $data['sub_mch_id'] = $sub_mch_id;
+                        $data['sub_mch_id'] = $config->getExtraData('sub_mch_id', '');
                     }
 
                     return empty($data['sub_mch_id']) ? new WxPayV3Merchant($data) : new WxPayV3Partner($data);

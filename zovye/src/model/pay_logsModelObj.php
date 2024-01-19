@@ -7,6 +7,7 @@
 namespace zovye\model;
 
 use zovye\contract\ICard;
+use zovye\domain\Device;
 use zovye\domain\User;
 use function zovye\tb;
 
@@ -20,6 +21,11 @@ class pay_logsModelObj extends BaseLogsModelObj implements ICard
     public function getOrderNO(): string
     {
         return strval($this->getData('orderData.orderNO') ?? $this->getTitle());
+    }
+
+    public function getDevice(): ?deviceModelObj
+    {
+        return Device::get($this->getDeviceId());
     }
 
     public function getDeviceId(): int

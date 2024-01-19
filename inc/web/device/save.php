@@ -21,6 +21,7 @@ use zovye\domain\Device;
 use zovye\domain\DeviceTypes;
 use zovye\domain\GoodsExpireAlert;
 use zovye\domain\Package;
+use zovye\domain\PaymentConfig;
 use zovye\model\packageModelObj;
 use zovye\util\DBUtil;
 use zovye\util\Helper;
@@ -339,6 +340,11 @@ $result = DBUtil::transactionDo(function () use ($id, &$device) {
             'schedule' => $extra['schedule']['screen'],
         ]);
     }
+
+    //设备单独支付配置
+    $extra['wx_v3'] = [
+        'sub_mch_id' => Request::trim('sub_mch_id'),
+    ];
 
     //合并extra
     $extra = array_merge($original_extra, $extra);

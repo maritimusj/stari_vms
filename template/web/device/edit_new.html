@@ -855,6 +855,14 @@
                             <span class="help-block">* 选择停用的设备，用户扫码后无法使用相关功能</span>
                         </div>
                     </div>
+                    <div class="seg-divider"></div>
+                    <div class="form-group">
+                        <label for="sub_mch_id" class="col-md-2 control-label">微信v3支付（子商户号）</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="sub_mch_id" id="sub_mch_id" value="{$extra['wx_v3']['sub_mch_id']}">
+                            <span class="help-block">* 流量计无流量超时时间，默认120秒</span>
+                        </div>
+                    </div>
                 </div>
                 <div v-show="active === 'app'" v-if="deviceId > 0&& config.app">
                     <div class="form-group">

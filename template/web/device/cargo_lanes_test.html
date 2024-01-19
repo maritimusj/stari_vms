@@ -20,8 +20,15 @@
                         {/if}
                     </span>
                 </td>
-                <td>{if $is_fueling_device}{php echo number_format($item['capacity'] / 100, 2, '.', '')}{else}{$item['capacity']}{/if} {$item['goods_unit_title']}</td>
-                <td>{if $is_fueling_device}{php echo number_format($item['num'] / 100, 2, '.', '')}{else}{$item['num']}{/if} {$item['goods_unit_title']}</td>
+                <td>
+                    {if $is_fueling_device}{php echo number_format($item['capacity'] / 100, 2, '.', '')}{else}{$item['capacity']}{/if} {$item['goods_unit_title']}
+                </td>
+                <td class="lane-data">
+                    {if $is_fueling_device}{php echo number_format($item['num'] / 100, 2, '.', '')}{else}{$item['num']}{/if} {$item['goods_unit_title']}
+                    {if $item['auto']}
+                    <sup class="auto" title="自动补货">*</sup>
+                    {/if}
+                </td>
                 <td class="test_btn">
                     {if !$is_bluetooth_device}
                     <i class="fa fa-sign-out" data-op="deviceTestLaneN" data-params="{$index}" title="测试"></i>

@@ -1153,7 +1153,7 @@ class deviceModelObj extends ModelObj
             $data['qrcode_url'] = $this->getUrl();
         }
 
-        return $this->appPublish('config', $data);
+        return $this->appPublishConfig($data);
     }
 
     /**
@@ -1179,6 +1179,21 @@ class deviceModelObj extends ModelObj
         }
 
         return null;
+    }
+
+    public function appRestart(): bool
+    {
+        return $this->appPublish('restart');
+    }
+
+    public function appUpdateNotify(): bool
+    {
+        return $this->appPublish('update');
+    }
+
+    public function appPublishConfig(array $data = []): bool
+    {
+        return $this->appPublish('config', $data);
     }
 
     /**
@@ -1584,7 +1599,7 @@ class deviceModelObj extends ModelObj
     public function updateScreenAdsData(): bool
     {
         if ($this->isAdsUpdated(Advertising::SCREEN)) {
-            return $this->appPublish('update');
+            return $this->appUpdateNotify();
         }
 
         return false;
@@ -1760,7 +1775,7 @@ class deviceModelObj extends ModelObj
 
         $data = ['volume' => $vol];
 
-        $res = $this->appPublish('config', $data);
+        $res = $this->appPublishConfig($data);
 
         return !is_error($res);
     }
@@ -1778,7 +1793,7 @@ class deviceModelObj extends ModelObj
             $data['srt'] = $srt;
         }
 
-        $res = $this->appPublish('config', $data);
+        $res = $this->appPublishConfig($data);
 
         return !is_error($res);
     }

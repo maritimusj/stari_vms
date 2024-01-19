@@ -61,7 +61,7 @@ try {
     }
     
     //通知实体设备
-    $device->appPublish('update');
+    $device->appUpdateNotify();
     
     $device->destroy();
     

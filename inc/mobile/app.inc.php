@@ -87,7 +87,7 @@ if ($op == 'default') {
                     }
                     $device->resetShadowId();
                     $device->createQrcodeFile();
-                    $device->appPublish('update');
+                    $device->appUpdateNotify();
 
                     return true;
 

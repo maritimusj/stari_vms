@@ -335,7 +335,7 @@ $result = DBUtil::transactionDo(function () use ($id, &$device) {
 
     $original_extra = $device->get('extra', []);
     if ($original_extra['schedule']['screen'] !== $extra['schedule']['screen']) {
-        $device->appPublish('config', [
+        $device->appPublishConfig([
             'schedule' => $extra['schedule']['screen'],
         ]);
     }

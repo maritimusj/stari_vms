@@ -1000,7 +1000,7 @@ class device
                 return err('没有权限管理这个设备！');
             }
 
-            $device->appPublish('restart');
+            $device->appRestart();
 
             return ['msg' => 'APP重启消息已发送！'];
         }

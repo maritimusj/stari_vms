@@ -518,7 +518,7 @@ class DeviceEventProcessor
             //APP要根据这个判断是否创建虚拟ＭＣＢ
             $config['mcbUID'] = strval($device->getImei());
 
-            $device->appPublish('config', $config);
+            $device->appPublishConfig($config);
         } else {
             $config = [
                 'volume' => 10, //音量百分比 0 - 100

@@ -300,7 +300,6 @@ function is_error($data): bool
     return is_array($data) && isset($data['errno']) && $data['errno'] != 0;
 }
 
-
 function load(): ClassLoader
 {
     return new ClassLoader();

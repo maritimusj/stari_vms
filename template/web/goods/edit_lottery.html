@@ -55,7 +55,7 @@
             <div class="form-group">
                 <label class="col-md-2 control-label">详情图片</label>
                 <div class="col-md-10">
-                    {php echo tpl_form_field_image('detailImg', $goods?$goods['detailImg'] : '');}
+                    {php echo tpl_form_field_multi_image('gallery', $goods?$goods['gallery']:[]);}
                 </div>
             </div>
             <div class="form-group">

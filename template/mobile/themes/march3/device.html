@@ -6,8 +6,8 @@
     <meta name="viewport"
         content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
     <title>{$tpl['site']['title']}</title>
-    <link rel="stylesheet" href="https://cdn.staticfile.org/Swiper/7.1.0/swiper-bundle.min.css">
-    <link href="https://cdn.staticfile.org/video.js/4.1.0/video-js.min.css" rel="stylesheet">
+    {php \zovye\url(true, CSS_SWIPER_BUNDLE_URL);}
+    {php \zovye\url(true, CSS_VIDEO_URL);}
     <style>
         html,
         body {
@@ -337,9 +337,9 @@
     </div>
     {$tpl['js']['code']}
     {php \zovye\url(true, JS_VUE_URL);}
-    <script src="https://cdn.staticfile.org/Swiper/7.1.0/swiper-bundle.min.js"> </script>
-    <script src="https://cdn.staticfile.org/video.js/4.1.0/video.js"></script>
-    <script src="https://cdn.staticfile.org/vue-clipboard2/0.3.1/vue-clipboard.min.js"></script>
+    {php \zovye\url(true, JS_SWIPER_BUNDLE_URL);}
+    {php \zovye\url(true, JS_VIDEO_URL);}
+    {php \zovye\url(true, JS_VUE_CLIPBOARD_URL);}
     <script>
         new Vue({
             el: '#app',

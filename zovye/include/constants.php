@@ -99,20 +99,22 @@ define('UPGRADE_URL', 'http://127.0.0.1:9012');
 define('DEFAULT_LBS_KEY', '');
 
 define('JS_WE7UTIL_URL', $GLOBALS['_W']['siteroot']."app/resource/js/app/util.js");
-define('JS_JQUERY_URL', 'https://cdn.staticfile.org/jquery/1.11.1/jquery.min.js');
-define('JS_AXIOS_URL', 'https://cdn.staticfile.org/axios/0.19.2/axios.min.js');
-define('JS_VUE_URL', 'https://cdn.staticfile.org/vue/2.6.9/vue.min.js');
-
-define('JS_MUI_URL', 'https://cdn.staticfile.org/mui/3.7.1/js/mui.min.js');
-define('CSS_MUI_URL', 'https://cdn.staticfile.org/mui/3.7.1/css/mui.min.css');
-
-define('JS_XLSX_URL', 'https://cdn.staticfile.org/xlsx/0.16.6/xlsx.full.min.js');
-define('JS_XLSX_SHIM_URL', 'https://cdn.staticfile.org/xlsx/0.16.6/shim.min.js');
-define('JS_ECHARTS_URL', 'https://cdn.staticfile.org/echarts/5.0.2/echarts.common.min.js');
-
-define('JS_SWIPER_URL', 'https://cdn.staticfile.org/Swiper/4.5.1/js/swiper.min.js');
-define('CSS_SWIPER_URL', 'https://cdn.staticfile.org/Swiper/4.5.1/css/swiper.min.css');
-define('CSS_ANIMATE_URL', 'https://cdn.staticfile.org/animate.css/4.1.1/animate.min.css');
+define('JS_JQUERY_URL', ZOVYE_STATIC_URL . 'static/js/jquery.min.js');//jquery/1.11.1
+define('JS_AXIOS_URL', ZOVYE_STATIC_URL . 'static/js/axios.min.js');//axios/0.19.2
+define('JS_VUE_URL', ZOVYE_STATIC_URL . 'static/js/vue.min.js');//2.6.9
+define('JS_MUI_URL', ZOVYE_STATIC_URL . 'static/js/mui.min.js');//3.7.1
+define('CSS_MUI_URL', ZOVYE_STATIC_URL . 'static/js/mui.min.css');
+define('JS_XLSX_URL', ZOVYE_STATIC_URL . 'static/js/xlsx.full.min.js');//0.16.6
+define('JS_XLSX_SHIM_URL', ZOVYE_STATIC_URL . 'static/js/shim.min.js');//0.16.6
+define('JS_ECHARTS_URL', ZOVYE_STATIC_URL . 'static/js/echarts.common.min.js');//5.0.2
+define('JS_SWIPER_URL', ZOVYE_STATIC_URL . 'static/js/swiper.min.js');//4.5.1
+define('JS_SWIPER_BUNDLE_URL', ZOVYE_STATIC_URL . 'static/js/swiper-bundle.min.js');//7.1.0
+define('CSS_SWIPER_BUNDLE_URL', ZOVYE_STATIC_URL . 'static/js/swiper-bundle.min.css');//7.1.0
+define('CSS_SWIPER_URL', ZOVYE_STATIC_URL . 'static/js/swiper.min.css');
+define('CSS_ANIMATE_URL', ZOVYE_STATIC_URL . 'static/js/animate.min.css');//4.1.1
+define('JS_VIDEO_URL', ZOVYE_STATIC_URL . 'static/js/video.js');//4.1.1
+define('CSS_VIDEO_URL', ZOVYE_STATIC_URL . 'static/js/video-js.min.css');//4.1.1
+define('JS_VUE_CLIPBOARD_URL', ZOVYE_STATIC_URL . 'static/js/vue-clipboard.min.js');//0.3.1
 
 defined('DEVELOPMENT') or define('DEVELOPMENT', DEBUG);
 defined('TIMESTAMP') or define('TIMESTAMP', time());

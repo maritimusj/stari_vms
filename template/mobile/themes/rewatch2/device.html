@@ -5,8 +5,8 @@
 	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
 	<title>{$tpl['site']['title']}</title>
 	{php \zovye\url(true, CSS_SWIPER_URL);}
+	{php \zovye\url(true, CSS_VIDEO_URL);}
 	{php \zovye\url(true, 'static/m/rewatch2/device.css?v=202105102013');}
-	<link href="https://cdn.staticfile.org/video.js/4.1.0/video-js.min.css" rel="stylesheet">
 </head>
 <body ontouchstart>
 <div id="app" v-cloak>
@@ -217,8 +217,8 @@
 		};
 </script>
 {php \zovye\url(true, 'static/m/rewatch2/device.js?v=20211216001');}
-<script src="https://cdn.staticfile.org/video.js/4.1.0/video.js"></script>
-<script src="https://cdn.staticfile.org/vue-clipboard2/0.3.1/vue-clipboard.min.js"></script>
+{php \zovye\url(true, JS_VIDEO_URL);}
+{php \zovye\url(true, JS_VUE_CLIPBOARD_URL);}
 {if !empty($tpl['site']['warning'])}
 <script type="text/javascript">
 		(function() {

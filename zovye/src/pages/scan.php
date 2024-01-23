@@ -16,7 +16,7 @@ $params = TemplateUtil::getTemplateVar();
 $tpl = is_array($params) ? $params : [];
 
 $token = Util::getTokenValue();
-$redirect_url = Util::murl('entry', ['from' => 'scan', 'device' => $token]);
+$redirect_url = Util::murl('entry', ['from' => 'scan', 'device' => $token, 'channel' => '__channel__']);
 $js_sdk = Util::jssdk();
 $jquery_url = JS_JQUERY_URL;
 
@@ -31,14 +31,15 @@ $js_sdk
             success: function(data) {
                 if(data && data.resultStr) {
                     const url = data.resultStr;
-                    let result = url.match(/id=(\w*)/);
+                    let result = url.match(/id=(\w*)\/?(\d+)?/);
                     if (!result) {
-                        result =  url.match(/device=(\w*)/);
+                        result =  url.match(/device=(\w*)\/?(\d+)?/);
                     }
                     if(result) {
                         const id = result[1];
+                        const ch = result[2] !== undefined ? result[2] : '';
                         if(id) {
-                            window.location.replace("$redirect_url".replace("$token", id));                            
+                            window.location.replace("$redirect_url".replace("$token", id).replace("__channel__", ch));                            
                         }
                     }
                 }
@@ -48,7 +49,7 @@ $js_sdk
     wx.ready(function(){
         wx.hideAllNonBaseMenuItem();
         zovye_fn.scan();
-    })    
+    })
     $(function(){
        $(document).on("touchstart", function(e) {
             const target = $(e.target);

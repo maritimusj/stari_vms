@@ -126,6 +126,10 @@ class goods
                 $goods->setExtraData('costPrice', Request::float('costPrice', 0, 2) * 100);
             }
 
+            if (Request::isset('discountPrice')) {
+                $goods->setExtraData('discountPrice',  Request::float('discountPrice', 0, 2) * 100);
+            }
+
             if (Request::str('goodsName') != $goods->getName()) {
                 $goods->setName(Request::str('goodsName'));
             }
@@ -156,6 +160,15 @@ class goods
             if (Request::str('goodsUnitTitle') != $goods->getUnitTitle()) {
                 $goods->setUnitTitle(Request::str('goodsUnitTitle'));
             }
+
+            if (Request::isset('goodsCW')) {
+                $goods->setExtraData('cw', Request::bool('goodsCW') ? 1 : 0);
+            }
+
+            if (App::isBalanceEnabled()) {
+                $goods->setExtraData('balance', max(0, Request::int('balance')));
+            }
+        
         } else {
             $goods_data = [
                 'name' => Request::trim('goodsName'),
@@ -164,6 +177,9 @@ class goods
                 'price' => Request::float('goodsPrice', 0, 2) * 100,
                 'extra' => [
                     'unitTitle' => Request::trim('goodsUnitTitle'),
+                    'costPrice' => Request::float('costPrice', 0, 2) * 100,
+                    'discountPrice' =>  Request::float('discountPrice', 0, 2) * 100,
+                    'cw' => Request::bool('goodsCW') ? 1 : 0, //成本是否参与分佣
                 ],
             ];
 
@@ -183,8 +199,12 @@ class goods
                 }
             }
 
+            if (App::isBalanceEnabled()) {
+                $goods_data['extra']['balance'] = max(0, Request::int('balance'));
+            }
+        
             //彩票商品商品指定货道
-            if (Request::is_string('goodsLaneID')) {
+            if (Request::isset('goodsLaneID')) {
                 $goods_data['extra']['lottery']['size'] = Request::int('goodsLaneID');
                 $goods_data['extra']['lottery']['index'] = Request::int('goodsMcbIndex');
                 $goods_data['extra']['lottery']['unit'] = Request::int('goodsSizeUnit');
@@ -192,7 +212,7 @@ class goods
             }
 
             //计时商品
-            if (Request::is_string('duration')) {
+            if (Request::isset('duration')) {
                 $goods_data['extra']['ts']['duration'] = Request::int('duration');
             }
 

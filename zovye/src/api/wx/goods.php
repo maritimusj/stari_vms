@@ -106,19 +106,20 @@ class goods
                 return err('没有权限管理这个商品');
             }
 
-            //固定货道商品商品指定货道
+            //彩票商品商品指定货道
             if (Request::isset('goodsLaneID')) {
                 $goods->setExtraData('lottery.size', Request::int('goodsLaneID'));
-            }
-
-            if (Request::isset('goodsMcbIndex')) {
                 $goods->setExtraData('lottery.index', Request::int('goodsMcbIndex'));
+                $goods->setExtraData('lottery.unit', Request::int('goodsSizeUnit'));
             } else {
                 $goods->setExtraData('lottery');
             }
 
-            if (Request::isset('goodsSizeUnit')) {
-                $goods->setExtraData('lottery.unit', Request::int('goodsSizeUnit'));
+            // 计时商品
+            if (Request::isset('duration')) {
+                $goods->setExtraData('ts.duration', Request::int('duration'));
+            } else {
+                $goods->setExtraData('ts');
             }
 
             if (Request::isset('costPrice')) {
@@ -182,21 +183,17 @@ class goods
                 }
             }
 
-            //固定货道商品商品指定货道
+            //彩票商品商品指定货道
             if (Request::is_string('goodsLaneID')) {
                 $goods_data['extra']['lottery']['size'] = Request::int('goodsLaneID');
-            }
-
-            if (Request::isset('goodsMcbIndex')) {
                 $goods_data['extra']['lottery']['index'] = Request::int('goodsMcbIndex');
-            }
-
-            if (Request::isset('goodsSizeUnit')) {
                 $goods_data['extra']['lottery']['unit'] = Request::int('goodsSizeUnit');
+                $goods_data['extra']['costPrice'] = Request::float('costPrice', 0, 2) * 100;
             }
 
-            if (Request::isset('costPrice')) {
-                $goods_data['extra']['costPrice'] = Request::float('costPrice', 0, 2) * 100;
+            //计时商品
+            if (Request::is_string('duration')) {
+                $goods_data['extra']['ts']['duration'] = Request::int('duration');
             }
 
             $goods_data['extra']['type'] = Request::str('type');

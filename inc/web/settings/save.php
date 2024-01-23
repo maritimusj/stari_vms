@@ -159,6 +159,7 @@ if ($page == 'device') {
 
     $settings['device']['v-device']['enabled'] = Request::bool('vDevice') ? 1 : 0;
     $settings['goods']['lottery']['enabled'] = Request::bool('lotteryGoods') ? 1 : 0;
+    $settings['goods']['ts']['enabled'] = Request::bool('tsGoods') ? 1 : 0;
     $settings['idcard']['verify']['enabled'] = Request::bool('idCardVerify') ? 1 : 0;
     if (!$settings['idcard']['verify']['enabled']) {
         $settings['user']['verify']['enabled'] = 0;

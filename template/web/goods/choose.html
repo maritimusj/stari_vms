@@ -147,8 +147,12 @@
         <td class="name">
             {$item['name']}<sup class="id" title="商品ID">{$item['id']}</sup>
             {if $item['lottery']}
-            <span class="lottery" title="固定货道商品">
+            <span class="lottery" title="彩票商品">
                         <i class="fa fa-fw fa-ticket"></i>
+                    </span>
+            {elseif $item['ts']}
+            <span class="lottery" title="计时商品">
+                        <i class="fa fa-fw fa-clock-o"></i>
                     </span>
             {elseif $item['type'] == 'fueling'}
             <span class="lottery">

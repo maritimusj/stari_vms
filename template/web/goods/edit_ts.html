@@ -4,9 +4,9 @@
     <li role="presentation" class="active">
         <a href="#">
             {if $goods}
-            <i class="fa fa-edit"></i> 编辑彩票商品
+            <i class="fa fa-edit"></i> 编辑计时商品
             {else}
-            <i class="fa fa-ticket"></i> 新建彩票商品
+            <i class="fa fa-ticket"></i> 新建计时商品
             {/if}
         </a>
     </li>
@@ -105,31 +105,10 @@
             {/if}
             <div class="seg-divider"></div>
             <div class="form-group">
-                <label for="goodsSize" class="col-md-2 control-label">出货长度</label>
+                <label for="duration" class="col-md-2 control-label">出货时长（秒）</label>
                 <div class="col-md-10">
-                    <input type="number" class="form-control" id="goodsSize" name="goodsSize" value="{php echo !empty($goods)&&isset($goods['lottery'])?$goods['lottery']['size'] : ''}" min="1" required>
-                    <span class="help-block">* 出货长度: 根据具体设备而定，请输入单个商品长度，用于设备切割商品！</span>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-xs-12 col-md-2 col-md-2 control-label">长度单位</label>
-                <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
-                    <label for="goodsSizeUnit1" class="radio-inline">
-                        <input name="goodsSizeUnit" id="goodsSizeUnit1" type="radio" value="1" {if $goods && $goods['lottery']['unit'] == 1}checked="checked"{/if}>
-                        英寸
-                    </label>
-                    <label for="goodsSizeUnit0" class="radio-inline">
-                        <input name="goodsSizeUnit" id="goodsSizeUnit0" type="radio" value="0"  {if empty($goods) || empty($goods['lottery']['unit'])}checked="checked"{/if}>
-                        亳米
-                    </label>
-                    <span class="help-block">* 长度单位: 出货长度所使用的单位，英寸或者亳米</span>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="goodsMcbIndex" class="col-md-2 control-label">出货口</label>
-                <div class="col-md-10">
-                    <input type="number" class="form-control" id="goodsMcbIndex" name="goodsMcbIndex" value="{php echo !empty($goods)&&isset($goods['lottery'])?$goods['lottery']['index'] : ''}" min="0">
-                    <span class="help-block">* 注意：没有指定出货口的情况下，<b>STA4DZ协议</b>以出货长度值做为出货口，出货长度固定为200mm；<b>STA4CP协议</b>出货口固定为0，长度单位固定为英寸。</i></span>
+                    <input type="number" class="form-control" id="duration" name="duration" value="{php echo !empty($goods)&&isset($goods['ts'])?$goods['ts']['duration'] : ''}" min="1" required>
+                    <span class="help-block">* 表示该商品需要持续的时间，单位：秒</span>
                 </div>
             </div>
         </div>

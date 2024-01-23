@@ -28,6 +28,8 @@ class Goods
 
     const Lottery = 'lottery';
 
+    const Ts = 'ts';
+
     const Fueling = 'fueling';
 
     const FlashEgg = 'flashEgg';
@@ -161,11 +163,17 @@ class Goods
         $lottery = $entry->getExtraData('lottery', []);
         if (!empty($lottery)) {
             $data['lottery'] = $lottery;
-            $data['type'] = 'lottery';
+            $data['type'] = Goods::Lottery;
+        }
+        
+        $ts = $entry->getExtraData('ts', []);
+        if (!empty($ts)) {
+            $data['ts'] = $ts;
+            $data['type'] = Goods::Ts;
         }
 
         if ($entry->isFlashEgg()) {
-            $data['type'] = 'flash_egg';
+            $data['type'] = Goods::FlashEgg;
             $data['redirect_url'] = $entry->getExtraData('redirect_url', '');
         }
 

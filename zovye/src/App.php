@@ -51,11 +51,19 @@ class App
     }
 
     /**
-     * 是否开启固定货道商品商品支持
+     * 是否开启彩票商品商品支持
      */
     public static function isLotteryGoodsSupported(): bool
     {
         return settings('goods.lottery.enabled', false);
+    }
+
+    /**
+     * 是否开启计时商品商品支持
+     */
+    public static function isTsGoodsSupported(): bool
+    {
+        return settings('goods.ts.enabled', false);
     }
 
     /**

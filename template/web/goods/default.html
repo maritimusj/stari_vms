@@ -63,7 +63,12 @@
                 </a>
                 {if \zovye\App::isLotteryGoodsSupported()}
                 <a href="{php echo $this->createWebUrl('goods', ['op' => 'editGoods', 'type' => 'lottery']);}">
-                    <i class="fa fa-ticket fa-fw" title="添加固定货道商品"></i>
+                    <i class="fa fa-ticket fa-fw" title="添加彩票商品"></i>
+                </a>                
+                {/if}
+                {if \zovye\App::isTsGoodsSupported()}
+                <a href="{php echo $this->createWebUrl('goods', ['op' => 'editGoods', 'type' => 'ts']);}">
+                    <i class="fa fa-clock-o fa-fw" title="添加计时商品"></i>
                 </a>                
                 {/if}
                 {if \zovye\App::isFuelingDeviceEnabled()}
@@ -149,8 +154,12 @@
                     <td>
                         {$item['name']}<sup class="id" title="商品ID">{$item['id']}</sup>
                         {if $item['lottery']}
-                        <span class="icon" title="固定货道商品">
+                        <span class="icon" title="彩票商品">
                             <i class="fa fa-fw fa-ticket"></i>
+                        </span>
+                        {elseif $item['ts']}
+                        <span class="icon" title="计时商品">
+                            <i class="fa fa-fw fa-clock-o"></i>
                         </span>
                         {elseif $item['type'] == 'fueling'}
                         <span class="icon">
@@ -226,6 +235,8 @@
                         <div class="btn-group">
                             {if $item['lottery']}
                             <a class="btn btn-default" href="{php echo $this->createWebUrl('goods', ['op' => 'editGoods', 'id' => $item['id'], 'type' => 'lottery'])}" title="编辑"><i class="fa fa-edit"> </i></a>
+                            {elseif $item['ts']}
+                            <a class="btn btn-default" href="{php echo $this->createWebUrl('goods', ['op' => 'editGoods', 'id' => $item['id'], 'type' => 'ts'])}" title="编辑"><i class="fa fa-edit"> </i></a>
                             {elseif $item['type'] == 'fueling'}
                             <a class="btn btn-default" href="{php echo $this->createWebUrl('goods', ['op' => 'editGoods', 'id' => $item['id'], 'type' => 'fueling'])}" title="编辑">
                                 <i class="fa fa-edit"> </i>

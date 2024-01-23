@@ -270,7 +270,12 @@ class Helper
             }
             $pull_data['unit'] = isset($goods['lottery']['unit']) ? intval(
                 $goods['lottery']['unit']
-            ) : 1;//1 默认1，inch为单位
+            ) : 1; //1 默认1，inch为单位
+        } elseif ($goods['ts']) {
+            $mcb_channel = intval($goods['ts']['duration']);
+            if ($mcb_channel < 1) {
+                return err('商品长度不正确！');
+            }
         } else {
             $mcb_channel = Device::cargoLane2Channel($device, $goods['cargo_lane'] ?? -1);
             if ($mcb_channel == Device::CHANNEL_INVALID) {

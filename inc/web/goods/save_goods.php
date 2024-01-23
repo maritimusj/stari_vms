@@ -100,6 +100,10 @@ if (isset($params['goodsId'])) {
             $goods->setExtraData('lottery.unit', intval($params['goodsSizeUnit']));
         }
 
+        if (isset($params['duration'])) {
+            $goods->setExtraData('ts.duration', intval($params['duration']));
+        }
+
         if (App::isBalanceEnabled()) {
             if (isset($params['balance'])) {
                 $goods->setExtraData('balance', max(0, intval($params['balance'])));
@@ -182,6 +186,12 @@ if (isset($params['goodsId'])) {
             'size' => intval($params['goodsSize']),
             'index' => $params['goodsMcbIndex'] ? intval($params['goodsMcbIndex']) : '',
             'unit' => intval($params['goodsSizeUnit']),
+        ];
+    }
+
+    if (isset($params['duration'])) {
+        $data['extra']['ts'] = [
+            'duration' => intval($params['duration']),
         ];
     }
 

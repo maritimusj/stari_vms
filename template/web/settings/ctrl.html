@@ -235,7 +235,15 @@
                         <div class="checkbox">
                             <label>
                                 <input type="checkbox" name="lotteryGoods" id="v-lottery-goods" value="1" {if $settings['goods']['lottery']['enabled']}checked{/if}>
-                                开启固定货道商品功能
+                                开启彩票商品功能
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-offset-2 col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="tsGoods" id="v-ts-goods" value="1" {if $settings['goods']['ts']['enabled']}checked{/if}>
+                                开启计时商品功能
                             </label>
                         </div>
                     </div>

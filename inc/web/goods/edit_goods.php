@@ -31,6 +31,8 @@ if ($goods_id > 0) {
 $type = Request::str('type');
 if ($type == Goods::Lottery) {
     Response::showTemplate('web/goods/edit_lottery', $params);
+} elseif ($type == Goods::Ts) {
+    Response::showTemplate('web/goods/edit_ts', $params);
 } elseif ($type == Goods::Fueling) {
     Response::showTemplate('web/goods/edit_fueling', $params);
 } else {

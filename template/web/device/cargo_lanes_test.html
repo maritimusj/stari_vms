@@ -1,3 +1,11 @@
+<style>
+    .test_btn {
+        position: relative;
+    }
+    .test_btn .qrcode {
+        position: relative;
+    }
+</style>
 <div style="max-height: 300px;overflow: auto;">
     {if $params['cargo_lanes']}
     <table class="table table-bordered cargolanes operate" id="cargolanes">
@@ -11,7 +19,9 @@
         <tbody>
             {loop $params['cargo_lanes'] $index $item}
             <tr data-fetchid="{$device_id}">
-                <td>{php echo $index + 1}</td>
+                <td>
+                    {php echo $index + 1}
+                </td>
                 <td>
                     <span {if empty($item['goods_id'])}class="text-gray"{/if}>
                         {$item['goods_name']}
@@ -30,6 +40,15 @@
                     {/if}
                 </td>
                 <td class="test_btn">
+                    {if $item['qrcode_url']}
+                    <div class="qrcode">
+                        <i class="fa fa-qrcode"></i>
+                        <div class="image">
+                            <img src="{$item['qrcode_url']}" alt="{$item['qrcode_url']}">
+                        </div>
+                    </div>
+
+                    {/if}
                     {if !$is_bluetooth_device}
                     <i class="fa fa-sign-out" data-op="deviceTestLaneN" data-params="{$index}" title="测试"></i>
                     {/if}

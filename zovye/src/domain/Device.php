@@ -307,6 +307,7 @@ class Device extends State
                 if ($available_restrict && !GoodsExpireAlert::isAvailable($device, $index)) {
                     continue;
                 }
+
                 $laneId = "l$index";
                 if (!empty($lanes_data[$laneId])) {
                     $lane['num'] = intval($lanes_data[$laneId]['num']);
@@ -315,8 +316,13 @@ class Device extends State
                         $lane['goods_price_formatted'] = number_format($lane['goods_price'] / 100, 2).'元';
                     }
                 }
+
                 if ($device->isBlueToothDevice()) {
                     $lane['is_motor'] = $device->getMotor() > $index;
+                }
+
+                if ($detail && App::isDeviceLaneQRCodeEnabled()) {
+                    $lane['qrcode_url'] = Util::toMedia($device->settings("qrcode.$index"));
                 }
 
                 $data['cargo_lanes'][$index] = $lane;

@@ -1082,6 +1082,11 @@ class deviceModelObj extends ModelObj
         return true;
     }
 
+    public function createQRCodeFileForLane($lane_id)
+    {
+
+    }
+
     /**
      * 创建二维码文件
      */
@@ -1110,7 +1115,7 @@ class deviceModelObj extends ModelObj
     }
 
     /**
-     * 获取领货链接
+     * 获取取货链接
      */
     public function getUrl(): string
     {
@@ -1120,8 +1125,6 @@ class deviceModelObj extends ModelObj
                 return Util::murl('sample', ['device' => $this->imei]);
             }
         }
-
-        $id = $this->isActiveQRCodeEnabled() ? $this->shadow_id : $this->imei;
 
         $params = [];
 
@@ -1140,7 +1143,7 @@ class deviceModelObj extends ModelObj
         }
 
         $params['from'] = 'device';
-        $params['device'] = $id;
+        $params['device'] = $this->isActiveQRCodeEnabled() ? $this->shadow_id : $this->imei;;
 
         return Util::murl('entry', $params);
     }

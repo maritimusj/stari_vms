@@ -531,5 +531,11 @@ class App
     public static function isDevicePayConfigEnabled(): bool
     {
         return settings('custom.device.payConfig.enabled', false);
-    }    
+    }
+
+    // 是否启用设备货道二维码
+    public static function isDeviceChannelQRCodeEnabled(): bool
+    {
+        return settings('custom.device.channelQRCode.enabled', false);
+    }
 }

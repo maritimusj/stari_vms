@@ -426,7 +426,7 @@ class DeviceEventProcessor
         $app_id = $data['id'];
         $device = Device::getFromAppId($app_id);
         if ($device) {
-            $device->updateQrcode();
+            $device->updateQRCode();
         }
     }
 

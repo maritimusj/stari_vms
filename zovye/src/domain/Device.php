@@ -444,7 +444,7 @@ class Device extends State
 
                 $device = Device::create($data);
                 if ($device) {
-                    $device->updateQrcode(true);
+                    $device->updateQRCode(true);
 
                     $extra = [];
 
@@ -665,7 +665,7 @@ class Device extends State
                 $device->set('extra', $extra);
             }
 
-            $device->updateQrcode(true);
+            $device->updateQRCode(true);
             $device->updateAppRemain();
 
             //更新公众号缓存

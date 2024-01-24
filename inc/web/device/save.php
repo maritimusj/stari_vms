@@ -383,7 +383,7 @@ $result = DBUtil::transactionDo(function () use ($id, &$device) {
         $device->updateAppRemain();
     }
 
-    $res = $device->updateQrcode(true);
+    $res = $device->updateQRCode(true);
 
     if (is_error($res)) {
         $msg .= ', 发生错误：'.$res['message'];

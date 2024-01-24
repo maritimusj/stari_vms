@@ -85,8 +85,9 @@ if ($op == 'default') {
                             return err('控制中心无法绑定appID，注册失败！');
                         }
                     }
+
                     $device->resetShadowId();
-                    $device->createQrcodeFile();
+                    $device->createQRCodeFile();
                     $device->appUpdateNotify();
 
                     return true;

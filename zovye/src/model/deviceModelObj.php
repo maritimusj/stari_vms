@@ -882,7 +882,7 @@ class deviceModelObj extends ModelObj
         $this->setAgent();
 
         $this->setTagsFromText('');
-        $this->updateQrcode(true);
+        $this->updateQRCode(true);
 
         return $this->save();
     }
@@ -1010,23 +1010,24 @@ class deviceModelObj extends ModelObj
     /**
      * 生成二维码并通知APP
      */
-    public function updateQrcode(bool $force = false): bool
+    public function updateQRCode(bool $force = false): bool
     {
         $need_notify = false;
+
         if ($this->isBlueToothDevice()) {
             if (empty($this->qrcode) || $force) {
-                $need_notify = $this->createQrcodeFile();
+                $need_notify = !is_error($this->createQRCodeFile());
             }
         } else {
             //无论什么情况都要更换shadowId!
             $this->resetShadowId();
 
             if ($force || $this->isActiveQrcodeEnabled() || empty($this->qrcode)) {
-                $need_notify = $this->createQrcodeFile();
+                $need_notify = !is_error($this->createQRCodeFile());
             }
         }
 
-        return $need_notify && $this->updateAppQrcode();
+        return $need_notify && $this->updateAppQRCode();
     }
 
     /**
@@ -1052,34 +1053,44 @@ class deviceModelObj extends ModelObj
         return $this->settings('extra.activeQrcode', 0);
     }
 
+    public function createChargerQRCode()
+    {
+        $chargerNum = $this->getChargerNum();
+        for ($i = 0; $i < $chargerNum; $i++) {
+
+            $chargerID = $i + 1;
+
+            $url = Util::murl('device', [
+                'charging' => true,
+                'device' => $this->getImei(),
+                'charger' => $chargerID,
+            ]);
+
+            $res = QRCodeUtil::createFile(
+                "device.$this->imei$chargerID",
+                $url,
+                function ($filename) use ($chargerID) {
+                    QRCodeUtil::renderTxt($filename, sprintf("%s%02d", $this->imei, $chargerID));
+                }
+            );
+            if (is_error($res)) {
+                return $res;
+            }
+            $this->setChargerProperty($chargerID, 'qrcode', $res);
+        }
+
+        return true;
+    }
+
     /**
      * 创建二维码文件
      */
-    public function createQrcodeFile(): bool
+    public function createQRCodeFile()
     {
         if ($this->isChargingDevice()) {
-            $chargerNum = $this->getChargerNum();
-            for ($i = 0; $i < $chargerNum; $i++) {
-
-                $chargerID = $i + 1;
-
-                $url = Util::murl('device', [
-                    'charging' => true,
-                    'device' => $this->getImei(),
-                    'charger' => $chargerID,
-                ]);
-
-                $qrcode_file = QRCodeUtil::createFile(
-                    "device.$this->imei$chargerID",
-                    $url,
-                    function ($filename) use ($chargerID) {
-                        QRCodeUtil::renderTxt($filename, sprintf("%s%02d", $this->imei, $chargerID));
-                    }
-                );
-                if (is_error($qrcode_file)) {
-                    return false;
-                }
-                $this->setChargerProperty($chargerID, 'qrcode', $qrcode_file);
+            $res = $this->createChargerQRCode();
+            if (is_error($res)) {
+                return $res;
             }
         }
 
@@ -1142,7 +1153,7 @@ class deviceModelObj extends ModelObj
     /**
      * 通知app更新二维码
      */
-    public function updateAppQrcode(): bool
+    public function updateAppQRCode(): bool
     {
         $data = [
             'qrcode' => $this->getAccountQRCode(),

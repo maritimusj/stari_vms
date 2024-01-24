@@ -69,7 +69,7 @@ foreach ($third_party_platform as $item) {
 $query = Device::query();
 /** @var deviceModelObj $device */
 foreach ($query->findAll() as $device) {
-    $res = $device->updateQrcode(true);
+    $res = $device->updateQRCode(true);
     if (is_error($res)) {
         Log::error('refresh_settings', [
             'device' => $device->getImei(),

@@ -90,7 +90,7 @@ if (empty($device)) {
 }
 
 $device->setDeviceModel(Device::BLUETOOTH_DEVICE);
-$device->updateQrcode(true);
+$device->updateQRCode(true);
 
 if ($device->set('extra', $extra) && $device->save()) {
     JSON::success(['message' => '成功']);

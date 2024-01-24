@@ -1022,7 +1022,7 @@ class deviceModelObj extends ModelObj
             //无论什么情况都要更换shadowId!
             $this->resetShadowId();
 
-            if ($force || $this->isActiveQrcodeEnabled() || empty($this->qrcode)) {
+            if ($force || $this->isActiveQRCodeEnabled() || empty($this->qrcode)) {
                 $need_notify = !is_error($this->createQRCodeFile());
             }
         }
@@ -1048,7 +1048,7 @@ class deviceModelObj extends ModelObj
     /**
      * 是否启用了动态二维码
      */
-    public function isActiveQrcodeEnabled(): bool
+    public function isActiveQRCodeEnabled(): bool
     {
         return $this->settings('extra.activeQrcode', 0);
     }
@@ -1121,7 +1121,7 @@ class deviceModelObj extends ModelObj
             }
         }
 
-        $id = $this->isActiveQrcodeEnabled() ? $this->shadow_id : $this->imei;
+        $id = $this->isActiveQRCodeEnabled() ? $this->shadow_id : $this->imei;
 
         $params = [];
 

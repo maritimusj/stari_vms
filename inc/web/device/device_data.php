@@ -37,7 +37,7 @@ if (is_array($ids)) {
             'ICCID' => $device->getICCID(),
             'qrcode' => $device->getQrcode(),
             'model' => $device->getDeviceModel(),
-            'activeQrcode' => $device->isActiveQrcodeEnabled(),
+            'activeQrcode' => $device->isActiveQRCodeEnabled(),
             'getUrl' => $device->getUrl(),
             'v0_status' => [
                 Device::V0_STATUS_SIG => $device->getSig(),

@@ -51,7 +51,7 @@ try {
     }
 
     //开启了shadowId的设备，只能通过shadowId找到
-    if ($device->isActiveQrcodeEnabled() && $device->getShadowId() !== $ticket_data_saved['shadowId']) {
+    if ($device->isActiveQRCodeEnabled() && $device->getShadowId() !== $ticket_data_saved['shadowId']) {
         throw new RuntimeException('请重新扫描设备二维码 [604]！');
     }
 

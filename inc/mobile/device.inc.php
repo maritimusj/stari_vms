@@ -38,7 +38,7 @@ if ($op == 'default') {
     }
 
     //开启了shadowId的设备，只能通过shadowId找到
-    if ($device->isActiveQrcodeEnabled() && $device->getShadowId() !== $device_id) {
+    if ($device->isActiveQRCodeEnabled() && $device->getShadowId() !== $device_id) {
         Response::alert('设备二维码不正确，请重新扫描！', 'error');
     }
 

@@ -99,7 +99,11 @@ class QRCodeUtil
             try {
                 We7::file_remote_upload("$dirname$filename");
             } catch (Exception $e) {
-                Log::error('createQrcodeFile', $e->getMessage());
+                Log::error('createQrcodeFile', [
+                    'filename' => $full_filename,
+                    'text' => $text,
+                    'error' => $e->getMessage(),
+                ]);
             }
 
             return "$dirname$filename";

@@ -26,7 +26,7 @@ SQL;
     $config = settings('pay', []);
 
     if ($config['lcsw'] && $config['lcsw']['enable']) {
-        PaymentConfig::createOrUpdateByName(Pay::LCSW, [
+        PaymentConfig::createOrUpdateDefaultByName(Pay::LCSW, [
             'merchant_no' => $config['lcsw']['merchant_no'],
             'terminal_id' => $config['lcsw']['terminal_id'],
             'access_token' => $config['lcsw']['access_token'],
@@ -41,7 +41,7 @@ SQL;
     }
 
     if ($config['SQB'] && $config['SQB']['enable']) {
-        PaymentConfig::createOrUpdateByName(Pay::SQB, [
+        PaymentConfig::createOrUpdateDefaultByName(Pay::SQB, [
             'sn' => $config['SQB']['terminal_sn'],
             'key' => $config['SQB']['terminal_key'],
             'title' => $config['SQB']['store_name'],
@@ -56,7 +56,7 @@ SQL;
     }
 
     if ($config['wx'] && $config['wx']['enable']) {
-        PaymentConfig::createOrUpdateByName(Pay::WX, [
+        PaymentConfig::createOrUpdateDefaultByName(Pay::WX, [
             'appid' => $config['wx']['appid'],
             'wxappid' => $config['wx']['wxappid'],
             'mch_id' => $config['wx']['mch_id'],
@@ -72,7 +72,7 @@ SQL;
         ]);
 
         if (!isEmptyArray($config['wx']['v3'])) {
-            PaymentConfig::createOrUpdateByName(Pay::WX_V3, [
+            PaymentConfig::createOrUpdateDefaultByName(Pay::WX_V3, [
                 'appid' => $config['wx']['appid'],
                 'wxappid' => $config['wx']['wxappid'],
                 'mch_id' => $config['wx']['mch_id'],
@@ -96,7 +96,7 @@ SQL;
         $data = $agent->settings('agentData.pay', []);
         if ($data) {
             if ($data['lcsw'] && $data['lcsw']['enable']) {
-                PaymentConfig::createOrUpdate($agent->getId(), Pay::LCSW, [
+                PaymentConfig::createOrUpdateFor($agent->getId(), Pay::LCSW, [
                     'merchant_no' => $data['lcsw']['merchant_no'],
                     'terminal_id' => $data['lcsw']['terminal_id'],
                     'access_token' => $data['lcsw']['access_token'],
@@ -110,7 +110,7 @@ SQL;
                 ]);
             }
             if ($data['SQB'] && $data['SQB']['enable']) {
-                PaymentConfig::createOrUpdate($agent->getId(), Pay::SQB, [
+                PaymentConfig::createOrUpdateFor($agent->getId(), Pay::SQB, [
                     'sn' => $data['SQB']['terminal_sn'],
                     'key' => $data['SQB']['terminal_key'],
                     'title' => $data['SQB']['store_name'],
@@ -124,7 +124,7 @@ SQL;
                 ]);
             }
             if ($data['wx'] && $data['wx']['enable']) {
-                PaymentConfig::createOrUpdate($agent->getId(), Pay::WX_V3, [
+                PaymentConfig::createOrUpdateFor($agent->getId(), Pay::WX_V3, [
                     'sub_mch_id' => $data['wx']['mch_id'],
                     'app' => [
                         'wx' => [

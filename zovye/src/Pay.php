@@ -142,7 +142,7 @@ class Pay
 
         foreach ($names as $name) {
             /** @var payment_configModelObj $config */
-            $config = PaymentConfig::getByName($name);
+            $config = PaymentConfig::getDefaultByName($name);
 
             if ($config && $matchFN($user, $config)) {
                 return self::make($config);
@@ -597,7 +597,7 @@ class Pay
                         $data = $config->toArray();
                     } else {
                         /** @var payment_configModelObj $default */
-                        $default = PaymentConfig::getByName(Pay::WX_V3);
+                        $default = PaymentConfig::getDefaultByName(Pay::WX_V3);
                         if (!$default) {
                             throw new RuntimeException('不正确的支付配置！');
                         }
@@ -637,13 +637,13 @@ class Pay
     public static function getWxMCHPayClient()
     {
         /** @var payment_configModelObj $config */
-        $config = PaymentConfig::getByName(Pay::WX_V3);
+        $config = PaymentConfig::getDefaultByName(Pay::WX_V3);
         if ($config) {
             return new WxMCHPayV3($config->toArray());
         }
 
         /** @var payment_configModelObj $config */
-        $config = PaymentConfig::getByName(Pay::WX);
+        $config = PaymentConfig::getDefaultByName(Pay::WX);
         if ($config) {
             return new WxMCHPay($config->toArray());
         }

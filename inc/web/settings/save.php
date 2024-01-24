@@ -786,7 +786,7 @@ if ($page == 'device') {
                 'ali' => Request::bool('lcswAli'),
             ],
         ];
-        $res = PaymentConfig::createOrUpdateByName(Pay::LCSW, $data);
+        $res = PaymentConfig::createOrUpdateDefaultByName(Pay::LCSW, $data);
         if (is_error($res)) {
             Log::error('settings', [
                 'error' => $res,
@@ -794,7 +794,7 @@ if ($page == 'device') {
             ]);
         }
     } else {
-        PaymentConfig::removeByName(Pay::LCSW);
+        PaymentConfig::removeDefaultByName(Pay::LCSW);
     }
 
     if (Request::bool('SQB')) {
@@ -815,7 +815,7 @@ if ($page == 'device') {
                     'error' => $result,
                 ]);
             } else {
-                PaymentConfig::createOrUpdateByName(Pay::SQB, [
+                PaymentConfig::createOrUpdateDefaultByName(Pay::SQB, [
                     'sn' => $result['terminal_sn'],
                     'key' => $result['terminal_key'],
                     'title' => $result['store_name'],
@@ -829,7 +829,7 @@ if ($page == 'device') {
                 ]);
             }
         } else {
-            $config = PaymentConfig::getByName(Pay::SQB);
+            $config = PaymentConfig::getDefaultByName(Pay::SQB);
             if ($config) {
                 $config->setExtraData('app', [
                     'wx' => [
@@ -842,7 +842,7 @@ if ($page == 'device') {
             }
         }
     } else {
-        PaymentConfig::removeByName(Pay::SQB);
+        PaymentConfig::removeDefaultByName(Pay::SQB);
     }
 
     if (Request::bool('wx')) {
@@ -864,7 +864,7 @@ if ($page == 'device') {
             ],
         ];
 
-        $res = PaymentConfig::createOrUpdateByName(Pay::WX, $data);
+        $res = PaymentConfig::createOrUpdateDefaultByName(Pay::WX, $data);
         if (is_error($res)) {
             Log::error('settings', [
                 'error' => $res,
@@ -891,7 +891,7 @@ if ($page == 'device') {
                 ],
             ];
 
-            $config = PaymentConfig::getByName(Pay::WX_V3);
+            $config = PaymentConfig::getDefaultByName(Pay::WX_V3);
             if ($config) {
                 $data['pem']['cert'] = $config->getExtraData('pem.cert', []);
                 $config->setExtraData($data);
@@ -904,11 +904,11 @@ if ($page == 'device') {
                 ]);
             }
         } else {
-            PaymentConfig::removeByName(Pay::WX_V3);
+            PaymentConfig::removeDefaultByName(Pay::WX_V3);
         }
     } else {
-        PaymentConfig::removeByName(Pay::WX);
-        PaymentConfig::removeByName(Pay::WX_V3);
+        PaymentConfig::removeDefaultByName(Pay::WX);
+        PaymentConfig::removeDefaultByName(Pay::WX_V3);
     }
 
     $settings['ali']['appid'] = Request::trim('ali_appid');

@@ -21,7 +21,7 @@ class PaymentConfig extends AbstractBase
         return m('payment_config');
     }
 
-    public static function getByName($name)
+    public static function getDefaultByName($name)
     {
         return parent::findOne([
             'agent_id' => 0,
@@ -29,7 +29,7 @@ class PaymentConfig extends AbstractBase
         ]);
     }
 
-    public static function removeByName($name): bool
+    public static function removeDefaultByName($name): bool
     {
         return parent::remove([
             'agent_id' => 0,
@@ -50,12 +50,12 @@ class PaymentConfig extends AbstractBase
         ]);
     }
 
-    public static function createOrUpdateByName($name, $extra = [])
+    public static function createOrUpdateDefaultByName($name, $extra = [])
     {
-        return self::createOrUpdate(0, $name, $extra);
+        return self::createOrUpdateFor(0, $name, $extra);
     }
 
-    public static function createOrUpdate($agent_id, $name, $extra = [])
+    public static function createOrUpdateFor($agent_id, $name, $extra = [])
     {
         /** @var payment_configModelObj $config */
         $config = PaymentConfig::findOne([

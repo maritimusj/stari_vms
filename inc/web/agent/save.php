@@ -320,7 +320,7 @@ $result = DBUtil::transactionDo(function () use ($id, &$from) {
     } elseif (Request::bool('agent_payment')) {
 
         if (Request::bool('lcsw')) {
-            if (!PaymentConfig::createOrUpdate($user->getId(), Pay::LCSW, [
+            if (!PaymentConfig::createOrUpdateFor($user->getId(), Pay::LCSW, [
                 'merchant_no' => Request::trim('merchant_no'),
                 'terminal_id' => Request::trim('terminal_id'),
                 'access_token' => Request::trim('access_token'),
@@ -359,7 +359,7 @@ $result = DBUtil::transactionDo(function () use ($id, &$from) {
                         'error' => $result,
                     ]);
                 } else {
-                    PaymentConfig::createOrUpdate($user->getId(), Pay::SQB, [
+                    PaymentConfig::createOrUpdateFor($user->getId(), Pay::SQB, [
                         'sn' => $result['terminal_sn'],
                         'key' => $result['terminal_key'],
                         'title' => $result['store_name'],
@@ -396,7 +396,7 @@ $result = DBUtil::transactionDo(function () use ($id, &$from) {
         }
 
         if (Request::bool('wx')) {
-            if (!PaymentConfig::createOrUpdate($user->getId(), Pay::WX_V3, [
+            if (!PaymentConfig::createOrUpdateFor($user->getId(), Pay::WX_V3, [
                 'sub_mch_id' => Request::trim('wxMCHID'),
                 'app' => [
                     'wx' => [

@@ -188,6 +188,7 @@ if ($page == 'device') {
     $settings['custom']['keeper']['commissionLimit']['enabled'] = Request::bool('KeeperCommissionLimitEnabled') ? 1 : 0;
     $settings['custom']['keeper']['commissionOrderDistinguish']['enabled'] = Request::bool('KeeperCommissionOrderDistinguishEnabled') ? 1 : 0;
     $settings['custom']['device']['payConfig']['enabled'] = Request::bool('DevicePayConfigEnabled') ? 1 : 0;
+    $settings['custom']['device']['laneQRCode']['enabled'] = Request::bool('DeviceLaneQRCodeEnabled') ? 1 : 0;
 
     Config::app('ad.sponsor.enabled', Request::bool('sponsorAd'), true);
     Config::app('misc.GoodsExpireAlert.enabled', Request::bool('GoodsExpireAlert') ? 1 : 0, true);

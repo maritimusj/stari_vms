@@ -127,7 +127,7 @@ class DeviceEventProcessor
         ],
         self::EVENT_V0_QRCODE => [
             'title' => '[v0]App请求更新二维码',
-            'handler' => [self::class, 'onAppQrcodeMsg'],
+            'handler' => [self::class, 'onAppQRCodeMsg'],
             'params' => [
                 'log' => [
                     'enable' => true,
@@ -421,7 +421,7 @@ class DeviceEventProcessor
     /**
      * app::qrcode 事件处理
      */
-    public static function onAppQrcodeMsg($data)
+    public static function onAppQRCodeMsg($data)
     {
         $app_id = $data['id'];
         $device = Device::getFromAppId($app_id);

@@ -534,8 +534,8 @@ class App
     }
 
     // 是否启用设备货道二维码
-    public static function isDeviceChannelQRCodeEnabled(): bool
+    public static function isDeviceLaneQRCodeEnabled(): bool
     {
-        return settings('custom.device.channelQRCode.enabled', false);
+        return settings('custom.device.laneQRCode.enabled', false);
     }
 }

@@ -459,6 +459,10 @@ if ($device) {
     }
 
     Helper::removeInvalidAlert($device);
+
+    if (App::isDeviceLaneQRCodeEnabled()) {
+        $device->createQRCodeFileForAllLanes();
+    }
 }
 
 $redirect_url = Util::url('device', [

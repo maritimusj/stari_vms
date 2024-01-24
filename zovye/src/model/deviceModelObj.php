@@ -1082,9 +1082,30 @@ class deviceModelObj extends ModelObj
         return true;
     }
 
-    public function createQRCodeFileForLane($lane_id)
+    public function createQRCodeFileForAllLanes()
     {
+        $device_type = DeviceTypes::from($this);
+        if ($device_type) {
+            $lanes = $device_type->getCargoLanes();
+            for ($i = 0; $i < count($lanes); $i++) {
+                $this->createQRCodeFileForLane($i);
+            }
+        }
+    }
 
+    public function createQRCodeFileForLane(int $lane_id)
+    {
+        $url = $this->getUrl($lane_id);
+
+        $res = QRCodeUtil::createFile("device.$this->imei$lane_id", $url, function ($filename) use ($lane_id) {
+            QRCodeUtil::renderTxt($filename, sprintf("%s%02d", $this->imei, $lane_id));
+        });
+
+        if (is_error($res)) {
+            return $res;
+        }
+
+        return $this->updateSettings("qrcode.$lane_id", $res);
     }
 
     /**
@@ -1117,7 +1138,7 @@ class deviceModelObj extends ModelObj
     /**
      * 获取取货链接
      */
-    public function getUrl(): string
+    public function getUrl(int $lane_id = null): string
     {
         if (App::isFlashEggEnabled()) {
             $adDeviceUID = $this->getAdDeviceUID();
@@ -1143,7 +1164,11 @@ class deviceModelObj extends ModelObj
         }
 
         $params['from'] = 'device';
-        $params['device'] = $this->isActiveQRCodeEnabled() ? $this->shadow_id : $this->imei;;
+        $params['device'] = $this->isActiveQRCodeEnabled() ? $this->shadow_id : $this->imei;
+
+        if (isset($lane_id)) {
+            $params['lane'] = $lane_id;
+        }
 
         return Util::murl('entry', $params);
     }

@@ -1,9 +1,17 @@
 <style>
-    .test_btn {
-        position: relative;
+    .test_btn .qrcode-x {
+        display: inline-block;
     }
-    .test_btn .qrcode {
-        position: relative;
+    .test_btn .qrcode-x .image {
+        position: absolute;
+        display: none;
+    }
+    .test_btn .qrcode-x img {
+        width: 150px;
+        height: 150px;
+    }
+    .test_btn .qrcode-x:hover .image {
+        display: block;
     }
 </style>
 <div style="max-height: 300px;overflow: auto;">
@@ -41,8 +49,8 @@
                 </td>
                 <td class="test_btn">
                     {if $item['qrcode_url']}
-                    <div class="qrcode">
-                        <i class="fa fa-qrcode"></i>
+                    <div class="qrcode-x">
+                        <i class="fa fa-qrcode" data-url="{$item['qrcode_url']}"></i>
                         <div class="image">
                             <img src="{$item['qrcode_url']}" alt="{$item['qrcode_url']}">
                         </div>

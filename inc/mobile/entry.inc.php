@@ -262,23 +262,6 @@ if (LocationUtil::mustValidate($user, $device)) {
     Response::locationPage($tpl_data);
 }
 
-if ($account) {
-    if ($account->isQuestionnaire() && $tid) {
-        $acc = Account::findOneFromUID($tid);
-        if ($acc) {
-            $res = Helper::checkAvailable($user, $acc, $device);
-        } else {
-            $res = err('找不到这个任务！');
-        }
-    } else {
-        $res = Helper::checkAvailable($user, $account, $device);
-    }
-    if (is_error($res)) {
-        $user->cleanLastActiveData();
-        $account = null;
-    }
-}
-
 if (empty($account)) {
     //设置用户最后活动数据
     $tpl_data = TemplateUtil::getTplData([$user, $device]);
@@ -288,6 +271,22 @@ if (empty($account)) {
     Response::devicePage($tpl_data);
     //调试使用
     //Response::douyinPage(['device' => $device, 'user' => $user]);
+}
+
+if ($account->isQuestionnaire() && $tid) {
+    $acc = Account::findOneFromUID($tid);
+    if ($acc) {
+        $res = Helper::checkAvailable($user, $acc, $device);
+    } else {
+        $res = err('找不到这个任务！');
+    }
+} else {
+    $res = Helper::checkAvailable($user, $account, $device);
+}
+
+if (is_error($res)) {
+    $user->cleanLastActiveData();
+    $account = null;
 }
 
 //处理多个关注二维码

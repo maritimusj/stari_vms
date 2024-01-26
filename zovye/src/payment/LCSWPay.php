@@ -178,7 +178,7 @@ class LCSWPay implements IPay
         }
 
         if ($res['result_code'] !== '01') {
-            return err($res['return_msg']);
+            return err($res['return_msg'] ?? '未知原因');
         }
 
         return $res;

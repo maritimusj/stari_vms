@@ -24,6 +24,7 @@ $zip->open($file_path, ZipArchive::CREATE);   //打开压缩包
 
 $ids = Request::array('ids');
 $query = Device::query(['id' => $ids]);
+$fn = Request::trim('fn');
 
 $addFile = function ($url) use ($zip, $url_prefix, $attach_prefix) {
     $filename = str_replace($url_prefix, $attach_prefix, $url);
@@ -42,7 +43,16 @@ foreach ($query->findAll() as $device) {
             $addFile($url);
         }
     } else {
-        $addFile($device->getQrcode());
+        if (empty($fn)) {
+            $addFile($device->getQrcode());
+        } elseif ($fn == 'lanes') {
+            $payload = $device->getPayload(true);
+            foreach((array)$payload['cargo_lanes'] as $lane) {
+                if ($lane['qrcode_url']) {
+                    $addFile($lane['qrcode_url']);    
+                }
+            }
+        }
     }
 }
 

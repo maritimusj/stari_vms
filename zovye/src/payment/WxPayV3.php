@@ -111,11 +111,11 @@ abstract class WxPayV3 implements IPay
 
             $result = PayUtil::parseWxPayV3Response($response);
 
-            if (!empty($result['code'])) {
-                return err($result['message'] ?? '请求失败！');
+            if (empty($result['code'])) {
+                return $result;
             }
 
-            return $result;
+            return err($result['message'] ?: '退款失败！');
 
         } catch (Exception $e) {
             if ($e instanceof RequestException) {

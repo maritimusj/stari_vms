@@ -147,15 +147,7 @@ class SQBPay implements IPay
             return err('退款进行中');
         }
 
-        if ($res['error_message']) {
-            return err($res['error_message']);
-        }
-
-        if ($res['result_code'] == 'REFUND_ERROR' || $res['result_code'] == 'REFUND_FAIL') {
-            return err('退款失败');
-        }
-
-        return err('退款失败，未知原因');
+        return err($res['error_message'] ?: '退款失败');
     }
 
     public function query(string $order_no)

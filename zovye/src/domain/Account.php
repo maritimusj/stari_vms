@@ -1173,6 +1173,17 @@ class Account extends State
         return true;
     }
 
+    public static function hasThirdPartyAccountEnabled(): bool
+    {
+        $all = self::getAllEnabledThirdPartyPlatform();
+        foreach ($all as $enabled) {
+            if ($enabled) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static function getAvailableList(deviceModelObj $device, userModelObj $user, array $params = []): array
     {
         if (Session::isSnapshot()) {

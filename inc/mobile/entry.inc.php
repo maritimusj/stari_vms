@@ -132,21 +132,20 @@ if ($device_id) {
     } else {
         //转跳回小程序
         if (Request::bool('jump')) {
-            $cb = function(userModelObj $user) use($account) {
+            $cb = function (userModelObj $user) use ($account) {
                 $user->setLastActiveAccount($account);
-                
+
                 $tpl_data = TemplateUtil::getTplData([
                     $user,
                     $account,
                     'misc' => [
                         'wx_app.username' => settings('agentWxapp.username', ''),
-                    ]
+                    ],
                 ]);
-                
+
                 Response::jumpPage($tpl_data);
             };
-        }
-        //如果公众号奖励为积分，显示获取积分页面
+        } //如果公众号奖励为积分，显示获取积分页面
         elseif (App::isBalanceEnabled() && $account->getBonusType() == Account::BALANCE) {
             $cb = function (userModelObj $user) use ($account) {
 
@@ -187,6 +186,10 @@ if ($device_id) {
         'ip' => CLIENT_IP,
         'user-agent' => $_SERVER['HTTP_USER_AGENT'],
     ];
+}
+
+if (Account::hasThirdPartyAccountEnabled()) {
+    $params['update'] = true;
 }
 
 $user = Session::getCurrentUser($params);
@@ -348,7 +351,7 @@ $tpl_data = TemplateUtil::getTplData([
     ],
     'misc' => [
         'wx_app.username' => settings('agentWxapp.username', ''),
-    ]
+    ],
 ]);
 
 //领取页面

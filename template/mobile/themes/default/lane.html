@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport"
-		content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+        content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
     <title>{$tpl['site']['title']}</title>
     <style type="text/css">
         html,
@@ -122,22 +122,21 @@
         }
 
         .btn {
-            width: calc(100% - 40px);
-            height: 40px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             background-color: #ff4444;
             color: white;
-            border-radius: 20px;
             border: none;
             font-size: 16px;
             font-weight: 500;
         }
 
-        .btn:active {
-            opacity: 0.8;
+        .pay {
+            width: calc(100% - 40px);
+            height: 40px;
+            border-radius: 20px;
         }
 
         .mask {
@@ -155,70 +154,95 @@
         }
 
         .loading-view {
-			width: 120px;
-			height: 120px;
-			background-color: rgba(255, 255, 255, 0.9);
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			justify-content: center;
-			border-radius: 10px;
-			box-shadow: 0 0 5px lightgray;
-		}
+            width: 120px;
+            height: 120px;
+            background-color: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            box-shadow: 0 0 5px lightgray;
+        }
 
-		.loading-view img {
-			width: 50px;
-			height: 50px;
-			animation: loading 1s infinite;
-		}
+        .loading-view img {
+            width: 50px;
+            height: 50px;
+            animation: loading 1s infinite;
+        }
 
-		.loading-view span {
-			font-size: 14px;
-			margin-top: 10px;
-		}
+        .loading-view span {
+            font-size: 14px;
+            margin-top: 10px;
+        }
 
-		@keyframes loading {
-			from {
-				transform: rotate(0deg);
-			}
-			to {
-				transform: rotate(360deg);
-			}
-		}
+        @keyframes loading {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .msg {
+            font-weight: 500;
+            color: #666;
+        }
+
+        .close {
+            margin-top: 50px;
+            width: 120px;
+            height: 40px;
+            border-radius: 20px;
+            background-color: #E15D65;
+        }
+
+        .clickable:active {
+            opacity: 0.8;
+        }
     </style>
 </head>
 
 <body ontouchstart>
-    <div id="app" v-cloak v-if="goods">
-        <img class="img" :src="goods.img">
-        <div class="info">
-            <div class="row">
-                <span class="goods">{{goods.name}}</span>
-                <div class="price">
-                    <span>{{(goods.price / 100).toFixed(2)}}</span>
-                    <span class="unit">元/{{goods.unit_title}}</span>
+    <div id="app" v-cloak>
+        <template v-if="status === true">
+            <img class="img" :src="goods.img">
+            <div class="info">
+                <div class="row">
+                    <span class="goods">{{goods.name}}</span>
+                    <div class="price">
+                        <span>{{(goods.price / 100).toFixed(2)}}</span>
+                        <span class="unit">元/{{goods.unit_title}}</span>
+                    </div>
+                </div>
+                <div class="divider"></div>
+                <div class="desc">
+                    <span>设备名称：{{device}}</span>
+                    <span>设备编号：{{imei}}</span>
+                    <span>剩余数量：{{goods.num}}</span>
                 </div>
             </div>
-            <div class="divider"></div>
-            <div class="desc">
-                <span>设备名称：{{device}}</span>
-                <span>设备编号：{{imei}}</span>
-                <span>剩余数量：{{goods.num}}</span>
+            <div class="gallery" v-if="goods.gallery">
+                <span class="title">商品详情</span>
+                <div class="divider"></div>
+                <img class="img" :src="item" v-for="(item, index) in goods.gallery" :key="index">
             </div>
-        </div>
-        <div class="gallery" v-if="goods.gallery">
-            <span class="title">商品详情</span>
-            <div class="divider"></div>
-            <img class="img" :src="item" v-for="(item, index) in goods.gallery" :key="index">
-        </div>
-        <div class="footer">
-            <button class="btn" @click="onPay">立即支付</button>
-        </div>
+            <div class="footer">
+                <button class="pay btn clickable" @click="onPay">立即支付</button>
+            </div>
+        </template>
+        <template v-else-if="status === false">
+            <img src="{MODULE_URL}static/img/error.svg">
+            <span class="msg">{{msg}}</span>
+            <button class="close btn clickable" @click="onClose">关闭页面</button>
+        </template>
         <div class="mask" v-if="loading">
             <div class="loading-view">
-				<img src="{MODULE_URL}static/m/balance/img/loading.svg">
-				<span>正在加载中...</span>
-			</div>
+                <img src="{MODULE_URL}static/m/balance/img/loading.svg">
+                <span>正在加载中...</span>
+            </div>
         </div>
     </div>
     {$tpl['js']['code']}
@@ -230,9 +254,11 @@
                 imei: '',
                 device: '',
                 goods: null,
-                loading: false
+                loading: false,
+                status: null,
+                msg: ''
             },
-            created() {
+            created () {
                 window.alert = function (name) {
                     var iframe = document.createElement("IFRAME")
                     iframe.style.display = "none"
@@ -247,15 +273,17 @@
             },
             methods: {
                 getDetail () {
+                    this.loading = true
                     zovye_fn.getDetail().then(res => {
-                        if (res.status) {
+                        this.loading = false
+                        this.status = res.status
+                        if (this.status) {
                             this.imei = res.data.imei
                             this.device = res.data.name
                             this.goods = res.data.goods
                             this.onPay()
                         } else {
-                            alert(res.data.msg || '暂时无法购买！')
-                            zovye_fn.closeWindow && zovye_fn.closeWindow()
+                            this.msg = res.data.msg || '暂时无法购买！'
                         }
                     })
                 },
@@ -268,6 +296,9 @@
                     zovye_fn.goods_wxpay(params).finally(() => {
                         this.loading = false
                     })
+                },
+                onClose() {
+                    zovye_fn.closeWindow && zovye_fn.closeWindow()
                 }
             }
         })

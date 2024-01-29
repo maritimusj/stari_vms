@@ -281,7 +281,7 @@ if ($op == 'default') {
     }
 
     $lane_id = Request::int('lane');
-    $goods = $device->getGoodsByLane($lane_id);
+    $goods = $device->getGoodsByLane($lane_id, ['fullPath', 'useImageProxy']);
     if (empty($goods)) {
         JSON::fail('对不起，没有商品信息！');
     }
@@ -291,6 +291,7 @@ if ($op == 'default') {
     }
 
     $data = $device->profile();
+
     $data['goods'] = $goods;
 
     JSON::success($data);

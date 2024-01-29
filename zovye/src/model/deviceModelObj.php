@@ -1097,8 +1097,9 @@ class deviceModelObj extends ModelObj
     {
         $url = $this->getUrl($lane_id);
 
-        $res = QRCodeUtil::createFile("device.$this->imei$lane_id", $url, function ($filename) use ($lane_id) {
-            QRCodeUtil::renderTxt($filename, sprintf("%s%02d", $this->imei, $lane_id + 1));
+        $filename_index = $lane_id + 1;
+        $res = QRCodeUtil::createFile("device.$this->imei$filename_index", $url, function ($filename) use ($filename_index) {
+            QRCodeUtil::renderTxt($filename, sprintf("%s%02d", $this->imei, $filename_index));
         });
 
         if (is_error($res)) {

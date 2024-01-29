@@ -162,8 +162,7 @@ class PayUtil
     const zovye_fn = {};
     zovye_fn.redirectToGetPayResultPage = function(orderNO, msg) {
         let api_url = "{$params['payResultURL']}".replace("__orderNO__", orderNO);
-        api_url = api_url.replace("__msg__", encodeURIComponent(msg));
-        window.location.replace(api_url);
+        window.location.replace(api_url.replace("__msg__", encodeURIComponent(msg)));
     }
     
     zovye_fn.redirectToPayFailedPage = function(msg) {
@@ -266,8 +265,7 @@ ALI_JSCODE;
     const zovye_fn = {};
     zovye_fn.redirectToGetPayResultPage = function(orderNO, msg) {
         let api_url = "{$params['payResultURL']}".replace("__orderNO__", orderNO);
-        api_url = api_url.replace("__msg__", encodeURIComponent(msg))
-        window.location.replace(api_url);
+        window.location.replace(api_url.replace("__msg__", encodeURIComponent(msg)));
     }
     
     zovye_fn.redirectToPayFailedPage = function(msg) {

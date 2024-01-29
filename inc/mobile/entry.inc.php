@@ -11,6 +11,7 @@ defined('IN_IA') or exit('Access Denied');
 use zovye\business\CZTV;
 use zovye\domain\Account;
 use zovye\domain\Device;
+use zovye\domain\User;
 use zovye\model\userModelObj;
 use zovye\util\Helper;
 use zovye\util\LocationUtil;
@@ -209,6 +210,13 @@ if (is_callable($cb)) {
     if ($res) {
         extract($res);
     }
+}
+
+if (App::isPuaiEnabled() && !User::isSubscribed($user)) {
+    Response::followPage([
+        'user' => $user,
+        'device' => $device,
+    ]);
 }
 
 if ($from == 'device') {

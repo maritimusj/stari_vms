@@ -21,20 +21,6 @@ if (!App::isFlashEggEnabled()) {
     Response::alert('该功能没有启用，请联系管理员，谢谢！', 'error');
 }
 
-$op = Request::op('default');
-
-//获取关注公众号二维码
-if ($op == 'qrcode') {
-    $url = Wx::getTempQRCodeUrl(http_build_query([
-        'app' => app::uid(),
-        'device' => Request::trim('device'),
-    ]));
-    if ($url) {
-        JSON::success(['url' => $url]);
-    }
-    JSON::fail('无法获取公众号二维码！');
-}
-
 $params = [
     'create' => true,
     'update' => true,
@@ -84,13 +70,6 @@ $user = $getUserFN();
 //记录设备ID
 $user->setLastActiveDevice($device);
 
-if ($op == 'check') {
-    JSON::success([
-        'user' => $user->profile(false),
-        'subscribed' => User::isSubscribed($user),
-    ]);
-}
-
 if (!User::isSubscribed($user)) {
     Response::followPage([
         'user' => $user,
@@ -98,13 +77,7 @@ if (!User::isSubscribed($user)) {
     ]);
 }
 
-//默认显示商品列表
-if ($op == 'default') {
-    Response::giftGoodsListPage([
-        'user' => $user,
-        'device' => $device,
-    ]);
-}
+$op = Request::op('default');
 
 //获取商品列表
 if ($op == 'goods') {
@@ -204,3 +177,8 @@ if ($op == 'detail') {
     ]);
 }
 
+//默认显示商品列表
+Response::giftGoodsListPage([
+    'user' => $user,
+    'device' => $device,
+]);

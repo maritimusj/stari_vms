@@ -379,4 +379,32 @@ if ($op == 'default') {
         'redirect' => $url,
     ]);
 
+} elseif ($op == 'qrcode') {
+
+    $url = Wx::getTempQRCodeUrl(http_build_query([
+        'app' => app::uid(),
+        'device' => Request::trim('device'),
+    ]));
+
+    if ($url) {
+        JSON::success(['url' => $url]);
+    }
+
+    JSON::fail('无法获取公众号二维码！');
+
+} elseif ($op == 'check') {
+
+    $user = Session::getCurrentUser();
+    if (empty($user)) {
+        JSON::fail('请用微信或者支付宝扫描二维码，谢谢！');
+    }
+
+    if ($user->isBanned()) {
+        JSON::fail('用户暂时无法使用该功能，请联系管理员！');
+    }
+
+    JSON::success([
+        'user' => $user->profile(false),
+        'subscribed' => User::isSubscribed($user),
+    ]);
 }

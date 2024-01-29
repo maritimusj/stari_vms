@@ -538,4 +538,9 @@ class App
     {
         return settings('custom.device.laneQRCode.enabled', false);
     }
+
+    public static function isPuaiEnabled(): bool
+    {
+        return settings('custom.puai.enabled', false);
+    }
 }

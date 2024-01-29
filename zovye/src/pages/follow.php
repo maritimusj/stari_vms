@@ -14,7 +14,7 @@ use zovye\util\Util;
 defined('IN_IA') or exit('Access Denied');
 
 /**
- * 闪蛋用户关注页面
+ * 用户关注页面
  * @param userModelObj $user
  * @param deviceModelObj $device
  * @return void
@@ -31,7 +31,7 @@ $tpl_data = TemplateUtil::getTplData([
     'device' => $device->profile(),
 ]);
 
-$api_url = Util::murl('sample', ['device' => $device->getImei()]);
+$api_url = Util::murl('util', ['device' => $device->getImei()]);
 $jquery_url = JS_JQUERY_URL;
 
 $tpl_data['js']['code'] = <<<JSCODE

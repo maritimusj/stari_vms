@@ -22,9 +22,18 @@ $device = $tpl['device']['_obj'];
 /** @var userModelObj $user */
 //$user = $tpl['user']['_obj'];
 
-$device_url = empty($params['redirect']) ? Util::murl('entry', ['device' => $device->getShadowId()]) : strval(
-    $params['redirect']
-);
+if (!empty($params['redirect'])) {
+    $device_url = strval($params['redirect']);
+} else {
+    $data = ['device' => $device->getShadowId()];
+    /** @var string $order_no */
+    $lane_id = TemplateUtil::getTemplateVar('lane_id');
+    if (isset($lane_id)) {
+        $data['lane'] = $lane_id;
+    }
+    $device_url = Util::murl('entry', $data);
+}
+
 $device_api_url = Util::murl('device', ['id' => $device->getId()]);
 $jquery_url = JS_JQUERY_URL;
 

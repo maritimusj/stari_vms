@@ -226,6 +226,11 @@ if ($from == 'device') {
     if ($device->isReadyTimeout()) {
         //设备准备页面，检测设备是否在线等等
         $tpl_data = TemplateUtil::getTplData([$device, $user]);
+
+        if (Request::isset('lane')) {
+            $tpl_data['lane_id'] = Request::int('lane');
+        }
+
         Response::devicePreparePage($tpl_data);
     }
 

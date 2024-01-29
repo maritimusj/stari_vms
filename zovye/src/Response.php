@@ -45,7 +45,7 @@ use zovye\util\Util;
  * @method static void userInfoPage(array $array)
  * @method static void cztvPage(array $array)
  * @method static void luckyRegistryPage(array $array)
- * @method static deviceGoodsPage(array $tpl_data)
+ * @method static deviceLanePage(array $tpl_data)
  */
 class Response
 {

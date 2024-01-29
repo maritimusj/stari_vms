@@ -225,7 +225,7 @@ if ($from == 'device') {
         //设备准备页面，检测设备是否在线等等
         $tpl_data = TemplateUtil::getTplData([$device, $user]);
         $tpl_data['lane_id'] = Request::int('lane');
-        Response::deviceGoodsPage($tpl_data);
+        Response::deviceLanePage($tpl_data);
     }
 
 } else {

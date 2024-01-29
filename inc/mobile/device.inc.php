@@ -277,7 +277,7 @@ if ($op == 'default') {
 
     $device = Device::get($device_id);
     if (empty($device)) {
-        JSON::fail('对不起，设备不存在！');
+        JSON::fail('对不起，请重新扫描设备二维码！');
     }
 
     if ($device->isMaintenance()) {

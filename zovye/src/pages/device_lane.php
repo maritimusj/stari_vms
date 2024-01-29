@@ -28,7 +28,7 @@ $device = $tpl['device']['_obj'];
 /** @var userModelObj $user */
 $user = $tpl['user']['_obj'];
 
-/** @var string $tid */
+/** @var int $lane_id */
 $lane_id = TemplateUtil::getTemplateVar('lane_id');
 
 $api_url = Util::murl('device', ['op' => 'lane', 'id' => $device->getId(), 'lane' => $lane_id]);

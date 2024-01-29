@@ -28,7 +28,10 @@ $device = $tpl['device']['_obj'];
 /** @var userModelObj $user */
 $user = $tpl['user']['_obj'];
 
-$api_url = Util::murl('device', ['id' => $device->getId(), 'lane' => $params['lane']]);
+/** @var string $tid */
+$lane_id = TemplateUtil::getTemplateVar('lane_id');
+
+$api_url = Util::murl('device', ['op' => 'lane', 'id' => $device->getId(), 'lane' => $lane_id]);
 $jquery_url = JS_JQUERY_URL;
 
 $js_sdk = Util::jssdk();

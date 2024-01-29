@@ -24,11 +24,16 @@ if ($device->isChargingDevice()) {
 } else {
     $title = "设备 [ {$device->getName()} ]";
     $tpl = 'web/device/cargo_lanes_test';
+
+    $payload = $device->getPayload(true);
+    foreach($payload['cargo_lanes'] as $index => &$lane) {
+        $lane['url'] = $device->getUrl($index);
+    }
     $data = [
         'device_id' => $device->getId(),
         'is_fueling_device' => $device->isFuelingDevice(),
         'is_bluetooth_device' => $device->isBlueToothDevice(),
-        'params' => $device->getPayload(true),
+        'params' => $payload,
     ];
 }
 

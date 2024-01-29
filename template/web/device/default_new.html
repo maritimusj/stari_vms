@@ -585,6 +585,10 @@
                                     <li><a href="#" data-op="getScheduleTaskList"><i class="fa fa-retweet"></i> 查看定时任务</a></li>
                                     <li role="separator" class="divider"></li>
                                     {/if}
+                                    {if \zovye\App::isDeviceLaneQRCodeEnabled()}
+                                    <li><a href="#" data-op="downloadLaneQRCodes"><i class="fa fa-download"></i> 下载货道二维码</a></li>
+                                    <li role="separator" class="divider"></li>
+                                    {/if}
                                     <template v-if="o.appId">
                                         <li ><a href="#" data-op="showVersions"><i class="fa fa-cloud-download fa-fw"></i> 推送版本更新</a></li>
                                         <li role="separator" class="divider"></li>

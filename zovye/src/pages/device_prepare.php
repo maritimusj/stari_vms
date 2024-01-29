@@ -25,7 +25,7 @@ $device = $tpl['device']['_obj'];
 if (!empty($params['redirect'])) {
     $device_url = strval($params['redirect']);
 } else {
-    $data = ['device' => $device->getShadowId()];
+    $data = ['device' => $device->getShadowId(), 'from' => 'device'];
     /** @var string $order_no */
     $lane_id = TemplateUtil::getTemplateVar('lane_id');
     if (isset($lane_id)) {

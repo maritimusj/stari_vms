@@ -223,21 +223,19 @@ if ($from == 'device') {
     $user->setLastActiveAccount();
     $account = null;
 
+    $tpl_data = TemplateUtil::getTplData([$device, $user]);
+
+    if (Request::isset('lane')) {
+        $tpl_data['lane_id'] = Request::int('lane');
+    }
+
+    //设备准备页面，检测设备是否在线等等
     if ($device->isReadyTimeout()) {
-        //设备准备页面，检测设备是否在线等等
-        $tpl_data = TemplateUtil::getTplData([$device, $user]);
-
-        if (Request::isset('lane')) {
-            $tpl_data['lane_id'] = Request::int('lane');
-        }
-
         Response::devicePreparePage($tpl_data);
     }
 
+    //带货道参数的链接，直接进入商品购买页面
     if (Request::isset('lane')) {
-        //带货道参数的链接，直接进入商品购买页面
-        $tpl_data = TemplateUtil::getTplData([$device, $user]);
-        $tpl_data['lane_id'] = Request::int('lane');
         Response::deviceLanePage($tpl_data);
     }
 

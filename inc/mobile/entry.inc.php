@@ -212,6 +212,15 @@ if (is_callable($cb)) {
     }
 }
 
+if (empty($device)) {
+    $device = $user->getLastActiveDevice();
+    if (empty($device)) {
+        //设备扫描页面
+        $tpl_data = TemplateUtil::getTplData([$user, $account]);
+        Response::scanPage($tpl_data);
+    }
+}
+
 if (App::isPuaiEnabled() && !User::isSubscribed($user)) {
     Response::followPage([
         'user' => $user,
@@ -249,15 +258,6 @@ if ($from == 'device') {
             'user' => $user,
             'account' => $account,
         ]);
-    }
-}
-
-if (empty($device)) {
-    $device = $user->getLastActiveDevice();
-    if (empty($device)) {
-        //设备扫描页面
-        $tpl_data = TemplateUtil::getTplData([$user, $account]);
-        Response::scanPage($tpl_data);
     }
 }
 

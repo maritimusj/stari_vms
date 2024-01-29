@@ -299,4 +299,6 @@ if ($op == 'default') {
     $data['goods'] = $goods;
 
     JSON::success($data);
-}
+} 
+
+JSON::fail('不正确的请求！');

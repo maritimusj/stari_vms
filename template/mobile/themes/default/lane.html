@@ -232,9 +232,6 @@
                 goods: null,
                 loading: false
             },
-            created () {
-                this.getDetail()
-            },
             mounted () {
                 window.alert = function (name) {
                     var iframe = document.createElement("IFRAME")
@@ -244,6 +241,7 @@
                     window.frames[0].window.alert(name)
                     iframe.parentNode.removeChild(iframe)
                 }
+                this.getDetail()
             },
             methods: {
                 getDetail () {

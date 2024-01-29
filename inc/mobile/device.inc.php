@@ -280,6 +280,10 @@ if ($op == 'default') {
         JSON::fail('对不起，设备不存在！');
     }
 
+    if ($device->isMaintenance()) {
+        JSON::fail('对不起，设备正在维护中！');
+    }
+
     $lane_id = Request::int('lane');
     $goods = $device->getGoodsByLane($lane_id, ['fullPath', 'useImageProxy']);
     if (empty($goods)) {

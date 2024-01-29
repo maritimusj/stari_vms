@@ -271,4 +271,27 @@ if ($op == 'default') {
     }
 
     Response::echo(CtrlServ::OK);
+
+} elseif ($op == 'lane') {
+    $device_id = Request::int('id');
+
+    $device = Device::get($device_id);
+    if (empty($device)) {
+        JSON::fail('对不起，设备不存在！');
+    }
+
+    $lane_id = Request::int('lane');
+    $goods = $device->getGoodsByLane($lane_id);
+    if (empty($goods)) {
+        JSON::fail('对不起，没有商品信息！');
+    }
+
+    if ($goods['num'] < 1) {
+        JSON::fail('对不起，商品已售罄！');
+    }
+
+    $data = $device->profile();
+    $data['goods'] = $goods;
+
+    JSON::success($data);
 }

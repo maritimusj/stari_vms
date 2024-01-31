@@ -10,7 +10,7 @@ use zovye\base\ModelObj;
 use zovye\traits\DataGetterAndSetter;
 
 /**
- * Class BaseLogsModelObj
+ * Class baseLogsModelObj
  * @package zovye
  * @method getLevel();
  * @method setLevel($level);
@@ -18,7 +18,7 @@ use zovye\traits\DataGetterAndSetter;
  * @method setTitle($title);
  * @method getCreatetime();
  */
-class BaseLogsModelObj extends ModelObj
+class baseLogsModelObj extends ModelObj
 {
     protected $id;
     protected $uniacid;

@@ -11,7 +11,7 @@ use zovye\domain\Device;
 use zovye\domain\User;
 use function zovye\tb;
 
-class pay_logsModelObj extends BaseLogsModelObj implements ICard
+class pay_logsModelObj extends baseLogsModelObj implements ICard
 {
     public static function getTableName($read_or_write): string
     {

@@ -468,11 +468,6 @@ class App
         return settings('custom.team.enabled', false);
     }
 
-    public static function isCZTVEnabled(): bool
-    {
-        return settings('custom.cztv.enabled', false);
-    }
-
     public static function isFlashEggEnabled(): bool
     {
         return settings('custom.flashEgg.enabled', false);

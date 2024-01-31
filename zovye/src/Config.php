@@ -17,7 +17,6 @@ namespace zovye;
  * @method static mixed charging(string $key, $v = '', $update = false)
  * @method static mixed fueling(string $key, $v = '', $update = false)
  * @method static mixed app(string $key, $v = '', $update = false)
- * @method static mixed cztv(string $key, $v = '', $update = false)
  * @method static mixed douyin(string $key, $v = '', $update = false)
  * @method static mixed wxplatform(string $key, $v = '', $update = false)
  * @method static mixed notify(string $key, $v = '', $update = false)

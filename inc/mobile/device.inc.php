@@ -7,7 +7,6 @@
 namespace zovye;
 
 use RuntimeException;
-use zovye\business\CZTV;
 use zovye\domain\Account;
 use zovye\domain\Cron;
 use zovye\domain\Device;
@@ -182,22 +181,6 @@ if ($op == 'default') {
     $user->setLastActiveData('goods', $goods['id']);
     JSON::success('已保存用户选择！');
 
-} elseif ($op == 'get') {
-
-    if (App::isCZTVEnabled()) {
-        $user = User::get(Request::str('user'), true);
-        if (empty($user) || $user->isBanned()) {
-            JSON::fail('找不到用户！');
-        }
-
-        $device = $user->getLastActiveDevice();
-        if (empty($device)) {
-            JSON::fail('请重新扫描设备二维码！');
-        }
-
-        $result = CZTV::get($user, $device->getUid(), Request::int('goods'));
-        JSON::result($result);
-    }
 } elseif ($op == 'schedule') {
 
     Log::debug('schedule', [

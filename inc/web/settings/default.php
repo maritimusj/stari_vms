@@ -80,10 +80,6 @@ if ($page == 'device') {
         $tpl_data['douyin'] = Config::douyin('client', []);
     }
 
-    if (App::isCZTVEnabled()) {
-        $tpl_data['cztv'] = Config::cztv('client', []);
-    }
-
 } elseif ($page == 'balance') {
 
     $tpl_data['navs'] = Helper::getSettingsNavs();

@@ -354,12 +354,7 @@ if ($op === 'create') {
 } elseif ($op == 'list') {
 
     //手机  用户订单列表
-    if (Request::has('user') && App::isCZTVEnabled()) {
-        $user = User::get(Request::str('user'), true);
-    } else {
-        $user = Session::getCurrentUser();
-    }
-
+    $user = Session::getCurrentUser();
     if (empty($user) || $user->isBanned()) {
         JSON::fail('找不到用户！');
     }
@@ -396,12 +391,7 @@ if ($op === 'create') {
 } elseif ($op == 'detail') {
 
     //查询订单状态
-    if (Request::has('user') && App::isCZTVEnabled()) {
-        $user = User::get(Request::str('user'), true);
-    } else {
-        $user = Session::getCurrentUser();
-    }
-
+    $user = Session::getCurrentUser();
     if (empty($user) || $user->isBanned()) {
         JSON::fail(['code' => 401, 'msg' => '找不到用户或者用户无法领取！']);
     }

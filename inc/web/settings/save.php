@@ -177,7 +177,6 @@ if ($page == 'device') {
     $settings['custom']['device']['briefPage']['enabled'] = Request::bool('deviceBriefPage') ? 1 : 0;
     $settings['custom']['smsPromo']['enabled'] = Request::bool('smsPromoEnabled') ? 1 : 0;
     $settings['custom']['team']['enabled'] = Request::bool('teamEnabled') ? 1 : 0;
-    $settings['custom']['cztv']['enabled'] = Request::bool('cztvEnabled') ? 1 : 0;
     $settings['custom']['flashEgg']['enabled'] = Request::bool('flashEggEnabled') ? 1 : 0;
     $settings['custom']['promoter']['enabled'] = Request::bool('promoterEnabled') ? 1 : 0;
     $settings['custom']['GDCVMachine']['enabled'] = Request::bool('GDCVMachineEnabled') ? 1 : 0;
@@ -493,14 +492,6 @@ if ($page == 'device') {
         Config::douyin('client', [
             'key' => Request::trim('douyinClientKey'),
             'secret' => Request::trim('douyinClientSecret'),
-        ], true);
-    }
-
-    if (App::isCZTVEnabled()) {
-        Config::cztv('client', [
-            'appid' => Request::trim('cztvAppId'),
-            'redirect_url' => Request::trim('cztvRedirectURL'),
-            'account_uid' => Request::trim('cztvAccountUID'),
         ], true);
     }
 

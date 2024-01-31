@@ -8,7 +8,6 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-use zovye\business\CZTV;
 use zovye\domain\Account;
 use zovye\domain\Device;
 use zovye\domain\User;
@@ -18,11 +17,9 @@ use zovye\util\LocationUtil;
 use zovye\util\TemplateUtil;
 use zovye\util\Util;
 
-$from = Request::str('from');
 $device_id = Request::str('device');
 $account_id = Request::str('account');
-$xid = Request::str('xid');
-$tid = Request::str('tid');
+$from = Request::str('from');
 
 if (Session::isAliAppContainer()) {
     $ali_entry_url = Util::murl('ali', [
@@ -31,7 +28,9 @@ if (Session::isAliAppContainer()) {
     ]);
 
     Response::redirect($ali_entry_url);
-} elseif (Session::isDouYinAppContainer()) {
+}
+
+if (Session::isDouYinAppContainer()) {
     $douyin_entry_url = Util::murl('douyin', [
         'from' => $from,
         'device' => $device_id,
@@ -39,11 +38,6 @@ if (Session::isAliAppContainer()) {
     ]);
 
     Response::redirect($douyin_entry_url);
-}
-
-//暖心小屋定制功能
-if (CZTV::handle($device_id)) {
-    exit();
 }
 
 $params = [
@@ -266,7 +260,6 @@ if ($from == 'device') {
 
 //检查用户定位
 if (LocationUtil::mustValidate($user, $device)) {
-
     $user->cleanLastActiveData();
     $tpl_data = TemplateUtil::getTplData(
         [
@@ -294,6 +287,8 @@ if (empty($account)) {
     //Response::douyinPage(['device' => $device, 'user' => $user]);
 }
 
+
+$tid = Request::str('tid');
 if ($account->isQuestionnaire() && $tid) {
     $acc = Account::findOneFromUID($tid);
     if ($acc) {
@@ -311,6 +306,7 @@ if (is_error($res)) {
 }
 
 //处理多个关注二维码
+$xid = Request::str('xid');
 $more_accounts = Helper::getRequireAccounts($device, $user, $account, [$account_id, $xid]);
 if ($more_accounts) {
     //准备页面广告

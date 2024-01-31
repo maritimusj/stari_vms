@@ -43,7 +43,6 @@ use zovye\util\Util;
  * @method static void giftGoodsListPage(array $array)
  * @method static void taskPage(array $array)
  * @method static void userInfoPage(array $array)
- * @method static void cztvPage(array $array)
  * @method static void luckyRegistryPage(array $array)
  * @method static void deviceLanePage(array $tpl_data)
  */
@@ -84,6 +83,8 @@ class Response
         }
 
         header("Location:$url", true, $response_code);
+
+        exit();
     }
 
     public static function message($msg, string $redirect = '', string $type = ''): void

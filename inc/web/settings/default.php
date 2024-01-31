@@ -165,14 +165,15 @@ if ($page == 'device') {
 
         $tpl_data['advsID'] = Config::app('wxapp.advs', []);
         $tpl_data['notify_url'] = Util::murl('wxnotify');
-
-        $config = Config::app('wxapp.message-push', []);
-        if (empty($config['token'])) {
-            $config['token'] = Util::random(32);
-        }
-
-        $tpl_data['config'] = $config;
     }
+
+    $config = Config::app('wxapp.message-push', []);
+    if (empty($config['token'])) {
+        $config['token'] = Util::random(32);
+    }
+
+    $tpl_data['config'] = $config;
+
 } elseif ($page == 'data_vw') {
     $tpl_data['navs']['data_vw'] = '数据大屏';
 

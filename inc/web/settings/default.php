@@ -164,8 +164,9 @@ if ($page == 'device') {
         ];
 
         $tpl_data['advsID'] = Config::app('wxapp.advs', []);
-        $tpl_data['notify_url'] = Util::murl('wxnotify');
     }
+
+    $tpl_data['notify_url'] = Util::murl('wxnotify');
 
     $config = Config::app('wxapp.message-push', []);
     if (empty($config['token'])) {

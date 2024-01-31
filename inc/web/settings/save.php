@@ -501,10 +501,11 @@ if ($page == 'device') {
     $settings['misc']['pushAccountMsg_val'] = Request::trim('pushAccountMsg_val');
     $settings['misc']['pushAccountMsg_delay'] = Request::int('pushAccountMsg_delay');
     $settings['misc']['maxAccounts'] = Request::int('maxAccounts');
+    $settings['misc']['accountsPromote'] = Request::bool('accountsPromote') ? 1 : 0;
+
     $settings['user']['maxTotalFree'] = Request::int('maxTotalFree');
     $settings['user']['maxFree'] = Request::int('maxFree');
     $settings['user']['freeCD'] = Request::int('freeCD');
-    $settings['misc']['accountsPromote'] = Request::bool('accountsPromote') ? 1 : 0;
 
     $settings['order']['retry']['last'] = Request::int('orderRetryLastTime');
     $settings['order']['retry']['max'] = Request::int('orderRetryMaxCount');

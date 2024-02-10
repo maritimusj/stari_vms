@@ -94,5 +94,11 @@ $user->setLastActiveDevice($device);
 $tpl_data = TemplateUtil::getTplData([$user, $device]);
 $tpl_data['from'] = $from;
 
+//带货道参数的链接，直接进入商品购买页面
+if (Request::isset('lane')) {
+    $tpl_data['lane_id'] = Request::int('lane');
+    Response::deviceLanePage($tpl_data);
+}
+
 //设备首页
 Response::devicePage($tpl_data);

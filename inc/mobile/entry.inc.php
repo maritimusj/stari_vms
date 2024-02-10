@@ -22,10 +22,15 @@ $account_id = Request::str('account');
 $from = Request::str('from');
 
 if (Session::isAliAppContainer()) {
-    $ali_entry_url = Util::murl('ali', [
+    $params = [
         'from' => $from,
         'device' => $device_id,
-    ]);
+    ];
+    if (Request::isset('lane')) {
+        $params['lane'] = Request::int('lane');
+    }
+
+    $ali_entry_url = Util::murl('ali', $params);
 
     Response::redirect($ali_entry_url);
 }

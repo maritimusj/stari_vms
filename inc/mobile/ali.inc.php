@@ -15,6 +15,7 @@ defined('IN_IA') or exit('Access Denied');
 $op = Request::op('default');
 $from = Request::str('from');
 $device_id = Request::str('device');
+$lane_id = Request::isset('lane') ? Request::int('lane') : null;
 
 //获取支付宝用户信息
 if ($op == 'auth') {
@@ -36,6 +37,7 @@ if (!Session::isAliUser()) {
         'op' => 'auth',
         'from' => $from,
         'device' => $device_id,
+        'lane' => $lane_id,
         'retries' => $retries + 1,
     ]);
 
@@ -68,7 +70,7 @@ if (App::isUserVerify18Enabled()) {
     if (!$user->isIDCardVerified()) {
         Response::showTemplate('verify_18', [
             'verify18' => settings('user.verify_18', []),
-            'entry_url' => Util::murl('ali', ['from' => $from, 'device' => $device_id]),
+            'entry_url' => Util::murl('ali', ['from' => $from, 'device' => $device_id, 'lane'=> $lane_id]),
         ], true);
     }
 }
@@ -78,25 +80,23 @@ if ($device->isActiveQRCodeEnabled() && $device->getShadowId() !== $device_id) {
     Response::alert('设备二维码不匹配！', 'error');
 }
 
+$tpl_data = TemplateUtil::getTplData([$user, $device]);
+$tpl_data['from'] = $from;
+$tpl_data['lane_id'] = $lane_id;
+
 if ($from == 'device') {
     if ($device->isReadyTimeout()) {
         //设备准备页面，检测设备是否在线等等
-        $tpl_data = TemplateUtil::getTplData([$device, $user]);
         Response::devicePreparePage($tpl_data);
     }
-
     $user->cleanLastActiveData();
 }
 
 //设置用户最后活动数据
 $user->setLastActiveDevice($device);
 
-$tpl_data = TemplateUtil::getTplData([$user, $device]);
-$tpl_data['from'] = $from;
-
 //带货道参数的链接，直接进入商品购买页面
-if (Request::isset('lane')) {
-    $tpl_data['lane_id'] = Request::int('lane');
+if (App::isDeviceLaneQRCodeEnabled() && isset($lane_id)) {
     Response::deviceLanePage($tpl_data);
 }
 

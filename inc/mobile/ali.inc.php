@@ -33,6 +33,7 @@ if (!Session::isAliUser()) {
     if ($retries > 3) {
         Response::alert('获取用户信息失败[01]', 'error');
     }
+
     $cb_url = Util::murl('ali', [
         'op' => 'auth',
         'from' => $from,
@@ -47,7 +48,6 @@ if (!Session::isAliUser()) {
 }
 
 //用户扫描设备，进入设备页面
-
 $device = Device::find($device_id, ['imei', 'shadow_id']);
 if (empty($device)) {
     Response::alert('请重新扫描设备上的二维码！', 'error');

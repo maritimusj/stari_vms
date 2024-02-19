@@ -149,17 +149,12 @@ class DeviceUtil
             return $pull_result;
         }
 
-        //如果是运营人员测试，则不减少库存
+        //如果不是运营人员测试，则减少库存
         if (empty($params['keeper'])) {
-            $locker = $device->payloadLockAcquire(3);
-            if (empty($locker)) {
-                return err('设备正忙，请重试！');
+            $res = self::resetDevicePayload($device, $pull_result, $goods, "设备测试，用户：{$data['userid']}");
+            if (is_error($res)) {
+                return $res;
             }
-            $payload = $device->resetPayload([$lane => -1], "设备测试，用户：{$data['userid']}");
-            if (is_error($payload)) {
-                return err('保存库存失败！');
-            }
-            $locker->unlock();
             $device->updateAppRemain();
         }
 
@@ -173,6 +168,22 @@ class DeviceUtil
         }
 
         return $result;
+    }
+
+    public static function resetDevicePayload(deviceModelObj $device, $result, $goods, $reason)
+    {
+        if ((settings('device.errorInventoryOp') || !is_error($result)) && isset($goods['cargo_lane'])) {
+            $locker = $device->payloadLockAcquire(3);
+            if (empty($locker)) {
+                return err('设备正忙，请重试！');
+            }
+            $res = $device->resetPayload([$goods['cargo_lane'] => -1], $reason);
+            if (is_error($res)) {
+                return err('保存库存失败！');
+            }
+            $locker->unlock();
+        }
+        return true;
     }
 
     /**
@@ -461,16 +472,9 @@ class DeviceUtil
                 }
 
                 //处理库存
-                if ((settings('device.errorInventoryOp') || !is_error($result)) && isset($goods['cargo_lane'])) {
-                    $locker = $device->payloadLockAcquire(3);
-                    if (empty($locker)) {
-                        return err('设备正忙，请重试！');
-                    }
-                    $v = $device->resetPayload([$goods['cargo_lane'] => -1], "订单：{$order->getOrderNO()}");
-                    if (is_error($v)) {
-                        return err('保存库存失败！');
-                    }
-                    $locker->unlock();
+                $res = self::resetDevicePayload($device, $result, $goods, "订单：{$order->getOrderNO()}");
+                if (is_error($res)) {
+                    return $res;
                 }
 
                 //出货失败后，只记录错误，不回退数据

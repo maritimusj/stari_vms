@@ -319,16 +319,9 @@ class Helper
         $result = $device->pull($pull_data);
 
         //处理库存
-        if ((settings('device.errorInventoryOp') || !is_error($result)) && isset($goods['cargo_lane'])) {
-            $locker = $device->payloadLockAcquire(3);
-            if (empty($locker)) {
-                return err('设备正忙，请重试！');
-            }
-            $res = $device->resetPayload([$goods['cargo_lane'] => -1], "订单：{$order->getOrderNO()}");
-            if (is_error($res)) {
-                return err('保存库存失败！');
-            }
-            $locker->unlock();
+        $res = DeviceUtil::resetDevicePayload($device, $result, $goods, "订单：{$order->getOrderNO()}");
+        if (is_error($res)) {
+            return $res;
         }
 
         $device->save();

@@ -28,6 +28,7 @@ use zovye\model\userModelObj;
 use zovye\Pay;
 use zovye\Request;
 use zovye\util\DBUtil;
+use zovye\util\DeviceUtil;
 use zovye\util\Helper;
 use zovye\ZovyeException;
 use function zovye\err;
@@ -342,16 +343,9 @@ function createOrder(array $params, string $order_no, array $goods): array
     }
 
     //处理库存
-    if ((settings('device.errorInventoryOp') || !is_error($result)) && isset($goods['cargo_lane'])) {
-        $locker = $device->payloadLockAcquire(3);
-        if (empty($locker)) {
-            return [err('设备正忙，请重试！')];
-        }
-        $result = $device->resetPayload([$goods['cargo_lane'] => -1], "订单：$order_no");
-        if (is_error($result)) {
-            return [err('保存库存变动失败！')];
-        }
-        $locker->unlock();
+    $res = DeviceUtil::resetDevicePayload($device, $result, $goods, "订单：$order_no");
+    if (is_error($res)) {
+        return [$res];
     }
 
     $device->save();

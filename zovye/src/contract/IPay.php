@@ -32,10 +32,10 @@ interface IPay
         string $body = ''
     );
 
+    function createQRCodePay(string $code, string $device_uid, string $order_no, int $price, string $body = '');
 
     public function createJsPay(string $user_uid, string $device_uid, string $order_no, int $price, string $body = '');
-
-
+    
     /**
      * 获取支付Js
      * @return mixed
@@ -54,7 +54,7 @@ interface IPay
      * @param bool $is_transaction_id
      * @return mixed
      */
-    public function refund(string $order_no, int $amount,  bool $is_transaction_id = false);
+    public function refund(string $order_no, int $amount, bool $is_transaction_id = false);
 
     /**
      * 查询订单

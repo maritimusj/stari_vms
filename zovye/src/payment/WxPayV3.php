@@ -14,6 +14,7 @@ use WeChatPay\BuilderChainable;
 use WeChatPay\Crypto\AesGcm;
 use WeChatPay\Crypto\Rsa;
 use WeChatPay\Formatter;
+use wx\pay;
 use zovye\contract\IPay;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
@@ -35,6 +36,21 @@ abstract class WxPayV3 implements IPay
     public function getCallbackUrl(): string
     {
         return PayUtil::getPaymentCallbackUrl($this);
+    }
+
+    function createQRCodePay(string $code, string $device_uid, string $order_no, int $price, string $body = '')
+    {
+        $config = $this->getConfig();
+
+        $params = [
+            'device_info' => $device_uid,
+            'out_trade_no' => $order_no,
+            'auth_code' => $code,
+            'body' => $body,
+            'total_fee' => $price,
+        ];
+
+        return (new pay($config))->buildQrcodePay($params);
     }
 
     public function parseJSPayResponse(ResponseInterface $response)

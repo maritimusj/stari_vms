@@ -709,7 +709,7 @@ class Helper
 
         try {
             $code = $params['code'] ?? '';
-            if (empty($code) || !is_numeric($code)) {
+            if (empty($code)) {
                 throw new RuntimeException('无效的付款码，请重新扫码！');
             }
 
@@ -729,7 +729,7 @@ class Helper
                 throw new RuntimeException('系统错误，创建用户失败！');
             }
 
-            $order_no = substr("U{$user->getId()}P$code".sha1($code), 0, MAX_ORDER_NO_LEN);
+            $order_no = substr("U{$user->getId()}P".sha1($code), 0, MAX_ORDER_NO_LEN);
             if (Order::exists($order_no)) {
                 throw new RuntimeException('订单已存在！');
             }
@@ -775,10 +775,6 @@ class Helper
             ]);
 
             if (is_error($data) && $data['errno'] != 100) {
-                Log::error('qr_pay', [
-                    'order_no' => $order_no,
-                    'data' => $data,
-                ]);
                 throw new RuntimeException('创建支付失败: '.$data['message']);
             }
 
@@ -807,6 +803,9 @@ class Helper
             }
 
         } catch (RuntimeException $e) {
+            Log::error('qr_pay', [
+                'error' => $e->getMessage(),
+            ]);
             $device->appShowMessage($e->getMessage(), 'error');
         }
     }

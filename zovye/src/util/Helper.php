@@ -746,7 +746,7 @@ class Helper
                 throw new RuntimeException('系统错误，没有可用商品！');
             }
 
-            if (App::isAllCodeEnabled() && $goods[Goods::ALLOW_FREE]) {
+            if (App::isAllCodeEnabled() && $goods[Goods::AllowFree]) {
                 if (!Job::createAccountOrder([
                     'account' => Account::getPseudoAccount()->getId(),
                     'device' => $device->getId(),

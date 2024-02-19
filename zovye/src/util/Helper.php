@@ -715,9 +715,9 @@ class Helper
 
             //根据付款码设置环境
             if (Pay::isWxPayQRCode($code)) {
-                $_SESSION['ali_user_id'] = $code;
-            } else {
                 $_SESSION['wx_user_id'] = $code;
+            } else {
+                $_SESSION['ali_user_id'] = $code;
             }
 
             if (!Locker::try($code)) {

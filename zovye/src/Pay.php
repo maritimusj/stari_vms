@@ -101,12 +101,10 @@ class Pay
      */
     public static function selectPay(deviceModelObj $device, userModelObj $user): ?IPay
     {
-        if ($user->isWxUser() || $user->isWXAppUser() || Session::isWxUser() || Session::isWxAppUser()) {
-            $names = [self::LCSW, self::SQB, self::WX_V3, self::WX];
-        } elseif ($user->isAliUser() || Session::isAliUser()) {
+        if ($user->isAliUser() || Session::isAliUser()) {
             $names = [self::LCSW, self::SQB];
         } else {
-            return null;
+            $names = [self::LCSW, self::SQB, self::WX_V3, self::WX];
         }
 
         $matchFN = function (userModelObj $user, payment_configModelObj $config) {

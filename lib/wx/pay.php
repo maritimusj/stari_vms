@@ -172,6 +172,11 @@ class pay
 
         $params['appid'] = $this->config['appid'];
         $params['mch_id'] = $this->config['mch_id'];
+
+        if ($this->config['sub_mch_id']) {
+            $params['sub_mch_id'] = $this->config['sub_mch_id'];
+        }
+
         $params['spbill_create_ip'] = CLIENT_IP;
         $params['nonce_str'] = Util::random(32);
         $params['sign'] = $this->buildSign($params);

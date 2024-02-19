@@ -21,10 +21,10 @@ class Goods
     const AllowBalance = 'allowBalance';
     const AllowDelivery = 'allowDelivery';
 
-    const ALLOW_PAY = 0b01;
-    const ALLOW_FREE = 0b10;
-    const ALLOW_BALANCE = 0b100;
-    const ALLOW_DELIVERY = 0b1000;
+    const ALLOW_PAY_BM = 0b01;
+    const ALLOW_FREE_BM = 0b10;
+    const ALLOW_BALANCE_BM = 0b100;
+    const ALLOW_DELIVERY_BM = 0b1000;
 
     const Lottery = 'lottery';
 
@@ -36,42 +36,42 @@ class Goods
 
     public static function setPayBitMask($s1, $allow = true): int
     {
-        return $allow ? $s1 | self::ALLOW_PAY : $s1 ^ self::ALLOW_PAY;
+        return $allow ? $s1 | self::ALLOW_PAY_BM : $s1 ^ self::ALLOW_PAY_BM;
     }
 
     public static function isAllowPay($s1): bool
     {
-        return $s1 & self::ALLOW_PAY;
+        return $s1 & self::ALLOW_PAY_BM;
     }
 
     public static function setFreeBitMask($s1, $allow = true): int
     {
-        return $allow ? $s1 | self::ALLOW_FREE : $s1 ^ self::ALLOW_FREE;
+        return $allow ? $s1 | self::ALLOW_FREE_BM : $s1 ^ self::ALLOW_FREE_BM;
     }
 
     public static function isAllowFree($s1): bool
     {
-        return $s1 & self::ALLOW_FREE;
+        return $s1 & self::ALLOW_FREE_BM;
     }
 
     public static function setBalanceBitMask($s1, $allow = true): int
     {
-        return $allow ? $s1 | self::ALLOW_BALANCE : $s1 ^ self::ALLOW_BALANCE;
+        return $allow ? $s1 | self::ALLOW_BALANCE_BM : $s1 ^ self::ALLOW_BALANCE_BM;
     }
 
     public static function isAllowBalance($s1): bool
     {
-        return $s1 & self::ALLOW_BALANCE;
+        return $s1 & self::ALLOW_BALANCE_BM;
     }
 
     public static function setDeliveryBitMask($s1, $allow = true): int
     {
-        return $allow ? $s1 | self::ALLOW_DELIVERY : $s1 ^ self::ALLOW_DELIVERY;
+        return $allow ? $s1 | self::ALLOW_DELIVERY_BM : $s1 ^ self::ALLOW_DELIVERY_BM;
     }
 
     public static function isAllowDelivery($s1): bool
     {
-        return $s1 & self::ALLOW_DELIVERY;
+        return $s1 & self::ALLOW_DELIVERY_BM;
     }
 
     /**

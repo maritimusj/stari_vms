@@ -640,6 +640,25 @@
         deviceTypes: JSON.parse(decodeURIComponent('{php echo json_encode($s_device_type ?: [])}')),
         tags: JSON.parse(decodeURIComponent('{php echo json_encode($s_tags ?: [])}')),
     }
+
+    $(function() {
+        $('body').on({
+            mouseenter: function(e){
+                $(e.target).parent().find('.image').show();
+            },
+            mouseleave: function(e){
+                $(e.target).parent().find('.image').hide();
+            },
+            mousemove: function(e) {
+                const x = $(e.target).closest('#modal-message .modal-body').offset();
+                $(e.target).parent().find('.image').css({
+                        "display": "block",
+                        "top": e.clientY - x.top + 10,
+                        "left": e.clientX - x.left + 10,
+                });
+            },
+        }, '.qrcode-x .fa-qrcode')
+    })
 </script>
 <script src="{php echo MODULE_URL}static/js/device.min.js?v=20220903005"></script>
 {template 'common/footer'}

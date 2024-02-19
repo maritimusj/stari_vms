@@ -729,7 +729,7 @@ class Helper
                 throw new RuntimeException('系统错误，创建用户失败！');
             }
 
-            $order_no = substr("U{$user->getId()}P$code".date('dH'), 0, MAX_ORDER_NO_LEN);
+            $order_no = substr("U{$user->getId()}P$code".sha1($code), 0, MAX_ORDER_NO_LEN);
             if (Order::exists($order_no)) {
                 throw new RuntimeException('订单已存在！');
             }
@@ -744,6 +744,19 @@ class Helper
 
             if (empty($goods)) {
                 throw new RuntimeException('系统错误，没有可用商品！');
+            }
+
+            if (App::isAllCodeEnabled() && $goods[Goods::ALLOW_FREE]) {
+                if (!Job::createAccountOrder([
+                    'account' => Account::getPseudoAccount()->getId(),
+                    'device' => $device->getId(),
+                    'user' => $user->getId(),
+                    'goods' => $goods['id'],
+                    'orderUID' => $order_no,
+                ])) {
+                    throw new RuntimeException('创建任务失败！');
+                }
+                return;
             }
 
             if (empty($goods[Goods::AllowPay]) || $goods['price'] < 1) {

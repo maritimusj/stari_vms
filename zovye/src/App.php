@@ -538,4 +538,9 @@ class App
     {
         return settings('custom.puai.enabled', false);
     }
+
+    public static function isAllCodeEnabled(): bool
+    {
+        return settings('custom.allCode.enabled', false);
+    }
 }

@@ -736,7 +736,7 @@ class Helper
             }
 
             if (empty($goods)) {
-                throw new RuntimeException('系统错误，没有可用商品！');
+                throw new RuntimeException('对不起，没有可用商品！');
             }
 
             if (App::isAllCodeEnabled() && $goods[Goods::AllowFree]) {
@@ -747,7 +747,7 @@ class Helper
                     'goods' => $goods['id'],
                     'orderUID' => $order_no,
                 ])) {
-                    throw new RuntimeException('创建任务失败！');
+                    throw new RuntimeException('系统错误，创建任务失败！');
                 }
                 return;
             }
@@ -768,7 +768,7 @@ class Helper
             ]);
 
             if (is_error($data) && $data['errno'] != 100) {
-                throw new RuntimeException('创建支付失败: '.$data['message']);
+                throw new RuntimeException('对不起，创建支付失败: '.$data['message']);
             }
 
             $user_id = $data['openid'] ?? ($data['payer_uid'] ?? $data['user_id']);

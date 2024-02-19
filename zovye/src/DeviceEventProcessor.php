@@ -268,6 +268,7 @@ class DeviceEventProcessor
     public static function logEventTitle($id): string
     {
         static $cache = [];
+
         if (empty($cache[$id])) {
             foreach (self::$events as $entry) {
                 if ($entry['params']['log']['id'] == $id) {
@@ -792,7 +793,6 @@ class DeviceEventProcessor
                     $property['status'] = 1;
                 }
                 $device->setChargerProperty($chargerID, $property);
-
             }
 
             $device->save();

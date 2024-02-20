@@ -33,25 +33,28 @@ class Job
     {
         if ($delay > 0) {
             return CtrlServ::scheduleDelayJob('refund', [
+                    'orderNO' => $order_no,
+                    'num' => $num,
+                    'reset' => $reset_payload ? 1 : 0,
+                    'message' => urlencode($message),
+                ], $delay) !== false;
+        }
+
+        return CtrlServ::scheduleJob('refund', [
                 'orderNO' => $order_no,
                 'num' => $num,
                 'reset' => $reset_payload ? 1 : 0,
                 'message' => urlencode($message),
-            ], $delay);
-        }
-
-        return CtrlServ::scheduleJob('refund', [
-            'orderNO' => $order_no,
-            'num' => $num,
-            'reset' => $reset_payload ? 1 : 0,
-            'message' => urlencode($message),
-        ]);
+            ]) !== false;
     }
 
     public static function deviceEventNotify(deviceModelObj $device, string $event): bool
     {
         if (Config::WxPushMessage("config.device.$event.enabled")) {
-            return CtrlServ::scheduleJob('device_event_notify', ['id' => $device->getId(), 'event' => $event]);
+            return CtrlServ::scheduleJob(
+                    'device_event_notify',
+                    ['id' => $device->getId(), 'event' => $event]
+                ) !== false;
         }
 
         return false;
@@ -75,93 +78,93 @@ class Job
             ], JOB_LEVEL_HIGH) !== false;
     }
 
-    public static function createOrder($order_no, deviceModelObj $device = null)
+    public static function createOrder($order_no, deviceModelObj $device = null): bool
     {
         if ($device && $device->isBlueToothDevice()) {
-            return CtrlServ::scheduleJob('create_order', ['orderNO' => $order_no], JOB_LEVEL_HIGH);
+            return CtrlServ::scheduleJob('create_order', ['orderNO' => $order_no], JOB_LEVEL_HIGH) !== false;
         }
 
-        return CtrlServ::scheduleJob('create_order_multi', ['orderNO' => $order_no], JOB_LEVEL_HIGH);
+        return CtrlServ::scheduleJob('create_order_multi', ['orderNO' => $order_no], JOB_LEVEL_HIGH) !== false;
     }
 
-    public static function orderPayResult($order_no, $start = 0, $timeout = 3)
+    public static function orderPayResult($order_no, $start = 0, $timeout = 3): bool
     {
         return CtrlServ::scheduleDelayJob(
-            'order_pay_result',
-            ['orderNO' => $order_no, 'start' => $start ?: time()],
-            $timeout
-        );
+                'order_pay_result',
+                ['orderNO' => $order_no, 'start' => $start ?: time()],
+                $timeout
+            ) !== false;
     }
 
-    public static function deviceRenewalPayResult($order_no, $start = 0, $timeout = 3)
+    public static function deviceRenewalPayResult($order_no, $start = 0, $timeout = 3): bool
     {
         return CtrlServ::scheduleDelayJob(
-            'device_renewal_pay_result',
-            ['orderNO' => $order_no, 'start' => $start ?: time()],
-            $timeout
-        );
+                'device_renewal_pay_result',
+                ['orderNO' => $order_no, 'start' => $start ?: time()],
+                $timeout
+            ) !== false;
     }
 
-    public static function chargingPayResult($serial, $start = 0, $timeout = 3)
+    public static function chargingPayResult($serial, $start = 0, $timeout = 3): bool
     {
         return CtrlServ::scheduleDelayJob(
-            'charging_pay_result',
-            ['orderNO' => $serial, 'start' => $start ?: time()],
-            $timeout
-        );
+                'charging_pay_result',
+                ['orderNO' => $serial, 'start' => $start ?: time()],
+                $timeout
+            ) !== false;
     }
 
-    public static function fuelingPayResult($serial, $start = 0, $timeout = 3)
+    public static function fuelingPayResult($serial, $start = 0, $timeout = 3): bool
     {
         return CtrlServ::scheduleDelayJob(
-            'fueling_pay_result',
-            ['orderNO' => $serial, 'start' => $start ?: time()],
-            $timeout
-        );
+                'fueling_pay_result',
+                ['orderNO' => $serial, 'start' => $start ?: time()],
+                $timeout
+            ) !== false;
     }
 
-    public static function rechargePayResult($serial, $start = 0, $timeout = 3)
+    public static function rechargePayResult($serial, $start = 0, $timeout = 3): bool
     {
         return CtrlServ::scheduleDelayJob(
-            'recharge_pay_result',
-            ['orderNO' => $serial, 'start' => $start ?: time()],
-            $timeout
-        );
+                'recharge_pay_result',
+                ['orderNO' => $serial, 'start' => $start ?: time()],
+                $timeout
+            ) !== false;
     }
 
-    public static function orderTimeout($order_no, $timeout = PAY_TIMEOUT)
+    public static function orderTimeout($order_no, $timeout = PAY_TIMEOUT): bool
     {
-        return CtrlServ::scheduleDelayJob('order_timeout', ['orderNO' => $order_no], $timeout);
+        return CtrlServ::scheduleDelayJob('order_timeout', ['orderNO' => $order_no], $timeout) !== false;
     }
 
     public static function adReview($id): bool
     {
-        return CtrlServ::scheduleJob('ad_review', ['id' => $id]);
+        return CtrlServ::scheduleJob('ad_review', ['id' => $id]) !== false;
     }
 
     public static function agentApplicationNotification($id): bool
     {
-        return CtrlServ::scheduleJob('agent_app', ['id' => $id]);
+        return CtrlServ::scheduleJob('agent_app', ['id' => $id]) !== false;
     }
 
     public static function newAgent(userModelObj $user): bool
     {
-        return CtrlServ::scheduleJob('new_agent', ['id' => $user->getId()]);
+        return CtrlServ::scheduleJob('new_agent', ['id' => $user->getId()]) !== false;
     }
 
     public static function goodsClone($goods_id): bool
     {
-        return CtrlServ::scheduleJob('goods_clone', ['id' => $goods_id]);
+        return CtrlServ::scheduleJob('goods_clone', ['id' => $goods_id]) !== false;
     }
 
     public static function accountMsg($msg): bool
     {
         $delay = intval($msg['delay']);
         if ($delay > 0) {
-            CtrlServ::scheduleDelayJob('account_msg', $msg, $delay);
+            CtrlServ::scheduleDelayJob('account_msg', $msg, $delay) !== false;
         }
 
-        return CtrlServ::scheduleJob('account_msg', $msg);
+        return CtrlServ::scheduleJob('account_msg', $msg) !== false;
     }
 
     public static function order(orderModelObj $order): bool
@@ -171,12 +174,12 @@ class Job
 
     public static function getResult($order_no, $openid): bool
     {
-        return CtrlServ::scheduleJob('get_result', ['openid' => $openid, 'orderNO' => $order_no]);
+        return CtrlServ::scheduleJob('get_result', ['openid' => $openid, 'orderNO' => $order_no]) !== false;
     }
 
     public static function withdraw($user_id): bool
     {
-        return CtrlServ::scheduleJob('withdraw', ['id' => $user_id]);
+        return CtrlServ::scheduleJob('withdraw', ['id' => $user_id]) !== false;
     }
 
     public static function createThirdPartyPlatformOrder($params = []): bool
@@ -197,71 +200,71 @@ class Job
         ], $params);
 
         if ($delay > 0) {
-            return CtrlServ::scheduleDelayJob('create_order_account', $params, $delay);
+            return CtrlServ::scheduleDelayJob('create_order_account', $params, $delay) !== false;
         }
 
-        return CtrlServ::scheduleJob('create_order_account', $params);
+        return CtrlServ::scheduleJob('create_order_account', $params) !== false;
     }
 
     public static function createRewardOrder($params = []): bool
     {
-        return CtrlServ::scheduleJob('create_order_reward', $params);
+        return CtrlServ::scheduleJob('create_order_reward', $params) !== false;
     }
 
     public static function authAccount($agent_id, $accountUID, $total = 0): bool
     {
         return CtrlServ::scheduleDelayJob(
-            'auth_account',
-            ['agent' => $agent_id, 'account' => $accountUID, 'total' => $total],
-            3
-        );
+                'auth_account',
+                ['agent' => $agent_id, 'account' => $accountUID, 'total' => $total],
+                3
+            ) !== false;
     }
 
-    public static function douyinOrder(userModelObj $user, deviceModelObj $device, $account_uid, $time = null)
+    public static function douyinOrder(userModelObj $user, deviceModelObj $device, $account_uid, $time = null): bool
     {
         return CtrlServ::scheduleJob('douyin', [
-            'id' => $user->getId(),
-            'device' => $device->getId(),
-            'uid' => $account_uid,
-            'time' => $time ?? time(),
-        ]);
+                'id' => $user->getId(),
+                'device' => $device->getId(),
+                'uid' => $account_uid,
+                'time' => $time ?? time(),
+            ]) !== false;
     }
 
-    public static function updateAgentCounter(agentModelObj $agent)
+    public static function updateAgentCounter(agentModelObj $agent): bool
     {
         if ($agent->acquireLocker("update_counter")) {
             if (time() - $agent->settings('extra.counter.last', 0) > 300) {
                 $agent->updateSettings('extra.counter.last', time());
 
                 return CtrlServ::scheduleJob('update_counter', [
-                    'agent' => $agent->getId(),
-                    'device' => 0,
-                    'datetime' => (new DateTimeImmutable('-1 hour'))->format("Y-m-d H:00:00"),
-                ]);
+                        'agent' => $agent->getId(),
+                        'device' => 0,
+                        'datetime' => (new DateTimeImmutable('-1 hour'))->format("Y-m-d H:00:00"),
+                    ]) !== false;
             }
         }
 
         return true;
     }
 
-    public static function updateDeviceCounter(deviceModelObj $device)
+    public static function updateDeviceCounter(deviceModelObj $device): bool
     {
         if (Locker::try("device:{$device->getId()}:update_counter", REQUEST_ID, 3)) {
             if (time() - $device->settings('extra.counter.last', 0) > 400) {
                 $device->updateSettings('extra.counter.last', time());
 
                 return CtrlServ::scheduleJob('update_counter', [
-                    'agent' => 0,
-                    'device' => $device->getId(),
-                    'datetime' => (new DateTimeImmutable('-1 hour'))->format("Y-m-d H:00:00"),
-                ]);
+                        'agent' => 0,
+                        'device' => $device->getId(),
+                        'datetime' => (new DateTimeImmutable('-1 hour'))->format("Y-m-d H:00:00"),
+                    ]) !== false;
             }
         }
 
         return true;
     }
 
-    public static function updateAppCounter()
+    public static function updateAppCounter(): bool
     {
         $uid = APP_NAME;
         if (Locker::try("app:$uid:update_counter", REQUEST_ID, 3)) {
@@ -269,10 +272,10 @@ class Job
                 Config::app('order.counter.last', time(), true);
 
                 return CtrlServ::scheduleJob('update_counter', [
-                    'agent' => 0,
-                    'device' => 0,
-                    'datetime' => (new DateTimeImmutable('-1 hour'))->format("Y-m-d H:00:00"),
-                ]);
+                        'agent' => 0,
+                        'device' => 0,
+                        'datetime' => (new DateTimeImmutable('-1 hour'))->format("Y-m-d H:00:00"),
+                    ]) !== false;
             }
         }
 
@@ -281,20 +284,12 @@ class Job
 
     public static function uploadDeviceInfo($lastId = 0): bool
     {
-        if (CtrlServ::scheduleJob('upload_device_info', ['lastId' => $lastId]) !== false) {
-            return true;
-        }
-
-        return false;
+        return CtrlServ::scheduleJob('upload_device_info', ['lastId' => $lastId]) !== false;
     }
 
     public static function refreshSettings(): bool
     {
-        if (CtrlServ::scheduleJob('refresh_settings') !== false) {
-            return true;
-        }
-
-        return false;
+        return CtrlServ::scheduleJob('refresh_settings') !== false;
     }
 
     public static function chargingStartTimeout(
@@ -304,30 +299,22 @@ class Job
         $user_id,
         $order_id
     ): bool {
-        if (CtrlServ::scheduleDelayJob('charging_start_timeout', [
+        return CtrlServ::scheduleDelayJob('charging_start_timeout', [
                 'uid' => $serial,
                 'chargerID' => $chargerID,
                 'device' => $device_id,
                 'user' => $user_id,
                 'order' => $order_id,
                 'time' => time(),
-            ], 180) !== false) {
-            return true;
-        }
-
-        return false;
+            ], 180) !== false;
     }
 
     public static function chargingStopTimeout($serial): bool
     {
-        if (CtrlServ::scheduleDelayJob('charging_stop_timeout', [
+        return CtrlServ::scheduleDelayJob('charging_stop_timeout', [
                 'uid' => $serial,
                 'time' => time(),
-            ], 60) !== false) {
-            return true;
-        }
-
-        return false;
+            ], 60) !== false;
     }
 
     public static function fuelingStartTimeout(
@@ -337,70 +324,50 @@ class Job
         $user_id,
         $order_id
     ): bool {
-        if (CtrlServ::scheduleDelayJob('fueling_start_timeout', [
+        return CtrlServ::scheduleDelayJob('fueling_start_timeout', [
                 'uid' => $serial,
                 'chargerID' => $chargerID,
                 'device' => $device_id,
                 'user' => $user_id,
                 'order' => $order_id,
                 'time' => time(),
-            ], 70) !== false) {
-            return true;
-        }
-
-        return false;
+            ], 70) !== false;
     }
 
     public static function fuelingStopTimeout($serial): bool
     {
-        if (CtrlServ::scheduleDelayJob('fueling_stop_timeout', [
+        return CtrlServ::scheduleDelayJob('fueling_stop_timeout', [
                 'uid' => $serial,
                 'time' => time(),
-            ], 60) !== false) {
-            return true;
-        }
-
-        return false;
+            ], 60) !== false;
     }
 
     public static function createOrderFor(orderModelObj $order): bool
     {
-        if (CtrlServ::scheduleJob('create_order_for', [
+        return CtrlServ::scheduleJob('create_order_for', [
                 'orderNO' => $order->getOrderNO(),
-            ]) !== false) {
-            return true;
-        }
-
-        return false;
+            ]) !== false;
     }
 
     public static function orderNotify(orderModelObj $order): bool
     {
-        if (CtrlServ::scheduleJob('order_notify', [
+        return CtrlServ::scheduleJob('order_notify', [
                 'id' => $order->getId(),
                 'device_id' => 0,
                 'order' => '',
                 'goods' => '',
                 'time' => '',
-            ]) !== false) {
-            return true;
-        }
-
-        return false;
+            ]) !== false;
     }
 
     public static function orderErrorNotify(deviceModelObj $device, array $data = []): bool
     {
-        if (CtrlServ::scheduleJob('order_notify', [
+        return CtrlServ::scheduleJob('order_notify', [
                 'id' => 0,
                 'device_id' => $device->getId(),
                 'order' => $data['order_no'] ?? '',
                 'goods' => $data['goods_name'] ?? '<未指定商品>',
                 'time' => $data['time'] ?? date('Y-m-d H:i:s', TIMESTAMP),
-            ]) !== false) {
-            return true;
-        }
-
-        return false;
+            ]) !== false;
     }
 }

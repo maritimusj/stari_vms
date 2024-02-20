@@ -650,14 +650,14 @@
                 $(e.target).parent().find('.image').hide();
             },
             mousemove: function(e) {
-                const x = $(e.target).closest('#modal-message .modal-body').offset();
+                const x = $('#modal-message .modal-body').offset();
                 $(e.target).parent().find('.image').css({
                         "display": "block",
                         "top": e.clientY - x.top + 10,
                         "left": e.clientX - x.left + 10,
                 });
             },
-        }, '.qrcode-x .fa-qrcode')
+        }, '.qrcode-x .fa-qrcode');
     })
 </script>
 <script src="{php echo MODULE_URL}static/js/device.min.js?v=20220903005"></script>

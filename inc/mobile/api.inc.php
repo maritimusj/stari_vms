@@ -57,7 +57,7 @@ if (Request::has('orderUID')) {
                 'price' => $goods['price_formatted'],
                 'num' => $goods['num'],
                 'unit' => $goods['unit_title'],
-            ];            
+            ];
         }
     }
 
@@ -115,11 +115,8 @@ if (empty($price)) {
      * 公众号免费出货
      */
     $account_uid = settings('api.account');
-    if (empty($account_uid)) {
-        JSON::fail('没有指定公众号！');
-    }
 
-    $account = Account::findOneFromUID($account_uid);
+    $account = empty($account_uid) ? Account::getPseudoAccount() : Account::findOneFromUID($account_uid);
     if (empty($account)) {
         JSON::fail('找不到指定的公众号！');
     }

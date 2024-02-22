@@ -63,12 +63,12 @@ class Session
                     if ($user) {
                         if ($update) {
                             //用户从屏幕授权公众号创建时，需要更改回普通公众号用户
-                            $user->setApp(User::WX);
-
+                            if ($user->isThirdAccountUser()) {
+                                $user->setApp(User::WX);
+                            }
                             if ($user->getNickname() != $fans['nickname']) {
                                 $user->setNickname($fans['nickname']);
                             }
-
                             if ($user->getAvatar() != $fans['headimgurl']) {
                                 $user->setAvatar($fans['headimgurl']);
                             }

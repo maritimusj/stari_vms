@@ -713,6 +713,9 @@ class WxPlatform
                 if (empty($message)) {
                     ZovyeException::throwWith($res['message'], -1, $device);
                 }
+
+                //推送消息
+                return $message;
             }
 
             $user = User::get($first);

@@ -38,7 +38,7 @@ class Session
                     $user = User::get($fans['openid'], true);
                     if (empty($user) && !empty($params['create'])) {
                         $data = [
-                            'app' => User::WX,
+                            'app' => Session::isSnapshot() ? User::PSEUDO : User::WX,
                             'nickname' => strval($fans['nickname'] ?? '<匿名用户>'),
                             'avatar' => strval($fans['headimgurl']),
                             'openid' => strval($fans['openid']),

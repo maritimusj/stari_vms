@@ -74,7 +74,9 @@ class Session
                             }
                             $user->save();
                         }
-                        self::setContainer($user);
+                        if (!Session::isSnapshot()) {
+                            self::setContainer($user);
+                        }
                     }
                 }
             }

@@ -33,7 +33,7 @@ $js_sdk
                     const url = data.resultStr;
                     let result = url.match(/id=(\w*)\/?(\d+)?/);
                     if (!result) {
-                        result =  url.match(/device=(\w*)\/?(\d+)?/);
+                        result = url.match(/device=(\w*)\/?(\d+)?/);
                     }
                     if(result) {
                         const id = result[1];

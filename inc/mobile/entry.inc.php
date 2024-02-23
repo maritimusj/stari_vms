@@ -307,7 +307,7 @@ if ($account->isQuestionnaire() && $tid) {
 
 if (is_error($res)) {
     $user->cleanLastActiveData();
-    $account = null;
+    Response::alert($res['message'], 'error');
 }
 
 //处理多个关注二维码

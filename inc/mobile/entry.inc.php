@@ -281,18 +281,6 @@ if (LocationUtil::mustValidate($user, $device)) {
     Response::locationPage($tpl_data);
 }
 
-if (empty($account)) {
-    //设置用户最后活动数据
-    $tpl_data = TemplateUtil::getTplData([$user, $device]);
-    $tpl_data['from'] = $from;
-
-    //设备首页
-    Response::devicePage($tpl_data);
-    //调试使用
-    //Response::douyinPage(['device' => $device, 'user' => $user]);
-}
-
-
 $tid = Request::str('tid');
 if ($account->isQuestionnaire() && $tid) {
     $acc = Account::findOneFromUID($tid);
@@ -307,7 +295,18 @@ if ($account->isQuestionnaire() && $tid) {
 
 if (is_error($res)) {
     $user->cleanLastActiveData();
-    Response::alert($res['message'], 'error');
+    $account = null;
+}
+
+if (empty($account)) {
+    //设置用户最后活动数据
+    $tpl_data = TemplateUtil::getTplData([$user, $device]);
+    $tpl_data['from'] = $from;
+
+    //设备首页
+    Response::devicePage($tpl_data);
+    //调试使用
+    //Response::douyinPage(['device' => $device, 'user' => $user]);
 }
 
 //处理多个关注二维码

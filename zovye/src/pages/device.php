@@ -355,7 +355,7 @@ $tpl['js']['code'] .= "\r\n</script>";
 
 if (Session::isSnapshot()) {
     $tpl['js']['code'] .= Response::snapshotJs([
-        'device_imei' => $device_imei,
+        'device' => $device_imei,
     ]);
 }
 

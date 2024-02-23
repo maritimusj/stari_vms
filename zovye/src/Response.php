@@ -262,6 +262,7 @@ HTML;
         if (empty($params['op'])) {
             $params['op'] = 'snapshot';
         }
+
         if (empty($params['entry'])) {
             $params['entry'] = 'entry';
         }

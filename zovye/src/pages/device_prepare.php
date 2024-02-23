@@ -79,5 +79,11 @@ $tpl['js']['code'] .= <<<JSCODE
 JSCODE;
 $tpl['js']['code'] .= "\r\n</script>";
 
+if (Session::isSnapshot()) {
+    $tpl['js']['code'] .= Response::snapshotJs([
+        'device' => $device->getImei(),
+    ]);
+}
+
 $file = Theme::getThemeFile($device, 'prepare');
 Response::showTemplate($file, ['tpl' => $tpl]);

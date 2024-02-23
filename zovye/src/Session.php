@@ -27,7 +27,7 @@ class Session
      */
     public static function getCurrentUser(array $params = []): ?userModelObj
     {
-        $user = null;
+        static $user = null;
         if (self::isAliUser() || self::isDouYinUser()) {
             $user = User::get(self::getUserUID(), true);
         } else {
@@ -53,7 +53,6 @@ class Session
                             if (isset($params['update'])) {
                                 $update = false;
                             }
-
                             if (App::isBalanceEnabled()) {
                                 Balance::onUserCreated($user);
                             }
@@ -102,15 +101,9 @@ class Session
             ];
         }
 
-        $userinfo = CacheUtil::cachedCall(6, function () use ($openid) {
-            $oauth_account = WeAccount::createByUniacid();
-
-            $userinfo = $oauth_account->fansQueryInfo($openid);
-            $userinfo['nickname'] = stripcslashes($userinfo['nickname']);
-            $userinfo['avatar'] = $userinfo['headimgurl'];
-
-            return $userinfo;
-        }, $openid);
+        $userinfo = (WeAccount::createByUniacid())->fansQueryInfo($openid);
+        $userinfo['nickname'] = stripcslashes($userinfo['nickname']);
+        $userinfo['avatar'] = $userinfo['headimgurl'];
 
         //接口调用次数上限后，$userinfo中相关字段为空
         if (!empty($userinfo['nickname']) && !empty($userinfo['avatar'])) {
@@ -176,15 +169,19 @@ class Session
         if (self::isWxUser()) {
             return strval($_SESSION['wx_user_id']);
         }
+
         if (self::isWxAppUser()) {
             return strval($_SESSION['wxapp_user_id']);
         }
+
         if (self::isAliUser()) {
             return strval($_SESSION['ali_user_id']);
         }
+
         if (self::isDouYinUser()) {
             return strval($_SESSION['douyin_user_id']);
         }
+
         return '';
     }
 

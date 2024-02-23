@@ -281,21 +281,23 @@ if (LocationUtil::mustValidate($user, $device)) {
     Response::locationPage($tpl_data);
 }
 
-$tid = Request::str('tid');
-if ($account->isQuestionnaire() && $tid) {
-    $acc = Account::findOneFromUID($tid);
-    if ($acc) {
-        $res = Helper::checkAvailable($user, $acc, $device);
+if ($account) {
+    $tid = Request::str('tid');
+    if ($account->isQuestionnaire() && $tid) {
+        $acc = Account::findOneFromUID($tid);
+        if ($acc) {
+            $res = Helper::checkAvailable($user, $acc, $device);
+        } else {
+            $res = err('找不到这个任务！');
+        }
     } else {
-        $res = err('找不到这个任务！');
+        $res = Helper::checkAvailable($user, $account, $device);
     }
-} else {
-    $res = Helper::checkAvailable($user, $account, $device);
-}
 
-if (is_error($res)) {
-    $user->cleanLastActiveData();
-    $account = null;
+    if (is_error($res)) {
+        $user->cleanLastActiveData();
+        $account = null;
+    }
 }
 
 if (empty($account)) {

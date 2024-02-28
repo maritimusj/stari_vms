@@ -55,7 +55,7 @@ if ($op === 'create') {
         if ($goods_id) {
             $goods = $device->getGoods($goods_id);
         } else {
-            $lane_id = Request::int('laneID');
+            $lane_id = Request::int('laneID') - 1;
             $goods = $device->getGoodsByLane($lane_id);
         }
 

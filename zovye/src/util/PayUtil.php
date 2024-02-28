@@ -203,8 +203,8 @@ class PayUtil
                     $.get("{$params['orderAPIURL']}", { op: "cancel", orderNO: data.orderNO });
                     reject("支付失败!");
                 }
-            });
-        });
+            })
+        })
     }
     zovye_fn.lane_wxpay = function(params, successFN, failFN) {
       return new Promise(function(resolve, reject) {
@@ -223,9 +223,9 @@ class PayUtil
                     zovye_fn.redirectToPayFailedPage(msg);
                   }
                   reject(msg);
-              });
-          });  
-      });
+              })
+          })
+      })
     }
     zovye_fn.goods_wxpay = function(params, successFN, failFN) {
       return new Promise(function(resolve, reject) {
@@ -244,9 +244,9 @@ class PayUtil
                     zovye_fn.redirectToPayFailedPage(msg);
                   }
                   reject(msg);
-              });
-          });  
-      });
+              })
+          })
+      })
     }
     
     zovye_fn.package_pay = function(packageID, successFN, failFN) {
@@ -262,9 +262,9 @@ class PayUtil
                     zovye_fn.redirectToPayFailedPage(msg);
                   }
                   reject(msg);
-              });
-          });  
-      });
+              })
+          })
+      })
     }
 </script>
 ALI_JSCODE;
@@ -280,7 +280,7 @@ ALI_JSCODE;
 <script>
     wx.ready(function() {
         wx.hideAllNonBaseMenuItem();
-    });
+    })
     
     const zovye_fn = {};
     zovye_fn.redirectToGetPayResultPage = function(orderNO, msg) {
@@ -333,8 +333,8 @@ ALI_JSCODE;
                     $.get("{$params['orderAPIURL']}", { op: "cancel", orderNO: data.orderNO });
                     reject("支付失败!");
                 }
-            });
-        });
+            })
+        })
     }
     zovye_fn.lane_wxpay = function(params, successFN, failFN) {
       return new Promise(function(resolve, reject) {
@@ -353,9 +353,9 @@ ALI_JSCODE;
                       zovye_fn.redirectToPayFailedPage(msg);
                   }
                   reject(msg);
-              });
-          });      
-      });
+              })
+          })   
+      })
     }
     zovye_fn.goods_wxpay = function(params, successFN, failFN) {
       return new Promise(function(resolve, reject) {
@@ -374,9 +374,9 @@ ALI_JSCODE;
                       zovye_fn.redirectToPayFailedPage(msg);
                   }
                   reject(msg);
-              });
-          });      
-      });
+              })
+          })     
+      })
     }
     
     zovye_fn.package_pay = function(packageID, successFN, failFN) {
@@ -392,9 +392,9 @@ ALI_JSCODE;
                     zovye_fn.redirectToPayFailedPage(msg);
                   }
                   reject(msg);
-              });
-          });  
-      });
+              })
+          })
+      })
     }
 </script>
 JSCODE;
@@ -422,7 +422,7 @@ JS;
         return new Promise(function(resolve, reject) {
             alert('暂时无法支付购买！');
             reject();
-        });
+        })
     }
     zovye_fn.goods_wxpay = function(params, successFN, failFN) {
         if (typeof failFN === 'function') {
@@ -433,7 +433,7 @@ JS;
         return new Promise(function(resolve, reject) {
             alert('暂时无法支付购买！');
             reject();
-        });
+        })
     }
     zovye_fn.package_pay = function(packageID, successFN, failFN) {
         if (typeof failFN === 'function') {
@@ -443,7 +443,7 @@ JS;
         return new Promise(function(resolve, reject) {
             alert('暂时无法支付购买！');
             reject();
-        });
+        })
     }
 </script>
 JSCODE;

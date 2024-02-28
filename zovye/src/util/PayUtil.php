@@ -355,9 +355,7 @@ ALI_JSCODE;
                   reject(msg);
               });
           });      
-      }).catch(e => {
-            alert(e);
-        });
+      });
     }
     zovye_fn.goods_wxpay = function(params, successFN, failFN) {
       return new Promise(function(resolve, reject) {
@@ -378,9 +376,7 @@ ALI_JSCODE;
                   reject(msg);
               });
           });      
-      }).catch(e => {
-            alert(e);
-        });
+      });
     }
     
     zovye_fn.package_pay = function(packageID, successFN, failFN) {

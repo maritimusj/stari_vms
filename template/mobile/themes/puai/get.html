@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>{$tpl['site']['title']}</title>
+		{php \zovye\url(true, CSS_SWIPER_URL);}
+		<style type="text/css">
+			html,
+			body {
+				position: relative;
+				width: 100%;
+			}
+
+			body {
+				background-color: #fff;
+				font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+				font-size: 14px;
+				color: #101010;
+				margin: 0;
+				padding: 0 0 20px;
+				-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+                background-image: url({MODULE_URL}static/m/puai/img/bg.jpg);
+			}
+
+			#app {
+				width: 100vw;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+			}
+
+			.status-view {
+				width: 100%;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+			}
+
+			.status-img {
+				width: 100%;
+			}
+			
+			.desc {
+				margin-top: 10px;
+				font-size: 16px;
+				font-weight: bolder;
+				text-align: center;
+			}
+
+			.time {
+				font-size: 16px;
+				color: #555;
+				margin-top: 10px;
+			}
+			
+			.goods-list {
+				width: 100%;
+				display: flex;
+				flex-direction: row;
+				flex-wrap: wrap;
+			}
+			
+			.goods-item {
+				width: calc((100vw - 30px)/2);
+				background-color: #fff;
+				margin-left: 10px;
+				margin-top: 10px;
+				border-radius: 10px;
+				display: flex;
+				flex-direction: column;
+				overflow: hidden;
+				padding-bottom: 10px;
+				position: relative;
+			}
+			
+			.goods-pic {
+				width: calc((100vw - 30px)/2);
+				height: calc((100vw - 30px)/2);
+			}
+			
+			.sell-out-view {
+				width: calc((100vw - 30px)/2);
+				height: calc((100vw - 30px)/2);
+				background-color: rgba(255, 255, 255, 0.7);
+				position: absolute;
+				top: 0;
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: center;
+			}
+			
+			.sell-out-view {
+				width: calc((100vw - 30px)/2);
+				height: calc((100vw - 30px)/2);
+				background-color: rgba(255, 255, 255, 0.7);
+				position: absolute;
+				top: 0;
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: center;
+			}
+			
+			.sell-out-icon {
+				width: 75%;
+				height: 75%;
+			}
+			
+			.goods-row {
+				width: 100%;
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+			}
+			
+			.goods-name {
+				width: calc(100% - 10px);
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				margin: 5px;
+			}
+			
+			.buy-btn {
+				width: 40px;
+				height: 20px;
+				background-color: #EA5587;
+				color: #fff;
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: center;
+				font-size: 13px;
+				border-radius: 3px;
+				margin-right: 5px;
+			}
+			
+			.buy-btn:active {
+				opacity: 0.7;
+			}
+			
+			.goods-num {
+				color: #A8A6A6;
+				margin-left: 8px;
+				flex-grow: 1;
+			}
+			
+			.swiper-container {
+                width: calc(100% - 20px);
+                height: 25vh;
+                margin-left: auto;
+                margin-right: auto;
+                position: fixed;
+                bottom: 10px;
+                border-radius: 10px;
+                overflow: hidden;
+    		}
+    
+    		.swiper-pagination-bullet-active {
+    			background: #f80;
+    		}
+    
+    		.adv-img {
+    			width: 100%;
+    			height: 100%;
+    		}
+			#app[v-cloak] {
+				display: none;
+			}
+		</style>
+	</head>
+	<body ontouchstart>
+		<div id="app" v-cloak>
+			<div class="status-view" v-if="showStatus">
+				<img class="status-img" src="{MODULE_URL}static/img/waiting_nobg.png" v-if="status === 0">
+				<img class="status-img" src="{MODULE_URL}static/img/success_nobg.png" v-else-if="status === 1">
+				<img class="status-img" src="{MODULE_URL}static/img/fail_nobg.png" v-else-if="status === 2">
+				<span class="desc" v-html="desc"></span>
+				<span class="time" v-if="status == 0">{{time}}s</span>
+    			{if $tpl['slides']}
+                <div class="swiper-container">
+                	<div class="swiper-wrapper">
+                		{loop $tpl['slides'] $index $item}
+                		<div class="swiper-slide">
+                			<a href="{php echo $item['url']?:'#'}">
+                				<img class="adv-img" src="{media $item['image']}" />
+                			</a>
+                		</div>
+                		{/loop}
+                	</div>
+                	<div class="swiper-pagination"></div>
+                </div>
+                {/if}
+			</div>
+			<div class="goods-list" v-if="showGoods">
+				<div class="goods-item" v-for="(item,index) in goods">
+					<img class="goods-pic" :src="item.img">
+					<div class="sell-out-view" v-if="item.num == 0">
+						<img class="sell-out-icon" src="{MODULE_URL}static/m/shopping/img/sellout_icon.png">
+					</div>
+					<div class="goods-row">
+						<div class="goods-name">{{item.name}}</div>
+					</div>
+					<div class="goods-row">
+						<span class="goods-num">剩余：{{item.num}}</span>
+						<div class="buy-btn" @click.stop="getClick(item)">领取</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		{$tpl['js']['code']}
+		{php \zovye\url(true, JS_SWIPER_URL);}
+		{php \zovye\url(true, JS_VUE_URL);}
+		<script type="text/javascript">
+				var app = new Vue({
+					el: '#app',
+					data: {
+						goods: [],
+						desc: "",
+						status: 0,
+						time: "{$tpl['timeout']}",
+						interval: null,
+						showStatus: false,
+						showGoods: false,
+                        ads: "{echo $tpl['slides']}"
+					},
+					created() {
+						zovye_fn.getGoodsList((res) => {
+							if (res && res.status && res.data.goods) {
+								this.goods = res.data.goods;
+								if (this.goods.length > 1) {
+									this.showGoods = true;
+								} else if (this.goods.length == 1) {
+									this.showStatus = true;
+									if (this.goods[0].num == 0) {
+										this.desc = "库存不足！";
+										this.status = 2;
+									} else {
+										this.doit(this.goods[0].id);
+									}
+								} else if (this.goods.length == 0) {
+									this.showStatus = true;
+									this.desc = "没有可用商品！";
+									this.status = 2;
+								}
+							}
+						})
+					},
+					mounted() {
+    					new Swiper('.swiper-container', {
+                    		autoplay: {
+                    			delay: 2500,
+                    			disableOnInteraction: false,
+                    		},
+                    		pagination: {
+                    			el: '.swiper-pagination',
+                    			clickable: true,
+                    		}
+    					});
+    				},
+					methods: {
+						doit(id) {
+							this.desc = "正在出货";
+							this.countdown();
+							zovye_fn.getGoods(id, (res) => {
+								if (res) {
+									clearInterval(this.interval)
+									this.status = res.status ? 1 : 2;
+									this.desc = res.status ? '领取成功！<br/><br/>如未取到商品，请扫码重试' : '领取失败！';
+									if (res.data && res.data['url']) {
+										setTimeout(function () {
+											window.location.href = res.data['url'];
+										}, 2000);
+									}
+								}
+							})
+						},
+						countdown() {
+							this.interval = setInterval(() => {
+								if (this.time == 0) {
+									clearInterval(this.interval);
+									this.status = 2;
+								} else {
+									this.time--;
+								}
+							}, 1000);
+						},
+						getClick(item) {
+							if (item.num == 0) {
+								alert("库存不足");
+							} else {
+								this.showGoods = false;
+								this.showStatus = true;
+								this.doit(item.id);
+							}
+						}
+					}
+				})
+		</script>
+	</body>
+</html>

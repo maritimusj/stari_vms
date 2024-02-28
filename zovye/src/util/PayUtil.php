@@ -355,7 +355,7 @@ ALI_JSCODE;
                   reject(msg);
               });
           });      
-      }).catch((e)=>{
+      }).catch(e => {
             alert(e);
         });
     }
@@ -378,7 +378,7 @@ ALI_JSCODE;
                   reject(msg);
               });
           });      
-      }).catch((e)=>{
+      }).catch(e => {
             alert(e);
         });
     }

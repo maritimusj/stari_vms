@@ -49,13 +49,16 @@ if ($op === 'create') {
     $discount = 0;
     $goods = [];
 
-    if (Request::has('goodsID')) {
+    if (Request::has('goodsID') || Request::has('laneID')) {
+
         $goods_id = Request::int('goodsID');
-        if (empty($goods_id)) {
-            JSON::fail('参数错误，没有指定商品！');
+        if ($goods_id) {
+            $goods = $device->getGoods($goods_id);
+        } else {
+            $lane_id = Request::int('laneID');
+            $goods = $device->getGoodsByLane($lane_id);
         }
 
-        $goods = $device->getGoods($goods_id);
         if (empty($goods) || empty($goods[Goods::AllowPay]) || $goods['price'] < 1) {
             JSON::fail('无法购买这个商品，请联系管理员！');
         }

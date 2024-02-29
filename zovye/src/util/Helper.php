@@ -76,7 +76,7 @@ class Helper
     {
         $theme = self::getTheme($device);
 
-        return !in_array($theme, ['balance', 'balance2', 'spa', 'spec', 'summer'], true);
+        return !in_array($theme, ['balance', 'balance2', 'spa', 'spec', 'summer', 'puai'], true);
     }
 
     /**

@@ -34,7 +34,7 @@ $user = $tpl['user']['_obj'];
 if (Session::isAliUser()) {
     $tpl['accounts'] = [];
 } else {
-    if (Helper::isNeedsTplAccountsData($device)) {
+    if (Helper::isThemeNeedsPrefetchAccountsData($device)) {
         $last_account = $user->getLastActiveAccount();
         if ($last_account) {
             $tpl['accounts'] = [$last_account];

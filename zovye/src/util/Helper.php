@@ -72,11 +72,11 @@ class Helper
      * 如果当前皮肤需要tpl_data中获取任务列表，否返回true
      * @param deviceModelObj|null $device
      */
-    public static function isNeedsTplAccountsData(deviceModelObj $device = null): bool
+    public static function isThemeNeedsPrefetchAccountsData(deviceModelObj $device = null): bool
     {
-        $theme = self::getTheme($device);
+        static $disabled_pre_fetch_themes = ['balance', 'balance2', 'spa', 'spec', 'summer', 'puai'];
 
-        return !in_array($theme, ['balance', 'balance2', 'spa', 'spec', 'summer', 'puai'], true);
+        return !in_array(self::getTheme($device), $disabled_pre_fetch_themes, true);
     }
 
     /**
@@ -749,6 +749,7 @@ class Helper
                 ])) {
                     throw new RuntimeException('系统错误，创建任务失败！');
                 }
+
                 return;
             }
 

@@ -185,7 +185,7 @@ class CloudFIAccount implements IAccountProvider
         $data = [
             'channel' => $this->channel,
             'scene' => $this->scene,
-            'areaCode' => intval($this->area),
+            'areaCode' => is_numeric($this->area) ? intval($this->area) : strval($this->area),
             'msg' => "",
             'openid' => $fans['openid'],
             'nickname' => $fans['nickname'],

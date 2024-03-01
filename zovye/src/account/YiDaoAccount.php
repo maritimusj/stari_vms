@@ -107,7 +107,7 @@ class YiDaoAccount implements IAccountProvider
 
                 $data['title'] = $res['appname'] ?: Account::YIDAO_NAME;
                 $data['qrcode'] = $res['qrcode_url'];
-                $data['descr'] = Account::replaceCode($data['descr'], 'code', strval($res['code']));
+                $data['descr'] = Account::replaceCode($data['descr'], 'code', strval($res['code']), false);
 
                 $v[] = $data;
 

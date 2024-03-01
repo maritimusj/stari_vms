@@ -1490,7 +1490,7 @@ class Account extends State
             ]);
         } else {
             if ($code && $must_replace) {
-                $desc = "回复<span data-key=\"$code\">$code</span>免费领取！";
+                $desc = "请关注后回复<span data-key=\"$code\">$code</span>";
             }
         }
 

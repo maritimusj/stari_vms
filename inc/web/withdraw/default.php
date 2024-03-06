@@ -110,7 +110,8 @@ if ($total > 0) {
         } elseif ($state == 'cancelled') {
             $status = '已退回';
         } else {
-            $status = '未知';
+            $status = '未知状态';
+            $state = 'mchpay unknown';
         }
 
         $data['state'] = $state;

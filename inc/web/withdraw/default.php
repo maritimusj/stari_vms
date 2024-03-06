@@ -97,6 +97,7 @@ if ($total > 0) {
                 $status = '未知状态';
                 $state = 'mchpay unknown';
                 if ($MCHPayResult['batch_id']) {
+                    $data['batch_id'] = $MCHPayResult['batch_id'];
                     $status = '已提交';
                     $state = 'mchpay committed';
                     $user = User::get($entry->getOpenid(), true);

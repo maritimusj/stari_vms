@@ -269,6 +269,11 @@
                             <i class="wi wi-money color-gray"></i>{$item['paymentNO']}
                         </div>
                         {/if}
+                        {if $item['batch_id']}
+                        <div class="paymentNO">
+                            <i class="wi wi-money color-gray" title="微信批次号"></i>{$item['batch_id']}
+                        </div>
+                        {/if}
                     </td>
                     <td>
                         <div class="price">

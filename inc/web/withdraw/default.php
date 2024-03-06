@@ -106,15 +106,15 @@ if ($total > 0) {
                     $state = 'mchpay committed';
                     $user = User::get($entry->getOpenid(), true);
                     if ($user) {
-                        $result = Pay::getMCHPayResult(
-                            $MCHPayResult['batch_id'],
-                            $MCHPayResult['out_batch_no']
-                        );
+                        $result = Pay::getMCHPayResult($MCHPayResult['batch_id'], $MCHPayResult['out_batch_no']);
                         if ($result['detail_status'] == 'SUCCESS' || $result['detail_status'] == 'FAIL') {
+
                             $result['batch_id'] = $MCHPayResult['batch_id'];
                             $result['out_batch_no'] = $MCHPayResult['out_batch_no'];
                             $entry->update(['mchpayResult' => $result]);
                             $entry->save();
+
+                            $MCHPayResult['detail_status'] = $result['detail_status'];
                         }
                     }
                 }

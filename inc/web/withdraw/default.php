@@ -96,9 +96,7 @@ if ($total > 0) {
         if (empty($state)) {
             $status = '审核中';
         } elseif ($state == 'mchpay') {
-            if ($MCHPayResult['payment_no']) {
-                $status = '已支付';
-            } elseif ($MCHPayResult['detail_status'] == 'SUCCESS') {
+            if ($MCHPayResult['payment_no'] || $MCHPayResult['detail_status'] == 'SUCCESS') {
                 $status = '已支付';
             } elseif ($MCHPayResult['detail_status'] == 'FAIL') {
                 $status = '失败';

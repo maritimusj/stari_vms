@@ -86,14 +86,26 @@ class WxMCHPayV3
                 'need_query_detail' => 'true',
                 'detail_status' => 'ALL',
             ],
-            'batch_id' => $batch_id,
         ];
 
         try {
-            $response = PayUtil::getWxPayV3Builder($this->config)
-                ->v3->transfer->batches->batch_id
-                ->_batch_id_
-                ->get($data);
+            if ($batch_id) {
+                $data['batch_id'] = $batch_id;
+                ///v3/transfer/batches/batch-id/{batch_id}
+                $response = PayUtil::getWxPayV3Builder($this->config)
+                    ->v3->transfer->batches->batchId
+                    ->_batch_id_
+                    ->get($data);
+            } elseif ($trade_no) {
+                $data['trade_no'] = $trade_no;
+                //v3/transfer/batches/out-batch-no/{out_batch_no}
+                $response = PayUtil::getWxPayV3Builder($this->config)
+                    ->v3->transfer->batches->outBatchNo
+                    ->_trade_no_
+                    ->get($data);
+            } else {
+                return err('参数错误！');
+            }
 
             $result = PayUtil::parseWxPayV3Response($response);
 

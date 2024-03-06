@@ -133,6 +133,28 @@ class CommissionBalance extends State
         return err('提现申请数据有误，请联系管理员核实！');
     }
 
+    public static function queryMCHPayResult(commission_balanceModelObj $entry)
+    {
+        $MCHPayResult = $entry->getExtraData('mchpayResult');
+        if ($MCHPayResult['payment_no'] || $MCHPayResult['detail_status'] == 'SUCCESS' || $MCHPayResult['detail_status'] == 'FAIL') {
+            return $MCHPayResult;
+        }
+
+        if ($MCHPayResult['batch_id']) {
+            $user = User::get($entry->getOpenid(), true);
+            if ($user) {
+                $result = Pay::getMCHPayResult($MCHPayResult['batch_id'], $MCHPayResult['out_batch_no']);
+                if ($result['detail_status'] == 'SUCCESS' || $result['detail_status'] == 'FAIL') {
+                    $MCHPayResult['detail_status'] = $result['detail_status'];
+                    $entry->update(['mchpayResult' => $MCHPayResult]);
+                    $entry->save();
+                }
+            }
+        }
+
+        return $MCHPayResult;
+    }
+
     public static function recharge(userModelObj $user, pay_logsModelObj $pay_log)
     {
         if (!$pay_log->isPaid()) {

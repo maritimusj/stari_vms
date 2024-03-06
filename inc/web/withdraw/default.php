@@ -85,7 +85,7 @@ if ($total > 0) {
             $data['memo'] = $memo;
         }
 
-        $MCHPayResult = $entry->getExtraData('mchpayResult');
+        $MCHPayResult = CommissionBalance::queryMCHPayResult($entry);
         if ($MCHPayResult['payment_no']) {
             $data['paymentNO'] = $MCHPayResult['payment_no'];
         } elseif ($MCHPayResult['batch_id']) {
@@ -98,35 +98,14 @@ if ($total > 0) {
         } elseif ($state == 'mchpay') {
             if ($MCHPayResult['payment_no']) {
                 $status = '已支付';
+            } elseif ($MCHPayResult['detail_status'] == 'SUCCESS') {
+                $status = '已支付';
+            } elseif ($MCHPayResult['detail_status'] == 'FAIL') {
+                $status = '失败';
+                $state = 'mchpay failed';
             } else {
                 $status = '未知状态';
                 $state = 'mchpay unknown';
-                if ($MCHPayResult['batch_id']) {
-                    $status = '已提交';
-                    $state = 'mchpay committed';
-                    $user = User::get($entry->getOpenid(), true);
-                    if ($user) {
-                        $result = Pay::getMCHPayResult($MCHPayResult['batch_id'], $MCHPayResult['out_batch_no']);
-                        if ($result['detail_status'] == 'SUCCESS' || $result['detail_status'] == 'FAIL') {
-
-                            $result['batch_id'] = $MCHPayResult['batch_id'];
-                            $result['out_batch_no'] = $MCHPayResult['out_batch_no'];
-                            $entry->update(['mchpayResult' => $result]);
-                            $entry->save();
-
-                            $MCHPayResult['detail_status'] = $result['detail_status'];
-                        }
-                    }
-                }
-                if ($MCHPayResult['detail_status']) {
-                    if ($MCHPayResult['detail_status'] == 'SUCCESS') {
-                        $status = '已支付';
-                        $state = 'mchpay';
-                    } elseif ($MCHPayResult['detail_status'] == 'FAIL') {
-                        $status = '失败';
-                        $state = 'mchpay failed';
-                    }
-                }
             }
         } elseif ($state == 'confirmed') {
             $status = '已完成';

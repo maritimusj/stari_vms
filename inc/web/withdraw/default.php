@@ -85,29 +85,35 @@ if ($total > 0) {
             $data['memo'] = $memo;
         }
 
+        $MCHPayResult = $entry->getExtraData('mchpayResult');
+        if ($MCHPayResult['payment_no']) {
+            $data['paymentNO'] = $MCHPayResult['payment_no'];
+        } elseif ($MCHPayResult['batch_id']) {
+            $data['batch_id'] = $MCHPayResult['batch_id'];
+        }
+
         $state = $entry->getExtraData('state');
         if (empty($state)) {
             $status = '审核中';
         } elseif ($state == 'mchpay') {
-            $MCHPayResult = $entry->getExtraData('mchpayResult');
             if ($MCHPayResult['payment_no']) {
                 $status = '已支付';
-                $data['paymentNO'] = $MCHPayResult['payment_no'];
             } else {
                 $status = '未知状态';
                 $state = 'mchpay unknown';
                 if ($MCHPayResult['batch_id']) {
-                    $data['batch_id'] = $MCHPayResult['batch_id'];
                     $status = '已提交';
                     $state = 'mchpay committed';
                     $user = User::get($entry->getOpenid(), true);
                     if ($user) {
-                        $MCHPayResult = Pay::getMCHPayResult(
+                        $result = Pay::getMCHPayResult(
                             $MCHPayResult['batch_id'],
                             $MCHPayResult['out_batch_no']
                         );
-                        if ($MCHPayResult['detail_status'] == 'SUCCESS' || $MCHPayResult['detail_status'] == 'FAIL') {
-                            $entry->update(['mchpayResult' => $MCHPayResult]);
+                        if ($result['detail_status'] == 'SUCCESS' || $result['detail_status'] == 'FAIL') {
+                            $result['batch_id'] = $MCHPayResult['batch_id'];
+                            $result['out_batch_no'] = $MCHPayResult['out_batch_no'];
+                            $entry->update(['mchpayResult' => $result]);
                             $entry->save();
                         }
                     }

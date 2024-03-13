@@ -115,6 +115,9 @@ if ($page == 'device') {
 
     $settings['user']['discountPrice'] = Request::float('discountPrice', 0, 2) * 100;
 
+    $settings['user']['wx']['update']['enabled'] = Request::bool('wxUpdate') ? 1 : 0;
+    $settings['user']['wx']['sex']['enabled'] = Request::bool('sexData') ? 1 : 0;
+
     if (App::isMustFollowAccountEnabled()) {
         $settings['mfa'] = [
             'enable' => Request::bool('mustFollow') ? 1 : 0,

@@ -87,6 +87,33 @@
                 </div>
             </div>
             <div class="seg">
+                <div class="title">微信用户</div>
+                <div class="form-group">
+                    <label for="wxUpdate" class="col-md-2 control-label">是否启用</label>
+                    <div class="col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="wxUpdate" id="wxUpdate" value="1" {if $settings['user']['wx']['update']['enabled']}checked{/if}>
+                                强制用户授权获取用户头像和昵称
+                            </label>
+                            <span class="help-block">启用后，用户必须授权系统获取头像和昵称后才能正常使用功能</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="sexData" class="col-md-2 control-label">是否启用</label>
+                    <div class="col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="sexData" id="sexData" value="1" {if $settings['user']['wx']['sex']['enabled']}checked{/if}>
+                                提示用户选择性别
+                            </label>
+                            <span class="help-block">启用后，提示用户选择男女性别（需要特定皮肤支持）</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="seg">
                 <div class="title">订单</div>
                 <div class="form-group">
                     <label for="discountPrice" class="col-md-2 control-label">首单优惠（元）</label>

@@ -47,7 +47,7 @@ if (Session::isDouYinAppContainer()) {
 
 $params = [
     'create' => true,
-    'update' => false,
+    'update' => settings('user.wx.update.enabled', false),
 ];
 
 $cb = null;

@@ -268,7 +268,7 @@ if (App::isDonatePayEnabled()) {
 }
 JSCODE;
 }
-if (is_null($user->settings('fansData.sex'))) {
+if (settings('user.wx.sex.enabled', false) && is_null($user->settings('fansData.sex'))) {
     $profile_url = Util::murl('util', ['op' => 'profile']);
     $tpl['js']['code'] .= <<<JSCODE
 \r\nzovye_fn.saveUserProfile = function(data) {

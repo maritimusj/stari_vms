@@ -74,6 +74,9 @@
         width: 32px;
         height: 32px;
     }
+    .profile-sex img {
+        cursor: pointer;
+    }
 </style>
 <ul class="nav nav-tabs" id="navbar">
     {if empty($s_principal)}
@@ -264,13 +267,13 @@
             </div>
         </td>
         <td>
-            <div class="profile-sex">
+            <div class="profile-sex" >
                 {if $item['sex'] === 1}
-                <img src="{MODULE_URL}static/img/man.svg" title="男">
+                <img src="{MODULE_URL}static/img/man.svg" title="男" data-op="removeSexData">
                 {elseif $item['sex'] == 2}
-                <img src="{MODULE_URL}static/img/woman.svg" title="女">
+                <img src="{MODULE_URL}static/img/woman.svg" title="女" data-op="removeSexData">
                 {else}
-                <img src="{MODULE_URL}static/img/unknown.svg" title="未知">
+                <img src="{MODULE_URL}static/img/unknown.svg" title="未知" data-op="removeSexData">
                 {/if}                
             </div>
         </td>
@@ -616,6 +619,12 @@
 
     api.viewFlashEggGifts = function (userid) {
         api.showResult({op: 'flash_gifts', id: userid});
+    }
+
+    api.removeSexData = function (userid) {
+        if (confirm('确定要清除这个用户的性别信息吗？')) {
+            api.showResult({op: 'remove_sex_data', id: userid});
+        }
     }
 
     $(function(){

@@ -28,10 +28,9 @@ $page = max(1, Request::int('page'));
 $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
 $query = CommissionBalance::query(['src' => CommissionBalance::WITHDRAW]);
-//$query->where('(updatetime IS NULL OR updatetime=0)');
 
-if (Request::has('agentId')) {
-    $user_x = User::get(request('agentId'));
+if (Request::has('userId')) {
+    $user_x = User::get(Request::int('userId'));
     if ($user_x) {
         $tpl_data['user'] = $user_x->profile();
         $query->where(['openid' => $user_x->getOpenid()]);

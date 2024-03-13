@@ -19,8 +19,10 @@
         </span>
     </div>
     <div class="panel-body">
-        {if $advs}
+        {if $advs || $keywords || isset($filter_agentId) || $filter_media}
         {template 'web/adv/search'}
+        {/if}
+        {if $advs}
         <table class="table" id="list">
             <thead>
                 <tr>
@@ -70,7 +72,12 @@
         </div>
     {else}
         <div class="text-center text-muted">
-            <i class="fa fa-question-circle"></i> 暂时没有任何内容！
+            <i class="fa fa-question-circle"></i>
+            {if $keywords || isset($filter_agentId) || $filter_media}
+            没有找到任何匹配的内容！
+            {else}
+            暂时没有任何内容！
+            {/if}
         </div>
     {/if}
     </div>

@@ -29,7 +29,7 @@ $tpl_data['mch_pay_enabled'] = !empty(settings('pay.wx.pem'));
 $page = max(1, Request::int('page'));
 $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
-$query = Withdraw::query(['src' => CommissionBalance::WITHDRAW]);
+$query = Withdraw::query();
 
 if (Request::has('userId')) {
     $user_x = User::get(Request::int('userId'));

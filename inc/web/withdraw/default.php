@@ -41,7 +41,11 @@ if (Request::has('userId')) {
 
 $keywords = Request::trim('keywords', '', true);
 if ($keywords) {
-    $query->whereOr(['name LIKE' => "%$keywords%", 'nickname LIKE' => "%$keywords%"]);
+    $query->whereOr([
+        'name LIKE' => "%$keywords%", 
+        'nickname LIKE' => "%$keywords%", 
+        'mobile LIKE' => "%$keywords%",
+    ]);
     $tpl_data['keywords'] = $keywords;
 }
 

@@ -16,7 +16,6 @@ use zovye\We7;
 use function zovye\_W;
 use function zovye\getArray;
 use function zovye\settings;
-use function zovye\setW;
 
 class Util
 {
@@ -135,26 +134,9 @@ class Util
         return md5("$app_key$name");
     }
 
-    /**
-     * 修正微擎payResult回调时，toMedia函数工作不正常的问题
-     */
     public static function toMedia($src, bool $use_image_proxy = false, bool $local_path = false): string
     {
-        if (empty(_W('attachurl'))) {
-            We7::load()->model('attachment');
-            setW('attachurl', We7::attachment_set_attach_url());
-        }
         $res = We7::tomedia($src, $local_path);
-        if (!$local_path) {
-            $str = ['/addons/'.APP_NAME];
-            $replacements = [''];
-            if (App::isHttpsWebsite()) {
-                $str[] = 'http://';
-                $replacements[] = 'https://';
-            }
-            $res = str_replace($str, $replacements, $res);
-        }
-
         return $use_image_proxy ? Util::getImageProxyURL($res) : strval($res);
     }
 

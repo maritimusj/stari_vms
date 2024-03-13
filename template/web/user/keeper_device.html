@@ -25,6 +25,7 @@
 <div class="panel panel-default{if empty($s_principal)} panel-first{/if} nav-tab-item">
     <div class="heading">
         <span class="operate">
+            <i class="fa fa-fw fa-filter" title="导出" data-op="keepers_export"></i>
             <a href="{php echo $this->createWebUrl('user', ['s_principal' => 'keeper']);}"><i class="fa fa-reply" title="返回"></i></a>
         </span>
     </div>
@@ -35,7 +36,7 @@
                 <thead>
                 <tr>
                     <th>#</th>
-                    <th>设备名称</th>
+                    <th>设备名称11</th>
                     <th>设备编号</th>
                     <th style="text-align: center;">
                         补货权限
@@ -158,6 +159,15 @@
                $('#modal-message').modal('hide');
             });
         })
+        zovye.op('keepers_export', function(self, next) {
+            util.loading();
+            next({}, function(res) {
+               if (res && res.status) {
+                    window.location = res.data.filename;
+               }
+               util.loaded();
+            });
+        })
     });
 </script>
 {else}
@@ -192,6 +202,13 @@
                     tr.find('.val').html(res.data.val);
                }
                $('#modal-message').modal('hide');
+            });
+        })
+        zovye.op('keepers_export', function(self, next) {
+            next({}, function(res) {
+               if (res && res.status) {
+                    window.location = res.data.filename;
+               }
             });
         })
     });

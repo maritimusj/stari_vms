@@ -32,6 +32,7 @@
 <div class="panel panel-default panel-first nav-tab-item">
     <div class="heading">
         <span class="operate">
+            <i class="fa fa-fw fa-filter" title="导出" data-op="keepers_export"></i>
             <a href="{$back_url}"><i class="fa fa-reply" title="返回"></i></a>
         </span>
     </div>
@@ -171,6 +172,15 @@
                         tr.find(".commission-total").text(res.data.val);
                     }
                 }
+            });
+        })
+        zovye.op('keepers_export', function(self, next) {
+            util.loading();
+            next({id: "{$agent['id']}"}, function(res) {
+               if (res && res.status) {
+                    window.location = res.data.filename;
+               }
+               util.loaded();
             });
         })
     });

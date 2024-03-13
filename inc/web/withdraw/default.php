@@ -10,6 +10,7 @@ defined('IN_IA') or exit('Access Denied');
 
 use zovye\domain\CommissionBalance;
 use zovye\domain\User;
+use zovye\domain\Withdraw;
 use zovye\model\commission_balanceModelObj;
 use zovye\model\userModelObj;
 use zovye\util\Util;
@@ -20,6 +21,7 @@ $commission_enabled = App::isCommissionEnabled();
 $tpl_data = [
     'agent_levels' => $agent_levels,
     'commission_enabled' => $commission_enabled,
+    'search_url' => Util::url('withdraw'),
 ];
 
 $tpl_data['mch_pay_enabled'] = !empty(settings('pay.wx.pem'));
@@ -27,7 +29,7 @@ $tpl_data['mch_pay_enabled'] = !empty(settings('pay.wx.pem'));
 $page = max(1, Request::int('page'));
 $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
-$query = CommissionBalance::query(['src' => CommissionBalance::WITHDRAW]);
+$query = Withdraw::query(['src' => CommissionBalance::WITHDRAW]);
 
 if (Request::has('userId')) {
     $user_x = User::get(Request::int('userId'));
@@ -35,6 +37,12 @@ if (Request::has('userId')) {
         $tpl_data['user'] = $user_x->profile();
         $query->where(['openid' => $user_x->getOpenid()]);
     }
+}
+
+$keywords = Request::trim('keywords', '', true);
+if ($keywords) {
+    $query->whereOr(['name LIKE' => "%$keywords%", 'nickname LIKE' => "%$keywords%"]);
+    $tpl_data['keywords'] = $keywords;
 }
 
 $total = $query->count();

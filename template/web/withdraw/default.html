@@ -175,6 +175,16 @@
             <i class="fa fa-question-circle"></i> 没有启用佣金系统！
         </div>
         {else}
+        {if empty($user)}
+        <form class="form-inline" action="{$search_url}" method="post" id="search-form">
+            <div id="search-bar">
+                <div class="text-input">
+                    <input type="text" class="form-control" name="keywords" placeholder="请输入关键字搜索..." value="{$keywords}">
+                    <button type="submit" class="button" role="button"><i class="fa fa-search"></i>&nbsp;搜索</span>
+                </div>
+            </div>
+        </form>
+        {/if}
         {if $apps}
         <table class="table" id="withdraw-list">
             <thead>
@@ -354,7 +364,12 @@
         </div>
         {else}
         <div class="text-center text-muted">
-            <i class="fa fa-question-circle"></i> 没有任何提现申请！
+            <i class="fa fa-question-circle"></i> 
+            {if $keywords}
+            没有匹配到任何提现记录！
+            {else}
+            没有任何提现申请！
+            {/if}
         </div>
         {/if}
         {/if}
@@ -366,10 +381,25 @@
             $(this).closest('tr').siblings().find('.proposer').removeClass('fixed');
             $(this).closest('.proposer').toggleClass('fixed'); 
         })
+
+        $("#search-form").submit(function(e){    
+            const params = new URLSearchParams();
+
+            const form = $("#search-form");
+            const s_keywords = $.trim(form.find('input[name=keywords]').val());
+            if (s_keywords) {
+                params.append("keywords", s_keywords);
+            }
+
+            location.href = form.attr("action") + "&" + encodeURI(params.toString());
+            setTimeout(function(){util.loading()}, 1000);   
+            e.preventDefault();
+        })
         
         const api = {
             url: "{php echo $this->createWebUrl('withdraw');}",
         }
+        
         
         api.showResult = function(params, url, cb) {
             $.getJSON(url || api.url, params).done(function(res){

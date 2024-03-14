@@ -23,12 +23,12 @@ $query = Keeper::query(['agent_id' => $agent->getId()]);
 
 $result = [];
 
-$getCommissionLimitFN = App::isKeeperCommissionLimitEnabled() ? function () {
-    return '未启用';
-} : function ($keeper) {
+$getCommissionLimitFN = App::isKeeperCommissionLimitEnabled() ? function ($keeper) {
     $total = $keeper->getCommissionLimitTotal();
 
     return $total == -1 ? '未设置' : $total;
+} : function () {
+    return '未启用';
 };
 /** @var keeperModelObj $keeper */
 foreach ($query->findAll() as $index => $keeper) {

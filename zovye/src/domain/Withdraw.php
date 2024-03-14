@@ -1,7 +1,6 @@
 <?php
 namespace zovye\domain;
 
-use zovye\api\wxweb\fueling;
 use zovye\base\ModelObjFinder;
 use zovye\model\commission_balanceModelObj;
 use zovye\util\Util;

@@ -22,9 +22,20 @@ if (empty($agent)) {
 $query = Keeper::query(['agent_id' => $agent->getId()]);
 
 $result = [];
+
+$getCommissionLimitFN = App::isKeeperCommissionLimitEnabled() ? function () {
+    return '未启用';
+} : function ($keeper) {
+    $total = $keeper->getCommissionLimitTotal();
+
+    return $total == -1 ? '未设置' : $total;
+};
 /** @var keeperModelObj $keeper */
 foreach ($query->findAll() as $index => $keeper) {
     $user = $keeper->getUser();
+    if (!$user) {
+        continue;
+    }
     $data = [
         $index + 1,
         $user->getNickname(),
@@ -32,7 +43,7 @@ foreach ($query->findAll() as $index => $keeper) {
         $keeper->getMobile(),
         intval($keeper->deviceQuery()->count()),
         number_format($user->getBalance()->total() / 100.00, 2, '.', ''),
-        App::isKeeperCommissionLimitEnabled() ? $keeper->getCommissionLimitTotal() : '',
+        $getCommissionLimitFN($keeper),
         date('Y-m-d H:i:s', $keeper->getCreatetime()),
     ];
     $result[] = $data;
@@ -46,7 +57,7 @@ $headers = [
     '设备数量',
     '余额',
     App::isKeeperCommissionLimitEnabled() ? '剩余有效补货数量' : '',
-    '创建时间'
+    '创建时间',
 ];
 
 $filename = date("YmdHis").'.csv';

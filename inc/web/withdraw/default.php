@@ -55,6 +55,7 @@ if ($page > $total_page) {
 }
 
 $apps = [];
+
 if ($total > 0) {
     $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
 

@@ -42,7 +42,7 @@ class unlock implements ICmd
 
     function getRaw()
     {
-        return pack('c*', 0xa5, 0x02, $this->locker_id, 0x05);
+        return pack('c*', 0xa5, 0x02, $this->locker_id, 0x0a);
     }
 
     function getMessage(): string

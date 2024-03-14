@@ -10,6 +10,7 @@ defined('IN_IA') or exit('Access Denied');
 
 use zovye\domain\Agent;
 use zovye\domain\Keeper;
+use zovye\domain\Withdraw;
 use zovye\model\keeperModelObj;
 use zovye\util\Util;
 
@@ -37,6 +38,13 @@ foreach ($query->findAll() as $keeper) {
     if (App::isKeeperCommissionLimitEnabled()) {
         $data['commission_limit_total'] = $keeper->getCommissionLimitTotal();
     }
+
+    if ($user) {
+        $data['withdraw'] =  Withdraw::query(['openid' => $user->getOpenid()])
+        ->where('(updatetime IS NULL OR updatetime=0)')
+        ->count();
+    }
+   
     $result[] = $data;
 }
 

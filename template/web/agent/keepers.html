@@ -14,6 +14,9 @@
     .commission-total {
         cursor: pointer;
     }
+    .withdraw {
+        cursor: pointer;
+    }
 </style>
 
 <ul class="nav nav-tabs" id="navbar">
@@ -50,6 +53,9 @@
                     {if \zovye\App::isKeeperCommissionLimitEnabled()}
                     <th class="center">剩余有效补货数量</th>
                     {/if}
+                    <th class="center">
+                        提现申请（未处理）
+                    </th>
                     <th style="text-align: center;width: 10em;">
                         <div>创建时间</div>
                     </th>
@@ -94,6 +100,9 @@
                         </div>
                     </td>
                     {/if}
+                    <td class="center">
+                        <span class="withdraw" data-op="withdraw_list">{$item['withdraw']}</span>
+                    </td>
                     <td>
                         <div style="color:#9E9E9E;font-size:12px;">{$item['createtime']}</div>
                     </td>
@@ -183,7 +192,31 @@
                util.loaded();
             });
         })
+        zovye.op('withdraw_list', function(self, next) {
+            const e = self.closest('[data-id]');
+            const id = e.data('id');
+            next({id}, function(res) {
+                console.log(res);
+            });
+        })
     });
+
+    $("body").on('click', '#list .pagination li:not(.active) a', function(e){
+        const url = $(this).attr("href");
+        $.getJSON(url).then(function(res){
+            if(res) {
+                if(res.status) {
+                    const dlg = util.dialog(res.data.title || '提现申请记录', res.data.content);
+                    dlg.modal('show')
+                }else{
+                    if(res.data && res.data.msg) {
+                        util.message(res.data.msg, '', 'error');
+                    }
+                }
+            }
+        })
+        e.preventDefault();
+    })
 </script>
 
 {template 'common/footer'}

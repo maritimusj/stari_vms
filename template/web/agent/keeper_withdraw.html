@@ -1,5 +1,3 @@
-{template 'common/header'}
-{php \zovye\url(true, 'static/css/common.css?v=20231125001');}
 <style>
     #commission-log .user img {
         width: 24px;
@@ -140,78 +138,16 @@
     	display: block;
     	position: absolute;
     }
+    .detail {
+        display: none;
+    }
 </style>
-<ul class="nav nav-tabs" id="navbar">
-{if empty($user)}
-    <li role="presentation" class="active">
-        <a href="{php echo $this->createWebUrl('withdraw');}">
-        提现管理
-        </a>
-    </li>
- {else}
-    <li role="presentation">
-        <a href="{php echo $this->createWebUrl('withdraw');}">
-        全部
-        </a>
-    </li>
-    <li role="presentation" class="active">
-        <a href="#">
-        <b>{$user['name']}</b>的提现申请
-        </a>
-    </li>
-{/if}    
-</ul>
-<div class="panel panel-default {if empty($user)}panel-first{/if}">
-    <div class="heading">
-        {if $commission_enabled}
-        <span class="operate">
-            <a href="{php echo $this->createWebUrl('withdraw', array('op'=>'export'));}" target="_blank"><i class="fa fa-filter" title="导出"></i></a>
-        </span>
-        {/if}
-    </div>
-    <div class="panel-body">
-        {if !$commission_enabled}
-        <div class="text-center text-muted">
-            <i class="fa fa-question-circle"></i> 没有启用佣金系统！
-        </div>
-        {else}
-        {if empty($user)}
-        <form class="form-inline" action="{$search_url}" method="post" id="search-form">
-            <div id="search-bar">
-                <div class="text-input">
-                    <input type="text" class="form-control" name="keywords" placeholder="请输入关键字搜索..." value="{$keywords}">
-                    <button type="submit" class="button" role="button"><i class="fa fa-search"></i>&nbsp;搜索</span>
-                </div>
-            </div>
-        </form>
-        {/if}
-        {if $apps}
-        {template 'web/withdraw/list'}
-        {else}
-        <div class="text-center text-muted">
-            <i class="fa fa-question-circle"></i> 
-            {if $keywords}
-            没有匹配到任何提现记录！
-            {else}
-            没有任何提现申请！
-            {/if}
-        </div>
-        {/if}
-        {/if}
-    </div>
+{if $apps}
+<div id="list">
+    {template 'web/withdraw/list'}
 </div>
-<script>
-    $("#search-form").submit(function(e){    
-        const params = new URLSearchParams();
-
-        const form = $("#search-form");
-        const s_keywords = $.trim(form.find('input[name=keywords]').val());
-        if (s_keywords) {
-            params.append("keywords", s_keywords);
-        }
-
-        location.href = form.attr("action") + "&" + encodeURI(params.toString());
-        setTimeout(function(){util.loading()}, 1000);   
-        e.preventDefault();
-    })
-</script>
+{else}
+<div class="text-center text-muted">
+    <i class="fa fa-question-circle"></i> 没有任何提现申请！
+</div>
+{/if}

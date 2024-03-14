@@ -1,0 +1,244 @@
+<table class="table" id="withdraw-list">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th class="detail">申请方</th>
+            <th class="detail">手机号码</th>
+            <th>账户余额</th>
+            <th>提现金额</th>
+            <th>手续费</th>
+            <th class="center">收款二维码</th>
+            <th>申请人</th>
+            <th>提交时间</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        {loop $apps $index $item}
+        <tr data-id="{$item['id']}">
+            <td>{php echo $index + 1}</td>
+            <td class="detail">
+                <div class="profile">
+                    <img src="{media $item['agent']['avatar']}" />
+                    {if empty($user)}
+                    <div>
+                    <a href="{php echo $this->createWebUrl('withdraw', ['op' => 'default', 'userId' => $item['agent']['id']]);}" title="点击查看{$item['agent']['name']}所有申请">
+                        {$item['agent']['name']}
+                    </a>
+                    {if $item['keeper']}
+                    <br>
+                    <span style="color: #9e9e9e;">{$item['keeper']['name']}</span>
+                    </div>
+                    {/if}
+                    {else}
+                        {if $item['keeper']}
+                        <div>
+                            {$item['agent']['name']}
+                            {if $item['keeper']}
+                            <br>
+                            <span style="color: #9e9e9e;">{$item['keeper']['name']}</span>
+                            </div>
+                            {/if}
+                        </div>
+                        {else}
+                            {$item['agent']['name']}
+                        {/if}
+                    {/if}
+                    {if $item['charging']}
+                    <i class="fa fa-bolt" style="color:#ff9800;" title="充电桩用户"></i>
+                    {/if}
+                </div>
+            </td>
+            <td class="detail">
+                <div>
+                    {if $item['keeper']}
+                    {if $item['keeper']['mobile']}
+                    <a href="{php echo $this->createWebUrl('user', ['s_keywords' => $item['keeper']['mobile']]);}" title="搜索这个用户">
+                        <span class="mobile" title="搜索用户">{$item['keeper']['mobile']}</span>
+                    </a>
+                    {else}
+                    <span class="text-muted">
+                        &lt;无&gt;
+                    </span>
+                    {/if}
+                    {else}
+                        {if $item['agent']['mobile']}
+                        <a href="{php echo $this->createWebUrl('agent', ['keywords' => $item['agent']['mobile']]);}" title="搜索这个代理商">
+                            <span class="mobile" title="搜索代理商">{$item['agent']['mobile']}</span>
+                        </a>
+                        {else}
+                        <span class="text-muted">
+                            &lt;无&gt;
+                        </span>
+                        {/if}
+                    {/if}
+                </div>
+            </td>
+            <td>
+                <div class="price"{if isset($item['remain'])} title="剩余：{$item['remain']}元"{/if}>
+                    {if isset($item['current'])}{$item['current']}元{else}<span class="text-muted">n/a</span>{/if}
+                </div>
+            </td>
+            <td>
+                <div class="price val">
+                    {$item['xval']}元
+                    {if $item['memo']}
+                    <i class="fa fa-comment" title="{$item['memo']}"></i>
+                    {/if}
+                </div>
+                {if $item['paymentNO']}
+                <div class="paymentNO">
+                    <i class="wi wi-money color-gray"></i>{$item['paymentNO']}
+                </div>
+                {/if}
+                {if $item['batch_id']}
+                <div class="paymentNO">
+                    <i class="wi wi-money color-gray" title="微信批次号"></i>{$item['batch_id']}
+                </div>
+                {/if}
+            </td>
+            <td>
+                <div class="price">
+                    {if isset($item['fee'])}
+                    <span{if empty($item['fee'])} class="text-muted"{/if}>{php echo number_format($item['fee'] / 100, 2);}元</span>
+                    {else}
+                    <span class="text-muted">n/a</span>
+                    {/if}
+                </div>
+            </td>
+            <td class="center">
+                <div class="agent-qrcode">
+                    {if $item['agent']['qrcode']['wx']}
+                    <span class="J_qrcode">
+                        <img style="width:inherit;" src="{MODULE_URL}static/img/wxpay.jpg" />
+                        <img class="wx-qrcode" src="{$item['agent']['qrcode']['wx']}" />
+                    </span>
+                    {/if}
+                    {if $item['agent']['qrcode']['ali'] }
+                    <span class="J_qrcode">
+                        <img style="width:inherit;" src="{MODULE_URL}static/img/alipay.jpg" />
+                        <img class="ali-qrcode" src="{$item['agent']['qrcode']['ali']}" />
+                    </span>
+                    {/if}
+                </div>
+            </td>
+            <td>
+                <div class="proposer operate">
+                    {$item['name']}
+                    {if $item['agent']['bank']}
+                    <i class="fa fa-credit-card"></i>
+                    <div class="bank-info">
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    <td>卡号</td><td>{$item['agent']['bank']['account']}</td>
+                                </tr>
+                                <tr>
+                                    <td>姓名</td><td>{$item['agent']['bank']['realname']}</td>
+                                </tr>
+                                <tr>
+                                    <td>开户行</td><td>{$item['agent']['bank']['bank']}</td>
+                                </tr>
+                                <tr>
+                                    <td>开户支行</td><td>{$item['agent']['bank']['branch']}</td>
+                                </tr>
+                                <tr>
+                                    <td>地址</td><td>{$item['agent']['bank']['address']['province']}{$item['agent']['bank']['address']['city']}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    {/if}
+                </div>
+            </td>
+            <td>{$item['createtime']}</td>
+            <td class="operate">
+                {if empty($item['state'])}
+                    {if $mch_pay_enabled}
+                    <button type="button" class="btn btn-danger btn-sm"  data-op2="pay" title="立即支付到代理商微信?">支付</button>
+                    {/if}
+                    <button type="button" class="btn btn-success btn-sm" data-op2="confirm" title="标记为已经支付完成">完成</button>
+                    <button type="button" class="btn btn-warning btn-sm" data-op2="refund" title="退款到用户的账户">退回</button>
+                {else}
+                    <span class="state {$item['state']}" title="操作时间：{$item['updatetime_formatted']}">{$item['state_formatted']}</span>
+                    {if $item['state'] == 'mchpay failed'}
+                    <button type="button" class="btn btn-success btn-sm" data-op2="confirm" title="标记为已经支付完成">完成</button>
+                    <button type="button" class="btn btn-warning btn-sm" data-op2="refund" title="退款到用户的账户">退回</button>
+                    {/if}
+                {/if}
+            </td>
+        </tr>
+        {/loop}
+    </tbody>
+</table>
+<div class="pull-right">
+    {$pager}
+</div>
+<script>
+    $(function(){
+        $('.proposer').on('click', 'i.fa-credit-card', function(){
+            $(this).closest('tr').siblings().find('.proposer').removeClass('fixed');
+            $(this).closest('.proposer').toggleClass('fixed'); 
+        })
+        
+        const api = {
+            url: "{php echo $this->createWebUrl('withdraw');}",
+        }
+        
+        api.showResult = function(params, url, cb) {
+            $.getJSON(url || api.url, params).done(function(res){
+                if(res) {
+                    if(res.status && res.data && res.data.content) {
+                        const dlg = util.dialog(res.data.title || '', res.data.content);
+                        dlg.modal('show')
+                    }else{
+                        if(res.data && res.data.msg) {
+                            util.message(res.data.msg, '', res.status?'success':'error');
+                        }
+                    }
+                    if (typeof cb == 'function') {
+                        cb(res.status);
+                    }
+                }
+            })
+        }
+        
+        api.pay = function(id, cb) {
+            if (confirm('确定要立即支付给用户吗？')) {
+                api.showResult({op: 'withdraw_pay', id: id}, null, cb);
+            }
+        }
+        
+        api.confirm = function(id, cb) {
+            if (confirm('确定要把这笔提现标记为已支付吗？')) {
+                api.showResult({op: 'withdraw_confirm', id: id}, null, cb);
+            }
+        }
+        
+        api.refund = function(id, cb) {
+            if (confirm('确定退款到用户账户吗？')) {
+                api.showResult({op: 'withdraw_refund', id: id}, null, cb);
+            }
+        }
+        
+        $('#withdraw-list').on('click', '[data-op2]', function(){
+            const self = $(this);
+            const op = self.data('op2');
+            if (api[op]) {
+                const tr = self.closest('tr');
+                const id = tr.data('id');
+                api[op](id, function(res){
+                    if(res) {
+                        $('<span>')
+                        .text({'refund':'已退款', 'pay':'已支付', 'confirm': '已完成'}[op])
+                        .addClass('state')
+                        .addClass({'refund':'cancelled', 'pay':'mchpay', 'confirm': 'confirmed'}[op])
+                        .appendTo(self.closest('td.operate'));
+                        self.siblings('button').remove();
+                        self.remove();
+                    }
+                })
+            }
+        })
+    })
+</script>

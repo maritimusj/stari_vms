@@ -8,14 +8,14 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-use zovye\domain\CommissionBalance;
 use zovye\domain\User;
+use zovye\domain\Withdraw;
 use zovye\model\commission_balanceModelObj;
 use zovye\util\Util;
 
 set_time_limit(60);
 
-$query = CommissionBalance::query(['src' => CommissionBalance::WITHDRAW]);
+$query = Withdraw::query();
 $query->where('(updatetime IS NULL OR updatetime=0)');
 
 $query->orderBy('id DESC');

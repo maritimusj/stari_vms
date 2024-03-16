@@ -1186,7 +1186,7 @@ class Account extends State
 
     public static function getAvailableList(deviceModelObj $device, userModelObj $user, array $params = []): array
     {
-        if (Session::isSnapshot()) {
+        if (settings('user.wx.update.enabled', false) && Session::isSnapshot()) {
             return [];
         }
 

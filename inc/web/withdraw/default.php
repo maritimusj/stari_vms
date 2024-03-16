@@ -37,16 +37,6 @@ if (Request::has('userId')) {
     }
 }
 
-$keywords = Request::trim('keywords', '', true);
-if ($keywords) {
-    $query->whereOr([
-        'name LIKE' => "%$keywords%", 
-        'nickname LIKE' => "%$keywords%", 
-        'mobile LIKE' => "%$keywords%",
-    ]);
-    $tpl_data['keywords'] = $keywords;
-}
-
 $total = $query->count();
 
 $total_page = ceil($total / $page_size);

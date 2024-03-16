@@ -175,16 +175,6 @@
             <i class="fa fa-question-circle"></i> 没有启用佣金系统！
         </div>
         {else}
-        {if empty($user)}
-        <form class="form-inline" action="{$search_url}" method="post" id="search-form">
-            <div id="search-bar">
-                <div class="text-input">
-                    <input type="text" class="form-control" name="keywords" placeholder="请输入关键字搜索..." value="{$keywords}">
-                    <button type="submit" class="button" role="button"><i class="fa fa-search"></i>&nbsp;搜索</span>
-                </div>
-            </div>
-        </form>
-        {/if}
         {if $apps}
         {template 'web/withdraw/list'}
         {else}

@@ -1,4 +1,5 @@
 <?php
+
 namespace zovye\domain;
 
 use zovye\base\ModelObjFinder;
@@ -7,13 +8,14 @@ use zovye\util\Util;
 
 use function zovye\m;
 
-class Withdraw {
+class Withdraw
+{
     public static function query($condition = []): ModelObjFinder
     {
-        return m('withdraw_vw')->query($condition);
+        return CommissionBalance::query(['src' => CommissionBalance::WITHDRAW])->where($condition);
     }
 
-    public static function format(commission_balanceModelObj $entry) 
+    public static function format(commission_balanceModelObj $entry): array
     {
         $data = [
             'id' => $entry->getId(),
@@ -121,6 +123,7 @@ class Withdraw {
                 $data['name'] = $app_user->getName();
             }
         }
+
         return $data;
     }
 }

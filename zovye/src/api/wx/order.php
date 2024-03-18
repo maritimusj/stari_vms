@@ -359,7 +359,7 @@ class order
 
             } elseif ($step == 'download') {
                 return [
-                    'url' => Util::toMedia("$dirname$filename"),
+                    'url' => str_replace('/addons/'.APP_NAME, '', Util::toMedia("$dirname$filename")),
                 ];
             }
         }

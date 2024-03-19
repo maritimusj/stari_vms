@@ -513,13 +513,6 @@ class DeviceUtil
             TKPromoting::confirmOrder($device, $args['tk_order_no']);
         }
 
-        if ($order && $account && $account->isCloudFI()) {
-            $cloudFIAccount = CloudFIAccount::newInstance();
-            if ($cloudFIAccount) {
-                $cloudFIAccount->confirmOrder($order);
-            }
-        }
-
         return [
             'result' => $result,
             'orderId' => isset($order) ? $order->getId() : 0,

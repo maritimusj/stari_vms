@@ -10,6 +10,7 @@ defined('IN_IA') or exit('Access Denied');
 
 use Exception;
 use RuntimeException;
+use zovye\account\CloudFIAccount;
 use zovye\domain\Account;
 use zovye\domain\Device;
 use zovye\domain\Goods;
@@ -143,6 +144,15 @@ try {
     }
 
     $order->setExtraData('ticket', $ticket_data_saved);
+
+    $account = $order->getAccount(true);
+    if ($account && $account ->isCloudFI()) {
+        $cloudFIAccount = CloudFIAccount::newInstance();
+        if ($cloudFIAccount) {
+            $cloudFIAccount->confirmOrder($order);
+        }
+    }
+
     if (!$order->save()) {
         throw new RuntimeException('保存订单数据失败！');
     }

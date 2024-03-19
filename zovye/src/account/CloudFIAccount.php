@@ -238,15 +238,30 @@ class CloudFIAccount implements IAccountProvider
     {
         $user = $order->getUser();
 
-        $data = [
-            'openid' => $user->getOpenid(),
-            'appid' => $user->getLastActiveData('ticket.appId', ''),
-            'channel' => $this->channel,
-            'gzopenid' => '',
-        ];
+        $app_id = $user->getLastActiveData('ticket.appId', '');
 
-        $result = HttpUtil::post(self::API_CONFIRM_URL, $data);
+        if ($app_id) {
+            $data = [
+                'openid' => $user->getOpenid(),
+                'appid' => $app_id,
+                'channel' => $this->channel,
+                'gzopenid' => '',
+            ];
 
-        $order->setExtraData('confirm_result', $result);
+            $result = HttpUtil::post(self::API_CONFIRM_URL, $data);
+
+            Log::debug('cloudFI', [
+                'order' => $order->profile(),
+                'data' => $data,
+                'result' => $result,
+            ]);
+
+            $order->setExtraData('confirm_result', $result);
+        } else {
+            Log::debug('cloudFI', [
+                'order' => $order->profile(),
+                'ticket' => $user->getLastActiveData('ticket'),
+            ]);
+        }
     }
 }

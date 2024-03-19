@@ -236,11 +236,9 @@ class CloudFIAccount implements IAccountProvider
 
     public function confirmOrder(orderModelObj $order)
     {
-        $user = $order->getUser();
-
-        $app_id = $user->getLastActiveData('ticket.appId', '');
-
+        $app_id = $order->getExtraData('ticket.appId', '');
         if ($app_id) {
+            $user = $order->getUser();
             $data = [
                 'openid' => $user->getOpenid(),
                 'appid' => $app_id,
@@ -260,7 +258,6 @@ class CloudFIAccount implements IAccountProvider
         } else {
             Log::debug('cloudFI', [
                 'order' => $order->profile(),
-                'ticket' => $user->getLastActiveData('ticket'),
             ]);
         }
     }

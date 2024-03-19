@@ -8,6 +8,7 @@
 namespace zovye\util;
 
 use Exception;
+use zovye\account\CloudFIAccount;
 use zovye\App;
 use zovye\business\Fueling;
 use zovye\business\TKPromoting;
@@ -183,6 +184,7 @@ class DeviceUtil
             }
             $locker->unlock();
         }
+
         return true;
     }
 
@@ -242,6 +244,7 @@ class DeviceUtil
             })
         );
 
+        /** @var accountModelObj $account */
         $account = empty($accounts) ? null : $accounts[0];
 
         //获取优惠券参数
@@ -508,6 +511,13 @@ class DeviceUtil
 
         if ($args['tk_order_no']) {
             TKPromoting::confirmOrder($device, $args['tk_order_no']);
+        }
+
+        if ($order && $account && $account->isCloudFI()) {
+            $cloudFIAccount = CloudFIAccount::newInstance();
+            if ($cloudFIAccount) {
+                $cloudFIAccount->confirmOrder($order);
+            }
         }
 
         return [

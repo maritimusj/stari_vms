@@ -12,15 +12,18 @@ use zovye\domain\User;
 use zovye\Log;
 use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
+use zovye\model\orderModelObj;
 use zovye\model\userModelObj;
 use zovye\Session;
 use zovye\util\HttpUtil;
+use zovye\util\Util;
 use function zovye\err;
 use function zovye\is_error;
 
 class CloudFIAccount implements IAccountProvider
 {
     const API_URL = "https://www.cloudfi.cn/index.php/Interface/zk/getZkOrder";
+    const API_CONFIRM_URL = "https://www.cloudfi.cn/index.php/Interface/scale/zkCallback";
 
     private $key;
     private $channel;
@@ -39,6 +42,22 @@ class CloudFIAccount implements IAccountProvider
         $this->channel = $channel;
         $this->scene = $scene;
         $this->area = $area;
+    }
+
+    public static function newInstance(): ?CloudFIAccount
+    {
+        $acc = Account::findOneFromType(Account::CloudFI);
+        if (!$acc) {
+            return null;
+        }
+
+        $config = $acc->settings('config', []);
+
+        if (empty($config['key']) || empty($config['channel'])) {
+            return null;
+        }
+
+        return new self($config['key'], $config['channel'], $config['scene'], $config['area']);
     }
 
     public static function getUID(): string
@@ -99,6 +118,18 @@ class CloudFIAccount implements IAccountProvider
                     $v[] = $data;
 
                     $user->setLastActiveDevice($device);
+
+                    $ticket_data = [
+                        'id' => REQUEST_ID,
+                        'time' => TIMESTAMP,
+                        'deviceId' => $device->getId(),
+                        'shadowId' => $device->getShadowId(),
+                        'accountId' => $acc->getId(),
+                        "appId" => $result['bizContent']['appid'],
+                    ];
+
+                    //准备领取商品的ticket
+                    $user->setLastActiveData('ticket', $ticket_data);
 
                 } catch (Exception $e) {
                     if (App::isAccountLogEnabled() && isset($log)) {
@@ -186,11 +217,13 @@ class CloudFIAccount implements IAccountProvider
             'channel' => $this->channel,
             'scene' => $this->scene,
             'areaCode' => is_numeric($this->area) ? intval($this->area) : strval($this->area),
-            'msg' => "",
             'openid' => $fans['openid'],
             'nickname' => $fans['nickname'],
             'sex' => empty($fans['sex']) ? 0 : $fans['sex'],
             'timestamp' => TIMESTAMP,
+            'msg' => Util::murl('getx', [
+                'ticket' => REQUEST_ID,
+            ]),
         ];
 
         $data['sign'] = md5($data['openid'].$data['timestamp'].$this->key);
@@ -199,5 +232,21 @@ class CloudFIAccount implements IAccountProvider
         if ($cb) {
             $cb($data, $result);
         }
+    }
+
+    public function confirmOrder(orderModelObj $order)
+    {
+        $user = $order->getUser();
+
+        $data = [
+            'openid' => $user->getOpenid(),
+            'appid' => $user->getLastActiveData('ticket.appId', ''),
+            'channel' => $this->channel,
+            'gzopenid' => '',
+        ];
+
+        $result = HttpUtil::post(self::API_CONFIRM_URL, $data);
+
+        $order->setExtraData('confirm_result', $result);
     }
 }

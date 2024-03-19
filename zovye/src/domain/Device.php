@@ -1304,7 +1304,7 @@ class Device extends State
             'data' => $data,
         ];
 
-        Helper::sendWxPushMessageTo($device, $event, $params);
+        Helper::sendWxPushMessageTo($device, "device.$event", $params);
 
         return true;
     }

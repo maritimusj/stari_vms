@@ -851,7 +851,7 @@ class Helper
         $agent = $device->getAgent();
 
         if ($agent && !$agent->isBanned()) {
-            foreach (self::getNotifyOpenIds($agent, "device.$event") as $openid) {
+            foreach (self::getNotifyOpenIds($agent, $event) as $openid) {
                 $params['touser'] = $openid;
                 $result = Wx::sendTemplateMsg($params);
                 if (is_error($result)) {
@@ -865,7 +865,7 @@ class Helper
         }
 
         foreach ($device->getKeepers() as $keeper) {
-            if ($keeper->settings("notice.device.$event")) {
+            if ($keeper->settings("notice.$event")) {
                 $user = $keeper->getUser();
                 if ($user && !$user->isBanned()) {
                     $params['touser'] = $user->getOpenid();

@@ -851,7 +851,21 @@ class Helper
         $agent = $device->getAgent();
 
         if ($agent && !$agent->isBanned()) {
-            foreach (self::getNotifyOpenIds($agent, $event) as $openid) {
+            $list = self::getNotifyOpenIds($agent, $event);
+
+            foreach ($device->getKeepers() as $keeper) {
+                if ($keeper->settings("notice.$event")) {
+                    $user = $keeper->getUser();
+                    if ($user && !$user->isBanned()) {
+                        $list[] = $user->getOpenid();
+                    }
+                }
+            }
+
+            // 去掉重复
+            $list = array_unique($list);
+
+            foreach ($list as $openid) {
                 $params['touser'] = $openid;
                 $result = Wx::sendTemplateMsg($params);
                 if (is_error($result)) {
@@ -862,26 +876,9 @@ class Helper
                     ]);
                 }
             }
-        }
 
-        foreach ($device->getKeepers() as $keeper) {
-            if ($keeper->settings("notice.$event")) {
-                $user = $keeper->getUser();
-                if ($user && !$user->isBanned()) {
-                    $params['touser'] = $user->getOpenid();
-                    $result = Wx::sendTemplateMsg($params);
-                    if (is_error($result)) {
-                        Log::error('sendEventTemplateMsg', [
-                            'keeper' => $user->profile(),
-                            'data' => $params,
-                            'result' => $result,
-                        ]);
-                    }
-                }
-            }
+            $device->setLastNotification($event);
         }
-
-        $device->setLastNotification($event);
     }
 
     public static function getWxPushMessageConfig($data = []): array

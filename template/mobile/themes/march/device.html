@@ -991,13 +991,19 @@
             },
             methods: {
                 judgeWechat () {
-                    let wechat = navigator.userAgent.match(/MicroMessenger\/([\d\.]+)/i);
-                    let judgewechat = wechat[1].split('.');
-                    if (judgewechat[0] > 7 || judgewechat[0] == 7 && (judgewechat[1] > 0 || judgewechat[1] == 0 && judgewechat[2] >= 12)) {
-                        this.wechatState = true;
-                    } else {
-                        this.wechatState = false;
+                    if (this.isWechatBrowser()) {
+                        let wechat = navigator.userAgent.match(/MicroMessenger\/([\d\.]+)/i);
+                        let judgewechat = wechat[1].split('.');
+                        if (judgewechat[0] > 7 || judgewechat[0] == 7 && (judgewechat[1] > 0 || judgewechat[1] == 0 && judgewechat[2] >= 12)) {
+                            this.wechatState = true;
+                        } else {
+                            this.wechatState = false;
+                        }
                     }
+                },
+                isWechatBrowser () {
+                    var ua = navigator.userAgent.toLowerCase();
+                    return ua.indexOf('micromessenger') !== -1;
                 },
                 visibilitychange () {
                     document.addEventListener('visibilitychange', () => {
@@ -1279,6 +1285,9 @@
                     }
                 },
                 addWeappListener () {
+                    if (!this.isWechatBrowser()) {
+                        return
+                    }
                     if (this.wechatState) {
                         this.$nextTick(() => {
                             var btn = document.getElementById(this.account.data.uid);

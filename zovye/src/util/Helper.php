@@ -462,13 +462,13 @@ class Helper
 
         //加入一个支付结果检查
         $res = Job::orderPayResult($order_no);
-        if (empty($res) || is_error($res)) {
+        if (!$res) {
             JSON::fail('创建支付任务失败！');
         }
 
         //加入一个支付超时任务
         $res = Job::orderTimeout($order_no);
-        if (empty($res) || is_error($res)) {
+        if (!$res) {
             return err('创建支付任务失败！');
         }
 
@@ -506,7 +506,7 @@ class Helper
 
         //加入一个支付结果检查
         $res = Job::deviceRenewalPayResult($order_no);
-        if (empty($res) || is_error($res)) {
+        if (!$res) {
             return err('创建支付任务失败！');
         }
 
@@ -551,14 +551,14 @@ class Helper
 
         //加入一个支付结果检查
         $res = Job::chargingPayResult($order_no);
-        if (empty($res) || is_error($res)) {
+        if (!$res) {
             return err('创建支付任务失败！');
         }
 
         //加入一个支付超时任务
         $res = Job::orderTimeout($order_no);
 
-        if (empty($res) || is_error($res)) {
+        if (!$res) {
             return err('创建支付任务失败！');
         }
 
@@ -603,13 +603,13 @@ class Helper
 
         //加入一个支付结果检查
         $res = Job::fuelingPayResult($order_no);
-        if (empty($res) || is_error($res)) {
+        if (!$res) {
             return err('创建支付任务失败！');
         }
 
         //加入一个支付超时任务
         $res = Job::orderTimeout($order_no);
-        if (empty($res) || is_error($res)) {
+        if (!$res) {
             return err('创建支付任务失败！');
         }
 
@@ -786,13 +786,13 @@ class Helper
 
             //加入一个支付结果检查
             $res = Job::orderPayResult($order_no);
-            if (empty($res) || is_error($res)) {
+            if (!$res) {
                 throw new RuntimeException('系统错误，创建支付任务失败！');
             }
 
             //加入一个支付超时任务
             $res = Job::orderTimeout($order_no);
-            if (empty($res) || is_error($res)) {
+            if (!$res) {
                 throw new RuntimeException('系统错误，创建支付任务失败！');
             }
 

@@ -147,6 +147,9 @@ try {
 
     $account = $order->getAccount(true);
     if ($account && $account ->isCloudFI()) {
+        Account::updateQueryLogCBData($account, $user, $device, [
+            'order_uid' => $order->getOrderNO(),
+        ]);
         $cloudFIAccount = CloudFIAccount::newInstance();
         if ($cloudFIAccount) {
             $cloudFIAccount->confirmOrder($order);

@@ -154,8 +154,6 @@ function prepare(string $order_no)
         'user' => $user->profile(),
         'goods' => $goods,
         'payload' => $device->getPayload(),
-        'account' => isset($acc) ? ['name' => $acc->name(), 'title' => $acc->title()] : [],
-        'voucher' => isset($voucher) ? ['id' => $voucher->getId()] : [],
     ];
 
     $params = [

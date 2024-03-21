@@ -851,7 +851,7 @@ class Helper
         $agent = $device->getAgent();
 
         if ($agent && !$agent->isBanned()) {
-            $list = self::getNotifyOpenIds($agent, $event);
+            $list = self::getNotificationOpenIds($agent, $event);
 
             foreach ($device->getKeepers() as $keeper) {
                 if ($keeper->settings("notice.$event")) {
@@ -1068,7 +1068,7 @@ class Helper
     /**
      * 获取需要通知的openid list
      */
-    public static function getNotifyOpenIds(agentModelObj $agent, string $event): array
+    public static function getNotificationOpenIds(agentModelObj $agent, string $event): array
     {
         $result = [];
 

@@ -83,6 +83,11 @@ if ($device_id) {
         }
     }
 
+    //如果设备没有分配任何吸粉号，则忽略用户授权
+    if (empty($device->getAssignedAccounts())) {
+        $params['update'] = false;
+    }
+
     /**
      * @param userModelObj $user
      * @return array

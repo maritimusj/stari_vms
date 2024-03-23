@@ -29,8 +29,8 @@ $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
 $query = Withdraw::query();
 
-if (Request::has('userId')) {
-    $user_x = User::get(Request::int('userId'));
+if (Request::has('user')) {
+    $user_x = User::get(Request::int('user'));
     if ($user_x) {
         $tpl_data['user'] = $user_x->profile();
         $query->where(['openid' => $user_x->getOpenid()]);

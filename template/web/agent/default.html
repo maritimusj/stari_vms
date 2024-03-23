@@ -206,7 +206,7 @@
                                 {if isset($agent['commission'])}
                                 <li role="separator" class="divider"></li>
                                 <li><a href="#" data-op="monthStats"><i class="fa fa-money fa-fw"></i> 收入统计</a></li>
-                                <li><a href="{php echo $this->createWebUrl('withdraw', array('op'=>'default', 'agentId'=>$agent['id']));}"><i class="fa fa-credit-card fa-fw"></i> 提现记录</a></li>
+                                <li><a href="{php echo $this->createWebUrl('withdraw', array('op'=>'default', 'user'=>$agent['id']));}"><i class="fa fa-credit-card fa-fw"></i> 提现记录</a></li>
                                 {/if}
                                 <li role="separator" class="divider"></li>
                                 <li>

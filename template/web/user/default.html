@@ -520,7 +520,7 @@
     }
 
     api.withdrawList = function(userid) {
-        window.location.href = "{php echo $this->createWebUrl('withdraw', ['agentId' => '__user__']);}".replace('__user__', userid);
+        window.location.href = "{php echo $this->createWebUrl('withdraw', ['user' => '__user__']);}".replace('__user__', userid);
     }
 
     api.viewCommissionLog = function(userid) {

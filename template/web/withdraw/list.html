@@ -22,7 +22,7 @@
                     <img src="{media $item['agent']['avatar']}" />
                     {if empty($user)}
                     <div>
-                    <a href="{php echo $this->createWebUrl('withdraw', ['op' => 'default', 'userId' => $item['agent']['id']]);}" title="点击查看{$item['agent']['name']}所有申请">
+                    <a href="{php echo $this->createWebUrl('withdraw', ['op' => 'default', 'user' => $item['agent']['id']]);}" title="点击查看{$item['agent']['name']}所有申请">
                         {$item['agent']['name']}
                     </a>
                     {if $item['keeper']}

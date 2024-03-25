@@ -41,7 +41,7 @@ class DeviceEventProcessor
     protected static $events = [
         self::EVENT_V0_ONLINE => [
             'title' => '[v0]App上线',
-            'handler' => [self::class, 'onlineMsg'],
+            'handler' => [self::class, 'onAppOnlineMsg'],
             'params' => [
                 'log' => [
                     'enable' => true,
@@ -96,6 +96,16 @@ class DeviceEventProcessor
                 'log' => [
                     'enable' => true,
                     'id' => 10,
+                ],
+            ],
+        ],
+        self::EVENT_V0_OFFLINE => [
+            'title' => '[v0]App离线',
+            'handler' => [self::class, 'onAppOfflineMsg'],
+            'params' => [
+                'log' => [
+                    'enable' => true,
+                    'id' => 22,
                 ],
             ],
         ],
@@ -176,15 +186,6 @@ class DeviceEventProcessor
                 'log' => [
                     'enable' => false,
                     'id' => 18,
-                ],
-            ],
-        ],
-        self::EVENT_V0_OFFLINE => [
-            'title' => '[v0]App离线',
-            'params' => [
-                'log' => [
-                    'enable' => true,
-                    'id' => 22,
                 ],
             ],
         ],
@@ -291,14 +292,25 @@ class DeviceEventProcessor
     /**
      * online 事件处理
      */
-    public static function onlineMsg(array $data)
+    public static function onAppOnlineMsg(array $data)
     {
         $app_id = $data['id'];
         $device = Device::getFromAppId($app_id);
         if ($device) {
             $device->setAppLastOnline(TIMESTAMP);
-
             $device->save();
+        }
+    }
+
+    /**
+     * online 事件处理
+     */
+    public static function onAppOfflineMsg(array $data)
+    {
+        $app_id = $data['id'];
+        $device = Device::getFromAppId($app_id);
+        if ($device) {
+            Device::processAppOnlineBonus($device);
         }
     }
 

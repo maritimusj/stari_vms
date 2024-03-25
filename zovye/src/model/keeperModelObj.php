@@ -73,6 +73,32 @@ class keeperModelObj extends ModelObj
         return null;
     }
 
+    public function getAppOnlineBonusPercent(deviceModelObj $device): int
+    {
+        $device_id = $device->getId();
+        /** @var keeper_devicesModelObj $res */
+        $res = m('keeper_devices')->findOne(
+            [
+                'device_id' => $device_id,
+                'keeper_id' => $this->getId(),
+            ]
+        );
+        return $res ? $res->getAppOnlineBonusPercent() : 0;
+    }
+
+    public function getDeviceQoeBonusPercent(deviceModelObj $device): int
+    {
+        $device_id = $device->getId();
+        /** @var keeper_devicesModelObj $res */
+        $res = m('keeper_devices')->findOne(
+            [
+                'device_id' => $device_id,
+                'keeper_id' => $this->getId(),
+            ]
+        );
+        return $res ? $res->getDeviceQoeBonusPercent() : 0;
+    }
+
     public function deviceQuery(): ModelObjFinder
     {
         return m('keeper_devices')->where(['keeper_id' => $this->getId()]);

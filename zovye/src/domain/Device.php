@@ -24,6 +24,7 @@ use zovye\model\keeperModelObj;
 use zovye\model\userModelObj;
 use zovye\Request;
 use zovye\State;
+use zovye\util\DBUtil;
 use zovye\util\Helper;
 use zovye\util\HttpUtil;
 use zovye\util\Util;
@@ -1307,5 +1308,94 @@ class Device extends State
         Helper::sendWxPushMessageTo($device, "device.$event", $params);
 
         return true;
+    }
+
+    public static function processAppOnlineBonus(deviceModelObj $device)
+    {
+        if (!App::isAppOnlineBonusEnabled()) {
+            return;
+        }
+
+        $agent = $device->getAgent();
+        if (!$agent) {
+            return;
+        }
+
+        $app_online_bonus_price = $agent->getAgentData('commission.appOnlineBonus.price', 0);
+        if ($app_online_bonus_price < 1) {
+            return;
+        }
+
+        $begin = $device->getAppLastOnline();
+        $end = time();
+
+        $ts = $end - $begin;
+
+        if ($ts < 1) {
+            return;
+        }
+
+        $total_price = intval(($ts / 3600) * $app_online_bonus_price);
+        if ($total_price < 1) {
+            return;
+        }
+
+        DBUtil::transactionDo(function () use ($device, $agent, $begin, $end, $total_price) {
+            $remain = $total_price;
+
+            foreach ($device->getKeepers() as $keeper) {
+                $user = $keeper->getUser();
+                if (!$user) {
+                    continue;
+                }
+
+                $percent = $keeper->getAppOnlineBonusPercent($device);
+                if ($percent < 1) {
+                    continue;
+                }
+
+                $price = intval($total_price * $percent / 10000);
+
+                if ($price > $remain) {
+                    $price = $remain;
+                }
+
+                $log = $user->commission_change($price, CommissionBalance::APP_ONLINE_BONUS, [
+                    'device' => $device->getId(),
+                    'percent' => $percent,
+                    'b' => $begin,
+                    'e' => $end,
+                ]);
+
+                if (empty($log) || !$log->update([], true)) {
+                    Log::error('app_online_bonus', [
+                        'msg' => '创建佣金记录失败！',
+                        'device' => $device->profile(),
+                        'user' => $user->profile(),
+                    ]);
+                    continue;
+                }
+
+                $remain -= $price;
+
+                if ($remain < 1) {
+                    return;
+                }
+            }
+
+            $log = $agent->commission_change($remain, CommissionBalance::APP_ONLINE_BONUS, [
+                'device' => $device->getId(),
+                'b' => $begin,
+                'e' => $end,
+            ]);
+
+            if (empty($log) || !$log->update([], true)) {
+                Log::error('app_online_bonus', [
+                    'msg' => '创建佣金记录失败！',
+                    'device' => $device->profile(),
+                    'agent' => $agent->profile(),
+                ]);
+            }
+        });
     }
 }

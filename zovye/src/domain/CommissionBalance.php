@@ -54,6 +54,9 @@ class CommissionBalance extends State
     const TRANSFER_OUT = 50;
     const TRANSFER_RECEIVED = 51;
 
+    const APP_ONLINE_BONUS = 60;
+    const DEVICE_QOE_BONUS = 61;
+
     protected static $unknown = 'n/a';
 
     protected static $title = [
@@ -77,6 +80,8 @@ class CommissionBalance extends State
         self::FUELING_FEE => '尿素加注订单结算',
         self::TRANSFER_OUT => '转账给用户',
         self::TRANSFER_RECEIVED => '收到转账',
+        self::APP_ONLINE_BONUS => 'APP在线奖励',
+        self::DEVICE_QOE_BONUS => '设备电费佣金',
     ];
 
     private $user;
@@ -528,6 +533,43 @@ TRANSFER;
 <dt>事件</dt>
 <dd class="event">收到转账</dd>
 <dt>来自</dt><dd class="user"><img src="{$user['headimgurl']}" alt=''/>{$user['nickname']}</dd>
+TRANSFER;
+        } elseif ($entry->getSrc() == CommissionBalance::APP_ONLINE_BONUS) {
+            $device_id = $entry->getExtraData('device', 0);
+            $device = Device::get($device_id);
+            if ($device) {
+                $device_info = "<dt>设备</dt><dd class=\"admin\">{$device->getName()}</dd>";
+            } else {
+                $device_info = "<dt>设备</dt><dd class=\"admin\"><已删除></dd>";
+            }
+            $b_ts = $entry->getExtraData('b', 0);
+            $begin = $b_ts ? date('Y-m-d H:i:s', $b_ts) : '?';
+            $e_ts = $entry->getExtraData('e', 0);
+            $end = $e_ts ? date('Y-m-d H:i:s', $e_ts) : '?';
+            $memo = "<dt>区间</dt><dd class=\"admin\">$begin ~ $end</dd>";
+            $data['memo'] = <<<TRANSFER
+<dl class="log dl-horizontal">
+<dt>事件</dt>
+<dd class="event">APP在线奖励</dd>
+{$device_info}
+{$memo}
+TRANSFER;
+        } elseif ($entry->getSrc() == CommissionBalance::DEVICE_QOE_BONUS) {
+            $device_id = $entry->getExtraData('device', 0);
+            $device = Device::get($device_id);
+            if ($device) {
+                $device_info = "<dt>设备</dt><dd class=\"admin\">{$device->getName()}</dd>";
+            } else {
+                $device_info = "<dt>设备</dt><dd class=\"admin\"><已删除></dd>";
+            }
+            $kw = $entry->getExtraData('kw', 0);
+            $memo = "<dt>电量</dt><dd class=\"admin\">{$kw}Kw</dd>";
+            $data['memo'] = <<<TRANSFER
+<dl class="log dl-horizontal">
+<dt>事件</dt>
+<dd class="event">设备电费佣金</dd>
+{$device_info}
+{$memo}
 TRANSFER;
         }
 

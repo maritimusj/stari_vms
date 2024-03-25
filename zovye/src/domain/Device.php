@@ -1345,7 +1345,7 @@ class Device extends State
 
             foreach ($device->getKeepers() as $keeper) {
                 $user = $keeper->getUser();
-                if (!$user) {
+                if (empty($user)) {
                     continue;
                 }
 

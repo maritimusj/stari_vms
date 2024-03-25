@@ -450,6 +450,9 @@ class keeper
             $way = Request::int('way', -1);
             $kind = Request::int('kind', -1);
 
+            $app_online_bonus_percent = max(0, min(10000, Request::float('app_online_bonus', 0, 2) * 100));
+            $device_qoe_bonus_percent = max(0, min(10000, Request::float('device_qoe_bonus', 0, 2) * 100));
+
             $keeper_id = Request::int('keeperid');
             $keeper = \zovye\domain\Keeper::get($keeper_id);
             if (empty($keeper) || $keeper->getAgentId() != $agent->getId()) {
@@ -470,6 +473,15 @@ class keeper
                 if ($kind != -1) {
                     $keeper_data['kind'] = $kind;
                 }
+
+                if (App::isAppOnlineBonusEnabled()) {
+                    $keeper_data['app_online_bonus_percent'] = $app_online_bonus_percent;
+                }
+
+                if (App::isDeviceQoeBonusEnabled()) {
+                    $keeper_data['device_qoe_bonus_percent'] = $device_qoe_bonus_percent;
+                }
+
                 $device->setKeeper($keeper, $set_commission($keeper_data));
             }
 

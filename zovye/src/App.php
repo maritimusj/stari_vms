@@ -518,6 +518,10 @@ class App
         return settings('custom.keeper.commissionLimit.enabled', false);
     }
 
+    /**
+     * 支付和免费订单佣金是否分开设置，为了兼容原有统一配置
+     * @return bool
+     */
     public static function isKeeperCommissionOrderDistinguishEnabled(): bool
     {
         return settings('custom.keeper.commissionOrderDistinguish.enabled', false);

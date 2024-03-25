@@ -18,9 +18,9 @@ use zovye\JobException;
 use zovye\Log;
 use zovye\model\pay_logsModelObj;
 use zovye\Pay;
-use function zovye\request;
+use zovye\Request;
 
-$order_no = request('orderNO');
+$order_no = Request::str('orderNO');
 $log = [
     'orderNO' => $order_no,
 ];

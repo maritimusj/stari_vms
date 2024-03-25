@@ -43,7 +43,6 @@ use zovye\We7;
 use function zovye\err;
 use function zovye\error;
 use function zovye\is_error;
-use function zovye\request;
 use function zovye\settings;
 
 class keeper
@@ -550,7 +549,7 @@ class keeper
         ];
 
         if (Request::has('deviceid')) {
-            $device = \zovye\api\wx\device::getDevice(request('deviceid'));
+            $device = \zovye\api\wx\device::getDevice(Request::trim('deviceid'));
             if (is_error($device)) {
                 return $device;
             }
@@ -813,7 +812,7 @@ class keeper
      */
     public static function deviceDetail(keeperModelObj $keeper): array
     {
-        $device = Device::find(request('id'), ['imei', 'shadow_id']);
+        $device = Device::find(Request::str('id'), ['imei', 'shadow_id']);
         if (empty($device)) {
             return err('找不到这个设备！');
         }
@@ -904,7 +903,7 @@ class keeper
             return err('无法锁定用户，请稍后再试！');
         }
 
-        $device = Device::find(request('id'), ['imei', 'shadow_id']);
+        $device = Device::find(Request::str('id'), ['imei', 'shadow_id']);
         if (empty($device)) {
             return err('找不到这个设备！');
         }
@@ -1096,7 +1095,7 @@ class keeper
      */
     public static function deviceTest(keeperModelObj $keeper): array
     {
-        $device = Device::find(request('id'), ['imei', 'shadow_id']);
+        $device = Device::find(Request::str('id'), ['imei', 'shadow_id']);
         if (empty($device)) {
             return err('找不到这个设备！');
         }
@@ -1147,7 +1146,7 @@ class keeper
      */
     public static function stats(keeperModelObj $keeper): array
     {
-        list($y, $m, $d) = explode('-', request('date'), 3);
+        list($y, $m, $d) = explode('-', Request::str('date'), 3);
         if (!checkdate($m, $d ?: 1, $y)) {
             return err('时间不正确！');
         }

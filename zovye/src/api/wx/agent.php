@@ -51,7 +51,6 @@ use zovye\util\Util;
 use function zovye\err;
 use function zovye\error;
 use function zovye\is_error;
-use function zovye\request;
 use function zovye\setArray;
 use function zovye\settings;
 
@@ -418,7 +417,7 @@ class agent
         common::checkPrivileges($agent, 'F_sb');
 
         /** @var deviceModelObj|array $device */
-        $device = \zovye\api\wx\device::getDevice(request('id'));
+        $device = \zovye\api\wx\device::getDevice(Request::trim('id'));
         if (is_error($device)) {
             return $device;
         }
@@ -717,7 +716,7 @@ class agent
         common::checkPrivileges($agent, 'F_sb');
 
         /** @var deviceModelObj|array $device */
-        $device = \zovye\api\wx\device::getDevice(request('id'), $agent);
+        $device = \zovye\api\wx\device::getDevice(Request::trim('id'), $agent);
         if (is_error($device)) {
             return $device;
         }
@@ -757,7 +756,7 @@ class agent
     {
         common::checkPrivileges($agent, 'F_sb');
 
-        $device = \zovye\api\wx\device::getDevice(request('id'), $agent);
+        $device = \zovye\api\wx\device::getDevice(Request::trim('id'), $agent);
         if (is_error($device)) {
             return $device;
         }
@@ -955,7 +954,7 @@ class agent
     {
         common::checkPrivileges($agent, 'F_sb');
 
-        $device = \zovye\api\wx\device::getDevice(request('id'), $agent);
+        $device = \zovye\api\wx\device::getDevice(Request::trim('id'), $agent);
         if (is_error($device)) {
             return $device;
         }
@@ -987,7 +986,7 @@ class agent
     {
         common::checkPrivileges($agent, 'F_sb');
 
-        $device = \zovye\api\wx\device::getDevice(request('id'), $agent);
+        $device = \zovye\api\wx\device::getDevice(Request::trim('id'), $agent);
         if (is_error($device)) {
             return $device;
         }
@@ -1147,7 +1146,7 @@ class agent
         $condition = [];
 
         if (Request::has('deviceid')) {
-            $device = \zovye\api\wx\device::getDevice(request('deviceid'));
+            $device = \zovye\api\wx\device::getDevice(Request::trim('deviceid'));
             if (is_error($device)) {
                 return $device;
             }
@@ -1175,7 +1174,7 @@ class agent
     {
         common::checkPrivileges($agent, 'F_sb');
 
-        $device = \zovye\api\wx\device::getDevice(request('id'));
+        $device = \zovye\api\wx\device::getDevice(Request::trim('id'));
         if (is_error($device)) {
             return $device;
         }
@@ -1408,12 +1407,12 @@ class agent
     public static function removeAgent(agentModelObj $agent): array
     {
         if ($agent->hasFactoryPermission()) {
-            $user_id = request('agent');
+            $user_guid = Request::str('agent');
 
-            if ($user_id) {
+            if ($user_guid) {
                 $res = DBUtil::transactionDo(
-                    function () use ($user_id) {
-                        $user = agent::getUserByGUID($user_id);
+                    function () use ($user_guid) {
+                        $user = agent::getUserByGUID($user_guid);
                         if ($user) {
                             return \zovye\domain\Agent::remove($user);
                         }
@@ -1705,7 +1704,7 @@ class agent
 
     public static function loginPoll(): array
     {
-        $uniq = request('uniq');
+        $uniq = Request::str('uniq');
         if (empty($uniq)) {
             return err('参数错误！');
         }
@@ -1735,7 +1734,7 @@ class agent
     public static function userIncome(): array
     {
         //one month
-        $user = agent::getUserByGUID(request('guid'));
+        $user = agent::getUserByGUID(Request::str('guid'));
         if ($user) {
             $condition['agent_id'] = $user->getId();
             $condition['createtime >='] = (new DateTimeImmutable('first day of this month 00:00'))->getTimestamp();

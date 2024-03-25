@@ -1613,7 +1613,7 @@ include './index.php';
     {
         $FNs = Helper::getAgentFNs(false);
         foreach ($FNs as $index => &$enable) {
-            $enable = empty(request($index)) ? 0 : 1;
+            $enable = Request::bool($index) ? 0 : 1;
         }
 
         return $FNs;

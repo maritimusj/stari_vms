@@ -17,7 +17,7 @@ $media = request('media') ?: [
 
 $typename = Request::trim('typename');
 
-$res = Helper::getWe7Material($typename, request('page'), request('pagesize'));
+$res = Helper::getWe7Material($typename, Request::int('page'), Request::int('pagesize'));
 
 Response::templateJSON(
     'web/account/msg',

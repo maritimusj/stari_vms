@@ -26,7 +26,7 @@ if ($op == 'default') {
         Response::alert('请关联充电桩小程序！');
     }
     //检查设备
-    $device_id = request('id'); //设备ＩＤ
+    $device_id = Request::trim('id'); //设备ＩＤ
     if (empty($device_id)) {
         Response::alert('请扫描设备二维码，谢谢！', 'error');
     }

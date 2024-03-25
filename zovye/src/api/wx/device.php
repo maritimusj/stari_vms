@@ -32,7 +32,6 @@ use zovye\util\Util;
 use function zovye\err;
 use function zovye\is_error;
 use function zovye\isEmptyArray;
-use function zovye\request;
 
 class device
 {
@@ -323,7 +322,7 @@ class device
         $reason = '??';
         if ($user->isAgent() || $user->isPartner()) {
             $agent = $user->isAgent() ? $user->getAgent() : $user->getPartnerAgent();
-            $device = self::getDevice(request('id'), $agent);
+            $device = self::getDevice(Request::trim('id'), $agent);
             if (is_error($device)) {
                 return $device;
             }
@@ -332,7 +331,7 @@ class device
             }
             $reason = '代理商补货';
         } elseif ($user->isKeeper()) {
-            $device = \zovye\domain\Device::find(request('id'), ['imei', 'shadow_id']);
+            $device = \zovye\domain\Device::find(Request::trim('id'), ['imei', 'shadow_id']);
             if (empty($device)) {
                 return err('找不到这个设备！');
             }
@@ -556,9 +555,9 @@ class device
     public static function statistics(agentModelObj $agent): array
     {
         $params = [
-            'date' => request('date'),
-            'guid' => request('guid'),
-            'deviceid' => request('deviceid'),
+            'date' => Request::str('date'),
+            'guid' => Request::str('guid'),
+            'deviceid' => Request::str('deviceid'),
             'w' => Request::str('w', 'goods'),
         ];
 
@@ -1023,7 +1022,7 @@ class device
                 return err('没有权限执行这个操作！');
             }
         } elseif ($user->isKeeper()) {
-            $device = \zovye\domain\Device::find(request('id'), ['imei', 'shadow_id']);
+            $device = \zovye\domain\Device::find(Request::str('id'), ['imei', 'shadow_id']);
             if (!$device) {
                 return err('找不到这个设备！');
             }

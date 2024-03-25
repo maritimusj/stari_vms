@@ -59,7 +59,7 @@ $result = DBUtil::transactionDo(function () use ($id, &$from) {
         $company = Request::trim('company');
         $license = Request::trim('license');
         $level = Request::trim('level');
-        $area = array_intersect_key(request('area'), ['province' => '省', 'city' => '市', 'district' => '区']);
+        $area = array_intersect_key(Request::array('area'), ['province' => '省', 'city' => '市', 'district' => '区']);
 
         //上级代理
         $superior_data = [];
@@ -259,7 +259,7 @@ $result = DBUtil::transactionDo(function () use ($id, &$from) {
                 ]
             );
 
-            $locationEnabled = request('locationEnabled') ? 1 : 0;
+            $locationEnabled = Request::bool('locationEnabled') ? 1 : 0;
             $user->updateSettings('agentData.location.validate.enabled', $locationEnabled);
             if ($locationEnabled) {
                 $user->updateSettings('agentData.location.validate.distance', Request::int('locationDistance'));

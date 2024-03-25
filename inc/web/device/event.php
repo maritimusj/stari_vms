@@ -28,7 +28,7 @@ if (Request::isset('enable')) {
 $tpl_data['enabled'] = $device->isEventLogEnabled();
 
 if (Request::isset('event')) {
-    $query->where(['event' => request('event')]);
+    $query->where(['event' => Request::trim('event')]);
 }
 
 $detail = Request::bool('detail');

@@ -46,8 +46,8 @@ $result = DBUtil::transactionDo(function () use ($id, &$device) {
         'activeQrcode' => Request::bool('activeQrcode') ? 1 : 0,
         'address' => Request::trim('address'),
         'grantloc' => [
-            'lng' => floatval(request('location')['lng']),
-            'lat' => floatval(request('location')['lat']),
+            'lng' => Request::float('location.lng'),
+            'lat' => Request::float('location.lat'),
         ],
         'theme' => Request::str('theme'),
     ];

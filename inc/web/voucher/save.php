@@ -34,13 +34,13 @@ $res = DBUtil::transactionDo(function () {
     $begin = 0;
     $end = 0;
 
-    if (request('validate')) {
+    if (Request::bool('validate')) {
         try {
-            $begin = (new DateTime(request('begin')))->getTimestamp();
+            $begin = (new DateTime(Request::str('begin')))->getTimestamp();
         } catch (Exception $e) {
         }
         try {
-            $end = (new DateTime(request('end')))->getTimestamp();
+            $end = (new DateTime(Request::str('end')))->getTimestamp();
         } catch (Exception $e) {
         }
     }
@@ -48,7 +48,7 @@ $res = DBUtil::transactionDo(function () {
     $total = Request::int('total');
     $original_limit_goods_dds = [];
 
-    if (request('id') > 0) {
+    if (Request::int('id') > 0) {
         $id = Request::int('id');
         $voucher = GoodsVoucher::get($id);
         if (empty($voucher)) {

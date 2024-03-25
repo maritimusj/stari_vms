@@ -23,7 +23,7 @@ if ($op == 'reg') {
         JSON::fail('您还不是我们的代理商！');
     }
 
-    $device = Device::find(request('id'), ['id', 'imei']);
+    $device = Device::find(Request::trim('id'), ['id', 'imei']);
     if ($device && empty($device->getAgentId())) {
         if (Device::bind($device, $user->agent()) && $device->save()) {
             JSON::success('恭喜，注册成功！');

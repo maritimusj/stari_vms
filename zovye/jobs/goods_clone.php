@@ -16,7 +16,6 @@ use zovye\domain\Goods;
 use zovye\JobException;
 use zovye\Log;
 use zovye\Request;
-use function zovye\request;
 
 $log = [
     'id' => Request::int('id'),
@@ -26,7 +25,7 @@ if (!CtrlServ::checkJobSign($log)) {
     throw new JobException('签名不正确!', $log);
 }
 
-$goods = Goods::get(request('id'));
+$goods = Goods::get(Request::int('id'));
 if (empty($goods)) {
     $log['error'] = 'goods not exists!';
 } else {

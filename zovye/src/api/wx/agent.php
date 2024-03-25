@@ -474,11 +474,16 @@ class agent
                 $cargo_lanes = [];
                 $capacities = Request::array('capacities');
                 foreach (Request::array('goods') as $index => $goods_id) {
-                    $cargo_lanes[] = [
+                    $lane = [
                         'goods' => intval($goods_id),
                         'capacity' => intval($capacities[$index]),
-                        'auto' => Request::bool("lane{$index}_auto"),
                     ];
+                    if (Request::isset("lane{$index}_auto")) {
+                        $lane['auto'] = Request::bool("lane{$index}_auto");
+                    } elseif (isset($old[$index]['auto'])) {
+                        $lane['auto'] = $old[$index]['auto'];
+                    }
+                    $cargo_lanes[] = $lane;
                     if ($old[$index] && $old[$index]['goods'] != intval($goods_id)) {
                         $payload[] = $device->resetPayload([$index => '@0'],
                             $device->isFuelingDevice() ? '代理商更改加注枪商品' : '代理商更改货道商品');

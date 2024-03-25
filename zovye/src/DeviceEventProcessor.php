@@ -303,7 +303,7 @@ class DeviceEventProcessor
     }
 
     /**
-     * online 事件处理
+     * offline 事件处理
      */
     public static function onAppOfflineMsg(array $data)
     {
@@ -334,8 +334,6 @@ class DeviceEventProcessor
         $app_id = $data['id'];
         $device = Device::getFromAppId($app_id);
         if ($device) {
-            $device->setAppLastOnline(TIMESTAMP);
-
             if ($data['data']) {
                 $data = $data['data'];
                 //记录设备定位信息
@@ -399,8 +397,6 @@ class DeviceEventProcessor
             //是不是刷新操作？
             if ($device->has('refresh')) {
                 $device->remove('refresh');
-            } else {
-                $device->setAppLastOnline(TIMESTAMP);
             }
 
             $device->setAppVersion($data['version']);

@@ -1327,6 +1327,11 @@ class Device extends State
         }
 
         $begin = $device->getAppLastOnline();
+        
+        if (empty($begin)) {
+            return;
+        }
+
         $end = time();
 
         $ts = $end - $begin;

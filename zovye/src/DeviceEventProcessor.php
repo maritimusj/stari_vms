@@ -279,19 +279,6 @@ class DeviceEventProcessor
     }
 
     /**
-     * online 事件处理
-     */
-    public static function onAppOnlineMsg(array $data)
-    {
-        $app_id = $data['id'];
-        $device = Device::getFromAppId($app_id);
-        if ($device) {
-            $device->setAppLastOnline(TIMESTAMP);
-            $device->save();
-        }
-    }
-
-    /**
      * offline 事件处理
      */
     public static function onAppOfflineMsg(array $data)

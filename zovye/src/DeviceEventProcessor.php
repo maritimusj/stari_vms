@@ -29,10 +29,7 @@ class DeviceEventProcessor
     const EVENT_V1_ONLINE = 'mcb.online';
     const EVENT_V1_OFFLINE = 'mcb.offline';
     const EVENT_V1_RESULT = 'mcb.result';
-    const EVENT_V1_RECORD = 'mcb.record';
     const EVENT_V1_REPORT = 'mcb.report';
-    const EVENT_V1_RELOAD = 'mcb.reload';
-    const EVENT_V1_RESET = 'mcb.reset';
     const EVENT_V1_PING = 'mcb.ping';
     const EVENT_V1_FEE = 'mcb.fee';
     const EVENT_V1_CONFIG = 'mcb.config';
@@ -135,36 +132,6 @@ class DeviceEventProcessor
                 'log' => [
                     'enable' => true,
                     'id' => 14,
-                ],
-            ],
-        ],
-        self::EVENT_V1_RELOAD => [
-            'title' => '[v1]已完成补货',
-            'handler' => [self::class, 'onMcbReload'],
-            'params' => [
-                'log' => [
-                    'enable' => true,
-                    'id' => 15,
-                ],
-            ],
-        ],
-        self::EVENT_V1_RECORD => [
-            'title' => '[v1]出货结果',
-            'handler' => [self::class, 'onMcbRecord'],
-            'params' => [
-                'log' => [
-                    'enable' => true,
-                    'id' => 16,
-                ],
-            ],
-        ],
-        self::EVENT_V1_RESET => [
-            'title' => '[v1]设备重启',
-            'handler' => [self::class, 'onMcbReset'],
-            'params' => [
-                'log' => [
-                    'enable' => true,
-                    'id' => 17,
                 ],
             ],
         ],
@@ -617,28 +584,6 @@ class DeviceEventProcessor
 
         $device->save();
     }
-
-    /**
-     * v1版本 mcb::reload 事件处理
-     */
-    public static function onMcbReload(array $data = [])
-    {
-    }
-
-    /**
-     * v1版本 mcb::record 事件处理
-     */
-    public static function onMcbRecord(array $data = [])
-    {
-    }
-
-    /**
-     * v1版本 mcb::reset 事件处理
-     */
-    public static function onMcbReset(array $data = [])
-    {
-    }
-
 
     /**
      * v1版本 mcb::ping 事件处理

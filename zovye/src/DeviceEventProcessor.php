@@ -19,14 +19,10 @@ use zovye\util\Util;
 
 class DeviceEventProcessor
 {
-    const EVENT_V0_PING = 'ping';
-    const EVENT_V0_FIRST = 'first';
-    const EVENT_V0_RESET = 'reset';
-    const EVENT_V0_RESULT = 'result';
+    const EVENT_V0_ONLINE = 'online';
     const EVENT_V0_INIT = 'init';
     const EVENT_V0_UPDATE = 'update';
     const EVENT_V0_INFO = 'info';
-    const EVENT_V0_ADV = 'adv';
     const EVENT_V0_QRCODE = 'qrcode';
     const EVENT_V0_CONFIG = 'config';
     const EVENT_V0_OFFLINE = 'offline';
@@ -45,19 +41,9 @@ class DeviceEventProcessor
     const EVENT_V2_STARTUP = 'mcb.startup';
 
     protected static $events = [
-        self::EVENT_V0_PING => [
-            'title' => '[v0]心跳',
-            'handler' => [self::class, 'onPingMsg'],
-            'params' => [
-                'log' => [
-                    'enable' => false,
-                    'id' => 1,
-                ],
-            ],
-        ],
-        self::EVENT_V0_FIRST => [
-            'title' => '[v0]上线，主板网络连接成功',
-            'handler' => [self::class, 'onFirstMsg'],
+        self::EVENT_V0_ONLINE => [
+            'title' => '[v0]App上线',
+            'handler' => [self::class, 'onlineMsg'],
             'params' => [
                 'log' => [
                     'enable' => true,
@@ -65,28 +51,8 @@ class DeviceEventProcessor
                 ],
             ],
         ],
-        self::EVENT_V0_RESET => [
-            'title' => '[v0]已完成补货',
-            'handler' => [self::class, 'onResetMsg'],
-            'params' => [
-                'log' => [
-                    'enable' => true,
-                    'id' => 3,
-                ],
-            ],
-        ],
-        self::EVENT_V0_RESULT => [
-            'title' => '[v0]出货结果',
-            'handler' => [self::class, 'onResultMsg'],
-            'params' => [
-                'log' => [
-                    'enable' => true,
-                    'id' => 4,
-                ],
-            ],
-        ],
         self::EVENT_V0_INIT => [
-            'title' => '[v0]App上线',
+            'title' => '[v0]App初始化',
             'handler' => [self::class, 'onAppInitMsg'],
             'params' => [
                 'log' => [
@@ -112,16 +78,6 @@ class DeviceEventProcessor
                 'log' => [
                     'enable' => true,
                     'id' => 7,
-                ],
-            ],
-        ],
-        self::EVENT_V0_ADV => [
-            'title' => '[v0]App报告广告状态',
-            'handler' => [self::class, 'onAppAdvMsg'],
-            'params' => [
-                'log' => [
-                    'enable' => true,
-                    'id' => 8,
                 ],
             ],
         ],
@@ -345,78 +301,17 @@ class DeviceEventProcessor
     }
 
     /**
-     * ping 事件处理
+     * online 事件处理
      */
-    public static function onPingMsg(array $data)
+    public static function onlineMsg(array $data)
     {
-        if ($data['IMEI']) {
-            $device = Device::get($data['IMEI'], true);
-            if ($device) {
-                if (isset($data['Signal'])) {
-                    $signal = intval($data['Signal']);
-                    $device->setSig($signal);
-                }
-                $device->setLastPing(TIMESTAMP);
-                $device->setLastOnline(TIMESTAMP);
-                $device->save();
-            }
+        $app_id = $data['id'];
+        $device = Device::getFromAppId($app_id);
+        if ($device) {
+            $device->setAppLastOnline(TIMESTAMP);
+
+            $device->save();
         }
-    }
-
-    /**
-     * first 事件处理
-     */
-    public static function onFirstMsg(array $data)
-    {
-        if ($data['IMEI']) {
-            $device = Device::get($data['IMEI'], true);
-            if (empty($device)) {
-                $device = Device::createNewDevice($data);
-            }
-
-            if ($device) {
-                if ($data['ICCID'] && $device->getICCID() != $data['ICCID']) {
-                    $device->setICCID($data['ICCID']);
-                }
-
-                $device->setMcbOnline(Device::ONLINE);
-                $device->setLastOnline(TIMESTAMP);
-                $device->updateFirstMsgStats();
-
-                Job::deviceEventNotify($device, Device::EVENT_ONLINE);
-            }
-        }
-    }
-
-
-    /**
-     * reset 事件处理
-     */
-    public static function onResetMsg(array $data)
-    {
-        if ($data['IMEI']) {
-            $device = Device::get($data['IMEI'], true);
-            if ($device) {
-                if ($device->payloadLockAcquire(3)) {
-                    $device->resetPayload([], 'reset重置');
-                    $device->updateAppRemain();
-                }
-            }
-        }
-    }
-
-    /**
-     * result 事件处理
-     */
-    public static function onResultMsg(array $data)
-    {
-    }
-
-    /**
-     * app::adv　事件处理
-     */
-    public static function onAppAdvMsg(array $data)
-    {
     }
 
     /**
@@ -439,7 +334,6 @@ class DeviceEventProcessor
         $app_id = $data['id'];
         $device = Device::getFromAppId($app_id);
         if ($device) {
-
             $device->setAppLastOnline(TIMESTAMP);
 
             if ($data['data']) {

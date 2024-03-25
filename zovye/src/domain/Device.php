@@ -1317,7 +1317,7 @@ class Device extends State
         }
 
         $agent = $device->getAgent();
-        if (!$agent) {
+        if (empty($agent) || !$agent->isCommissionEnabled()) {
             return;
         }
 

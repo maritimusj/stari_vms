@@ -815,7 +815,7 @@
                 {/if}
                 {if \zovye\App::isDeviceQoeBonusEnabled()}
                 <div class="form-group">
-                    <label for="deviceQoeBonus" class="col-md-2 control-label">电费（元/KW）</label>
+                    <label for="deviceQoeBonus" class="col-md-2 control-label">电费佣金（元/Kw）</label>
                     <div class="col-md-10">
                         <input type="number" class="form-control" name="deviceQoeBonus" id="deviceQoeBonus" value="{php echo isset($agent_data['commission']['deviceQoeBonus']['price']) ? number_format($agent_data['commission']['deviceQoeBonus']['price']/100, 2) : ''}" min="0" step="0.01">
                         <span class="help-block">* 根据设备上报的电量，给代理商支付电费佣金</span>

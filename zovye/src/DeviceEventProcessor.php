@@ -19,7 +19,6 @@ use zovye\util\Util;
 
 class DeviceEventProcessor
 {
-    const EVENT_V0_ONLINE = 'online';
     const EVENT_V0_INIT = 'init';
     const EVENT_V0_UPDATE = 'update';
     const EVENT_V0_INFO = 'info';
@@ -39,16 +38,6 @@ class DeviceEventProcessor
     const EVENT_V1_CONFIG = 'mcb.config';
 
     protected static $events = [
-        self::EVENT_V0_ONLINE => [
-            'title' => '[v0]App上线',
-            'handler' => [self::class, 'onAppOnlineMsg'],
-            'params' => [
-                'log' => [
-                    'enable' => true,
-                    'id' => 2,
-                ],
-            ],
-        ],
         self::EVENT_V0_INIT => [
             'title' => '[v0]App初始化',
             'handler' => [self::class, 'onAppInitMsg'],
@@ -397,6 +386,8 @@ class DeviceEventProcessor
             //是不是刷新操作？
             if ($device->has('refresh')) {
                 $device->remove('refresh');
+            } else {
+                $device->setAppLastOnline(TIMESTAMP);
             }
 
             $device->setAppVersion($data['version']);
@@ -408,7 +399,6 @@ class DeviceEventProcessor
             //发送设备注册的MCB的IMEI
             //APP要根据这个判断是否创建虚拟ＭＣＢ
             $config['mcbUID'] = strval($device->getImei());
-
             $device->appPublishConfig($config);
         } else {
             $config = [

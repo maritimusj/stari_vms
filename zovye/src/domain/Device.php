@@ -1335,7 +1335,7 @@ class Device extends State
             return;
         }
 
-        $total_price = intval(($ts / 3600) * $app_online_bonus_price);
+        $total_price = intval(($ts / 3600.00) * $app_online_bonus_price);
         if ($total_price < 1) {
             return;
         }

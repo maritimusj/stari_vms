@@ -36,7 +36,7 @@
                 <thead>
                 <tr>
                     <th>#</th>
-                    <th>设备名称11</th>
+                    <th>设备名称</th>
                     <th>设备编号</th>
                     <th style="text-align: center;">
                         补货权限
@@ -45,28 +45,38 @@
                         类型
                     </th>            
                     <th>
-                        佣金
+                        订单佣金
                     </th>
+                    {if \zovye\App::isAppOnlineBonusEnabled()}
+                    <th>
+                        APP在线奖励
+                    </th>
+                    {/if}
+                    {if \zovye\App::isDeviceQoeBonusEnabled()}
+                    <th>
+                        电费佣金
+                    </th>
+                    {/if}
                     <th>
                         操作
                     </th>
                 </tr>
                 </thead>
                 <tbody>
-                {loop $devices $index $device}
-                <tr data-id="{$device['id']}">
+                {loop $devices $index $item}
+                <tr data-id="{$item['id']}">
                     <td>{php echo $index + 1}</td>
                     <td>
                         <div class="">
-                            <div>{php echo $device['name']}</div>
+                            <div>{php echo $item['name']}</div>
                         </div>
                     </td>
                     <td>
-                        <div>{php echo $device['imei']}</div>
+                        <div>{php echo $item['imei']}</div>
                     </td>
                     <td>
                         <div class="kind">
-                            {if $device['kind']}
+                            {if $item['kind']}
                             <i class="fa fa-check-square-o"></i>
                             {else}
                             <i class="fa fa-square-o"></i>
@@ -75,22 +85,36 @@
                     </td>
                     <td>
                         <span class="way">
-                            {php echo $device['way'] == 0 ? '销售分成' : '补货分成'}
+                            {php echo $item['way'] == 0 ? '销售分成' : '补货分成'}
                         </span>
                     </td>
                     <td>
-                        <div class="box" {if !\zovye\App::isKeeperCommissionOrderDistinguishEnabled() || $device['way'] != 0} style="display:none"{/if}>
+                        <div class="box" {if !\zovye\App::isKeeperCommissionOrderDistinguishEnabled() || $item['way'] != 0} style="display:none"{/if}>
                             <div>
-                                支付订单：<span class="pay_val">{$device['pay_val']}</span>
+                                支付订单：<span class="pay_val">{$item['pay_val']}</span>
                             </div>
                             <div>
-                                免费订单：<span class="free_val">{$device['free_val']}</span>
+                                免费订单：<span class="free_val">{$item['free_val']}</span>
                             </div>                            
                         </div>
-                        <div class="val"{if \zovye\App::isKeeperCommissionOrderDistinguishEnabled() && $device['way'] == 0} style="display:none"{/if}>
-                            {$device['val']}
+                        <div class="val"{if \zovye\App::isKeeperCommissionOrderDistinguishEnabled() && $item['way'] == 0} style="display:none"{/if}>
+                            {$item['val']}
                         </div>
                     </td>
+                    {if \zovye\App::isAppOnlineBonusEnabled()}
+                    <td>
+                        <span class="app_online_bonus">
+                            {$item['app_online_bonus_percent']}
+                        </span>
+                    </td>
+                    {/if}
+                    {if \zovye\App::isDeviceQoeBonusEnabled()}
+                    <td>
+                        <span class="device_qoe_bonus">
+                            {$item['device_qoe_bonus_percent']}
+                        </span>
+                    </td>
+                    {/if}
                     <td class="operate">
                         <i class="fa fa-gear" title="配置" data-op="keeper_device_edit"></i>
                         <i class="fa fa-trash" title="删除" data-op="keeper_device_remove"></i>
@@ -136,8 +160,10 @@
             const val = e.find('input[name=commissionVal]').val();
             const pay_val = e.find('input[name=payCommissionVal]').val();
             const free_val = e.find('input[name=freeCommissionVal]').val();
+            const app_online_bonus = e.find('input[name=appOnlineBonus]').val();
+            const device_qoe_bonus = e.find('input[name=deviceQoeBonus]').val();
             const tr = $('#keeperDevice tr[data-id="'+id+'"]');
-            next({id, kind, way, type, val, pay_val, free_val}, function(res) {
+            next({id, kind, way, type, val, pay_val, free_val, app_online_bonus, device_qoe_bonus}, function(res) {
                 if (res && res.status) {
                     tr.find('.kind').html(res.data.kind ? '<i class="fa fa-check-square-o"></i>' : '<i class="fa fa-square-o"></i>');
                     tr.find('.way').html(res.data.way === 0 ? '销售分成' : '补货分成');
@@ -155,6 +181,8 @@
                         tr.find('.val').hide();
                         tr.find('.free_val').html(res.data.free_val);
                     }
+                    tr.find('.app_online_bonus').html(res.data.app_online_bonus_percent);
+                    tr.find('.device_qoe_bonus').html(res.data.device_qoe_bonus_percent);
                }
                $('#modal-message').modal('hide');
             });
@@ -194,12 +222,16 @@
             const way = e.find('input[name=way]:checked').val();
             const type = e.find('input[name=type]:checked').val();
             const val = e.find('input[name=commissionVal]').val();
+            const app_online_bonus = e.find('input[name=appOnlineBonus]').val();
+            const device_qoe_bonus = e.find('input[name=deviceQoeBonus]').val();
             const tr = $('#keeperDevice tr[data-id="'+id+'"]');
-            next({id, kind, way, type, val}, function(res) {
+            next({id, kind, way, type, val, app_online_bonus, device_qoe_bonus}, function(res) {
                 if (res && res.status) {
                     tr.find('.kind').html(res.data.kind ? '<i class="fa fa-check-square-o"></i>' : '<i class="fa fa-square-o"></i>');
                     tr.find('.way').html(res.data.way === 0 ? '销售分成' : '补货分成');
                     tr.find('.val').html(res.data.val);
+                    tr.find('.app_online_bonus').html(res.data.app_online_bonus_percent);
+                    tr.find('.device_qoe_bonus').html(res.data.device_qoe_bonus_percent);
                }
                $('#modal-message').modal('hide');
             });

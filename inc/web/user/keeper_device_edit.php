@@ -12,8 +12,6 @@ use zovye\domain\Device;
 use zovye\domain\Keeper;
 use zovye\domain\User;
 use zovye\model\device_keeper_vwModelObj;
-use zovye\model\deviceModelObj;
-use zovye\model\keeper_devicesModelObj;
 
 $user = User::get(Request::int('user'));
 if (empty($user)) {
@@ -59,6 +57,14 @@ if (App::isKeeperCommissionOrderDistinguishEnabled() && $device->getWay() == Kee
         $data['val'] = number_format($device->getCommissionPercent() / 100, 2, '.', '');
         $data['type'] = 'percent';
     }
+}
+
+if (App::isAppOnlineBonusEnabled()) {
+    $data['app_online_bonus_percent'] = number_format($device->getAppOnlineBonusPercent() / 100, 2, '.', '');
+}
+
+if (App::isDeviceQoeBonusEnabled()) {
+    $data['device_qoe_bonus_percent'] = number_format($device->getDeviceQoeBonusPercent() / 100, 2, '.', '');
 }
 
 Response::templateJSON(

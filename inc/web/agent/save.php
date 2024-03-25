@@ -230,6 +230,20 @@ $result = DBUtil::transactionDo(function () use ($id, &$from) {
                     ]
                 );
             }
+
+            // app在线时长奖励
+            if (App::isAppOnlineBonusEnabled()) {
+                $user->updateSettings('agentData.commission.appOnlineBonus', [
+                    'price' => intval(Request::float('appOnlineBonus', 0, 2) * 100),
+                ]);
+            }
+
+            // 设备电费佣金
+            if (App::isDeviceQoeBonusEnabled()) {
+                $user->updateSettings('agentData.commission.deviceQoeBonus', [
+                    'price' => intval(Request::float('deviceQoeBonus', 0, 2) * 100),
+                ]);
+            }
         }
     } elseif (Request::bool('agent_misc')) {
 

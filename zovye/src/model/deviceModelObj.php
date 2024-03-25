@@ -2576,6 +2576,14 @@ class deviceModelObj extends ModelObj
             $res->setKind(intval($data['kind']));
             $res->setWay(intval($data['way']));
 
+            if (App::isAppOnlineBonusEnabled()) {
+                $res->setAppOnlineBonusPercent(intval($data['app_online_bonus_percent']));
+            }
+            
+            if (App::isDeviceQoeBonusEnabled()) {
+                $res->setDeviceQoeBonusPercent(intval($data['device_qoe_bonus_percent']));
+            }
+            
             return $res->save();
         }
 

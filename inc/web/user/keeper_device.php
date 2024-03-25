@@ -61,6 +61,16 @@ foreach ($query->findAll() as $item) {
     $data['way'] = $item->getWay();
     $data['kind'] = $item->getKind();
 
+    if (App::isAppOnlineBonusEnabled()) {
+        $percent = $item->getAppOnlineBonusPercent();
+        $data['app_online_bonus_percent'] = $percent > 0 ? number_format($percent / 100, 2, '.', '') . '%' : '';
+    }
+
+    if (App::isDeviceQoeBonusEnabled()) {
+        $percent = $item->getDeviceQoeBonusPercent();
+        $data['device_qoe_bonus_percent'] = $percent > 0 ? number_format($percent / 100, 2, '.', '') . '%' : '';
+    }
+
     $list[] = $data;
 }
 

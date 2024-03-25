@@ -40,6 +40,12 @@ class device_keeper_vwModelObj extends deviceModelObj
     /** @var int */
     protected $commission_free_fixed;
 
+    /** @var int */
+    protected $device_qoe_bonus_percent; //设备电费分成比例 0 ~ 100
+
+    /** @var int */
+    protected $app_online_bonus_percent; //app在线分成比例 0 ~ 100
+
     public static function getTableName($read_or_write): string
     {
         if ($read_or_write == self::OP_WRITE) {

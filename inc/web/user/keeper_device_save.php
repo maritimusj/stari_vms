@@ -60,6 +60,14 @@ if (App::isKeeperCommissionOrderDistinguishEnabled() && $data['way'] == Keeper::
     }
 }
 
+if (App::isAppOnlineBonusEnabled()) {
+    $data['app_online_bonus_percent'] = max(0, min(10000, intval(Request::float('app_online_bonus', 0, 2) * 100)));
+}
+
+if (App::isDeviceQoeBonusEnabled()) {
+    $data['device_qoe_bonus_percent'] = max(0, min(10000, intval(Request::float('device_qoe_bonus', 0, 2) * 100)));
+}
+
 $device->setKeeper($keeper, $data);
 
 $result = [
@@ -67,6 +75,8 @@ $result = [
     'way' => $data['way'],
     'kind' => $data['kind'],
     'type' => $data['type'],
+    'app_online_bonus_percent' => $data['app_online_bonus_percent'] > 0 ? number_format($data['app_online_bonus_percent'] / 100, 2, '.', '') . '%' : '',
+    'device_qoe_bonus_percent' => $data['device_qoe_bonus_percent'] > 0 ? number_format($data['device_qoe_bonus_percent'] / 100, 2, '.', '') . '%' : '',
 ];
 
 if (App::isKeeperCommissionOrderDistinguishEnabled() && $data['way'] == Keeper::COMMISSION_ORDER) {

@@ -657,6 +657,22 @@
                             </label>
                         </div>
                     </div>
+                    <div class="col-md-offset-2 col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="appOnlineBonusEnabled" id="appOnlineBonusEnabled" value="1" {if \zovye\App::isAppOnlineBonusEnabled()}checked{/if}>
+                                启用根据APP在线时长计算代理商奖励功能
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-offset-2 col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="deviceQoeBonusEnabled" id="deviceQoeBonusEnabled" value="1" {if \zovye\App::isDeviceQoeBonusEnabled()}checked{/if}>
+                                启用根据设备电量支付代理商电费佣金功能
+                            </label>
+                        </div>
+                    </div>                    
                 </div>
             </div>
         </div>

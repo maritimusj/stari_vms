@@ -193,6 +193,8 @@ if ($page == 'device') {
     $settings['custom']['device']['laneQRCode']['enabled'] = Request::bool('DeviceLaneQRCodeEnabled') ? 1 : 0;
     $settings['custom']['puai']['enabled'] = Request::bool('puaiEnabled') ? 1 : 0;
     $settings['custom']['allCode']['enabled'] = Request::bool('allCodeEnabled') ? 1 : 0;
+    $settings['custom']['appOnlineBonus']['enabled'] = Request::bool('appOnlineBonusEnabled') ? 1 : 0;
+    $settings['custom']['deviceQoeBonus']['enabled'] = Request::bool('deviceQoeBonusEnabled') ? 1 : 0;
 
     Config::app('ad.sponsor.enabled', Request::bool('sponsorAd'), true);
     Config::app('misc.GoodsExpireAlert.enabled', Request::bool('GoodsExpireAlert') ? 1 : 0, true);

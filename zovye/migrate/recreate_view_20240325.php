@@ -50,7 +50,9 @@ SELECT log.*,acc.state FROM `ims_zovye_vms_balance_logs` AS log INNER JOIN `ims_
 WHERE type=110;
 
 CREATE OR REPLACE VIEW `ims_zovye_vms_device_keeper_vw` AS 
-SELECT d.*,IFNULL(k.keeper_id,0) keeper_id,k.commission_percent, k.commission_fixed,k.commission_free_percent, k.commission_free_fixed,IFNULL(k.kind,0) kind,IFNULL(k.way,0) way FROM `ims_zovye_vms_device` d 
+SELECT d.*,IFNULL(k.keeper_id,0) keeper_id,
+k.commission_percent, k.commission_fixed,k.commission_free_percent, k.commission_free_fixed,k.device_qoe_bonus_percent,k.app_online_bonus_percent,
+IFNULL(k.kind,0) kind,IFNULL(k.way,0) way FROM `ims_zovye_vms_device` d 
 LEFT JOIN `ims_zovye_vms_keeper_devices` k ON d.id=k.device_id WHERE 1;
 
 CREATE OR REPLACE VIEW `ims_zovye_vms_goods_voucher_vw` AS

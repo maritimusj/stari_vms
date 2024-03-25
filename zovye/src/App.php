@@ -543,4 +543,14 @@ class App
     {
         return settings('custom.allCode.enabled', false);
     }
+
+    public static function isAppOnlineBonusEnabled(): bool
+    {
+        return settings('custom.appOnlineBonus.enabled', false);
+    }
+
+    public static function isDeviceQoeBonusEnabled(): bool
+    {
+        return settings('custom.deviceQoeBonus.enabled', false);
+    }
 }

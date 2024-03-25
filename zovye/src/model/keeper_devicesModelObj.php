@@ -54,6 +54,12 @@ class keeper_devicesModelObj extends ModelObj
     protected $kind; //补货权限 0 没有 1 有
 
     /** @var int */
+    protected $device_qoe_bonus_percent; //设备电费分成比例 0 ~ 100
+
+    /** @var int */
+    protected $app_online_bonus_percent; //app在线分成比例 0 ~ 100
+
+    /** @var int */
     protected $createtime;
 
     public static function getTableName($read_or_write): string

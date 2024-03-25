@@ -50,7 +50,7 @@ class commission_balanceModelObj extends ModelObj
         return tb('commission_balance');
     }
 
-    public function update(array $data = [], $setUpdatetime = false): bool
+    public function update(array $data = [], $update = false): bool
     {
         if ($data) {
             if (We7::is_serialized($this->extra)) {
@@ -63,7 +63,7 @@ class commission_balanceModelObj extends ModelObj
             $this->setExtra(serialize($data));
         }
 
-        if ($setUpdatetime) {
+        if ($update) {
             $this->setUpdatetime(time());
         }
 

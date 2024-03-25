@@ -38,8 +38,6 @@ class DeviceEventProcessor
     const EVENT_V1_FEE = 'mcb.fee';
     const EVENT_V1_CONFIG = 'mcb.config';
 
-    const EVENT_V2_STARTUP = 'mcb.startup';
-
     protected static $events = [
         self::EVENT_V0_ONLINE => [
             'title' => '[v0]App上线',
@@ -178,16 +176,6 @@ class DeviceEventProcessor
                 'log' => [
                     'enable' => false,
                     'id' => 18,
-                ],
-            ],
-        ],
-        self::EVENT_V2_STARTUP => [
-            'title' => '[v2]主板启动',
-            'handler' => [self::class, 'onMcbStartup'],
-            'params' => [
-                'log' => [
-                    'enable' => true,
-                    'id' => 19,
                 ],
             ],
         ],
@@ -690,26 +678,6 @@ class DeviceEventProcessor
             }
 
             $device->save();
-        }
-    }
-
-    public static function onMcbStartup(array $data = [])
-    {
-        $device = Device::get($data['uid'], true);
-        if ($device) {
-            if (isset($data['extra']['RSSI'])) {
-                $device->setSig($data['extra']['RSSI']);
-            }
-            if (isset($data['extra']['ICCID'])) {
-                $device->setICCID($data['extra']['ICCID']);
-            }
-
-            $device->setMcbOnline(Device::ONLINE);
-            $device->setLastOnline(TIMESTAMP);
-            $device->setLastPing(TIMESTAMP);
-            $device->save();
-
-            Job::deviceEventNotify($device, Device::EVENT_ONLINE);
         }
     }
 

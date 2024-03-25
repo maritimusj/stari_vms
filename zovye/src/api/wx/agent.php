@@ -477,6 +477,7 @@ class agent
                     $cargo_lanes[] = [
                         'goods' => intval($goods_id),
                         'capacity' => intval($capacities[$index]),
+                        'auto' => Request::bool("lane{$index}_auto"),
                     ];
                     if ($old[$index] && $old[$index]['goods'] != intval($goods_id)) {
                         $payload[] = $device->resetPayload([$index => '@0'],

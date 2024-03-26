@@ -48,11 +48,11 @@ class device
         ];
 
         if (App::isAppOnlineBonusEnabled()) {
-            $data['app_online_bonus'] = $device->getAppOnlineBonusPercent($keeper_id);
+            $data['app_online_bonus'] = $device->getAppOnlineBonusPercent($keeper_id) / 100;
         }
 
         if (App::isDeviceQoeBonusEnabled()) {
-            $data['device_qoe_bonus'] = $device->getAppOnlineBonusPercent($keeper_id);
+            $data['device_qoe_bonus'] = $device->getAppOnlineBonusPercent($keeper_id) / 100;
         }
 
         return $data;

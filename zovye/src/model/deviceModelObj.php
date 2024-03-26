@@ -2637,6 +2637,14 @@ class deviceModelObj extends ModelObj
         $cond['kind'] = intval($data['kind']);
         $cond['way'] = intval($data['way']);
 
+        if (App::isAppOnlineBonusEnabled()) {
+            $cond['app_online_bonus_percent'] = intval($data['app_online_bonus_percent']);
+        }
+
+        if (App::isDeviceQoeBonusEnabled()) {
+            $cond['device_qoe_bonus_percent'] = intval($data['device_qoe_bonus_percent']);
+        }
+
         $res = m('keeper_devices')->create($cond);
 
         return !empty($res);

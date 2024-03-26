@@ -38,7 +38,7 @@ class device
 
     protected static function getKeeperData(deviceModelObj $device, $keeper_id): array
     {
-        $commission_val = $device->getCommissionValue($keeper_id);
+        $commission_val = $device->getKeeperCommissionValue($keeper_id);
 
         $data = [
             'keeper_id' => $keeper_id,
@@ -48,11 +48,11 @@ class device
         ];
 
         if (App::isAppOnlineBonusEnabled()) {
-            $data['app_online_bonus'] = $device->getAppOnlineBonusPercent($keeper_id) / 100;
+            $data['app_online_bonus'] = $device->getKeeperAppOnlineBonusPercent($keeper_id) / 100;
         }
 
         if (App::isDeviceQoeBonusEnabled()) {
-            $data['device_qoe_bonus'] = $device->getDeviceQoeBonusPercent($keeper_id) / 100;
+            $data['device_qoe_bonus'] = $device->getKeeperDeviceQoeBonusPercent($keeper_id) / 100;
         }
 
         return $data;

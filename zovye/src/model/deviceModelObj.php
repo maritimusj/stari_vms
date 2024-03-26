@@ -2539,21 +2539,21 @@ class deviceModelObj extends ModelObj
         );
     }
 
-    public function getDeviceQoeBonusPercent($keeper): int
+    public function getKeeperDeviceQoeBonusPercent($keeper): int
     {
         $res = $this->getKeeperDeviceModelObj($keeper);
 
         return $res ? $res->getAppOnlineBonusPercent() : 0;
     }
 
-    public function getAppOnlineBonusPercent($keeper): int
+    public function getKeeperAppOnlineBonusPercent($keeper): int
     {
         $res = $this->getKeeperDeviceModelObj($keeper);
 
         return $res ? $res->getAppOnlineBonusPercent() : 0;
     }
 
-    public function getCommissionValue($keeper): ?CommissionValue
+    public function getKeeperCommissionValue($keeper): ?CommissionValue
     {
         $res = $this->getKeeperDeviceModelObj($keeper);
 

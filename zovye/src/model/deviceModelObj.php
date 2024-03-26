@@ -511,16 +511,16 @@ class deviceModelObj extends ModelObj
 
     public function getAppLastOnline()
     {
-        if ($this->isVDevice()) {
-            return date('Y-m-d H:i:s');
+        if ($this->isVDevice() || $this->isDummyDevice()) {
+            return TIMESTAMP;
         }
 
-        return $this->settings('extra.v0.status.app_last_online', $this->app_last_online);
+        return $this->settings('extra.v0.status.app.last_online', $this->app_last_online);
     }
 
     public function setAppLastOnline($last_online): bool
     {
-        return $this->updateSettings('extra.v0.status.app_last_online', $last_online);
+        return $this->updateSettings('extra.v0.status.app.last_online', $last_online);
     }
 
     public function getICCID()

@@ -2543,7 +2543,7 @@ class deviceModelObj extends ModelObj
     {
         $res = $this->getKeeperDeviceModelObj($keeper);
 
-        return $res ? $res->getAppOnlineBonusPercent() : 0;
+        return $res ? $res->getDeviceQoeBonusPercent() : 0;
     }
 
     public function getKeeperAppOnlineBonusPercent($keeper): int

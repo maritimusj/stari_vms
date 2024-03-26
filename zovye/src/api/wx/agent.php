@@ -220,6 +220,8 @@ class agent
                 'goods_expire_alert' => App::isGoodsExpireAlertEnabled(),
                 'keeper_commission_limit_enabled' => App::isKeeperCommissionLimitEnabled(),
                 'keeper_commission_order_distinguish_enabled' => App::isKeeperCommissionOrderDistinguishEnabled(),
+                'app_online_bonus_enabled' => App::isAppOnlineBonusEnabled(),
+                'device_qoe_bonus_enabled' => App::isDeviceQoeBonusEnabled(),
             ],
             'wxapp' => [
                 'debug' => false,

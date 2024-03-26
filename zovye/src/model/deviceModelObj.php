@@ -1101,9 +1101,13 @@ class deviceModelObj extends ModelObj
         $url = $this->getUrl($lane_id);
 
         $filename_index = $lane_id + 1;
-        $res = QRCodeUtil::createFile("device.$this->imei$filename_index", $url, function ($filename) use ($filename_index) {
-            QRCodeUtil::renderTxt($filename, sprintf("%s%02d", $this->imei, $filename_index));
-        });
+        $res = QRCodeUtil::createFile(
+            "device.$this->imei$filename_index",
+            $url,
+            function ($filename) use ($filename_index) {
+                QRCodeUtil::renderTxt($filename, sprintf("%s%02d", $this->imei, $filename_index));
+            }
+        );
 
         if (is_error($res)) {
             return $res;
@@ -2512,7 +2516,7 @@ class deviceModelObj extends ModelObj
         return 0;
     }
 
-    public function getCommissionValue($keeper): ?CommissionValue
+    public function getKeeperDeviceModelObj($keeper): ?keeper_devicesModelObj
     {
         if ($keeper instanceof keeperModelObj) {
             $keeper_id = $keeper->getId();
@@ -2525,19 +2529,35 @@ class deviceModelObj extends ModelObj
         }
 
         $device_id = $this->getId();
+
         /** @var keeper_devicesModelObj $res */
-        $res = m('keeper_devices')->findOne(
+        return m('keeper_devices')->findOne(
             [
                 'device_id' => $device_id,
                 'keeper_id' => $keeper_id,
             ]
         );
+    }
 
-        if ($res) {
-            return $res->getCommissionValue();
-        }
+    public function getDeviceQoeBonusPercent($keeper): int
+    {
+        $res = $this->getKeeperDeviceModelObj($keeper);
 
-        return null;
+        return $res ? $res->getAppOnlineBonusPercent() : 0;
+    }
+
+    public function getAppOnlineBonusPercent($keeper): int
+    {
+        $res = $this->getKeeperDeviceModelObj($keeper);
+
+        return $res ? $res->getAppOnlineBonusPercent() : 0;
+    }
+
+    public function getCommissionValue($keeper): ?CommissionValue
+    {
+        $res = $this->getKeeperDeviceModelObj($keeper);
+
+        return $res ? $res->getCommissionValue() : null;
     }
 
     public function setKeeper($keeper, $data = []): bool
@@ -2582,11 +2602,11 @@ class deviceModelObj extends ModelObj
             if (App::isAppOnlineBonusEnabled()) {
                 $res->setAppOnlineBonusPercent(intval($data['app_online_bonus_percent']));
             }
-            
+
             if (App::isDeviceQoeBonusEnabled()) {
                 $res->setDeviceQoeBonusPercent(intval($data['device_qoe_bonus_percent']));
             }
-            
+
             return $res->save();
         }
 

@@ -27,6 +27,8 @@ use function zovye\tb;
  * @method getCommissionFreePercent()
  * @method getAppOnlineBonusPercent()
  * @method getDeviceQoeBonusPercent()
+ * @method setAppOnlineBonusPercent(int $v)
+ * @method setDeviceQoeBonusPercent(int $v)
  */
 class keeper_devicesModelObj extends ModelObj
 {

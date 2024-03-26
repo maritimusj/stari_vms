@@ -35,6 +35,28 @@ use function zovye\isEmptyArray;
 
 class device
 {
+
+    protected static function getKeeperData(deviceModelObj $device, $keeper_id): array
+    {
+        $commission_val = $device->getCommissionValue($keeper_id);
+
+        $data = [
+            'keeper_id' => $keeper_id,
+            'id' => $device->hasKeeper($keeper_id) ? $keeper_id : 0,
+            'kind' => $device->getKeeperKind($keeper_id),
+            'commission' => $commission_val ? $commission_val->format() : null,
+        ];
+
+        if (App::isAppOnlineBonusEnabled()) {
+            $data['app_online_bonus'] = $device->getAppOnlineBonusPercent($keeper_id);
+        }
+        if (App::isDeviceQoeBonusEnabled()) {
+            $data['device_qoe_bonus'] = $device->getAppOnlineBonusPercent($keeper_id);
+        }
+
+        return $data;
+    }
+
     /**
      * 格式化设备信息
      */
@@ -49,8 +71,6 @@ class device
 
         $extra = $device->get('extra', []);
 
-        $commission_val = $device->getCommissionValue($keeper_id);
-
         $location = isEmptyArray($extra['location']['tencent']) ? $extra['location'] : $extra['location']['tencent'];
 
         if ($simple) {
@@ -60,16 +80,15 @@ class device
                     'name' => $device->getName(),
                     'model' => $device->getDeviceModel(),
                 ],
-                'keeper' => [
-                    'keeper_id' => $keeper_id,
-                    'id' => $device->hasKeeper($keeper_id) ? $keeper_id : 0,
-                    'kind' => $device->getKeeperKind($keeper_id),
-                    'commission' => $commission_val ? $commission_val->format() : null,
-                ],
                 'extra' => [
                     'is_down' => $device->isMaintenance() ? 1 : 0,
                 ],
             ];
+
+            if ($keeper_id) {
+                $result['keeper'] = self::getKeeperData($device, $keeper_id);
+            }
+
             if (!isEmptyArray($location)) {
                 $result['extra']['location'] = $location;
             }
@@ -101,13 +120,11 @@ class device
             'statistics' => [
                 //暂未实现
             ],
-            'keeper' => [
-                'keeper_id' => $keeper_id,
-                'id' => $device->hasKeeper($keeper_id) ? $keeper_id : 0,
-                'kind' => $device->getKeeperKind($keeper_id),
-                'commission' => $commission_val ? $commission_val->format() : null,
-            ],
         ];
+
+        if ($keeper_id) {
+            $result['keeper'] = self::getKeeperData($device, $keeper_id);
+        }
 
         $device_type = DeviceTypes::from($device);
         if ($device_type) {

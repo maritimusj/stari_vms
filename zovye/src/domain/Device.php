@@ -1326,15 +1326,13 @@ class Device extends State
             return;
         }
 
-        $begin = $device->getAppLastOnline();
-        
+        $begin = $device->settings('extra.v0.status.app.last_bonus_ts', $device->getAppLastOnline());
+
         if (empty($begin)) {
             return;
         }
 
-        $end = time();
-
-        $ts = $end - $begin;
+        $ts = TIMESTAMP - $begin;
 
         if ($ts < 1) {
             return;
@@ -1345,7 +1343,12 @@ class Device extends State
             return;
         }
 
-        DBUtil::transactionDo(function () use ($device, $agent, $begin, $end, $total_price) {
+        DBUtil::transactionDo(function () use ($device, $agent, $begin, $total_price) {
+
+            if (!$device->updateSettings('extra.v0.status.app.last_bonus_ts', TIMESTAMP)) {
+                return err('更新时间戳失败！');
+            }
+
             $remain = $total_price;
 
             foreach ($device->getKeepers() as $keeper) {
@@ -1369,7 +1372,7 @@ class Device extends State
                     'device' => $device->getId(),
                     'percent' => $percent,
                     'b' => $begin,
-                    'e' => $end,
+                    'e' => TIMESTAMP,
                 ]);
 
                 if (empty($log) || !$log->update([], true)) {
@@ -1378,20 +1381,20 @@ class Device extends State
                         'device' => $device->profile(),
                         'user' => $user->profile(),
                     ]);
-                    continue;
+                    return err('创建运营人员佣金记录失败！');
                 }
 
                 $remain -= $price;
 
                 if ($remain < 1) {
-                    return;
+                    return true;
                 }
             }
 
             $log = $agent->commission_change($remain, CommissionBalance::APP_ONLINE_BONUS, [
                 'device' => $device->getId(),
                 'b' => $begin,
-                'e' => $end,
+                'e' => TIMESTAMP,
             ]);
 
             if (empty($log) || !$log->update([], true)) {
@@ -1400,7 +1403,10 @@ class Device extends State
                     'device' => $device->profile(),
                     'agent' => $agent->profile(),
                 ]);
+                return err('创建代理商佣金记录失败！');
             }
+
+            return true;
         });
     }
 }

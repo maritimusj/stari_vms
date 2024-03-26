@@ -520,6 +520,9 @@ class deviceModelObj extends ModelObj
 
     public function setAppLastOnline($last_online): bool
     {
+        $this->app_last_online = $last_online;
+        $this->setDirty('app_last_online');
+
         return $this->updateSettings('extra.v0.status.app.last_online', $last_online);
     }
 

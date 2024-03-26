@@ -1326,26 +1326,26 @@ class Device extends State
             return;
         }
 
-        $begin = $device->settings('extra.v0.status.app.last_bonus_ts', $device->getAppLastOnline());
+        $last_ts = $device->settings('extra.v0.status.app.last_bonus_ts', $device->getAppLastOnline());
 
-        if (empty($begin)) {
+        if (empty($last_ts)) {
             return;
         }
 
-        $ts = TIMESTAMP - $begin;
+        $hours = intval((TIMESTAMP - $last_ts) / 3600);
 
-        if ($ts < 1) {
+        if ($hours < 1) {
             return;
         }
 
-        $total_price = intval(($ts / 3600.00) * $app_online_bonus_price);
+        $total_price = $hours * $app_online_bonus_price;
         if ($total_price < 1) {
             return;
         }
 
-        DBUtil::transactionDo(function () use ($device, $agent, $begin, $total_price) {
+        DBUtil::transactionDo(function () use ($device, $agent, $last_ts, $hours, $total_price) {
 
-            if (!$device->updateSettings('extra.v0.status.app.last_bonus_ts', TIMESTAMP)) {
+            if (!$device->updateSettings('extra.v0.status.app.last_bonus_ts', $last_ts + $hours * 3600)) {
                 return err('更新时间戳失败！');
             }
 
@@ -1371,7 +1371,7 @@ class Device extends State
                 $log = $user->commission_change($price, CommissionBalance::APP_ONLINE_BONUS, [
                     'device' => $device->getId(),
                     'percent' => $percent,
-                    'b' => $begin,
+                    'b' => $last_ts,
                     'e' => TIMESTAMP,
                 ]);
 
@@ -1393,7 +1393,7 @@ class Device extends State
 
             $log = $agent->commission_change($remain, CommissionBalance::APP_ONLINE_BONUS, [
                 'device' => $device->getId(),
-                'b' => $begin,
+                'b' => $last_ts,
                 'e' => TIMESTAMP,
             ]);
 

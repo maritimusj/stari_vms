@@ -39,7 +39,7 @@ class Session
                     if (empty($user) && !empty($params['create'])) {
                         $data = [
                             'app' => Session::isSnapshot() ? User::PSEUDO : User::WX,
-                            'nickname' => strval($fans['nickname'] ?? '<匿名用户>'),
+                            'nickname' => strval($fans['nickname']),
                             'avatar' => strval($fans['headimgurl']),
                             'openid' => strval($fans['openid']),
                         ];
@@ -106,7 +106,7 @@ class Session
         $userinfo['avatar'] = $userinfo['headimgurl'];
 
         //接口调用次数上限后，$userinfo中相关字段为空
-        if (!empty($userinfo['nickname']) && !empty($userinfo['avatar'])) {
+        if (!empty($userinfo['avatar'])) {
             return $userinfo;
         }
 

@@ -60,7 +60,7 @@ class YiDaoAccount implements IAccountProvider
             'label' => intval($config['scene']),
             'ip' => CLIENT_IP,
             'auth_open_id' => $fans['openid'],
-            'nickname' => empty($fans['nickname']) ? Util::random(6) : $fans['nickname'],
+            'nickname' => $fans['nickname'],
             'sex' => $fans['sex'] ?? 0,
             'nonce' => Util::random(16, true),
             'timestamp' => TIMESTAMP,
